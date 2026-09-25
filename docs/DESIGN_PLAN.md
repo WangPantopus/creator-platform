@@ -13,7 +13,7 @@ link to each published artifact next to its item when it exists.
 | Deliverable | Home | Mirror in this repo |
 | --- | --- | --- |
 | Research report, personas, journeys | [Qelvora UX Research](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803) (shared doc on claude.ai) | [`docs/research/UX_RESEARCH.md`](research/UX_RESEARCH.md) |
-| Visual directions | A Design canvas artifact on claude.ai | Link in this file |
+| Visual directions | [Qelvora Visual Directions](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su) (Design canvas) | [`design/phase2-directions/`](../design/phase2-directions/) |
 | Design system | A Design System artifact on claude.ai | `docs/design-system/` (tokens and component notes, later as code tokens) |
 | Screens and states | Design canvas artifacts on claude.ai, one per area | Links in this file |
 | Prototypes | Clickable artifacts on claude.ai | Links in this file |
@@ -80,11 +80,15 @@ Discord, Replika and the OnlyFans chatter ruling still need a teardown.
 
 ## Phase 2: visual direction
 
-- [ ] 2.1 Three distinct brand directions (type, color, shape, motion, tone of
+Canvas: [Qelvora Visual Directions](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su),
+snapshot in [`design/phase2-directions/`](../design/phase2-directions/). Directions:
+A · Correspondence, B · Nocturne, C · Instrument. Waiting on the founder's pick (2.3).
+
+- [x] 2.1 Three distinct brand directions (type, color, shape, motion, tone of
       the wordmark placeholder), each applied to the same two key screens: a
       fan thread mixing `ai`, a Note, an `approved_draft`, a signed `human_creator`
       reply, a correction and a system line; and the creator home, public view.
-- [ ] 2.2 For each direction, the AI and person hue pair and three
+- [x] 2.2 For each direction, the AI and person hue pair and three
       approved-draft treatments (split bubble, gradient edge, stacked badge),
       checked in light and dark and for color-blind rendering.
 - [ ] 2.3 Pick one direction (founder decision) and record it in the Brief's

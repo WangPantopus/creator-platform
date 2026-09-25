@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Instrument · Ask Maya to step in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#8E9094}
+a{color:#2F5A8A}a:hover{color:#1F4470}
+</style>
+</helmet>
+<div style="width: 390px; height: 1760px; box-sizing: border-box; display: flex; flex-direction: column; background: #8E9094; color: #1B1C1E; font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; overflow: hidden">
+<div style="height: 44px; flex-shrink: 0"></div>
+<section aria-label="Ask Maya to step in" style="flex-grow: 1; display: flex; flex-direction: column; background: #F2F2F0; border-radius: 18px 18px 0 0">
+<div style="display: flex; justify-content: center; padding-top: 8px"><div style="width: 38px; height: 4px; border-radius: 2px; background: #B9B9B4"></div></div>
+<div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 8px 18px 20px; border-bottom: 1px solid #D9D9D5">
+<div style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1">
+<div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: #5F6166">NEW REQUEST · TO MAYA'S QUEUE</div>
+<h1 style="margin: 0; font-size: 30px; line-height: 32px; font-weight: 600; letter-spacing: -0.035em">Ask Maya to step in</h1>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #5F6166">She decides on each request herself.</p>
+</div>
+<button aria-label="Close" style="width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 0">
+<svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#1B1C1E" stroke-width="1.5"></path></svg>
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 22px 16px 0">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Included in your request</h2>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5F6166">01</span>
+</div>
+<div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #D9D9D5; border-radius: 12px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px">
+<div style="display: flex; align-items: center; gap: 10px">
+<input id="c-inc-summary" type="checkbox" checked style="width: 20px; height: 20px; margin: 0; accent-color: #1B1C1E">
+<label for="c-inc-summary" style="font-size: 15px; font-weight: 600; flex-grow: 1">Summary of your question</label>
+<span style="padding: 3px 7px; border: 1px solid #B4441A; border-radius: 5px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; color: #B4441A">EDITED BY YOU</span>
+</div>
+<label for="c-summary" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Summary</label>
+<textarea id="c-summary" rows="4" style="box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #D9D9D5; border-radius: 8px; background: #F7F7F5; font-family: 'Geist', Arial, sans-serif; font-size: 15px; line-height: 22px; color: #1B1C1E; resize: none">My cone 6 glaze crawls at the rim after a thick single dip. Is it the coat or the bisque? Photo of the rim attached.</textarea>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-top: 1px solid #D9D9D5">
+<input id="c-inc-last" type="checkbox" checked style="width: 20px; height: 20px; margin: 0; accent-color: #1B1C1E">
+<label for="c-inc-last" style="font-size: 14px; flex-grow: 1">Last 6 messages and 1 photo</label>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-top: 1px solid #D9D9D5">
+<input id="c-inc-all" type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #1B1C1E">
+<label for="c-inc-all" style="font-size: 14px; flex-grow: 1">The whole conversation</label>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 0 14px; border-top: 1px solid #D9D9D5">
+<input id="c-inc-name" type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #1B1C1E">
+<label for="c-inc-name" style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 14px">Your name and city</span><span style="font-size: 12px; color: #5F6166">Otherwise Maya sees @kilnfire</span></label>
+</div>
+</div>
+<p style="margin: 0 4px; font-size: 12px; line-height: 18px; color: #5F6166">Maya and her authorized team can separately review this AI conversation. Those accesses are logged.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 26px 16px 0">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">How</h2>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5F6166">02</span>
+</div>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 0; background: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px #D9D9D5">
+<legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">How Maya answers</legend>
+<label for="c-mode-reply" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; background: #1B1C1E; color: #F2F1ED">
+<input id="c-mode-reply" type="radio" name="c-mode" checked style="width: 20px; height: 20px; margin: 0; accent-color: #F08A5D">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Written reply from Maya</span><span style="font-size: 12px; color: #A9ABB0">Within 48 h or refunded</span></span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 4px; height: 4px; border-radius: 50%; background: #5F6166"></span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 15px; color: #F08A5D">$25</span><span style="width: 4px; height: 4px; border-radius: 50%; background: #5F6166"></span></span>
+</label>
+<label for="c-mode-voice" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; border-top: 1px solid #D9D9D5">
+<input id="c-mode-voice" type="radio" name="c-mode" style="width: 20px; height: 20px; margin: 0; accent-color: #1B1C1E">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Voice note from Maya</span><span style="font-size: 12px; color: #5F6166">Within 72 h or refunded · up to 2 min</span></span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 15px">$18</span>
+</label>
+<label for="c-mode-call" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; border-top: 1px solid #D9D9D5; background: repeating-linear-gradient(135deg, #F7F7F5 0 6px, #F2F2F0 6px 12px); color: #5F6166">
+<input id="c-mode-call" type="radio" name="c-mode" disabled style="width: 20px; height: 20px; margin: 0">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Call with Maya · 15 min</span><span style="font-size: 12px">Fully booked this week · opens Monday</span></span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 15px">$60</span>
+</label>
+</fieldset>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 26px 16px 0">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Who sees the answer</h2>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5F6166">03</span>
+</div>
+<a href="#" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #C9D3DF; border-radius: 12px; text-decoration: none; color: #1B1C1E">
+<div style="display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex-shrink: 0; border: 1px solid #2F5A8A; border-radius: 6px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="#2F5A8A" stroke-width="1.8"></circle><circle cx="8" cy="8" r="2" fill="#2F5A8A"></circle></svg></div>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 12px; font-weight: 600; color: #2F5A8A">Maya's AI found a public answer</span><span style="font-size: 14px">"Crawling on porcelain rims" · Maya, June</span></span>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" stroke="#5F6166" stroke-width="1.5"></path></svg>
+</a>
+<fieldset style="margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Who sees the answer</legend>
+<label for="c-vis-private" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #FFFFFF; border: 1.5px solid #1B1C1E; border-radius: 12px">
+<span style="display: flex; align-items: center; gap: 8px"><input id="c-vis-private" type="radio" name="c-vis" checked style="width: 18px; height: 18px; margin: 0; accent-color: #1B1C1E"><span style="font-size: 15px; font-weight: 600">Private</span></span>
+<span style="font-size: 12px; line-height: 17px; color: #5F6166">Only you</span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px">$25</span>
+</label>
+<label for="c-vis-public" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #FFFFFF; border: 1px solid #D9D9D5; border-radius: 12px">
+<span style="display: flex; align-items: center; gap: 8px"><input id="c-vis-public" type="radio" name="c-vis" style="width: 18px; height: 18px; margin: 0; accent-color: #1B1C1E"><span style="font-size: 15px; font-weight: 600">Public</span></span>
+<span style="font-size: 12px; line-height: 17px; color: #5F6166">Kiln Club members can read it, and it may help her AI answer others</span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px">$12</span>
+</label>
+</fieldset>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 0; margin: 26px 16px 0; background: #FFFFFF; border: 1px solid #D9D9D5; border-radius: 12px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; border-bottom: 1px dashed #D9D9D5">
+<span style="color: #5F6166">IF MAYA ACCEPTS</span><span>$25.00</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; border-bottom: 1px dashed #D9D9D5">
+<span style="color: #5F6166">IF SHE DECLINES OR 48 H PASS</span><span>$0.00</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px">
+<p style="margin: 0; font-size: 14px; line-height: 20px"><span style="font-weight: 600">Charged only when Maya accepts.</span> If she declines or 48 h pass, nothing is charged.</p>
+<p style="margin: 0; font-size: 12px; line-height: 18px; color: #5F6166">Your bank may show a pending hold for a few days.</p>
+<p style="margin: 0; font-size: 12px; line-height: 18px; color: #5F6166">Maya may answer with her AI's draft; you'll see that label.</p>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 10px; padding: 16px 20px 0; font-size: 13px; color: #5F6166">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="#5F6166" stroke-width="1.3"></circle><path d="M8 4.8V8l2.2 1.4" stroke="#5F6166" stroke-width="1.3"></path></svg>
+<span>Maya usually decides in 1 to 2 days · 4 requests ahead of you</span>
+</div>
+
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 24px 16px 34px">
+<button style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border: 0; border-radius: 14px; background: #1B1C1E; color: #F2F1ED; font-family: 'Geist', Arial, sans-serif; font-size: 16px; font-weight: 600">
+<span style="width: 24px; height: 24px; border-radius: 6px; background: #F08A5D; color: #1B1C1E; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700">M</span>
+Send request · $25 if accepted
+</button>
+<div style="text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5F6166">THIS MONTH · $5 OF YOUR $60 LIMIT</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

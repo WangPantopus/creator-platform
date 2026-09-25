@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>B · Nocturne · Ask Maya to step in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0A08}
+a{color:#A3B8CC}a:hover{color:#C4D3E0}
+</style>
+</helmet>
+<div style="width: 390px; height: 1760px; box-sizing: border-box; display: flex; flex-direction: column; background: #0B0A08; color: #ECE6DA; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; overflow: hidden">
+<div style="height: 44px; flex-shrink: 0"></div>
+<section aria-label="Ask Maya to step in" style="position: relative; flex-grow: 1; display: flex; flex-direction: column; background: #1A1714; border-radius: 26px 26px 0 0; border-top: 1px solid #3A342D; overflow: hidden">
+<div aria-hidden="true" style="position: absolute; top: -120px; left: 40px; width: 320px; height: 260px; background: radial-gradient(ellipse at 50% 50%, rgba(217,154,108,0.14), rgba(26,23,20,0) 70%); pointer-events: none"></div>
+<div style="position: relative; display: flex; justify-content: center; padding-top: 8px"><div style="width: 38px; height: 5px; border-radius: 3px; background: #3A342D"></div></div>
+<div style="position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 18px 8px 0 22px">
+<div style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1">
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 42px; letter-spacing: -0.01em">Ask Maya<br>to step in</h1>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #A39C8F">Your request goes to Maya's queue. She decides on each one herself.</p>
+</div>
+<button aria-label="Close" style="width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 0">
+<svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#ECE6DA" stroke-width="1.5" stroke-linecap="round"></path></svg>
+</button>
+</div>
+
+<div style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 28px 18px 0">
+<h2 style="margin: 0 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #A39C8F">Included in your request</h2>
+<div style="display: flex; flex-direction: column; background: #211E1A; border: 1px solid #3A342D; border-radius: 16px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px">
+<div style="display: flex; align-items: center; gap: 10px">
+<input id="b-inc-summary" type="checkbox" checked style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<label for="b-inc-summary" style="font-size: 15px; font-weight: 600; flex-grow: 1">Summary of your question</label>
+<span style="padding: 3px 8px; border-radius: 999px; background: #2B211A; border: 1px solid #5A3F2C; font-size: 11px; font-weight: 600; color: #D99A6C">edited by you</span>
+</div>
+<label for="b-summary" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Summary</label>
+<textarea id="b-summary" rows="4" style="box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #3A342D; border-radius: 12px; background: #14120F; font-family: 'Instrument Sans', Arial, sans-serif; font-size: 15px; line-height: 22px; color: #ECE6DA; resize: none">My cone 6 glaze crawls at the rim after a thick single dip. Is it the coat or the bisque? Photo of the rim attached.</textarea>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-top: 1px solid #3A342D">
+<input id="b-inc-last" type="checkbox" checked style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<label for="b-inc-last" style="font-size: 14px; flex-grow: 1">Last 6 messages and 1 photo</label>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-top: 1px solid #3A342D">
+<input id="b-inc-all" type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<label for="b-inc-all" style="font-size: 14px; flex-grow: 1">The whole conversation</label>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 0 14px; border-top: 1px solid #3A342D">
+<input id="b-inc-name" type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<label for="b-inc-name" style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 14px">Your name and city</span><span style="font-size: 12px; color: #A39C8F">Otherwise Maya sees @kilnfire</span></label>
+</div>
+</div>
+<p style="margin: 0 4px; font-size: 12px; line-height: 18px; color: #A39C8F">Maya and her authorized team can separately review this AI conversation. Those accesses are logged.</p>
+</div>
+
+<div style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 30px 18px 0">
+<h2 style="margin: 0 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #A39C8F">How</h2>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">How Maya answers</legend>
+<label for="b-mode-reply" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; background: #2B211A; border: 1px solid #D99A6C; border-radius: 16px; box-shadow: 0 18px 30px -24px rgba(217,154,108,0.8)">
+<input id="b-mode-reply" type="radio" name="b-mode" checked style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Written reply from Maya</span><span style="font-size: 12px; color: #A39C8F">Within 48 h or refunded</span></span>
+<span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">$25</span>
+</label>
+<label for="b-mode-voice" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; background: #211E1A; border: 1px solid #3A342D; border-radius: 16px">
+<input id="b-mode-voice" type="radio" name="b-mode" style="width: 20px; height: 20px; margin: 0; accent-color: #D99A6C">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Voice note from Maya</span><span style="font-size: 12px; color: #A39C8F">Within 72 h or refunded · up to 2 min</span></span>
+<span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">$18</span>
+</label>
+<label for="b-mode-call" style="display: flex; align-items: center; gap: 12px; padding: 16px 14px; background: transparent; border: 1px dashed #3A342D; border-radius: 16px; color: #A39C8F">
+<input id="b-mode-call" type="radio" name="b-mode" disabled style="width: 20px; height: 20px; margin: 0">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 15px; font-weight: 600">Call with Maya · 15 min</span><span style="font-size: 12px">Fully booked this week · opens Monday</span></span>
+<span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">$60</span>
+</label>
+</fieldset>
+</div>
+
+<div style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 30px 18px 0">
+<h2 style="margin: 0 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #A39C8F">Who sees the answer</h2>
+<a href="#" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #1B1F23; border: 1px solid #3A4652; border-radius: 14px; text-decoration: none; color: #ECE6DA">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="#A3B8CC" stroke-width="1.6"></circle><circle cx="8" cy="8" r="1.8" fill="#A3B8CC"></circle></svg>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 12px; font-weight: 600; color: #A3B8CC">Maya's AI found a public answer</span><span style="font-size: 14px">"Crawling on porcelain rims" · Maya, June</span></span>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" stroke="#A39C8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+<fieldset style="margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Who sees the answer</legend>
+<label for="b-vis-private" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #211E1A; border: 1px solid #ECE6DA; border-radius: 16px">
+<span style="display: flex; align-items: center; gap: 8px"><input id="b-vis-private" type="radio" name="b-vis" checked style="width: 18px; height: 18px; margin: 0; accent-color: #ECE6DA"><span style="font-size: 15px; font-weight: 600">Private</span></span>
+<span style="font-size: 12px; line-height: 17px; color: #A39C8F">Only you</span>
+<span style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">$25</span>
+</label>
+<label for="b-vis-public" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #211E1A; border: 1px solid #3A342D; border-radius: 16px">
+<span style="display: flex; align-items: center; gap: 8px"><input id="b-vis-public" type="radio" name="b-vis" style="width: 18px; height: 18px; margin: 0; accent-color: #ECE6DA"><span style="font-size: 15px; font-weight: 600">Public</span></span>
+<span style="font-size: 12px; line-height: 17px; color: #A39C8F">Kiln Club members can read it, and it may help her AI answer others</span>
+<span style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">$12</span>
+</label>
+</fieldset>
+</div>
+
+<div style="position: relative; display: flex; flex-direction: column; gap: 8px; margin: 30px 22px 0; padding-top: 18px; border-top: 1px solid #3A342D">
+<p style="margin: 0; font-size: 15px; line-height: 22px"><span style="font-weight: 600">Charged only when Maya accepts.</span> If she declines or 48 h pass, nothing is charged.</p>
+<p style="margin: 0; font-size: 12px; line-height: 18px; color: #A39C8F">Your bank may show a pending hold for a few days.</p>
+<p style="margin: 0; font-size: 12px; line-height: 18px; color: #A39C8F">Maya may answer with her AI's draft; you'll see that label.</p>
+<div style="display: flex; align-items: center; gap: 10px; padding-top: 8px; font-size: 13px; color: #A39C8F">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="#A39C8F" stroke-width="1.3"></circle><path d="M8 4.8V8l2.2 1.4" stroke="#A39C8F" stroke-width="1.3" stroke-linecap="round"></path></svg>
+<span>Maya usually decides in 1 to 2 days · 4 requests ahead of you</span>
+</div>
+</div>
+
+<div style="position: relative; margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 24px 18px 34px">
+<button style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 58px; border: 0; border-radius: 29px; background: #D99A6C; color: #14120F; font-family: 'Instrument Sans', Arial, sans-serif; font-size: 16px; font-weight: 600; box-shadow: 0 16px 36px -18px rgba(217,154,108,0.9)">Send request · $25 if accepted</button>
+<div style="text-align: center; font-size: 12px; color: #A39C8F; font-variant-numeric: tabular-nums">This month: $5 of your $60 limit</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
