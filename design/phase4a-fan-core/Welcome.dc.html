@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continue with Pantopus</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; padding: 64px 24px 40px">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 22px; color: var(--ink)">Qelvora</span>
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 28px">
+<svg width="120" height="56" viewBox="0 0 120 56" fill="none" aria-hidden="true">
+<circle cx="28" cy="28" r="22" style="stroke: var(--ai-ink)" stroke-width="2"/>
+<circle cx="28" cy="28" r="5" style="fill: var(--ai-ink)"/>
+<circle cx="80" cy="28" r="26" style="fill: var(--maya-surface)"/>
+<circle cx="80" cy="28" r="12" style="fill: var(--maya-accent)"/>
+</svg>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 44px; line-height: 46px; letter-spacing: -0.025em">Her AI answers you now. She answers in person when you ask.</h1>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: var(--ink-muted)">Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<x-import component-from-global-scope="Qelvora.ContextCard" source="You came from Maya's page" title="Maya · Ceramics · Kiln Club"></x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" size="lg" block="{{yes}}">Continue with Pantopus</x-import>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); text-align: center">One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true }; }
+}
+</script>
+</body>
+</html>

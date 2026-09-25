@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Maya's home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 1560px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; overflow: hidden">
+<div class="qv-on-maya" style="background: var(--maya-surface); color: var(--on-maya); border-radius: 0 0 var(--radius-xl) var(--radius-xl); box-shadow: var(--shadow-plate); padding: 12px 16px 28px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<a href="#" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--on-maya)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 18px; color: var(--on-maya-muted)">Qelvora</span>
+<a href="#" aria-label="Share Maya's page" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--on-maya)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 12.5V3.5M6.5 7L10 3.5 13.5 7M4 11v5h12v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</div>
+<div style="height: 236px; border-radius: var(--radius-lg); border: 1px dashed var(--on-maya-muted); display: flex; align-items: flex-end; padding: 14px; box-sizing: border-box">
+<span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; color: var(--on-maya-muted)">PHOTO · MAYA'S STUDIO, THE OCTOBER KILN</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; color: var(--maya-accent)">CERAMICS · CONE 6 TO 10</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 64px; line-height: 60px; letter-spacing: -0.03em">Maya</h1>
+<p style="margin: 0; font-family: var(--font-serif); font-size: 18px; line-height: 28px; color: var(--on-maya)">Glazes, kilns and the long patience of both. I teach what fifteen years of firing got wrong first.</p>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid var(--maya-line)">
+<x-import component-from-global-scope="Qelvora.Seal" size="{{s22}}"></x-import>
+<span style="font-size: 13px; line-height: 18px; color: var(--on-maya-muted)">Verified through Pantopus · 2,314 Kiln Club members</span>
+</div>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<x-import component-from-global-scope="Qelvora.Button" variant="ai" size="lg" block="{{yes}}">Message Maya's AI</x-import>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); text-align: center">Official means Maya authorized this AI. It does not mean she read your message.</p>
+</div>
+<div style="padding: 20px 16px 0">
+<x-import component-from-global-scope="Qelvora.Segmented" active="Posts"></x-import>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 26px; line-height: 30px; letter-spacing: -0.015em">From Maya</h2>
+<span class="qv-meta">2 NOTES THIS WEEK</span>
+</div>
+<x-import component-from-global-scope="Qelvora.Note" time="09:12" audience-size="2,314" reply="{{no}}" media="Photo · three test tiles on the kiln shelf">Opened the kiln this morning. The new celadon test came out the color of shallow water. The recipe goes into the Kiln Club library on Friday.</x-import>
+</div>
+<div style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 26px; line-height: 30px; letter-spacing: -0.015em">Her time, by request</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 12px; column-gap: 12px; font-size: 15px; line-height: 20px">
+<span>Written reply</span><span class="qv-mono">$25</span>
+<span>Voice note</span><span class="qv-mono">$40</span>
+<span>10-minute call</span><span class="qv-mono">$120</span>
+</div>
+<p style="margin: 0; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; line-height: 18px; color: var(--ink-muted)">Maya answers written replies within 7 days · 3 of 10 left this week. Charged only when she accepts.</p>
+<x-import component-from-global-scope="Qelvora.StepIn"></x-import>
+</div>
+</div>
+<div style="padding: 32px 16px 40px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 26px; line-height: 30px; letter-spacing: -0.015em">Kiln Club</h2>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px 16px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 600">Membership</span><span class="qv-mono">$5 a month</span></div>
+<x-import component-from-global-scope="Qelvora.AccessLines" can="message Maya's AI, read her Notes and ask her to step in." included="your free first conversation, about 24 hours." changes="join any time; cancel from You."></x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" block="{{yes}}">Join Kiln Club · $5 a month</x-import>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, no: false, s22: 22 }; }
+}
+</script>
+</body>
+</html>

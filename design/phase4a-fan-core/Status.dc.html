@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Request status and receipt</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 1300px; box-sizing: border-box; background: var(--ground); font-family: var(--font-sans); color: var(--ink); display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 4px; border-bottom: 1px solid var(--line)">
+<a href="#" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em">Your request</span>
+</div>
+<div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; gap: 12px">
+<x-import component-from-global-scope="Qelvora.Avatar"></x-import>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Written reply from Maya</span><span class="qv-meta">DELIVERED OCT 5 · 18:40</span></div>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px">
+<x-import component-from-global-scope="Qelvora.RequestStatus" steps="{{steps}}"></x-import>
+</div>
+<x-import component-from-global-scope="Qelvora.Message" kind="human_creator" time="OCT 5">Single dip, count to three, let it drip off, then sponge the top 5 mm. Fire slow on the way down from 1,900°F. Send me a photo of the next tile; I want to see it.</x-import>
+<div style="display: flex; gap: 8px">
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary">Share this reply</x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="quiet">Report a problem</x-import>
+</div>
+<x-import component-from-global-scope="Qelvora.SystemLine" variant="date">Receipt</x-import>
+<x-import component-from-global-scope="Qelvora.Receipt" rows="{{rows}}"></x-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+steps: [
+{ label: 'Sent · hold placed', time: 'OCT 3 14:02', state: 'done' },
+{ label: 'Maya accepted · $25 charged', time: 'OCT 4 09:15', state: 'done' },
+{ label: 'Delivered', time: 'OCT 5 18:40', state: 'done' }
+],
+rows: [['Request', 'Written reply, private'], ['Accepted', 'Oct 4, 09:15'], ['Delivered', 'Oct 5, 18:40'], ['Charged', '$25.00'], ['Card', 'Visa ·· 4242']]
+};
+}
+}
+</script>
+</body>
+</html>

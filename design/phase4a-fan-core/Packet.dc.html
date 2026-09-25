@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask Maya to step in</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 1700px; box-sizing: border-box; background: var(--surface-sunken); font-family: var(--font-sans); color: var(--ink); padding-top: 40px">
+<div style="background: var(--surface); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-sheet); padding: 12px 20px 36px; display: flex; flex-direction: column; gap: 24px; min-height: 1660px; box-sizing: border-box">
+<div style="width: 36px; height: 5px; border-radius: 3px; background: var(--line); align-self: center"></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 10px">
+<x-import component-from-global-scope="Qelvora.Seal" size="{{s30}}"></x-import>
+<span class="qv-meta">ASK MAYA TO STEP IN</span>
+</div>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">What Maya will see</h1>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted)">Maya's AI drafted a summary. Change anything; nothing is sent until you do.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">INCLUDED IN YOUR REQUEST</span>
+<x-import component-from-global-scope="Qelvora.IncludeList" edited="{{yes}}" summary="My satin white crawls at the rim after a single dip at cone 6, fired in a small electric kiln. Could you look at my test tile and tell me what to change?" items="{{items}}"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">HOW</span>
+<x-import component-from-global-scope="Qelvora.ModeList" group="how" modes="{{modes}}"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">WHO SEES THE ANSWER</span>
+<x-import component-from-global-scope="Qelvora.ModeList" group="who" legend="Who sees the answer" modes="{{who}}"></x-import>
+</div>
+<x-import component-from-global-scope="Qelvora.EtaLine" ahead="{{ahead}}"></x-import>
+<x-import component-from-global-scope="Qelvora.TermsBlock"></x-import>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Send request · $25 if accepted</x-import>
+<span style="text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; color: var(--ink-muted)">THIS MONTH · $5 OF YOUR $60 LIMIT</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+yes: true, s30: 30, ahead: 4,
+items: [
+{ label: 'The last 10 messages and 1 photo', help: 'Maya sees them exactly as they are', checked: true },
+{ label: 'The whole conversation', help: '46 messages since Sep 30' },
+{ label: 'Your name and city', help: 'Otherwise Maya sees @kilnfire' }
+],
+modes: [
+{ title: 'Written reply', meta: 'Within 7 days or a full refund · 3 of 10 left this week', price: '$25', selected: true },
+{ title: 'Voice note', meta: 'Within 7 days or a full refund · 2 of 4 left this week', price: '$40' },
+{ title: '10-minute call', meta: 'Fully booked this week · opens Monday', price: '$120', disabled: true }
+],
+who: [
+{ title: 'Private', meta: 'Only you', price: '$25', selected: true },
+{ title: 'Public', meta: "Kiln Club members can read it, and it may help her AI answer others", price: '$15' }
+]
+};
+}
+}
+</script>
+</body>
+</html>
