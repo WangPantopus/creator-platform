@@ -1,0 +1,19 @@
+<!-- @dsCard group="Identity" height=190 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Mark · preview</title></head>
+<body>
+<div id="root" class="qv-stack"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h('div', { className: 'qv-row', style: { padding: 0, gap: 20 } }, [['ai', "Maya's AI"], ['approved_draft', 'Approved draft'], ['human_creator', 'Maya'], ['human_broadcast', 'Note'], ['human_reaction', 'Reaction'], ['team', "Maya's team"], ['correction', 'Correction']].map(function (k) {
+      return h('div', { key: k[0], style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, minWidth: 76 } }, h(Q.Mark, { kind: k[0], size: 20 }), h('span', { className: 'qv-help' }, k[1]));
+    })),
+    cap('On Maya’s surface'),
+    plate(['human_creator', 'human_broadcast', 'human_reaction', 'correction'].map(function (k) { return h(Q.Mark, { key: k, kind: k, size: 20, onMaya: true }); }))));
+</script>
+</body>
+</html>

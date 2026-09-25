@@ -1,0 +1,18 @@
+<!-- @dsCard group="Requests" height=470 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>IncludeList · preview</title></head>
+<body>
+<div id="root" class="qv-stack qv-phone"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Q.IncludeList, { edited: true, summary: "My satin white crawls at the rim after a single dip at cone 6. I've tried thinning it. Could you look at my test tile and tell me what to change?", items: [
+      { label: 'The last 10 messages and 1 photo', help: 'Maya sees them exactly as they are', checked: true },
+      { label: 'The whole conversation', help: '46 messages since Sep 30' },
+      { label: 'Your name and city', help: 'Otherwise Maya sees @kilnfire' }
+    ] }));
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!-- @dsCard group="Conversation" height=2100 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Message · preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div', { className: 'qv-thread qv-phone' },
+    h(Q.SystemLine, { variant: 'date' }, 'Today'),
+    h(Q.Message, { kind: 'fan' }, 'My satin white keeps crawling at the rim. Cone 6, dipped.'),
+    h(Q.Message, { kind: 'ai', time: '14:32', citation: h(Q.CitationChip, { title: 'Dipping glazes without drips', meta: 'Kiln Club video · 4:12' }) }, 'Crawling at the rim usually means the coat went on too thick there. Maya shows her single-dip method in this video.'),
+    h(Q.SystemLine, { variant: 'presence', time: '14:38' }),
+    h(Q.Message, { kind: 'human_creator', live: true, time: '14:38' }, "Single dip, count to three, and let it drip off. Then sponge the rim. You'll see the difference in one firing."),
+    h(Q.Message, { kind: 'fan', after: h(Q.ReactionChip, null) }, 'Trying it tonight.'),
+    h(Q.SystemLine, null, "Maya left the conversation · you're back with Maya's AI"),
+    h(Q.Message, { kind: 'team', time: '16:05' }, "Your seat for Saturday's glazing workshop is confirmed."),
+    h(Q.Message, { kind: 'ai', time: '16:20', sponsor: 'Glazeco' }, "For a cone 6 satin white, Maya starts from Glazeco's satin base in her videos."),
+    h(Q.SystemLine, null, "You've been talking with Maya's AI for a while. It's an AI, and it will be here when you're back."),
+    cap('Delivery states'),
+    h(Q.Message, { kind: 'fan', delivery: 'pending' }, 'Here is my test tile.'),
+    h(Q.Message, { kind: 'fan', delivery: 'failed' }, 'Here is my test tile.'),
+    h(Q.Message, { kind: 'ai', delivery: 'accepted', actions: false }),
+    h(Q.Message, { kind: 'ai', delivery: 'streaming', actions: false }, 'Cone 6 oxidation is where most'),
+    h(Q.Message, { kind: 'ai', delivery: 'interrupted', actions: false }, 'Cone 6 oxidation is where most satin glazes'),
+    cap('Approved draft: split (default), gradient, stacked'),
+    h(Q.Message, { kind: 'approved_draft', time: 'OCT 4' }, 'Thin the glaze to 1.45 specific gravity and wipe the top 5 mm before firing.'),
+    h(Q.Message, { kind: 'approved_draft', treatment: 'gradient', time: 'OCT 4' }, 'Thin the glaze to 1.45 specific gravity and wipe the top 5 mm before firing.'),
+    h(Q.Message, { kind: 'approved_draft', treatment: 'stacked', time: 'OCT 4' }, 'Thin the glaze to 1.45 specific gravity and wipe the top 5 mm before firing.')));
+</script>
+</body>
+</html>

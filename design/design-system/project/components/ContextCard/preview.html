@@ -1,0 +1,16 @@
+<!-- @dsCard group="Conversation" height=180 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ContextCard · preview</title></head>
+<body>
+<div id="root" class="qv-stack qv-phone"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(Q.ContextCard, { title: "Maya's reel · Opening the October kiln" }),
+    h(Q.ContextCard, { source: 'From her newsletter', title: 'Five glazes I keep coming back to' })));
+</script>
+</body>
+</html>

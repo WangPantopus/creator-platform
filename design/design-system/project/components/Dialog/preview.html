@@ -1,0 +1,16 @@
+<!-- @dsCard group="Controls" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Dialog · preview</title></head>
+<body>
+<div id="root" class="qv-stack"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Q.Dialog, { title: 'Delete this conversation?', confirm: 'Delete conversation', cancel: 'Keep it', destructive: true },
+    h('p', null, "Your messages with Maya's AI and what it remembers from them are deleted everywhere."),
+    h('p', { className: 'qv-help' }, 'What you shared in requests, and what Maya delivered, is kept for 12 months in case of a dispute, then deleted.')));
+</script>
+</body>
+</html>

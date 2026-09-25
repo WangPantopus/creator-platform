@@ -14,7 +14,7 @@ link to each published artifact next to its item when it exists.
 | --- | --- | --- |
 | Research report, personas, journeys | [Qelvora UX Research](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803) (shared doc on claude.ai) | [`docs/research/UX_RESEARCH.md`](research/UX_RESEARCH.md) |
 | Visual directions | [Qelvora Visual Directions](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su) (Design canvas) | [`design/phase2-directions/`](../design/phase2-directions/) |
-| Design system | A Design System artifact on claude.ai | `docs/design-system/` (tokens and component notes, later as code tokens) |
+| Design system | [Qelvora](https://claude.ai/artifact/AyfModKVToY2VeqMACNxFU) (Design System artifact) | [`design/design-system/`](../design/design-system/) (tokens, brand book, components, previews and tools) |
 | Screens and states | Design canvas artifacts on claude.ai, one per area | Links in this file |
 | Prototypes | Clickable artifacts on claude.ai | Links in this file |
 | Audit and handoff specs | This repo | `docs/audit/` |
@@ -97,26 +97,36 @@ A · Correspondence, B · Nocturne, C · Instrument, and the founder-requested b
 
 ## Phase 3: design system
 
-- [ ] 3.1 Foundations: color tokens (light and dark, WCAG AA), type scale,
+Design System: [Qelvora](https://claude.ai/artifact/AyfModKVToY2VeqMACNxFU), snapshot in
+[`design/design-system/`](../design/design-system/). Built in D · Atelier: Light and
+Night themes, the brand book, 53 components with guidelines and a live preview each,
+and the cover. Every preview is rendered headlessly in both themes with no errors;
+every text pair holds 4.5:1 or more in both themes.
+
+- [x] 3.1 Foundations: color tokens (light and dark, WCAG AA), type scale,
       spacing, radius, elevation, motion (with reduced-motion variants), iconography.
-- [ ] 3.2 **The authorship kit**: a word, glyph and color per state; the identity
+- [x] 3.2 **The authorship kit**: a word, glyph and color per state; the identity
       strip in its three states; the Signed marker; the correction attachment; the
-      reserved states drawn but disabled.
-- [ ] 3.3 Conversation components: message bubbles for every state and delivery
+      reserved states drawn but disabled. Also the live-call chip (`human_call`).
+- [x] 3.3 Conversation components: message bubbles for every state and delivery
       state (local pending, accepted, generating, delivered, failed, interrupted);
       citation chip (including "no longer accessible"); memory chip; context
       card; composer (normal, trial, paused, human active, capacity zero); system
-      lines; Note card with reply box; reactions; voice-note players (human and AI).
-- [ ] 3.4 Money and request components: access lines, mode rows (price,
+      lines; Note card with reply box; reactions; voice-note players (human and AI);
+      the sponsor disclosure; the share card.
+- [x] 3.4 Money and request components: access lines, mode rows (price,
       deadline, refund rule, capacity), packet disclosure checklist, rule line,
-      status stepper, receipt, spend-limit picker, countdowns.
-- [ ] 3.5 Studio components: queue cards (commitment, packet, rule match),
+      status stepper, receipt, spend-limit picker, countdowns; "Who sees the
+      answer" (private or public) as a second mode list.
+- [x] 3.5 Studio components: queue cards (commitment, packet, rule match),
       capacity header, "Instead" menu, label preview, passkey signing sheet,
-      source rows with scope chips, test-console transcript, version list, audit banner.
-- [ ] 3.6 Shared: navigation (fan tabs, studio tabs plus More, desktop sidebar),
+      source rows with scope chips, test-console transcript, version list, audit banner;
+      the 72-hour digest item.
+- [x] 3.6 Shared: navigation (fan tabs, studio tabs plus More, desktop sidebar),
       sheets, dialogs, toasts, empty, loading and error patterns, offline banner,
-      notification rows, email templates, share card.
-- [ ] 3.7 Content guidelines: the copy system (fixed sentences, never-words,
+      notification rows, email templates, share card. The email layout is one
+      component; each email's wording is designed with its screen in Phase 4.
+- [x] 3.7 Content guidelines: the copy system (fixed sentences, never-words,
       the AI's voice) as usage rules on the components.
 
 ## Phase 4: screens (every state, light and dark, phone and desktop where relevant)

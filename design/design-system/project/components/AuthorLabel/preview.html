@@ -1,0 +1,23 @@
+<!-- @dsCard group="Identity" height=360 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>AuthorLabel · preview</title></head>
+<body>
+<div id="root" class="qv-stack"></div>
+<script>
+  var Q = window.Qelvora, h = React.createElement;
+  function cap(t) { return h('div', { className: 'qv-meta', style: { marginTop: 4 } }, t); }
+  function plate(kids, pad) { return h('div', { className: 'qv qv-on-maya', style: { background: 'var(--maya-surface)', color: 'var(--on-maya)', borderRadius: 'var(--radius-lg)', padding: pad || 16, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', '--qv-cut': 'var(--maya-surface)' } }, kids); }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(Q.AuthorLabel, { kind: 'ai', time: '14:32' }),
+    h(Q.AuthorLabel, { kind: 'approved_draft', time: '11:20' }),
+    h(Q.AuthorLabel, { kind: 'human_creator', time: '14:38' }),
+    h(Q.AuthorLabel, { kind: 'human_broadcast', time: '09:12' }),
+    h(Q.AuthorLabel, { kind: 'human_reaction' }),
+    h(Q.AuthorLabel, { kind: 'team', member: 'Priya', time: '16:05' }),
+    h(Q.AuthorLabel, { kind: 'correction' }),
+    cap('On Maya’s surface'),
+    plate([h(Q.AuthorLabel, { key: 1, kind: 'human_creator', onMaya: true, time: '14:38' }), h(Q.AuthorLabel, { key: 2, kind: 'human_broadcast', onMaya: true }), h(Q.AuthorLabel, { key: 3, kind: 'correction', onMaya: true })])));
+</script>
+</body>
+</html>
