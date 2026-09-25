@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Verify a signed reply</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1000px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 24px; padding: 28px 16px">
+<span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; color: var(--ink-muted)">QELVORA.APP/V/8KD2Q4</span>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="display: inline-flex; color: var(--maya-ink)"><svg width="40" height="40" viewBox="0 0 16 16"><path d="M8 1.2l1.6 1.2 2-.2.6 1.9 1.7 1.1-.6 1.9.6 1.9-1.7 1.1-.6 1.9-2-.2L8 14.8l-1.6-1.2-2 .2-.6-1.9-1.7-1.1.6-1.9-.6-1.9 1.7-1.1.6-1.9 2 .2z" fill="currentColor"/><path d="M5.4 8.2l1.8 1.8 3.5-3.7" stroke="var(--ground)" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Signed by Maya</h1>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 22px">This reply was written by Maya herself and signed with her passkey on Oct 5, 18:40. It has not been changed since.</p>
+<x-import component-from-global-scope="Qelvora.ShareCard" handle="@kilnfire" time="OCT 5">Single dip, count to three, let it drip off, then sponge the top.</x-import>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; font-size: 14px">
+<span>Author</span><span style="font-weight: 600; color: var(--maya-ink)">Maya · verified creator</span>
+<span>Written by</span><span>Maya, not her AI</span>
+<span>Signed</span><span class="qv-mono">OCT 5 · 18:40</span>
+<span>Shared by</span><span>@kilnfire</span>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Anyone can open this page. It shows the words, who wrote them and when, and nothing else from the conversation.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

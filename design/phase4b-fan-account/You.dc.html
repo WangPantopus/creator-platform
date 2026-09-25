@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>You</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1100px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">@kilnfire</h1>
+<span style="font-size: 13px; color: var(--ink-muted)">Signed in with Pantopus</span>
+</div>
+<div style="padding: 24px 16px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">THIS MONTH</span><span style="font-family: var(--font-mono); font-size: 24px; line-height: 28px">$30</span><span class="qv-help">of your $60 limit</span></div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">MEMBERSHIPS</span><span style="font-family: var(--font-mono); font-size: 24px; line-height: 28px">1</span><span class="qv-help">Kiln Club · $5 a month</span></div>
+</div>
+<nav aria-label="Your account" style="padding: 24px 16px 0; flex-grow: 1">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<a href="{{r.href}}" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600; font-size: 15px">{{r.t}}</span><span class="qv-help">{{r.d}}</span></span>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+</sc-for>
+</div>
+</nav>
+<x-import component-from-global-scope="Qelvora.TabBar" active="You"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+return { rows: [
+{ t: 'Me and privacy', d: 'Memories, who opened your conversations, consents', href: 'Privacy.dc.html' },
+{ t: 'Spending and time', d: 'Your limit, receipts, time with each AI', href: 'Spending.dc.html' },
+{ t: 'Memberships', d: 'Kiln Club · renews Nov 1', href: '#' },
+{ t: 'Notifications', d: 'Push and email, per creator, quiet hours', href: '#' },
+{ t: 'Receipts', d: '2 this month', href: '#' },
+{ t: 'Help and safety', d: 'Report, block, crisis support', href: '#' }
+] };
+}
+}
+</script>
+</body>
+</html>

@@ -131,11 +131,11 @@ every text pair holds 4.5:1 or more in both themes.
 
 ## Phase 4: screens (every state, light and dark, phone and desktop where relevant)
 
-- [~] 4A **Fan core, pilot** ([canvas](https://claude.ai/artifact/CVDK7KgFQ5rL3rMekhJBcF); first pass: 10 screens, see `design/phase4a-fan-core/`): public creator home (plus post, invite and
+- [x] 4A **Fan core, pilot** ([canvas](https://claude.ai/artifact/CVDK7KgFQ5rL3rMekhJBcF); first pass: 10 screens, see `design/phase4a-fan-core/`): public creator home (plus post, invite and
       Instagram entrances), onboarding, processor consent, thread (every state),
       memory card, packet, spend-limit step and checkout sheet, request status and
       receipt, a Note in the thread, notifications.
-- [ ] 4B **Fan account and discovery, pilot**: Home, Discover, creator profile
+- [x] 4B **Fan account and discovery, pilot** ([canvas](https://claude.ai/artifact/VZNMhK2CdYKHF9pECEojQE), `design/phase4b-fan-account/`): Home, Discover, creator profile
       (Access segment), post view, You, Me and privacy, spending and time,
       verification page.
 - [ ] 4C **Studio on phone, pilot**: Notes and the Replies feed, Requests queue,

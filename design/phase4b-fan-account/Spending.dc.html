@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spending and time</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1000px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 4px; border-bottom: 1px solid var(--line)">
+<a href="You.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<span style="font-size: 17px; font-weight: 600">Spending and time</span>
+</div>
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">OCTOBER</span>
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: var(--font-mono); font-size: 44px; line-height: 48px">$30</span><span style="color: var(--ink-muted)">of $60</span></div>
+<div style="height: 8px; border-radius: 999px; background: var(--surface-sunken); overflow: hidden" role="img" aria-label="Half of your monthly limit used"><div style="width: 50%; height: 100%; background: var(--ink)"></div></div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; font-size: 14px"><span>Kiln Club membership</span><span class="qv-mono">$5.00</span><span>Written reply from Maya</span><span class="qv-mono">$25.00</span><span style="color: var(--ink-muted)">Held, not charged</span><span class="qv-mono" style="color: var(--ink-muted)">$0.00</span></div>
+</section>
+<section style="padding: 0 16px">
+<x-import component-from-global-scope="Qelvora.SpendLimit"></x-import>
+</section>
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">TIME WITH EACH AI · THIS WEEK</span>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; font-size: 14px"><span>Maya's AI</span><span class="qv-mono">1 h 10 min</span><span>Devon's AI</span><span class="qv-mono">25 min</span></div>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 44px; font-size: 14px">Remind me after an hour a day<input type="checkbox" checked></label>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

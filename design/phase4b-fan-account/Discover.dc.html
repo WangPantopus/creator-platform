@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Discover</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1400px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 20px 16px 0; display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Discover</h1>
+<div class="qv-field"><label class="qv-field__label qv-sr" for="q">Search creators</label><input id="q" class="qv-input" placeholder="Search creators, crafts or questions"></div>
+<x-import component-from-global-scope="Qelvora.Segmented" items="{{cats}}" active="Crafts" label="Categories"></x-import>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+<sc-for list="{{creators}}" as="c" hint-placeholder-count="3">
+<article style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<div class="qv-on-maya" style="height: 150px; background: var(--maya-surface); display: flex; align-items: flex-end; justify-content: space-between; padding: 14px 16px; box-sizing: border-box">
+<span style="font-family: var(--font-serif); font-size: 34px; line-height: 36px; color: var(--on-maya)">{{c.name}}</span>
+<span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; color: var(--on-maya-muted)">{{c.photo}}</span>
+</div>
+<div style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-weight: 600">{{c.craft}}</span>
+<span style="font-size: 14px; line-height: 20px; color: var(--ink-muted)">{{c.line}}</span>
+<span style="font-size: 13px; line-height: 18px; padding-top: 8px; border-top: 1px dashed var(--line)">{{c.cap}}</span>
+</div>
+</article>
+</sc-for>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); text-align: center">Ordered by what you've asked about, never by what creators pay. Every creator here is verified through Pantopus.</p>
+</div>
+<x-import component-from-global-scope="Qelvora.TabBar" active="Discover"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+cats: ['For you', 'Crafts', 'Music', 'Food'],
+creators: [
+{ name: 'Maya', photo: 'PHOTO · STUDIO', craft: 'Ceramics · expert and companion', line: 'Glazes, kilns and the long patience of both.', cap: 'Maya answers written replies within 7 days · 3 of 10 left this week.' },
+{ name: 'Devon', photo: 'PHOTO · REHEARSAL', craft: 'Guitar · companion', line: 'Practice routines for adults who came back to it.', cap: 'Devon answers voice notes within 5 days · 4 of 6 left this week.' },
+{ name: 'Ines', photo: 'PHOTO · BENCH', craft: 'Woodworking · expert', line: 'Hand tools, small shop, honest joinery.', cap: 'Ines answers written replies within 10 days · fully booked · opens Monday.' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1300px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 16px 16px 0; display: flex; justify-content: space-between; align-items: center">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 22px">Qelvora</span>
+<a href="#" aria-label="Notifications, 2 new" style="position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M5 13.5V9a5 5 0 0 1 10 0v4.5l1.5 1.5h-13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 17h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="qv-count" style="position: absolute; top: 4px; right: 2px">2</span></a>
+</div>
+<div style="padding: 20px 16px 0">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 38px; letter-spacing: -0.02em">Good evening, @kilnfire</h1>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">WAITING ON MAYA</span>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Written reply · $25 if accepted</span><x-import component-from-global-scope="Qelvora.Countdown">Decides by Oct 5</x-import></div>
+<x-import component-from-global-scope="Qelvora.EtaLine" ahead="{{ahead}}"></x-import>
+</div>
+</div>
+<div style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 2px">
+<span class="qv-meta" style="padding-bottom: 8px">YOUR CREATORS</span>
+<a href="#" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none">
+<x-import component-from-global-scope="Qelvora.Avatar"></x-import>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">Maya</span><span style="font-size: 13px; color: var(--maya-ink)">New Note · to Kiln Club members</span></span>
+<span class="qv-meta">09:12</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; color: var(--ink); text-decoration: none">
+<x-import component-from-global-scope="Qelvora.Avatar" initial="D"></x-import>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">Devon</span><span style="font-size: 13px; color: var(--ink-muted)">Devon's AI · "Try the bridge again slower."</span></span>
+<span class="qv-meta">MON</span></a>
+</div>
+<div style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 10px; flex-grow: 1">
+<span class="qv-meta">FROM MAYA</span>
+<x-import component-from-global-scope="Qelvora.Note" time="09:12" reply="{{no}}">Opened the kiln this morning. The new celadon test came out the color of shallow water. The recipe goes into the Kiln Club library on Friday.</x-import>
+</div>
+<x-import component-from-global-scope="Qelvora.TabBar" active="Home"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { return { no: false, ahead: 4 }; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Requests</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1100px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 20px 16px 0; display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Requests</h1>
+<x-import component-from-global-scope="Qelvora.Segmented" items="{{tabs}}" active="Open" label="Request status"></x-import>
+</div>
+<div style="padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px">
+<x-import component-from-global-scope="Qelvora.RequestStatus" steps="{{s1}}"></x-import>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px">
+<x-import component-from-global-scope="Qelvora.RequestStatus" req-id="REQ-0421" mode="Voice note" price="$30" steps="{{s2}}"></x-import>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px">
+<x-import component-from-global-scope="Qelvora.RequestStatus" req-id="REQ-0398" mode="10-minute call" price="$120" steps="{{s3}}" outcome="Maya passed on this one · nothing charged"></x-import>
+</div>
+</div>
+<x-import component-from-global-scope="Qelvora.TabBar" active="Requests"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+tabs: ['Open', 'Delivered', 'Closed'],
+s1: [{ label: 'Sent to Maya · hold placed', time: 'OCT 3 14:02', state: 'done' }, { label: 'Maya decides · usually 1 to 2 days', state: 'current' }, { label: 'Written and delivered', state: 'todo' }],
+s2: [{ label: 'Sent to Devon · hold placed', time: 'OCT 2 20:40', state: 'done' }, { label: 'Devon accepted · $30 charged', time: 'OCT 3 08:10', state: 'done' }, { label: 'Devon is recording', state: 'current' }],
+s3: [{ label: 'Sent to Maya · hold placed', time: 'SEP 30 18:40', state: 'done' }, { label: 'Maya passed · hold released', time: 'OCT 1 10:02', state: 'done' }]
+};
+}
+}
+</script>
+</body>
+</html>
