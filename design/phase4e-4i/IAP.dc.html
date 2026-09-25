@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Join Kiln Club in the app</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--surface-sunken); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; justify-content: flex-end">
+<div style="background: var(--surface); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-sheet); padding: 12px 20px 36px; display: flex; flex-direction: column; gap: 18px">
+<div style="width: 36px; height: 5px; border-radius: 3px; background: var(--line); align-self: center"></div>
+<span class="qv-meta">MEMBERSHIP</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">Kiln Club</h1>
+<x-import component-from-global-scope="Qelvora.AccessLines" included="her AI, her Notes and the library." changes="renews monthly through your App Store account."></x-import>
+<div style="display: flex; justify-content: space-between; font-size: 15px"><span>Price</span><span class="qv-mono">[STORE PRICE] a month</span></div>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" size="lg" block="{{yes}}">Subscribe with the App Store</x-import>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Pending counsel: whether paid replies can be bought in the app. Until then, requests are paid on the web.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic { renderVals() { return { yes: true }; } }
+</script>
+</body>
+</html>

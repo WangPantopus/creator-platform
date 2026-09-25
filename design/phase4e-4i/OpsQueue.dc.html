@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ops queue</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: grid; grid-template-columns: 220px minmax(0, 1fr)">
+<nav aria-label="Ops" style="background: var(--surface); border-right: 1px solid var(--line); padding: 24px 12px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 18px; padding: 0 10px 16px">Qelvora Ops</span>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="5"><a href="#" style="display: flex; justify-content: space-between; min-height: 40px; align-items: center; padding: 0 10px; border-radius: var(--radius-md); color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600; background: {{n.bg}}">{{n.t}}<span class="qv-mono" style="font-weight: 400; color: var(--ink-muted)">{{n.c}}</span></a></sc-for>
+</nav>
+<main style="padding: 32px 40px; display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">Safety cases</h1>
+<p style="margin: 0; font-size: 13px; color: var(--ink-muted)">Every case you open is logged. Fan message text appears only inside a case, never in lists or alerts.</p>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<div class="qv-meta" style="display: grid; grid-template-columns: 110px 1.4fr 1fr 1fr 120px; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line)"><span>CASE</span><span>CATEGORY</span><span>CREATOR</span><span>OPENED</span><span>STATE</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a href="OpsCase.dc.html" style="display: grid; grid-template-columns: 110px 1.4fr 1fr 1fr 120px; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 14px"><span class="qv-mono">{{r.id}}</span><span>{{r.c}}</span><span>{{r.cr}}</span><span class="qv-meta">{{r.t}}</span><span style="color: {{r.col}}; font-weight: 600">{{r.s}}</span></a>
+</sc-for>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic { renderVals() {
+const n = (t, c, a) => ({ t: t, c: c, bg: a ? 'var(--surface-sunken)' : 'transparent' });
+return { nav: [n('Safety cases', '4', true), n('Disputes', '2'), n('Verification review', '7'), n('Pauses and suspensions', '1'), n('Access audits', '')],
+rows: [
+{ id: 'CASE-218', c: 'Crisis signal · protocol followed', cr: 'Devon', t: '12 MIN AGO', s: 'Urgent', col: 'var(--alert)' },
+{ id: 'CASE-217', c: 'Report: AI reply', cr: 'Maya', t: '2 H AGO', s: 'Open', col: 'var(--ink)' },
+{ id: 'CASE-215', c: 'Guardrail: medical question', cr: 'Maya', t: 'YESTERDAY', s: 'Reviewed', col: 'var(--ink-muted)' },
+{ id: 'CASE-212', c: 'Impersonation claim', cr: 'Ines', t: 'OCT 2', s: 'Waiting on creator', col: 'var(--ink-muted)' }
+] }; } }
+</script>
+</body>
+</html>

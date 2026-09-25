@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Discover with the pass</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1000px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 16px; padding: 20px 16px 0">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">Discover</h1>
+<sc-for list="{{c}}" as="x" hint-placeholder-count="3">
+<article style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: var(--font-serif); font-size: 24px">{{x.n}}</span><span class="qv-badge" style="color: var(--ink-muted)">{{x.m}}</span></div>
+<span class="qv-help">{{x.d}}</span>
+<span style="font-size: 13px">{{x.a}}</span>
+</article>
+</sc-for>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Try a creator's AI free for one conversation before spending a pass slot on them.</p>
+<div style="flex-grow: 1"></div>
+<x-import component-from-global-scope="Qelvora.TabBar" active="Discover"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic { renderVals() { return { c: [
+{ n: 'Maya', m: 'In your pass', d: 'Ceramics', a: 'You can message her AI now.' },
+{ n: 'Theo', m: 'Joins Nov 1', d: 'Bread and fermentation', a: 'In next month’s pass.' },
+{ n: 'Ines', m: 'Not in your pass', d: 'Woodworking', a: 'Free first conversation available.' }
+] }; } }
+</script>
+</body>
+</html>

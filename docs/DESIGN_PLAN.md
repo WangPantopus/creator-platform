@@ -145,17 +145,17 @@ every text pair holds 4.5:1 or more in both themes.
       proof, passkey, license, interview), My AI (mode, sources, style, rules,
       approval, test console, versions, export, 72-hour digest), Offers, Publish
       (basic), Earnings (minimal), Team and settings, License and sponsorships.
-- [ ] 4E **Slice 2, calls and native**: call screens for fan and creator
+- [x] 4E **Slice 2, calls and native** (4E to 4I share one [canvas](https://claude.ai/artifact/SuT31u7iaBNPVaHqAMbBFT), `design/phase4e-4i/`): call screens for fan and creator
       (pre-call, waiting, connected, reconnecting, every outcome), offering
       times, native app (push, incoming call, in-app purchase sheets, offline).
-- [ ] 4F **Slice 3, producer and sharing**: share cards and their verification
+- [x] 4F **Slice 3, producer and sharing**: share cards and their verification
       pages, public answers with credits, Publish (full), Insights and producer,
       AI voice notes.
-- [ ] 4G **Slice 4, the pass**: pass inside You, Discover markers, slot
+- [x] 4G **Slice 4, the pass**: pass inside You, Discover markers, slot
       replacement, pool earnings.
-- [ ] 4H **Ops console** (proposed; not in the source docs): verification review,
+- [x] 4H **Ops console** (proposed; not in the source docs): verification review,
       safety cases, disputes, pauses and license suspension.
-- [ ] 4I **Notifications and email**: every row of Product Design section 9 as
+- [x] 4I **Notifications and email**: every row of Product Design section 9 as
       push, email and in-app designs.
 
 ## Phase 5: prototypes

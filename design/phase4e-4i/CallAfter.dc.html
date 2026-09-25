@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>After the call</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 20px; padding: 28px 20px 36px">
+<x-import component-from-global-scope="Qelvora.Seal" size="{{s}}"></x-import>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">You spoke with Maya for 10 minutes.</h1>
+<x-import component-from-global-scope="Qelvora.SignedMarker" time="OCT 9 · 16:10" extra="Call"></x-import>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-weight: 600">Both of you can get a short summary</span>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; min-height: 44px">I'd like a summary<input type="checkbox" checked></label>
+<span class="qv-help">Made only if you both agree. Either of you can delete it.</span>
+</div>
+<x-import component-from-global-scope="Qelvora.Receipt" req-id="REQ-0440" title="A 10-minute call with Maya" label="Live with Maya" rows="{{rows}}"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic { renderVals() { return { s: 44, rows: [['Connected', '10:00 of 10:00'], ['Charged', '$120.00'], ['Recording', 'None']] }; } }
+</script>
+</body>
+</html>

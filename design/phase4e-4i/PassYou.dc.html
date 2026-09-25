@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Your pass</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1100px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 20px; padding: 24px 16px 0">
+<span class="qv-meta">YOU · PASS · [PASS PRICE] A MONTH</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Three creators' AIs, this month</h1>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{slots}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md)">
+<span style="width: 38px; height: 38px; border-radius: 11px; background: var(--maya-surface); color: var(--maya-accent); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-style: italic; font-size: 20px">{{s.i}}</span>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">{{s.n}}</span><span class="qv-help">{{s.d}}</span></span>
+</div>
+</sc-for>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">NEXT MONTH · CHANGES ON NOV 1</span>
+<span style="font-size: 14px">Keep Maya and Devon · swap Ines for Theo</span>
+<span class="qv-help">Conversations with Ines stay readable. Your Kiln Club membership is separate and unchanged: no pass slot needed.</span>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" block="{{yes}}">Change next month</x-import>
+</div>
+<div style="flex-grow: 1"></div>
+<x-import component-from-global-scope="Qelvora.TabBar" active="You"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic { renderVals() { return { yes: true, slots: [
+{ i: 'M', n: 'Maya', d: 'In your pass · also a Kiln Club member' },
+{ i: 'D', n: 'Devon', d: 'In your pass' },
+{ i: 'I', n: 'Ines', d: 'In your pass until Oct 31' }
+] }; } }
+</script>
+</body>
+</html>

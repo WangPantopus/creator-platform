@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Every notification</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 1300px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); padding: 40px 48px; display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">Every notification, in three channels</h1>
+<p style="margin: 0; font-size: 13px; color: var(--ink-muted)">The sender label is set by the notification type, never by who triggered it. In-app is the record and can't be turned off; push and email are per creator, per type, with quiet hours and hidden previews.</p>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<div class="qv-meta" style="display: grid; grid-template-columns: 1.2fr 1.3fr 2fr 1.6fr; gap: 16px; padding: 12px 18px; border-bottom: 1px solid var(--line)"><span>TYPE</span><span>SENDER LABEL</span><span>PUSH PREVIEW</span><span>NEVER</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div style="display: grid; grid-template-columns: 1.2fr 1.3fr 2fr 1.6fr; gap: 16px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-size: 13px; line-height: 18px"><span style="font-weight: 600">{{r.t}}</span><span style="color: {{r.col}}; font-weight: 600">{{r.s}}</span><span>{{r.p}}</span><span style="color: var(--ink-muted)">{{r.n}}</span></div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic { renderVals() {
+const ai = 'var(--ai-ink)', maya = 'var(--maya-ink)', sys = 'var(--ink-muted)', team = 'var(--team-ink)';
+const r = (t, s, col, p, n) => ({ t, s, col, p, n });
+return { rows: [
+r('AI reply', "Maya's AI", ai, 'First line of the reply', "Maya's name as sender"),
+r('Approved draft', 'Approved by Maya', maya, 'First line', '"Maya replied"'),
+r('Personal reply', 'Maya', maya, 'First line, or "voice note"', 'Restricted text'),
+r('New Note', 'Maya · to Kiln Club members', maya, 'First line, or "voice note"', '"Maya messaged you"'),
+r('Reaction', 'Maya reacted to your reply', maya, "Your reply's first words", 'Anything sent by the team'),
+r('Announcement', "Maya's team", team, 'First line', 'Framed as personal'),
+r('Request status', 'Request update', sys, 'Status word and creator', 'Price'),
+r('Call reminder', 'Call reminder', sys, 'Time, length, join', 'Packet content'),
+r('Answered publicly', 'Public answer', sys, 'Post title', 'Your question text'),
+r('Spending reminder', 'Spending', sys, 'Percent of your limit', 'Amounts on the lock screen'),
+r('New packet (creator)', 'New request', sys, 'Handle, mode, due-in, first line', 'Full thread'),
+r('Overdue (creator)', 'Due now', sys, 'Handle, mode, time left', 'Snooze'),
+r('Pool share (creator)', 'Pool posted', sys, 'Slots and cycle', 'Amount in push'),
+r('Impact digest (creator)', 'Your week', sys, 'People helped, thanks', 'Fan names without consent')
+] }; } }
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A dispute</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); padding: 32px 40px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<span class="qv-meta">DISPUTE-031 · REQ-0401 · @GLAZEDANDCONFUSED AND MAYA</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">"The reply was written by her AI, not her."</h1>
+<x-import component-from-global-scope="Qelvora.AuditBanner">Opening this case is logged. You see the packet and the delivery, kept 12 months for disputes, and nothing else.</x-import>
+<x-import component-from-global-scope="Qelvora.Message" kind="approved_draft" time="OCT 3">For a garage, look for a 120-volt test kiln first; you can move up once you know you'll fire weekly.</x-import>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: grid; grid-template-columns: 160px minmax(0, 1fr); row-gap: 10px; font-size: 14px">
+<span class="qv-meta">MODE SOLD</span><span>Written reply by Maya</span>
+<span class="qv-meta">DELIVERED AS</span><span>Prepared by AI · approved by Maya, signed Oct 3</span>
+<span class="qv-meta">FAN SAW</span><span>"Maya may answer with her AI's draft; you'll see that label." at checkout</span>
+</div>
+</div>
+<aside style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">RESOLVE</span>
+<x-import component-from-global-scope="Qelvora.ModeList" group="res" legend="Resolution" modes="{{m}}"></x-import>
+<label for="why" class="qv-field__label">Reason sent to both</label>
+<textarea id="why" rows="3" style="border: 1px solid var(--control-line); border-radius: var(--radius-md); padding: 10px; font: 14px/20px var(--font-sans); resize: none; background: var(--ground); color: var(--ink)">The label was disclosed before purchase and shown on delivery.</textarea>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" block="{{yes}}">Resolve and notify both</x-import>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic { renderVals() { return { yes: true, m: [
+{ title: 'Uphold', meta: 'Delivered as disclosed', price: '$0', selected: true },
+{ title: 'Partial refund', meta: 'Goodwill', price: '$10' },
+{ title: 'Full refund', meta: 'Not delivered as promised', price: '$25' }
+] }; } }
+</script>
+</body>
+</html>

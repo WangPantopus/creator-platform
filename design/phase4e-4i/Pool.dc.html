@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pool earnings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="Earnings" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">EARNINGS · PASS POOL · OCTOBER CYCLE</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">You're in 412 fans' passes this cycle</h1></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">SLOTS</span><span class="qv-mono" style="font-size: 24px">412</span><span class="qv-help">pro-rated by days in the cycle</span></div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">YOUR SHARE</span><span class="qv-mono" style="font-size: 24px">[AMOUNT]</span><span class="qv-help">in-app only, never in a push</span></div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">POSTED</span><span class="qv-mono" style="font-size: 24px">NOV 1</span><span class="qv-help">with the cycle's full breakdown</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); max-width: 640px">The pool splits by slots held, not by messages sent. Nothing in the product rewards keeping fans talking longer.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic { renderVals() { return { five: 5 }; } }
+</script>
+</body>
+</html>

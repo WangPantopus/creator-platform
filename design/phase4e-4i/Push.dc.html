@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lock screen</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div data-theme="night" class="qv" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 10px; padding: 120px 12px 32px">
+<span style="text-align: center; font-family: var(--font-mono); font-size: 56px; line-height: 60px; padding-bottom: 40px">9:15</span>
+<sc-for list="{{pushes}}" as="p" hint-placeholder-count="4">
+<div style="background: var(--surface); border-radius: 20px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; justify-content: space-between"><span style="font-size: 12px; color: var(--ink-muted)">QELVORA</span><span style="font-size: 12px; color: var(--ink-muted)">{{p.t}}</span></div>
+<span style="font-size: 15px; font-weight: 600">{{p.s}}</span>
+<span style="font-size: 14px; line-height: 19px">{{p.b}}</span>
+</div>
+</sc-for>
+<div class="qv-on-maya" style="margin-top: auto; background: var(--maya-surface); border-radius: 24px; padding: 18px; display: flex; align-items: center; gap: 12px">
+<x-import component-from-global-scope="Qelvora.Seal" size="{{s}}" live="{{yes}}"></x-import>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="color: var(--on-maya); font-weight: 600">Maya · the person</span><span style="color: var(--on-maya-muted); font-size: 13px">Your 10-minute call is starting</span></span>
+<span class="qv-btn" style="background: var(--maya-accent); color: var(--on-maya-accent); min-height: 44px">Join</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic { renderVals() { return { yes: true, s: 40, pushes: [
+{ t: 'now', s: 'Maya', b: 'I looked at your test tile. That crawl is the rim, not the recipe.' },
+{ t: '2m', s: "Maya's AI", b: "That's likely it: a double dip nearly doubles the thickness." },
+{ t: '8m', s: 'Maya · to Kiln Club members', b: 'Opened the kiln this morning.' },
+{ t: '1h', s: 'Request update', b: 'Maya accepted your request.' }
+] }; } }
+</script>
+</body>
+</html>

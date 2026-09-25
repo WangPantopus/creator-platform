@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offer times</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 20px; padding: 24px 16px 32px">
+<span class="qv-meta">STUDIO · @QUIETCLAY · 10-MINUTE CALL · $120</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Offer three times</h1>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{slots}}" as="s" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md)"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{s.you}}</span><span class="qv-help">{{s.fan}}</span></span><input type="checkbox" checked></label>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted)">The fan picks one. Offering times accepts the request, so the fan is charged now; if the call doesn't happen, they're refunded in full.</p>
+<div style="margin-top: auto"><x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Sign and send times</x-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic { renderVals() { return { yes: true, slots: [
+{ you: 'Tue Oct 14 · 16:00 your time', fan: 'Wed 00:00 for the fan in London' },
+{ you: 'Thu Oct 16 · 16:30 your time', fan: 'Fri 00:30 for the fan' },
+{ you: 'Thu Oct 16 · 17:30 your time', fan: 'Fri 01:30 for the fan' }
+] }; } }
+</script>
+</body>
+</html>

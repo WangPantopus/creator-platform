@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Insights</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="Insights" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">INSIGHTS · THIS WEEK</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">What fans asked, and your sources couldn't answer</h1></div>
+<div style="display: flex; gap: 32px"><span><b class="qv-mono" style="font-size: 24px">188</b> <span class="qv-help">unique fans</span></span><span><b class="qv-mono" style="font-size: 24px">212</b> <span class="qv-help">conversations</span></span><span><b class="qv-mono" style="font-size: 24px">23</b> <span class="qv-help">unanswered from sources</span></span></div>
+<sc-for list="{{clusters}}" as="c" hint-placeholder-count="3">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px">
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600">{{c.t}}</span><span class="qv-help">{{c.n}}</span></span>
+<button class="qv-btn qv-btn--secondary" style="min-height: 44px; font-size: 13px">Answer once for everyone</button>
+</div>
+</sc-for>
+</div>
+<aside style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px; margin-top: 64px">
+<span class="qv-meta">RECOMMENDED NEXT</span>
+<span style="font-family: var(--font-serif); font-size: 22px; line-height: 28px">A 10-minute video: bisque temperatures, and why they matter for glaze fit</span>
+<span class="qv-help">Why: 31 questions in 14 days · effort: an afternoon · suggested for Kiln Club</span>
+<div style="display: flex; gap: 8px"><x-import component-from-global-scope="Qelvora.Button" variant="secondary">Accept</x-import><x-import component-from-global-scope="Qelvora.Button" variant="quiet">Not now</x-import></div>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic { renderVals() { return { five: 5, clusters: [
+{ t: 'Bisque temperature and glaze fit', n: '31 questions from 26 fans · 14 days' },
+{ t: 'Choosing a first electric kiln', n: '12 questions from 11 fans · 14 days' },
+{ t: 'Reduction without a gas kiln', n: 'A few fans · below the group minimum, so no count is shown' }
+] }; } }
+</script>
+</body>
+</html>
