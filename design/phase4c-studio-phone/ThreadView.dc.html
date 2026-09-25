@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thread with @kilnfire</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1300px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 4px; border-bottom: 1px solid var(--line)">
+<a href="Threads.dc.html" aria-label="Back to threads" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<span style="font-size: 17px; font-weight: 600; flex-grow: 1">@kilnfire</span>
+</div>
+<div style="padding: 12px 16px 0"><x-import component-from-global-scope="Qelvora.AuditBanner"></x-import></div>
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1">
+<x-import component-from-global-scope="Qelvora.Message" kind="fan">My satin white keeps crawling at the rim. Cone 6, dipped.</x-import>
+<x-import component-from-global-scope="Qelvora.DigestItem" handle="@kilnfire" time="14:32">Crawling at the rim usually means the coat went on too thick there. Maya's method is a single dip and a count of three.</x-import>
+<x-import component-from-global-scope="Qelvora.Correction" ai-text="Maya's celadon is fired at cone 6." ai-time="14:34" time="NOT SENT">My AI got this wrong: my celadon is fired at cone 10, in reduction.</x-import>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg)">
+<span class="qv-meta">WHAT YOUR AI REMEMBERS · READ ONLY</span>
+<span style="font-size: 14px">Fires cone 6 in a small electric kiln at home.</span>
+</div>
+</div>
+<div style="border-top: 1px solid var(--line); padding: 14px 16px 28px; display: flex; flex-direction: column; gap: 10px">
+<x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Take over this conversation</x-import>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary">Pause AI for this fan</x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="quiet">Add a correction</x-import>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Taking over stops your AI mid-sentence, and the fan sees "Maya is here" at once.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true }; }
+}
+</script>
+</body>
+</html>

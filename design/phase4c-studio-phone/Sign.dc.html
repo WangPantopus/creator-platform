@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review and sign</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--surface-sunken); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; justify-content: flex-end">
+<div style="padding: 0 16px 16px">
+<x-import component-from-global-scope="Qelvora.Message" kind="human_creator" time="DRAFT">Single dip, count to three, let it drip off, then sponge the top. Fire slow on the way down. Send me the next tile.</x-import>
+</div>
+<x-import component-from-global-scope="Qelvora.SigningSheet" title="Accept and send" rows="{{rows}}"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return { rows: [['Request', 'REQ-0412 · @kilnfire'], ['Answer as', 'Written by Maya'], ['Fan is charged', '$25.00 now'], ['Delivered', 'Right after you sign']] }; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio · Requests</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1400px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 16px 16px 0; display: flex; justify-content: space-between; align-items: center">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 18px; color: var(--ink-muted)">Qelvora Studio</span>
+<x-import component-from-global-scope="Qelvora.Avatar"></x-import>
+</div>
+<div style="padding: 12px 16px 0">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Requests</h1>
+</div>
+<div style="padding: 16px 16px 0">
+<x-import component-from-global-scope="Qelvora.CapacityHeader" rows="{{cap}}" line="Your AI handled 212 conversations this week. 9 asked for you."></x-import>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">DUE · 2</span>
+<x-import component-from-global-scope="Qelvora.QueueCard" kind="commitment" overdue="{{yes}}" handle="@glazedandconfused" mode="Written reply" price="$25" due="OCT 2" summary="Recommend a first kiln for a garage studio."></x-import>
+<x-import component-from-global-scope="Qelvora.QueueCard" kind="commitment" handle="@wheelhouse" mode="Voice note" price="$40" due="DUE IN 2 DAYS" summary="How you decide when a pot is done trimming."></x-import>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">TO DECIDE · 3</span>
+<x-import component-from-global-scope="Qelvora.QueueCard" kind="packet" handle="@kilnfire" mode="Written reply" price="$25" due="DECIDE BY OCT 5" summary="Satin white crawls at the rim after a single dip at cone 6, small electric kiln. Wants to know what to change." shared="summary, 10 messages, 1 photo" draft-ready="{{yes}}"></x-import>
+<x-import component-from-global-scope="Qelvora.QueueCard" kind="rule" handle="@northshorepots" mode="Written reply" price="$25" due="DECIDE BY OCT 6" summary="Matched your rule: collaboration requests. Asks about a joint workshop in spring."></x-import>
+</div>
+<div style="flex-grow: 1"></div>
+<x-import component-from-global-scope="Qelvora.StudioTabBar" active="Requests" requests="{{five}}"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, five: 5, cap: [{ mode: 'Written replies', used: 7, limit: 10 }, { mode: 'Voice notes', used: 2, limit: 4 }, { mode: 'Calls', used: 1, limit: 1 }] }; }
+}
+</script>
+</body>
+</html>

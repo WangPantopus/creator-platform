@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A request from @kilnfire</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1700px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 22px; padding-bottom: 32px">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 4px; border-bottom: 1px solid var(--line)">
+<a href="Main.dc.html" aria-label="Back to requests" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-size: 17px; font-weight: 600">@kilnfire</span><span class="qv-meta">WRITTEN REPLY · $25 · DECIDE BY OCT 5</span></div>
+</div>
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">WHAT THEY SHARED</span>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0; font-family: var(--font-serif); font-size: 17px; line-height: 25px">My satin white crawls at the rim after a single dip at cone 6, fired in a small electric kiln. Could you look at my test tile and tell me what to change?</p>
+<div style="height: 120px; border: 1px dashed var(--control-line); border-radius: var(--radius-md); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box"><span class="qv-meta">PHOTO · TEST TILE</span></div>
+<span class="qv-help">Summary edited by the fan · 10 messages · 1 photo · handle only</span>
+<a href="ThreadView.dc.html" style="font-size: 13px; font-weight: 600; color: var(--ink); min-height: 44px; display: flex; align-items: center">Open full conversation · logged and visible to the fan</a>
+</div>
+</section>
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">YOUR AI'S DRAFT</span>
+<x-import component-from-global-scope="Qelvora.Message" kind="ai" actions="{{no}}">Crawling at the rim is almost always thickness. Dip once for three seconds, let it drip off, sponge the top 5 mm, and cool slowly from 1,900°F.</x-import>
+<x-import component-from-global-scope="Qelvora.LabelPreview" kind="approved_draft"></x-import>
+</section>
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Reply myself</x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" size="lg" block="{{yes}}">Review and send the draft</x-import>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Either one fulfills this request. The fan is charged $25 when you accept.</p>
+</section>
+<section style="padding: 0 16px">
+<x-import component-from-global-scope="Qelvora.InsteadMenu"></x-import>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, no: false }; }
+}
+</script>
+</body>
+</html>

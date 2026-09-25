@@ -138,7 +138,7 @@ every text pair holds 4.5:1 or more in both themes.
 - [x] 4B **Fan account and discovery, pilot** ([canvas](https://claude.ai/artifact/VZNMhK2CdYKHF9pECEojQE), `design/phase4b-fan-account/`): Home, Discover, creator profile
       (Access segment), post view, You, Me and privacy, spending and time,
       verification page.
-- [ ] 4C **Studio on phone, pilot**: Notes and the Replies feed, Requests queue,
+- [x] 4C **Studio on phone, pilot** ([canvas](https://claude.ai/artifact/HgnU1RHdqJTS9aYN6Gpmdc), `design/phase4c-studio-phone/`): Notes and the Replies feed, Requests queue,
       packet detail and reply composer, Threads with takeover and handback,
       passkey signing sheet, weekly impact digest.
 - [ ] 4D **Studio on desktop, pilot**: verification and onboarding (external

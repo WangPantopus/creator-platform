@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio · More</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 20px 16px 0">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">More</h1>
+</div>
+<nav aria-label="More studio sections" style="padding: 20px 16px 0; flex-grow: 1">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 16px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none">
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">{{r.t}}</span><span class="qv-help">{{r.d}}</span></span>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+</sc-for>
+</div>
+</nav>
+<x-import component-from-global-scope="Qelvora.StudioTabBar" active="More" requests="{{five}}"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { five: 5, rows: [
+{ t: 'Offers', d: 'Your prices, your deadlines, weekly capacity' },
+{ t: 'Publish', d: 'Posts, and what your AI may use' },
+{ t: 'Insights', d: 'What fans asked this week, by topic' },
+{ t: 'Earnings', d: 'This month so far · paid out on the 1st' },
+{ t: 'Team', d: 'Priya · triage and drafting' },
+{ t: 'Verification and account', d: 'Pantopus identity, passkeys' }
+] }; }
+}
+</script>
+</body>
+</html>

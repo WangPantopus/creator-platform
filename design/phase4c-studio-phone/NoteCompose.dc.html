@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Write a Note</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1100px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 20px; padding-bottom: 32px">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 10px 4px; border-bottom: 1px solid var(--line)">
+<a href="Main.dc.html" style="min-height: 44px; padding: 0 12px; display: flex; align-items: center; color: var(--ink); font-size: 15px">Cancel</a>
+<span style="font-size: 17px; font-weight: 600">New Note</span>
+<span style="width: 60px"></span>
+</div>
+<div style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">TO</span>
+<x-import component-from-global-scope="Qelvora.Segmented" items="{{aud}}" active="Kiln Club" label="Audience"></x-import>
+<span class="qv-help">2,314 members will see this. It's labeled "Maya · to Kiln Club members" everywhere.</span>
+</div>
+<div class="qv-on-maya" style="margin: 0 16px; background: var(--maya-surface); color: var(--on-maya); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow-plate); --qv-cut: var(--maya-surface)">
+<x-import component-from-global-scope="Qelvora.AuthorLabel" kind="human_broadcast" on-maya="{{yes}}"></x-import>
+<label for="note" class="qv-sr">Your Note</label>
+<textarea id="note" rows="5" style="background: transparent; border: 0; color: var(--on-maya); font: 18px/28px var(--font-serif); resize: none">Opened the kiln this morning. The new celadon test came out the color of shallow water.</textarea>
+<div style="display: flex; gap: 8px">
+<x-import component-from-global-scope="Qelvora.Button" variant="quiet">Photo</x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="quiet">Voice · up to 60 s</x-import>
+</div>
+</div>
+<label style="margin: 0 16px; display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg)">
+<input type="checkbox" style="margin-top: 3px">
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600">Let my AI use this</span><span class="qv-help">Adds it to your AI's sources for Kiln Club members only, after you approve it in My AI.</span></span>
+</label>
+<label style="margin: 0 16px; display: flex; align-items: center; justify-content: space-between; min-height: 44px; font-size: 14px">Show audience size<input type="checkbox" checked></label>
+<div style="padding: 0 16px; margin-top: auto">
+<x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Sign and post to Kiln Club</x-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, aud: ['Followers', 'Kiln Club', 'Everyone'] }; }
+}
+</script>
+</body>
+</html>
