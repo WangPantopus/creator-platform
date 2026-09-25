@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Earnings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="Earnings" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">EARNINGS · OCTOBER SO FAR</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">[AMOUNT] · paid out Nov 1</h1></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">MEMBERSHIPS</span><span style="font-family: var(--font-mono); font-size: 24px">[AMOUNT]</span><span class="qv-help">Kiln Club, after fees</span></div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">REQUESTS</span><span style="font-family: var(--font-mono); font-size: 24px">[AMOUNT]</span><span class="qv-help">Only accepted and delivered</span></div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 4px"><span class="qv-meta">REFUNDED</span><span style="font-family: var(--font-mono); font-size: 24px">[AMOUNT]</span><span class="qv-help">Late deliveries, automatic</span></div>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: 120px minmax(0, 1fr) 160px 120px; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); font-size: 14px"><span class="qv-meta">{{r.d}}</span><span>{{r.t}}</span><span style="color: var(--ink-muted)">{{r.s}}</span><span class="qv-mono" style="text-align: right">{{r.a}}</span></div>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Payouts through Stripe to your bank. Fee breakdown and tax forms are under each payout.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { five: 5, rows: [
+{ d: 'OCT 5', t: 'Written reply · @kilnfire · REQ-0412', s: 'Delivered, signed', a: '$25.00' },
+{ d: 'OCT 4', t: 'Voice note · @wheelhouse · REQ-0409', s: 'Accepted, due Oct 11', a: 'pending' },
+{ d: 'OCT 2', t: 'Written reply · @glazedandconfused · REQ-0401', s: 'Late, refunded', a: '$0.00' },
+{ d: 'OCT 1', t: 'Kiln Club · monthly', s: 'Memberships', a: '[AMOUNT]' }
+] }; }
+}
+</script>
+</body>
+</html>

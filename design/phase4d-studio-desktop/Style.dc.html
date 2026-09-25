@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My AI · Mode, style and rules</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="My AI" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">MY AI · DRAFT V5</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">How it answers</h1></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="3">
+<label style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: var(--surface); border: 1px solid {{m.border}}; border-radius: var(--radius-lg)">
+<span style="display: flex; gap: 8px; align-items: center; font-weight: 600"><input type="radio" name="mode" checked="{{m.on}}">{{m.t}}</span>
+<span class="qv-help">{{m.d}}</span>
+</label>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">STYLE CARD · FROM YOUR OWN REPLIES</span>
+<p style="margin: 0; font-family: var(--font-serif); font-size: 17px; line-height: 26px">Short, practical, a little dry. Starts with the likely cause, then one thing to try. Names cones and temperatures exactly. Never gushes.</p>
+<x-import component-from-global-scope="Qelvora.Segmented" items="{{tone}}" active="As written" label="Tone"></x-import>
+<span class="qv-help">20 fixed example replies anchor this voice · 146 more in the pool · Edit examples</span>
+</section>
+<section style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">RULES</span>
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="5">
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 36px; font-size: 14px; border-bottom: 1px solid var(--line)">{{r}}<input type="checkbox" checked></label>
+</sc-for>
+<span class="qv-meta" style="padding-top: 8px">NEVER REVEAL</span>
+<span style="font-size: 14px">The studio's location · family · health · anything about other potters</span>
+<span class="qv-help">Hand off to you when: a fan mentions a commission, a collaboration, or seems distressed.</span>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { five: 5, tone: ['Plainer', 'As written', 'Warmer'],
+modes: [
+{ t: 'Expert', d: 'Answers only from your sources, hands off when it can’t.', on: false, border: 'var(--line)' },
+{ t: 'Companion', d: 'Your voice and memory, with stricter guardrails on closeness.', on: false, border: 'var(--line)' },
+{ t: 'Blend', d: 'Both: expert answers, companion warmth.', on: true, border: 'var(--ink)' }
+],
+rules: ['No medical, legal or financial advice', 'No politics or religion', 'No talk about other creators', 'No talk about my relationships', 'Daily cap per fan: 60 messages']
+}; }
+}
+</script>
+</body>
+</html>

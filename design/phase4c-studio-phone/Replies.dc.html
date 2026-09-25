@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio · Notes and replies</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 1200px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="padding: 20px 16px 0; display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Notes</h1>
+<a href="NoteCompose.dc.html" class="qv-btn qv-btn--maya" style="min-height: 44px">New Note</a>
+</div>
+<div style="padding: 16px 16px 0">
+<x-import component-from-global-scope="Qelvora.Note" time="09:12" audience-size="2,314" reply="{{no}}">Opened the kiln this morning. The new celadon test came out the color of shallow water.</x-import>
+</div>
+<div style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
+<div style="display: flex; justify-content: space-between"><span class="qv-meta">REPLIES · 38</span><span class="qv-help">Only you and your team see these</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-bottom: 1px solid var(--line)">
+<div style="display: flex; justify-content: space-between"><span style="font-weight: 600">{{r.h}}</span><span class="qv-meta">{{r.t}}</span></div>
+<span style="font-size: 15px; line-height: 22px">{{r.m}}</span>
+<div style="display: flex; gap: 8px">
+<button class="qv-btn qv-btn--secondary" style="min-height: 40px; font-size: 13px; padding: 0 14px">React</button>
+<button class="qv-btn qv-btn--quiet" style="font-size: 13px">Quote in a Note</button>
+</div>
+</div>
+</sc-for>
+</div>
+<x-import component-from-global-scope="Qelvora.StudioTabBar" active="Notes" requests="{{five}}"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() { return { no: false, five: 5, rows: [
+{ h: '@kilnfire', t: '09:30', m: 'Shallow water is exactly it. Is it the same base as your satin white?' },
+{ h: '@quietclay', t: '09:41', m: 'Would love to see it on a darker clay body.' },
+{ h: '@wheelhouse', t: '10:05', m: 'Friday cannot come soon enough.' }
+] }; }
+}
+</script>
+</body>
+</html>

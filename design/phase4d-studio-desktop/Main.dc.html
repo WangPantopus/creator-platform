@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Get verified and set up</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: grid; grid-template-columns: 420px minmax(0, 1fr)">
+<div class="qv-on-maya" style="background: var(--maya-surface); color: var(--on-maya); padding: 48px 40px; display: flex; flex-direction: column; gap: 28px">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 22px; color: var(--on-maya-muted)">Qelvora Studio</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 44px; line-height: 46px; letter-spacing: -0.025em">An AI that speaks for you only as far as you allow.</h1>
+<p style="margin: 0; font-family: var(--font-serif); font-size: 18px; line-height: 28px">It learns from what you've published, answers under its own label, and hands fans to you when they need you. Nothing goes live until you've read its tests.</p>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: auto">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="6">
+<li style="display: flex; align-items: center; gap: 12px; font-size: 15px"><span style="width: 26px; height: 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; background: {{s.bg}}; color: {{s.fg}}">{{s.n}}</span><span style="color: {{s.tc}}">{{s.t}}</span></li>
+</sc-for>
+</ol>
+</div>
+<div style="padding: 56px 72px; display: flex; flex-direction: column; gap: 28px; max-width: 720px">
+<span class="qv-meta">STEP 2 OF 6 · PROVE IT'S YOU</span>
+<h2 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">Post this code from your Instagram</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: var(--ink-muted)">Your Pantopus account proves you're a person. This proves you're the Maya your fans already follow. Post the code in a story or a caption; you can delete it once we've seen it.</p>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg)">
+<span style="font-family: var(--font-mono); font-size: 32px; letter-spacing: .12em">QV-7K2M</span>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary">Copy code</x-import>
+</div>
+<div class="qv-field"><label class="qv-field__label" for="acct">Your account</label><input id="acct" class="qv-input" value="instagram.com/[YOUR HANDLE]"></div>
+<x-import component-from-global-scope="Qelvora.Notice" tone="neutral" title="We look once, then forget the code">We check that the post exists and comes from that account. We don't read your other posts or messages.</x-import>
+<div style="display: flex; gap: 12px"><x-import component-from-global-scope="Qelvora.Button" variant="secondary" size="lg">I've posted it · check now</x-import><x-import component-from-global-scope="Qelvora.Button" variant="quiet">Use YouTube instead</x-import></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const done = { bg: 'var(--maya-accent)', fg: 'var(--on-maya-accent)', tc: 'var(--on-maya)' };
+const now = { bg: 'var(--on-maya)', fg: 'var(--maya-surface)', tc: 'var(--on-maya)' };
+const todo = { bg: 'transparent', fg: 'var(--on-maya-muted)', tc: 'var(--on-maya-muted)' };
+return { steps: [
+Object.assign({ n: '1', t: 'Continue with Pantopus' }, done),
+Object.assign({ n: '2', t: 'Prove it’s you' }, now),
+Object.assign({ n: '3', t: 'A passkey for signing' }, todo),
+Object.assign({ n: '4', t: 'Your license to your AI' }, todo),
+Object.assign({ n: '5', t: 'A 15-minute interview in your voice' }, todo),
+Object.assign({ n: '6', t: 'Sources, style, rules, tests' }, todo)
+] };
+}
+}
+</script>
+</body>
+</html>

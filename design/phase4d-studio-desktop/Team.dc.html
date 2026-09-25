@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="Team" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">TEAM</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">Who helps, and what they can do</h1></div>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary">Invite by email</x-import>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+<section style="background: var(--team-surface); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<x-import component-from-global-scope="Qelvora.AuthorLabel" kind="team" member="Priya"></x-import>
+<sc-for list="{{roles}}" as="r" hint-placeholder-count="4"><label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px"><input type="checkbox" checked="{{r.on}}" style="margin-top: 3px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{r.t}}</span><span class="qv-help">{{r.d}}</span></span></label></sc-for>
+</section>
+<section class="qv-on-maya" style="background: var(--maya-surface); color: var(--on-maya); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; color: var(--maya-accent)">ONLY YOU · CANNOT BE SHARED</span>
+<span style="font-size: 15px">Approve anything as you</span>
+<span style="font-size: 15px">Deliver written replies, voice notes and calls</span>
+<span style="font-size: 15px">Change your AI's rules and guardrails</span>
+<span style="font-size: 13px; color: var(--on-maya-muted); padding-top: 8px">Your team's messages always read "Maya's team · Priya", never as you.</span>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { five: 5, roles: [
+{ t: 'Triage', d: 'Reads threads and packets. Every opening is logged and shown to the fan.', on: true },
+{ t: 'Drafting', d: 'Prepares replies for you to review and sign. Can’t send them as you.', on: true },
+{ t: 'Publishing', d: 'Posts content you’ve approved. Notes stay yours.', on: false },
+{ t: 'Scheduling', d: 'Offers call times from your hours.', on: false }
+] }; }
+}
+</script>
+</body>
+</html>

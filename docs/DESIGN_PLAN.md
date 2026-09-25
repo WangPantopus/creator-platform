@@ -141,7 +141,7 @@ every text pair holds 4.5:1 or more in both themes.
 - [x] 4C **Studio on phone, pilot** ([canvas](https://claude.ai/artifact/HgnU1RHdqJTS9aYN6Gpmdc), `design/phase4c-studio-phone/`): Notes and the Replies feed, Requests queue,
       packet detail and reply composer, Threads with takeover and handback,
       passkey signing sheet, weekly impact digest.
-- [ ] 4D **Studio on desktop, pilot**: verification and onboarding (external
+- [x] 4D **Studio on desktop, pilot** ([canvas](https://claude.ai/artifact/K465Z5XjExNgXWLgM3Ln3u), `design/phase4d-studio-desktop/`): verification and onboarding (external
       proof, passkey, license, interview), My AI (mode, sources, style, rules,
       approval, test console, versions, export, 72-hour digest), Offers, Publish
       (basic), Earnings (minimal), Team and settings, License and sponsorships.

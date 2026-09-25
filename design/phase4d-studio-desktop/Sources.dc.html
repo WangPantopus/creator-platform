@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My AI · Sources</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 900px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex">
+<x-import component-from-global-scope="Qelvora.Sidebar" active="My AI" requests="{{five}}"></x-import>
+<main style="flex-grow: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="qv-meta">MY AI</span><h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px">What your AI knows</h1></div>
+<x-import component-from-global-scope="Qelvora.Segmented" items="{{tabs}}" active="Sources" label="My AI sections"></x-import>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span class="qv-meta">APPROVED · 4 · WAITING FOR YOU · 1</span><x-import component-from-global-scope="Qelvora.Button" variant="quiet">Approve all waiting</x-import></div>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Instagram captions, last 90 days" meta="Found · not used until you approve · 64 posts" scope="public" state="candidate"></x-import>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Glazing 101" meta="YouTube playlist · 18 videos with captions · approved Sep 12" scope="public" state="approved"></x-import>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Kiln Club library" meta="42 documents · approved Sep 12" scope="Kiln Club" state="approved"></x-import>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Your interview" meta="15 minutes, transcribed · Sep 10" scope="public" state="approved"></x-import>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Studio tour, spring 2025" meta="Revoked Sep 20 · no longer used" scope="public" state="revoked"></x-import>
+</div>
+<aside style="display: flex; flex-direction: column; gap: 16px">
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta">ADD A SOURCE</span>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" block="{{yes}}">Connect YouTube</x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="secondary" block="{{yes}}">Upload files</x-import>
+<span class="qv-help">Podcast and newsletter next. Instagram and TikTok arrive through their data exports.</span>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<span class="qv-meta">THIS WEEK'S UPDATE</span>
+<label for="upd" class="qv-sr">This week's update</label>
+<textarea id="upd" rows="3" style="border: 1px solid var(--control-line); border-radius: var(--radius-md); padding: 10px; font: 14px/20px var(--font-sans); resize: none; background: var(--ground); color: var(--ink)">Teaching in Portland Oct 7 to 11. Requests pause until the 14th.</textarea>
+<span class="qv-help">Your AI mentions this when it's relevant. Expires Oct 14.</span>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted)">Sources are evidence, never instructions. Scope decides who can hear answers drawn from each one.</p>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, five: 5, tabs: ['Sources', 'Style', 'Rules', 'Test', 'Versions'] }; }
+}
+</script>
+</body>
+</html>
