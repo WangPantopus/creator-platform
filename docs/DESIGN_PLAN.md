@@ -1,0 +1,175 @@
+# Qelvora design plan
+
+The plan for designing Qelvora end to end: UX research, visual direction, the
+design system, every screen and state, prototypes, and an audit against the
+source contracts. Scope is **full** (every build slice), pilot screens first.
+Read [BRIEF.md](BRIEF.md) before working on any phase.
+
+Status keys: `[ ]` not started · `[~]` in progress · `[x]` done. Record the
+link to each published artifact next to its item when it exists.
+
+## Where the work lives
+
+| Deliverable | Home | Mirror in this repo |
+| --- | --- | --- |
+| Research report, personas, journeys | A shared doc on claude.ai | `docs/research/` (Markdown copy) |
+| Visual directions | A Design canvas artifact on claude.ai | Link in this file |
+| Design system | A Design System artifact on claude.ai | `docs/design-system/` (tokens and component notes, later as code tokens) |
+| Screens and states | Design canvas artifacts on claude.ai, one per area | Links in this file |
+| Prototypes | Clickable artifacts on claude.ai | Links in this file |
+| Audit and handoff specs | This repo | `docs/audit/` |
+
+## Sample content used in every design
+
+- **Maya**, a ceramicist, blend mode (expert plus companion), sample tier
+  **"Kiln Club"** (renamed from the source docs' "Studio" so mockups never say
+  "Studio members" inside Qelvora Studio; see Brief section 15, item 6). Pottery
+  examples from the docs: cone 6 glazes, kiln repair, crawling glaze, Glazeco as
+  a sponsor.
+- **Devon**, a companion-mode creator (a musician), to show the companion
+  guardrails, the 90-minute signal and the warmer voice.
+- **@kilnfire**, the sample fan; **Priya**, Maya's team member (triage and drafter).
+
+## Phase 0: foundation
+
+- [x] Source documents committed as Markdown in `docs/source/`
+- [x] Naming rules ([NAMING.md](NAMING.md))
+- [x] Design brief ([BRIEF.md](BRIEF.md))
+- [x] This plan
+- [x] `CLAUDE.md` so every session starts from the brief
+
+## Phase 1: UX research
+
+Secondary research, expert analysis and research kits. Live sessions with real
+fans and creators are run by the team using the kits in 1.6.
+
+- [ ] 1.1 **Competitive and analogous teardown**: Bubble (Dear U), Weverse DM,
+      Fanfix, Patreon, Delphi, Character.AI, Cameo, Substack chat, Discord,
+      Instagram broadcast channels, plus pattern sources for trust and money
+      (bank card authentication, Stripe Checkout, Apple Wallet), messaging
+      (iMessage, WhatsApp), and queues (Linear, Superhuman, Front). Output: what
+      each gets right and wrong on identity, presence, paid access, waiting and
+      wellbeing, and what Qelvora should adopt or avoid.
+- [ ] 1.2 **Personas and jobs to be done**: expert fan, companion fan, expert
+      creator, companion creator, team member; plus the ops reviewer.
+- [ ] 1.3 **Journey maps** with emotions, risks and moments that matter:
+      fan first visit (creator-led and Instagram), free conversation to
+      membership, return visit, asking for the person (packet, waiting,
+      delivery), call; creator onboarding to first handled conversation, the
+      daily five minutes (Note, reactions, queue), correcting the AI, earnings;
+      team member triage.
+- [ ] 1.4 **Screen and state inventory matrix**: every screen × state × the
+      invariant and fixed copy it carries (built from Brief sections 9–11).
+- [ ] 1.5 **Design risks and hypotheses**, each with how the design addresses it:
+      telling AI from human at a glance; packet anxiety and price clarity; the
+      wait for a person; companion over-attachment; creator guilt and drop-off;
+      passkey signing friction; trust in the verification page; the empty state
+      before a creator has content.
+- [ ] 1.6 **Research kits**: the fan comprehension test (T-21: five threads mixing
+      every authorship state, "who wrote this?" per message, the pass bar agreed
+      before the pilot); a creator onboarding usability script; a packet and
+      checkout usability script; what to instrument for the pilot gates (Second
+      Review, section 8).
+
+## Phase 2: visual direction
+
+- [ ] 2.1 Three distinct brand directions (type, color, shape, motion, tone of
+      the wordmark placeholder), each applied to the same two key screens: a
+      fan thread mixing `ai`, a Note, an `approved_draft`, a signed `human_creator`
+      reply, a correction and a system line; and the creator home, public view.
+- [ ] 2.2 For each direction, the AI and person hue pair and three
+      approved-draft treatments (split bubble, gradient edge, stacked badge),
+      checked in light and dark and for color-blind rendering.
+- [ ] 2.3 Pick one direction (founder decision) and record it in the Brief's
+      decision log.
+
+## Phase 3: design system
+
+- [ ] 3.1 Foundations: color tokens (light and dark, WCAG AA), type scale,
+      spacing, radius, elevation, motion (with reduced-motion variants), iconography.
+- [ ] 3.2 **The authorship kit**: a word, glyph and color per state; the identity
+      strip in its three states; the Signed marker; the correction attachment; the
+      reserved states drawn but disabled.
+- [ ] 3.3 Conversation components: message bubbles for every state and delivery
+      state (local pending, accepted, generating, delivered, failed, interrupted);
+      citation chip (including "no longer accessible"); memory chip; context
+      card; composer (normal, trial, paused, human active, capacity zero); system
+      lines; Note card with reply box; reactions; voice-note players (human and AI).
+- [ ] 3.4 Money and request components: access lines, mode rows (price,
+      deadline, refund rule, capacity), packet disclosure checklist, rule line,
+      status stepper, receipt, spend-limit picker, countdowns.
+- [ ] 3.5 Studio components: queue cards (commitment, packet, rule match),
+      capacity header, "Instead" menu, label preview, passkey signing sheet,
+      source rows with scope chips, test-console transcript, version list, audit banner.
+- [ ] 3.6 Shared: navigation (fan tabs, studio tabs plus More, desktop sidebar),
+      sheets, dialogs, toasts, empty, loading and error patterns, offline banner,
+      notification rows, email templates, share card.
+- [ ] 3.7 Content guidelines: the copy system (fixed sentences, never-words,
+      the AI's voice) as usage rules on the components.
+
+## Phase 4: screens (every state, light and dark, phone and desktop where relevant)
+
+- [ ] 4A **Fan core, pilot**: public creator home (plus post, invite and
+      Instagram entrances), onboarding, processor consent, thread (every state),
+      memory card, packet, spend-limit step and checkout sheet, request status and
+      receipt, a Note in the thread, notifications.
+- [ ] 4B **Fan account and discovery, pilot**: Home, Discover, creator profile
+      (Access segment), post view, You, Me and privacy, spending and time,
+      verification page.
+- [ ] 4C **Studio on phone, pilot**: Notes and the Replies feed, Requests queue,
+      packet detail and reply composer, Threads with takeover and handback,
+      passkey signing sheet, weekly impact digest.
+- [ ] 4D **Studio on desktop, pilot**: verification and onboarding (external
+      proof, passkey, license, interview), My AI (mode, sources, style, rules,
+      approval, test console, versions, export, 72-hour digest), Offers, Publish
+      (basic), Earnings (minimal), Team and settings, License and sponsorships.
+- [ ] 4E **Slice 2, calls and native**: call screens for fan and creator
+      (pre-call, waiting, connected, reconnecting, every outcome), offering
+      times, native app (push, incoming call, in-app purchase sheets, offline).
+- [ ] 4F **Slice 3, producer and sharing**: share cards and their verification
+      pages, public answers with credits, Publish (full), Insights and producer,
+      AI voice notes.
+- [ ] 4G **Slice 4, the pass**: pass inside You, Discover markers, slot
+      replacement, pool earnings.
+- [ ] 4H **Ops console** (proposed; not in the source docs): verification review,
+      safety cases, disputes, pauses and license suspension.
+- [ ] 4I **Notifications and email**: every row of Product Design section 9 as
+      push, email and in-app designs.
+
+## Phase 5: prototypes
+
+- [ ] 5.1 Fan: from a creator's link in bio to a first useful, cited answer in
+      under two minutes.
+- [ ] 5.2 Fan: asking Maya to step in → packet → waiting → a signed reply →
+      share card.
+- [ ] 5.3 Creator: the daily five minutes (post a Note, react to replies, work
+      the queue, review and send a draft).
+- [ ] 5.4 Creator: onboarding to a published AI and its first handled conversation.
+- [ ] 5.5 The comprehension-test prototype for T-21.
+
+## Phase 6: audit and handoff
+
+- [ ] 6.1 Audit every screen against the invariants, the identity rules, the copy
+      system and the honest-state rules; log each finding and its fix.
+- [ ] 6.2 Accessibility audit (contrast in both themes, focus order, screen-reader
+      labels before bodies, reduced motion, color-blind simulation).
+- [ ] 6.3 Developer handoff: tokens as code, component specs and states, and the
+      screen-to-endpoint map from the System Architecture.
+
+## Proposed answers to the open questions (awaiting approval)
+
+From Brief section 15. Each becomes a decision-log row once approved.
+
+| # | Question | Proposal |
+| --- | --- | --- |
+| 1 | Stale trial wording | Follow D-26 and D-23: the state is "Your free conversation has ended", shown at the next natural pause, explaining the membership with the four access lines |
+| 2 | Auto-reply after 20 drafts | Follow D-12: the AI replies instantly once live; the approval policy covers only `approved_draft` |
+| 3 | Fan tabs | Four tabs (Home, Discover, Requests, You) with notifications behind a bell on Home; the pass lives in You and becomes a fifth tab only if testing fails |
+| 4 | Studio navigation on a phone | Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) |
+| 5 | Approved-draft treatment | Explore all three in phase 2; choose by the comprehension test, not by taste |
+| 6 | "Studio" naming | The creator app is "Qelvora Studio"; the sample tier is "Kiln Club" |
+| 7 | Theme default | Follow the system setting; both themes first-class |
+| 8 | Discover lead | Search by need with three example queries, categories below |
+| 9 | Studio density | Mobile-first for Notes, Requests and Threads; desktop-first for My AI and Insights; everything works on both |
+| 10 | AI vs human voice player | Same player shape, different identity: the label, glyph and color of the state, the Signed marker and "Recorded by Maya" on human notes, and an "AI voice" chip plus the spoken tag on AI notes |
+| 11 | Ops console | Design a minimal console in 4H |
