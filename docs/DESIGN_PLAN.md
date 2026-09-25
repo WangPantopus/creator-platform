@@ -12,7 +12,7 @@ link to each published artifact next to its item when it exists.
 
 | Deliverable | Home | Mirror in this repo |
 | --- | --- | --- |
-| Research report, personas, journeys | A shared doc on claude.ai | `docs/research/` (Markdown copy) |
+| Research report, personas, journeys | [Qelvora UX Research](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803) (shared doc on claude.ai) | [`docs/research/UX_RESEARCH.md`](research/UX_RESEARCH.md) |
 | Visual directions | A Design canvas artifact on claude.ai | Link in this file |
 | Design system | A Design System artifact on claude.ai | `docs/design-system/` (tokens and component notes, later as code tokens) |
 | Screens and states | Design canvas artifacts on claude.ai, one per area | Links in this file |
@@ -43,29 +43,36 @@ link to each published artifact next to its item when it exists.
 Secondary research, expert analysis and research kits. Live sessions with real
 fans and creators are run by the team using the kits in 1.6.
 
-- [ ] 1.1 **Competitive and analogous teardown**: Bubble (Dear U), Weverse DM,
+Delivered 2026-09-25 as the shared doc
+[Qelvora UX Research](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803),
+with a Markdown copy in [research/UX_RESEARCH.md](research/UX_RESEARCH.md).
+Follow-ups: web pages could not be opened during the research (network policy),
+so sourced claims rest on search extracts; Patreon, Instagram channels, Substack,
+Discord, Replika and the OnlyFans chatter ruling still need a teardown.
+
+- [x] 1.1 **Competitive and analogous teardown**: Bubble (Dear U), Weverse DM,
       Fanfix, Patreon, Delphi, Character.AI, Cameo, Substack chat, Discord,
       Instagram broadcast channels, plus pattern sources for trust and money
       (bank card authentication, Stripe Checkout, Apple Wallet), messaging
       (iMessage, WhatsApp), and queues (Linear, Superhuman, Front). Output: what
       each gets right and wrong on identity, presence, paid access, waiting and
       wellbeing, and what Qelvora should adopt or avoid.
-- [ ] 1.2 **Personas and jobs to be done**: expert fan, companion fan, expert
+- [x] 1.2 **Personas and jobs to be done**: expert fan, companion fan, expert
       creator, companion creator, team member; plus the ops reviewer.
-- [ ] 1.3 **Journey maps** with emotions, risks and moments that matter:
+- [x] 1.3 **Journey maps** with emotions, risks and moments that matter:
       fan first visit (creator-led and Instagram), free conversation to
       membership, return visit, asking for the person (packet, waiting,
       delivery), call; creator onboarding to first handled conversation, the
       daily five minutes (Note, reactions, queue), correcting the AI, earnings;
       team member triage.
-- [ ] 1.4 **Screen and state inventory matrix**: every screen × state × the
+- [x] 1.4 **Screen and state inventory matrix**: every screen × state × the
       invariant and fixed copy it carries (built from Brief sections 9–11).
-- [ ] 1.5 **Design risks and hypotheses**, each with how the design addresses it:
+- [x] 1.5 **Design risks and hypotheses**, each with how the design addresses it:
       telling AI from human at a glance; packet anxiety and price clarity; the
       wait for a person; companion over-attachment; creator guilt and drop-off;
       passkey signing friction; trust in the verification page; the empty state
       before a creator has content.
-- [ ] 1.6 **Research kits**: the fan comprehension test (T-21: five threads mixing
+- [x] 1.6 **Research kits**: the fan comprehension test (T-21: five threads mixing
       every authorship state, "who wrote this?" per message, the pass bar agreed
       before the pilot); a creator onboarding usability script; a packet and
       checkout usability script; what to instrument for the pilot gates (Second
@@ -156,20 +163,21 @@ fans and creators are run by the team using the kits in 1.6.
 - [ ] 6.3 Developer handoff: tokens as code, component specs and states, and the
       screen-to-endpoint map from the System Architecture.
 
-## Proposed answers to the open questions (awaiting approval)
+## Answers to the open questions
 
-From Brief section 15. Each becomes a decision-log row once approved.
+From Brief section 15. Approved on 2026-09-25 unless marked otherwise; approved
+rows are also in the Brief's decision log.
 
-| # | Question | Proposal |
-| --- | --- | --- |
-| 1 | Stale trial wording | Follow D-26 and D-23: the state is "Your free conversation has ended", shown at the next natural pause, explaining the membership with the four access lines |
-| 2 | Auto-reply after 20 drafts | Follow D-12: the AI replies instantly once live; the approval policy covers only `approved_draft` |
-| 3 | Fan tabs | Four tabs (Home, Discover, Requests, You) with notifications behind a bell on Home; the pass lives in You and becomes a fifth tab only if testing fails |
-| 4 | Studio navigation on a phone | Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) |
-| 5 | Approved-draft treatment | Explore all three in phase 2; choose by the comprehension test, not by taste |
-| 6 | "Studio" naming | The creator app is "Qelvora Studio"; the sample tier is "Kiln Club" |
-| 7 | Theme default | Follow the system setting; both themes first-class |
-| 8 | Discover lead | Search by need with three example queries, categories below |
-| 9 | Studio density | Mobile-first for Notes, Requests and Threads; desktop-first for My AI and Insights; everything works on both |
-| 10 | AI vs human voice player | Same player shape, different identity: the label, glyph and color of the state, the Signed marker and "Recorded by Maya" on human notes, and an "AI voice" chip plus the spoken tag on AI notes |
-| 11 | Ops console | Design a minimal console in 4H |
+| # | Question | Answer | Status |
+| --- | --- | --- | --- |
+| 1 | Stale trial wording | Follow D-26 and D-23: the state is "Your free conversation has ended", shown at the next natural pause, explaining the membership with the four access lines | Approved |
+| 2 | Auto-reply after 20 drafts | Follow D-12: the AI replies instantly once live; the approval policy covers only `approved_draft` | Approved |
+| 3 | Fan tabs | Four tabs (Home, Discover, Requests, You) with notifications behind a bell on Home; the pass lives in You and becomes a fifth tab only if testing fails | Approved |
+| 4 | Studio navigation on a phone | Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) | Approved |
+| 5 | Approved-draft treatment | Explore all three in phase 2; choose by the comprehension test, not by taste | Decided in Phase 2 |
+| 6 | "Studio" naming | The creator app is "Qelvora Studio"; the sample tier is "Kiln Club"; Devon is the second sample creator | Approved |
+| 7 | Theme default | Follow the system setting; both themes first-class | Approved |
+| 8 | Discover lead | Search by need with three example queries, categories below | Approved (source recommendation) |
+| 9 | Studio density | Mobile-first for Notes, Requests and Threads; desktop-first for My AI and Insights; everything works on both | Approved (source recommendation) |
+| 10 | AI vs human voice player | Same player shape, different identity: the label, glyph and color of the state, the Signed marker and "Recorded by Maya" on human notes, and an "AI voice" chip plus the spoken tag on AI notes | Decided in Phase 3 |
+| 11 | Ops console | Design a minimal console in 4H | Approved |

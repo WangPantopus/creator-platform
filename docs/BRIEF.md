@@ -218,7 +218,8 @@ Fixed sentences (use verbatim; `{…}` are variables):
 - "Official means Maya authorized this AI. It does not mean she read your message."
 - "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
 - "Maya and her authorized team can separately review this AI conversation. Those accesses are logged."
-- "Charged only when Maya accepts. If she declines or {deadline} pass, nothing is charged."
+- "Charged only when Maya accepts. If she declines or {deadline} pass, nothing is charged." followed, wherever a hold is placed, by "Your bank may show a pending hold for a few days."
+- ETA: "Maya usually decides in {range}" (a range from her record, for example "1 to 2 days"), always beside the absolute deadline.
 - "Maya may answer with her AI's draft; you'll see that label."
 - "Maya answers {mode} within {deadline} · {n} of {cap} left this week."
 - "Opening this conversation is logged and visible to the fan."
@@ -271,6 +272,17 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-09-25 | Scope: design every slice (pilot, calls and native, producer and AI voice, the pass), pilot screens first |
 | 2026-09-25 | Pantopus is the company; one Pantopus account signs in to every Pantopus app; Qelvora gets its own brand and design system |
 | 2026-09-25 | Source docs kept verbatim as Markdown in `docs/source/`; this brief is the working summary |
+| 2026-09-25 | Fan app: four tabs (Home, Discover, Requests, You); notifications behind a bell on Home; the pass lives in You |
+| 2026-09-25 | Studio on a phone: Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) |
+| 2026-09-25 | The creator app is "Qelvora Studio"; mockups use the sample tier "Kiln Club" and a second sample creator, Devon (companion mode) |
+| 2026-09-25 | Themes follow the system setting; light and dark are both fully designed |
+| 2026-09-25 | A minimal ops console is designed (verification review, safety cases, disputes, pauses) |
+| 2026-09-25 | Stale trial wording follows D-26 and D-23; approval policy follows D-12 (no auto-reply gate) |
+| 2026-09-25 | Copy: request ETAs are shown as a range from the creator's record ("Maya usually decides in 1 to 2 days") beside the absolute deadline, replacing the single-number ETA |
+| 2026-09-25 | Copy: the rule line gains "Your bank may show a pending hold for a few days." wherever a hold is placed |
+| 2026-09-25 | Notes may show their audience size ("to 2,314 Kiln Club members") when the creator turns it on |
+| 2026-09-25 | "Off the record" conversations: the AI writes no memory or open loops from them; they stay labeled, covered by the access notice (D-01) and retention (D-08), and deletable. Needs a domain-model and architecture addition before build |
+| 2026-09-25 | Brand aim: a high-end, premium product. The luxury comes from craft, calm, service and honesty ("quiet luxury"), never from status or exclusivity language, which the copy system forbids |
 
 ## 15. Open questions and known inconsistencies
 
