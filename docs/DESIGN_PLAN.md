@@ -82,7 +82,8 @@ Discord, Replika and the OnlyFans chatter ruling still need a teardown.
 
 Canvas: [Qelvora Visual Directions](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su),
 snapshot in [`design/phase2-directions/`](../design/phase2-directions/). Directions:
-A · Correspondence, B · Nocturne, C · Instrument. Waiting on the founder's pick (2.3).
+A · Correspondence, B · Nocturne, C · Instrument, and the founder-requested blend D · Atelier
+(mostly C, then A, then B), now the working direction.
 
 - [x] 2.1 Three distinct brand directions (type, color, shape, motion, tone of
       the wordmark placeholder), each applied to the same two key screens: a
@@ -91,7 +92,7 @@ A · Correspondence, B · Nocturne, C · Instrument. Waiting on the founder's pi
 - [x] 2.2 For each direction, the AI and person hue pair and three
       approved-draft treatments (split bubble, gradient edge, stacked badge),
       checked in light and dark and for color-blind rendering.
-- [ ] 2.3 Pick one direction (founder decision) and record it in the Brief's
+- [x] 2.3 Pick one direction (founder decision) and record it in the Brief's
       decision log.
 
 ## Phase 3: design system

@@ -5,31 +5,39 @@
   "launch": {"view": "canvas"},
   "pages": [],
   "boards": {
-    "Main.dc.html": {"x": 0, "y": 300, "w": 390, "h": 1800, "title": "A · Thread"},
-    "AStepIn.dc.html": {"x": 470, "y": 300, "w": 390, "h": 1500, "title": "A · Maya steps in"},
-    "AHome.dc.html": {"x": 940, "y": 300, "w": 390, "h": 1960, "title": "A · Creator home, public"},
-    "APacket.dc.html": {"x": 1410, "y": 300, "w": 390, "h": 1760, "title": "A · Ask Maya to step in"},
-    "AKit.dc.html": {"x": 1880, "y": 300, "w": 1100, "h": 1560, "title": "A · Identity kit"},
-    "BThread.dc.html": {"x": 0, "y": 2680, "w": 390, "h": 1800, "title": "B · Thread"},
-    "BStepIn.dc.html": {"x": 470, "y": 2680, "w": 390, "h": 1500, "title": "B · Maya steps in"},
-    "BHome.dc.html": {"x": 940, "y": 2680, "w": 390, "h": 1960, "title": "B · Creator home, public"},
-    "BPacket.dc.html": {"x": 1410, "y": 2680, "w": 390, "h": 1760, "title": "B · Ask Maya to step in"},
-    "BKit.dc.html": {"x": 1880, "y": 2680, "w": 1100, "h": 1560, "title": "B · Identity kit"},
-    "CThread.dc.html": {"x": 0, "y": 5060, "w": 390, "h": 1800, "title": "C · Thread"},
-    "CStepIn.dc.html": {"x": 470, "y": 5060, "w": 390, "h": 1500, "title": "C · Maya steps in"},
-    "CHome.dc.html": {"x": 940, "y": 5060, "w": 390, "h": 1960, "title": "C · Creator home, public"},
-    "CPacket.dc.html": {"x": 1410, "y": 5060, "w": 390, "h": 1760, "title": "C · Ask Maya to step in"},
-    "CKit.dc.html": {"x": 1880, "y": 5060, "w": 1100, "h": 1560, "title": "C · Identity kit"}
+    "DThread.dc.html": {"x": 0, "y": 300, "w": 390, "h": 1800, "title": "D · Thread"},
+    "DStepIn.dc.html": {"x": 470, "y": 300, "w": 390, "h": 1500, "title": "D · Maya steps in"},
+    "DStepInDark.dc.html": {"x": 940, "y": 300, "w": 390, "h": 1500, "title": "D · Maya steps in, night theme"},
+    "DHome.dc.html": {"x": 1410, "y": 300, "w": 390, "h": 2140, "title": "D · Creator home, public"},
+    "DPacket.dc.html": {"x": 1880, "y": 300, "w": 390, "h": 1760, "title": "D · Ask Maya to step in"},
+    "DKit.dc.html": {"x": 2350, "y": 300, "w": 1100, "h": 1680, "title": "D · Identity kit"},
+    "Main.dc.html": {"x": 0, "y": 2860, "w": 390, "h": 1800, "title": "A · Thread"},
+    "AStepIn.dc.html": {"x": 470, "y": 2860, "w": 390, "h": 1500, "title": "A · Maya steps in"},
+    "AHome.dc.html": {"x": 940, "y": 2860, "w": 390, "h": 1960, "title": "A · Creator home, public"},
+    "APacket.dc.html": {"x": 1410, "y": 2860, "w": 390, "h": 1760, "title": "A · Ask Maya to step in"},
+    "AKit.dc.html": {"x": 1880, "y": 2860, "w": 1100, "h": 1560, "title": "A · Identity kit"},
+    "BThread.dc.html": {"x": 0, "y": 5240, "w": 390, "h": 1800, "title": "B · Thread"},
+    "BStepIn.dc.html": {"x": 470, "y": 5240, "w": 390, "h": 1500, "title": "B · Maya steps in"},
+    "BHome.dc.html": {"x": 940, "y": 5240, "w": 390, "h": 1960, "title": "B · Creator home, public"},
+    "BPacket.dc.html": {"x": 1410, "y": 5240, "w": 390, "h": 1760, "title": "B · Ask Maya to step in"},
+    "BKit.dc.html": {"x": 1880, "y": 5240, "w": 1100, "h": 1560, "title": "B · Identity kit"},
+    "CThread.dc.html": {"x": 0, "y": 7620, "w": 390, "h": 1800, "title": "C · Thread"},
+    "CStepIn.dc.html": {"x": 470, "y": 7620, "w": 390, "h": 1500, "title": "C · Maya steps in"},
+    "CHome.dc.html": {"x": 940, "y": 7620, "w": 390, "h": 1960, "title": "C · Creator home, public"},
+    "CPacket.dc.html": {"x": 1410, "y": 7620, "w": 390, "h": 1760, "title": "C · Ask Maya to step in"},
+    "CKit.dc.html": {"x": 1880, "y": 7620, "w": 1100, "h": 1560, "title": "C · Identity kit"}
   },
   "order": [
+    "DThread.dc.html", "DStepIn.dc.html", "DStepInDark.dc.html", "DHome.dc.html", "DPacket.dc.html", "DKit.dc.html",
     "Main.dc.html", "AStepIn.dc.html", "AHome.dc.html", "APacket.dc.html", "AKit.dc.html",
     "BThread.dc.html", "BStepIn.dc.html", "BHome.dc.html", "BPacket.dc.html", "BKit.dc.html",
     "CThread.dc.html", "CStepIn.dc.html", "CHome.dc.html", "CPacket.dc.html", "CKit.dc.html"
   ],
   "notes": {
-    "rowA": {"x": 0, "y": 40, "text": "A · Correspondence", "kind": "title1", "maxW": 2980},
-    "rowB": {"x": 0, "y": 2420, "text": "B · Nocturne", "kind": "title1", "maxW": 2980},
-    "rowC": {"x": 0, "y": 4800, "text": "C · Instrument", "kind": "title1", "maxW": 2980}
+    "rowD": {"x": 0, "y": 40, "text": "D · Atelier · mostly C, then A, then B", "kind": "title1", "maxW": 3450},
+    "rowA": {"x": 0, "y": 2600, "text": "A · Correspondence", "kind": "title1", "maxW": 2980},
+    "rowB": {"x": 0, "y": 4980, "text": "B · Nocturne", "kind": "title1", "maxW": 2980},
+    "rowC": {"x": 0, "y": 7360, "text": "C · Instrument", "kind": "title1", "maxW": 2980}
   },
   "designSystems": []
 }

@@ -282,6 +282,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-09-25 | Copy: the rule line gains "Your bank may show a pending hold for a few days." wherever a hold is placed |
 | 2026-09-25 | Notes may show their audience size ("to 2,314 Kiln Club members") when the creator turns it on |
 | 2026-09-25 | "Off the record" conversations: the AI writes no memory or open loops from them; they stay labeled, covered by the access notice (D-01) and retention (D-08), and deletable. Needs a domain-model and architecture addition before build |
+| 2026-09-25 | Visual direction: a blend led by C · Instrument, then A · Correspondence, then B · Nocturne, built as D · Atelier. From C: Maya on a dark plate and the AI on a light panel, Geist and Geist Mono, precision details. From A: the wax seal, Newsreader for Maya's own words, receipts as keepsakes. From B: "house lights" while Maya is present, and the warm night palette as the dark theme. Person color ember #7E2E12 (#EE8D5F on the plate); AI color blue graphite #3A6795 |
 | 2026-09-25 | Brand aim: a high-end, premium product. The luxury comes from craft, calm, service and honesty ("quiet luxury"), never from status or exclusivity language, which the copy system forbids |
 
 ## 15. Open questions and known inconsistencies
