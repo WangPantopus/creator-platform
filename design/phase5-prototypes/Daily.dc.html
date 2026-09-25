@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prototype: the daily five minutes</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line)"><span class="qv-meta">PROTOTYPE 5.3 · {{label}}</span><button class="qv-link-btn" onClick="{{restart}}">Restart</button></div>
+<sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+<div style="flex-grow: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 30px; line-height: 32px">1 · Post a Note</h1>
+<x-import component-from-global-scope="Qelvora.Note" time="NOW" reply="{{no}}">Opened the kiln this morning. The new celadon came out the color of shallow water.</x-import>
+<button class="qv-btn qv-btn--maya qv-btn--block qv-on-maya" style="margin-top: auto" onClick="{{next}}"><span class="qv-seal" style="width: 28px; height: 28px; font-size: 17px">M</span>Sign and post to Kiln Club</button>
+</div>
+</sc-if>
+<sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+<div style="flex-grow: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 30px; line-height: 32px">2 · React to replies</h1>
+<x-import component-from-global-scope="Qelvora.Message" kind="fan">Shallow water is exactly it.</x-import>
+<button class="qv-btn qv-btn--secondary" onClick="{{next}}">React</button>
+</div>
+</sc-if>
+<sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+<div style="flex-grow: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 30px; line-height: 32px">3 · Work the queue</h1>
+<x-import component-from-global-scope="Qelvora.QueueCard" kind="packet" handle="@kilnfire" mode="Written reply" price="$25" due="DECIDE BY OCT 5" summary="Satin white crawls at the rim. What to change?" shared="summary, 1 photo" draft-ready="{{yes}}"></x-import>
+<button class="qv-btn qv-btn--secondary qv-btn--block" onClick="{{next}}">Open · the draft is ready</button>
+</div>
+</sc-if>
+<sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; background: var(--surface-sunken)">
+<div style="padding: 16px"><x-import component-from-global-scope="Qelvora.LabelPreview" kind="approved_draft"></x-import></div>
+<x-import component-from-global-scope="Qelvora.SigningSheet" title="Review and send" rows="{{rows}}"></x-import>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = (this.state && this.state.s) || 0;
+return { yes: true, no: false, label: ['NOTE', 'REACT', 'QUEUE', 'SIGN'][s], s0: s === 0, s1: s === 1, s2: s === 2, s3: s === 3,
+rows: [['Answer as', 'Prepared by AI · approved by Maya'], ['Fan is charged', '$25.00 now']],
+next: () => this.setState({ s: Math.min(s + 1, 3) }), restart: () => this.setState({ s: 0 }) };
+}
+}
+</script>
+</body>
+</html>

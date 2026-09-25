@@ -285,6 +285,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-09-25 | Visual direction: a blend led by C · Instrument, then A · Correspondence, then B · Nocturne, built as D · Atelier. From C: Maya on a dark plate and the AI on a light panel, Geist and Geist Mono, precision details. From A: the wax seal, Newsreader for Maya's own words, receipts as keepsakes. From B: "house lights" while Maya is present, and the warm night palette as the dark theme. Person color ember #7E2E12 (#EE8D5F on the plate); AI color blue graphite #3A6795 |
 | 2026-09-25 | Design system published in D · Atelier: [Qelvora](https://claude.ai/artifact/AyfModKVToY2VeqMACNxFU) (Design System artifact), snapshot in `design/design-system/`. Light and Night themes; 53 components, each with guidelines and a live preview |
 | 2026-09-25 | Deferred by the founder: AI provider names on the consent screen stay `[AI PROVIDERS]`; native in-app purchase for paid replies waits for counsel; cards are designed as a direct card hold |
+| 2026-09-25 | Phases 4 to 6 drafted end to end: 64 screens on six canvases, five prototypes, the audit and developer handoff (see the design plan for links) |
 | 2026-09-25 | Brand aim: a high-end, premium product. The luxury comes from craft, calm, service and honesty ("quiet luxury"), never from status or exclusivity language, which the copy system forbids |
 
 ## 15. Open questions and known inconsistencies

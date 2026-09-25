@@ -160,22 +160,26 @@ every text pair holds 4.5:1 or more in both themes.
 
 ## Phase 5: prototypes
 
-- [ ] 5.1 Fan: from a creator's link in bio to a first useful, cited answer in
+Canvas: [Qelvora · Prototypes](https://claude.ai/artifact/BCbknq2yt777Du9u8c4Yep), snapshot in `design/phase5-prototypes/`.
+
+- [x] 5.1 Fan: from a creator's link in bio to a first useful, cited answer in
       under two minutes.
-- [ ] 5.2 Fan: asking Maya to step in → packet → waiting → a signed reply →
+- [x] 5.2 Fan: asking Maya to step in → packet → waiting → a signed reply →
       share card.
-- [ ] 5.3 Creator: the daily five minutes (post a Note, react to replies, work
+- [x] 5.3 Creator: the daily five minutes (post a Note, react to replies, work
       the queue, review and send a draft).
-- [ ] 5.4 Creator: onboarding to a published AI and its first handled conversation.
-- [ ] 5.5 The comprehension-test prototype for T-21.
+- [x] 5.4 Creator: onboarding to a published AI and its first handled conversation.
+- [x] 5.5 The comprehension-test prototype for T-21.
 
 ## Phase 6: audit and handoff
 
-- [ ] 6.1 Audit every screen against the invariants, the identity rules, the copy
+Audit: [`docs/audit/AUDIT.md`](audit/AUDIT.md) (14 findings, 13 fixed, 1 open proposal; canvases not visually verified). Handoff: [`design/handoff/`](../design/handoff/).
+
+- [x] 6.1 Audit every screen against the invariants, the identity rules, the copy
       system and the honest-state rules; log each finding and its fix.
-- [ ] 6.2 Accessibility audit (contrast in both themes, focus order, screen-reader
+- [x] 6.2 Accessibility audit (contrast in both themes, focus order, screen-reader
       labels before bodies, reduced motion, color-blind simulation).
-- [ ] 6.3 Developer handoff: tokens as code, component specs and states, and the
+- [x] 6.3 Developer handoff: tokens as code, component specs and states, and the
       screen-to-endpoint map from the System Architecture.
 
 ## Answers to the open questions

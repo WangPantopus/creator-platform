@@ -1,0 +1,78 @@
+:root, [data-theme="light"] {
+  --ground: #F3F2EE;
+  --surface: #FFFFFF;
+  --surface-sunken: #E6E4DE;
+  --line: #DAD8D2;
+  --control-line: #7F7D78;
+  --ink: #1B1A18;
+  --ink-muted: #5C5B57;
+  --ai-surface: #FFFFFF;
+  --ai-line: #C8D2DC;
+  --ai-ink: #3A6795;
+  --on-ai: #FFFFFF;
+  --maya-surface: #1C1B19;
+  --maya-line: #1C1B19;
+  --on-maya: #F4F1EA;
+  --on-maya-muted: #ABA8A1;
+  --maya-accent: #EE8D5F;
+  --on-maya-accent: #1C1B19;
+  --maya-ink: #7E2E12;
+  --team-surface: #ECEAE5;
+  --team-ink: #5C5B57;
+  --alert: #B42318;
+  --focus: var(--ink);
+  --focus-on-maya: var(--maya-accent);
+  --shadow-plate: 0 20px 34px -24px rgba(28,27,25,0.8);
+  --shadow-sheet: 0 -12px 40px rgba(28,27,25,0.22);
+  --glow-maya: 0 18px 38px -20px rgba(238,141,95,0.62);
+}
+[data-theme="night"] {
+  --ground: #14120F;
+  --surface: #211E1A;
+  --surface-sunken: #2A2621;
+  --line: #3A342D;
+  --control-line: #80796E;
+  --ink: #ECE6DA;
+  --ink-muted: #A39C8F;
+  --ai-surface: #1B1F23;
+  --ai-line: #3A4652;
+  --ai-ink: #A3B8CC;
+  --on-ai: #14120F;
+  --maya-surface: #2B211A;
+  --maya-line: #5A3F2C;
+  --on-maya: #ECE6DA;
+  --on-maya-muted: #B3A99A;
+  --maya-accent: #E89A6E;
+  --on-maya-accent: #14120F;
+  --maya-ink: #E89A6E;
+  --team-surface: #24221F;
+  --team-ink: #A39C8F;
+  --alert: #FF8A7A;
+  --focus: var(--ink);
+  --focus-on-maya: var(--maya-accent);
+  --shadow-plate: 0 20px 34px -24px rgba(0,0,0,0.9);
+  --shadow-sheet: 0 -12px 40px rgba(0,0,0,0.6);
+  --glow-maya: 0 18px 40px -22px rgba(232,154,110,0.62);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-tail: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --z-strip: 10;
+  --z-composer: 20;
+  --z-sheet: 40;
+  --font-sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: Newsreader, Georgia, "Times New Roman", serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}

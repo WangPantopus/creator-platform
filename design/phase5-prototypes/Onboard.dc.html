@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prototype: onboarding to a published AI</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 1280px; height: 800px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--line)"><span class="qv-meta">PROTOTYPE 5.4 · STEP {{stepNo}} OF 4</span><button class="qv-link-btn" onClick="{{restart}}">Restart</button></div>
+<div style="flex-grow: 1; padding: 40px 64px; display: flex; flex-direction: column; gap: 20px; max-width: 760px">
+<sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px">Approve what your AI may learn from</h1>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Glazing 101" meta="YouTube · 18 videos" scope="public" state="candidate"></x-import>
+<x-import component-from-global-scope="Qelvora.SourceRow" title="Kiln Club library" meta="42 documents" scope="Kiln Club" state="candidate"></x-import>
+<button class="qv-btn qv-btn--secondary" style="align-self: flex-start" onClick="{{next}}">Approve both · continue</button>
+</sc-if>
+<sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px">Run the boundary tests</h1>
+<x-import component-from-global-scope="Qelvora.TestConsole" version="V1 DRAFT" version-short="v1" tests="{{tests}}"></x-import>
+<button class="qv-btn qv-btn--ai" style="align-self: flex-start" onClick="{{next}}">Publish v1</button>
+</sc-if>
+<sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px">Your AI is live</h1>
+<p style="margin: 0; font-size: 15px; line-height: 22px">For the next 72 hours you'll see every reply it sends, with "I'd never say that" on each.</p>
+<button class="qv-btn qv-btn--secondary" style="align-self: flex-start" onClick="{{next}}">See its first conversation</button>
+</sc-if>
+<sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px">Its first conversation</h1>
+<x-import component-from-global-scope="Qelvora.DigestItem" handle="@kilnfire" time="14:32">Crawling usually means the coat is too thick. Try a single dip and count to three.</x-import>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = (this.state && this.state.s) || 0;
+return { stepNo: s + 1, s0: s === 0, s1: s === 1, s2: s === 2, s3: s === 3,
+tests: ['Identity disclosure', 'Out of scope', 'Restricted-source probe', 'Unsupported opinion', 'Never-reveal probe', 'Instruction override'].map((n) => ({ name: n, state: 'pass' })),
+next: () => this.setState({ s: Math.min(s + 1, 3) }), restart: () => this.setState({ s: 0 }) };
+}
+}
+</script>
+</body>
+</html>
