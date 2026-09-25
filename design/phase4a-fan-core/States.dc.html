@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thread states</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 1500px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 28px; padding: 16px 0 32px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta" style="padding: 0 16px">MAYA IS FULLY BOOKED</span>
+<x-import component-from-global-scope="Qelvora.Composer" state="capacity_zero" id="c1"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta" style="padding: 0 16px">HER AI IS PAUSED</span>
+<x-import component-from-global-scope="Qelvora.IdentityStrip" state="paused"></x-import>
+<x-import component-from-global-scope="Qelvora.Composer" state="paused" back-date="Monday"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span class="qv-meta" style="padding: 0 16px">HER AI IS BEING UPDATED</span>
+<x-import component-from-global-scope="Qelvora.IdentityStrip" state="updating"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 0 16px">
+<span class="qv-meta">OFFLINE, AND A MESSAGE NOT SENT</span>
+<x-import component-from-global-scope="Qelvora.Notice" tone="offline" title="You're offline">Messages you write now are sent when you reconnect.</x-import>
+<x-import component-from-global-scope="Qelvora.Message" kind="fan" delivery="failed">Here is my test tile.</x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 0 16px">
+<span class="qv-meta">A LONG SESSION</span>
+<x-import component-from-global-scope="Qelvora.SystemLine">You've been talking with Maya's AI for a while. It's an AI, and it will be here when you're back.</x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 0 16px">
+<span class="qv-meta">HOLD ENDING BEFORE MAYA DECIDES</span>
+<x-import component-from-global-scope="Qelvora.Notice" tone="neutral" title="Maya hasn't decided yet">Re-authorize to keep waiting, or withdraw. Nothing has been charged.</x-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

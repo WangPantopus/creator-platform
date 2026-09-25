@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add a card</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: var(--surface-sunken); font-family: var(--font-sans); color: var(--ink); display: flex; flex-direction: column; justify-content: flex-end">
+<div class="qv" style="background: var(--surface); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-sheet); padding: 12px 20px 36px; display: flex; flex-direction: column; gap: 20px">
+<div style="width: 36px; height: 5px; border-radius: 3px; background: var(--line); align-self: center"></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="qv-meta">REQ-0412 · WRITTEN REPLY</span>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">A hold, not a charge</h1>
+</div>
+<div class="qv-field"><label class="qv-field__label" for="card">Card number</label><input id="card" class="qv-input" value="4242 4242 4242 4242"></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div class="qv-field"><label class="qv-field__label" for="exp">Expiry</label><input id="exp" class="qv-input" value="08 / 29"></div>
+<div class="qv-field"><label class="qv-field__label" for="cvc">Security code</label><input id="cvc" class="qv-input" value="•••"></div>
+</div>
+<x-import component-from-global-scope="Qelvora.TermsBlock" draft-note="{{no}}"></x-import>
+<x-import component-from-global-scope="Qelvora.Button" variant="maya" size="lg" block="{{yes}}">Place hold · $25.00</x-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, no: false }; }
+}
+</script>
+</body>
+</html>

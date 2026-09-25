@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Your handle</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--ground); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; padding: 16px 20px 36px; gap: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<a href="Welcome.dc.html" aria-label="Back" style="width: 44px; height: 44px; margin-left: -12px; display: flex; align-items: center; justify-content: center; color: var(--ink)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13.5 4.5L7 11l6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<span class="qv-meta">SIGNED IN WITH PANTOPUS</span>
+</div>
+<h1 style="margin: 0; font-family: var(--font-serif); font-weight: 400; font-size: 34px; line-height: 36px; letter-spacing: -0.02em">How creators will know you</h1>
+<div class="qv-field">
+<label class="qv-field__label" for="handle">Handle</label>
+<input id="handle" class="qv-input" value="@kilnfire">
+<div class="qv-help">Creators and their teams see your handle, never your name or city unless you share them in a request.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg)">
+<span class="qv-meta">A LINE ABOUT YOU · OPTIONAL</span>
+<label for="intro" class="qv-sr">A line about you</label>
+<textarea id="intro" rows="3" style="border: 0; background: transparent; font: 15px/22px var(--font-sans); color: var(--ink); resize: none">Hobby potter, garage studio, cone 6 electric.</textarea>
+<span class="qv-help">You choose, per creator, whether their AI may use this.</span>
+</div>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<a href="Consent.dc.html" class="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block">Continue</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

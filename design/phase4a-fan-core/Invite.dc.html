@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>An invitation from Maya</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/qelvora/tokens.css">
+<link rel="stylesheet" href="ds/qelvora/components/bundle.css">
+<script src="ds/qelvora/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div class="qv-on-maya" style="width: 390px; height: 844px; box-sizing: border-box; background: var(--maya-surface); color: var(--on-maya); font-family: var(--font-sans); display: flex; flex-direction: column; padding: 64px 24px 40px; --qv-cut: var(--maya-surface)">
+<span style="font-family: var(--font-serif); font-style: italic; font-size: 18px; color: var(--on-maya-muted)">Qelvora</span>
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 22px">
+<x-import component-from-global-scope="Qelvora.Seal" size="{{s56}}" live="{{yes}}"></x-import>
+<span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; color: var(--maya-accent)">AN INVITATION FROM MAYA · TO WORKSHOP GUESTS</span>
+<p style="margin: 0; font-family: var(--font-serif); font-size: 30px; line-height: 38px; letter-spacing: -0.015em">Thank you for Saturday. My AI can answer glaze questions any hour; when you want me, ask, and I'll decide within a couple of days.</p>
+<x-import component-from-global-scope="Qelvora.SignedMarker" extra="Sep 21"></x-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<a href="Welcome.dc.html" class="qv-btn qv-btn--lg qv-btn--block" style="background: var(--maya-accent); color: var(--on-maya-accent)">Accept the invitation</a>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: var(--on-maya-muted); text-align: center">Includes a free first conversation with Maya's AI. No card needed.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return { yes: true, s56: 56 }; }
+}
+</script>
+</body>
+</html>
