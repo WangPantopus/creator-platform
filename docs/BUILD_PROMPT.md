@@ -36,8 +36,8 @@ ask; do not guess.
 
 ## 2. Stack
 
-Use **TypeScript end to end**, matching the Pantopus monorepo (Node backend,
-Next.js web, pnpm and Turbo) and the architecture's ADRs:
+Match the Pantopus monorepo (Node backend, Next.js web, native Swift iOS and
+native Kotlin Android, pnpm and Turbo) and the architecture's ADRs:
 
 - **Backend:** a new module family inside the existing Pantopus Node backend
   (ADR-1, a modular monolith), deployed as the three runtime pools the ADR
@@ -48,15 +48,22 @@ Next.js web, pnpm and Turbo) and the architecture's ADRs:
 - **Web:** Next.js (App Router) with React 18+, for the fan web app, the
   creator's public home and verification pages (server-rendered and shareable),
   Qelvora Studio on desktop, and the ops console.
-- **Native:** Expo (React Native) for iOS and Android, as the architecture's
-  native shell specifies: push, incoming-call UI, in-app purchase, offline.
+- **iOS:** native Swift and SwiftUI, inside the Pantopus iOS app workspace
+  conventions: push, CallKit incoming calls, StoreKit 2 in-app purchase,
+  passkeys for signed acts, offline. This replaces the architecture's Expo shell
+  (founder decision).
+- **Android:** native Kotlin and Jetpack Compose, same scope: FCM push,
+  ConnectionService calls, Play Billing, Credential Manager passkeys, offline.
 - **Providers, each behind an interface:** Stripe (PaymentIntents with manual
   capture, Billing, Connect Express), LiveKit Cloud for calls, the model provider,
   and the voice provider.
 - **Shared packages:** `@qelvora/tokens` generated from
   `design/handoff/tokens.json`, `@qelvora/copy` (every fixed sentence, one
-  source), `@qelvora/api` (typed client and schemas), and `@qelvora/ui-web` and
-  `@qelvora/ui-native` implementing the same component set.
+  source), `@qelvora/api` (typed client and schemas, with an OpenAPI spec generated
+  from them), and `@qelvora/ui-web`. From the same `tokens.json` and copy file,
+  generate `QelvoraTokens.swift` and `QelvoraTokens.kt` and the native string
+  catalogs, and generate the Swift and Kotlin API clients from the OpenAPI spec,
+  so all three clients share one source of truth.
 
 ## 3. The design is the spec: reproduce it exactly
 
@@ -81,8 +88,9 @@ Rules:
 2. **Components first.** Port every design-system component with the same
    name, props, variants and states as `index.d.ts`. On web, start from
    `bundle.js` and `bundle.css` and convert them to typed React components with
-   the same class structure and CSS. On native, rebuild each one with identical
-   measurements from the same tokens. Screens are built only from these
+   the same class structure and CSS. On iOS (SwiftUI) and Android (Compose), rebuild each one
+   as a native component with identical measurements from the generated tokens,
+   with a preview catalog that mirrors the design-system previews. Screens are built only from these
    components plus layout.
 3. **Screens match pixel for pixel.** Build each `.dc.html` screen with the same
    hierarchy, order, spacing, sizes, copy and states. Phone layouts are 390 pt
@@ -91,7 +99,9 @@ Rules:
 4. **Visual regression is mandatory.** Render every design screen and your
    implementation at the same size, in Light and Night, and diff them.
    `design/visual-review/render.js` shows how the design files render headlessly.
-   Store baselines in the repo and run the comparison in CI; a screen is not done
+   On iOS use snapshot tests (swift-snapshot-testing) and on Android Paparazzi
+   or Roborazzi, compared against the design renders. Store baselines in the repo
+   and run the comparison in CI; a screen is not done
    until its diff is reviewed and accepted.
 5. **Both themes, everywhere.** Themes follow the system setting through
    `data-theme` and native appearance. Every screen must work in Light and Night.
@@ -138,8 +148,8 @@ with its screens, backend, tests and visual baselines:
 - Implement every test in the Domain Model (T-01 onward) as automated tests,
   especially money (holds, capture, refunds, idempotency), the thread-isolation
   property test (T-11) and the takeover mid-stream test (T-23).
-- Unit, integration and end-to-end tests (Playwright on web, Detox or Maestro on
-  native) for every flow in the prototypes (5.1 to 5.5).
+- Unit, integration and end-to-end tests (Playwright on web, XCUITest on iOS,
+  Compose UI tests or Maestro on Android) for every flow in the prototypes (5.1 to 5.5).
 - Accessibility: WCAG 2.2 AA, Dynamic Type up to 200%, reduced motion, focus
   order, VoiceOver and TalkBack checks, 44 pt touch targets.
 - Performance: meet the latency budget in the architecture (section 5); the
