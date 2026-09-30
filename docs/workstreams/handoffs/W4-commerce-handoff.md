@@ -4,6 +4,8 @@ W4 is handed to the next primary implementation agent at a working implementatio
 
 The founder now explicitly requests a feature-branch commit and push, a complete handoff, and a prompt to finish the remaining work. Publication branch: **`codex/w4-commerce-handoff`**, remote **`WangPantopus/creator-platform`**. Publication uses a frozen snapshot and a separate Git index, preserving the shared checkout on `main` and its existing changes. The branch contains a shared dependency checkpoint followed by W4 implementation/evidence/handoff. The dependency checkpoint includes existing foundation/peer code required by the registered application roots; it is not a claim that W4 authored or accepted those domains. Publication details and file hashes are in [the checkpoint manifest](W4-checkpoint.json). Non-W4 runtime artifacts are not included in that snapshot; existing source, documentation and test files are preserved.
 
+Local resource availability changed after publication at the founder’s request. [Resource release and the remaining Docker blocker](W4-resource-release.md) supersede the historical running-device/process/tmp state below. Source and evidence remain preserved.
+
 ## Start here and source authority
 
 1. Read [the comprehensive continuation prompt](../prompts/W4-resume-to-completion.md), then this entire handoff.
