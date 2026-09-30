@@ -920,5 +920,58 @@
       "MarkMatchesPriorLocalCapture": true
     },
     "remoteRerun": "pending"
+  },
+  "sharpHeadlessCaptureHandoff": {
+    "recordedAt": "2026-09-30T21:30:38.077902+00:00",
+    "parentRevision": "9b193d288781d873453bb41a2a97989679b2caa6",
+    "producer": "eedf35fc82544ab9216384896b84e376f2c323f4",
+    "genuineProducerRun": "https://github.com/WangPantopus/creator-platform/actions/runs/36763954818",
+    "genuineProducerHead": "7b167fb",
+    "genuineProducerImages": 110,
+    "genuineProducerPixels": [780, 1688],
+    "observed": "Explicit2x bitmap still enlarged a blurry1x host raster; Welcome Light personally compared with sharp local output.",
+    "fix": "Scale window/host frame by2/window.backingScaleFactor while retaining390x844 logical host bounds and explicit780x1688 sRGB bitmap; references/strict equality unchanged.",
+    "sourceSHA256": "090616b4bcd2282a41f7228a25293b920f3a9abec8f6bb5605d72addfe440385",
+    "local": {
+      "compilation": "passed",
+      "nonSnapshotCasesPassed": 15,
+      "snapshotCases": 3,
+      "strictImageFailures": 110,
+      "snapshotSeconds": 54.667,
+      "outputPixels": [780, 1688],
+      "decodedImagesIdenticalToPreviousLocal2x": 110,
+      "log": "/tmp/qelvora-w6-swift-host-coordinate-20260930.log",
+      "artifacts": "/tmp/qelvora-w6-swift-host-coordinate-20260930/NativeSnapshotTests"
+    },
+    "reviewImagesSHA256": {
+      "ci-w5-welcome-light.png": "972fad779c720f569f784a94b50b4e283dc6f999465eb9e94f16518637bf7824",
+      "local-host-corrected-welcome-light.png": "f3bf9339e63aaa9fc948bdab0b37bd6a9154cef75e96b2471009b156017413da"
+    },
+    "newReferences": 0,
+    "changedTolerances": false,
+    "remoteSharpCaptureVerification": "pending; inspect exact new PR head checks/artifacts before further pushes",
+    "supersededRemote": {
+      "head": "9b193d288781d873453bb41a2a97989679b2caa6",
+      "foundationRun": 36775179503,
+      "webAndBackend": "passed",
+      "androidRuntime": "passed",
+      "trustRun": 36775179551,
+      "trust": "passed",
+      "macOSJobs": "all3 queued about40 minutes before handoff/capture push"
+    },
+    "finalProducerRefs": {
+      "W1": "ea82025fff129ef8132d932b9c30a8cc2b5821a1",
+      "W2": "1e897375042df6001c559ae4f0e805b1aee51ca5",
+      "W3": "bb2c7f84c6fcd5e184f6cbe819f72b6b687fc8d9",
+      "W4": "c4275d47e4bfc74e50e2851989a3b781abd9fc6c",
+      "W5": "d9ce38ec2ba92a090d776e9e5e15fb168f29e01e",
+      "W7": "f406b09423c0c84cc0f378ca7f609711d9d29a6f",
+      "W8": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4"
+    },
+    "main": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+    "availabilityAllocated": false,
+    "configuredMediaCallProvidersFound": false,
+    "founderPolicies": "undecided; answered2026-09-30; not missing approved configuration paths",
+    "openaiRequests": 0
   }
 }

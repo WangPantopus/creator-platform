@@ -79,6 +79,12 @@
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
       window.colorSpace = .sRGB
       window.contentView = host
+      // Preserve sharp 2x rasterization even when the attached display is 1x.
+      let hostScale = 2 / window.backingScaleFactor
+      window.setContentSize(
+        CGSize(width: size.width * hostScale, height: size.height * hostScale))
+      host.frame = NSRect(origin: .zero, size: window.contentLayoutRect.size)
+      host.bounds = NSRect(origin: .zero, size: size)
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
