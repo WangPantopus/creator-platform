@@ -65,12 +65,15 @@ export class Database {
       await assertCurrentSession(client, scope.actorAccountId);
       // Issued scopes are not durable authority. Recheck role/verification before
       // any scoped read or mutation, including a queued request using an old scope.
+      // Acquire the domain's exclusive thread lock before idempotency locks.
+      // Concurrent SHARE holders otherwise deadlock when a callback upgrades
+      // to UPDATE while another retry waits for its idempotency key.
       const authority = await client.query(
         `SELECT 1 FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
          WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND c.account_id=$6 AND t.deleted_at IS NULL AND (
          ($5='fan' AND f.account_id=$4) OR ($5='creator' AND c.account_id=$4 AND c.verification='verified') OR
          ($5='triage' AND c.verification='verified' AND EXISTS(SELECT 1 FROM creator.team_membership tm WHERE tm.creator_id=c.id AND tm.account_id=$4 AND tm.revoked_at IS NULL AND 'triage'=ANY(tm.roles))))
-         FOR SHARE OF t`,
+         FOR UPDATE OF t`,
         [
           scope.threadId,
           scope.creatorId,

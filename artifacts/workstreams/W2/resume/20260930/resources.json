@@ -31,14 +31,15 @@
     "rates": "Explicit synthetic ordinary/output/cache-read/cache-write prices in private provider.env; no production approval"
   },
   "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
-  "reviewRuntime": "Retained for successor: API restarted with responses-v2-cache-accounting; Studio companion revision 16/current seven-case pass, publication disabled",
+  "reviewRuntime": "Retained for successor: API restarted with cache accounting and exclusive-first thread locking; Studio companion revision 16/current seven-case pass, publication disabled",
   "existingTestCluster": {
     "container": "creator-platform-w2-checks-20260930",
     "port": 55449,
     "database": "creator_w2_foundation_test",
     "purpose": "Existing tests reset schema/runtime password; isolated from Studio and peers",
     "disposable": true,
-    "state": "Removed after local checks; remote backend/root checks pass on isolated CI PostgreSQL"
+    "state": "Removed again after unchanged deadlock reproduction and full 18-case/10,000-pair verification; port 55449 released",
+    "latestVerification": "deadlock-remediation.json"
   },
   "preflight": "Ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
@@ -61,10 +62,10 @@
       "executionSession": 76235
     },
     "api": {
-      "pid": 85113,
-      "executionSession": 50327
+      "pid": 91186,
+      "executionSession": 79779
     },
-    "observedAt": "2026-09-30T21:22:18.751Z",
+    "observedAt": "2026-09-30T21:38:59.985Z",
     "warning": "Inspect current listener identity before stopping/restarting; these PIDs are observations."
   },
   "currentDraft": {
