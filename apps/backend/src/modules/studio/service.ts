@@ -171,12 +171,12 @@ export class StudioService {
           `WITH queue AS (
         SELECT p.id,p.fan_id,f.handle,p.version,p.state,p.payment_state,p.snapshot,p.disclosure,p.decision_at,p.hold_expires_at,p.submitted_at,
          c.id AS commitment_id,c.state AS commitment_state,c.version AS commitment_version,c.due_at,
-         CASE WHEN c.state IN('due','in_progress') THEN 0 ELSE 1 END AS priority,
-         CASE WHEN c.state IN('due','in_progress') THEN c.due_at ELSE p.decision_at END AS deadline
+         CASE WHEN c.state IN('due','in_progress') THEN 0 WHEN p.state='submitted' THEN 1 ELSE 2 END AS priority,
+         CASE WHEN c.state IN('due','in_progress') THEN c.due_at WHEN p.state='submitted' THEN p.decision_at ELSE p.hold_expires_at END AS deadline
         FROM creator.commerce_packet p JOIN creator.fan_profile f ON f.id=p.fan_id LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id
         WHERE p.creator_id=$1 AND (c.state IN('due','in_progress') OR p.state IN('submitted','more_info','offer_pending'))
-        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state IN('submitted','offer_pending')) OR ($2='more_info' AND p.state='more_info'))
-      ) SELECT * FROM queue WHERE $3::uuid IS NULL OR (priority,deadline,id)>(SELECT priority,deadline,id FROM queue WHERE id=$3) ORDER BY priority,deadline,id LIMIT $4`,
+        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state='submitted') OR ($2='more_info' AND p.state='more_info'))
+      ) SELECT * FROM queue WHERE $3::uuid IS NULL OR (priority,coalesce(deadline,'infinity'::timestamptz),id)>(SELECT priority,coalesce(deadline,'infinity'::timestamptz),id FROM queue WHERE id=$3) ORDER BY priority,deadline NULLS LAST,id LIMIT $4`,
           [creatorId, input.filter, input.cursor ?? null, input.limit + 1],
         )
       ).rows;

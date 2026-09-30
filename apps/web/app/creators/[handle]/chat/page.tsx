@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { sessionCookie } from "../../../../lib/session";
 import { Button, Notice } from "@qelvora/ui-web";
 import { growthRequest } from "../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../features/growth/shell";
@@ -32,7 +33,7 @@ export default async function ContextualChat({
         throw new Error("This post cannot be used as conversation context.");
     }
     const jar = await cookies();
-    const signedIn = Boolean(jar.get("qelvora_session"));
+    const signedIn = Boolean(jar.get(sessionCookie));
     const returnTo = `/creators/${handle}/chat${context ? `?context=${context}` : ""}`;
     return (
       <GrowthShell>

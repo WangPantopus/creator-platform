@@ -1,8 +1,22 @@
 import { cookies } from "next/headers";
 import { SessionSchema } from "@qelvora/api";
 
-export const sessionCookie = "qelvora_session";
-export const continuationCookie = "qelvora_continuation";
+// C01 from W1 cf851a5: cookies are shared across ports on a hostname.
+// Isolate explicitly configured loopback development apps from peer sessions.
+function developmentCookieSuffix() {
+  if (process.env.NODE_ENV === "production") return "";
+  const configured =
+    process.env.QELVORA_PUBLIC_ORIGIN ?? process.env.WEB_ORIGIN;
+  if (!configured) return "";
+  const origin = new URL(configured);
+  return ["localhost", "127.0.0.1", "[::1]"].includes(origin.hostname)
+    ? `_${origin.port || (origin.protocol === "https:" ? "443" : "80")}`
+    : "";
+}
+const cookieSuffix = developmentCookieSuffix();
+export const sessionCookie = `qelvora_session${cookieSuffix}`;
+export const continuationCookie = `qelvora_continuation${cookieSuffix}`;
+export const continuationReturnCookie = `qelvora_auth_return${cookieSuffix}`;
 export const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",

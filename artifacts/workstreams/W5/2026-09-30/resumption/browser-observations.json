@@ -1,0 +1,40 @@
+{
+  "host": "localhost3005 -> persisted API4105 creator_w5 nonowner runtime",
+  "actor": "explicit synthetic W5 development creator",
+  "viewportChecks": [
+    {
+      "width": 390,
+      "themes": [
+        "light",
+        "night"
+      ],
+      "focusedElement": "note-text",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1280,
+      "themes": [
+        "light",
+        "night"
+      ],
+      "sidebarWidth": 248
+    }
+  ],
+  "journeys": [
+    "real development continuation sign-in retained through Studio navigation",
+    "saved draft reopened revision4 with exact text",
+    "own API stopped; private composer hidden/inert during transport outage",
+    "own API restarted; current account/roles revalidated; exact unsaved text and textarea focus restored",
+    "genuine signing review savedrevision5 and returned registered creator passkey required"
+  ],
+  "publication": false,
+  "signedAct": false,
+  "media": false,
+  "isolatedFans": false,
+  "roleRace": "not yet checked concurrently",
+  "limitations": [
+    "No real passkey was available; no UV simulated.",
+    "Cookie success is bounded to this namespaced session.",
+    "Screenshots prove current composer layout, not remaining packet/provider/native flows."
+  ]
+}

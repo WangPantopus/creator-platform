@@ -34,7 +34,7 @@ import type {
   PrivateNoteReply,
 } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
-import { studioRequest } from "./api";
+import { StudioFailure, studioRequest } from "./api";
 import "./studio.css";
 
 type Creator = {
@@ -176,8 +176,11 @@ export function Studio({
       }[]
     >([]),
     [error, setError] = useState(""),
+    [suspended, setSuspended] = useState(false),
     [loading, setLoading] = useState(true);
   const generation = useRef(0),
+    reconnectButton = useRef<HTMLButtonElement>(null),
+    previousFocus = useRef<HTMLElement | null>(null),
     router = useRouter();
   const refresh = useCallback(async () => {
     const current = ++generation.current;
@@ -192,11 +195,25 @@ export function Studio({
       setCreators(result.creators);
       setInvitations(result.invitations);
       setCreator(result.creators.find((c) => c.id === creatorId) ?? null);
+      setSuspended(false);
     } catch (failure) {
       if (current !== generation.current) return;
       setCreators([]);
       setInvitations([]);
-      setCreator(null);
+      const unavailable =
+        failure instanceof StudioFailure && failure.status >= 500;
+      // A transport outage cannot prove role removal. Keep the mounted view's
+      // input in memory, but conceal it and disable interaction until the same
+      // account's current authority is confirmed. Explicit denial clears it.
+      if (unavailable) {
+        const focused = document.activeElement;
+        if (focused instanceof HTMLElement && focused.closest(".w5-studio"))
+          previousFocus.current = focused;
+      } else {
+        setCreator(null);
+        previousFocus.current = null;
+      }
+      setSuspended(unavailable);
       setError(
         failure instanceof Error ? failure.message : "Studio is unavailable.",
       );
@@ -204,6 +221,13 @@ export function Studio({
       if (current === generation.current) setLoading(false);
     }
   }, [creatorId]);
+  useEffect(() => {
+    if (suspended) reconnectButton.current?.focus();
+    else if (previousFocus.current?.isConnected) {
+      previousFocus.current.focus();
+      previousFocus.current = null;
+    }
+  }, [suspended]);
   useEffect(() => {
     void refresh();
     return () => {
@@ -327,80 +351,104 @@ export function Studio({
       </main>
     );
   return (
-    <div
-      key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
-      className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
-    >
-      <aside className="w5-sidebar">
-        {navigationTree(
-          Sidebar({
-            name: creator.display_name,
-            active,
-            status: creator.owned
-              ? "Creator workspace"
-              : `Team · ${creator.roles.join(", ")}`,
-          }),
-          href,
-        )}
-      </aside>
-      <main className="w5-main">
-        <div className="w5-account">
-          <Link href="/studio/workspace">{brand.studioName}</Link>
-          <span>
-            {creator.owned
-              ? creator.display_name
-              : `Team · ${creator.roles.join(", ")}`}
-          </span>
+    <>
+      {suspended && (
+        <main className="qv w5-entry">
+          <Notice tone="error" title="Reconnect to Studio">
+            Your input is kept in this tab. Studio is hidden until your current
+            account and roles can be checked again.
+          </Notice>
           <button
+            ref={reconnectButton}
             type="button"
-            className="qv-link-btn"
+            disabled={loading}
             onClick={() => void refresh()}
           >
-            Refresh role
+            Check connection and roles
           </button>
-        </div>
-        {error && (
-          <Notice tone="error" title="Connection status">
-            {error}
-          </Notice>
-        )}
-        {current === "compose" ? (
-          <Compose
-            creator={creator}
-            id={screen[1]}
-            onDone={() => router.push(`${root}/notes`)}
-          />
-        ) : current === "notes" ? (
-          <Notes creator={creator} />
-        ) : current === "requests" ? (
-          <Requests creator={creator} />
-        ) : current === "packets" && screen[1] ? (
-          <PacketDetail creator={creator} id={screen[1]} />
-        ) : current === "publish" ? (
-          <Library creator={creator} />
-        ) : current === "team" ? (
-          <Team creator={creator} />
-        ) : current === "threads" ? (
-          <Threads creator={creator} fanId={screen[1]} />
-        ) : current === "thanks" ? (
-          <ThanksFeed creator={creator} />
-        ) : (
-          <More creator={creator} />
-        )}
-      </main>
-      <div className="w5-tabs">
-        {navigationTree(
-          StudioTabBar({
-            active: ["Notes", "Requests", "Threads", "My AI", "More"].includes(
+        </main>
+      )}
+      <div
+        key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
+        className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
+        hidden={suspended}
+        inert={suspended}
+      >
+        <aside className="w5-sidebar">
+          {navigationTree(
+            Sidebar({
+              name: creator.display_name,
               active,
-            )
-              ? (active as "Notes")
-              : "More",
-          }),
-          href,
-        )}
+              status: creator.owned
+                ? "Creator workspace"
+                : `Team · ${creator.roles.join(", ")}`,
+            }),
+            href,
+          )}
+        </aside>
+        <main className="w5-main">
+          <div className="w5-account">
+            <Link href="/studio/workspace">{brand.studioName}</Link>
+            <span>
+              {creator.owned
+                ? creator.display_name
+                : `Team · ${creator.roles.join(", ")}`}
+            </span>
+            <button
+              type="button"
+              className="qv-link-btn"
+              onClick={() => void refresh()}
+            >
+              Refresh role
+            </button>
+          </div>
+          {error && (
+            <Notice tone="error" title="Connection status">
+              {error}
+            </Notice>
+          )}
+          {current === "compose" ? (
+            <Compose
+              creator={creator}
+              id={screen[1]}
+              onDone={() => router.push(`${root}/notes`)}
+            />
+          ) : current === "notes" ? (
+            <Notes creator={creator} />
+          ) : current === "requests" ? (
+            <Requests creator={creator} />
+          ) : current === "packets" && screen[1] ? (
+            <PacketDetail creator={creator} id={screen[1]} />
+          ) : current === "publish" ? (
+            <Library creator={creator} />
+          ) : current === "team" ? (
+            <Team creator={creator} />
+          ) : current === "threads" ? (
+            <Threads creator={creator} fanId={screen[1]} />
+          ) : current === "thanks" ? (
+            <ThanksFeed creator={creator} />
+          ) : (
+            <More creator={creator} />
+          )}
+        </main>
+        <div className="w5-tabs">
+          {navigationTree(
+            StudioTabBar({
+              active: [
+                "Notes",
+                "Requests",
+                "Threads",
+                "My AI",
+                "More",
+              ].includes(active)
+                ? (active as "Notes")
+                : "More",
+            }),
+            href,
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 function useAction() {
@@ -1536,10 +1584,12 @@ function Requests({ creator }: { creator: Creator }) {
                   handle={`@${p.handle}`}
                   mode={p.snapshot.title}
                   price={money(p.snapshot.amount, p.snapshot.currency)}
-                  due={`${index === 0 ? "DUE" : "DECIDE BY"} ${time(p.deadline)}`}
+                  due={`${index === 0 ? "DUE" : index === 1 ? "DECIDE BY" : "HOLD EXPIRES"} ${time(p.deadline)}`}
                   summary={p.disclosure.summary ?? "Fan-selected disclosure"}
                   shared="Only the fan's selected disclosure"
-                  overdue={new Date(p.deadline).getTime() < Date.now()}
+                  overdue={
+                    index < 2 && new Date(p.deadline).getTime() < Date.now()
+                  }
                 />
               </button>
             ))}
@@ -1689,7 +1739,7 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
               {time(detail.packet.hold_expires_at)}
             </p>
             <div className="w5-card">
-              <h2>Shared with you</h2>
+              <h2>Included in your request</h2>
               <p className="w5-fan-text">{detail.packet.disclosure.summary}</p>
               {detail.packet.disclosure.messages?.map((m, i) => (
                 <p key={i}>{m.text}</p>
