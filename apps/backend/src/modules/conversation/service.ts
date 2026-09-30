@@ -659,7 +659,6 @@ export class ConversationService {
               scope,
               generation,
               generation.last_sequence > 0,
-              generation.id,
             );
             await appendFrame(client, scope, {
               epoch: generation.epoch,

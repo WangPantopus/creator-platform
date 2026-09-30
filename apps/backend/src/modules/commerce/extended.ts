@@ -29,14 +29,16 @@ export interface StoreEntitlementVerifier {
     input: { platform: "apple" | "google"; transaction: string },
     actor: Actor,
   ): Promise<VerifiedStoreEntitlement>;
+  /** Only invoked after verified entitlement persistence, never before a grant. */
+  acknowledge?(
+    input: { platform: "apple" | "google"; transaction: string },
+    actor: Actor,
+  ): Promise<void>;
 }
 
 export class ExtendedCommerce {
   get storeConfigured() {
-    return (
-      Boolean(this.stores) &&
-      Boolean(this.service.policy.costAllowanceIntegrated)
-    );
+    return Boolean(this.stores);
   }
   constructor(
     private readonly service: CommerceService,
@@ -83,7 +85,7 @@ export class ExtendedCommerce {
       "store_period_invalid",
       "The verified subscription period is invalid.",
     );
-    return this.service.account(actor, async (client) => {
+    const result = await this.service.account(actor, async (client) => {
       const fan = (
         await client.query<{ id: string }>(
           "SELECT id FROM creator.fan_profile WHERE account_id=$1",
@@ -165,9 +167,13 @@ export class ExtendedCommerce {
         ["active", "grace", "cancelled"].includes(verified.state) &&
         verified.startsAt <= new Date() &&
         verified.endsAt > new Date();
+      // Pausing sales preserves an already purchased tier, including renewals.
+      // A new purchase still requires a currently offered tier.
+      const tierAvailable =
+        tier.state === "active" || (tier.state === "paused" && Boolean(prior));
       invariant(
         !currentPeriod ||
-          (tier.state === "active" &&
+          (tierAvailable &&
             tier.verification === "verified" &&
             !tier.recovery_required &&
             (!tier.ai_allowance ||
@@ -197,7 +203,7 @@ export class ExtendedCommerce {
       );
       const active =
         currentPeriod &&
-        tier.state === "active" &&
+        tierAvailable &&
         tier.verification === "verified" &&
         !tier.recovery_required &&
         verified.startsAt <= new Date() &&
@@ -256,6 +262,8 @@ export class ExtendedCommerce {
         validUntil: verified.endsAt.toISOString(),
       };
     });
+    if (result.accessGranted) await this.stores.acknowledge?.(input, actor);
+    return result;
   }
   async draftPass(actor: Actor, input: unknown) {
     invariant(this.pass, "pass_unavailable", "The pass is not available yet.");

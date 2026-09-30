@@ -25,6 +25,9 @@ export function createCommerceRuntime(input: {
   stores?: StoreEntitlementVerifier;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
+  assertActorAllowed?: (
+    actor: import("../identity/adapter.js").Actor,
+  ) => Promise<void>;
 }) {
   if (input.generationCostUnits)
     input.access.configureGenerationAllowance(
@@ -39,6 +42,7 @@ export function createCommerceRuntime(input: {
       costAllowanceIntegrated: Boolean(input.generationCostUnits),
     },
     input.payments,
+    input.assertActorAllowed,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);

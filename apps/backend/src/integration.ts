@@ -42,6 +42,8 @@ export async function createConfiguredBackend(input: {
   signedSubjectPolicies?: readonly SignedSubjectPolicy[];
   /** Construct with the separately configured INSERT-only notification role. */
   stripeNotifications?: Router;
+  /** Each store router verifies its signed/OIDC signal before durable ingress. */
+  storeNotifications?: Partial<Record<"apple" | "google", Router>>;
   registerFeatures?: (
     runtime: BackendRuntime,
   ) => Promise<readonly FeatureRegistration[]>;
@@ -186,6 +188,9 @@ export async function createConfiguredBackend(input: {
       assertActorAllowed,
       ...(input.stripeNotifications
         ? { stripeNotifications: input.stripeNotifications }
+        : {}),
+      ...(input.storeNotifications
+        ? { storeNotifications: input.storeNotifications }
         : {}),
     }),
   );

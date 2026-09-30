@@ -55,6 +55,7 @@ export type ApplicationDependencies = {
   trustRouter?: Router;
   /** Verified provider ingress must receive the original bytes before JSON/auth middleware. */
   stripeNotifications?: Router;
+  storeNotifications?: Partial<Record<"apple" | "google", Router>>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -76,6 +77,11 @@ export function createApp(
       "/v1/commerce/provider-notifications/stripe",
       dependencies.stripeNotifications,
     );
+  for (const provider of ["apple", "google"] as const) {
+    const router = dependencies.storeNotifications?.[provider];
+    if (router)
+      app.use(`/v1/commerce/provider-notifications/${provider}`, router);
+  }
   app.use(express.json({ limit: "64kb" }));
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {

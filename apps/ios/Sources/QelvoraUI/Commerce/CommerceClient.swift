@@ -6,10 +6,12 @@ struct CommerceOverview: Decodable, Sendable {
     struct Policy: Decodable, Sendable { let currency: String; let limitOptions: [Int64]; let passEnabled: Bool }
     struct Capabilities: Decodable, Sendable { let paymentsAvailable: Bool; let membershipAvailable: Bool; let nativeReplyPurchase: Bool; let storePurchasesAvailable: Bool? }
     struct Exposure: Decodable, Sendable { let captured: Int64; let held: Int64; let total: Int64; let currency: String }
+    struct Tier: Decodable, Sendable { struct Catalog: Decodable, Sendable { struct StoreProduct: Decodable, Sendable { let productId: String }; let apple: StoreProduct? }; let id: String; let state: String; let catalog: Catalog }
     let fan: Fan?; let creators: [Creator]; let packets: [CommercePacket]; let modes: [CommerceMode]
     let limits: [CommerceLimit]; let memberships: [CommerceMembership]; let slots: [CommerceSlot]
     let pass: [CommercePass]; let passChoices: CommercePassChoices; let spendingNotices: [CommerceSpendingNotice]
     let policy: Policy; let capabilities: Capabilities; let exposure: Exposure?
+    let tiers: [Tier]
 }
 struct CommerceMode: Decodable, Identifiable, Sendable {
     let id: String; let creator_id: String; let title: String; let kind: String; let amount: String?

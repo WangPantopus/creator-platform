@@ -22,8 +22,9 @@ public final class StoreMembershipCoordinator: ObservableObject {
         }
     }
     public func load(productIDs: [String]) async {
+        products = []
         guard !productIDs.isEmpty else { status = "Membership products are not configured."; return }
-        do { products = try await Product.products(for: productIDs).sorted { $0.id < $1.id }; status = products.isEmpty ? "The App Store has no available products for this catalog." : "" }
+        do { products = try await Product.products(for: productIDs).filter { $0.type == .autoRenewable && $0.subscription?.subscriptionPeriod.unit == .month && $0.subscription?.subscriptionPeriod.value == 1 }.sorted { $0.id < $1.id }; status = products.isEmpty ? "The App Store has no available monthly memberships for this catalog." : "" }
         catch { status = "The App Store is unavailable. Reconnect to try again." }
     }
     public func purchase(_ product: Product, accountID: String) async {

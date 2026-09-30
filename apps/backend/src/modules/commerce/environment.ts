@@ -6,6 +6,7 @@ import { StripePaymentProvider } from "../payments/provider.js";
 import type { CommercePolicy } from "./service.js";
 import { StripeTierCatalog } from "./stripe-catalog.js";
 import { StripeMembershipBilling } from "./stripe-billing.js";
+import { readStoreEnvironment } from "./store-environment.js";
 
 /** Local host configuration. Launch economics/providers are injected by the
  * production integrator into createCommerceRuntime; env flags cannot enable AI. */
@@ -36,7 +37,8 @@ export function readCommerceEnvironment(
     "stripe_configuration_invalid",
     "Configure the matching sandbox keys, approved collection account and pinned API version together.",
   );
-  if (!stripeConfigured) return { policy };
+  const stores = readStoreEnvironment(pool, env)?.stores;
+  if (!stripeConfigured) return { policy, ...(stores ? { stores } : {}) };
   policy.stripePublishableKey = env.STRIPE_PUBLISHABLE_KEY;
   const payments = new StripePaymentProvider(
     env.STRIPE_SECRET_KEY!,
@@ -54,6 +56,7 @@ export function readCommerceEnvironment(
   return {
     policy,
     payments,
+    ...(stores ? { stores } : {}),
     ...(tierCatalog
       ? {
           tierCatalog,

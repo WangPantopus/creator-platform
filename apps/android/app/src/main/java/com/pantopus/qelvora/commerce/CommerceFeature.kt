@@ -35,7 +35,7 @@ object CommerceFanFeature {
 }
 
 @Composable private fun CommerceFeature(context: Context, baseURL: String?, session: FanSession) {
-    val api = remember(baseURL) { baseURL?.let { CommerceClient(context, it) } }; val scope = rememberCoroutineScope()
+    val api = remember(baseURL,session.session?.accountId) { baseURL?.let { CommerceClient(context, it) } }; val scope = rememberCoroutineScope()
     var data by remember { mutableStateOf<CommerceOverview?>(null) }; var detail by remember { mutableStateOf<CommerceDetail?>(null) }
     val arrival = remember(session.destination) { Uri.parse(session.destination) }; val arrivalPath = arrival.path.orEmpty()
     var screen by remember { mutableStateOf(if (arrivalPath.startsWith("/commerce/")) arrivalPath.substringAfterLast("/") else if (arrivalPath.endsWith("/access")) "access" else "requests") }
@@ -127,7 +127,9 @@ object CommerceFanFeature {
                 CommerceText("Manage membership", "display-md")
                 if (current.memberships.isEmpty()) CommerceText("No memberships yet")
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
-                Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                val accountId=session.session?.accountId
+                if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
+                else Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
                 CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
             }
             "pass" -> {

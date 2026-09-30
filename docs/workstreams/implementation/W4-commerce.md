@@ -1,3 +1,11 @@
+# Resumed implementation additions — 2026-09-30
+
+`apple-store.ts`, `google-store.ts`, `stores.ts` and `store-environment.ts` verify current sandbox provider truth and canonical purchase ownership. `store-notifications.ts` authenticates delivery signals before an injected durable inbox; those signals never directly grant access. `ExtendedCommerce.storePurchase` preserves same-period counters, denies stale/refunded resurrection, retains purchased paused tiers and acknowledges Play only after grant commit. Published SKU IDs feed the real StoreKit/Play clients. Product configuration, catalog publication, replacement economics and actual store acceptance remain open.
+
+`financial-export.ts` pages complete forced-RLS collections in one repeatable snapshot, resolves linked grants per authorized pair, hashes exact staged pages and publishes only through the W8 writer’s final fence. `audience.ts` projects genuine tier/group authority with a five-second maximum lease. Current actor denials can be injected into every commerce account transaction. Tier command replay resolves completed idempotent commands before provider availability checks. No applied migration history changed.
+
+These additions supersede dated “missing adapter/client” descriptions below where specified; provider/host acceptance and external policy gates remain explicit in the current status and evidence.
+
 # W4 commerce implementation and recovery
 
 This is an implementation register, not paid acceptance. [Current acceptance](../status/W4.md) and [producer contracts](../coordination/W4.md) are authoritative about outstanding integrations. All amounts are safe integer minor units with explicit currency; aggregation/allocation uses integer arithmetic. Public client routes never accept settlement/refund/payout evidence or credit issuance amounts.
