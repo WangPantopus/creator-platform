@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "status": "threshold_proposals_require_staffed_responders_and_staging_validation",
+  "rules": [
+    {
+      "signal": "authorization_or_cross_scope_breach",
+      "condition": "any confirmed occurrence",
+      "severity": "critical",
+      "responder": "W1 security on-call",
+      "action": "Disable affected capability; preserve scoped audit; rotate compromised credential; reverify isolation."
+    },
+    {
+      "signal": "interactive_availability",
+      "condition": "error-budget burn 14.4x over 1h and 5m, or 6x over 6h and 30m",
+      "severity": "critical",
+      "responder": "W8 incident commander",
+      "action": "Inspect capability/revision; halt rollout; use compatible application rollback."
+    },
+    {
+      "signal": "safety_urgent_case_age_seconds",
+      "condition": ">900 for 5m",
+      "severity": "critical",
+      "responder": "W8 safety on-call",
+      "action": "Claim with purpose; escalate to staffed safety responder; keep crisis resources reachable."
+    },
+    {
+      "signal": "effect_queue_age_seconds",
+      "condition": ">300 for 5m",
+      "severity": "high",
+      "responder": "W8 trust on-call + owning domain",
+      "action": "Inspect provider/domain receipt and stable effect key before replay."
+    },
+    {
+      "signal": "privacy_queue_age_seconds",
+      "condition": ">3600 for 10m",
+      "severity": "high",
+      "responder": "W8 privacy on-call",
+      "action": "Inspect missing hooks, lease, retry/DLQ; keep tombstone active."
+    },
+    {
+      "signal": "dead_letter_count",
+      "condition": ">0 for 5m",
+      "severity": "high",
+      "responder": "W8 trust on-call",
+      "action": "Resolve cause and inspect receipts before bounded retry."
+    },
+    {
+      "signal": "payment_unknown_or_unbalanced",
+      "condition": "W4 reconciliation age>300s or any ledger imbalance",
+      "severity": "critical",
+      "responder": "W4 commerce on-call",
+      "action": "Reconcile provider intent; pause new paid requests; never manufacture capture or refund."
+    },
+    {
+      "signal": "license_revocation_latency_ms",
+      "condition": ">5000",
+      "severity": "critical",
+      "responder": "W2 AI on-call",
+      "action": "Deny generation/delivery for affected creator; inspect ordered revocation acknowledgments."
+    },
+    {
+      "signal": "wal_archive_lag_seconds",
+      "condition": ">120 warning; >240 critical",
+      "severity": "critical",
+      "responder": "W8 database on-call",
+      "action": "Check archiver, storage, encryption and last base backup; suspend RPO claim."
+    },
+    {
+      "signal": "event_loop_lag_p99_ms",
+      "condition": ">100 for 5m",
+      "severity": "high",
+      "responder": "W8 service on-call",
+      "action": "Inspect CPU/pool saturation; shed optional work; keep trust/reporting lane separate."
+    },
+    {
+      "signal": "notification_delivery_lag_seconds",
+      "condition": ">300 for 10m",
+      "severity": "high",
+      "responder": "W7 delivery on-call",
+      "action": "Inspect permission/provider/dead letters; in-app record remains authoritative."
+    },
+    {
+      "signal": "daily_ai_cost_budget",
+      "condition": "90% warn; 100% deny new cost reservations",
+      "severity": "high",
+      "responder": "W2 AI + W4 budget owner",
+      "action": "Use approved cost policy and circuit breakers; no hidden cheaper-provider fallback."
+    }
+  ],
+  "missingCollectors": [
+    "W2 approved-visible/control/cost events",
+    "W3 socket/backpressure/frame counters",
+    "W4 money/refund reconciliation",
+    "W6 room/outcome timing",
+    "W7 transport delivery",
+    "production WAL archive"
+  ],
+  "humanAssignments": "required_before_pilot"
+}

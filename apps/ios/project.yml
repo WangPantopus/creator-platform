@@ -1,0 +1,54 @@
+name: QelvoraApp
+options:
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  QelvoraNative:
+    path: .
+targets:
+  QelvoraApp:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    info:
+      path: App/Info.plist
+      properties:
+        NSMicrophoneUsageDescription: Record a voice note you choose to send.
+        CFBundleURLTypes:
+          - CFBundleURLName: local-development-entry
+            CFBundleURLSchemes: [qelvora]
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Qelvora
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - package: QelvoraNative
+        product: QelvoraUI
+  QelvoraUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+    dependencies:
+      - target: QelvoraApp
+schemes:
+  QelvoraApp:
+    build:
+      targets:
+        QelvoraApp: all
+        QelvoraUITests: [test]
+    test:
+      targets:
+        - QelvoraUITests
