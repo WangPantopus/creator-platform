@@ -16,6 +16,10 @@ import {
   type MoneyStatementProvider,
 } from "./reconciliation.js";
 import type { CreatorSettlement } from "./accounting.js";
+import {
+  createCommerceAudience,
+  type GroupAudienceReader,
+} from "./audience.js";
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
@@ -25,6 +29,7 @@ export function createCommerceRuntime(input: {
   access: AccessService;
   policy: Omit<CommercePolicy, "costAllowanceIntegrated">;
   generationCostUnits?: (scope: ThreadScope) => number;
+  groupAudience?: GroupAudienceReader;
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
   stores?: StoreEntitlementVerifier;
@@ -73,6 +78,7 @@ export function createCommerceRuntime(input: {
     tiers,
     money,
     settlement,
+    audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),
   };
 }

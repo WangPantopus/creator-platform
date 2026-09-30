@@ -20,7 +20,17 @@ export interface VerifiedPassPeriod {
 export interface PassPeriodVerifier {
   current(actor: Actor, reference: string): Promise<VerifiedPassPeriod>;
 }
-export type PassRoster = Readonly<{ creatorIds: readonly string[] }>;
+export type PassRoster = Readonly<{
+  creatorIds: readonly string[];
+  /** Current W2 AI/license and W8 creator/fan denials, using this transaction.
+   * A published roster is not current availability. No provider I/O or separate
+   * transaction may run here while the pass lock is held. */
+  available(
+    client: PoolClient,
+    creatorId: string,
+    fanId: string,
+  ): Promise<boolean>;
+}>;
 type SlotChoice = { id: string; creator_id: string; position: number };
 /** Roster gate controls release, while provider truth controls each paid cycle. */
 export class PassCommerce {
@@ -29,6 +39,7 @@ export class PassCommerce {
       this.service.policy.passEnabled &&
         this.service.policy.costAllowanceIntegrated &&
         this.roster &&
+        typeof this.roster.available === "function" &&
         this.billing,
     );
   }
@@ -341,9 +352,7 @@ export class PassCommerce {
       creatorIds: z.array(z.uuid()).min(1).max(100),
     }).parse(input);
     invariant(
-      this.service.policy.passEnabled &&
-        this.service.policy.costAllowanceIntegrated &&
-        this.roster,
+      this.configured,
       "pass_unavailable",
       "The pass is not available yet.",
     );
@@ -414,9 +423,7 @@ export class PassCommerce {
       creatorIds: z.array(z.uuid()).max(100),
     }).parse(input);
     invariant(
-      this.service.policy.passEnabled &&
-        this.service.policy.costAllowanceIntegrated &&
-        this.roster,
+      this.configured,
       "pass_unavailable",
       "The pass is not available yet.",
     );
@@ -507,7 +514,11 @@ export class PassCommerce {
     creatorId: string,
     fanId: string,
   ) {
-    if (!this.roster?.creatorIds.includes(creatorId)) return false;
+    if (
+      !this.roster?.creatorIds.includes(creatorId) ||
+      typeof this.roster.available !== "function"
+    )
+      return false;
     await pair(client, creatorId, fanId);
     const creator = await client.query(
       "SELECT id FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required",
@@ -517,7 +528,11 @@ export class PassCommerce {
       "SELECT id FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2 AND source='membership' AND state='active' AND valid_from<=now() AND valid_until>now() AND 'ai_message'=ANY(capabilities)",
       [creatorId, fanId],
     );
-    return creator.rowCount === 1 && included.rowCount === 0;
+    return (
+      creator.rowCount === 1 &&
+      included.rowCount === 0 &&
+      (await this.roster.available(client, creatorId, fanId))
+    );
   }
   private async activate(
     client: PoolClient,
@@ -558,9 +573,7 @@ export class PassCommerce {
   async replace(actor: Actor, slotId: string, input: unknown) {
     const body = VersionCommand.extend({ creatorId: z.uuid() }).parse(input);
     invariant(
-      this.service.policy.passEnabled &&
-        this.service.policy.costAllowanceIntegrated &&
-        this.roster,
+      this.configured,
       "pass_unavailable",
       "The pass is not available yet.",
     );

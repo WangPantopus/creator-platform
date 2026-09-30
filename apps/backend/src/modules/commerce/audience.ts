@@ -4,12 +4,45 @@ import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { AudienceSnapshot } from "../agent/pipeline.js";
+import type { Database } from "../../db/database.js";
 
 export type VerifiedGroupAudience = {
   groupIds: readonly string[];
   revision: string;
   validUntil: Date;
 };
+
+/** The group owner must hold current rights/denial locks through this transaction.
+ * A snapshot obtained from another transaction cannot authorize a sentence. */
+export type GroupAudienceReader = (
+  scope: ThreadScope,
+  client: PoolClient,
+) => Promise<VerifiedGroupAudience>;
+
+/** W2/W3 use currentInTransaction during accepted-message/sentence writes. */
+export function createCommerceAudience(
+  database: Database,
+  groups?: GroupAudienceReader,
+) {
+  const currentInTransaction = async (
+    scope: ThreadScope,
+    client: PoolClient,
+  ) => {
+    assertThreadScope(scope);
+    return commerceAudience(
+      client,
+      scope,
+      groups ? await groups(scope, client) : undefined,
+    );
+  };
+  return {
+    current: (scope: ThreadScope) =>
+      database.withThread(scope, (client) =>
+        currentInTransaction(scope, client),
+      ),
+    currentInTransaction,
+  };
+}
 
 /** W2 consumes domain tier IDs, never grant UUIDs. Unknown group membership
  * contributes no group audience. Revalidate this five-second lease before using
@@ -37,7 +70,7 @@ export async function commerceAudience(
      WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN('active','grace','cancelled') AND m.period_start<=now()
      AND CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END>now()
      AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now() AND 'ai_message'=ANY(g.capabilities)
-     ORDER BY m.tier_id,m.id LIMIT 1001`,
+     ORDER BY m.tier_id,m.id LIMIT 1001 FOR SHARE OF m,g`,
       [scope.creatorId, scope.fanId],
     )
   ).rows;
