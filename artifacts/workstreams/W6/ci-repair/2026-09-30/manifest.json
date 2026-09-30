@@ -32,7 +32,18 @@
     "name": "Handle Night reference composition",
     "passed": true
   },
-  "remoteCI": "pending publication",
+  "remoteCI": {
+    "repairCommit": "d9a17501b586b1b0f35246313348a60844a4c02d",
+    "integratedCommit": "7d4f86117e1453cbea37ec1c96eb0586a69fb527",
+    "repairRunId": 36753823133,
+    "integratedRunId": 36754102532,
+    "webBackend": "success",
+    "postgresTestsPassed": 18,
+    "postgresRandomPairDurationMs": 97708,
+    "androidRuntime": "success",
+    "androidFoundationRepairRun": "15 of 19 passed; 4 snapshot assertions need report",
+    "integratedNativeVisualJobs": "queued at observation"
+  },
   "producerIntegration": {
     "branchHead": "ada430cf8ff5ddfc98a6b60bcecff2f69620ec24",
     "producerCommit": "81d92355dadcb808e5332fd409398c3647824b3f",
@@ -40,5 +51,9 @@
     "sha256": "11319a69740826a171b93ff40c97984036696b3b2beb230faccdc25a9d8a11f5",
     "buildLintFormat": "passed",
     "runtimeAcceptance": "unverified"
+  },
+  "resources": {
+    "postgresContainer": "stopped, preserved",
+    "githubCLI": "official 2.102.0 amd64 release digest verified; browser login pending"
   }
 }
