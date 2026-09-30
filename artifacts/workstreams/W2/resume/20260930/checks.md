@@ -1,15 +1,17 @@
-# Existing checks — 2026-09-30
+# Earlier existing checks — 2026-09-30
+
+This is the historical `112c04a` failure receipt. The founder later authorized justified repairs to existing checks; [CI remediation](ci-remediation.md) records the corrected fixtures/harness, unchanged migration authority and subsequent passing root/backend checks. The latest PR checks establish the current head; the failures below are no longer current.
 
 Commands ran in the isolated W2 worktree using bundled Node 24.19.0 and available pnpm 11.25.0 (manifest requests pnpm 12.5.1). Frozen-lock dependencies were reused; no package versions changed.
 
-| Check | Observed result |
-| --- | --- |
-| `pnpm generate:check` | PASS: 12 web/Swift/Kotlin shared resources and 31 OpenAPI operations. |
-| `pnpm lint` | PASS, full configured root scope. |
-| `pnpm format:check` | PASS, full configured root scope; inherited mechanical corrections committed separately. |
-| `pnpm typecheck` | PASS: all seven packages. |
-| `pnpm build` | PASS: backend bundle and production Next.js build, including final pipeline 9 follow-up. Dev server stopped before build and restored afterwards. |
-| `pnpm test` | FAIL: shared Node 2/2 pass; backend contracts 8/9 pass; PostgreSQL setup fails and nine cases do not execute. Existing tests unchanged, no new tests/scripts written. |
+| Check                 | Observed result                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm generate:check` | PASS: 12 web/Swift/Kotlin shared resources and 31 OpenAPI operations.                                                                                                 |
+| `pnpm lint`           | PASS, full configured root scope.                                                                                                                                     |
+| `pnpm format:check`   | PASS, full configured root scope; inherited mechanical corrections committed separately.                                                                              |
+| `pnpm typecheck`      | PASS: all seven packages.                                                                                                                                             |
+| `pnpm build`          | PASS: backend bundle and production Next.js build, including final pipeline 9 follow-up. Dev server stopped before build and restored afterwards.                     |
+| `pnpm test`           | FAIL: shared Node 2/2 pass; backend contracts 8/9 pass; PostgreSQL setup fails and nine cases do not execute. Existing tests unchanged, no new tests/scripts written. |
 
 ## Exact existing failures
 
