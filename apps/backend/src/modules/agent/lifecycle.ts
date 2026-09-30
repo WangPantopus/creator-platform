@@ -133,13 +133,18 @@ export class AgentLifecycle {
       },
     );
   }
-  async pendingEvents(scope: CreatorScope, limit = 100) {
+  /** A consumer selects its owned lane without acknowledging another owner's events. */
+  async pendingEvents(scope: CreatorScope, limit = 100, eventType?: string) {
     return this.repository.transaction(
       scope,
       async (client) => {
         const rows = await client.query(
-          "SELECT id,creator_id,type,revision,payload,created_at FROM creator.ai_event WHERE creator_id=$1 AND published_at IS NULL ORDER BY created_at,id LIMIT $2",
-          [scope.creatorId, Math.min(100, Math.max(1, limit))],
+          "SELECT id,creator_id,type,revision,payload,created_at FROM creator.ai_event WHERE creator_id=$1 AND published_at IS NULL AND ($3::text IS NULL OR type=$3) ORDER BY created_at,id LIMIT $2",
+          [
+            scope.creatorId,
+            Math.min(100, Math.max(1, limit)),
+            eventType ?? null,
+          ],
         );
         return rows.rows;
       },

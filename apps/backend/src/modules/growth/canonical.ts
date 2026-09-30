@@ -194,7 +194,13 @@ export async function relayAgentPublications(
   retention: Retention,
   scope: CreatorScope,
 ) {
-  const events = await lifecycle.pendingEvents(scope, 100);
+  // W2's other consumers must keep their pending events. Filter before the
+  // bounded read so a full first page of unrelated events cannot starve W7.
+  const events = await lifecycle.pendingEvents(
+    scope,
+    100,
+    "ai.version_published",
+  );
   let acknowledged = 0;
   for (const event of events) {
     if (event.type !== "ai.version_published") continue;
