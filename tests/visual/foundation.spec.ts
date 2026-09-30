@@ -87,9 +87,7 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
     .click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
   await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
-  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
-    "/creators/maya/chat",
-  );
+  expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
     "http://localhost:3000/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests",
   );

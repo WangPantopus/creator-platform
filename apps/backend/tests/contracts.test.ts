@@ -96,7 +96,10 @@ describe("authority boundaries", () => {
       const signIn = await fetch(`${url}/v1/identity/continue`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnTo: "/creators/maya?context=kiln" }),
+        body: JSON.stringify({
+          returnTo:
+            "/creators/maya?context=00000000-0000-4000-8000-000000000001",
+        }),
       });
       expect(signIn.status).toBe(503);
       expect(await signIn.json()).toMatchObject({
