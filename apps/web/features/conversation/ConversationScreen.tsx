@@ -618,7 +618,7 @@ export function ConversationScreen({
                 <div className="conversation-actions">
                   <a
                     className="qv-link-btn"
-                    href={`/support?messageId=${message.id}`}
+                    href={`/support?creatorId=${creatorId}${message.authorKind === "ai" ? `&messageId=${message.id}` : ""}`}
                   >
                     Report
                   </a>

@@ -192,7 +192,7 @@ export default function CasePage({
   };
   return (
     <div className="ops-shell ops-case">
-      <main className="ops-case-body" id="ops-main">
+      <main className="ops-case-body" id="ops-main" tabIndex={-1}>
         <Link className="qv-link-btn" href="/ops">
           Back to cases
         </Link>

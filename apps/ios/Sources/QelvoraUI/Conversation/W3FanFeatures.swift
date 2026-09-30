@@ -98,10 +98,10 @@ private struct W3ThreadScreen: View {
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system { SystemLine(children: message.text) }
         else if let kind = MessageKind(rawValue: message.authorKind.rawValue) {
-            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open("/support") }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
+            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open(reportDestination(message)) }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
                 .accessibilityLabel(message.authorLabel(name: page.creatorName))
             if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
-            if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open("/support") } }
+            if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open(reportDestination(message)) } }
             if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {
@@ -110,6 +110,9 @@ private struct W3ThreadScreen: View {
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
             }
         }
+    }
+    private func reportDestination(_ message: W3Message) -> String {
+        "/support?creatorId=" + model.creatorId + (message.authorKind == .ai ? "&messageId=" + message.id : "")
     }
 }
 private struct W3Passage: Decodable, Identifiable, Sendable { let id: String; let title: String; let text: String }

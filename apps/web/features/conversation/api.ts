@@ -17,6 +17,7 @@ export async function conversationRequest<T>(
     cache: "no-store",
     headers: {
       Accept: "application/json",
+      "X-Correlation-Id": crypto.randomUUID(),
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),

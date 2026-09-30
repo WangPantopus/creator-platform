@@ -21,7 +21,7 @@ import { readCommerceEnvironment } from "../modules/commerce/environment.js";
 import { commerceSignedSubjects } from "../modules/commerce/registration.js";
 import { createContentStudio } from "../modules/content/integration.js";
 import { createTrustRouter } from "../modules/trust/router.js";
-import { TrustTelemetry } from "./telemetry.js";
+import { TrustTelemetry, failureClass } from "./telemetry.js";
 import { Readiness } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { AccessService } from "../modules/access/scope.js";
@@ -29,7 +29,11 @@ import { Database } from "../db/database.js";
 import { SessionService } from "../modules/identity/sessions.js";
 import { DevelopmentIdentityAdapter } from "../modules/identity/development.js";
 import { IdentityProfiles } from "../modules/identity/profiles.js";
-import { IdentityContinueSchema, SessionSchema } from "@qelvora/api";
+import {
+  IdentityContinueSchema,
+  IdentityCompletionSchema,
+  SessionSchema,
+} from "@qelvora/api";
 import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
 import { PrivacyDomains } from "../modules/trust/contracts.js";
 import { GrowthDatabase } from "../modules/growth/database.js";
@@ -384,11 +388,9 @@ const readiness = new Readiness(
       name: `privacy_${domain}`,
       required: true,
       run: async () => ({
-        state: privacyHooks.some((hook) => hook.domain === domain)
-          ? ("available" as const)
-          : ("unavailable" as const),
+        state: "unavailable" as const,
         code: privacyHooks.some((hook) => hook.domain === domain)
-          ? "owner_hook_registered_policy_gates_apply"
+          ? "export_hook_registered_retention_gated"
           : "owner_hook_unconfigured",
       }),
     })),
@@ -450,7 +452,18 @@ const nativeView = async (token: string) => {
 };
 app.post("/v1/identity/complete", async (req, res) => {
   const result = await nativeIdentity.complete(req.body);
-  res.json({ ...result, session: await nativeView(result.token) });
+  try {
+    res.json(
+      IdentityCompletionSchema.parse({
+        token: result.token,
+        returnTo: result.returnTo,
+        session: await nativeView(result.token),
+      }),
+    );
+  } catch (error) {
+    await nativeIdentity.logout(result.token);
+    throw error;
+  }
 });
 app.get("/v1/identity/session", async (req, res) =>
   res.json(await nativeView(nativeToken(req))),
@@ -559,6 +572,7 @@ app.use(
     },
     {
       identity: nativeIdentity,
+      telemetry,
       platformIdentity: {
         sessions: nativeIdentity,
         profiles: nativeProfiles,
@@ -598,6 +612,8 @@ app.use(
             "This local account action could not complete.",
             503,
           );
+    res.locals.errorCode = value.code;
+    res.locals.failureClass = failureClass(error);
     res.status(value.status).json({
       error: {
         code: value.code,

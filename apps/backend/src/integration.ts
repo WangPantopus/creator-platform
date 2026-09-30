@@ -220,7 +220,9 @@ export async function createConfiguredBackend(input: {
       signing,
       generationAvailable: false,
       features,
-      ...(trust ? { trustRouter: trust.router } : {}),
+      ...(trust
+        ? { trustRouter: trust.router, telemetry: trust.telemetry }
+        : {}),
       assertActorAllowed,
       ...(input.stripeNotifications
         ? { stripeNotifications: input.stripeNotifications }

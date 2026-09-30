@@ -50,6 +50,7 @@ export default function SupportPage() {
       reportedMessage = params.get("messageId");
     const uuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (creator && uuid.test(creator)) setCreatorId(creator);
     if (
       creator &&
       reportedMessage &&

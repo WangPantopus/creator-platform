@@ -133,8 +133,10 @@ export function TrustSession() {
     };
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", visible);
+    const timer = window.setInterval(visible, 4000);
     return () => {
       channel.close();
+      window.clearInterval(timer);
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", visible);
     };

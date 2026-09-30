@@ -1,6 +1,32 @@
 import { randomUUID } from "node:crypto";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 import type { RequestHandler } from "express";
+import { ZodError } from "zod";
+import { DomainError } from "../core/errors.js";
+
+/** Fixed diagnostic classes only. Never serialize database messages or details. */
+export function failureClass(error: unknown): string | null {
+  const databaseCodes: Record<string, string> = {
+    "57014": "database_timeout",
+    "55P03": "database_lock_timeout",
+    "40P01": "database_deadlock",
+    "53300": "database_capacity",
+    "57P01": "database_interruption",
+    "42501": "database_authority",
+  };
+  const code =
+    error && typeof error === "object" && "code" in error
+      ? String(error.code)
+      : "";
+  return (
+    databaseCodes[code] ??
+    (error instanceof DomainError ||
+    error instanceof ZodError ||
+    error instanceof SyntaxError
+      ? null
+      : "unexpected_failure")
+  );
+}
 
 const buckets = [50, 100, 300, 500, 1000, 2500, 4000, 10000];
 export class TrustTelemetry {
@@ -41,8 +67,9 @@ export class TrustTelemetry {
           ? incoming
           : randomUUID();
       res.locals.correlationId = correlation;
+      res.locals.requestId ??= randomUUID();
       res.setHeader("X-Correlation-Id", correlation);
-      res.setHeader("X-Request-Id", randomUUID());
+      res.setHeader("X-Request-Id", res.locals.requestId as string);
       res.setHeader("Cache-Control", "no-store");
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.on("finish", () => {

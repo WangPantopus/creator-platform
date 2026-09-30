@@ -98,6 +98,11 @@ async function complete(
       ...cookieOptions,
       maxAge: 7 * 86400,
     });
+    if (
+      process.env.W8_LOCAL_DEVELOPMENT === "true" &&
+      process.env.NODE_ENV !== "production"
+    )
+      redirect.cookies.delete("w8_local_session");
     redirect.cookies.delete(continuationCookie);
     redirect.cookies.delete(continuationReturnCookie);
     return redirect;

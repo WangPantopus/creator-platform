@@ -59,6 +59,7 @@ actor W3ConversationClient {
         var request = URLRequest(url: target.url!)
         request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = 15
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let requestCredential = publicRead ? nil : try await credentials.read()
         if !publicRead {
             guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
@@ -77,6 +78,7 @@ actor W3ConversationClient {
         var target = URLComponents(url: baseURL.appendingPathComponent("v1/realtime"), resolvingAgainstBaseURL: false)!
         target.scheme = target.scheme == "https" ? "wss" : "ws"
         var request = URLRequest(url: target.url!); request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let socket = session.webSocketTask(with: request); socket.resume(); return socket
     }
 }

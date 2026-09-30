@@ -30,6 +30,7 @@ import {
 import { requestAuthority } from "./modules/identity/request-authority.js";
 import { createCommerceRouter } from "./modules/commerce/router.js";
 import { createW6Router } from "./modules/media/router.js";
+import { failureClass, type TrustTelemetry } from "./operations/telemetry.js";
 
 export type FeatureRegistration = {
   name: string;
@@ -53,6 +54,7 @@ export type ApplicationDependencies = {
   platformIdentity?: IdentityRuntime;
   features?: readonly FeatureRegistration[];
   trustRouter?: Router;
+  telemetry?: TrustTelemetry;
   /** Verified provider ingress must receive the original bytes before JSON/auth middleware. */
   stripeNotifications?: Router;
   storeNotifications?: Partial<Record<"apple" | "google", Router>>;
@@ -66,8 +68,9 @@ export function createApp(
 ) {
   const app = express();
   app.disable("x-powered-by");
+  if (dependencies.telemetry) app.use(dependencies.telemetry.middleware());
   app.use((_req, res, next) => {
-    res.locals.requestId = randomUUID();
+    res.locals.requestId ??= randomUUID();
     res.setHeader("X-Request-Id", res.locals.requestId as string);
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -354,6 +357,7 @@ export function createApp(
         code: "not_found",
         message: "This endpoint is unavailable.",
         requestId: res.locals.requestId as string,
+        correlationId: res.locals.correlationId as string | undefined,
       },
     }),
   );
@@ -374,11 +378,14 @@ export function createApp(
                 "The service is unavailable. Please try again.",
                 503,
               );
+      res.locals.errorCode = domain.code;
+      res.locals.failureClass = failureClass(error);
       res.status(domain.status).json({
         error: {
           code: domain.code,
           message: domain.message,
           requestId: res.locals.requestId as string,
+          correlationId: res.locals.correlationId as string | undefined,
         },
       });
     },

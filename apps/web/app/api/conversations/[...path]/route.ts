@@ -36,10 +36,16 @@ async function proxy(
       `/v1/conversations${joined === "begin" ? "" : "/" + joined}${req.nextUrl.search}`,
       {
         method: req.method,
+        headers: {
+          "X-Correlation-Id":
+            req.headers.get("x-correlation-id") ?? crypto.randomUUID(),
+          ...(req.method === "GET"
+            ? {}
+            : { "Content-Type": "application/json" }),
+        },
         ...(req.method === "GET"
           ? {}
           : {
-              headers: { "Content-Type": "application/json" },
               body: await req.text(),
             }),
       },
@@ -64,7 +70,12 @@ async function proxy(
     }
     return Response.json(data, {
       status: upstream.status,
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Cache-Control": "no-store",
+        ...(upstream.headers.get("x-correlation-id")
+          ? { "X-Correlation-Id": upstream.headers.get("x-correlation-id")! }
+          : {}),
+      },
     });
   } catch {
     return Response.json(
