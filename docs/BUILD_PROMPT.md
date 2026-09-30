@@ -1,5 +1,17 @@
 # Build prompt for the development agent
 
+> Current execution instructions (2026-09-29): read
+> [the parallel workstream plan](workstreams/README.md) before using this prompt.
+> The founder now requires development in this standalone repository first,
+> Pantopus integration later, and feature verification in the running browser,
+> iOS Simulator and Android Emulator without writing new test code or pursuing
+> unit-test coverage. The plan supplies eight agent assignments and supersedes
+> conflicting repository-location/testing instructions below. Node.js, Next.js,
+> native Swift and native Kotlin, exact design fidelity, and replaceable naming
+> remain required. Each assigned agent must personally implement and verify its
+> stream; subagents may only research or check information. Use the
+> [eight paste-ready prompts](workstreams/prompts/README.md) for execution.
+
 Copy everything below the line into the agent's first message. Give the agent
 access to the `WangPantopus/creator-platform` repository (design and specs) and
 the Pantopus monorepo (the backend it builds into).
