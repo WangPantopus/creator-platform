@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import pg from "pg";
 import type { IdentityRuntime } from "../identity/router.js";
 import { DomainError } from "../../core/errors.js";
@@ -56,7 +57,7 @@ export async function configureGrowthForBackend(
               if (profile.creator?.verification !== "verified") return null;
               throw new DomainError(
                 "growth_restrictions_unconfigured",
-                "Creator controls require current trust restrictions.",
+                copy.growthErrorGrowthRestrictionsUnconfigured,
                 503,
               );
             },
@@ -65,7 +66,7 @@ export async function configureGrowthForBackend(
           (async () => {
             throw new DomainError(
               "home_owner_unconfigured",
-              "Conversations and requests are not connected yet.",
+              copy.growthErrorHomeOwnerUnconfigured,
               503,
             );
           }),

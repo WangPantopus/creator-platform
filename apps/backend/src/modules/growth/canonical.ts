@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { createHash } from "node:crypto";
 import { FrameSchema } from "@qelvora/api";
 import { DomainError } from "../../core/errors.js";
@@ -59,7 +60,7 @@ export function conversationGrowthSource(
         if (!fan)
           throw new DomainError(
             "fan_unavailable",
-            "The recipient is unavailable.",
+            copy.growthErrorFanUnavailable,
             503,
           );
         const rows = (
@@ -208,7 +209,7 @@ export async function relayAgentPublications(
     )
       throw new DomainError(
         "activation_publication_unavailable",
-        "The immutable publication must be available before activation.",
+        copy.growthErrorActivationPublicationUnavailable,
         503,
       );
     await retention.scheduleActivation(

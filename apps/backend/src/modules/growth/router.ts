@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import {
   Router,
   type Request,
@@ -53,7 +54,7 @@ export function createGrowthRouter(
     if (!creator)
       throw new DomainError(
         "creator_unavailable",
-        "This creator is unavailable.",
+        copy.growthThisCreatorIsUnavailable,
         404,
       );
     res.json({ creator, posts: await service.posts(creator.id) });
@@ -66,7 +67,7 @@ export function createGrowthRouter(
     if (!value)
       throw new DomainError(
         "post_unavailable",
-        "This post is unavailable.",
+        copy.growthThisPostIsUnavailable,
         404,
       );
     res.json(value);
@@ -76,7 +77,7 @@ export function createGrowthRouter(
     if (!value)
       throw new DomainError(
         "invite_unavailable",
-        "This invitation is unavailable.",
+        copy.growthErrorEntryUnavailable2,
         404,
       );
     res.json(value);
@@ -86,7 +87,7 @@ export function createGrowthRouter(
     if (!value)
       throw new DomainError(
         "share_unavailable",
-        "This card is unavailable.",
+        copy.growthErrorShareUnavailable,
         404,
       );
     res.json(value);
@@ -265,12 +266,12 @@ export function createGrowthRouter(
           : error instanceof ZodError
             ? new DomainError(
                 "invalid_request",
-                "Check the highlighted input.",
+                copy.growthErrorInvalidRequest,
                 400,
               )
             : new DomainError(
                 "growth_unavailable",
-                "This feature is unavailable. Please try again.",
+                copy.growthErrorGrowthUnavailable,
                 503,
               );
       res

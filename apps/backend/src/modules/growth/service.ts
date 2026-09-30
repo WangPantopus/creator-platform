@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import {
   createHash,
   createHmac,
@@ -49,7 +50,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "growth_data_erased",
-          "This account or creator is no longer available.",
+          copy.growthErrorGrowthDataErased2,
           410,
         );
     };
@@ -98,7 +99,7 @@ export class GrowthService {
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
-        "Public named content requires signed evidence.",
+        copy.growthErrorSignedContentRequired,
       );
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, item.creatorId))) return;
@@ -210,7 +211,7 @@ export class GrowthService {
     if (!result.rowCount)
       throw new DomainError(
         "creator_unavailable",
-        "This creator is unavailable.",
+        copy.growthThisCreatorIsUnavailable,
         404,
       );
     await this.db.actor(actor, null, async (client) => {
@@ -328,7 +329,7 @@ export class GrowthService {
       if (!result.rowCount)
         throw new DomainError(
           "notification_unavailable",
-          "This update is unavailable.",
+          copy.growthErrorNotificationUnavailable,
           404,
         );
       return { read: true };
@@ -377,7 +378,7 @@ export class GrowthService {
       if (!(await this.erasure.subjects(client, [accountId])))
         throw new DomainError(
           "growth_data_erased",
-          "This account is no longer available.",
+          copy.growthErrorGrowthDataErased3,
           410,
         );
       await client.query(
@@ -410,13 +411,13 @@ export class GrowthService {
     if (!source)
       throw new DomainError(
         "sharing_unavailable",
-        "Sharing is not permitted for this reply.",
+        copy.growthErrorSharingUnavailable,
       );
     const current = await this.owners.shareStatus(grantId, source);
     if (!current.valid)
       throw new DomainError(
         "sharing_unavailable",
-        "Sharing is not permitted for this reply.",
+        copy.growthErrorSharingUnavailable,
       );
     // Canonical W1/W4/W5 adapter attests exact delivered version, creator permission and fan choice.
     return this.db.actor(actor, null, async (client) => {
@@ -435,7 +436,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "share_version_conflict",
-          "The shared version has changed.",
+          copy.growthErrorShareVersionConflict,
           409,
         );
       return { id: prior.rows[0].id };
@@ -470,7 +471,7 @@ export class GrowthService {
       if (!posts.some((p) => p.id === value.contextId))
         throw new DomainError(
           "context_unavailable",
-          "This post is unavailable.",
+          copy.growthThisPostIsUnavailable,
           404,
         );
     }
@@ -486,7 +487,7 @@ export class GrowthService {
       if (count.rows[0].count >= 20)
         throw new DomainError(
           "invite_limit",
-          "You already have 20 active invitation links.",
+          copy.growthErrorInviteLimit2,
           429,
         );
       const result = await client.query(
@@ -515,7 +516,7 @@ export class GrowthService {
     if (!id)
       throw new DomainError(
         "creator_required",
-        "This view is available to the creator only.",
+        copy.growthErrorCreatorRequired,
       );
     return id;
   }
@@ -530,7 +531,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "invalid_window",
-        "Insights use Monday-starting weekly windows.",
+        copy.growthErrorInvalidWindow,
         400,
       );
     const fanKey = this.pseudonym(
@@ -561,7 +562,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "window_closed",
-          "This weekly evidence window is already closed.",
+          copy.growthErrorWindowClosed,
           409,
         );
       const saved = await client.query(
@@ -590,7 +591,7 @@ export class GrowthService {
         )
           throw new DomainError(
             "signal_version_conflict",
-            "A signal version cannot change its meaning.",
+            copy.growthErrorSignalVersionConflict,
             409,
           );
       }
@@ -606,15 +607,11 @@ export class GrowthService {
     )
       throw new DomainError(
         "invalid_window",
-        "Insights use Monday-starting weekly windows.",
+        copy.growthErrorInvalidWindow,
         400,
       );
     if (date.valueOf() + 7 * 86400000 > Date.now())
-      throw new DomainError(
-        "window_open",
-        "Insights publish after the weekly evidence window closes.",
-        409,
-      );
+      throw new DomainError("window_open", copy.growthErrorWindowOpen, 409);
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, creatorId))) return;
       await client.query(
@@ -669,7 +666,7 @@ export class GrowthService {
       if (!snapshot.rowCount)
         throw new DomainError(
           "insight_unavailable",
-          "This insight is unavailable.",
+          copy.growthErrorInsightUnavailable,
           404,
         );
       await client.query(
@@ -703,7 +700,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "insight_unavailable",
-        "This insight is unavailable.",
+        copy.growthErrorInsightUnavailable,
       );
     return this.owners.publishRecommendation(actor, value);
   }
@@ -715,7 +712,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "creator_required",
-        "This outcome is outside your creator scope.",
+        copy.growthErrorCreatorRequired2,
       );
     await this.db.actor(actor, null, async (client) => {
       const inserted = await client.query(
@@ -739,7 +736,7 @@ export class GrowthService {
         if (!prior || contentHash(prior.document) !== contentHash(value))
           throw new DomainError(
             "metric_id_conflict",
-            "This outcome ID already refers to another event.",
+            copy.growthErrorMetricIdConflict,
             409,
           );
       }
@@ -835,7 +832,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "experiment_limit",
-          "Review your existing draft proposals first.",
+          copy.growthErrorExperimentLimit,
           429,
         );
       const result = await client.query(

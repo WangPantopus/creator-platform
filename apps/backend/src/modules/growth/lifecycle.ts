@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { GrowthService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
@@ -18,7 +19,7 @@ export function growthPrivacyHook(
       if (input.scope !== "account")
         throw new DomainError(
           "growth_scope_adapter_required",
-          "Creator/thread privacy needs the owner-scoped object mapping.",
+          copy.growthErrorGrowthScopeAdapterRequired,
           503,
         );
       const resolved = await scope?.({
@@ -28,7 +29,7 @@ export function growthPrivacyHook(
       if (!resolved)
         throw new DomainError(
           "growth_account_scope_required",
-          "A durable verified account ownership snapshot is required.",
+          copy.growthErrorGrowthAccountScopeRequired,
           503,
         );
       const ownedCreators = z.array(z.uuid()).max(100).parse(resolved);
@@ -74,7 +75,7 @@ export function growthPrivacyHook(
             if (rows.length > 10000)
               throw new DomainError(
                 "growth_export_stream_required",
-                "This export requires the streaming artifact adapter.",
+                copy.growthErrorGrowthExportStreamRequired,
                 503,
               );
             return rows;
@@ -109,7 +110,7 @@ export function growthPrivacyHook(
           if ((result.devices as unknown[]).length > 10000)
             throw new DomainError(
               "growth_export_stream_required",
-              "This export requires the streaming artifact adapter.",
+              copy.growthErrorGrowthExportStreamRequired,
               503,
             );
           const email = (
@@ -134,7 +135,7 @@ export function growthPrivacyHook(
           if ((result.delivery as unknown[]).length > 10000)
             throw new DomainError(
               "growth_export_stream_required",
-              "This export requires the streaming artifact adapter.",
+              copy.growthErrorGrowthExportStreamRequired,
               503,
             );
           const subjectKey = service.privacySubjectKey(input.accountId);
@@ -156,7 +157,7 @@ export function growthPrivacyHook(
           )
             throw new DomainError(
               "growth_export_stream_required",
-              "This export requires the streaming artifact adapter.",
+              copy.growthErrorGrowthExportStreamRequired,
               503,
             );
           result.creators = [];

@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.ui
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -32,21 +34,21 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
     fun toggle(key: String, id: String) {val list = value!!.getJSONArray(key);val present = contains(key, id);val updated = JSONArray();for (i in 0 until list.length()) if (list.getString(i) != id) updated.put(list.getString(i));if (!present) updated.put(id);update(key, updated)}
     fun time(key: String): String {val current = value ?: return "";if (current.isNull(key)) return "";val minute = current.getInt(key);return "%02d:%02d".format(minute / 60, minute % 60)}
     fun minute(text: String): Any {if (text.isEmpty()) return JSONObject.NULL;require(Regex("[0-2][0-9]:[0-5][0-9]").matches(text));val parts = text.split(':').map {it.toInt()};require(parts[0] < 24);return parts[0] * 60 + parts[1]}
-    LaunchedEffect(client, reload) {busy = true;try {requireNotNull(client);value = client.request("preferences");val directory = client.request("preferences/creators").getJSONArray("creators");creators = (0 until directory.length()).map {val c = directory.getJSONObject(it);c.getString("id") to c.getString("name")};from = time("quietStart");until = time("quietEnd");zone = value!!.getString("timeZone");message = ""}catch (cancelled: CancellationException) {throw cancelled} catch (_: Exception) {message = "Settings need a current signed-in account and network connection."}finally {busy = false}}
+    LaunchedEffect(client, reload) {busy = true;try {requireNotNull(client);value = client.request("preferences");val directory = client.request("preferences/creators").getJSONArray("creators");creators = (0 until directory.length()).map {val c = directory.getJSONObject(it);c.getString("id") to c.getString("name")};from = time("quietStart");until = time("quietEnd");zone = value!!.getString("timeZone");message = ""}catch (cancelled: CancellationException) {throw cancelled} catch (_: Exception) {message = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")}finally {busy = false}}
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        BasicText("Notification settings", style = qText("display-md").copy(color = ink))
-        BasicText("Your in-app record cannot be turned off. Push and email are optional.", style = qText("body").copy(color = ink))
+        BasicText(QelvoraCopy.text("growthNotificationSettings"), style = qText("display-md").copy(color = ink))
+        BasicText(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd"), style = qText("body").copy(color = ink))
         value?.let {current ->
-            listOf("push" to "Push notifications", "email" to "Email digest", "hideSensitive" to "Hide sensitive previews").forEach {(key, label) -> Button("$label · ${if (current.getBoolean(key)) "on" else "off"}", ButtonVariant.SECONDARY, disabled = busy, block = true) {update(key, !current.getBoolean(key))} }
-            BasicTextField(from, {from = it.take(5)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = "Quiet hours from · HH:mm"})
-            BasicTextField(until, {until = it.take(5)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = "Quiet hours until · HH:mm"})
-            BasicTextField(zone, {zone = it.take(80)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = "Time zone"})
-            BasicText("Leave both times empty for no quiet hours.", style = qText("caption").copy(color = ink))
-            creators.forEach {(id, name) -> Button("$name · ${if (contains("mutedCreators", id)) "muted" else "push and email allowed"}", ButtonVariant.SECONDARY, disabled = busy, block = true) {toggle("mutedCreators", id)} }
-            growthKinds.forEach {kind -> BasicText(kind.replace('_', ' '), style = qText("label").copy(color = ink));listOf("disabledPushTypes" to "Push", "disabledEmailTypes" to "Email").forEach {(key, label) -> Button("$label · ${if (contains(key, kind)) "off" else "on"}", ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)} } }
-            Button(if (busy) "Saving…" else "Save preferences", ButtonVariant.SECONDARY, disabled = busy, block = true) {scope.launch {busy = true;try {requireNotNull(client);require(from.isEmpty() == until.isEmpty());val body = JSONObject(current.toString()).put("quietStart", minute(from)).put("quietEnd", minute(until)).put("timeZone", zone);value = client.request("preferences", "PUT", body);message = "Preferences saved. Your in-app record remains available."}catch (cancelled: CancellationException) {throw cancelled} catch (_: Exception) {message = "Preferences were not saved. Check both quiet-hour times and reconnect."}finally {busy = false}}}
+            listOf("push" to QelvoraCopy.text("growthPushNotifications"), "email" to QelvoraCopy.text("growthEmailDigest"), "hideSensitive" to QelvoraCopy.text("growthHideSensitivePreviews")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (current.getBoolean(key)) QelvoraCopy.text("growthOn") else QelvoraCopy.text("growthOff"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {update(key, !current.getBoolean(key))} }
+            BasicTextField(from, {from = it.take(5)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = QelvoraCopy.text("growthQuietHoursFromHhMm")})
+            BasicTextField(until, {until = it.take(5)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = QelvoraCopy.text("growthQuietHoursUntilHhMm")})
+            BasicTextField(zone, {zone = it.take(80)}, textStyle = qText("body").copy(color = ink), modifier = Modifier.fillMaxWidth().padding(12.dp).semantics {contentDescription = QelvoraCopy.text("growthTimeZone")})
+            BasicText(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours"), style = qText("caption").copy(color = ink))
+            creators.forEach {(id, name) -> Button(QelvoraCopy.text("growthCreatorWithState", mapOf("name" to name, "state" to if (contains("mutedCreators", id)) QelvoraCopy.text("growthMuted") else QelvoraCopy.text("growthPushAndEmailAllowed"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {toggle("mutedCreators", id)} }
+            growthKinds.forEach {kind -> BasicText(QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }), style = qText("label").copy(color = ink));listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)} } }
+            Button(if (busy) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {scope.launch {busy = true;try {requireNotNull(client);require(from.isEmpty() == until.isEmpty());val body = JSONObject(current.toString()).put("quietStart", minute(from)).put("quietEnd", minute(until)).put("timeZone", zone);value = client.request("preferences", "PUT", body);message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")}catch (cancelled: CancellationException) {throw cancelled} catch (_: Exception) {message = QelvoraCopy.text("growthPreferencesWereNotSavedCheckBothQuietHourTimesAnd")}finally {busy = false}}}
         }
         if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink))
-        Button("Reload settings", ButtonVariant.QUIET, disabled = busy) {reload++}
+        Button(QelvoraCopy.text("growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
     }
 }

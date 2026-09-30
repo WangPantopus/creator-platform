@@ -54,3 +54,11 @@ Final logs/captures/source hashes are included beside this manifest. Initial sou
 W5 content/Studio APIs are absent from this foundation. W3 Home/categorical useful-answer/scope enumeration, W4 ShareGrant/notices, W2 actual72h outcomes, W6 host effects, W8 privacy registration/streaming and synchronized restrictions remain unconnected. APNs/FCM/email credentials, approved public/store origins, RP association and physical/background device proof are missing. Instagram/experiments/locales/rewards remain gated. All19 actual producer/provider paths, populated13-artboard Light/Night comparisons, authenticated tap-through, accessibility and meaningful latency cohorts remain unaccepted. Empty screens/diagnostics do not prove these paths.
 
 Additional source/build manifests and captures follow as continuation proceeds. Keys, cookies, auth headers and private payloads are excluded from evidence/Git.
+
+### CI follow-up
+
+At checkpoint `6b34a20`, Trust release compilation passed. Foundation web/backend generation, typecheck and lint passed, then stopped at inherited formatting in `apps/backend/src/config.ts` and `apps/web/app/globals.css`. The follow-up applies Prettier only; full local `pnpm format:check` passes. Android runtime compiled/installed and reported `Failed to inject touch input` in the existing arrival-context test; it is a failed runtime check, not accepted device proof. Native/visual jobs were still queued when inspected. Further checks will be recorded against their actual commit.
+
+### Catalog completion follow-up
+
+[Copy and CI continuation](copy-and-ci.md) records387 shared English additions, generated Swift/Kotlin resources, final builds, actual saved/reloaded browser settings and native Night captures. Existing catalog values are unchanged. Full locale/copy review and integrated acceptance remain gates. The current source is recorded separately in `source-copy.sha256`; earlier manifests/logs are historical.

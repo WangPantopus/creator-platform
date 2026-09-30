@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { GrowthService } from "./service.js";
@@ -73,7 +74,7 @@ export class Retention {
     )
       throw new DomainError(
         "impact_window_open",
-        "Impact uses closed weekly observation windows.",
+        copy.growthErrorImpactWindowOpen,
         409,
       );
     const thanks = value.thanks.map((t) => ({
@@ -96,7 +97,7 @@ export class Retention {
         )
           throw new DomainError(
             "growth_data_erased",
-            "Rebuild this Impact without erased subjects.",
+            copy.growthErrorGrowthDataErased,
             410,
           );
         await client.query(
@@ -271,13 +272,10 @@ export class InstagramEntry {
     if (!input.creatorRuleConsent || (input.live && !input.broadcastActive))
       throw new DomainError(
         "private_reply_unavailable",
-        "This private reply is not authorized.",
+        copy.growthErrorPrivateReplyUnavailable,
       );
     if (input.createdAt.valueOf() + 7 * 86400000 <= Date.now())
-      throw new DomainError(
-        "comment_expired",
-        "This comment is outside the private-reply window.",
-      );
+      throw new DomainError("comment_expired", copy.growthErrorCommentExpired);
     await this.service.db.transaction(
       this.service.db.worker,
       async (client) => {
