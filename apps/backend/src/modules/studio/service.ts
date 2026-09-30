@@ -14,41 +14,60 @@ import type { AccessService } from "../access/scope.js";
 import type { AgentService } from "../agent/service.js";
 import { ContentPage } from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { identityTransaction } from "../identity/transaction.js";
 
 export class StudioService {
   constructor(
     readonly content: ContentService,
     readonly owners: {
-      commerce: CommerceService;
+      commerce?: CommerceService;
       conversation: ConversationService;
       access: AccessService;
       agent?: AgentService;
       profiles?: IdentityProfiles;
     },
   ) {}
+  private commerce() {
+    if (!this.owners.commerce)
+      throw new DomainError(
+        "commerce_unconfigured",
+        "Requests and paid offers are unavailable until commerce is configured.",
+        503,
+      );
+    return this.owners.commerce;
+  }
   async session(actor: Actor) {
-    return this.owners.commerce.account(actor, async (client) => {
-      const creators = (
-        await client.query(
-          "SELECT cp.id,cp.display_name,cp.handle,cp.verification,cp.account_id=$1 AS owned,coalesce(tm.roles,'{}') AS roles,f.handle AS \"memberHandle\" FROM creator.creator_profile cp LEFT JOIN creator.team_membership tm ON tm.creator_id=cp.id AND tm.account_id=$1 AND tm.revoked_at IS NULL LEFT JOIN creator.fan_profile f ON f.account_id=$1 WHERE cp.account_id=$1 OR tm.account_id=$1 ORDER BY cp.handle LIMIT 50",
-          [actor.accountId],
-        )
-      ).rows;
-      const invitations = (
-        await client.query(
-          'SELECT i.id,i.creator_id AS "creatorId",c.display_name AS "creatorName",i.roles,i.expires_at AS "expiresAt" FROM creator.team_invitation i JOIN creator.creator_profile c ON c.id=i.creator_id WHERE i.account_id=$1 AND i.accepted_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>now() ORDER BY i.expires_at,i.id LIMIT 50',
-          [actor.accountId],
-        )
-      ).rows;
-      return {
-        creators: creators.map((row) => ({
-          ...row,
-          viewerAccountId: actor.accountId,
-        })),
-        invitations,
-        serverTime: new Date().toISOString(),
-      };
-    });
+    invariant(
+      actor.adultEligible,
+      "adult_eligibility_required",
+      "Adult eligibility is required.",
+    );
+    return identityTransaction(
+      this.content.pool,
+      actor.accountId,
+      async (client) => {
+        const creators = (
+          await client.query(
+            "SELECT cp.id,cp.display_name,cp.handle,cp.verification,cp.account_id=$1 AS owned,coalesce(tm.roles,'{}') AS roles,f.handle AS \"memberHandle\" FROM creator.creator_profile cp LEFT JOIN creator.team_membership tm ON tm.creator_id=cp.id AND tm.account_id=$1 AND tm.revoked_at IS NULL LEFT JOIN creator.fan_profile f ON f.account_id=$1 WHERE cp.account_id=$1 OR tm.account_id=$1 ORDER BY cp.handle LIMIT 50",
+            [actor.accountId],
+          )
+        ).rows;
+        const invitations = (
+          await client.query(
+            'SELECT i.id,i.creator_id AS "creatorId",c.display_name AS "creatorName",i.roles,i.expires_at AS "expiresAt" FROM creator.team_invitation i JOIN creator.creator_profile c ON c.id=i.creator_id WHERE i.account_id=$1 AND i.accepted_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>now() ORDER BY i.expires_at,i.id LIMIT 50',
+            [actor.accountId],
+          )
+        ).rows;
+        return {
+          creators: creators.map((row) => ({
+            ...row,
+            viewerAccountId: actor.accountId,
+          })),
+          invitations,
+          serverTime: new Date().toISOString(),
+        };
+      },
+    );
   }
   async acceptInvitation(actor: Actor, id: string) {
     if (!this.owners.profiles)
@@ -133,6 +152,8 @@ export class StudioService {
         "drafter",
         "publisher",
       ]);
+      if (!this.owners.commerce)
+        return { audienceCountsAvailable: false, tiers: [], groups: [] };
       const tiers = (
         await client.query(
           "SELECT id,name,catalog FROM creator.commerce_tier WHERE creator_id=$1 ORDER BY name,id LIMIT 100",
@@ -154,6 +175,7 @@ export class StudioService {
     });
   }
   async queue(actor: Actor, creatorId: string, raw: unknown) {
+    this.commerce();
     const input = StudioQueueQuery.parse(raw);
     return this.content.transaction(actor, creatorId, async (client) => {
       const role = await this.content.role(client, actor, creatorId, [
@@ -205,13 +227,13 @@ export class StudioService {
     await this.content.transaction(actor, creatorId, (client) =>
       this.content.role(client, actor, creatorId),
     );
-    const result = await this.owners.commerce.packet(actor, id);
+    const result = await this.commerce().packet(actor, id);
     invariant(
       result.packet.creator_id === creatorId,
       "request_unavailable",
       "This request is unavailable.",
     );
-    const groupModes = await this.owners.commerce.account(
+    const groupModes = await this.commerce().account(
       actor,
       async (client) =>
         (
@@ -229,7 +251,7 @@ export class StudioService {
   }
   async decide(actor: Actor, creatorId: string, id: string, raw: unknown) {
     await this.packet(actor, creatorId, id);
-    return this.owners.commerce.decide(actor, id, raw);
+    return this.commerce().decide(actor, id, raw);
   }
   async deliveries(actor: Actor, creatorId: string, packetId: string) {
     const packet = await this.packet(actor, creatorId, packetId);
@@ -257,7 +279,7 @@ export class StudioService {
     raw: unknown,
   ) {
     await this.packet(actor, creatorId, packetId);
-    return this.owners.commerce.deliver(actor, packetId, raw);
+    return this.commerce().deliver(actor, packetId, raw);
   }
   async replyDraft(actor: Actor, creatorId: string, fanId: string) {
     await this.owners.access.openThread(actor, creatorId, fanId, false);

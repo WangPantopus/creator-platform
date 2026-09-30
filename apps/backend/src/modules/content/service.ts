@@ -48,6 +48,13 @@ export interface ContentDependencies {
     accountId: string,
     creatorId: string,
   ) => Promise<boolean>;
+  /** W4 current paid/group rights, with W1/W8 denial locks on this client. */
+  paidAudience?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    audience: Audience,
+  ) => Promise<boolean>;
   audienceCount?: (
     client: PoolClient,
     creatorId: string,
@@ -243,6 +250,20 @@ export class ContentService {
     creatorId: string,
     permitted: string[] = [],
   ) {
+    // Match W1's creator -> team removal lock order. Hold current ownership or
+    // the actor's membership through the domain commit, including role changes
+    // made by invitation acceptance. No team actor acquires creator authority.
+    await client.query(
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+      [creatorId, actor.accountId],
+    );
+    await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      `team:${creatorId}:${actor.accountId}`,
+    ]);
+    await client.query(
+      "SELECT roles FROM creator.team_membership WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL FOR SHARE",
+      [creatorId, actor.accountId],
+    );
     const row = (
       await client.query<{
         display_name: string;
@@ -299,6 +320,12 @@ export class ContentService {
     return result;
   }
   async index(client: PoolClient, creatorId: string, id: string, lock = false) {
+    // Fan RLS deliberately cannot FOR SHARE an index row. Shared object locks
+    // fence reads against all W5 mutations without widening its UPDATE policy.
+    await client.query(
+      `SELECT ${lock ? "pg_advisory_xact_lock" : "pg_advisory_xact_lock_shared"}(hashtextextended($1,0))`,
+      [`content:${id}`],
+    );
     const row = (
       await client.query<Index>(
         `SELECT * FROM creator.content_index WHERE id=$1 AND creator_id=$2${lock ? " FOR UPDATE" : ""}`,
@@ -328,6 +355,10 @@ export class ContentService {
     )
       return false;
     if (row.quote_reply_id) {
+      await client.query(
+        "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+        [`content.quote:${row.quote_reply_id}`],
+      );
       const consent = (
         await client.query(
           "SELECT share_text,version FROM creator.content_quote_permission WHERE reply_id=$1",
@@ -373,23 +404,13 @@ export class ContentService {
           row.creator_id,
         )) ?? false
       );
-    await client.query("SELECT set_config('app.fan_id',$1,true)", [fan.id]);
-    const rows = (
-      await client.query<{
-        tier_id: string;
-        capabilities: string[];
-        catalog: { contentGroups?: string[] };
-      }>(
-        `SELECT m.tier_id,t.capabilities,t.catalog FROM creator.commerce_membership m JOIN creator.commerce_tier t ON t.id=m.tier_id AND t.creator_id=m.creator_id JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.period_start<=now() AND ((m.state='active' AND m.period_end>now()) OR (m.state='grace' AND m.grace_end>now())) AND g.source='membership' AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now()`,
-        [row.creator_id, fan.id],
-      )
-    ).rows;
-    const audience = row.audience;
-    if (audience.kind === "members") return rows.length > 0;
-    if (audience.kind === "tiers")
-      return rows.some((m) => audience.ids.includes(m.tier_id));
-    return rows.some((m) =>
-      audience.ids.some((id) => (m.catalog.contentGroups ?? []).includes(id)),
+    return (
+      (await this.dependencies.paidAudience?.(
+        client,
+        actor,
+        row.creator_id,
+        row.audience,
+      )) ?? false
     );
   }
   async authorizeRead(
@@ -1631,14 +1652,28 @@ export class ContentService {
   async runScheduled(actor: Actor, creatorId: string) {
     return this.transaction(actor, creatorId, async (client) => {
       await this.role(client, actor, creatorId, ["publisher"]);
-      const rows = (
-        await client.query<Index>(
-          "SELECT * FROM creator.content_index WHERE creator_id=$1 AND state='scheduled' AND scheduled_at<=now() ORDER BY scheduled_at,id LIMIT 20 FOR UPDATE SKIP LOCKED",
+      const candidates = (
+        await client.query<{ id: string }>(
+          "SELECT id FROM creator.content_index WHERE creator_id=$1 AND state='scheduled' AND scheduled_at<=now() ORDER BY scheduled_at,id LIMIT 20",
           [creatorId],
         )
       ).rows;
       let published = 0;
-      for (const row of rows) {
+      for (const candidate of candidates) {
+        const locked = (
+          await client.query<{ acquired: boolean }>(
+            "SELECT pg_try_advisory_xact_lock(hashtextextended($1,0)) AS acquired",
+            [`content:${candidate.id}`],
+          )
+        ).rows[0]?.acquired;
+        if (!locked) continue;
+        const row = await this.index(client, creatorId, candidate.id, true);
+        if (
+          row.state !== "scheduled" ||
+          !row.scheduled_at ||
+          row.scheduled_at.getTime() > Date.now()
+        )
+          continue;
         const view = await this.view(client, actor, row),
           publication = (
             await client.query(

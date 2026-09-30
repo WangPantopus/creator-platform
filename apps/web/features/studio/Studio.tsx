@@ -177,11 +177,18 @@ export function Studio({
     >([]),
     [error, setError] = useState(""),
     [suspended, setSuspended] = useState(false),
+    [freshUntil, setFreshUntil] = useState(0),
     [loading, setLoading] = useState(true);
   const generation = useRef(0),
     reconnectButton = useRef<HTMLButtonElement>(null),
     previousFocus = useRef<HTMLElement | null>(null),
     router = useRouter();
+  const conceal = useCallback(() => {
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && focused.closest(".w5-studio"))
+      previousFocus.current = focused;
+    setSuspended(true);
+  }, []);
   const refresh = useCallback(async () => {
     const current = ++generation.current;
     setLoading(true);
@@ -195,6 +202,7 @@ export function Studio({
       setCreators(result.creators);
       setInvitations(result.invitations);
       setCreator(result.creators.find((c) => c.id === creatorId) ?? null);
+      setFreshUntil(Date.now() + 5000);
       setSuspended(false);
     } catch (failure) {
       if (current !== generation.current) return;
@@ -206,11 +214,10 @@ export function Studio({
       // input in memory, but conceal it and disable interaction until the same
       // account's current authority is confirmed. Explicit denial clears it.
       if (unavailable) {
-        const focused = document.activeElement;
-        if (focused instanceof HTMLElement && focused.closest(".w5-studio"))
-          previousFocus.current = focused;
+        conceal();
       } else {
         setCreator(null);
+        setFreshUntil(0);
         previousFocus.current = null;
       }
       setSuspended(unavailable);
@@ -220,7 +227,13 @@ export function Studio({
     } finally {
       if (current === generation.current) setLoading(false);
     }
-  }, [creatorId]);
+  }, [conceal, creatorId]);
+  useEffect(() => {
+    if (!creator || !freshUntil) return;
+    // A slow role request cannot extend the last successful authority check.
+    const timer = setTimeout(conceal, Math.max(0, freshUntil - Date.now()));
+    return () => clearTimeout(timer);
+  }, [conceal, creator, freshUntil]);
   useEffect(() => {
     if (suspended) reconnectButton.current?.focus();
     else if (previousFocus.current?.isConnected) {
@@ -1134,22 +1147,22 @@ function Compose({
             type="button"
             onClick={() =>
               action.setNotice(
-                "Voice recordings for this content are unavailable. You can still save your text draft.",
+                "Photo uploads for this content are unavailable. You can still save your text draft.",
               )
             }
           >
-            Voice · up to 60 s
+            Photo
           </button>
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
             onClick={() =>
               action.setNotice(
-                "Photo uploads for this content are unavailable. You can still save your text draft.",
+                "Voice recordings for this content are unavailable. You can still save your text draft.",
               )
             }
           >
-            Photo
+            Voice · up to 60 s
           </button>
         </div>
       </div>

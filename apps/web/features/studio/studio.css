@@ -190,7 +190,7 @@
   background: transparent;
   border: 0;
   color: inherit;
-  resize: vertical;
+  resize: none;
   font: 18px/28px var(--font-serif);
   width: 100%;
   box-sizing: border-box;
