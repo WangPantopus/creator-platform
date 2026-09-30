@@ -270,6 +270,84 @@ export class MemoryService {
       sensitiveCategory: item.category,
     });
   }
+  async forgetMessage(
+    scope: ThreadScope,
+    messageId: string,
+    expectedRevision: number,
+  ) {
+    invariant(
+      scope.authority === "fan",
+      "fan_required",
+      "Only the fan can change what their AI remembers.",
+    );
+    await this.db.withThread(scope, async (client) => {
+      const current = await client.query(
+        "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 FOR UPDATE",
+        [...pair(scope), expectedRevision],
+      );
+      invariant(
+        current.rowCount === 1,
+        "memory_changed",
+        "This conversation changed. Refresh before making this change.",
+      );
+      const message = (
+        await client.query(
+          "SELECT text,off_the_record FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 AND author_kind='fan' FOR UPDATE",
+          [messageId, ...pair(scope)],
+        )
+      ).rows[0];
+      invariant(
+        message,
+        "message_unavailable",
+        "This memory source is unavailable.",
+      );
+      if (message.off_the_record) return;
+      const items = (
+        await client.query(
+          "SELECT id,semantic_key,text FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND provenance_message_id=$4 LIMIT 101 FOR UPDATE",
+          [...pair(scope), messageId],
+        )
+      ).rows;
+      invariant(
+        items.length <= 100,
+        "bounded_subjob_required",
+        "These memories need a bounded deletion job.",
+      );
+      const exclusions = [
+        {
+          key: contentHash({ messageId, purpose: "dont_remember" }),
+          text: message.text,
+        },
+        ...items.map((item) => ({
+          key: contentHash(item.semantic_key),
+          text: item.text,
+        })),
+      ];
+      for (const exclusion of exclusions) {
+        await this.semantics?.retain(scope, client, exclusion);
+        await client.query(
+          "INSERT INTO creator.memory_exclusion(thread_id,creator_id,fan_id,semantic_key,normalized_text) VALUES($1,$2,$3,$4,NULL) ON CONFLICT(thread_id,semantic_key) DO NOTHING",
+          [...pair(scope), exclusion.key],
+        );
+      }
+      await client.query(
+        "UPDATE creator.memory_consent SET withdrawn_at=now() WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND item_id=ANY($4::uuid[]) AND withdrawn_at IS NULL",
+        [...pair(scope), items.map((item) => item.id)],
+      );
+      await client.query(
+        "DELETE FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND provenance_message_id=$4",
+        [...pair(scope), messageId],
+      );
+      await client.query(
+        "UPDATE creator.message SET off_the_record=true WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND (id=$4 OR id IN(SELECT ai_message_id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND fan_message_id=$4))",
+        [...pair(scope), messageId],
+      );
+      await client.query(
+        "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+        pair(scope),
+      );
+    });
+  }
   async decide(scope: ThreadScope, memoryId: string, raw: unknown) {
     invariant(
       scope.authority === "fan",

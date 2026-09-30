@@ -13,6 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -66,8 +69,23 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var busy by remember(root) { mutableStateOf(false) }
     var privacy by remember(root) { mutableStateOf(false) }
     var source by remember(root) { mutableStateOf<Pair<String,String>?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
     val scroll = rememberLazyListState()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _,_ -> foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(root,foreground,privacy,page?.threadId) {
+        if (page != null) {
+            suspend fun pulse(active: Boolean) { try { client.request("$root/presence",buildJsonObject { put("clientId",presenceId);put("active",active) }) } catch(failure:Exception) { if(failure is CancellationException) throw failure } }
+            if (!foreground || privacy) pulse(false)
+            else while (true) { pulse(true);delay(20000) }
+        }
+    }
     val fail: (Throwable) -> Unit = { failure ->
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
@@ -86,7 +104,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = false; error = ""
-                pending?.let { item -> if (client.request("$root/messages/status/${item.key}").jsonObject["accepted"]?.jsonPrimitive?.boolean == true) { pending = null; if (draft.trim() == item.text) draft = "" } }
+                pending?.let { item -> if (client.request("$root/messages/status/${item.key}").jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
         } catch (failure: Throwable) { fail(failure) }
     }
@@ -151,7 +169,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
-                    ConversationMessageRow(message, current.creatorName, current.control, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support") }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    ConversationMessageRow(message, current.creatorName, current.control, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
                 }
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption")); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption")); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
@@ -169,15 +187,16 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
 }
 
-@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, onVerify: () -> Unit, onReport: () -> Unit, onCitation: (String) -> Unit) {
+@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, onVerify: () -> Unit, onReport: () -> Unit, onForget: (() -> Unit)?, onCitation: (String) -> Unit) {
     val kind = when (message.authorKind) { APIMessageAuthorKind.FAN -> MessageKind.FAN; APIMessageAuthorKind.AI -> MessageKind.AI; APIMessageAuthorKind.TEAM -> MessageKind.TEAM; APIMessageAuthorKind.HUMAN_CREATOR -> MessageKind.HUMAN_CREATOR; APIMessageAuthorKind.APPROVED_DRAFT -> MessageKind.APPROVED_DRAFT; else -> null }
     SelectionContainer {
-        Column(Modifier.semantics { contentDescription = if (message.authorKind == APIMessageAuthorKind.FAN) "You" else if (message.authorKind == APIMessageAuthorKind.AI) "$name's AI" else if (message.authorKind == APIMessageAuthorKind.TEAM) "$name's team" else name }) {
+        Column(Modifier.semantics { contentDescription = message.authorLabel(name) }) {
             if (message.authorKind == APIMessageAuthorKind.SYSTEM) SystemLine(text = message.text)
             else if (kind != null) {
                 Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
                 if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText("Reply unavailable · your allowance was released", style = qText("caption"))
                 if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
+                if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption")) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
             } else {
                 BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label"))
                 BasicText(message.text, style = qText("body"))
@@ -190,13 +209,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 @Composable private fun ConversationPrivacy(client: ConversationClient, root: String, name: String, onBack: () -> Unit, onData: () -> Unit) {
     var memory by remember(root) { mutableStateOf<ConversationMemories?>(null) }
     var audit by remember(root) { mutableStateOf<List<ConversationAudit>>(emptyList()) }
+    var usage by remember(root) { mutableStateOf<ConversationUsage?>(null) }
     var policy by remember(root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(root) { mutableStateOf<ConversationPage?>(null) }
     val uriHandler = LocalUriHandler.current
     var error by remember(root) { mutableStateOf("") }; var busy by remember { mutableStateOf(false) }
     var provenance by remember(root) { mutableStateOf<ConversationMessage?>(null) }
     var editing by remember { mutableStateOf<String?>(null) }; var text by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    suspend fun refresh() { try { memory = client.json.decodeFromJsonElement(client.request("$root/memory")); audit = client.json.decodeFromJsonElement(client.request("$root/audit")); policy = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true)); page = client.page(root); error = "" } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Reconnect to refresh your privacy settings." } }
+    suspend fun refresh() { try { memory = client.json.decodeFromJsonElement(client.request("$root/memory")); audit = client.json.decodeFromJsonElement(client.request("$root/audit")); policy = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true)); page = client.page(root); usage = client.json.decodeFromJsonElement(client.request("$root/usage")); error = "" } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Reconnect to refresh your privacy settings." } }
     suspend fun decide(item: ConversationMemory, action: String) {
         val snapshot = memory ?: return; if (busy) return; busy = true
         try { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }); editing = null; refresh() }
@@ -217,7 +237,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Consent could not be saved." } finally { busy = false }
     }
     provenance?.let { message -> Dialog(onDismissRequest={provenance=null}) { Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-        BasicText("Where this came from",style=qText("title"));BasicText(if(message.authorKind==APIMessageAuthorKind.FAN) "You" else message.authorKind.name,style=qText("label"))
+        BasicText("Where this came from",style=qText("title"));BasicText(message.authorLabel(name),style=qText("label"))
         LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body")) } } }
         BasicText(message.createdAt,style=qText("data-sm"));Button("Close",variant=ButtonVariant.QUIET) {provenance=null}
     } } }
@@ -246,6 +266,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (policy?.providers == null) BasicText("AI providers and verified processing terms are not configured yet.", style = qText("body"))
             Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || policy?.providers?.verified != true) { scope.launch { consent() } }
         }
+        item { BasicText("Time with this creator's AI",style=qText("display-md"));usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption"));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body"));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body")) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption")) } }
         item { BasicText("Who opened your conversations", style = qText("display-md")); if (audit.isEmpty()) BasicText("No logged openings.", style = qText("body")) }
         items(audit, key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body")) }
         item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption")); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData) }

@@ -21,6 +21,7 @@ import {
 import { IdSchema } from "@qelvora/api";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
+import type { ConversationWellbeing } from "./wellbeing.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -36,6 +37,7 @@ export class ConversationFeature {
     readonly afterAcceptance?: (scope: ThreadScope) => void,
     readonly tickets?: ConversationSocketTickets,
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
+    readonly wellbeing?: ConversationWellbeing,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -365,6 +367,31 @@ export function conversationFeature(
           req.method === "GET" && !req.path.endsWith("/events"),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
+      router.post(root + "/presence", async (req, res) => {
+        invariant(
+          feature.wellbeing,
+          "wellbeing_unavailable",
+          "Conversation time is unavailable.",
+        );
+        const body = z
+          .strictObject({ active: z.boolean(), clientId: IdSchema })
+          .parse(req.body);
+        res.json(
+          await feature.wellbeing.presence(
+            await scopeFor(req),
+            body.active,
+            body.clientId,
+          ),
+        );
+      });
+      router.get(root + "/usage", async (req, res) => {
+        invariant(
+          feature.wellbeing,
+          "wellbeing_unavailable",
+          "Conversation time is unavailable.",
+        );
+        res.json(await feature.wellbeing.usage(await scopeFor(req)));
+      });
       router.get(root, async (req, res) => {
         const before =
           req.query.before === undefined
@@ -389,6 +416,18 @@ export function conversationFeature(
       router.get(root + "/memory", async (req, res) =>
         res.json(await feature.memory.list(await scopeFor(req))),
       );
+      router.post(root + "/messages/:id/dont-remember", async (req, res) => {
+        const scope = await scopeFor(req);
+        const body = z
+          .strictObject({ expectedRevision: z.number().int().nonnegative() })
+          .parse(req.body);
+        await feature.memory.forgetMessage(
+          scope,
+          IdSchema.parse(req.params.id),
+          body.expectedRevision,
+        );
+        res.json(await feature.page(scope));
+      });
       router.get(root + "/messages/:id", async (req, res) => {
         const scope = await scopeFor(req);
         const id = IdSchema.parse(req.params.id);

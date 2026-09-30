@@ -6,6 +6,12 @@ struct W3Message: Decodable, Identifiable, Sendable {
     let text: String; let deliveryState: APIMessageDeliveryState; let controlEpoch: Int
     let sequence: Int; let signedActId: String?; let citations: [String]
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
+    func authorLabel(name: String) -> String {
+        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
+        if authorKind == .fan { return "You" }
+        if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
+        return "Conversation update"
+    }
 }
 struct W3Page: Decodable, Sendable {
     let threadId: String; let creatorId: String; let fanId: String; let creatorName: String; let fanHandle: String
@@ -29,6 +35,11 @@ struct W3Preferences: Encodable { let offTheRecord: Bool; let introShared: Bool;
 struct W3Decision: Encodable { let expectedRevision: Int; let action: String; let text: String? }
 struct W3Consent: Encodable { let version: String; let accepted: Bool }
 struct W3Begin: Encodable { let creatorId: String; let policyVersion: String; let accessNoticeAccepted: Bool; let idempotencyKey: String }
+struct W3Presence: Encodable { let clientId: String; let active: Bool }
+struct W3Usage: Decodable, Sendable {
+    struct Day: Decodable, Sendable { let day: String; let seconds: Double; let companionSeconds: Double }
+    let timezone: String; let days: [Day]; let modeAvailable: Bool; let measurement: String
+}
 
 /// W1's OS credential store supplies account authority; no model credential reaches a fan client.
 actor W3ConversationClient {
@@ -80,6 +91,7 @@ final class W3ThreadModel: ObservableObject {
     private let accountId: String
     private var resumeCursor: Int?
     private var resumeActivated = false
+    private let presenceId = UUID().uuidString.lowercased()
     private var storageScope: String { client.baseURL.absoluteString + "/" + root }
     var root: String { creatorId + "/" + fanId }
     private var gate: ThreadDeliveryGate?
@@ -98,7 +110,7 @@ final class W3ThreadModel: ObservableObject {
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
             await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
             offline = false; failure = ""
-            if let pending { let status: W3Status = try await client.request(root + "/messages/status/" + pending.key); if status.accepted { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
+            if let pending { let status: W3Status = try await client.request(root + "/messages/status/" + pending.key); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
         } catch { failed(error) }
     }
     func connect() async {
@@ -145,6 +157,15 @@ final class W3ThreadModel: ObservableObject {
     func earlier() async {
         guard let before, !busy else { return }; busy = true; defer { busy = false }
         do { let previous: W3Page = try await client.request(root + "?before=" + String(before)); let current = Set(older.map(\.id)); older = (previous.messages.filter { !current.contains($0.id) } + older).prefix(250).map { $0 }; self.before = previous.before }
+        catch { failed(error) }
+    }
+    func presence(active: Bool) async {
+        guard page != nil else { return }
+        let _: W3Usage? = try? await client.request(root + "/presence", body: JSONEncoder().encode(W3Presence(clientId: presenceId, active: active)))
+    }
+    func forget(_ message: W3Message) async {
+        guard !busy, !offline, let page else { return }; busy = true; defer { busy = false }
+        do { let body = try JSONSerialization.data(withJSONObject:["expectedRevision":page.revision]); let _: W3Page = try await client.request(root + "/messages/" + message.id + "/dont-remember",body:body); await refresh() }
         catch { failed(error) }
     }
     private func failed(_ error: Error) {

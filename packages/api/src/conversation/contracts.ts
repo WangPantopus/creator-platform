@@ -108,3 +108,18 @@ export const TranslationSchema = z.strictObject({
   label: z.literal("Translated · original available"),
 });
 export const ConversationAuthorshipSchema = AuthorKindSchema;
+export const ConversationUsageSchema = z.strictObject({
+  timezone: z.literal("UTC"),
+  days: z
+    .array(
+      z.strictObject({
+        day: z.string(),
+        seconds: z.number().nonnegative().max(86400),
+        companionSeconds: z.number().nonnegative().max(86400),
+      }),
+    )
+    .max(7),
+  modeAvailable: z.boolean(),
+  measurement: z.string(),
+});
+export type ConversationUsage = z.infer<typeof ConversationUsageSchema>;

@@ -14,6 +14,17 @@ import java.net.URL
     val signedActId: String? = null, val citations: List<String>, val createdAt: String,
     val member: String? = null, val offTheRecord: Boolean, val version: Long
 )
+fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
+    APIMessageAuthorKind.FAN -> "You"
+    APIMessageAuthorKind.AI -> QelvoraCopy.text("aiAuthor",mapOf("name" to name))
+    APIMessageAuthorKind.APPROVED_DRAFT -> QelvoraCopy.text("approvedAuthor",mapOf("name" to name))
+    APIMessageAuthorKind.TEAM -> QelvoraCopy.text("teamAuthor",mapOf("name" to name,"member" to (member ?: "Authorized team member")))
+    APIMessageAuthorKind.HUMAN_CREATOR -> name
+    APIMessageAuthorKind.HUMAN_CALL -> QelvoraCopy.text("callAuthor",mapOf("name" to name))
+    APIMessageAuthorKind.HUMAN_BROADCAST -> "Note from $name"
+    APIMessageAuthorKind.HUMAN_REACTION -> QelvoraCopy.text("reaction",mapOf("name" to name))
+    APIMessageAuthorKind.SYSTEM -> "Conversation update"
+}
 @Serializable data class ConversationPage(
     val threadId: String, val creatorId: String, val fanId: String, val creatorName: String, val fanHandle: String,
     val control: APIThreadControl, val epoch: Long, val cursor: Long, val revision: Long,
@@ -27,6 +38,8 @@ import java.net.URL
 @Serializable data class ConversationMemory(val id: String, val kind: String, val text: String, val provenanceMessageId: String, val sensitiveCategory: String? = null, val state: String, val editedByFan: Boolean, val createdAt: String)
 @Serializable data class ConversationMemories(val revision: Long, val offTheRecord: Boolean, val introShared: Boolean, val items: List<ConversationMemory>)
 @Serializable data class ConversationAudit(val id: String, val readerAccountId: String, val role: String, val readAt: String)
+@Serializable data class ConversationUsage(val timezone: String, val days: List<ConversationUsageDay>, val modeAvailable: Boolean, val measurement: String)
+@Serializable data class ConversationUsageDay(val day: String, val seconds: Double, val companionSeconds: Double)
 class ConversationFailure(val status: Int, override val message: String) : Exception(message)
 
 /** Uses W1's encrypted credential supplier and disables HTTP response caching. */

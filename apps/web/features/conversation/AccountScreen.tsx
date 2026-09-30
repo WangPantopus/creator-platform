@@ -48,7 +48,13 @@ export function AccountScreen({
     };
   }, []);
   if (creatorId && fanId)
-    return <ConversationPrivacy creatorId={creatorId} fanId={fanId} />;
+    return (
+      <ConversationPrivacy
+        key={`${creatorId}:${fanId}`}
+        creatorId={creatorId}
+        fanId={fanId}
+      />
+    );
   return (
     <main className="conversation-account">
       <div className="account-title">
@@ -152,6 +158,10 @@ function ConversationPrivacy({
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [memory, setMemory] = useState<MemoryView | null>(null);
   const [audit, setAudit] = useState<Audit[]>([]);
+  const [usage, setUsage] = useState<
+    | import("../../../../packages/api/src/conversation/contracts").ConversationUsage
+    | null
+  >(null);
   const [policy, setPolicy] = useState<ProviderPolicy | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -159,18 +169,22 @@ function ConversationPrivacy({
   const [text, setText] = useState("");
   const refresh = useCallback(async () => {
     try {
-      const [fresh, memories, entries, caps] = await Promise.all([
+      const [fresh, memories, entries, caps, time] = await Promise.all([
         conversationRequest<ConversationPage>(root),
         conversationRequest<MemoryView>(`${root}/memory`),
         conversationRequest<Audit[]>(`${root}/audit`),
         conversationRequest<{ providers: ProviderPolicy | null }>(
           "capabilities",
         ),
+        conversationRequest<
+          import("../../../../packages/api/src/conversation/contracts").ConversationUsage
+        >(`${root}/usage`),
       ]);
       setPage(fresh);
       setMemory(memories);
       setAudit(entries);
       setPolicy(caps.providers);
+      setUsage(time);
       setError(null);
     } catch (error) {
       if (
@@ -180,6 +194,7 @@ function ConversationPrivacy({
         setPage(null);
         setMemory(null);
         setAudit([]);
+        setUsage(null);
         setEditing(null);
         setText("");
       }
@@ -341,6 +356,31 @@ function ConversationPrivacy({
         </p>
       </section>
       <section>
+        <h2>Time with this creator’s AI</h2>
+        {usage && (
+          <article>
+            <p>{usage.measurement} Days are shown in UTC.</p>
+            <p>
+              This week ·{" "}
+              {Math.floor(
+                usage.days.reduce((total, day) => total + day.seconds, 0) / 60,
+              )}{" "}
+              minutes
+            </p>
+            {usage.days.map((day) => (
+              <div className="conversation-row" key={day.day}>
+                <time>{day.day}</time>
+                <span>{Math.floor(day.seconds / 60)} minutes</span>
+              </div>
+            ))}
+            {!usage.modeAvailable && (
+              <p className="qv-help">
+                Companion mode time signals await the verified AI mode
+                configuration.
+              </p>
+            )}
+          </article>
+        )}
         <h2>Who opened your conversations</h2>
         <article>
           {audit.length === 0 ? (

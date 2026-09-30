@@ -31,6 +31,7 @@ private struct W3ThreadScreen: View {
     @State private var privacy = false
     @State private var source: W3Passage?
     @State private var sourceFailure = ""
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
         _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out")); self.session = session
@@ -83,8 +84,13 @@ private struct W3ThreadScreen: View {
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task { await model.connect() }
-            .task { while !Task.isCancelled { try? await Task.sleep(for: .seconds(5)); if !Task.isCancelled { await model.refresh() } } }
+            .task(id: scenePhase) { if scenePhase == .active { await model.connect() } }
+            .task(id: scenePhase) { if scenePhase == .active { while !Task.isCancelled { try? await Task.sleep(for: .seconds(5)); if !Task.isCancelled { await model.refresh() } } } }
+            .task(id: "\(scenePhase)-\(privacy)-\(model.page != nil)") {
+                if scenePhase != .active || privacy { await model.presence(active: false) }
+                else { while !Task.isCancelled { await model.presence(active: true); try? await Task.sleep(for: .seconds(20)) } }
+            }
+            .onDisappear { Task { await model.presence(active: false) } }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, name: model.page?.creatorName ?? "the creator", session: session) }
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("meta"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
@@ -93,9 +99,10 @@ private struct W3ThreadScreen: View {
         if message.authorKind == .system { SystemLine(children: message.text) }
         else if let kind = MessageKind(rawValue: message.authorKind.rawValue) {
             Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open("/support") }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
-                .accessibilityLabel(message.authorKind == .fan ? "You" : message.authorKind == .ai ? page.creatorName + "'s AI" : message.authorKind == .team ? page.creatorName + "'s team" : page.creatorName)
+                .accessibilityLabel(message.authorLabel(name: page.creatorName))
             if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
             if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open("/support") } }
+            if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 Text(message.authorKind == .human_broadcast ? "Note from \(page.creatorName) · audience details unavailable" : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : "Call with \(page.creatorName)").qText("label")
@@ -151,6 +158,7 @@ private struct W3FirstConversation: View {
 private struct W3PrivacyScreen: View {
     let client: W3ConversationClient; let root: String; let name: String; @ObservedObject var session: FanSession
     @State private var memory: W3MemoryView?; @State private var audit: [W3Audit] = []; @State private var caps: W3Capabilities?; @State private var page: W3Page?
+    @State private var usage: W3Usage?
     @State private var failure = ""; @State private var busy = false; @State private var editing: String?; @State private var text = ""
     @State private var provenance: W3Message?
     @Environment(\.colorScheme) private var scheme
@@ -178,15 +186,22 @@ private struct W3PrivacyScreen: View {
             Toggle("Keep this conversation off the record", isOn: Binding(get: { memory?.offTheRecord ?? false }, set: { value in Task { await preferences(offTheRecord: value, introShared: memory?.introShared ?? false) } })).disabled(busy || memory == nil)
             Text("The AI keeps no memory from it. It is still labeled, visible to the creator and their team, and you can delete it.").qText("caption")
             Toggle("Share my intro with this creator's AI", isOn: Binding(get: { memory?.introShared ?? false }, set: { value in Task { await preferences(offTheRecord: memory?.offTheRecord ?? false, introShared: value) } })).disabled(busy || memory == nil)
+            Text("Time with this creator's AI").qText("display-md")
+            if let usage {
+                Text(usage.measurement + " Days are shown in UTC.").qText("caption")
+                Text("This week · \(Int(usage.days.reduce(0) { $0 + $1.seconds } / 60)) minutes").qText("body")
+                ForEach(usage.days, id: \.day) { day in HStack { Text(day.day).qText("data-sm"); Spacer(); Text("\(Int(day.seconds / 60)) minutes").qText("body") } }
+                if !usage.modeAvailable { Text("Companion mode time signals await the verified AI mode configuration.").qText("caption") }
+            }
             Text("AI providers").qText("display-md")
             ForEach(caps?.providers?.providers ?? [], id: \.name) { provider in if let url = URL(string: provider.termsUrl) { Link(provider.name + " processing terms", destination: url) } }
             if let policy = caps?.providers { Button(page?.consentCurrent == true ? "Withdraw AI provider consent" : "Agree to these AI providers", variant: .secondary, disabled: busy || !policy.verified) { Task { await consent(policy) } } }
             Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
             Button("Help and safety", variant: .quiet) { session.open("/support") }
         }.padding(16) }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme)).task { await refresh() }.refreshable { await refresh() }
-            .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Where this came from").qText("title"); Text(message.authorKind == .fan ? "You" : message.authorKind.rawValue).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
+            .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Where this came from").qText("title"); Text(message.authorLabel(name:name)).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
     }
-    private func refresh() async { do { memory = try await client.request(root + "/memory"); audit = try await client.request(root + "/audit"); caps = try await client.request("capabilities", publicRead: true); page = try await client.request(root); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to refresh privacy settings." } }
+    private func refresh() async { do { memory = try await client.request(root + "/memory"); audit = try await client.request(root + "/audit"); caps = try await client.request("capabilities", publicRead: true); page = try await client.request(root); usage = try await client.request(root + "/usage"); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to refresh privacy settings." } }
     private func decide(_ item: W3Memory, _ action: String) async { guard !busy, let memory else { return }; busy = true; defer { busy = false }; do { let _: W3MemoryView = try await client.request(root + "/memory/" + item.id, body: JSONEncoder().encode(W3Decision(expectedRevision: memory.revision, action: action, text: action == "edit" ? text : nil))); editing = nil; await refresh() } catch { failure = (error as? W3Failure)?.message ?? "This change could not be saved." } }
     private func preferences(offTheRecord: Bool, introShared: Bool) async { guard !busy, let memory else { return }; busy = true; defer { busy = false }; do { let _: W3Page = try await client.request(root + "/preferences", body: JSONEncoder().encode(W3Preferences(offTheRecord: offTheRecord, introShared: introShared, expectedRevision: memory.revision))); await refresh() } catch { failure = (error as? W3Failure)?.message ?? "This change could not be saved." } }
     private func consent(_ policy: W3Policy) async { guard !busy else { return }; busy = true; defer { busy = false }; do { let _: W3Page = try await client.request(root + "/consent", body: JSONEncoder().encode(W3Consent(version: policy.version, accepted: page?.consentCurrent != true))); await refresh() } catch { failure = (error as? W3Failure)?.message ?? "Consent could not be saved." } }
