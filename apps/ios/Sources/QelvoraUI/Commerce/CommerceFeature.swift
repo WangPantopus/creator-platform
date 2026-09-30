@@ -117,7 +117,7 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Monthly spending limit").qText("body-strong")
                 HStack { Button("Choose an amount", variant: .secondary) { choice = "amount" }; Button("No limit", variant: .secondary) { choice = "none" } }
-                if choice == "amount" { TextField("Amount in \(data.policy.currency)", text: $amount).commerceDecimalInput().padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
+                if choice == "amount" { TextField("Amount in \(data.policy.currency)", text: $amount).qDecimalKeyboard().padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
                 Toggle("Remind me at 50% and 100%", isOn: $reminders).qText("body")
                 Text("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.").qText("caption")
                 Button(busy ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: busy || choice.isEmpty) { Task {
@@ -216,12 +216,3 @@ struct CommerceFeature: View {
     private func outcome(_ packet: CommercePacket) -> String { ["released":"Hold released · nothing charged", "failed":"Payment failed · nothing charged", "unknown":"Confirming payment", "requires_action":"Payment authentication needed", "refund_pending":"Refund processing", "refunded":"Refund confirmed"][packet.payment_state] ?? (packet.commitment_state == "delivered" ? "Delivered" : packet.state.replacingOccurrences(of: "_", with: " ")) }
 }
 
-private extension View {
-    @ViewBuilder func commerceDecimalInput() -> some View {
-        #if os(iOS)
-        self.keyboardType(.decimalPad)
-        #else
-        self
-        #endif
-    }
-}

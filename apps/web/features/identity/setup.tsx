@@ -1,12 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { brand } from "@qelvora/brand";
 import { Notice } from "@qelvora/ui-web";
 import { ProofSchema, type Session } from "@qelvora/api";
 import { registerPasskey } from "./passkey";
+import { useIdentityRequest } from "./session-boundary";
 
-async function action(path: string, body?: unknown) {
-  const response = await fetch(`/api/platform/identity/${path}`, {
+async function identityAction(
+  request: ReturnType<typeof useIdentityRequest>["request"],
+  path: string,
+  body?: unknown,
+) {
+  const response = await request(path, {
     method: body === undefined ? "GET" : "POST",
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -19,6 +24,12 @@ async function action(path: string, body?: unknown) {
   return data;
 }
 export function CreatorSetup({ initial }: { initial: Session }) {
+  const identity = useIdentityRequest();
+  const action = useCallback(
+    (path: string, body?: unknown) =>
+      identityAction(identity.request, path, body),
+    [identity.request],
+  );
   const [creator, setCreator] = useState(initial.creator);
   const [name, setName] = useState(creator?.displayName ?? "");
   const [handle, setHandle] = useState(creator?.handle ?? "");
@@ -31,6 +42,19 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const proofExpired =
+    !!proof && new Date(proof.expiresAt).getTime() <= Date.now();
+  useEffect(() => {
+    const current = identity.session.creator;
+    if (
+      current &&
+      (!creator ||
+        current.id !== creator.id ||
+        current.version > creator.version ||
+        current.verification !== creator.verification)
+    )
+      setCreator(current);
+  }, [identity.session.creator, creator]);
   useEffect(() => {
     let active = true;
     if (creator)
@@ -46,7 +70,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     return () => {
       active = false;
     };
-  }, [creator]);
+  }, [creator, action]);
   const perform = async (work: () => Promise<void>) => {
     if (busy) return;
     setBusy(true);
@@ -192,9 +216,9 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                 onChange={(event) => setAccount(event.target.value)}
               />
             </div>
-            <Notice title="We look once, then forget the code">
-              We check that the post exists and comes from that account. We
-              don't read your other posts or messages.
+            <Notice title="Proof is reviewed before signing">
+              The proof code is saved with your verification request. Signing
+              stays disabled until your request is approved.
             </Notice>
             {proof?.state === "challenge" && (
               <div className="qv-field">
@@ -212,7 +236,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
             )}
             <div className="proof-actions">
               <button
-                disabled={busy || proof?.state === "pending"}
+                disabled={busy || (proof?.state === "pending" && !proofExpired)}
                 className="qv-btn qv-btn--secondary qv-btn--lg"
                 onClick={() =>
                   perform(async () => {
@@ -221,7 +245,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                       ["rejected", "revoked", "approved"].includes(
                         proof.state,
                       ) ||
-                      new Date(proof.expiresAt).getTime() <= Date.now()
+                      proofExpired
                     ) {
                       setProof(
                         ProofSchema.parse(
@@ -247,6 +271,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                 }
               >
                 {!proof ||
+                proofExpired ||
                 ["rejected", "revoked", "approved"].includes(proof.state)
                   ? "Create proof code"
                   : "I've posted it · check now"}
@@ -270,11 +295,15 @@ export function CreatorSetup({ initial }: { initial: Session }) {
             </div>
             {proof && (
               <>
-                <Notice title={`Verification ${proof.state}`}>
-                  {proof.reason ??
-                    (proof.state === "pending"
-                      ? "Your proof is awaiting manual review. This status is separate from payout-provider identity checks."
-                      : "Creator identity is checked independently of payout-provider identity checks.")}
+                <Notice
+                  title={`Verification ${proofExpired ? "expired" : proof.state}`}
+                >
+                  {proofExpired
+                    ? "Create a fresh proof code to continue. Your draft setup is kept."
+                    : (proof.reason ??
+                      (proof.state === "pending"
+                        ? "Your proof is awaiting manual review. This status is separate from payout-provider identity checks."
+                        : "Creator identity is checked independently of payout-provider identity checks."))}
                 </Notice>
                 <button
                   className="qv-btn qv-btn--quiet"
@@ -304,7 +333,10 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                   perform(async () => {
                     const begin = await action("passkeys/begin", {});
                     try {
-                      const credential = await registerPasskey(begin.options);
+                      const credential = await registerPasskey(
+                        begin.options,
+                        identity.signal,
+                      );
                       await action("passkeys/register", {
                         challengeId: begin.challengeId,
                         credential,

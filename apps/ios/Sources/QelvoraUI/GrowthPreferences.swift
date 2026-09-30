@@ -27,7 +27,7 @@ struct GrowthNotificationSettings: View {
                 Toggle("Hide sensitive previews", isOn: field(\.hideSensitive))
                 TextField("Quiet hours from · HH:mm", text: $from).textFieldStyle(.roundedBorder)
                 TextField("Quiet hours until · HH:mm", text: $until).textFieldStyle(.roundedBorder)
-                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).growthTimeZoneInput()
+                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).qDisableAutoCapitalization()
                 Text("Leave both times empty for no quiet hours.").qText("caption")
                 ForEach(creators) {creator in Toggle(creator.name + " · push and email", isOn: allowed(\.mutedCreators, creator.id))}
                 ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(kind.replacingOccurrences(of: "_", with: " ")).qText("label");Toggle("Push", isOn: allowed(\.disabledPushTypes, kind));Toggle("Email", isOn: allowed(\.disabledEmailTypes, kind))}}
@@ -45,12 +45,3 @@ struct GrowthNotificationSettings: View {
     private func save() async {guard let client, var current = value else {return};busy = true;defer {busy = false};do {current.quietStart = try minute(from);current.quietEnd = try minute(until);guard (current.quietStart == nil) == (current.quietEnd == nil) else {throw URLError(.cannotParseResponse)};let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current));value = updated;message = "Preferences saved. Your in-app record remains available."} catch {message = "Preferences were not saved. Check both quiet-hour times and reconnect."}}
 }
 
-private extension View {
-    @ViewBuilder func growthTimeZoneInput() -> some View {
-        #if os(iOS)
-        self.textInputAutocapitalization(.never)
-        #else
-        self
-        #endif
-    }
-}

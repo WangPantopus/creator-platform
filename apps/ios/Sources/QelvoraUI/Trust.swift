@@ -179,7 +179,7 @@ public struct TrustFanFeature: View {
         }
     }
     private var privacyDisabled: Bool { busy || capability?.actorVerification != "configured" || (capability?.localDevelopment == true ? proof != "LOCAL DEVELOPMENT" : capability?.verificationMethod != "current_session" && proof.isEmpty) || (scope != "account" && UUID(uuidString: creatorID) == nil) || (scope == "thread" && UUID(uuidString: threadID) == nil) }
-    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).trustInputCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).accessibilityLabel(title) } }
+    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).qDisableAutoCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).accessibilityLabel(title) } }
     private func load() async { guard let client else { error = "The trust service is not configured."; return }; busy = true; defer { busy = false }; do { capability = try await client.request("capabilities"); help = try await client.request("help"); if route.hasPrefix("/trust") || route.contains("feedback") { } else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items } else if route.contains("privacy") { let page: TrustItems<TrustJob> = try await client.request("privacy/jobs"); jobs = page.items } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items }; error = "" } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; self.error = error.localizedDescription } }
     private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? { guard let client, !busy else { return nil }; busy = true; defer { busy = false }; do { let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); error = ""; commandKey = UUID().uuidString; return ack } catch { self.error = error.localizedDescription; return nil } }
     private func report() async {
@@ -193,12 +193,3 @@ public struct TrustFanFeature: View {
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
 
-private extension View {
-    @ViewBuilder func trustInputCapitalization() -> some View {
-        #if os(iOS)
-        self.textInputAutocapitalization(.never)
-        #else
-        self
-        #endif
-    }
-}
