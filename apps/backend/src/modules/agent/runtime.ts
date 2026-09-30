@@ -8,10 +8,9 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { reserveCreatorCost, settleCreatorCost } from "./budget.js";
 import { AgentService } from "./service.js";
 import {
-  licensed,
   licenseRow,
   sourceRows,
-  versionRows,
+  versionRow,
   type CreatorScope,
 } from "./repository.js";
 import {
@@ -24,6 +23,8 @@ import {
 /** Producer contracts are callbacks, not SQL into W3 memory or W4 grant/money tables. */
 export interface ConversationContextPort {
   current(scope: ThreadScope): Promise<ThreadSnapshot>;
+  /** Current W1/W3 processor consent is required before sending fan text remotely. */
+  assertProcessorConsent?(scope: ThreadScope): Promise<void>;
   assertDeliveryCurrent(
     scope: ThreadScope,
     expected: { epoch: number; revision: number },
@@ -64,9 +65,23 @@ export class LiveAgentRuntime {
     }) => Promise<void>,
   ) {
     assertThreadScope(scope);
-    if (!needsImmediateSafety(message)) return false;
     signal.throwIfAborted();
     const snapshot = await this.conversations.current(scope);
+    let crisis = needsImmediateSafety(message);
+    if (!crisis && this.service.pipeline.model) {
+      invariant(
+        this.conversations.assertProcessorConsent,
+        "processor_consent_unavailable",
+        "Current processor consent is required before safety classification.",
+      );
+      await this.conversations.assertProcessorConsent(scope);
+      crisis = await this.service.pipeline.classifySafety(
+        this.creatorScope(scope),
+        message,
+        signal,
+      );
+    }
+    if (!crisis) return false;
     await this.conversations.assertDeliveryCurrent(scope, {
       epoch: snapshot.epoch,
       revision: snapshot.revision,
@@ -106,15 +121,20 @@ export class LiveAgentRuntime {
           "The creator has paused this AI.",
         );
         invariant(
-          licensed(await licenseRow(client, scope.creatorId)),
+          await this.service.currentLicense(
+            scope,
+            await licenseRow(client, scope.creatorId),
+          ),
           "license_expired",
           "This AI’s license is unavailable or expired.",
         );
-        const version = (await versionRows(client, scope.creatorId)).find(
-          (v) => v.id === workspace.live_version_id && v.state === "live",
+        const version = await versionRow(
+          client,
+          scope.creatorId,
+          workspace.live_version_id,
         );
         invariant(
-          version,
+          version?.state === "live",
           "version_unavailable",
           "The live version is unavailable.",
         );
@@ -161,6 +181,12 @@ export class LiveAgentRuntime {
     );
     const creatorScope = this.creatorScope(scope);
     const current = await this.current(creatorScope);
+    invariant(
+      this.conversations.assertProcessorConsent,
+      "processor_consent_unavailable",
+      "Current processor consent is required before generation.",
+    );
+    await this.conversations.assertProcessorConsent(scope);
     const snapshot = await this.conversations.current(scope);
     const grants = await this.audiences.current(scope);
     const hold = await reserveCreatorCost(
@@ -187,6 +213,7 @@ export class LiveAgentRuntime {
         epoch: snapshot.epoch,
         revision: snapshot.revision,
       });
+      await this.conversations.assertProcessorConsent!(scope);
       const fresh = await this.current(creatorScope);
       if (fresh.version.id !== current.version.id)
         throw new DomainError(
@@ -197,7 +224,7 @@ export class LiveAgentRuntime {
       const audience = await this.audiences.current(scope);
       if (
         audience.revision !== grants.revision ||
-        Date.parse(audience.validUntil) <= Date.now()
+        !(Date.parse(audience.validUntil) > Date.now())
       )
         throw new DomainError(
           "access_changed",
@@ -205,10 +232,29 @@ export class LiveAgentRuntime {
           409,
         );
     };
+    // Recheck durable authority in every process, including while the provider
+    // is silent. Sentence delivery also rechecks it immediately before release.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const monitor = async () => {
+      try {
+        await assertCurrent();
+      } catch (error) {
+        controller.abort(error);
+      }
+      if (!controller.signal.aborted && !signal.aborted)
+        timer = setTimeout(() => {
+          void monitor();
+        }, 1000);
+    };
     try {
+      await assertCurrent();
+      timer = setTimeout(() => {
+        void monitor();
+      }, 1000);
       let emitted = 0;
       const result = await this.service.pipeline.run({
         scope: creatorScope,
+        usageCategory: "reply",
         configuration: current.version.configuration,
         creatorName: scope.creatorName,
         sourceSet: current.version.sourceSet,
@@ -243,6 +289,8 @@ export class LiveAgentRuntime {
       completed = true;
       return result;
     } finally {
+      if (timer) clearTimeout(timer);
+      controller.abort();
       try {
         await settleCreatorCost(
           this.service.repository,
@@ -262,7 +310,7 @@ export class LiveAgentRuntime {
   async passage(scope: ThreadScope, passageId: string): Promise<Passage> {
     const creatorScope = this.creatorScope(scope);
     const grants = await this.audiences.current(scope);
-    if (Date.parse(grants.validUntil) <= Date.now())
+    if (!(Date.parse(grants.validUntil) > Date.now()))
       throw new DomainError(
         "citation_unavailable",
         "No longer accessible to you",

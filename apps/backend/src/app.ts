@@ -82,6 +82,7 @@ export function createApp(
     if (router)
       app.use(`/v1/commerce/provider-notifications/${provider}`, router);
   }
+  app.use("/v1/agent", express.json({ limit: "1100kb" }));
   app.use(express.json({ limit: "64kb" }));
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {

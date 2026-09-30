@@ -201,6 +201,7 @@ export type License = {
   estateOptInReference?: string;
 };
 export type StudioState = {
+  actorAccountId: string;
   creator: { id: string; name: string; verification: string };
   development: boolean;
   revision: number;
@@ -209,6 +210,7 @@ export type StudioState = {
   status: { text: string; expiresAt: string } | null;
   sources: Source[];
   versions: Version[];
+  liveVersion: Version | null;
   evaluation: Evaluation | null;
   license: License | null;
   sponsors: {

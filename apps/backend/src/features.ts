@@ -2,6 +2,7 @@ import type { FeatureRegistration } from "./app.js";
 import { createAgentRouter } from "./modules/agent/router.js";
 import type { AgentService } from "./modules/agent/service.js";
 import type { SourceService } from "./modules/sources/service.js";
+import type { ShadowReplay } from "./modules/agent/shadow.js";
 import { commerceFeature } from "./modules/commerce/registration.js";
 import type { CommerceService } from "./modules/commerce/service.js";
 import type { ExtendedCommerce } from "./modules/commerce/extended.js";
@@ -23,6 +24,7 @@ export function registerDomainFeatures(input: {
     service: AgentService;
     sources: SourceService;
     development: boolean;
+    shadow?: ShadowReplay;
   };
   commerce?: CommerceService;
   extendedCommerce?: ExtendedCommerce;
