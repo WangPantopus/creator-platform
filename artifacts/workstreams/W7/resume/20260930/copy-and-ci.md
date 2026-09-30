@@ -1,6 +1,6 @@
 # W7 English catalog and CI continuation
 
-Continuation from pushed `1115ba34412979a252cc7b29af06665f2c5c30e1`. Primary personally edited, generated, built, installed, launched and inspected this work. No new test code, paid AI call or delegated implementation.
+Implementation pushed as `0ecf061ea926ae843e5f1076616e9ee7be7741ee`, following `1115ba34412979a252cc7b29af06665f2c5c30e1`. Primary personally edited, generated, built, installed, launched and inspected this work. No new test code, paid AI call or delegated implementation.
 
 ## Copy implementation
 
@@ -33,3 +33,5 @@ During extraction review, technical CSS, authorization and context-query strings
 The SDK fix follows the [v3 action input](https://raw.githubusercontent.com/android-actions/setup-android/v3/action.yml) and the [maintainer's deprecated-tools guidance](https://github.com/android-actions/setup-android#the-deprecated-tools-package). It changes only SDK setup, not tests, runtime checks or approvals.
 
 The existing suite was also run locally against a separate disposable `creator_w7_test_foundation` database inside W7's own PostgreSQL container; it reproduced the two backend failures. W7 runtime DB/schema and all test source remained intact. No missing owner/provider/design acceptance is converted to success. PR#2 remains draft and main is not merged.
+
+Remote verification: PR#2 head is0ecf061, open/draft/merged=false. Main remains2e337a1. Full diff versus main has1027 files and includes the reconciled committed foundation; it is not a W7-only implementation patch. GitHub metadata edit remains denied403; the corrected reviewable description is committed in `pr-description.md`.
