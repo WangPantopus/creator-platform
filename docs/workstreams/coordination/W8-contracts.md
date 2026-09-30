@@ -2,6 +2,8 @@
 
 ## Continued isolated integration scope — 2026-09-30
 
+**Phone acceptance follow-up:** W8's own `apps/web/app/ops/trust.css` now gives phone case metadata a16px column gap and wraps long labels/values. Actual390 Light/Night preserves scoped CASE-003 atresolved, its original evidence/decision, zero horizontal overflow and recipient-only local notice. Current evidence/inputs and the narrow existing-fixture/setup proposal are prepared; no test edit or grant widening occurred. The exact source/build/API/image revisions remain separately recorded.
+
 **Integrated failure correction:** current CID86c88aa7-ea94-4cde-b910-e00c84d23b2a located a grant-free W3 history read failing in W4’s `modules/access/commerce.ts`: the capability snapshot passed an undefined pass record into strict canonical hashing. W8’s narrow isolated correction uses explicit null for an absent pass. It preserves canonical JSON/signing validation, grant checks and allowance zero; no grant is created.
 
 **Follow-up scope:** the same human continuation authority covers exact report references in W3 web/Swift/Kotlin callers and conversation correlation headers; W1 auth completion clears only the explicit development override; canonical app composition installs the existing W8 telemetry middleware. No tests, generated resources, signing policies, RLS/grants or peer worktrees change. The local completion payload now conforms to W1’s strict IdentityCompletion schema instead of exposing its internal top-level session ID. Deployed C10 readiness requires a registered hook **and** a required, real `privacy_<domain>` probe for each of eight domains; registration alone is not readiness.
