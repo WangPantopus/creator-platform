@@ -13,16 +13,17 @@ enum QelvoraLayout {
 struct QelvoraTextStyle: ViewModifier {
     let style: QelvoraTokens.TextStyle
     let weight: Font.Weight?
+    let italic: Bool
     @ScaledMetric(relativeTo: .body) private var scaledSize: CGFloat = 1
 
-    init(_ name: String, weight: Font.Weight?) {
+    init(_ name: String, weight: Font.Weight?, italic: Bool = false) {
         guard let style = QelvoraTokens.textStyles[name] else { preconditionFailure("Unknown text style: \(name)") }
-        self.style = style; self.weight = weight
+        self.style = style; self.weight = weight; self.italic = italic
         _scaledSize = ScaledMetric(wrappedValue: style.size, relativeTo: .body)
     }
 
-    init(style: QelvoraTokens.TextStyle, weight: Font.Weight? = nil) {
-        self.style = style; self.weight = weight
+    init(style: QelvoraTokens.TextStyle, weight: Font.Weight? = nil, italic: Bool = false) {
+        self.style = style; self.weight = weight; self.italic = italic
         _scaledSize = ScaledMetric(wrappedValue: style.size, relativeTo: .body)
     }
 
@@ -36,7 +37,7 @@ struct QelvoraTextStyle: ViewModifier {
 
     func body(content: Content) -> some View {
         let numericWeight: Int = weight == .semibold || weight == .bold ? 600 : weight == .medium ? 500 : style.weight
-        let font = QelvoraFonts.coreText(style.family, size: scaledSize, weight: numericWeight)
+        let font = QelvoraFonts.coreText(style.family, size: scaledSize, weight: numericWeight, italic: italic)
         let naturalHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
         content
             .font(Font(font))
@@ -60,8 +61,8 @@ extension View {
         self
         #endif
     }
-    func qText(_ name: String, weight: Font.Weight? = nil) -> some View {
-        modifier(QelvoraTextStyle(name, weight: weight))
+    func qText(_ name: String, weight: Font.Weight? = nil, italic: Bool = false) -> some View {
+        modifier(QelvoraTextStyle(name, weight: weight, italic: italic))
     }
     func qShadow(_ name: String, radius: CGFloat = QelvoraTokens.token("radius-lg")) -> some View { modifier(QelvoraShadow(name: name, radius: radius)) }
 }

@@ -1,0 +1,45 @@
+{
+  "scope": "Maintenance of existing CI checks; not full native product/provider acceptance",
+  "host": {
+    "os": "macOS26.7",
+    "architecture": "x86_64",
+    "xcode": "26.5",
+    "ios": "26.5 Simulator"
+  },
+  "swift": {
+    "tests": 18,
+    "failures": 0,
+    "durationSeconds": 184.291,
+    "sourceDimensions": [
+      390,
+      844
+    ],
+    "bitmapDimensions": [
+      780,
+      1688
+    ],
+    "comparison": "Normalize both original ICC-profiled reference and capture into sRGB. Exact dimensions; at least99.85% of pixels within8 channel units. Native blur/font edge variance calibrated from all110 preserved comparisons; source artboards and Swift baseline PNGs unchanged."
+  },
+  "iosAppBuild": "Normal signed generic Simulator BUILD SUCCEEDED",
+  "android": {
+    "tests": 19,
+    "failures": 0,
+    "assembleDebug": "BUILD SUCCESSFUL",
+    "verifyPaparazziDebug": "BUILD SUCCESSFUL",
+    "duration": "2m25s",
+    "sdk": "Existing SDK35/build-tools34/35 and license files copied read-only into W1 private tools; no new agreement accepted",
+    "expectedChanges": "Only4 Composer/ended PNGs now include previously implemented required StepIn control; original files archived under android-composer"
+  },
+  "sourceDigests": {
+    "apps/ios/Sources/QelvoraUI/Theme.swift": "f4c5ea37a0bd93f9171509f708c9ebf14a1ba0a875d889dcec2b0d527d6c4132",
+    "apps/ios/Sources/QelvoraUI/StudioComponents.swift": "badf366d9d12f9acc308ede670eb0a12fb2917b0c9a680e19fc79df65d536ff0",
+    "apps/ios/Sources/QelvoraUI/Navigation.swift": "208c98bf1cf0de1b0a9ebfc1699f6654ed5c3225d95d7cd7bce0eb6e8bf0e144",
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "505eab62f1d6c2f6a82b85a1bb5b5d91992a66c98c7273033a1e015cf9467e68",
+    "apps/ios/Tools/NativeSnapshots/main.swift": "e5e20d8fc5bab9eb661274924d2434f4641d259d8fb370df16da84f3d14d2949"
+  },
+  "limits": [
+    "CI on pushed Swift repair still pending",
+    "No real native sign-in/passkey/provider or physical device acceptance",
+    "Native UI APIs unavailable; existing automated checks do not replace personally operated acceptance"
+  ]
+}
