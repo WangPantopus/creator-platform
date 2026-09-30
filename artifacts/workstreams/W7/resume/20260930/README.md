@@ -62,3 +62,9 @@ At checkpoint `6b34a20`, Trust release compilation passed. Foundation web/backen
 ### Catalog completion follow-up
 
 [Copy and CI continuation](copy-and-ci.md) records387 shared English additions, generated Swift/Kotlin resources, final builds, actual saved/reloaded browser settings and native Night captures. Existing catalog values are unchanged. Full locale/copy review and integrated acceptance remain gates. The current source is recorded separately in `source-copy.sha256`; earlier manifests/logs are historical.
+
+### Native preferences follow-up
+
+[Atomic reload and field recovery](native-preferences.md) fixes a partial-load overwrite risk in both native clients. Full builds pass; iOS launch reaches canonical sign-in. Native settings operation remains unverified. Current shared catalog has605 keys. Matching native CI remains queued; provider/owner/design gates remain open.
+
+[Native comparison/runner and owner-directory follow-up](../../ci-repair/20260930/native-color-contract.md) records18/18 local checks and110 unchanged images under the explicitly changed reviewed rounding contract. Matching pushed-head CI is required. Home paging is bounded100/uninstalled; larger accounts need the reviewed paged contract. Android System UI ANR is reproduced after both preserved-data renderer attempts, superseding earlier no-ANR observations.

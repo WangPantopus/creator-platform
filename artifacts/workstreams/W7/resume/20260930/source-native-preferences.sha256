@@ -1,0 +1,8 @@
+ca0961bb369bccb87fc73474f30827c0813a16c5a2a9690b1b8a42ed31909c25  apps/ios/Sources/QelvoraUI/GrowthPreferences.swift
+9041f5ee52d0f1b4c28aac19127fd5d818f192b551916690ba27c79d56b63127  apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt
+b0750b6aaa5c11eca543cd2611ed5874646c51583afcadc660fcaf3493e5bbaa  config/copy.json
+b998e0a159375fd851c2ed20a8151888fa8bda739608862033ce8676f5272657  packages/copy/src/index.ts
+66dbdb016467f36adde66f4122829d35f6dba0f22da2d4fb6d636f4bbb0086e2  apps/ios/Sources/Generated/QelvoraCopy.swift
+e59a46aaf3a24cee6ea7f1bb9cabaf678efd60d8b6eae6ebdcc5ac3d6abb6996  apps/ios/Sources/Generated/Localizable.xcstrings
+f241e8d37e03d60f65c4f61c6b7f6b34b70fd11812fe7df0ea1fcbb72fd0fab7  apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt
+d65f4278c2640130e88ea1a3b32714819ceac57a02bd67499726440f09022d22  apps/android/app/src/main/res/values/strings.xml

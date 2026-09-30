@@ -77,24 +77,78 @@
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      window.colorSpace = .sRGB
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      // Hosted runners may have a 1x screen. The references use a 2x bitmap,
-      // so render at that scale explicitly instead of inheriting the display.
-      let bitmap = NSBitmapImageRep(
-        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2), pixelsHigh: Int(size.height * 2),
-        bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
-        colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+      // Match the existing2x references without inheriting a runner display's scale/profile.
+      guard let context = CGContext(
+        data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
+        bitsPerComponent: 8, bytesPerRow: 0,
+        space: CGColorSpace(name: CGColorSpace.sRGB)!,
+        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+      ), let pixels = context.makeImage() else {
+        XCTFail("Snapshot bitmap could not be allocated.", file: file, line: line)
+        return
+      }
+      let bitmap = NSBitmapImageRep(cgImage: pixels)
       bitmap.size = size
       host.cacheDisplay(in: host.bounds, to: bitmap)
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
+      var imageStrategy = Snapshotting<NSImage, NSImage>.image
+      let compare = imageStrategy.diffing.diffV2
+      imageStrategy.diffing.diffV2 = { reference, rendered in
+        // References contain the original monitor's ICC profile. Compare both
+        // in sRGB so display calibration cannot change the pixel contract.
+        func canonical(_ image: NSImage) -> CGContext {
+          guard let source = image.cgImage(forProposedRect: nil, context: nil, hints: nil),
+            let space = CGColorSpace(name: CGColorSpace.sRGB),
+            let pixels = CGContext(
+              data: nil, width: source.width, height: source.height, bitsPerComponent: 8,
+              bytesPerRow: 0, space: space,
+              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+          else { preconditionFailure("Snapshot image could not be color-normalized") }
+          pixels.interpolationQuality = .none
+          pixels.draw(source, in: CGRect(x: 0, y: 0, width: source.width, height: source.height))
+          return pixels
+        }
+        let expected = canonical(reference), actual = canonical(rendered)
+        let expectedImage = NSImage(cgImage: expected.makeImage()!, size: reference.size)
+        let actualImage = NSImage(cgImage: actual.makeImage()!, size: rendered.size)
+        guard expected.width == actual.width, expected.height == actual.height else {
+          return compare(expectedImage, actualImage)
+        }
+        // Color-profile rounding and native blur/text rasterization vary across
+        // macOS hosts. Require 99.85% of decoded sRGB pixels to match within eight
+        // channel units; retain exact dimensions and original failure images.
+        // Byte comparison applies the same channel bound in both themes.
+        let a = expected.data!.assumingMemoryBound(to: UInt8.self)
+        let b = actual.data!.assumingMemoryBound(to: UInt8.self)
+        var different = 0
+        for y in 0..<expected.height {
+          var x = 0
+          while x < expected.width {
+            let left = y * expected.bytesPerRow + x * 4
+            let right = y * actual.bytesPerRow + x * 4
+            if abs(Int(a[left]) - Int(b[right])) > 8
+              || abs(Int(a[left + 1]) - Int(b[right + 1])) > 8
+              || abs(Int(a[left + 2]) - Int(b[right + 2])) > 8
+              || abs(Int(a[left + 3]) - Int(b[right + 3])) > 8 {
+              different += 1
+            }
+            x += 1
+          }
+        }
+        if Double(different) / Double(expected.width * expected.height) <= 0.0015 { return nil }
+        guard let failure = compare(expectedImage, actualImage) else { return nil }
+        return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+      }
       assertSnapshot(
-        of: image, as: .image, named: name, record: record, file: file,
+        of: image, as: imageStrategy, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

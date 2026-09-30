@@ -9,9 +9,13 @@ import type { GrowthOwners, HomeEntry } from "./contracts.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
 export interface ConversationHomeDirectory {
-  account(actor: Actor): Promise<{
+  account(
+    actor: Actor,
+    cursor?: string,
+  ): Promise<{
     fan: { id: string };
     threads: readonly { id: string; creatorId: string; fanId: string }[];
+    nextCursor?: string | null;
   }>;
 }
 const Directory = z.object({
@@ -19,6 +23,7 @@ const Directory = z.object({
   threads: z
     .array(z.object({ id: z.uuid(), creatorId: z.uuid(), fanId: z.uuid() }))
     .max(100),
+  nextCursor: z.uuid().nullable().optional(),
 });
 
 /** Minimal private Home read through fresh issued fan scopes. The host can
@@ -31,15 +36,49 @@ export function canonicalConversationHome(
   handleFor: (creatorId: string) => Promise<string | null>,
 ): GrowthOwners["home"] {
   return async (actor) => {
-    const directory = Directory.parse(await conversation.account(actor));
-    const result: HomeEntry[] = [];
-    for (const entry of directory.threads) {
-      if (entry.fanId !== directory.fan.id)
+    const entries: z.infer<typeof Directory>["threads"] = [];
+    const seen = new Set<string>();
+    let fanId: string | undefined, cursor: string | undefined;
+    // W3 now returns at most50 relationships per page. Read two authorized
+    // pages rather than silently treating the first page as the whole account.
+    for (let page = 0; page < 2; page++) {
+      const directory = Directory.parse(
+        await conversation.account(actor, cursor),
+      );
+      if (fanId && fanId !== directory.fan.id)
         throw new DomainError(
           "home_scope_invalid",
           copy.growthErrorPrivateReplyUnavailable,
           503,
         );
+      fanId = directory.fan.id;
+      for (const entry of directory.threads) {
+        if (seen.has(entry.id) || entry.fanId !== fanId)
+          throw new DomainError(
+            "home_scope_invalid",
+            copy.growthErrorPrivateReplyUnavailable,
+            503,
+          );
+        seen.add(entry.id);
+        entries.push(entry);
+      }
+      cursor = directory.nextCursor ?? undefined;
+      if (entries.length > 100 || (cursor && page === 1))
+        throw new DomainError(
+          "home_directory_limit",
+          copy.growthErrorPrivateReplyUnavailable,
+          503,
+        );
+      if (!cursor) break;
+      if (!directory.threads.length || !seen.has(cursor))
+        throw new DomainError(
+          "home_scope_invalid",
+          copy.growthErrorPrivateReplyUnavailable,
+          503,
+        );
+    }
+    const result: HomeEntry[] = [];
+    for (const entry of entries) {
       try {
         const scope = await access.openThread(
           actor,

@@ -605,7 +605,8 @@ object QelvoraCopy {
     "growthRetainedEventDedupe" to "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.",
     "growthRetainedFanAggregates" to "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair" to "Both quiet-hour boundaries are required",
-    "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles."
+    "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
+    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59."
   )
   fun text(key: String, values: Map<String, String> = emptyMap()): String = values.entries.fold(strings.getValue(key)) { text, (key, value) -> text.replace("{$key}", value) }
   const val brandName = "Qelvora"

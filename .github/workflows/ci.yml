@@ -52,8 +52,10 @@ jobs:
             playwright-report
             test-results
   ios-foundation:
-    runs-on: xcode-27
+    # Native font rasterization must match the verified macOS26/Intel baseline.
+    runs-on: macos-26-intel
     env:
+      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
       SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/artifacts/ios/snapshot-diffs
     steps:
       - uses: actions/checkout@v4

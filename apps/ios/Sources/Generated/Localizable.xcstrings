@@ -6589,6 +6589,17 @@
           }
         }
       }
+    },
+    "Enter a time in HH:mm, from 00:00 to 23:59.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a time in HH:mm, from 00:00 to 23:59."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

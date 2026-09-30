@@ -605,7 +605,8 @@ public enum QelvoraCopy {
     "growthRetainedEventDedupe": "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.",
     "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
-    "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles."
+    "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
+    "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
   ]
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
     guard var result = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
