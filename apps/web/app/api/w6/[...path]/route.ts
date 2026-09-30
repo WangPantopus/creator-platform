@@ -1,0 +1,93 @@
+import { NextRequest } from "next/server";
+import { platformFetch } from "../../../../lib/session";
+export const dynamic = "force-dynamic";
+/** Same-origin cookie bridge: target paths are fixed to W6 and ticket URLs never redirect. */
+async function proxy(
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  const { path } = await context.params;
+  if (
+    !path.length ||
+    path.some((part) => !/^[a-zA-Z0-9_-]+$/u.test(part)) ||
+    path.length > 9
+  )
+    return Response.json(
+      { error: { message: "This media route is unavailable." } },
+      { status: 400 },
+    );
+  if (
+    !["GET", "HEAD"].includes(request.method) &&
+    request.headers.get("origin") !== request.nextUrl.origin
+  )
+    return Response.json(
+      { error: { message: "Open this action from the app." } },
+      { status: 403 },
+    );
+  const length = Number(request.headers.get("content-length") ?? 0);
+  if (length > 1_048_576)
+    return Response.json(
+      { error: { message: "The upload chunk is too large." } },
+      { status: 413 },
+    );
+  const headers: Record<string, string> = {};
+  for (const key of ["content-type", "upload-offset", "range"]) {
+    const value = request.headers.get(key);
+    if (value) headers[key] = value;
+  }
+  try {
+    const data = ["GET", "HEAD"].includes(request.method)
+      ? undefined
+      : await request.arrayBuffer();
+    if (data && data.byteLength > 1_048_576)
+      return Response.json(
+        { error: { message: "The upload chunk is too large." } },
+        { status: 413 },
+      );
+    const response = await platformFetch(
+      `/v1/w6/${path.join("/")}${request.nextUrl.search}`,
+      {
+        method: request.method,
+        headers,
+        ...(data ? { body: data } : {}),
+        redirect: "error",
+      },
+    );
+    const outgoing = new Headers({
+      "Cache-Control": "private, no-store",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff",
+    });
+    for (const key of [
+      "content-type",
+      "content-length",
+      "content-range",
+      "accept-ranges",
+      "x-request-id",
+    ]) {
+      const value = response.headers.get(key);
+      if (value) outgoing.set(key, value);
+    }
+    return new Response(response.body, {
+      status: response.status,
+      headers: outgoing,
+    });
+  } catch {
+    return Response.json(
+      {
+        error: {
+          code: "media_unavailable",
+          message: "Media is unavailable. Your recording stays here for retry.",
+        },
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
+export {
+  proxy as GET,
+  proxy as POST,
+  proxy as PUT,
+  proxy as DELETE,
+  proxy as HEAD,
+};
