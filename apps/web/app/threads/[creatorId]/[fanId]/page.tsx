@@ -3,6 +3,7 @@ import { IdSchema } from "@qelvora/api";
 import { currentSession } from "../../../../lib/session";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
 import { ConversationScreen } from "../../../../features/conversation/ConversationScreen";
+import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function ThreadPage({
@@ -25,11 +26,16 @@ export default async function ThreadPage({
       />
     );
   return (
-    <ConversationScreen
+    <IdentitySessionBoundary
       key={`${session.accountId}:${creatorId}:${fanId}`}
-      creatorId={creatorId}
-      fanId={fanId}
-      accountId={session.accountId}
-    />
+      initial={session}
+      returnTo={`/threads/${creatorId}/${fanId}`}
+    >
+      <ConversationScreen
+        creatorId={creatorId}
+        fanId={fanId}
+        accountId={session.accountId}
+      />
+    </IdentitySessionBoundary>
   );
 }

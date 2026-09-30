@@ -78,6 +78,19 @@ describe.skipIf(!adminUrl)(
           "utf8",
         ),
       );
+      // Existing checks must exercise the current W3 schema. These immutable
+      // proposals are installed only in this explicitly disposable database;
+      // W8 still owns their canonical production registry allocation.
+      for (const name of ["pending_w3_conversations", "pending_w3_wellbeing"])
+        await admin.query(
+          await readFile(
+            new URL(
+              `../src/modules/conversation/migrations/${name}.sql`,
+              import.meta.url,
+            ),
+            "utf8",
+          ),
+        );
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );
@@ -208,7 +221,9 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
-      expect(observedStatements).toBe(30000);
+      // Five actual scoped context statements now include exclusion and
+      // provenance reads. Every statement still checks both family IDs.
+      expect(observedStatements).toBe(50000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });

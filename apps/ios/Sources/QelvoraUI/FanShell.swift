@@ -90,7 +90,7 @@ public final class FanSession: ObservableObject {
         catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { await purge() }; error = Self.message(failure) }
         catch { self.error = "Session refresh could not complete. Reconnect and try again." }
     }
-    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil) }
+    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }

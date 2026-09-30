@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 data class ArrivalContext(val source: String, val title: String, val creatorName: String)
-class FanSession(context: Context, private val baseURL: String?, returnTo: String) {
+class FanSession(private val context: Context, private val baseURL: String?, returnTo: String) {
     private val storage = SecureSessionStorage(context)
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
@@ -41,7 +41,7 @@ class FanSession(context: Context, private val baseURL: String?, returnTo: Strin
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
     private var removedArrivalFor: String? = null
-    private fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null) }
+    private suspend fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
     suspend fun refresh() {
         val client = api ?: return; val current = generation
         if (currentToken() == null) { session = null; return }

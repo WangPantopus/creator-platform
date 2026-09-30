@@ -6,7 +6,7 @@ import type {
   MemoryItem,
   ProviderPolicy,
 } from "../../../../packages/api/src/conversation/contracts";
-import { conversationRequest, ConversationError } from "./api";
+import { useConversationRequest, ConversationError } from "./api";
 import "./conversation.css";
 type Account = {
   fan: { id: string; handle: string; intro: string };
@@ -32,11 +32,12 @@ export function AccountScreen({
   creatorId?: string;
   fanId?: string;
 }) {
+  const request = useConversationRequest();
   const [account, setAccount] = useState<Account | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let active = true;
-    void conversationRequest<Account>("account")
+    void request<Account>("account")
       .then((value) => {
         if (active) setAccount(value);
       })
@@ -46,7 +47,7 @@ export function AccountScreen({
     return () => {
       active = false;
     };
-  }, []);
+  }, [request]);
   if (creatorId && fanId)
     return (
       <ConversationPrivacy
@@ -154,6 +155,7 @@ function ConversationPrivacy({
   creatorId: string;
   fanId: string;
 }) {
+  const request = useConversationRequest();
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [memory, setMemory] = useState<MemoryView | null>(null);
@@ -170,13 +172,11 @@ function ConversationPrivacy({
   const refresh = useCallback(async () => {
     try {
       const [fresh, memories, entries, caps, time] = await Promise.all([
-        conversationRequest<ConversationPage>(root),
-        conversationRequest<MemoryView>(`${root}/memory`),
-        conversationRequest<Audit[]>(`${root}/audit`),
-        conversationRequest<{ providers: ProviderPolicy | null }>(
-          "capabilities",
-        ),
-        conversationRequest<
+        request<ConversationPage>(root),
+        request<MemoryView>(`${root}/memory`),
+        request<Audit[]>(`${root}/audit`),
+        request<{ providers: ProviderPolicy | null }>("capabilities"),
+        request<
           import("../../../../packages/api/src/conversation/contracts").ConversationUsage
         >(`${root}/usage`),
       ]);
@@ -204,7 +204,7 @@ function ConversationPrivacy({
           : "Reconnect to view your privacy settings.",
       );
     }
-  }, [root]);
+  }, [root, request]);
   useEffect(() => {
     void refresh();
   }, [refresh]);
@@ -228,7 +228,7 @@ function ConversationPrivacy({
   };
   const decide = (item: MemoryItem, decision: string) =>
     action(() =>
-      conversationRequest(`${root}/memory/${item.id}`, {
+      request(`${root}/memory/${item.id}`, {
         action: decision,
         expectedRevision: memory!.revision,
         ...(decision === "edit" ? { text } : {}),
@@ -422,7 +422,7 @@ function ConversationPrivacy({
             disabled={busy || !memory}
             onChange={(event) =>
               void action(() =>
-                conversationRequest(`${root}/preferences`, {
+                request(`${root}/preferences`, {
                   offTheRecord: event.target.checked,
                   introShared: memory!.introShared,
                   expectedRevision: memory!.revision,
@@ -446,7 +446,7 @@ function ConversationPrivacy({
             disabled={busy || !memory}
             onChange={(event) =>
               void action(() =>
-                conversationRequest(`${root}/preferences`, {
+                request(`${root}/preferences`, {
                   offTheRecord: memory!.offTheRecord,
                   introShared: event.target.checked,
                   expectedRevision: memory!.revision,
@@ -475,7 +475,7 @@ function ConversationPrivacy({
             className="qv-btn qv-btn--secondary"
             onClick={() =>
               void action(() =>
-                conversationRequest(`${root}/consent`, {
+                request(`${root}/consent`, {
                   version: policy?.version ?? "",
                   accepted: false,
                 }),
@@ -491,7 +491,7 @@ function ConversationPrivacy({
               className="qv-btn qv-btn--secondary"
               onClick={() =>
                 void action(() =>
-                  conversationRequest(`${root}/consent`, {
+                  request(`${root}/consent`, {
                     version: policy.version,
                     accepted: true,
                   }),

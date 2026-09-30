@@ -259,15 +259,6 @@ export class ConversationService {
                 "Review the current AI providers before messaging.",
               );
             await this.delivery.assertReady?.(scope, client);
-            const active = await client.query(
-              "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
-              [scope.threadId, scope.creatorId, scope.fanId],
-            );
-            invariant(
-              !active.rowCount,
-              "reply_in_progress",
-              "Wait for this reply before sending another message.",
-            );
             const reservation = await this.delivery.allowance?.reserve(
               scope,
               client,
@@ -276,6 +267,18 @@ export class ConversationService {
             const grantId =
               reservation?.grantId ??
               (await this.access.reserveAllowance(scope, client));
+            const active = await client.query(
+              "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
+              [scope.threadId, scope.creatorId, scope.fanId],
+            );
+            // Access/allowance denial agrees with the capability projection.
+            // If another reply is running, rejection rolls this transaction's
+            // reservation back; an unavailable send cannot consume a unit.
+            invariant(
+              !active.rowCount,
+              "reply_in_progress",
+              "Wait for this reply before sending another message.",
+            );
             const generationId = randomUUID();
             const fan = await this.insertMessage(
               client,

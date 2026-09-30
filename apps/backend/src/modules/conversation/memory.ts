@@ -167,7 +167,13 @@ export class MemoryService {
     return this.writeProposal(scope, MemoryProposalSchema.parse(raw));
   }
   async writeProposal(scope: ThreadScope, raw: unknown): Promise<boolean> {
-    return (await this.writeProposals(scope, [raw])) > 0;
+    const proposal = MemoryProposalSchema.parse(raw);
+    invariant(
+      !proposal.sensitiveCategory,
+      "sensitive_memory_disabled",
+      "Sensitive memories require an item-specific consent proposal.",
+    );
+    return (await this.writeProposals(scope, [proposal])) > 0;
   }
   /** One extraction snapshot commits as one revision. Later fan changes invalidate
    * the entire batch, including candidates classified by a slow model call. */
@@ -267,14 +273,16 @@ export class MemoryService {
   ) {
     // C05 currently omits the key/kind for sensitive items. Bind consent to this
     // immutable proposal hash; W2 must add canonical semantic metadata for full matching.
-    await this.writeProposal(scope, {
-      kind: "fact",
-      text: item.text,
-      semanticKey: item.itemHash,
-      provenanceMessageId: item.provenanceMessageId,
-      expectedRevision: item.expectedRevision,
-      sensitiveCategory: item.category,
-    });
+    await this.writeProposals(scope, [
+      {
+        kind: "fact",
+        text: item.text,
+        semanticKey: item.itemHash,
+        provenanceMessageId: item.provenanceMessageId,
+        expectedRevision: item.expectedRevision,
+        sensitiveCategory: item.category,
+      },
+    ]);
   }
   async forgetMessage(
     scope: ThreadScope,
