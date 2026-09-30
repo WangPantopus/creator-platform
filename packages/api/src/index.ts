@@ -8,3 +8,5 @@ export * as agentContracts from "./agent/contracts.ts";
 export * as commerceContracts from "./commerce/contracts.ts";
 export * as mediaContracts from "./media.ts";
 export * as callContracts from "./session.ts";
+export * as conversationContracts from "./conversation/contracts.ts";
+export * as contentContracts from "./content.ts";

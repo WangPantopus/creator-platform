@@ -72,7 +72,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
       res.setHeader("Vary", "Origin");
       res.setHeader(
         "Access-Control-Allow-Headers",
-        "Authorization, Content-Type, X-Correlation-Id",
+        "Authorization, Content-Type, X-Correlation-Id, X-Expected-Account-Id",
       );
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
@@ -83,6 +83,13 @@ export function createTrustRouter(options: TrustRouterOptions) {
   const id = (req: Request) => z.uuid().parse(req.params.id);
   const actor = async (req: Request) => {
     const current = await options.actor(req);
+    const expected = req.get("X-Expected-Account-Id");
+    if (expected && z.uuid().parse(expected) !== current.accountId)
+      throw new DomainError(
+        "session_account_changed",
+        "Your account changed. Reopen this page before taking this action.",
+        409,
+      );
     // Preserve personal support/appeals/privacy progress after a denial while
     // preventing a suspended operations account from reading or deciding cases.
     if (

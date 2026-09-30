@@ -28,6 +28,15 @@ export type BackendRuntime = {
   access: AccessService;
   conversation: ConversationService;
   identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
+  assertActorAllowed: (
+    actor: import("./modules/identity/adapter.js").Actor,
+  ) => Promise<void>;
+  assertScopeAllowed: ScopeRestriction;
+  assertCreatorAllowed: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
+  configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
 };
 type TrustConfiguration = Omit<
   Parameters<typeof createTrustRuntime>[0],
@@ -51,6 +60,10 @@ export async function createConfiguredBackend(input: {
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  assertCreatorAllowed?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
   trust?:
     | TrustConfiguration
     | ((runtime: BackendRuntime) => Promise<TrustConfiguration>);
@@ -101,12 +114,13 @@ export async function createConfiguredBackend(input: {
     access,
     input.guardrails,
   );
+  const subjects = [...(input.signedSubjectPolicies ?? [])];
   const signing = new SignedActService(
     pool,
     input.config.rpId,
     input.config.passkeyOrigins ?? [input.config.allowedOrigin],
     undefined,
-    input.signedSubjectPolicies,
+    subjects,
   );
   const sessions = input.config.identitySessionKey
     ? new SessionService(
@@ -135,6 +149,27 @@ export async function createConfiguredBackend(input: {
     access,
     conversation,
     identity: platformIdentity,
+    assertActorAllowed,
+    assertScopeAllowed,
+    assertCreatorAllowed: async (actor, creatorId) => {
+      await assertActorAllowed(actor);
+      if (input.assertCreatorAllowed)
+        await input.assertCreatorAllowed(actor, creatorId);
+      else if (!trust && input.identity.mode !== "development")
+        throw new DomainError(
+          "creator_denial_unconfigured",
+          "Creator actions require their current trust authority.",
+          503,
+        );
+      await trust?.service.assertAllowed(actor, creatorId);
+    },
+    configureSignedSubjects: (policies) => {
+      for (const policy of policies) {
+        if (subjects.some((current) => current.name === policy.name))
+          throw new Error("Duplicate signed-subject registration.");
+        subjects.push(policy);
+      }
+    },
   };
   try {
     if (input.trust) {
@@ -170,6 +205,7 @@ export async function createConfiguredBackend(input: {
       });
     }
     features = (await input.registerFeatures?.(backendRuntime)) ?? [];
+    Object.freeze(subjects);
   } catch (error) {
     await trust?.stop();
     await pool.end();

@@ -577,7 +577,12 @@ export class ConversationService {
           scope.fanId,
         ],
       );
-      await this.settle(client, scope, generation, !failed || generation.last_sequence > 0);
+      await this.settle(
+        client,
+        scope,
+        generation,
+        !failed || generation.last_sequence > 0,
+      );
       await client.query(
         "UPDATE creator.generation SET completed_at=now(),worker_token=NULL,lease_until=NULL WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
         [generationId, scope.threadId, scope.creatorId, scope.fanId],

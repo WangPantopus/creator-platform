@@ -7,6 +7,8 @@ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { createCommerceRuntime } from "./modules/commerce/runtime.js";
 import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
+import { createConversationRuntime } from "./modules/conversation/runtime.js";
+import { createContentStudio } from "./modules/content/integration.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -33,10 +35,36 @@ const configured =
         },
         signedSubjectPolicies: [commerceSignedSubjects],
         registerFeatures: async (runtime) => {
-          features.growth = await configureGrowthForBackend(runtime);
-          const commerce = readCommerceEnvironment(runtime.pool);
+          features.growth = await configureGrowthForBackend({
+            ...runtime,
+            assertAllowed: async (actor, creatorId) =>
+              creatorId
+                ? runtime.assertCreatorAllowed(actor, creatorId)
+                : runtime.assertActorAllowed(actor),
+          });
+          const commerceConfiguration = readCommerceEnvironment(runtime.pool);
+          const commerce = commerceConfiguration
+            ? createCommerceRuntime({ ...runtime, ...commerceConfiguration })
+            : undefined;
+          const conversation = createConversationRuntime(runtime);
+          const content = commerce
+            ? createContentStudio({
+                pool: runtime.pool,
+                owners: {
+                  commerce: commerce.service,
+                  conversation: runtime.conversation,
+                  access: runtime.access,
+                  profiles: runtime.identity?.profiles,
+                },
+                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+              })
+            : undefined;
+          if (content)
+            runtime.configureSignedSubjects([content.signedSubjects]);
           return [
-            ...(commerce ? [createCommerceRuntime({ ...runtime, ...commerce }).feature] : []),
+            conversation.registration,
+            ...(commerce ? [commerce.feature] : []),
+            ...(content?.features ?? []),
             ...(features.growth ? [features.growth.feature] : []),
           ];
         },
