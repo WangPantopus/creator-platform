@@ -45,7 +45,10 @@ for (const theme of ["light", "night"] as const) {
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await page.goto(
         `${visualWebURL}/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
       );
@@ -55,7 +58,10 @@ for (const theme of ["light", "night"] as const) {
         errors,
         `${screen.file} must render without client errors`,
       ).toEqual([]);
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       const comparison = compareCatalog(actual, expected);
       if (comparison.pixels !== 0) {
         await test.info().attach(`${screen.file}-implementation`, {
@@ -131,6 +137,7 @@ for (const theme of ["light", "night"] as const) {
       await reference.evaluate(() => document.fonts.ready);
       const expected = await reference.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       await page.goto(
@@ -140,6 +147,7 @@ for (const theme of ["light", "night"] as const) {
       await page.evaluate(() => document.fonts.ready);
       const actual = await page.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       const comparison = compareCatalog(actual, expected);

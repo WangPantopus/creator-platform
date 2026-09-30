@@ -25,6 +25,12 @@ android {
     testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
+// Keep failed image names and assertion messages in CI logs as well as HTML
+// artifacts, so a failure can be diagnosed when artifact download is unavailable.
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    testLogging.exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+}
+
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.10.01"))
     implementation("androidx.activity:activity-compose:1.9.3")
