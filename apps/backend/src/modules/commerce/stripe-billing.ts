@@ -83,6 +83,7 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
   }
   async start(input: Parameters<MembershipBillingProvider["start"]>[0]) {
     return stripeOperation(async () => {
+      const key = createHash("sha256").update(input.key).digest("hex");
       const price = await this.price(input.priceReference);
       await this.tierForPrice(price.id);
       const customerId =
@@ -93,6 +94,7 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
               metadata: {
                 commerce_account_id: input.accountId,
                 commerce_fan_id: input.fanId,
+                commerce_key: key,
               },
             },
             { ...this.options, idempotencyKey: `${input.key}:customer` },
@@ -156,13 +158,21 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
           "billing_change_unavailable",
           "Reconcile the current consolidated monthly subscription before adding this membership.",
         );
+        // The pending-update endpoint accepts invoice-affecting fields only.
+        // Bind the method separately so an incomplete payment retains its
+        // existing memberships while the new item awaits confirmation.
+        await this.stripe.subscriptions.update(
+          current.id,
+          { default_payment_method: method.id },
+          { ...this.options, idempotencyKey: `${input.key}:method` },
+        );
         subscription = await this.stripe.subscriptions.update(
           current.id,
           {
             items: [{ price: price.id, quantity: 1 }],
-            default_payment_method: method.id,
             proration_behavior: "always_invoice",
             payment_behavior: "pending_if_incomplete",
+            metadata: { commerce_key: key },
             expand: ["latest_invoice.confirmation_secret"],
           },
           { ...this.options, idempotencyKey: `${input.key}:subscription` },
@@ -183,12 +193,86 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
             metadata: {
               commerce_account_id: input.accountId,
               commerce_fan_id: input.fanId,
+              commerce_key: key,
             },
             expand: ["latest_invoice.confirmation_secret"],
           },
           { ...this.options, idempotencyKey: `${input.key}:subscription` },
         );
       }
+      return this.truth(subscription);
+    });
+  }
+  async recoverStart(input: Parameters<MembershipBillingProvider["start"]>[0]) {
+    return stripeOperation(async () => {
+      const key = createHash("sha256").update(input.key).digest("hex");
+      let subscription: Stripe.Subscription | undefined;
+      if (input.subscriptionReference) {
+        const current = await this.stripe.subscriptions.retrieve(
+          input.subscriptionReference,
+          { expand: ["latest_invoice.confirmation_secret"] },
+          this.options,
+        );
+        if (current.metadata.commerce_key !== key) return undefined;
+        subscription = current;
+      } else {
+        let customerId = input.customerReference;
+        if (!customerId) {
+          const customers = (
+            await collect(
+              this.stripe.customers.list({ limit: 100 }, this.options),
+            )
+          ).filter((c) => c.metadata.commerce_key === key);
+          invariant(
+            customers.length <= 1,
+            "billing_reference_conflict",
+            "More than one customer matches the original billing effect.",
+          );
+          if (!customers[0]) return undefined;
+          invariant(
+            !customers[0].livemode &&
+              customers[0].metadata.commerce_account_id === input.accountId &&
+              customers[0].metadata.commerce_fan_id === input.fanId,
+            "billing_link_conflict",
+            "The original customer belongs to another account.",
+          );
+          customerId = customers[0].id;
+        }
+        const matches = (
+          await collect(
+            this.stripe.subscriptions.list(
+              { customer: customerId, status: "all", limit: 100 },
+              this.options,
+            ),
+          )
+        ).filter((s) => s.metadata.commerce_key === key);
+        invariant(
+          matches.length <= 1,
+          "billing_reference_conflict",
+          "More than one subscription matches the original billing effect.",
+        );
+        if (!matches[0]) return undefined;
+        subscription = await this.stripe.subscriptions.retrieve(
+          matches[0].id,
+          { expand: ["latest_invoice.confirmation_secret"] },
+          this.options,
+        );
+      }
+      const items = await this.items(subscription.id);
+      invariant(
+        !subscription.livemode &&
+          subscription.metadata.commerce_account_id === input.accountId &&
+          subscription.metadata.commerce_fan_id === input.fanId &&
+          subscription.metadata.commerce_key === key &&
+          (!input.customerReference ||
+            reference(subscription.customer) === input.customerReference) &&
+          (items.some((i) => i.price.id === input.priceReference) ||
+            subscription.pending_update?.subscription_items?.some(
+              (i) => reference(i.price) === input.priceReference,
+            )),
+        "billing_reference_conflict",
+        "The original subscription no longer matches its immutable billing terms.",
+      );
       return this.truth(subscription);
     });
   }
@@ -709,31 +793,58 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
       return this.current(sub.id);
     });
   }
+  private async findRefund(
+    input: Parameters<MembershipBillingProvider["refund"]>[0],
+  ) {
+    const cause = createHash("sha256").update(input.key).digest("hex");
+    const matches = (
+      await collect(
+        this.stripe.creditNotes.list(
+          { invoice: input.invoiceReference, limit: 100 },
+          this.options,
+        ),
+      )
+    ).filter((note) => note.metadata?.commerce_cause === cause);
+    invariant(
+      matches.length <= 1,
+      "refund_cause_conflict",
+      "The provider has conflicting refund records for this operation.",
+    );
+    const note = matches[0];
+    if (!note) return undefined;
+    const lines = await collect(
+      this.stripe.creditNotes.listLineItems(
+        note.id,
+        { limit: 100 },
+        this.options,
+      ),
+    );
+    invariant(
+      !note.livemode &&
+        reference(note.invoice) === input.invoiceReference &&
+        note.metadata?.commerce_refund === "membership" &&
+        Number(note.metadata.commerce_cash) === input.amount &&
+        note.amount === input.amount &&
+        note.post_payment_amount === input.amount &&
+        note.pre_payment_amount === 0 &&
+        note.metadata.commerce_payment === input.paymentReference &&
+        lines.length === 1 &&
+        lines[0]!.invoice_line_item === input.lineReference,
+      "refund_receipt_mismatch",
+      "The original provider refund does not match this immutable obligation.",
+    );
+    return this.currentRefund(note.id, input);
+  }
+  async recoverRefund(
+    input: Parameters<MembershipBillingProvider["refund"]>[0],
+  ) {
+    return stripeOperation(() => this.findRefund(input));
+  }
   async refund(input: Parameters<MembershipBillingProvider["refund"]>[0]) {
     return stripeOperation(async () => {
+      const existing = await this.findRefund(input);
+      if (existing) return existing;
       const cause = createHash("sha256").update(input.key).digest("hex");
-      const existing = (
-        await collect(
-          this.stripe.creditNotes.list(
-            { invoice: input.invoiceReference, limit: 100 },
-            this.options,
-          ),
-        )
-      ).filter((note) => note.metadata?.commerce_cause === cause);
-      invariant(
-        existing.length <= 1,
-        "refund_cause_conflict",
-        "The provider has conflicting refund records for this operation.",
-      );
-      if (existing[0]) {
-        invariant(
-          Number(existing[0].metadata?.commerce_cash) === input.amount &&
-            existing[0].metadata?.commerce_payment === input.paymentReference,
-          "refund_receipt_mismatch",
-          "The existing provider refund does not match this obligation.",
-        );
-        return this.currentRefund(existing[0].id);
-      }
       const invoice = await this.stripe.invoices.retrieve(
         input.invoiceReference,
         {},
@@ -773,6 +884,7 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
           commerce_refund: "membership",
           commerce_cash: String(input.amount),
           commerce_payment: input.paymentReference,
+          commerce_line: input.lineReference,
           commerce_cause: cause,
         },
         reason: "order_change",
@@ -792,10 +904,13 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
         ...this.options,
         idempotencyKey: input.key,
       });
-      return this.currentRefund(note.id);
+      return this.currentRefund(note.id, input);
     });
   }
-  async currentRefund(id: string) {
+  async currentRefund(
+    id: string,
+    expected?: Omit<Parameters<MembershipBillingProvider["refund"]>[0], "key">,
+  ) {
     return stripeOperation(async () => {
       const note = await this.stripe.creditNotes.retrieve(id, {}, this.options);
       invariant(
@@ -804,6 +919,45 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
           Number(note.metadata.commerce_cash) === note.amount,
         "refund_receipt_mismatch",
         "This credit note is not the matching membership cash refund.",
+      );
+      if (expected) {
+        const lines = await collect(
+          this.stripe.creditNotes.listLineItems(
+            note.id,
+            { limit: 100 },
+            this.options,
+          ),
+        );
+        invariant(
+          reference(note.invoice) === expected.invoiceReference &&
+            note.amount === expected.amount &&
+            note.metadata.commerce_payment === expected.paymentReference &&
+            note.pre_payment_amount === 0 &&
+            note.post_payment_amount === expected.amount &&
+            lines.length === 1 &&
+            lines[0]!.invoice_line_item === expected.lineReference,
+          "refund_receipt_mismatch",
+          "Current refund truth must match its original invoice, payment and line.",
+        );
+      }
+      // Refund objects do not expose livemode. Verify the actual original
+      // captured card PaymentIntent instead of inferring mode from metadata.
+      const payment = await this.stripe.paymentIntents.retrieve(
+        note.metadata.commerce_payment!,
+        { expand: ["latest_charge"] },
+        this.options,
+      );
+      const charge = payment.latest_charge;
+      invariant(
+        !payment.livemode &&
+          payment.status === "succeeded" &&
+          payment.currency === note.currency &&
+          charge &&
+          typeof charge !== "string" &&
+          charge.paid &&
+          charge.payment_method_details?.type === "card",
+        "refund_receipt_mismatch",
+        "Refunds require the original captured sandbox card payment.",
       );
       const refunds = await Promise.all(
         note.refunds.map(async (linked) => {
@@ -818,8 +972,10 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
             this.options,
           );
           invariant(
-            reference(refund.payment_intent) ===
-              note.metadata?.commerce_payment,
+            refund.currency === note.currency &&
+              refund.amount >= linked.amount_refunded &&
+              reference(refund.payment_intent) ===
+                note.metadata?.commerce_payment,
             "refund_receipt_mismatch",
             "The refund belongs to another payment.",
           );

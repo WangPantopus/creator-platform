@@ -1717,13 +1717,21 @@ export class CommerceService {
             "The request mode changed. Refresh before choosing sharing.",
           );
           const c = (
-            await client.query<{ id: string; state: string }>(
-              "SELECT id,state FROM creator.commerce_commitment WHERE packet_id=$1",
+            await client.query<{
+              id: string;
+              state: string;
+              delivered_at: Date | null;
+            }>(
+              "SELECT id,state,delivered_at FROM creator.commerce_commitment WHERE packet_id=$1",
               [id],
             )
           ).rows[0];
           invariant(
-            c?.state === "delivered",
+            c &&
+              (body.enabled
+                ? c.state === "delivered"
+                : c.delivered_at !== null &&
+                  ["delivered", "refunded", "resolved"].includes(c.state)),
             "delivery_required",
             "Sharing needs a delivered reply.",
           );
@@ -1906,22 +1914,34 @@ export class CommerceService {
           );
           return;
         }
+        const recovered =
+          !packet.intent_ref && effect.attempt > 1
+            ? await this.provider.recoverAuthorization?.({
+                packetId: effect.packet_id,
+                amount: effect.request.amount,
+                currency: effect.request.currency,
+                paymentMethodId: effect.request.paymentMethodId!,
+                key: effect.provider_key,
+              })
+            : undefined;
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
           packet.intent_ref !== null ||
+            recovered ||
             Date.now() - effect.created_at.getTime() < 23 * 3600000,
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
         const intent = packet.intent_ref
           ? await this.provider.fetchIntent(packet.intent_ref)
-          : await this.provider.authorize({
+          : (recovered ??
+            (await this.provider.authorize({
               packetId: effect.packet_id,
               amount: effect.request.amount,
               currency: effect.request.currency,
               paymentMethodId: effect.request.paymentMethodId!,
               key: effect.provider_key,
-            });
+            })));
         await this.applyIntent(actor, effect, intent);
       } else {
         let intentId = effect.request.intentId;

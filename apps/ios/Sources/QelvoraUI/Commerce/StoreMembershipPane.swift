@@ -12,7 +12,7 @@ struct StoreMembershipPane: View {
     init(baseURL: URL, productIDs: [String], accountID: String, onVerified: @escaping @MainActor () async -> Void = {}) {
         self.productIDs = productIDs; self.accountID = accountID
         self.onVerified = onVerified
-        let client = CommerceClient(baseURL: baseURL)
+        let client = CommerceClient(baseURL: baseURL, accountId: accountID)
         _coordinator = StateObject(wrappedValue: StoreMembershipCoordinator { transaction in
             struct Delivery: Decodable, Sendable { let serverVerified: Bool }
             let body = try JSONSerialization.data(withJSONObject: ["platform": "apple", "transaction": transaction])

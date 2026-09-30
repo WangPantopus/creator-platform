@@ -47,6 +47,9 @@ export interface MembershipBillingProvider {
     paymentMethodId: string;
     key: string;
   }): Promise<BillingTruth>;
+  recoverStart?(
+    input: Parameters<MembershipBillingProvider["start"]>[0],
+  ): Promise<BillingTruth | undefined>;
   current(subscriptionReference: string): Promise<BillingTruth>;
   cancel(input: {
     subscriptionReference: string;
@@ -61,8 +64,14 @@ export interface MembershipBillingProvider {
     amount: number;
     key: string;
   }): Promise<{ id: string; state: "pending" | "succeeded" | "failed" }>;
+  recoverRefund?(
+    input: Parameters<MembershipBillingProvider["refund"]>[0],
+  ): Promise<
+    { id: string; state: "pending" | "succeeded" | "failed" } | undefined
+  >;
   currentRefund(
     reference: string,
+    expected?: Omit<Parameters<MembershipBillingProvider["refund"]>[0], "key">,
   ): Promise<{ id: string; state: "pending" | "succeeded" | "failed" }>;
 }
 const Start = VersionCommand.extend({
@@ -416,13 +425,48 @@ export class MembershipBilling {
         };
       });
     try {
+      const r = effect.request;
+      const recovered =
+        !effect.provider_ref &&
+        effect.operation === "start" &&
+        effect.attempt > 1
+          ? await this.provider.recoverStart?.({
+              ...(effect.request as unknown as Parameters<
+                MembershipBillingProvider["start"]
+              >[0]),
+              key: effect.provider_key,
+            })
+          : undefined;
+      const cancellation =
+        !effect.provider_ref &&
+        effect.operation === "cancel" &&
+        effect.attempt > 1
+          ? await this.provider.current(String(r.subscriptionReference))
+          : undefined;
+      const cancelled = (truth: BillingTruth) => {
+        const line = truth.lines.find(
+          (l) => l.itemReference === r.itemReference,
+        );
+        return (
+          !line ||
+          (r.atEnd === true
+            ? line.cancelAtEnd ||
+              (truth.subscriptionState === "cancelled" &&
+                !["active", "grace", "cancelled"].includes(line.state))
+            : !["active", "grace", "cancelled"].includes(line.state))
+        );
+      };
+      const recoveredCancellation =
+        cancellation && cancelled(cancellation) ? cancellation : undefined;
       invariant(
-        effect.provider_ref ||
+        effect.operation === "refund" ||
+          effect.provider_ref ||
+          recovered ||
+          recoveredCancellation ||
           Date.now() - effect.created_at.getTime() < 23 * 3600000,
         "operator_reconciliation_required",
         "This original billing change needs provider reconciliation.",
       );
-      const r = effect.request;
       if (effect.operation === "refund") {
         const receipt = r.receipt as {
           invoice_ref: string;
@@ -432,15 +476,27 @@ export class MembershipBilling {
           creator_id: string;
           membership_id: string;
         };
+        const refundInput = {
+          invoiceReference: receipt.invoice_ref,
+          lineReference: receipt.line_ref,
+          paymentReference: receipt.payment_ref,
+          amount: Number(r.amount),
+          key: effect.provider_key,
+        };
+        const recoveredRefund =
+          !effect.provider_ref && effect.attempt > 1
+            ? await this.provider.recoverRefund?.(refundInput)
+            : undefined;
+        invariant(
+          effect.provider_ref ||
+            recoveredRefund ||
+            Date.now() - effect.created_at.getTime() < 23 * 3600000,
+          "operator_reconciliation_required",
+          "This original billing refund needs provider reconciliation.",
+        );
         const result = effect.provider_ref
-          ? await this.provider.currentRefund(effect.provider_ref)
-          : await this.provider.refund({
-              invoiceReference: receipt.invoice_ref,
-              lineReference: receipt.line_ref,
-              paymentReference: receipt.payment_ref,
-              amount: Number(r.amount),
-              key: effect.provider_key,
-            });
+          ? await this.provider.currentRefund(effect.provider_ref, refundInput)
+          : (recoveredRefund ?? (await this.provider.refund(refundInput)));
         await this.service.account(actor, async (client) => {
           // Keep the account -> membership order used by cancellation and
           // reconciliation, and advance the aggregate before changing a grant.
@@ -507,18 +563,20 @@ export class MembershipBilling {
       const truth = effect.provider_ref
         ? await this.provider.current(effect.provider_ref)
         : effect.operation === "start"
-          ? await this.provider.start({
+          ? (recovered ??
+            (await this.provider.start({
               ...(r as unknown as Parameters<
                 MembershipBillingProvider["start"]
               >[0]),
               key: effect.provider_key,
-            })
-          : await this.provider.cancel({
+            })))
+          : (recoveredCancellation ??
+            (await this.provider.cancel({
               subscriptionReference: String(r.subscriptionReference),
               itemReference: String(r.itemReference),
               atEnd: Boolean(r.atEnd),
               key: effect.provider_key,
-            });
+            })));
       await this.apply(actor, truth, before.version, effect);
       const confirmed =
         effect.operation === "start"
@@ -528,16 +586,7 @@ export class MembershipBilling {
                 ["active", "grace", "cancelled"].includes(line.state) &&
                 Boolean(line.receipt),
             )
-          : r.atEnd === true
-            ? truth.lines.some(
-                (line) =>
-                  line.itemReference === r.itemReference && line.cancelAtEnd,
-              )
-            : !truth.lines.some(
-                (line) =>
-                  line.itemReference === r.itemReference &&
-                  ["active", "grace", "cancelled"].includes(line.state),
-              );
+          : cancelled(truth);
       const refundId = await this.service.account(actor, async (client) => {
         await this.fence(client, effect);
         let refundId: string | undefined;
