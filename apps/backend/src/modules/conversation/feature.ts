@@ -226,24 +226,28 @@ export class ConversationFeature {
       "Only the fan can change their conversation preferences.",
     );
     const body = ThreadPreferencesSchema.parse(raw);
-    await this.db.withThread(scope, async (client) => {
-      const result = await client.query(
-        "UPDATE creator.thread SET off_the_record=$1,intro_shared=$2,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$3 AND creator_id=$4 AND fan_id=$5 AND revision=$6 RETURNING id",
-        [
-          body.offTheRecord,
-          body.introShared,
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-          body.expectedRevision,
-        ],
-      );
-      invariant(
-        result.rowCount === 1,
-        "conversation_changed",
-        "This conversation changed. Refresh before saving.",
-      );
-    });
+    await this.db.withThread(
+      scope,
+      async (client) => {
+        const result = await client.query(
+          "UPDATE creator.thread SET off_the_record=$1,intro_shared=$2,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$3 AND creator_id=$4 AND fan_id=$5 AND revision=$6 RETURNING id",
+          [
+            body.offTheRecord,
+            body.introShared,
+            scope.threadId,
+            scope.creatorId,
+            scope.fanId,
+            body.expectedRevision,
+          ],
+        );
+        invariant(
+          result.rowCount === 1,
+          "conversation_changed",
+          "This conversation changed. Refresh before saving.",
+        );
+      },
+      "write",
+    );
     return this.page(scope);
   }
   async consent(scope: ThreadScope, raw: unknown) {
@@ -259,38 +263,42 @@ export class ConversationFeature {
         "providers_changed",
         "Review the currently configured providers.",
       );
-    await this.db.withThread(scope, async (client) => {
-      await client.query(
-        "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      await client.query(
-        "UPDATE creator.processor_consent SET withdrawn_at=now() WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND withdrawn_at IS NULL",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      if (body.accepted)
+    await this.db.withThread(
+      scope,
+      async (client) => {
         await client.query(
-          "INSERT INTO creator.processor_consent(thread_id,creator_id,fan_id,account_id,version,providers) VALUES($1,$2,$3,$4,$5,$6)",
+          "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        await client.query(
+          "UPDATE creator.processor_consent SET withdrawn_at=now() WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND withdrawn_at IS NULL",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        if (body.accepted)
+          await client.query(
+            "INSERT INTO creator.processor_consent(thread_id,creator_id,fan_id,account_id,version,providers) VALUES($1,$2,$3,$4,$5,$6)",
+            [
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+              scope.actorAccountId,
+              body.version,
+              JSON.stringify(this.policy!.providers),
+            ],
+          );
+        await client.query(
+          "UPDATE creator.thread SET processor_consent_version=$1,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$2 AND creator_id=$3 AND fan_id=$4",
           [
+            body.accepted ? body.version : null,
             scope.threadId,
             scope.creatorId,
             scope.fanId,
-            scope.actorAccountId,
-            body.version,
-            JSON.stringify(this.policy!.providers),
           ],
         );
-      await client.query(
-        "UPDATE creator.thread SET processor_consent_version=$1,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$2 AND creator_id=$3 AND fan_id=$4",
-        [
-          body.accepted ? body.version : null,
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-        ],
-      );
-      await this.wellbeing?.boundary(scope, client);
-    });
+        await this.wellbeing?.boundary(scope, client);
+      },
+      "write",
+    );
     return this.page(scope);
   }
   async account(actor: Actor) {

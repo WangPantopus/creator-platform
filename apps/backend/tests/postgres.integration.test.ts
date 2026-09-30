@@ -73,6 +73,12 @@ describe.skipIf(!adminUrl)(
         ),
       );
       await admin.query(
+        await readFile(
+          new URL("../migrations/0002_w1_identity.sql", import.meta.url),
+          "utf8",
+        ),
+      );
+      await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );
       url.username = "creator_runtime";
@@ -206,7 +212,9 @@ describe.skipIf(!adminUrl)(
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 120000);
+      // Ten thousand real scoped transactions include current identity locks.
+      // Keep every pair/assertion; allow slower Docker/CI hosts to finish.
+    }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",

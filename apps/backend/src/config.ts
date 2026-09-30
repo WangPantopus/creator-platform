@@ -6,7 +6,9 @@ const ConfigSchema = z.strictObject({
   databaseUrl: z.string().min(1).optional(),
   allowedOrigin: z.url().default("http://localhost:3000"),
   rpId: z.string().default("localhost"),
-  identityAdapter: z.enum(["unconfigured", "development", "pantopus"]).optional(),
+  identityAdapter: z
+    .enum(["unconfigured", "development", "pantopus"])
+    .optional(),
   identitySessionKey: z.string().optional(),
   passkeyOrigins: z.array(z.string()).optional(),
 });
@@ -26,7 +28,11 @@ export function readConfig(
     allowedOrigin: env.WEB_ORIGIN ?? "http://localhost:3000",
     rpId: env.PASSKEY_RP_ID ?? "localhost",
     identityAdapter: env.IDENTITY_ADAPTER ?? "unconfigured",
-    ...(env.IDENTITY_SESSION_KEY ? { identitySessionKey: env.IDENTITY_SESSION_KEY } : {}),
-    ...(env.PASSKEY_ORIGINS ? { passkeyOrigins: env.PASSKEY_ORIGINS.split(",") } : {}),
+    ...(env.IDENTITY_SESSION_KEY
+      ? { identitySessionKey: env.IDENTITY_SESSION_KEY }
+      : {}),
+    ...(env.PASSKEY_ORIGINS
+      ? { passkeyOrigins: env.PASSKEY_ORIGINS.split(",") }
+      : {}),
   });
 }

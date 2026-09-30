@@ -16,7 +16,7 @@ export function IdentityWelcome({
   const [context, setContext] = useState(arrival);
   const [destination, setDestination] = useState(returnTo);
   return (
-    <main className="identity-welcome">
+    <main className="qv identity-welcome">
       <span className="identity-wordmark">{brand.name}</span>
       <div className="identity-welcome-body">
         <svg
@@ -56,13 +56,11 @@ export function IdentityWelcome({
           />
         )}
         {error && (
-          <div role="alert">
-            <Notice tone="error" title={copy.pantopusUnavailableTitle}>
-              {error === "invalid_return"
-                ? "This arrival link is unavailable. You can continue to Home."
-                : copy.pantopusUnavailable}
-            </Notice>
-          </div>
+          <Notice tone="error" title={copy.pantopusUnavailableTitle}>
+            {error === "invalid_return"
+              ? "This arrival link is unavailable. You can continue to Home."
+              : copy.pantopusUnavailable}
+          </Notice>
         )}
         <a
           className="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block"

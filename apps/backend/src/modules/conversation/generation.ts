@@ -52,31 +52,35 @@ export class ConversationGenerationProcessor {
   }
   async recover(scope: ThreadScope) {
     const token = randomUUID();
-    const job = await this.db.withThread(scope, async (client) => {
-      await client.query(
-        "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      const row = (
-        await client.query<{
-          id: string;
-          last_sequence: number;
-          text: string;
-          epoch: number;
-          fan_message_id: string;
-          ai_message_id: string;
-        }>(
-          `SELECT g.id,g.last_sequence,g.epoch,g.fan_message_id,g.ai_message_id,m.text FROM creator.generation g JOIN creator.message m ON m.id=g.fan_message_id AND m.thread_id=g.thread_id AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3 AND g.state IN('queued','generating') AND (g.lease_until IS NULL OR g.lease_until<now()) ORDER BY g.accepted_at LIMIT 1 FOR UPDATE OF g`,
+    const job = await this.db.withThread(
+      scope,
+      async (client) => {
+        await client.query(
+          "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
           [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows[0];
-      if (!row) return null;
-      const claimed = await client.query<{ context_revision: number }>(
-        "UPDATE creator.generation SET worker_token=$1,lease_until=now()+interval '60 seconds',state='generating',context_revision=(SELECT revision FROM creator.thread WHERE id=$3 AND creator_id=$4 AND fan_id=$5) WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5 RETURNING context_revision",
-        [token, row.id, scope.threadId, scope.creatorId, scope.fanId],
-      );
-      return { ...row, contextRevision: claimed.rows[0]!.context_revision };
-    });
+        );
+        const row = (
+          await client.query<{
+            id: string;
+            last_sequence: number;
+            text: string;
+            epoch: number;
+            fan_message_id: string;
+            ai_message_id: string;
+          }>(
+            `SELECT g.id,g.last_sequence,g.epoch,g.fan_message_id,g.ai_message_id,m.text FROM creator.generation g JOIN creator.message m ON m.id=g.fan_message_id AND m.thread_id=g.thread_id AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3 AND g.state IN('queued','generating') AND (g.lease_until IS NULL OR g.lease_until<now()) ORDER BY g.accepted_at LIMIT 1 FOR UPDATE OF g`,
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows[0];
+        if (!row) return null;
+        const claimed = await client.query<{ context_revision: number }>(
+          "UPDATE creator.generation SET worker_token=$1,lease_until=now()+interval '60 seconds',state='generating',context_revision=(SELECT revision FROM creator.thread WHERE id=$3 AND creator_id=$4 AND fan_id=$5) WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5 RETURNING context_revision",
+          [token, row.id, scope.threadId, scope.creatorId, scope.fanId],
+        );
+        return { ...row, contextRevision: claimed.rows[0]!.context_revision };
+      },
+      "write",
+    );
     if (!job) return;
     // A crashed stream with visible text is terminal. Never append a newly
     // generated continuation to its old immutable delivered prefix.
