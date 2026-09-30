@@ -1,7 +1,7 @@
 {
-  "recordedAt": "2026-09-30T08:26:02.498971+00:00",
+  "recordedAt": "2026-09-30T08:43:30.007984+00:00",
   "parentRevision": "a96ecbb12021c2d105f805e2266cfc1f6bceec12",
-  "sourceState": "working tree before resume checkpoint commit; hashes bind the exact checked source",
+  "sourceState": "code checkpoint plus owned early-end/grace correction; hashes bind final source before publication",
   "branch": "codex/w6-calls-media-handoff",
   "mainCompared": "2e337a1",
   "originalW6Head": "509890c",
@@ -28,7 +28,7 @@
     "apps/backend/src/modules/session/clocks.ts": "0c13196f22af9e13d286b7c371c191952f6333268573d8f05232273ced66eff9",
     "apps/backend/src/modules/session/commerce.ts": "5f0ca756c8092bab53032c4fd2e5482e12c455f5a3454d46f450b411d52dbe9c",
     "apps/backend/src/modules/session/provider.ts": "cb552cb8f401f5d5a01feee9c713d8e1759cb943187f8cf81fdf85efe6a26320",
-    "apps/backend/src/modules/session/service.ts": "3ef05ae7d03d7eb49c08d168c4135f60446ad2fd3f25db19ba75dae0eba888fe",
+    "apps/backend/src/modules/session/service.ts": "34b3810a7d765d1cb8c88bde732f234f337d5a06d1bf54f07f035754fb3ff260",
     "apps/backend/src/modules/session/worker.ts": "eb05e49d3f5dfd39bdb41d6ee7e76f90d08cbce3f10e453d38e45f905317a342",
     "apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift": "2592c204a6cd80bc430f087d1c348cd630d6b15a436c63b623c3e2a2daf75c58",
     "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift": "bf14bb9047efab5b9c38a7bc5faba0cbe9d16d178058a61e7aa42044086a78df",
@@ -79,5 +79,21 @@
   "newTestCode": false,
   "aiRequests": 0,
   "aiCredentialRead": false,
-  "acceptance": "partial; integration and hardware gates open"
+  "acceptance": "partial; integration and hardware gates open",
+  "codeCheckpoint": "fa6af82f7ceb103b77085db2301e9dc6b3da12d7",
+  "ci": {
+    "codeRevision": "fa6af82",
+    "foundationRun": 36689759981,
+    "trustRun": 36689759910,
+    "trustCompilation": "passed",
+    "foundationWebBackend": "failed at 5 shared formatting files; all typechecks/root lint passed",
+    "foundationIOS": "failed macOS iOS-only modifier",
+    "foundationAndroid": "failed SDK setup requesting removed tools package",
+    "sharedCIProposal": "unapplied; nine-file lease requested; isolated macOS library build passed",
+    "prMetadata": "connector HTTP403; browser signed out",
+    "mergeable": true,
+    "draft": true,
+    "merged": false
+  },
+  "runtimeStopped": true
 }

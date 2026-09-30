@@ -38,3 +38,9 @@ ClamAV exit classifications and limit-alert options follow its [official manual 
 5. **Verification:** provision native tooling and owned simulator/emulator with supported UI control; actual iPhone/Android, microphone input and genuine actors/providers. Complete media and call journeys, design comparison, accessibility, latency/cost and five-second revocation evidence. The implementation does not establish those targets.
 
 The PR remains draft pending these gates and current checks. The founder authorized commits/pushes and merging when ready; no second PR is needed. Full W6 completion or merge readiness is not claimed.
+
+## Publication and CI follow-up
+
+Pushed `fa6af82` and verified PR #4 contains it and the main merge; GitHub reports the conflict cleared. Foundation CI then found shared formatting, macOS-only Swift compilation and SDK-setup failures. [CI triage, concrete repair proposal and runtime release](ci-triage.md) record the exact results. The expanded nine-file proposal is build checked in an isolated macOS copy and awaits the explicitly required shared edit lease; it is not applied to this branch. PR metadata write was denied by the connector and the GitHub browser was signed out; the replacement description is saved for an authorized session.
+
+An additional owned clock correction ensures a call explicitly ended before grace cannot become a no-show merely because provider reconciliation arrives later. Backend build/lint/format passed again; current hashes reflect that change. No new monetary rule was selected.
