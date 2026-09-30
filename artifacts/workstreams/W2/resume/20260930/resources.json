@@ -11,7 +11,7 @@
   },
   "database": "creator_w2_resume",
   "runtimeRole": "creator_runtime (non-owner, forced RLS)",
-  "migrations": "canonical 0001\u20130031; immutable histories preserved",
+  "migrations": "canonical 0001–0031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
   "builds": "isolated worktree .next and backend dist",
@@ -25,10 +25,13 @@
     "embeddingModel": "text-embedding-3-small",
     "authorization": "Founder-authorized isolated synthetic verification",
     "productionPolicy": "unapproved; store:false is not zero-retention proof",
-    "publication": "disabled: no reviewed license/current verification, cap zero"
+    "publication": "disabled: no reviewed license/current verification, cap zero",
+    "adapter": "responses-v2-cache-accounting",
+    "modelFingerprint": "192a3a3dabede8d932914ab78d5a5fba50deeba62f1cfcab38d8985cf4e80d9c",
+    "rates": "Explicit synthetic ordinary/output/cache-read/cache-write prices in private provider.env; no production approval"
   },
   "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
-  "reviewRuntime": "Primary Studio API restarted with the usage-journal fix; web/API/database on 3002/4102/55442 retained for review",
+  "reviewRuntime": "Retained for successor: API restarted with responses-v2-cache-accounting; Studio companion revision 16/current seven-case pass, publication disabled",
   "existingTestCluster": {
     "container": "creator-platform-w2-checks-20260930",
     "port": 55449,
@@ -51,5 +54,39 @@
     "port": 4202,
     "creatorId": "20000000-0000-4000-8000-000000000003",
     "state": "Stopped after genuine import/process-loss/reclaim receipts; port released"
+  },
+  "processes": {
+    "web": {
+      "pid": 18487,
+      "executionSession": 76235
+    },
+    "api": {
+      "pid": 85113,
+      "executionSession": 50327
+    },
+    "observedAt": "2026-09-30T21:22:18.751Z",
+    "warning": "Inspect current listener identity before stopping/restarting; these PIDs are observations."
+  },
+  "currentDraft": {
+    "revision": 16,
+    "mode": "companion",
+    "evaluationId": "5a8042b0-7308-4ecf-8279-184d511ca501",
+    "evaluationFingerprint": "995c3e0e15fd0dec1d803e8d68981a4b3dc295e3c6d13f789a334443f5300b10",
+    "state": "passed",
+    "cases": 7,
+    "verification": "pending",
+    "activeLicense": false,
+    "dailyCostCapMicros": 0
+  },
+  "webLaunch": {
+    "cwd": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web",
+    "environment": {
+      "W2_DEVELOPMENT_MODE": "true",
+      "W2_DEVELOPMENT_SESSION": "development:10000000-0000-4000-8000-000000000001",
+      "W2_CREATOR_ID": "20000000-0000-4000-8000-000000000002",
+      "W2_API_URL": "http://127.0.0.1:4102",
+      "CREATOR_NEXT_OUTPUT": ".next-w2-review"
+    },
+    "command": "node node_modules/next/dist/bin/next dev --webpack -H 127.0.0.1 -p 3002"
   }
 }

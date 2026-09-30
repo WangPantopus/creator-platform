@@ -1,0 +1,108 @@
+{
+  "synthetic": true,
+  "productionPublication": false,
+  "observedAt": "2026-09-30T21:13:57.441Z",
+  "adapter": "responses-v2-cache-accounting",
+  "modelFingerprint": "192a3a3dabede8d932914ab78d5a5fba50deeba62f1cfcab38d8985cf4e80d9c",
+  "pricingConfigured": true,
+  "request": "Actual structured adapter, three identical requests with 150 synthetic studio notes, store:false",
+  "rates": {
+    "gpt-4.1-mini-2025-04-14": {
+      "inputMicrosPerMillion": 400000,
+      "outputMicrosPerMillion": 1600000,
+      "cachedInputMicrosPerMillion": 100000,
+      "cacheWriteMicrosPerMillion": 400000
+    },
+    "gpt-4.1-2025-04-14": {
+      "inputMicrosPerMillion": 2000000,
+      "outputMicrosPerMillion": 8000000,
+      "cachedInputMicrosPerMillion": 500000,
+      "cacheWriteMicrosPerMillion": 2000000
+    },
+    "text-embedding-3-small": {
+      "inputMicrosPerMillion": 20000,
+      "outputMicrosPerMillion": 0
+    }
+  },
+  "receipts": [
+    {
+      "attempt": 1,
+      "elapsedMs": 1199,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 3977,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1602
+      }
+    },
+    {
+      "attempt": 2,
+      "elapsedMs": 665,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 3977,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1602
+      }
+    },
+    {
+      "attempt": 3,
+      "elapsedMs": 730,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 3977,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1602
+      }
+    },
+    {
+      "attempt": 4,
+      "elapsedMs": 1187,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 3977,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1602
+      }
+    }
+  ],
+  "unpricedReceipt": {
+    "pricingConfigured": false,
+    "value": {
+      "label": "synthetic"
+    },
+    "usage": {
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "inputTokens": 49,
+      "outputTokens": 7,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "costMicros": null
+    }
+  }
+}

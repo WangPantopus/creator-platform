@@ -1,5 +1,7 @@
 # W2 handoff — Creator AI, knowledge, and model runtime
 
+**Latest successor checkpoint:** Use the comprehensive [September 30 successor prompt](../prompts/W2-resume-20260930.md) first. The completed Responses cache-accounting fix has new actual seven-case passes in expert revision 15 and restored companion revision 16; older adapter evaluations are historical. The stable Xcode 26.6 CI run now actually passes all 18 package tests/110 images and both app UI tests. Exact latest-head CI remains authoritative before merge; PR metadata writes previously returned 403. All original release gates remain in R01–R14. The 3002/4102/55442 review runtime and saved draft are retained for handoff.
+
 **September 30 CI continuation:** The founder authorized repairing code and justified existing CI checks. Current repairs, original failing job IDs, isolated resources and outstanding results are in [CI remediation](../../../artifacts/workstreams/W2/resume/20260930/ci-remediation.md). Existing-test preservation statements below describe earlier checkpoints. New remote W3/W4/W7 interfaces have been inspected; canonical migration/policy/licensing/usage-settlement registration still gates real fan delivery.
 
 **Current acceptance boundary:** Main integration after passing CI is authorized by the founder; it does not enable production publication or complete unresolved R01–R14 acceptance. Earlier instructions/receipts below are historical where superseded by the current continuation, particularly test preservation, unavailable provider, hook names and cleanup state.

@@ -112,6 +112,9 @@ export const BoundaryNames = [
 export type Usage = {
   inputTokens: number;
   outputTokens: number;
+  /** Subsets of inputTokens; null denotes an unavailable provider counter. */
+  cachedInputTokens?: number | null;
+  cacheWriteInputTokens?: number | null;
   costMicros: number | null;
   model: string;
   provider: string;
