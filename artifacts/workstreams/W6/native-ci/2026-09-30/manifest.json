@@ -819,5 +819,28 @@
     "normalizedMarkDifferentPixels": 3113,
     "normalizedMarkTotalPixels": 1316640,
     "backgroundEqual": true
+  },
+  "postCallConsent": {
+    "sourceSHA256": {
+      "apps/web/features/calls/CallView.tsx": "b8917404abcec1e4202c4c071814c96c20341a1caaf06375be27fc2159c5eb0e",
+      "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift": "2eedaab2f0cb6f480c3c20b9aa653518c97ea135236139d07f208ba3a6a76206",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "5da44f697b81e5b065465666c452b3e1d9c5770fedc71b0e53c0ffe134e0c639"
+    },
+    "webTypeLintFormat": "passed",
+    "androidAPK": "passed in4m51s",
+    "iosSimulatorQelvoraUITarget": "passed in158.72s with SDK26.5/x86_64",
+    "functionalRevocationDeletion": "unverified; genuine runtime/effects remain required",
+    "androidAPK_SHA256": "8af16aa2e368708887ca7454cda11fb91abec92b2178a5c2d2b543af57deae4c"
+  },
+  "fontProducer": {
+    "revision": "cdb828c9dc1a8b47906396f61f70a0c18040404a",
+    "exactSourceSHA256": {
+      "apps/ios/Sources/QelvoraUI/Theme.swift": "f4c5ea37a0bd93f9171509f708c9ebf14a1ba0a875d889dcec2b0d527d6c4132",
+      "apps/ios/Sources/QelvoraUI/Navigation.swift": "208c98bf1cf0de1b0a9ebfc1699f6654ed5c3225d95d7cd7bce0eb6e8bf0e144",
+      "apps/ios/Sources/QelvoraUI/StudioComponents.swift": "badf366d9d12f9acc308ede670eb0a12fb2917b0c9a680e19fc79df65d536ff0"
+    },
+    "comparisonPrecision": 1,
+    "producerThresholdChangeConsumed": false,
+    "localSwiftNonSnapshotCasesPassed": 15
   }
 }

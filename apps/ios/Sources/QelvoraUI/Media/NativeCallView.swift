@@ -137,9 +137,13 @@ private struct NativeCallDocument: Decodable, Sendable {
                         }
                         HStack { Button("Report", variant: .secondary) { open("/support") }; Button("Leave", variant: .secondary, disabled: busy || stale || role(call) == nil) { leaving = true } }
                     }
-                    if live || call.state == "ended" {
+                    if live || ended {
                         Text(call.state == "ended" ? "Both of you can get a short summary" : "Separate permissions").qText("title")
-                        ForEach(["recording", "summary", "content_reuse", "ai_source"].filter { call.state != "ended" || $0 != "recording" }, id: \.self) { purpose in
+                        ForEach(["recording", "summary", "content_reuse", "ai_source"].filter { purpose in
+                            let granted = call.consents.contains { $0.role == role(call) && $0.purpose == purpose && $0.granted }
+                            if call.state == "cancelled" { return granted }
+                            return purpose != "recording" || !["ending", "ended"].contains(call.state) || granted
+                        }, id: \.self) { purpose in
                             Toggle(purpose == "summary" ? "I'd like a summary" : purpose == "recording" ? "Allow recording" : purpose == "content_reuse" ? "Allow content reuse" : "Allow use as an AI source", isOn: Binding(get: { call.consents.contains { $0.role == role(call) && $0.purpose == purpose && $0.granted } }, set: { granted in Task { await action("consent", values: ["purpose": purpose, "granted": granted]) } })).disabled(busy || stale || role(call) == nil)
                         }
                         Text("Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note.").qText("caption")

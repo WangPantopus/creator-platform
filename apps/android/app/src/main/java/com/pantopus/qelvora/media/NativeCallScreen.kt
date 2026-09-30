@@ -141,11 +141,14 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Button("Report", ButtonVariant.SECONDARY) { model.open("/support") }; Button("Leave", ButtonVariant.SECONDARY, disabled = busy || stale || role(value) == null) { leaving = true } }
             }
-            if (live || state == "ended") {
+            if (live || ended) {
                 BasicText(if (state == "ended") "Both of you can get a short summary" else "Separate permissions", style = qText("title").copy(color = qColor("ink")))
                 val consents = value.getJSONArray("consents")
                 fun granted(purpose: String, participant: String?) = (0 until consents.length()).any { val c = consents.getJSONObject(it); c.getString("role") == participant && c.getString("purpose") == purpose && c.getBoolean("granted") }
-                listOf("recording", "summary", "content_reuse", "ai_source").filter { state != "ended" || it != "recording" }.forEach { purpose ->
+                listOf("recording", "summary", "content_reuse", "ai_source").filter { purpose ->
+                    if (state == "cancelled") granted(purpose, role(value))
+                    else purpose != "recording" || state !in listOf("ending", "ended") || granted(purpose, role(value))
+                }.forEach { purpose ->
                     val label = when (purpose) { "recording" -> "Allow recording"; "summary" -> "I'd like a summary"; "content_reuse" -> "Allow content reuse"; else -> "Allow use as an AI source" }
                     val allowed = granted(purpose, role(value))
                     Button("$label · ${if (allowed) "On" else "Off"}", ButtonVariant.SECONDARY, block = true, disabled = busy || stale || role(value) == null) { scope.launch { action("consent", JSONObject().put("purpose", purpose).put("granted", !allowed)) } }

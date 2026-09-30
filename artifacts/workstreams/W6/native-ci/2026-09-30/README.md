@@ -16,6 +16,14 @@ Workflow concurrency now groups the same repository/branch across push/PR events
 
 After normalization, the full existing Swift package rerun compiles and passes15 non-snapshot cases; the three snapshot cases still report110 differences on this macOS26/Xcode26 host. The simple Mark comparison drops from nearly the whole image to3113/1,316,640 differing pixels after common-profile conversion, with the uniform background now equal. This does not prove that the remaining differences are only OS rasterization; matching-runner failure artifacts must be inspected. No further local golden recording or precision relaxation was used.
 
+## Post-call consent and current font producer
+
+An additional W6 review found that all three call clients hid recording permission after ending, preventing the actor from revoking a previous grant. Web/Swift/Kotlin now retain previously granted recording controls for revocation in ending/ended states. Cancelled calls expose only previously granted purposes for revocation; no new cancelled-call grant is presented. Web summary output also requires both current summary grants, matching the native projections. The existing server consent command queues recording stop and purpose-specific purge and retains immutable occurrence history. No new route/schema/policy was invented.
+
+Web TypeScript, ESLint and formatting pass; Android APK rebuild passes4m51s. The complete QelvoraUI target, including NativeCallView, builds for the x86_64 iOS Simulator SDK26.5 in158.72s. The first unrestricted cross-build also attempted the macOS-only snapshot CLI and failed on its AppKit import; targeting the actual QelvoraUI library resolved that command mismatch. Neither library build is an app-install/tap or provider consent/deletion proof.
+
+Consumed W1 producer `cdb828c9dc1a8b47906396f61f70a0c18040404a`'s exact Theme/Navigation/StudioComponents files. Its optional italic parameter uses the existing bundled italic CoreText face at the scaled token size for Sidebar, EmailFrame and notification initials; its platform-specific input helpers are preserved. This is a source rendering correction. W6's snapshot assertion precision stays1; the producer's changed comparison threshold is not consumed. Local baseline-conversion history remains attributable to the earlier checkpoint. After the producer/consent changes, all15 existing non-snapshot Swift cases pass. Automatic transitive lockfile rewrites are restored, with no dependency change.
+
 ## Owned resources and acceptance limits
 
 Official Temurin21.0.12.1 and Android command-line archives were checksum-verified and extracted under `/tmp/qelvora-w6-android-toolchain-20260930`. SDK35, required build tools, Gradle cache/output and Swift capture/scratch paths are isolated from peers. No emulator or physical phone was operated in this checkpoint. The owned PostgreSQL container remains stopped/preserved; the supplied OpenAI env file was not accessed.

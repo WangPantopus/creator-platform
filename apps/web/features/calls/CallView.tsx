@@ -498,15 +498,28 @@ export function CallView({
           </button>
         </div>
       )}
-      {(live || session.state === "ended") && (
+      {(live || ended) && (
         <section className="w6-card">
           <strong>
-            {ended
+            {session.state === "ended"
               ? "Both of you can get a short summary"
               : "Separate permissions"}
           </strong>
           {(["recording", "summary", "content_reuse", "ai_source"] as const)
-            .filter((p) => !ended || p !== "recording")
+            .filter((purpose) => {
+              const granted = session.consents.some(
+                (value) =>
+                  value.role === role &&
+                  value.purpose === purpose &&
+                  value.granted,
+              );
+              if (session.state === "cancelled") return granted;
+              return (
+                purpose !== "recording" ||
+                !["ending", "ended"].includes(session.state) ||
+                granted
+              );
+            })
             .map((purpose) => (
               <label key={purpose}>
                 <span>
@@ -538,7 +551,15 @@ export function CallView({
             permission, a summary uses only the packet and a creator-typed note.
             Either of you can delete it.
           </p>
-          {session.summary && <p>{session.summary}</p>}
+          {session.summary &&
+            ["creator", "fan"].every((participant) =>
+              session.consents.some(
+                (value) =>
+                  value.role === participant &&
+                  value.purpose === "summary" &&
+                  value.granted,
+              ),
+            ) && <p>{session.summary}</p>}
           {ended &&
             role === "creator" &&
             ["creator", "fan"].every((r) =>
