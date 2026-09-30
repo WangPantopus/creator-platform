@@ -16,6 +16,7 @@ import {
 } from "@qelvora/ui-web";
 import { copy, formatCopy } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
+import { SessionSchema, type commerceContracts } from "@qelvora/api";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
 
@@ -178,6 +179,7 @@ type Detail = {
     version: number;
     due_at: string;
     delivered_at: string | null;
+    accept_act_id?: string;
     evidence?: { signedActId: string; authorKind: string };
   } | null;
   ledger: Ledger[];
@@ -317,8 +319,7 @@ function status(p: Packet, name: string) {
     ["accepting", "releasing"].includes(p.state)
   )
     return "Confirming payment · check again shortly";
-  if (p.payment_state === "refunded")
-    return copy.deadlineMissed.replace("{name}", name);
+  if (p.payment_state === "refunded") return "Refund confirmed";
   if (p.payment_state === "requires_action")
     return "Your bank needs authentication · nothing shared yet";
   if (p.payment_state === "failed") return copy.paymentFailed;
@@ -333,15 +334,108 @@ function status(p: Packet, name: string) {
     : "Seen by the queue · charged only on acceptance";
 }
 
-export function CommerceScreen({
+type CommerceScreenProps = {
+  screen: string;
+  creatorId?: string;
+  packetId?: string;
+  accountId: string | null;
+};
+function commerceDestination({
   screen,
   creatorId,
   packetId,
+}: CommerceScreenProps) {
+  const query = new URLSearchParams();
+  if (creatorId) query.set("creatorId", creatorId);
+  if (packetId) query.set("packetId", packetId);
+  const suffix = query.toString();
+  return `/commerce/${screen}${suffix ? `?${suffix}` : ""}`;
+}
+export function CommerceScreen(props: CommerceScreenProps) {
+  const [ended, setEnded] = useState(false);
+  const [identityAvailable, setIdentityAvailable] = useState(
+    Boolean(props.accountId),
+  );
+  useEffect(() => {
+    let active = true;
+    let checking = false;
+    const abort = new AbortController();
+    const check = async () => {
+      if (checking || document.visibilityState !== "visible") return;
+      checking = true;
+      try {
+        const response = await commerceFetch("/api/platform/identity/session", {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
+        });
+        if (!active) return;
+        if (response.status === 401) {
+          setEnded(true);
+          return;
+        }
+        if (!response.ok) throw new Error("Session unavailable");
+        const session = SessionSchema.parse(await response.json());
+        if (!active) return;
+        if (session.accountId !== props.accountId) {
+          setEnded(true);
+          return;
+        }
+        setIdentityAvailable(true);
+      } catch {
+        if (active) setIdentityAvailable(false);
+      } finally {
+        checking = false;
+      }
+    };
+    void check();
+    const timer = setInterval(() => void check(), 4000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      active = false;
+      abort.abort();
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [props.accountId]);
+  if (ended || !props.accountId)
+    return (
+      <main className="commerce commerce-phone commerce-content">
+        <Empty title="Continue with Pantopus">
+          Your session ended or the account changed. Continue to load this
+          account’s current commerce information.
+          <Link
+            className="commerce-link-button"
+            href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination(props))}`}
+          >
+            {copy.continueWithPantopus}
+          </Link>
+        </Empty>
+      </main>
+    );
+  return (
+    <CommerceAccountScreen {...props} identityAvailable={identityAvailable} />
+  );
+}
+function CommerceAccountScreen({
+  screen,
+  creatorId,
+  packetId,
+  accountId,
+  identityAvailable,
 }: {
   screen: string;
   creatorId?: string;
   packetId?: string;
+  accountId: string | null;
+  identityAvailable: boolean;
 }) {
+  const accountFetch = useCallback(
+    (path: string, init: RequestInit = {}) => {
+      const headers = new Headers(init.headers);
+      if (accountId) headers.set("x-commerce-account-id", accountId);
+      return commerceFetch(path, { ...init, headers });
+    },
+    [accountId],
+  );
   const [data, setData] = useState<Overview | null>(null),
     [detail, setDetail] = useState<Detail | null>(null),
     [error, setError] = useState<string | null>(null),
@@ -376,7 +470,7 @@ export function CommerceScreen({
     if (screen !== "packet" || !selectedCreator || !data?.fan) return;
     const abort = new AbortController();
     setDisclosure(null);
-    void fetch(
+    void accountFetch(
       `/api/commerce/creators/${selectedCreator}/fans/${data.fan.id}/disclosure`,
       { cache: "no-store", signal: abort.signal },
     )
@@ -386,7 +480,7 @@ export function CommerceScreen({
           throw new Error(
             body.error?.message ?? "Conversation disclosure is unavailable.",
           );
-        setDisclosure(body);
+        if (!abort.signal.aborted) setDisclosure(body);
       })
       .catch((error) => {
         if (!abort.signal.aborted)
@@ -397,11 +491,11 @@ export function CommerceScreen({
           );
       });
     return () => abort.abort();
-  }, [screen, selectedCreator, data?.fan?.id]);
+  }, [screen, selectedCreator, data?.fan?.id, accountFetch]);
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await commerceFetch(
+      const response = await accountFetch(
         `/api/commerce/overview${creatorId ? `?creatorId=${encodeURIComponent(creatorId)}` : ""}`,
         { cache: "no-store" },
       );
@@ -426,7 +520,7 @@ export function CommerceScreen({
       setData(body);
       setError(null);
       if (packetId) {
-        const response = await commerceFetch(
+        const response = await accountFetch(
           `/api/commerce/packets/${packetId}`,
           {
             cache: "no-store",
@@ -446,7 +540,7 @@ export function CommerceScreen({
     } finally {
       setLoading(false);
     }
-  }, [creatorId, packetId]);
+  }, [creatorId, packetId, accountFetch]);
   useEffect(() => {
     void load();
   }, [load]);
@@ -458,7 +552,21 @@ export function CommerceScreen({
     const key = pending.current.get(signature) ?? crypto.randomUUID();
     pending.current.set(signature, key);
     try {
-      const response = await commerceFetch(`/api/commerce/${path}`, {
+      if (!identityAvailable)
+        throw new Error("Reconnect to confirm your account before continuing.");
+      const sessionResponse = await accountFetch(
+        "/api/platform/identity/session",
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (
+        !sessionResponse.ok ||
+        SessionSchema.parse(await sessionResponse.json()).accountId !==
+          accountId
+      )
+        throw new Error(
+          "Your session changed. Continue with Pantopus to refresh this account.",
+        );
+      const response = await accountFetch(`/api/commerce/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...body, idempotencyKey: key }),
@@ -491,6 +599,92 @@ export function CommerceScreen({
   const studio = ["offers", "earnings", "pool"].includes(screen);
   const currency = data?.policy.currency ?? "USD";
   const activeCreator = selectedCreator || data?.creators[0]?.id || "";
+  const [access, setAccess] = useState<{
+    value: commerceContracts.CapabilitySnapshot;
+    receivedAt: number;
+  } | null>(null);
+  const [accessNow, setAccessNow] = useState(0);
+  useEffect(() => {
+    setAccess(null);
+    setAccessNow(Date.now());
+    if (
+      screen !== "access" ||
+      !identityAvailable ||
+      !activeCreator ||
+      !data?.fan
+    )
+      return;
+    const fanId = data.fan.id;
+    const abort = new AbortController();
+    let checking = false;
+    const check = async () => {
+      if (checking || document.visibilityState !== "visible") return;
+      checking = true;
+      const checkedAt = Date.now();
+      setAccessNow(checkedAt);
+      try {
+        const response = await accountFetch(
+          `/api/commerce/creators/${activeCreator}/fans/${fanId}/access`,
+          {
+            signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
+          },
+        );
+        const value: commerceContracts.CapabilitySnapshot =
+          await response.json();
+        if (abort.signal.aborted) return;
+        if (
+          !response.ok ||
+          value.creatorId !== activeCreator ||
+          value.fanId !== fanId
+        )
+          throw new Error("Current access is unavailable.");
+        setAccess({ value, receivedAt: checkedAt });
+        setAccessNow(Date.now());
+      } catch {
+        if (!abort.signal.aborted) setAccess(null);
+      } finally {
+        checking = false;
+      }
+    };
+    void check();
+    const refresh = setInterval(() => void check(), 4000);
+    const clock = setInterval(() => setAccessNow(Date.now()), 1000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      abort.abort();
+      clearInterval(refresh);
+      clearInterval(clock);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [screen, activeCreator, data?.fan?.id, identityAvailable, accountFetch]);
+  const currentAccess =
+    access &&
+    access.value.creatorId === activeCreator &&
+    access.value.fanId === data?.fan?.id &&
+    accessNow - access.receivedAt < 5000 &&
+    (!access.value.validUntil ||
+      Date.parse(access.value.validUntil) > accessNow)
+      ? access.value
+      : null;
+  const paidMemberships =
+    data?.memberships.filter(
+      (m) =>
+        m.creator_id === activeCreator &&
+        ["active", "grace", "cancelled"].includes(m.state) &&
+        Date.parse(m.period_end) > accessNow,
+    ) ?? [];
+  const accessChanges = [
+    ...paidMemberships.map(
+      (m) =>
+        `${m.name}: ${m.cancel_at_end || m.state === "cancelled" ? "ends" : "renews"} ${date(m.period_end)}`,
+    ),
+    ...(currentAccess?.sources
+      .filter((s) => s.source !== "membership")
+      .map(
+        (s) =>
+          `${{ pass_slot: "Pass AI reach", trial: "Conversation trial", comp: "Gifted access", commitment: "Accepted service" }[s.source] ?? "Access"} ends ${date(s.validUntil)}`,
+      ) ?? []),
+  ].join("; ");
   const name =
     data?.creators.find((c) => c.id === activeCreator)?.display_name ??
     "the creator";
@@ -586,6 +780,11 @@ export function CommerceScreen({
           <p className="commerce-announcement" role="status" aria-live="polite">
             {notice}
           </p>
+          {!identityAvailable && (
+            <p role="status">
+              Reconnect to confirm your account. Your input is kept.
+            </p>
+          )}
           {loading && !data && (
             <p role="status">Loading current information…</p>
           )}
@@ -601,7 +800,7 @@ export function CommerceScreen({
               <br />
               {errorCode === "session_required" ? (
                 <Link
-                  href={`/auth/continue?returnTo=${encodeURIComponent(`/commerce/${screen}`)}`}
+                  href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination({ screen, creatorId, packetId, accountId }))}`}
                 >
                   {copy.continueWithPantopus}
                 </Link>
@@ -785,69 +984,99 @@ export function CommerceScreen({
                   <AccessLines
                     name={name}
                     can={
-                      data.memberships.some(
-                        (m) =>
-                          m.creator_id === activeCreator &&
-                          ["active", "grace", "cancelled"].includes(m.state) &&
-                          Date.parse(m.period_end) > Date.now(),
-                      )
-                        ? "See your active membership benefits."
-                        : "Read your existing conversations."
+                      currentAccess
+                        ? [
+                            currentAccess.capabilities.includes("ai_message")
+                              ? currentAccess.allowance.available > 0
+                                ? "Message this AI."
+                                : "Your AI allowance is used for this period."
+                              : "",
+                            currentAccess.capabilities.includes("note")
+                              ? "Read included notes."
+                              : "",
+                            currentAccess.capabilities.includes("request")
+                              ? "Request available services."
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || "Read your existing conversations."
+                        : "Current access is unavailable. Refresh to try again."
                     }
                     included={
-                      data.memberships
-                        .filter(
-                          (m) =>
-                            m.creator_id === activeCreator &&
-                            ["active", "grace", "cancelled"].includes(
-                              m.state,
-                            ) &&
-                            Date.parse(m.period_end) > Date.now(),
-                        )
-                        .map((m) => m.name)
-                        .join(", ") || "No active membership."
+                      currentAccess
+                        ? [
+                            ...new Set(
+                              currentAccess.sources.map(
+                                (s) =>
+                                  ({
+                                    membership: "Membership",
+                                    comp: "Gifted access",
+                                    commitment: "Accepted service",
+                                    pass_slot: "Pass AI reach",
+                                    trial: "Conversation trial",
+                                  })[s.source] ?? "Current access",
+                              ),
+                            ),
+                          ]
+                            .sort()
+                            .join(", ") ||
+                          "No included access for this creator."
+                        : "Benefits cannot be confirmed."
                     }
                     byRequest={
-                      modes.length
-                        ? modes.map((m) => m.title).join(", ")
+                      modes.some(
+                        (m) =>
+                          m.state === "offered" &&
+                          m.used + m.reserved < m.weekly_limit,
+                      )
+                        ? modes
+                            .filter(
+                              (m) =>
+                                m.state === "offered" &&
+                                m.used + m.reserved < m.weekly_limit,
+                            )
+                            .map((m) => m.title)
+                            .join(", ")
                         : "No human modes are currently available."
                     }
                     changes={
-                      data.memberships.some(
-                        (m) => m.creator_id === activeCreator,
-                      )
-                        ? data.memberships
-                            .filter((m) => m.creator_id === activeCreator)
-                            .map(
-                              (m) =>
-                                `${m.name}: ${m.cancel_at_end ? "ends" : "renews"} ${date(m.period_end)}`,
-                            )
-                            .join("; ")
-                        : "Access refreshes from the server."
+                      accessChanges || "Access refreshes from the server."
                     }
                   />
                   <h2>By request</h2>
-                  {modes.map((m) => (
-                    <section className="commerce-card" key={m.id}>
-                      <h3>{m.title}</h3>
-                      <span className="qv-meta">
-                        {m.amount
-                          ? money(m.amount, m.currency)
-                          : "Price unavailable"}
-                      </span>
-                      <p>
-                        Within {m.delivery_hours} hours or a full refund ·{" "}
-                        {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
-                        {m.weekly_limit} left this week
-                      </p>
-                    </section>
-                  ))}
+                  {modes
+                    .filter((m) => m.state === "offered")
+                    .map((m) => (
+                      <section className="commerce-card" key={m.id}>
+                        <h3>{m.title}</h3>
+                        <span className="qv-meta">
+                          {m.amount
+                            ? money(m.amount, m.currency)
+                            : "Price unavailable"}
+                        </span>
+                        <p>
+                          Within {m.delivery_hours} hours or a full refund ·{" "}
+                          {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
+                          {m.weekly_limit} left this week
+                        </p>
+                      </section>
+                    ))}
                   <p className="commerce-help">
                     Charged only when {name} accepts. {copy.pendingHold}
                   </p>
-                  <Link href={`/commerce/packet${suffix}`}>
-                    Ask {name} to step in
-                  </Link>
+                  {modes.some(
+                    (m) =>
+                      m.state === "offered" &&
+                      m.used + m.reserved < m.weekly_limit,
+                  ) ? (
+                    <Link href={`/commerce/packet${suffix}`}>
+                      Ask {name} to step in
+                    </Link>
+                  ) : (
+                    <p className="commerce-help">
+                      Requests are unavailable right now.
+                    </p>
+                  )}
                   <Link href="/commerce/membership">Manage membership</Link>
                 </>
               )}
@@ -1333,75 +1562,105 @@ export function CommerceScreen({
                         Check payment status
                       </Button>
                     )}
-                    {detail.commitment?.state === "delivered" && (
-                      <>
-                        <Receipt
-                          name={
-                            data.creators.find(
-                              (c) => c.id === detail.packet.creator_id,
-                            )?.display_name ?? "Creator"
-                          }
-                          reqId={requestId(detail.packet.id)}
-                          title={detail.packet.snapshot.title}
-                          rows={[
-                            [
-                              "Charged",
-                              money(
-                                detail.packet.snapshot.amount,
-                                detail.packet.snapshot.currency,
-                              ),
-                            ],
-                            ["Accepted", date(detail.packet.accepted_at)],
-                            ["Delivered", date(detail.commitment.delivered_at)],
-                          ]}
-                          label={
-                            detail.commitment.evidence?.authorKind ===
-                            "approved_draft"
-                              ? "Prepared by AI · personally approved"
-                              : `${detail.packet.snapshot.title} · personally fulfilled by the creator`
-                          }
-                        />
-                        {detail.commitment.evidence?.signedActId && (
-                          <Link
-                            href={`/verify/${detail.commitment.evidence.signedActId}`}
-                          >
-                            Open signed verification
-                          </Link>
-                        )}
-                        <Button
-                          disabled={
-                            busy ||
-                            !detail.packet.snapshot.shareable ||
-                            Boolean(detail.share?.revoked_at)
-                          }
-                          onClick={() =>
-                            void command(`packets/${detail.packet.id}/share`, {
-                              version: detail.share?.version ?? 1,
-                              enabled: true,
-                              handleDisplay: "hidden",
-                            })
-                          }
-                        >
-                          Allow a share card without your handle
-                        </Button>
-                        {detail.share?.fan_choice && (
-                          <Button
-                            onClick={() =>
-                              void command(
-                                `packets/${detail.packet.id}/share`,
-                                {
-                                  version: detail.share!.version,
-                                  enabled: false,
-                                  handleDisplay: "hidden",
-                                },
-                              )
+                    {detail.commitment?.delivered_at &&
+                      ["delivered", "refunded", "resolved"].includes(
+                        detail.commitment.state,
+                      ) && (
+                        <>
+                          <Receipt
+                            name={
+                              data.creators.find(
+                                (c) => c.id === detail.packet.creator_id,
+                              )?.display_name ?? "Creator"
                             }
-                          >
-                            Revoke sharing
-                          </Button>
-                        )}
-                      </>
-                    )}
+                            reqId={requestId(detail.packet.id)}
+                            title={detail.packet.snapshot.title}
+                            rows={[
+                              [
+                                "Charged",
+                                money(
+                                  detail.packet.snapshot.amount,
+                                  detail.packet.snapshot.currency,
+                                ),
+                              ],
+                              ["Accepted", date(detail.packet.accepted_at)],
+                              [
+                                "Delivered",
+                                date(detail.commitment.delivered_at),
+                              ],
+                              ...detail.ledger
+                                .filter(
+                                  (l) =>
+                                    l.kind === "refund" &&
+                                    l.currency ===
+                                      detail.packet.snapshot.currency,
+                                )
+                                .map((l): [string, string] => [
+                                  "Refund confirmed",
+                                  money(l.amount, l.currency),
+                                ]),
+                            ]}
+                            label={
+                              detail.commitment.evidence?.authorKind ===
+                              "approved_draft"
+                                ? `Prepared by AI · approved by ${data.creators.find((c) => c.id === detail.packet.creator_id)?.display_name ?? "the creator"}`
+                                : `${detail.packet.snapshot.title} · personally fulfilled by the creator`
+                            }
+                          />
+                          {detail.commitment.evidence?.signedActId && (
+                            <Link
+                              href={`/verify/${detail.commitment.evidence.signedActId}`}
+                            >
+                              Open signed verification
+                            </Link>
+                          )}
+                          {!detail.commitment.evidence?.signedActId &&
+                            detail.commitment.accept_act_id && (
+                              <Link
+                                href={`/verify/${detail.commitment.accept_act_id}`}
+                              >
+                                Open signed acceptance
+                              </Link>
+                            )}
+                          {detail.commitment.state === "delivered" && (
+                            <Button
+                              disabled={
+                                busy ||
+                                !detail.packet.snapshot.shareable ||
+                                Boolean(detail.share?.revoked_at)
+                              }
+                              onClick={() =>
+                                void command(
+                                  `packets/${detail.packet.id}/share`,
+                                  {
+                                    version: detail.share?.version ?? 1,
+                                    enabled: true,
+                                    handleDisplay: "hidden",
+                                  },
+                                )
+                              }
+                            >
+                              Allow a share card without your handle
+                            </Button>
+                          )}
+                          {detail.share?.fan_choice && (
+                            <Button
+                              onClick={() =>
+                                void command(
+                                  `packets/${detail.packet.id}/share`,
+                                  {
+                                    version: detail.share!.version,
+                                    enabled: false,
+                                    handleDisplay: "hidden",
+                                  },
+                                )
+                              }
+                            >
+                              Revoke sharing
+                            </Button>
+                          )}
+                        </>
+                      )}
                     <Link href="/support">Get help with this request</Link>
                   </>
                 ))}

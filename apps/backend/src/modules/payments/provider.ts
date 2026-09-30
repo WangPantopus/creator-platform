@@ -35,6 +35,11 @@ export interface PaymentProvider {
     paymentMethodId: string;
     key: string;
   }): Promise<Intent>;
+  /** Read-only recovery of the original authorization attempt. No aged lookup
+   * result can authorize creating another hold after idempotency expiry. */
+  recoverAuthorization?(
+    input: Parameters<PaymentProvider["authorize"]>[0],
+  ): Promise<Intent | undefined>;
   fetchIntent(id: string): Promise<Intent>;
   capture(id: string, key: string): Promise<Intent>;
   release(id: string, key: string): Promise<Intent>;
@@ -109,7 +114,12 @@ export class StripePaymentProvider implements PaymentProvider {
               confirm: true,
               payment_method_types: ["card"],
               use_stripe_sdk: true,
-              metadata: { packet_id: input.packetId },
+              metadata: {
+                packet_id: input.packetId,
+                commerce_key: createHash("sha256")
+                  .update(input.key)
+                  .digest("hex"),
+              },
               expand: ["latest_charge"],
             },
             { ...this.options, idempotencyKey: input.key },
@@ -130,6 +140,51 @@ export class StripePaymentProvider implements PaymentProvider {
         }
         throw error;
       }
+    });
+  }
+  async recoverAuthorization(
+    input: Parameters<PaymentProvider["authorize"]>[0],
+  ) {
+    return stripeOperation(async () => {
+      const key = createHash("sha256").update(input.key).digest("hex");
+      const matches: Stripe.PaymentIntent[] = [];
+      let count = 0;
+      // Use the paginated list rather than eventually-consistent search. A
+      // bounded history that cannot be fully inspected remains unresolved.
+      for await (const intent of this.client.paymentIntents.list(
+        { limit: 100 },
+        this.options,
+      )) {
+        invariant(
+          ++count <= 1000,
+          "provider_statement_too_large",
+          "Authorization history requires reviewed bulk reconciliation.",
+        );
+        if (intent.metadata.commerce_key === key) matches.push(intent);
+      }
+      invariant(
+        matches.length <= 1,
+        "authorization_reference_conflict",
+        "More than one authorization matches this immutable attempt.",
+      );
+      if (!matches[0]) return undefined;
+      const intent = matches[0];
+      const method =
+        typeof intent.payment_method === "string"
+          ? intent.payment_method
+          : intent.payment_method?.id;
+      invariant(
+        !intent.livemode &&
+          intent.metadata.packet_id === input.packetId &&
+          intent.amount === input.amount &&
+          intent.currency === input.currency.toLowerCase() &&
+          intent.capture_method === "manual" &&
+          (method === input.paymentMethodId ||
+            (!method && intent.status === "requires_payment_method")),
+        "authorization_reference_conflict",
+        "The original authorization has different immutable terms.",
+      );
+      return this.fetchIntent(intent.id);
     });
   }
   async fetchIntent(id: string) {

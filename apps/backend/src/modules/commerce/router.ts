@@ -20,6 +20,17 @@ export function createCommerceRouter(input: {
     return input.service;
   };
   const id = (value: unknown) => z.uuid().parse(value);
+  const actorFor = async (request: Request) => {
+    const actor = await input.actorFor(request);
+    const expected = request.header("x-commerce-account-id");
+    if (expected !== undefined && id(expected) !== actor.accountId)
+      throw new DomainError(
+        "session_changed",
+        "Your account changed. Continue with Pantopus before using this form.",
+        409,
+      );
+    return actor;
+  };
   router.get("/capabilities", (_req, res) =>
     res.json({
       configured: Boolean(input.service),
@@ -32,19 +43,19 @@ export function createCommerceRouter(input: {
   );
   router.get("/overview", async (req, res) => {
     const value = await service().overview(
-      await input.actorFor(req),
+      await actorFor(req),
       req.query.creatorId ? id(req.query.creatorId) : undefined,
     );
     res.json({
       ...value,
       tierCatalog:
-        (await input.extended?.tiers?.choices(await input.actorFor(req))) ?? [],
+        (await input.extended?.tiers?.choices(await actorFor(req))) ?? [],
       policy: {
         ...value.policy,
         passEnabled: input.extended?.pass?.configured ?? false,
       },
       passChoices: (await input.extended?.pass?.choices(
-        await input.actorFor(req),
+        await actorFor(req),
       )) ?? { creators: [], replaceableSlotIds: [] },
       capabilities: {
         ...value.capabilities,
@@ -62,7 +73,7 @@ export function createCommerceRouter(input: {
       );
     res.json(
       await input.extended.money.reconcile(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
       ),
     );
@@ -76,7 +87,7 @@ export function createCommerceRouter(input: {
       );
     res.json(
       await input.extended.settlement.release(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.commitmentId),
       ),
     );
@@ -88,9 +99,7 @@ export function createCommerceRouter(input: {
         "Membership billing is not connected yet.",
         503,
       );
-    res.json(
-      await input.extended.billing.start(await input.actorFor(req), req.body),
-    );
+    res.json(await input.extended.billing.start(await actorFor(req), req.body));
   });
   router.post("/memberships/reconcile", async (req, res) => {
     if (!input.extended?.billing)
@@ -99,7 +108,7 @@ export function createCommerceRouter(input: {
         "Membership billing is not connected yet.",
         503,
       );
-    res.json(await input.extended.billing.reconcile(await input.actorFor(req)));
+    res.json(await input.extended.billing.reconcile(await actorFor(req)));
   });
   router.post("/memberships/:membershipId/cancel", async (req, res) => {
     if (!input.extended?.billing)
@@ -110,7 +119,7 @@ export function createCommerceRouter(input: {
       );
     res.json(
       await input.extended.billing.cancel(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.membershipId),
         req.body,
       ),
@@ -123,9 +132,7 @@ export function createCommerceRouter(input: {
         "The pass is not available yet.",
         503,
       );
-    res.json(
-      await input.extended.draftPass(await input.actorFor(req), req.body),
-    );
+    res.json(await input.extended.draftPass(await actorFor(req), req.body));
   });
   router.post("/pass/initial", async (req, res) => {
     if (!input.extended?.pass)
@@ -135,10 +142,7 @@ export function createCommerceRouter(input: {
         503,
       );
     res.json(
-      await input.extended.pass.selectInitial(
-        await input.actorFor(req),
-        req.body,
-      ),
+      await input.extended.pass.selectInitial(await actorFor(req), req.body),
     );
   });
   router.post("/pass/slots/:slotId/replace", async (req, res) => {
@@ -150,14 +154,14 @@ export function createCommerceRouter(input: {
       );
     res.json(
       await input.extended.pass.replace(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.slotId),
         req.body,
       ),
     );
   });
   router.post("/spend-limit", async (req, res) =>
-    res.json(await service().setLimit(await input.actorFor(req), req.body)),
+    res.json(await service().setLimit(await actorFor(req), req.body)),
   );
   const saveTier = async (req: Request, tierId?: string) => {
     if (!input.extended?.tiers)
@@ -167,7 +171,7 @@ export function createCommerceRouter(input: {
         503,
       );
     return input.extended.tiers.save(
-      await input.actorFor(req),
+      await actorFor(req),
       id(req.params.creatorId),
       tierId,
       req.body,
@@ -182,7 +186,7 @@ export function createCommerceRouter(input: {
   router.post("/creators/:creatorId/modes", async (req, res) =>
     res.json(
       await service().saveMode(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.creatorId),
         null,
         req.body,
@@ -192,7 +196,7 @@ export function createCommerceRouter(input: {
   router.post("/creators/:creatorId/modes/:modeId", async (req, res) =>
     res.json(
       await service().saveMode(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.creatorId),
         id(req.params.modeId),
         req.body,
@@ -202,7 +206,7 @@ export function createCommerceRouter(input: {
   router.get("/creators/:creatorId/fans/:fanId/access", async (req, res) =>
     res.json(
       await service().accessFor(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.creatorId),
         id(req.params.fanId),
       ),
@@ -211,7 +215,7 @@ export function createCommerceRouter(input: {
   router.get("/creators/:creatorId/fans/:fanId/disclosure", async (req, res) =>
     res.json(
       await service().packetDisclosure(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.creatorId),
         id(req.params.fanId),
       ),
@@ -220,27 +224,24 @@ export function createCommerceRouter(input: {
   router.post("/creators/:creatorId/fans/:fanId/trial", async (req, res) =>
     res.json(
       await service().openTrial(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.creatorId),
         id(req.params.fanId),
       ),
     ),
   );
   router.post("/packets", async (req, res) =>
-    res.json(await service().submit(await input.actorFor(req), req.body)),
+    res.json(await service().submit(await actorFor(req), req.body)),
   );
   router.get("/packets/:packetId", async (req, res) =>
     res.json(
-      await service().packet(
-        await input.actorFor(req),
-        id(req.params.packetId),
-      ),
+      await service().packet(await actorFor(req), id(req.params.packetId)),
     ),
   );
   router.post("/packets/:packetId/withdraw", async (req, res) =>
     res.json(
       await service().withdraw(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -249,7 +250,7 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/decide", async (req, res) =>
     res.json(
       await service().decide(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -258,7 +259,7 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/info", async (req, res) =>
     res.json(
       await service().moreInfo(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -267,7 +268,7 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/offer-choice", async (req, res) =>
     res.json(
       await service().offerChoice(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -276,7 +277,7 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/reauthorize", async (req, res) =>
     res.json(
       await service().reauthorize(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -295,14 +296,12 @@ export function createCommerceRouter(input: {
         transaction: z.string().min(1).max(160000),
       })
       .parse(req.body);
-    res.json(
-      await input.extended.storePurchase(await input.actorFor(req), body),
-    );
+    res.json(await input.extended.storePurchase(await actorFor(req), body));
   });
   router.post("/packets/:packetId/deliver", async (req, res) =>
     res.json(
       await service().deliver(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -311,7 +310,7 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/share", async (req, res) =>
     res.json(
       await service().share(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
         req.body,
       ),
@@ -319,16 +318,13 @@ export function createCommerceRouter(input: {
   );
   router.post("/packets/:packetId/reconcile", async (req, res) =>
     res.json(
-      await service().reconcile(
-        await input.actorFor(req),
-        id(req.params.packetId),
-      ),
+      await service().reconcile(await actorFor(req), id(req.params.packetId)),
     ),
   );
   router.post("/packets/:packetId/authentication", async (req, res) =>
     res.json(
       await service().paymentAuthentication(
-        await input.actorFor(req),
+        await actorFor(req),
         id(req.params.packetId),
       ),
     ),

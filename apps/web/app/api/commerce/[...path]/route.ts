@@ -37,10 +37,21 @@ async function proxy(
       `/v1/commerce/${target}${request.nextUrl.search}`,
       {
         method: request.method,
+        headers: {
+          ...(request.headers.has("x-commerce-account-id")
+            ? {
+                "x-commerce-account-id": request.headers.get(
+                  "x-commerce-account-id",
+                )!,
+              }
+            : {}),
+          ...(request.method === "GET"
+            ? {}
+            : { "Content-Type": "application/json" }),
+        },
         ...(request.method === "GET"
           ? {}
           : {
-              headers: { "Content-Type": "application/json" },
               body: await request.text(),
             }),
       },
