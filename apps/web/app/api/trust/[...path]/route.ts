@@ -90,7 +90,7 @@ async function forward(
   const token =
     (development
       ? request.cookies.get("w8_local_session")?.value
-      : undefined) ?? request.cookies.get("qelvora_session")?.value;
+      : undefined) || request.cookies.get("qelvora_session")?.value;
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   if (
     request.method === "POST" &&
