@@ -1,0 +1,42 @@
+# W7 — Discovery, growth, notifications, and insights
+
+## Agent assignment
+
+**Execution rule:** You personally do all coding, migrations, configuration, documentation, debugging/fixes, integration, app launching and end-to-end verification. Subagents may only research or check information read-only; never delegate implementation or acceptance, including asking for patches to apply yourself. Do not write new test code. Use your [complete execution prompt](prompts/W7-growth-insights.md) when assigning this stream.
+
+Own how people find value, return to it, and help creators understand their audience. Follow [the plan](README.md), [standards](STANDARDS.md), [contracts](CONTRACTS.md), [runtime verification](VERIFICATION.md), Product §3/§9, Domain F2/F13/F14, and Second Review A11/A13 and pilot measurements. Build Node.js, Next.js, and relevant native fan surfaces in Swift/Kotlin. No new test code. Growth must preserve clear authorship, consent, privacy and fair access.
+
+## Work packages
+
+1. **Public creator home and fan Home.** Functional signed-out/signed-in creator profile segments, posts/requests/access read models, creator status/reliability/capacity from canonical owners, chronological updates, active requests/upcoming calls/thread recency and authorship, follow relationships and empty states. Preserve exact sample compositions while replacing hard-coded content with real authorized data.
+2. **Discovery.** Search by need, categories, creator cards, modes, availability/reliability, accessible filters/loading/no results, later pass markers, and search/read-model refresh on creator pause or source changes. Start with public creator-level data; never expose restricted source passages or private fan questions through search. No algorithmic feed or paid attention ranking is added.
+3. **Acquisition and entry context.** Stable creator/content/campaign links, public server-rendered pages, canonical URLs/sitemaps/metadata and eligible structured data, accessible link previews, preserving the originating post through sign-in/install/open. W1 owns auth/native resolver; W7 owns context and destinations with feature owners. Instagram comment-to-one-private-reply adapter is conditional on approved API permissions and current policy; the AI conversation remains in this app. No unsolicited outreach is performed by agents.
+4. **Notifications and email.** Durable event consumption, recipient/audience checks, current-state recheck before send, dedupe, retries/backoff/dead letters, preferences/per-creator mute/channel controls/quiet hours, device-token lifecycle, email delivery/bounce/unsubscribe, in-app read state and correct deep links. Implement all **19 Product §9 types**; the 14-row design matrix is not the complete behavior inventory. In-app is the authoritative record and cannot be muted away; push/email are optional. Sender labels always reflect the actual event; sensitive text, money and restricted content follow the specified redaction rules. A stale event must not send “join” after a call ended.
+5. **Sharing and verification entry.** Consented private reply sharing, immutable versioned share artifact, embedded authorship/AI labels, verification URL, correction/revocation status, public answers, approved quote/tenure display, safe preview generation and downstream access. W1 verifies signed-act semantics; W5 owns content; W4 owns credits. Screenshots cannot strip the identifying label through the default export path.
+6. **Insights and producer.** Anonymized creator-scoped aggregation with at least five distinct fans per cluster, no raw fan identifiers/text in reports, unresolved question clusters, evidence/effort recommendations, accept/edit/defer/dismiss, “answer once for everyone,” opted-in public/group delivery and “posted about what you asked.” W5 publishes, W4 handles price-change consent, W3 supplies minimal scoped signals. Prevent re-identification through repeated small filters, exports and drill-downs.
+7. **Creator activation and retention.** 72-hour post-publish digest from W2, weekly Impact using consented thanks, setup/import recovery cues, optional creator launch/share kit, truthful reliability/context and permitted return updates. The AI never sends a notification just to start a conversation; its only proactive notification is the specified creator-content match. Prefer returning value over notification volume. W5 owns Thanks and Notes; W7 owns digest aggregation and delivery.
+8. **Measurement.** Versioned minimal event taxonomy for arrival→sign-in→consent→first useful answer→follow/membership→request→human delivery→return; distinguish fan/creator and expert/companion cohorts, web/native sources, new/returning users and unavailable capabilities. Measure acquisition source, time to first useful answer, D1/D7/D30 return, renewal/churn/reasons, creator activity/effort, support/refund burden, comprehension and cost with W8/W4. No private message text, sensitive memory, or individual heavy-use ranking enters marketing analytics.
+9. **Beneficial additions.** Own the acquisition/activation/retention improvements in [opportunities](OPPORTUNITIES.md), including usable empty states, opt-in invitations/share tools, search indexing hygiene and feedback channels. Treat experiments as hypotheses with success/stop criteria, not invented product policy. New compositions go through the design-gap process.
+
+## Surfaces and files
+
+Own public creator/profile and post entry composition, fan Home/Discover/notification views, Push/Email/notification matrix, sharing surfaces, Insights and Impact as assigned in the [inventory](research/design-inventory.md). W4 supplies commerce/access/capacity; W3 owns conversation/account data; W5 owns content. Implement public read models, notifications, insights and growth features in isolated module directories; shared navigation/push entitlement wiring goes through W1, operational delivery settings through W8.
+
+## First deliveries and dependencies
+
+Establish C09 event envelope/recipient references and C11 destination contracts first. Deliver signed-out creator arrival → authenticated contextual thread, one current-state-correct notification, and basic funnel visibility. Complete daily presence notifications and digests before wider acquisition. Add insights/group answers/sharing, followed by pass discovery and measured acquisition refinements.
+
+## Required runtime demonstrations
+
+- Open creator/post links signed out on browser, iOS and Android; preserve valid context through sign-in, cold launch and app/web fallback. Wrong/expired/revoked targets show truthful recovery without leaking object details.
+- Search for public creator needs and verify results/metadata update after pause/unpublish. Restricted sources and private pages never appear in rendered public HTML, previews or search results.
+- Generate each notification type with actual domain actions; compare in-app/push/email label, redaction, deep link and current status. Duplicate/reorder/late events cannot produce duplicate or misleading messages.
+- Change channel/mute/quiet-hour preferences, revoke permission, rotate a token, bounce an email and uninstall/reinstall. Explain delivery limitations and confirm preferences persist across clients.
+- Share a permitted reply/public answer; verify identity, consent, immutable content version and correction/revocation from the public link. Denied sharing must not create an accessible artifact.
+- Run insight cohorts below/at/above five distinct fans, repeated fan events and narrow filters; aggregate eligibility cannot be inflated or reveal raw conversation data.
+- Publish from a producer recommendation and trace the authorized fan update and W4 group offer/credit outcome. Consent is never inferred from topic matching.
+- Walk the full acquisition/retention funnel with development actors; inspect deduplicated events and dashboards, explaining denominators and exclusions. Suggested pilot bars remain proposed until agreed.
+
+## Delivery standard
+
+Supply usable discovery/entry/return journeys on actual clients, a complete notification matrix with runtime evidence, consented sharing, privacy-preserving creator insight, and trustworthy measurement. Include visual comparisons and current primary-source research for platform integrations. Do not buy ads, send recruiting messages, enable broad outreach, or claim retention uplift from an unrun experiment.

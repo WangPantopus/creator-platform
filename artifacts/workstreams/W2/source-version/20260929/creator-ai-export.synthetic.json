@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-09-30T01:03:07.070Z",
+  "configuration": {
+    "mode": "expert",
+    "tone": "As written",
+    "rules": [
+      "No medical, legal or financial advice",
+      "No invented creator opinions",
+      "Never imply paid access brings closeness",
+      "Start with one practical glaze application step."
+    ],
+    "handoff": "",
+    "examples": [],
+    "styleCard": "Short, practical, a little dry. Starts with the likely cause, then one thing to try. Never gushes.",
+    "neverReveal": ["private studio address", "family health details"],
+    "styleCriteria": "Clear short sentences and exact craft terminology; always visibly labeled AI.",
+    "dailyCostCapMicros": 0,
+    "usefulnessCriteria": "Answers identify the likely cause and one practical next step, with precise source support.",
+    "sessionNudgeMinutes": 90
+  },
+  "interview": {
+    "story": "Synthetic creator-owned story: I teach glaze application through practical kiln notes.",
+    "boundaries": "Never disclose studio addresses or family health information.",
+    "audioConsent": false
+  },
+  "status": {
+    "text": "Synthetic check-in: preparing new glaze demonstrations this week.",
+    "expiresAt": "2026-10-07T00:43:15.706Z"
+  },
+  "sources": [
+    {
+      "id": "67082ac7-28a3-4e43-a5fb-03c2c4c21f8f",
+      "title": "Glazing field notes",
+      "origin": "manual_text",
+      "origin_reference": null,
+      "audience": { "kind": "public" },
+      "rights_evidence": "Synthetic development material written by the W2 owner for the isolated local creator; public AI reuse is permitted for this exercise.",
+      "expires_at": null,
+      "revision": 2,
+      "state": "revoked",
+      "text_content": "Crawling often means the glaze coat is too thick. Try a single dip and count to three. Let the coat dry before firing. These are creator-owned public teaching notes."
+    }
+  ],
+  "versions": [],
+  "license": null,
+  "sponsors": [
+    {
+      "id": "429982c2-faac-4ae7-8393-51fc0a7606f9",
+      "brand": "Synthetic glaze partner",
+      "aliases": ["Synthetic glaze"],
+      "expiresAt": "2026-10-06T23:00:00.000Z",
+      "active": false
+    }
+  ],
+  "regressions": [
+    {
+      "paraphrased_prompt": "Synthetic glaze advice question about thick coats.",
+      "rule": "Start with one practical glaze application step.",
+      "unacceptable_answer": "Synthetic AI negative example: a vague answer with no practical step."
+    }
+  ]
+}
