@@ -6,6 +6,12 @@
   @testable import QelvoraUI
 
   @MainActor
+  private final class ReferenceWindow: NSWindow {
+    var referenceScale: CGFloat = 2
+    override var backingScaleFactor: CGFloat { referenceScale }
+  }
+
+  @MainActor
   final class NativeSnapshotTests: XCTestCase {
     private let size = CGSize(width: 390, height: 844)
     private var record: Bool {
@@ -85,12 +91,23 @@
           .transaction { $0.disablesAnimations = true }.frame(
             width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
+      let window = ReferenceWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      window.referenceScale = displayScale
       window.colorSpace = referenceBitmap?.colorSpace ?? .sRGB
       window.appearance = NSAppearance(named: name.hasSuffix("night") ? .darkAqua : .aqua)
       window.contentView = host
+      host.viewDidChangeBackingProperties()
       host.layoutSubtreeIfNeeded()
+      // The destination bitmap alone does not change SwiftUI/Core Animation's
+      // backing store. A 1x layer would otherwise be enlarged into a 2x PNG.
+      func configureScale(_ layer: CALayer) {
+        layer.contentsScale = displayScale
+        layer.rasterizationScale = displayScale
+        layer.setNeedsDisplay()
+        layer.sublayers?.forEach(configureScale)
+      }
+      if let layer = host.layer { configureScale(layer) }
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
