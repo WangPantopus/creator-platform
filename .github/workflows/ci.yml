@@ -52,7 +52,11 @@ jobs:
     runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
-      - run: swift test --package-path apps/ios
+      - name: Verify native Swift package
+        run: |
+          nativeTemporaryDirectory="${RUNNER_TEMP}/creator-native-${GITHUB_RUN_ID}-${GITHUB_JOB}"
+          mkdir -p "$nativeTemporaryDirectory"
+          SNAPSHOT_ARTIFACTS="$nativeTemporaryDirectory" swift test --package-path apps/ios
       - run: brew install xcodegen
       - run: xcodegen generate --spec apps/ios/project.yml
       - name: Select an available iPhone simulator
@@ -69,7 +73,9 @@ jobs:
         if: always()
         with:
           name: ios-review
-          path: artifacts/ios
+          path: |
+            artifacts/ios
+            ${{ runner.temp }}/creator-native-${{ github.run_id }}-${{ github.job }}/NativeSnapshotTests
   android-foundation:
     runs-on: macos-latest
     steps:
