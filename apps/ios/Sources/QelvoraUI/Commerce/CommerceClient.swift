@@ -44,7 +44,7 @@ struct CommercePacket: Decodable, Identifiable, Sendable {
     let id: String; let creator_id: String; let fan_id: String; let snapshot: Snapshot
     let state: String; let payment_state: String; let version: Int; let created_at: String
     let decision_at: String?; let hold_expires_at: String?; let question: String?; let disclosure: Disclosure
-    let commitment_state: String?
+    let commitment_state: String?; let delivered_at: String?
 }
 struct CommerceDetail: Decodable, Sendable {
     struct Ledger: Decodable, Sendable { let kind: String; let amount: String; let currency: String }

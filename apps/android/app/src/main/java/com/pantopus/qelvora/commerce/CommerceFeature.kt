@@ -224,8 +224,8 @@ object CommerceFanFeature {
             }
             else -> {
                 CommerceText("Requests", "display-lg"); Segmented(listOf("Open", "Delivered", "Closed"), category) { category = it }
-                val visible = current.packets.filter { if (category == "Delivered") it.commitment_state == "delivered" else if (category == "Closed") it.state in listOf("draft", "declined", "withdrawn", "expired") else it.state !in listOf("draft", "declined", "withdrawn", "expired") && it.commitment_state != "delivered" }
-                if (visible.isEmpty()) CommerceText("No requests here. Requests appear after you send them. Nothing is held or charged here.")
+                val visible = current.packets.filter { commerceRequestCategory(it) == category }
+                if (visible.isEmpty()) CommerceText(if (current.packets.isEmpty()) "No requests here. Requests appear after you send them." else "No requests here. Choose another category to view your requests and retained receipts.")
                 visible.forEach { packet ->
                     RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
                     Button("View request", ButtonVariant.SECONDARY, block = true, disabled = busy) { scope.launch { try { busy = true; detail = api?.detail(packet.id); screen = "status" } catch (error: Exception) { report(error) } finally { busy = false } } }
@@ -244,4 +244,9 @@ object CommerceFanFeature {
 @Composable private fun CommerceField(label: String, value: String, onChange: (String) -> Unit, lines: Int = 1) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { CommerceText(label, "label"); BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), minLines = lines) } }
 private fun commerceWhen(value: String?): String = value?.let { runCatching { DateTimeFormatter.ofPattern("MMM d, uuuu HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(it)) }.getOrDefault(it) } ?: "—"
 private fun commerceID(value: String) = "REQ-" + value.take(8).uppercase()
-private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to "Hold released · nothing charged", "failed" to "Payment failed · nothing charged", "unknown" to "Confirming payment", "requires_action" to "Payment authentication needed", "refund_pending" to "Refund processing", "refunded" to "Refund confirmed")[packet.payment_state] ?: if (packet.commitment_state == "delivered") "Delivered" else packet.state.replace('_', ' ')
+private fun commerceRequestCategory(packet: CommercePacket): String = when {
+    packet.delivered_at != null || packet.commitment_state == "delivered" -> "Delivered"
+    packet.state in listOf("draft", "declined", "withdrawn", "expired") || packet.commitment_state in listOf("refunded", "resolved") -> "Closed"
+    else -> "Open"
+}
+private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to "Hold released · nothing charged", "failed" to "Payment failed · nothing charged", "unknown" to "Confirming payment", "requires_action" to "Payment authentication needed", "refund_pending" to "Refund processing", "refunded" to "Refund confirmed")[packet.payment_state] ?: if (packet.delivered_at != null || packet.commitment_state == "delivered") "Delivered" else packet.state.replace('_', ' ')

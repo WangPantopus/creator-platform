@@ -33,7 +33,7 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceSlot(val id: String, val creator_id:String,val cycle_start:String,val display_name: String, val state: String, val position: Int, val ends_at: String)
 @Serializable data class CommerceSnapshot(val title: String, val mode: String, val amount: Long, val currency: String, val decisionHours: Int, val deliveryHours: Int, val shareable: Boolean)
 @Serializable data class CommerceDisclosure(val summary: String? = null)
-@Serializable data class CommercePacket(val id: String, val creator_id: String, val fan_id: String, val snapshot: CommerceSnapshot, val state: String, val payment_state: String, val version: Int, val created_at: String, val decision_at: String?, val hold_expires_at: String?, val question: String? = null, val disclosure: CommerceDisclosure, val commitment_state: String? = null)
+@Serializable data class CommercePacket(val id: String, val creator_id: String, val fan_id: String, val snapshot: CommerceSnapshot, val state: String, val payment_state: String, val version: Int, val created_at: String, val decision_at: String?, val hold_expires_at: String?, val question: String? = null, val disclosure: CommerceDisclosure, val commitment_state: String? = null, val delivered_at: String? = null)
 @Serializable data class CommerceDeliveryEvidence(val signedActId: String? = null, val authorKind: String? = null)
 @Serializable data class CommerceCommitment(val id: String, val state: String, val version: Int, val due_at: String, val delivered_at: String?, val accept_act_id: String? = null, val evidence: CommerceDeliveryEvidence? = null)
 @Serializable data class CommerceShare(val version: Int, val fan_choice: Boolean, val revoked_at: String?)
