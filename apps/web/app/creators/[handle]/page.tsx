@@ -8,6 +8,11 @@ import {
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
 import { Follow, ShareLink } from "../../../features/growth/actions";
 import type { Creator, Post } from "../../../features/growth/types";
+import {
+  ApprovedVariant,
+  VoluntaryInvite,
+  EntryConsent,
+} from "../../../features/growth/engagement";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -173,6 +178,12 @@ export default async function CreatorHome({
           </>
         )}
       </section>
+      <ApprovedVariant handle={c.handle} />
+      <details className="growth-stack">
+        <summary>Optional link choices</summary>
+        <VoluntaryInvite handle={c.handle} />
+        <EntryConsent handle={c.handle} source="creator_link" />
+      </details>
       {origin && c.state === "published" ? (
         <script
           type="application/ld+json"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { applicationOrigin } from "../../../../lib/request-origin";
 import { IdentityContinueSchema } from "@qelvora/api/schemas";
 import { IdentityRedirectSchema } from "@qelvora/api";
 import { continuationCookie, cookieOptions } from "../../../../lib/session";
@@ -7,7 +8,7 @@ export async function GET(request: NextRequest) {
   const requested = request.nextUrl.searchParams.get("returnTo") ?? "/home";
   const context = IdentityContinueSchema.safeParse({ returnTo: requested });
   const returnTo = context.success ? context.data.returnTo : "/home";
-  const target = new URL("/auth/continue", request.url);
+  const target = new URL("/auth/continue", applicationOrigin(request));
   target.searchParams.set("returnTo", returnTo);
   if (!context.success) {
     target.searchParams.set("error", "invalid_return");

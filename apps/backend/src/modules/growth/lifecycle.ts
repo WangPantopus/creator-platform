@@ -37,6 +37,12 @@ export function growthPrivacyHook(
           receipt: await service.privacyDelete(input.accountId, ownedCreators),
           retained: [
             {
+              category: "pseudonymous_erasure_fence",
+              until: null,
+              reason:
+                "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.",
+            },
+            {
               category: "anonymous_event_dedupe",
               until: null,
               reason:

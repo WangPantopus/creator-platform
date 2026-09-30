@@ -156,6 +156,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                 }
                 route == "/home" && home != null -> {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {BasicText("Your people", style = qText("display-lg").copy(color = ink));Button("Notifications", ButtonVariant.QUIET) {route = "/notifications"}}
+                    GrowthPostValuePrompt(client) { route = it }
                     home!!.objects("entries").forEach {entry -> Button(entry.getString("creatorName") + " · " + entry.getString("label"), ButtonVariant.SECONDARY, block = true) {route = entry.getString("destination")} }
                     home!!.objects("posts").forEach {update -> val post = update.getJSONObject("post");BasicText(post.getString("authorLabel"), style = qText("label").copy(color = ink));Button(post.getString("title"), ButtonVariant.SECONDARY, block = true) {route = "/creators/${update.getJSONObject("creator").getString("handle")}/posts/${post.getString("id")}"} }
                     if (home!!.objects("entries").isEmpty() && home!!.objects("posts").isEmpty()) EmptyState("Pick a creator to start", "Find a creator whose work you care about.") {Button("Discover", ButtonVariant.SECONDARY) {route = "/discover"}}
@@ -175,5 +176,42 @@ private fun GrowthCreatorCard(creator: JSONObject, passState: String? = null, on
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(qColor("surface")).clickable(role = Role.Button, onClick = onOpen)) {
         Row(Modifier.fillMaxWidth().height(150.dp).background(qColor("maya-surface")).padding(16.dp), verticalAlignment = Alignment.Bottom) {BasicText(creator.getString("name"), style = qText("display-md").copy(color = qColor("on-maya")));Spacer(Modifier.weight(1f));BasicText(creator.getString("photoCaption"), style = qText("data-sm").copy(color = qColor("on-maya-muted")))}
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {BasicText(creator.getString("category") + " · " + creator.getString("mode").replace('_', ' '), style = qText("body-strong").copy(color = qColor("ink")));BasicText(creator.getString("biography"), style = qText("body").copy(color = qColor("ink")));BasicText(creator.getString("capacity"), style = qText("caption").copy(color = qColor("ink-muted")));if(passState != null) BasicText(when(passState) {"active" -> "In your pass";"draft_next" -> "Draft for your next pass cycle";else -> "Not in your pass"}, style = qText("data-sm").copy(color = qColor("ink-muted")))}
+    }
+}
+
+/** The server requires genuine useful value and persists a shared cap and this retry key. */
+@Composable
+private fun GrowthPostValuePrompt(client: GrowthClient?, open: (String) -> Unit) {
+    val claimId = remember { java.util.UUID.randomUUID().toString() }
+    var target by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(client, claimId) {
+        try {
+            val result = client?.request("engagement/return/claim", "POST", JSONObject().put("id", claimId).put("platform", "android"))
+            target = if (result?.optBoolean("eligible") == true) result.getString("target") else null
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch (_: Exception) { target = null }
+    }
+    fun choose(choice: String) {
+        val destination = target ?: return
+        busy = true; error = ""
+        scope.launch {
+            try {
+                client?.request("engagement/return/choice", "PUT", JSONObject().put("id", claimId).put("choice", choice)) ?: throw IllegalStateException()
+                target = null
+                if (choice == "accepted") open(destination)
+            } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (_: Exception) { error = "This choice could not be saved. Try again." }
+            finally { busy = false }
+        }
+    }
+    if (target != null) Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        BasicText("Keep useful updates within reach", style = qText("title").copy(color = qColor("ink")))
+        BasicText("Choose push or email in settings when you want updates. You can change them any time.", style = qText("body").copy(color = qColor("ink")))
+        Button("Choose updates", ButtonVariant.SECONDARY, disabled = busy) { choose("accepted") }
+        Button("Later", ButtonVariant.QUIET, disabled = busy) { choose("later") }
+        Button("Don't ask again", ButtonVariant.QUIET, disabled = busy) { choose("declined") }
+        if (error.isNotEmpty()) Notice("error", "Unavailable", error)
     }
 }

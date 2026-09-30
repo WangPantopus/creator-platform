@@ -35,11 +35,21 @@ export class Engagement {
     }
   }
   /** No account event can claim a useful answer. Its owner must record that outcome first. */
-  async claimPrompt(actor: Actor, kind: unknown, platform: unknown) {
+  async claimPrompt(
+    actor: Actor,
+    kind: unknown,
+    platform: unknown,
+    claimId: string,
+  ) {
     const key = PromptKind.parse(kind),
-      device = z.enum(["ios", "android"]).parse(platform);
+      device = z.enum(["web", "ios", "android"]).parse(platform),
+      id = z.uuid().parse(claimId);
     const target =
-      key === "install" ? this.installURLs[device] : "/notifications/settings";
+      key === "install"
+        ? device === "web"
+          ? undefined
+          : this.installURLs[device]
+        : "/notifications/settings";
     if (!target) return { eligible: false as const };
     return this.service.db.actor(actor, null, async (client) => {
       await client.query(
@@ -65,12 +75,30 @@ export class Engagement {
         "INSERT INTO growth.prompt_choice(account_id,kind) VALUES($1,$2) ON CONFLICT DO NOTHING",
         [actor.accountId, key],
       );
+      const previous = (
+        await client.query(
+          "SELECT choice,last_claim_id,last_claim_platform,last_shown_at,updated_at FROM growth.prompt_choice WHERE account_id=$1 AND kind=$2",
+          [actor.accountId, key],
+        )
+      ).rows[0];
+      if (previous.last_claim_id === id) {
+        if (previous.last_claim_platform !== device)
+          throw new DomainError(
+            "prompt_claim_conflict",
+            "This choice request changed platforms.",
+            409,
+          );
+        return previous.choice === "eligible" &&
+          previous.updated_at.getTime() === previous.last_shown_at.getTime()
+          ? { eligible: true as const, target }
+          : { eligible: false as const };
+      }
       const row = (
         await client.query(
-          `UPDATE growth.prompt_choice SET impressions=impressions+1,last_shown_at=now(),updated_at=now()
+          `UPDATE growth.prompt_choice SET impressions=impressions+1,last_shown_at=now(),updated_at=now(),choice='eligible',last_claim_id=$3,last_claim_platform=$4
          WHERE account_id=$1 AND kind=$2 AND choice IN ('eligible','later') AND impressions<3
          AND NOT EXISTS(SELECT 1 FROM growth.prompt_choice p WHERE p.account_id=$1 AND p.last_shown_at>now()-interval '7 days') RETURNING kind`,
-          [actor.accountId, key],
+          [actor.accountId, key, id, device],
         )
       ).rows[0];
       return row
@@ -78,13 +106,23 @@ export class Engagement {
         : { eligible: false as const };
     });
   }
-  async choosePrompt(actor: Actor, kind: unknown, decision: unknown) {
+  async choosePrompt(
+    actor: Actor,
+    kind: unknown,
+    decision: unknown,
+    claimId: string,
+  ) {
     const key = PromptKind.parse(kind),
-      choice = PromptDecision.parse(decision);
+      choice = PromptDecision.parse(decision),
+      id = z.uuid().parse(claimId);
     return this.service.db.actor(actor, null, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.prompt:${actor.accountId}`],
+      );
       const result = await client.query(
-        "UPDATE growth.prompt_choice SET choice=$3,updated_at=now() WHERE account_id=$1 AND kind=$2 AND impressions>0 RETURNING kind",
-        [actor.accountId, key, choice],
+        "UPDATE growth.prompt_choice SET choice=$3,updated_at=now() WHERE account_id=$1 AND kind=$2 AND impressions>0 AND last_claim_id=$4 AND choice IN ('eligible',$3) RETURNING kind",
+        [actor.accountId, key, choice, id],
       );
       if (!result.rowCount)
         throw new DomainError(

@@ -68,13 +68,15 @@ export class GrowthRelay {
             "The owner event does not match its retry key.",
             409,
           );
+        const retained = await this.service.erasure.event(client, event);
+        if (!retained) return { queued: false };
         await client.query(
           "INSERT INTO growth.producer_relay(id,producer,creator_id,envelope,envelope_hash) VALUES($1,$2,$3,$4,$5)",
           [
             id,
             owner,
             creatorId,
-            event,
+            retained,
             contentHash({ producer: owner, event }),
           ],
         );
@@ -90,9 +92,11 @@ export class GrowthRelay {
     return this.service.db.transaction(
       this.service.db.worker,
       async (client) => {
+        const retained = await this.service.erasure.event(client, event);
+        if (!retained) return { queued: false };
         await client.query(
           "INSERT INTO growth.producer_relay(id,producer,creator_id,envelope,envelope_hash) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
-          [event.id, owner, event.creatorId, event, hash],
+          [event.id, owner, event.creatorId, retained, hash],
         );
         const prior = (
           await client.query(

@@ -123,9 +123,14 @@ export class GrowthExperiments {
   }
   async stop(actor: Actor, id: string) {
     const creatorId = await this.service.requireCreator(actor);
-    const result = await this.service.db.worker.query(
-      "UPDATE growth.experiment SET state='stopped' WHERE id=$1 AND creator_id=$2 AND state IN ('draft','active') RETURNING id",
-      [z.uuid().parse(id), creatorId],
+    const result = await this.service.db.workerActor(
+      actor,
+      creatorId,
+      (client) =>
+        client.query(
+          "UPDATE growth.experiment SET state='stopped' WHERE id=$1 AND creator_id=$2 AND state IN ('draft','active') RETURNING id",
+          [z.uuid().parse(id), creatorId],
+        ),
     );
     if (!result.rowCount)
       throw new DomainError(

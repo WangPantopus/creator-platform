@@ -25,9 +25,11 @@ import {
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
+import { GrowthErasure } from "./erasure.js";
 
 export class GrowthService {
   readonly notifications: Notifications;
+  readonly erasure: GrowthErasure;
   constructor(
     readonly db: GrowthDatabase,
     readonly owners: GrowthOwners,
@@ -36,7 +38,22 @@ export class GrowthService {
   ) {
     if (secret.length !== 32)
       throw new Error("Growth requires a 32-byte encryption/aggregation key");
-    this.notifications = new Notifications(db, owners, provider);
+    this.erasure = new GrowthErasure(secret);
+    db.actorFence = async (client, accountId, creatorId) => {
+      if (
+        !(await this.erasure.subjects(
+          client,
+          [accountId],
+          creatorId ? [creatorId] : [],
+        ))
+      )
+        throw new DomainError(
+          "growth_data_erased",
+          "This account or creator is no longer available.",
+          410,
+        );
+    };
+    this.notifications = new Notifications(db, owners, this.erasure, provider);
   }
   private pseudonym(creatorId: string, accountId: string, window: string) {
     return createHmac("sha256", this.secret)
@@ -67,11 +84,14 @@ export class GrowthService {
   }
   async projectCreator(input: unknown) {
     const item = CreatorProjection.parse(input);
-    await this.db.worker.query(
-      `INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6)
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.id))) return;
+      await client.query(
+        `INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6)
       ON CONFLICT(id) DO UPDATE SET version=excluded.version,handle=excluded.handle,state=excluded.state,document=excluded.document,updated_at=excluded.updated_at WHERE growth.creator_public.version<excluded.version`,
-      [item.id, item.version, item.handle, item.state, item, item.updatedAt],
-    );
+        [item.id, item.version, item.handle, item.state, item, item.updatedAt],
+      );
+    });
   }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
@@ -80,18 +100,21 @@ export class GrowthService {
         "signed_content_required",
         "Public named content requires signed evidence.",
       );
-    await this.db.worker.query(
-      `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.creatorId))) return;
+      await client.query(
+        `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
       ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document WHERE growth.content_public.version<excluded.version`,
-      [
-        item.id,
-        item.creatorId,
-        item.version,
-        item.state,
-        item,
-        item.publishedAt,
-      ],
-    );
+        [
+          item.id,
+          item.creatorId,
+          item.version,
+          item.state,
+          item,
+          item.publishedAt,
+        ],
+      );
+    });
   }
   async discover(query: string, category: string, offset = 0) {
     const q = z.string().max(120).parse(query),
@@ -350,14 +373,22 @@ export class GrowthService {
   async bindVerifiedEmail(accountId: string, address: string) {
     const email = z.email().parse(address),
       token = randomBytes(32).toString("base64url");
-    await this.db.worker.query(
-      "INSERT INTO growth.email(account_id,encrypted_address,verified_at,unsubscribe_hash) VALUES($1,$2,now(),$3) ON CONFLICT(account_id) DO UPDATE SET encrypted_address=excluded.encrypted_address,verified_at=now(),bounced_at=NULL,unsubscribed_at=NULL,unsubscribe_hash=excluded.unsubscribe_hash",
-      [
-        accountId,
-        this.seal(email),
-        createHash("sha256").update(token).digest("hex"),
-      ],
-    );
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.subjects(client, [accountId])))
+        throw new DomainError(
+          "growth_data_erased",
+          "This account is no longer available.",
+          410,
+        );
+      await client.query(
+        "INSERT INTO growth.email(account_id,encrypted_address,verified_at,unsubscribe_hash) VALUES($1,$2,now(),$3) ON CONFLICT(account_id) DO UPDATE SET encrypted_address=excluded.encrypted_address,verified_at=now(),bounced_at=NULL,unsubscribed_at=NULL,unsubscribe_hash=excluded.unsubscribe_hash",
+        [
+          accountId,
+          this.seal(email),
+          createHash("sha256").update(token).digest("hex"),
+        ],
+      );
+    });
     return { unsubscribeToken: token };
   }
   async unsubscribe(token: string) {
@@ -508,6 +539,14 @@ export class GrowthService {
       value.window,
     );
     await this.db.transaction(this.db.worker, async (client) => {
+      if (
+        !(await this.erasure.subjects(
+          client,
+          [value.fanAccountId],
+          [value.creatorId],
+        ))
+      )
+        return;
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [value.creatorId + ":" + value.window],
@@ -577,6 +616,7 @@ export class GrowthService {
         409,
       );
     await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, creatorId))) return;
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [creatorId + ":" + window],
@@ -757,12 +797,17 @@ export class GrowthService {
   }
   async experiments(actor: Actor) {
     const creatorId = await this.requireCreator(actor);
-    return (
-      await this.db.worker.query(
-        "SELECT id,hypothesis,success_criterion,stop_criterion,state,approved_at FROM growth.experiment WHERE creator_id=$1 ORDER BY id LIMIT 20",
-        [creatorId],
-      )
-    ).rows;
+    return this.db.workerActor(
+      actor,
+      creatorId,
+      async (client) =>
+        (
+          await client.query(
+            "SELECT id,hypothesis,success_criterion,stop_criterion,state,approved_at FROM growth.experiment WHERE creator_id=$1 ORDER BY id LIMIT 20",
+            [creatorId],
+          )
+        ).rows,
+    );
   }
   async proposeExperiment(actor: Actor, input: unknown) {
     const creatorId = await this.requireCreator(actor),
@@ -773,7 +818,7 @@ export class GrowthService {
           stopCriterion: z.string().trim().min(12).max(800),
         })
         .parse(input);
-    return this.db.transaction(this.db.worker, async (client) => {
+    return this.db.workerActor(actor, creatorId, async (client) => {
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [creatorId],
@@ -830,6 +875,7 @@ export class GrowthService {
     ownedCreatorIds: readonly string[] = [],
   ) {
     await this.db.transaction(this.db.worker, async (client) => {
+      await this.erasure.mark(client, accountId, ownedCreatorIds);
       await client.query(
         "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
         [accountId],

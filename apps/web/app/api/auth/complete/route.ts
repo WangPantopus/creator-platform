@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  applicationOrigin,
+  sameRequestOrigin,
+} from "../../../../lib/request-origin";
 import { IdentityCompletionSchema } from "@qelvora/api";
 import {
   continuationCookie,
@@ -8,7 +12,7 @@ import {
 } from "../../../../lib/session";
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get("origin") !== request.nextUrl.origin)
+  if (!sameRequestOrigin(request))
     return Response.json(
       { error: { message: "Start sign-in from this app." } },
       { status: 403 },
@@ -17,7 +21,10 @@ export async function POST(request: NextRequest) {
   const continuationId = request.cookies.get(continuationCookie)?.value;
   if (!continuationId || form.get("continuationId") !== continuationId)
     return NextResponse.redirect(
-      new URL("/auth/continue?error=continuation_expired", request.url),
+      new URL(
+        "/auth/continue?error=continuation_expired",
+        applicationOrigin(request),
+      ),
       303,
     );
   return complete(request, continuationId, form.get("code"), form.get("state"));
@@ -34,7 +41,10 @@ export async function GET(request: NextRequest) {
     query.getAll("state").length !== 1
   )
     return NextResponse.redirect(
-      new URL("/auth/continue?error=continuation_expired", request.url),
+      new URL(
+        "/auth/continue?error=continuation_expired",
+        applicationOrigin(request),
+      ),
       303,
     );
   return complete(
@@ -70,7 +80,10 @@ async function complete(
     const target = result.session.fan
       ? result.returnTo
       : `/onboarding/handle?returnTo=${encodeURIComponent(result.returnTo)}`;
-    const redirect = NextResponse.redirect(new URL(target, request.url), 303);
+    const redirect = NextResponse.redirect(
+      new URL(target, applicationOrigin(request)),
+      303,
+    );
     redirect.cookies.set(sessionCookie, result.token, {
       ...cookieOptions,
       maxAge: 7 * 86400,
@@ -79,7 +92,10 @@ async function complete(
     return redirect;
   } catch {
     return NextResponse.redirect(
-      new URL("/auth/continue?error=continuation_failed", request.url),
+      new URL(
+        "/auth/continue?error=continuation_failed",
+        applicationOrigin(request),
+      ),
       303,
     );
   }

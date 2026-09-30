@@ -84,18 +84,35 @@ export class Retention {
       text: t.text,
       displayName: t.identityConsent ? t.displayName : null,
     }));
-    await this.service.db.worker.query(
-      "INSERT INTO growth.impact(creator_id,window_start,unique_fans,ai_conversations,personal_replies,notes,thanks_count,consented_thanks) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING",
-      [
-        value.creatorId,
-        value.window,
-        value.uniqueFans,
-        value.aiConversations,
-        value.personalReplies,
-        value.notes,
-        value.thanksCount,
-        JSON.stringify(thanks),
-      ],
+    await this.service.db.transaction(
+      this.service.db.worker,
+      async (client) => {
+        if (
+          !(await this.service.erasure.subjects(
+            client,
+            value.thanks.map((t) => t.fanAccountId),
+            [value.creatorId],
+          ))
+        )
+          throw new DomainError(
+            "growth_data_erased",
+            "Rebuild this Impact without erased subjects.",
+            410,
+          );
+        await client.query(
+          "INSERT INTO growth.impact(creator_id,window_start,unique_fans,ai_conversations,personal_replies,notes,thanks_count,consented_thanks) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING",
+          [
+            value.creatorId,
+            value.window,
+            value.uniqueFans,
+            value.aiConversations,
+            value.personalReplies,
+            value.notes,
+            value.thanksCount,
+            JSON.stringify(thanks),
+          ],
+        );
+      },
     );
   }
   async impact(actor: Actor) {
@@ -136,14 +153,27 @@ export class Retention {
     agentVersion: number,
     publishedAt: Date,
   ) {
-    await this.service.db.worker.query(
-      "INSERT INTO growth.activation_job(creator_id,creator_account_id,agent_version,due_at) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING",
-      [
-        z.uuid().parse(creatorId),
-        z.uuid().parse(accountId),
-        z.int().positive().parse(agentVersion),
-        new Date(publishedAt.valueOf() + 72 * 3600000),
-      ],
+    await this.service.db.transaction(
+      this.service.db.worker,
+      async (client) => {
+        if (
+          !(await this.service.erasure.subjects(
+            client,
+            [accountId],
+            [creatorId],
+          ))
+        )
+          return;
+        await client.query(
+          "INSERT INTO growth.activation_job(creator_id,creator_account_id,agent_version,due_at) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING",
+          [
+            z.uuid().parse(creatorId),
+            z.uuid().parse(accountId),
+            z.int().positive().parse(agentVersion),
+            new Date(publishedAt.valueOf() + 72 * 3600000),
+          ],
+        );
+      },
     );
   }
   /** W2's creator surface reads this completed snapshot; no invented notification type. */
@@ -248,17 +278,24 @@ export class InstagramEntry {
         "comment_expired",
         "This comment is outside the private-reply window.",
       );
-    await this.service.db.worker.query(
-      "INSERT INTO growth.instagram_reply(creator_id,comment_id,context_id,received_at,expires_at) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
-      [
-        input.creatorId,
-        input.commentId,
-        input.contextId,
-        input.createdAt,
-        input.live
-          ? new Date(Date.now() + 60000)
-          : new Date(input.createdAt.valueOf() + 7 * 86400000),
-      ],
+    await this.service.db.transaction(
+      this.service.db.worker,
+      async (client) => {
+        if (!(await this.service.erasure.creator(client, input.creatorId)))
+          return;
+        await client.query(
+          "INSERT INTO growth.instagram_reply(creator_id,comment_id,context_id,received_at,expires_at) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
+          [
+            input.creatorId,
+            input.commentId,
+            input.contextId,
+            input.createdAt,
+            input.live
+              ? new Date(Date.now() + 60000)
+              : new Date(input.createdAt.valueOf() + 7 * 86400000),
+          ],
+        );
+      },
     );
   }
   async deliver(creatorId: string, commentId: string) {

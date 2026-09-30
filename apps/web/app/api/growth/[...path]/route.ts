@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 import {
   growthRequest,
   GrowthUnavailable,
@@ -16,10 +17,7 @@ async function handle(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (
-    request.method !== "GET" &&
-    request.headers.get("origin") !== request.nextUrl.origin
-  )
+  if (request.method !== "GET" && !sameRequestOrigin(request))
     return NextResponse.json(
       { error: { message: "Open this action from the app." } },
       { status: 403 },

@@ -49,10 +49,17 @@ export async function configureGrowthForBackend(
       owners: {
         ...unavailableOwners,
         ...input.owners,
-        creatorFor: canonicalCreatorOwner(
-          input.identity.profiles,
-          input.assertAllowed ?? (async () => {}),
-        ),
+        creatorFor: input.assertAllowed
+          ? canonicalCreatorOwner(input.identity.profiles, input.assertAllowed)
+          : async (actor) => {
+              const profile = await input.identity!.profiles.view(actor);
+              if (profile.creator?.verification !== "verified") return null;
+              throw new DomainError(
+                "growth_restrictions_unconfigured",
+                "Creator controls require current trust restrictions.",
+                503,
+              );
+            },
         home:
           input.owners?.home ??
           (async () => {

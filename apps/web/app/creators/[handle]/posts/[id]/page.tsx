@@ -6,6 +6,10 @@ import {
 } from "../../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../../features/growth/shell";
 import type { Creator, Post } from "../../../../../features/growth/types";
+import {
+  VoluntaryInvite,
+  EntryConsent,
+} from "../../../../../features/growth/engagement";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -86,6 +90,11 @@ export default async function PostPage({
             </section>
           ) : null}
         </article>
+        <details className="growth-stack">
+          <summary>Optional link choices</summary>
+          <VoluntaryInvite handle={handle} contextId={id} />
+          <EntryConsent handle={handle} source="post" objectId={id} />
+        </details>
       </GrowthShell>
     );
   } catch (error) {
