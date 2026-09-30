@@ -72,20 +72,33 @@ export function createApp(
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {
       const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+      const expectedAccount = req.get("X-Expected-Account-Id");
       // Refresh and logout also accept an expired access window within refresh_until.
-      if (
-        !token ||
-        [
-          "/identity/refresh",
-          "/identity/logout",
-          "/identity/revoke-sessions",
-        ].includes(req.path)
-      ) {
+      const refreshing = [
+        "/identity/refresh",
+        "/identity/logout",
+        "/identity/revoke-sessions",
+      ].includes(req.path);
+      if (!token || (refreshing && !expectedAccount)) {
         next();
         return;
       }
-      const resolved =
-        await dependencies.platformIdentity!.sessions.resolve(token);
+      const resolved = await dependencies.platformIdentity!.sessions.resolve(
+        token,
+        refreshing,
+      );
+      // A stale form may have a new browser cookie. This header can only deny a
+      // mismatch; the verified session remains the sole source of authority.
+      if (expectedAccount && expectedAccount !== resolved.actor.accountId)
+        throw new DomainError(
+          "session_account_changed",
+          "Your account changed. Reopen this form before saving.",
+          409,
+        );
+      if (refreshing) {
+        next();
+        return;
+      }
       await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
         { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },

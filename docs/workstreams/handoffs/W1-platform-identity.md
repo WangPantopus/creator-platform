@@ -1,5 +1,9 @@
 # W1 handoff — platform, identity, and app foundations
 
+## Active continuation
+
+September 30: work resumed on the retained W1 branch in an isolated worktree. Read [W1-resume status and evidence](../status/W1-resume.md) first for current leases, browser repairs/observations, builds, CI gate and producer requests. The H01–H20 obligations below remain; historical control failures, released resources and absent W3/W5 producers are not current facts.
+
 Prepared September 29, 2026, America/Los_Angeles. This is the continuation record for the next **primary W1 implementation agent**, not a release approval. Continue the existing implementation through the entire original scope. Do not restart from the old `main` foundation or treat compilation as finished product work.
 
 **Resource-release update after handoff:** The user requested PR creation and W1 resource cleanup. [Draft PR #6](https://github.com/WangPantopus/creator-platform/pull/6) targets `main`. W1 API/web processes, dedicated iOS simulator, Android emulator/AVD and isolated ADB server are now stopped/deleted. W1 leased native builds, Next/Gradle caches, disposable rename copies, temporary logs/indexes and private local env were removed. Source, manifests, lockfile, existing tests and committed evidence remain. See the [verified resource-release record](W1-resource-release.json). Runtime tables/launch commands below describe the former lease and are historical templates: provision fresh development configuration/data/devices, reserve new/current ports and rebuild from this branch. Docker container/image/volume cleanup remains blocked: Docker Desktop's engine returned 503 "unable to start"; the supported start command reported it already running, and the W1-only container removal request timed out. No shared Docker restart/reset/prune or image/volume deletion occurred.

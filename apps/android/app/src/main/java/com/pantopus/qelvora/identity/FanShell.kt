@@ -40,13 +40,15 @@ class FanSession(context: Context, private val baseURL: String?, returnTo: Strin
     var actors by mutableStateOf<List<APIIdentityCapabilitiesDevelopmentActorsItem>>(emptyList())
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
+    private var rotatingCredential = false
     private var removedArrivalFor: String? = null
     private fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null) }
     suspend fun refresh() {
+        if (rotatingCredential) return
         val client = api ?: return; val current = generation
         if (currentToken() == null) { session = null; return }
         try { val value = client.identitySession(); if (current != generation) return; if (session?.accountId != null && session?.accountId != value.accountId) { purge(); error = "The account changed. Continue with Pantopus again."; return }; session = value; error = "" }
-        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { purge(); error = "Your session ended. Continue with Pantopus again." } else error = message(failure) }
+        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { if (!busy) refreshCredentials() else { purge(); error = "Your session ended. Continue with Pantopus again." } } else error = message(failure) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
@@ -82,19 +84,20 @@ class FanSession(context: Context, private val baseURL: String?, returnTo: Strin
         finally { busy = false }
     }
     suspend fun logout(all: Boolean = false) {
-        val client = api ?: return
+        if (busy) return; val client = api ?: return; busy = true
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
         catch (_: Exception) { error = "Sign-out could not reach the server. Retry to revoke the session." }
+        finally { busy = false }
     }
     suspend fun refreshCredentials() {
-        if (busy) return; val client = api ?: return; val current = generation; busy = true
-        try { val result = client.refreshSession(); if (current != generation) return; storage.save(result.token); refresh() }
+        if (busy) return; val client = api ?: return; busy = true; rotatingCredential = true; generation++; val current = generation
+        try { val result = client.refreshSession(); if (current != generation) return; storage.save(result.token); generation++; rotatingCredential = false; refresh() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) purge(); error = message(failure) } }
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
-        finally { busy = false }
+        finally { busy = false; rotatingCredential = false }
     }
     fun open(target: String) { if (ApplicationDestination.isPermitted(target)) { removedArrivalFor = null; destination = target } else error = "This link is unavailable. Open the object from the app." }
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."

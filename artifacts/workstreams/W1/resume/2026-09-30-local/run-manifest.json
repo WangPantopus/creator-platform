@@ -1,0 +1,249 @@
+{
+  "workstream": "W1",
+  "increment": "resume",
+  "run": "2026-09-30-local",
+  "startingRevision": "d6348c41d7c070bf10648aefa4818deba3e896c8",
+  "checkpointAncestor": true,
+  "environment": "isolated local development",
+  "identityProvider": "explicit synthetic development adapter",
+  "database": "fresh core-only PostgreSQL 17 + pgvector",
+  "runtimeRole": "creator_runtime",
+  "apiPort": 4101,
+  "webPort": 3001,
+  "dbPort": 55431,
+  "uiControl": {
+    "web": "IAB navigation and forms work",
+    "native": "API disabled",
+    "viewport": "Requested390x844 override acknowledged but ineffective; actual834/843x1211 and1280x720 recorded per screenshot"
+  },
+  "releaseReady": false,
+  "observations": [
+    {
+      "case": "twoSyntheticActors",
+      "result": "Welcome/chooser/Handle/Account; collision rejected; profiles persist"
+    },
+    {
+      "case": "crossTabDraftIsolation",
+      "result": "reproduced stale actor-two draft; repaired unmount/cancel/account precondition; both tabs signed out after revoke"
+    },
+    {
+      "case": "offlineDraftRecovery",
+      "result": "stopped only W1 API; unsaved intro retained; restart and Continue persisted same input"
+    },
+    {
+      "case": "pendingCreator",
+      "result": "persisted pending creator; no fabricated proof/approval/public AI"
+    },
+    {
+      "case": "sessionRotation",
+      "result": "expired access renewed; token rotated; original authentication time and seven-day window unchanged"
+    },
+    {
+      "case": "returnVisit",
+      "result": "leave private page, expire own DB access, revisit Account; restored without development chooser"
+    },
+    {
+      "case": "finalRevoke",
+      "result": "both tabs signed out; unsaved draft gone; no renewed session resurrected",
+      "upperBoundMs": 601,
+      "earlierUpperBoundMs": 472,
+      "limitations": "single Mac, foreground localhost, shared cookie jar; not independent/native clients or p95"
+    },
+    {
+      "case": "malformedReturn",
+      "result": "cross-origin/encoded separator/wrong UUID context/duplicate targets denied; safe Home recovery"
+    },
+    {
+      "case": "signedVerification",
+      "result": "malformed ID rejected; missing canonical ID 404 and readable unavailable; production secret-free build uses runtime API URL"
+    },
+    {
+      "case": "comprehension",
+      "result": "personally clicked four correct answers;4/4, completion disables answers; separate T-21 participant gate"
+    },
+    {
+      "case": "approvedDraftReadingOrder",
+      "result": "browser AX now names AI preparation and creator approval before message; Swift/Compose semantics edited; no screen-reader acceptance claim"
+    },
+    {
+      "case": "expiredContinuationRetry",
+      "result": "personally expired an own synthetic continuation; exact Studio destination preserved; specific expiry notice; retry returned to persisted pending creator setup"
+    },
+    {
+      "case": "desktopStudio",
+      "result": "light/night full-page1280x900 captures at1280x720 viewport; no horizontal overflow; account-field Tab moves to proof action; no matched-mobile/native/screenreader claim"
+    },
+    {
+      "case": "proofRetentionDisclosure",
+      "result": "web notice now reflects stored challenge; no immutable SQL or reference-artboard edit; retention decision remains W8/Q10"
+    }
+  ],
+  "updatedAt": "2026-09-30T09:10:37.167741+00:00",
+  "checkpointBlobAudit": {
+    "total": 841,
+    "unchangedAtStartingTip": 837,
+    "laterHandoffDocuments": 4
+  },
+  "host": {
+    "architecture": "x86_64",
+    "macOS": "26.7 (25G229)",
+    "xcode": "26.5 (17F42)",
+    "node": "24.19.0",
+    "pnpm": "11.25.0; manifest requests12.5.1"
+  },
+  "checks": {
+    "frozenInstall": "passed",
+    "generation": "12 shared resources/31 native operations verified",
+    "targetedTypesLint": "passed: backend/web types; full source lint; final web check",
+    "format": "full source check passed",
+    "backendBuild": "passed",
+    "webProduction": "passed including restore/expired continuation/account keys/rotation error preservation",
+    "iosSignedSimulator": "normally signed generic iOS Simulator build passed after shared platform helpers",
+    "rename": "disposable FolioPreview regenerated; backend/web/signed iOS builds passed; final web-only guards being checked before push",
+    "androidLocal": "pending SDK license/toolchain decision; no fresh build claim",
+    "existingBackendTests": "8passed/1failed/9skipped; core-only migration fixture/grants and stale context target assertion",
+    "existingSwiftTests": "compiled package;18tests/110 image failures on current OS; baselines untouched",
+    "preResumeCI": "trust compilation passed; five foundation jobs failed; diagnostics preserved in status; not merge-ready"
+  },
+  "resources": {
+    "active": ["API4101", "web3001", "W1 DB55431"],
+    "stopped": [
+      "temporary production server3011",
+      "owned iOS simulator365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5 after CLI launch inspection",
+      "W1 separate existing-test DB55441 after verified label ownership"
+    ],
+    "buildDirectories": [
+      "artifacts/workstreams/W1/build/resume-ios",
+      "artifacts/workstreams/W1/build/swift-package",
+      "apps/web/.next-w1-build",
+      "apps/web/.next-w1-resume"
+    ],
+    "renameCopy": "/private/tmp/creator-w1-resume-rename",
+    "secretValuesCommitted": false
+  },
+  "screenshots": [
+    {
+      "file": "account-one.jpg",
+      "sha256": "1d1b2a8ad0dbc799898e7db09739b628e8f3c8010439f2e4124e17d52a4090d7",
+      "pixelWidth": 843,
+      "pixelHeight": 1211
+    },
+    {
+      "file": "approved-reading-order.jpg",
+      "sha256": "d474037509c575ed35b055a5b957631d97b40bccec58452c437676fbdcdc7794",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "comprehension-complete.jpg",
+      "sha256": "e66ca8eb2f9626533b827a4a344dc1fe5646ab6a4ab3e72a718ef12448aaebf1",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "expired-continuation-preserved.jpg",
+      "sha256": "d93054524f76f0a71e5b02a133cc17f6bc5ee52f67776f7c956e7df948f00cbb",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "offline-draft.jpg",
+      "sha256": "a8817eccb13a6a590243d5a0700d50bb39d83f2e539901500786f6ccae113c60",
+      "pixelWidth": 843,
+      "pixelHeight": 1211
+    },
+    {
+      "file": "pending-proof.jpg",
+      "sha256": "ad9453b34051daa327963011cbac52bd8fdd98c067d7fae3e26a088b13756cd8",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "return-visit-renewed.jpg",
+      "sha256": "3524d6ac364f0b6e22a14a3051a99c4117b78925d405f0bc629b67e195a24c1c",
+      "pixelWidth": 834,
+      "pixelHeight": 1211
+    },
+    {
+      "file": "revoked-after-renewal.jpg",
+      "sha256": "67071012dafdb1c0860725dc347b57b1279d3e5bad7e700b4ed58294f7558391",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "setup-arrival-signedout.jpg",
+      "sha256": "46f07adb7623f6086c38e56b3b1f711fcacc32522db6c64a1d32fabf7f434479",
+      "pixelWidth": 1280,
+      "pixelHeight": 844
+    },
+    {
+      "file": "setup-light-1280-full.jpg",
+      "sha256": "5fb44f3955c54a64d2648129229d1d142a74b5790e076e5faf3a51a0a71011e5",
+      "pixelWidth": 1280,
+      "pixelHeight": 900
+    },
+    {
+      "file": "setup-night-1280-full.jpg",
+      "sha256": "e4095fea7f17f98962e1ab5923e6f19db5735d70f11e3d45d1b4ef8fd4572bb2",
+      "pixelWidth": 1280,
+      "pixelHeight": 900
+    },
+    {
+      "file": "stale-draft-after.jpg",
+      "sha256": "67071012dafdb1c0860725dc347b57b1279d3e5bad7e700b4ed58294f7558391",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "stale-draft-before.jpg",
+      "sha256": "acf2b3fe90a022f9d304f681d2cec349f307d40edf996db366a70aac1b832855",
+      "pixelWidth": 1280,
+      "pixelHeight": 720
+    },
+    {
+      "file": "welcome-light-834.jpg",
+      "sha256": "b9915abb6ebf8aacf3c78ee746da027d4a06d44d2c6ed8fd982ff2d2dc58a7f8",
+      "pixelWidth": 834,
+      "pixelHeight": 1211
+    },
+    {
+      "file": "welcome-night-834.jpg",
+      "sha256": "566218af3ac07b889a8743c655764e1095f2574d151e6762d8003887de34c6ed",
+      "pixelWidth": 834,
+      "pixelHeight": 1211
+    }
+  ],
+  "changedSourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "d55c1dba13d114a5a491f050f88726f021bcad04c6e69114b2ad71e5e5c3db05",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Conversation.kt": "87391302be8e8a55fd327f48b698a3200248967b37be46ba3f6f576fcf65ce5b",
+    "apps/backend/src/app.ts": "59d688ad0131d58af8e07a111cfe73f2b50db49feb3fb8c1b13875ebb2f1df48",
+    "apps/backend/src/config.ts": "0624538531d5ba9308c7dc7e2aaa7bb6608df51e834452da3e0a16eeed30ea23",
+    "apps/backend/src/modules/identity/sessions.ts": "bfa7c1c013073836f6d2359b94a85a4676679618bc2ee0a3f602830ba41ad6ba",
+    "apps/backend/src/modules/identity/signed-acts.ts": "179d193e173499a1798643601bf2333beee5aa5fba2c9af95b62da4afc152066",
+    "apps/backend/src/server.ts": "299a1c915854a2baf62e686880566800557891142864f7709b6d0c1312e5940f",
+    "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift": "2a7bb0bc30114a27c0fd6d385410d610230c50e83fa2d96ae2eddfcc0c8da141",
+    "apps/ios/Sources/QelvoraUI/Conversation.swift": "42d9fc7a7ede0ad2286a1949d37d085fb44b9dc61f279e60bad96eb43c18ce32",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "430b9b923e7785b32743e2cde10c324a907a71f0e2b7608c2ac6115eba83bc26",
+    "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift": "db97b22d73f0a581b3378b673d7b5683daa34286cadcf8808e4ce0f215aaaac3",
+    "apps/ios/Sources/QelvoraUI/Theme.swift": "9ca7e83ba059a94f6db8bfd64830ae4556db97e9310e6a2494dabd116b7ea357",
+    "apps/ios/Sources/QelvoraUI/Trust.swift": "cdccdc088e5c94922d01e1123365b9e3a31e04e807bbe83c8fbd63b2eeab2f77",
+    "apps/web/app/api/auth/complete/route.ts": "416def2082d91ea2cbf171d6b8199241fa1ddb826f36c6640fc946c80803093b",
+    "apps/web/app/api/auth/continue/route.ts": "acfbbf5c40d8afb4e46be7cacafd781777e48ff7eb9b8acd1a13549b8f942281",
+    "apps/web/app/api/auth/restore/route.ts": "237d27052f7538d6163a7c40955edda7591a5a9584ce2e4e7d819f0fe21f81d9",
+    "apps/web/app/api/platform/[...path]/route.ts": "d5e7374ed63e2a53181ed51eca39f0e319c6a52be9028feb33482f88640c2bce",
+    "apps/web/app/auth/development/page.tsx": "ad62b1840e72d7dad1a7e9359fb83f9df6e6bc0f9ef5b923e4dc045694c631ed",
+    "apps/web/app/globals.css": "aaa9fd6b4e372c20c8e6a34f0e0a90fad16937efc1757a7532324484f0f8e5cf",
+    "apps/web/app/identity/account/page.tsx": "475c51ea3c0a8e8133dd839e9de104d9f9ef002efb250e07a7713c2f32a1b553",
+    "apps/web/app/onboarding/handle/page.tsx": "3cf90256e43de07958bff3721cf357d397c38735d7c8824b2f126415da2e909c",
+    "apps/web/app/page.tsx": "b4eeb7c9db948bbb936d97e80b7501ce82252825df1eb296a5120c66fff69bfe",
+    "apps/web/app/studio/setup/page.tsx": "7d0afe7799dc554ca2b3f73745cb9aa37b3d8a17bf85c01b7d2b99e29d3f2598",
+    "apps/web/app/unsubscribe/[token]/route.ts": "65e4f670aca15276f3c44e49e44a69d2a6b4885be1032b80d78633d576fa3c95",
+    "apps/web/features/identity/account.tsx": "458cea8ed00dbde2dd95e3784466bfdef2cac4d2c879a65f3f3ced88360af332",
+    "apps/web/features/identity/handle.tsx": "1e063a9a4a211250b723a1b22468398993a6426e78ac7fdfde6510a5726b2ab6",
+    "apps/web/features/identity/session-boundary.tsx": "b84c2162ce2444c0f88f2f87794d2e26cf3cb5947cc1239fb607449d658980d1",
+    "apps/web/features/identity/setup.tsx": "7e91315d1975690fe6f150609ec65fbf936ee5e639e77e9c3bcc3ba794aba2f2",
+    "apps/web/features/identity/welcome.tsx": "dd143a372a8f8f4f67112f682a6c41e96238d79cc79e0f7f2c67db571418ae4d",
+    "apps/web/lib/session.ts": "da9ccff29aed80be9b7f50d62ec6d66d53fb2505048e3bbb2671677f854d5263",
+    "packages/ui-web/src/components.ts": "0c855ef9cb568283ef60551cd618035af73033f3def7baf1f3896202b8fa5119"
+  }
+}
