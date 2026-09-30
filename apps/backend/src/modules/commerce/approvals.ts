@@ -1,4 +1,5 @@
 import type { PoolClient } from "pg";
+import { z } from "zod";
 import type { SignedActCommand } from "@qelvora/api";
 import {
   CreateReplyDraft,
@@ -41,6 +42,40 @@ function draft(row: DraftRow): ReplyDraft {
  */
 export class CommerceApprovals {
   constructor(private readonly db: Database) {}
+
+  async sources(scope: ThreadScope, raw: unknown) {
+    const input = z
+      .strictObject({
+        beforeSequence: z.coerce.number().int().positive().optional(),
+      })
+      .parse(raw);
+    return this.db.withThread(scope, async (client) => {
+      await this.lockThread(client, scope);
+      const rows = (
+        await client.query<{
+          id: string;
+          version: number;
+          text: string;
+          sequence: number;
+        }>(
+          `SELECT id,version,text,sequence FROM creator.message
+         WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='ai'
+         AND delivery_state IN('delivered','interrupted') AND length(btrim(text)) BETWEEN 1 AND 8000
+         AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 21`,
+          [
+            scope.threadId,
+            scope.creatorId,
+            scope.fanId,
+            input.beforeSequence ?? null,
+          ],
+        )
+      ).rows;
+      return {
+        items: rows.slice(0, 20),
+        nextSequence: rows.length > 20 ? rows[19]!.sequence : null,
+      };
+    });
+  }
 
   private async lockThread(client: PoolClient, scope: ThreadScope) {
     invariant(

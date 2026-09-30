@@ -47,6 +47,9 @@ export function createCommerceApprovals(input: {
       router.post(root, async (req, res) =>
         res.json(await approvals.create(await scope(req), req.body)),
       );
+      router.get(`${root}/sources`, async (req, res) =>
+        res.json(await approvals.sources(await scope(req), req.query)),
+      );
       router.get(`${root}/:draftId`, async (req, res) =>
         res.json(
           await approvals.read(await scope(req), id(req.params.draftId)),

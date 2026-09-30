@@ -19,6 +19,7 @@ import { consumeSignedAct } from "../identity/signed-acts.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
 import type { AccessService } from "../access/scope.js";
 import { capabilitySnapshot } from "../access/commerce.js";
+import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
@@ -701,6 +702,15 @@ export class CommerceService {
     const scope = await this.access.openThread(actor, creatorId, fanId, false);
     return this.db.withThread(scope, (client) =>
       capabilitySnapshot(client, scope),
+    );
+  }
+  /** Current W2/W3 audience on an already-issued canonical thread scope. */
+  async sourceAudienceFor(
+    scope: import("../access/scope.js").ThreadScope,
+    groups?: VerifiedGroupAudience,
+  ) {
+    return this.db.withThread(scope, (client) =>
+      commerceAudience(client, scope, groups),
     );
   }
   async packetDisclosure(actor: Actor, creatorId: string, fanId: string) {

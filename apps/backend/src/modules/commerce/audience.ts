@@ -20,17 +20,22 @@ export async function commerceAudience(
   groups?: VerifiedGroupAudience,
 ): Promise<AudienceSnapshot> {
   assertThreadScope(scope);
+  const observedAt = Date.now();
   const memberships = (
     await client.query<{
       tier_id: string;
       id: string;
       version: number;
       period_end: Date;
+      audience_end: Date;
       grant_id: string;
     }>(
-      `SELECT m.tier_id,m.id,m.version,m.period_end,m.grant_id FROM creator.commerce_membership m
+      `SELECT m.tier_id,m.id,m.version,m.period_end,m.grant_id,
+     least(CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END,g.valid_until) AS audience_end
+     FROM creator.commerce_membership m
      JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id
-     WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN('active','grace','cancelled') AND m.period_start<=now() AND m.period_end>now()
+     WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN('active','grace','cancelled') AND m.period_start<=now()
+     AND CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END>now()
      AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now() AND 'ai_message'=ANY(g.capabilities)
      ORDER BY m.tier_id,m.id LIMIT 1001`,
       [scope.creatorId, scope.fanId],
@@ -46,8 +51,8 @@ export async function commerceAudience(
     : [];
   const validUntil = new Date(
     Math.min(
-      Date.now() + 5000,
-      ...memberships.map((row) => row.period_end.getTime()),
+      observedAt + 5000,
+      ...memberships.map((row) => row.audience_end.getTime()),
       groups?.validUntil.getTime() ?? Infinity,
     ),
   );
@@ -63,6 +68,7 @@ export async function commerceAudience(
       memberships: memberships.map((row) => ({
         ...row,
         period_end: row.period_end.toISOString(),
+        audience_end: row.audience_end.toISOString(),
       })),
       groups: groups ? { ids: groupIds, revision: groups.revision } : null,
     }),

@@ -1,0 +1,495 @@
+.w5-studio {
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+.w5-studio h1,
+.w5-entry h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-display-lg, 34px);
+  line-height: 36px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.w5-studio h2,
+.w5-dialog h2 {
+  margin: 0;
+  font-size: var(--text-body-lg, 18px);
+  font-weight: 600;
+}
+.w5-studio p {
+  margin: 0;
+  line-height: 1.5;
+}
+.w5-entry {
+  padding: var(--space-6);
+  max-width: var(--text-measure);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.w5-sidebar {
+  display: none;
+}
+.w5-main {
+  min-width: 0;
+  padding-bottom: calc(var(--space-8) * 3 + env(safe-area-inset-bottom));
+}
+.w5-account {
+  padding: var(--space-4);
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-caption, 12px);
+}
+.w5-account > a {
+  font: italic 18px var(--font-serif);
+  color: var(--ink);
+}
+.w5-heading {
+  padding: var(--space-5) var(--space-4) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.w5-heading a {
+  white-space: nowrap;
+}
+.w5-gutter {
+  margin-inline: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.w5-note-list {
+  padding: var(--space-4) var(--space-4) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.w5-replies {
+  padding: var(--space-6) var(--space-4) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.w5-replies-title,
+.w5-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.w5-replies-title .qv-help {
+  font-size: 12px;
+}
+.w5-reply {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.w5-reply p {
+  font-size: 15px;
+  line-height: 22px;
+}
+.w5-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.w5-studio button,
+.w5-dialog button {
+  cursor: pointer;
+}
+.w5-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  z-index: var(--z-chrome, 20);
+}
+.w5-compose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-bottom: var(--space-8);
+  min-height: calc(100dvh - 140px);
+}
+.w5-compose-head {
+  padding: 10px var(--space-4) 10px var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  min-height: 64px;
+}
+.w5-compose-head > a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  color: var(--ink);
+}
+.w5-compose-head > span {
+  width: 60px;
+}
+.w5-audience {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+.w5-audience > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-muted);
+  font: 600 13px var(--font-sans);
+}
+.w5-audience > button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.w5-editor {
+  margin-inline: var(--space-4);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.w5-editor.qv-on-maya {
+  background: var(--maya-surface);
+  color: var(--on-maya);
+  box-shadow: var(--shadow-plate);
+  --qv-cut: var(--maya-surface);
+}
+.w5-editor textarea {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  resize: vertical;
+  font: 18px/28px var(--font-serif);
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 140px;
+}
+.w5-editor .qv-btn--quiet {
+  color: inherit;
+}
+.w5-source-row {
+  margin-inline: var(--space-4);
+  padding: 14px var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.w5-source-row > span,
+.w5-check > span {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.w5-toggle {
+  margin-inline: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+}
+.w5-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.w5-field input,
+.w5-field textarea,
+.w5-field select {
+  min-height: 44px;
+  padding: var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--control-line);
+  border-radius: var(--radius-md);
+  font: inherit;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.w5-field textarea {
+  resize: vertical;
+}
+.w5-compose-bottom {
+  margin-top: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.w5-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.w5-card pre {
+  white-space: pre-wrap;
+  font: 12px var(--font-mono);
+}
+.w5-check {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding-block: var(--space-3);
+}
+.w5-requests,
+.w5-packet,
+.w5-library,
+.w5-threads {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.w5-queue-section {
+  margin-inline: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.w5-queue-open {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+.w5-queue-open .qv-queue {
+  width: 100%;
+  box-sizing: border-box;
+}
+.w5-fan-text {
+  font-family: var(--font-sans);
+}
+.w5-more-links {
+  margin: var(--space-5) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+.w5-more-links a {
+  min-height: 60px;
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.w5-more-links a:last-child {
+  border: 0;
+}
+.w5-team-columns {
+  padding: var(--space-6) var(--space-4);
+  display: grid;
+  gap: var(--space-6);
+}
+.w5-team-member {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--space-4);
+}
+.w5-thread-messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.w5-dialog {
+  max-width: 560px;
+  max-height: 90dvh;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink);
+  overflow: auto;
+}
+.w5-dialog::backdrop {
+  background: var(--scrim, rgba(0, 0, 0, 0.55));
+}
+.w5-dialog > div {
+  margin-bottom: var(--space-4);
+}
+.w5-studio .qv-meta,
+.w5-dialog .qv-meta {
+  white-space: nowrap;
+}
+.w5-studio :focus-visible,
+.w5-dialog :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.w5-editor.qv-on-maya :focus-visible {
+  outline-color: var(--focus-on-maya);
+}
+.w5-studio button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+@media (max-width: 899px) {
+  .w5-studio--compose .w5-account,
+  .w5-studio--compose .w5-tabs {
+    display: none;
+  }
+  .w5-studio--compose .w5-main {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .w5-studio--compose .w5-compose {
+    min-height: 100dvh;
+    box-sizing: border-box;
+  }
+}
+@media (min-width: 900px) {
+  .w5-studio {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+  }
+  .w5-sidebar {
+    display: block;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100dvh;
+  }
+  .w5-sidebar .qv-side {
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .w5-main {
+    padding: var(--space-8) 48px;
+    max-width: 1200px;
+  }
+  .w5-account {
+    padding: 0 0 var(--space-4);
+  }
+  .w5-tabs {
+    display: none;
+  }
+  .w5-heading {
+    padding: var(--space-5) 0 0;
+  }
+  .w5-gutter {
+    margin-inline: 0;
+  }
+  .w5-note-list,
+  .w5-replies {
+    padding-inline: 0;
+  }
+  .w5-team-columns {
+    padding-inline: 0;
+    grid-template-columns: 1fr 1fr;
+  }
+  .w5-editor {
+    margin-inline: 0;
+  }
+  .w5-compose {
+    max-width: 700px;
+  }
+  .w5-source-row,
+  .w5-toggle {
+    margin-inline: 0;
+  }
+  .w5-queue-section {
+    margin-inline: 0;
+  }
+  .w5-compose-head {
+    padding-inline: 0;
+  }
+  .w5-more-links {
+    margin-inline: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .w5-studio *,
+  .w5-dialog * {
+    scroll-behavior: auto;
+    animation: none;
+    transition: none;
+  }
+}
+.w5-fan {
+  max-width: 680px;
+  margin: auto;
+  padding: 16px;
+  color: var(--ink);
+}
+.w5-fan nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.w5-fan section {
+  margin-top: 32px;
+}
+.w5-fan form {
+  display: grid;
+  gap: 12px;
+}
+.w5-fan textarea {
+  width: 100%;
+  min-height: 100px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--control-line);
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+}
+.w5-fan button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--control-line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.w5-fan label {
+  display: block;
+  margin: 12px 0;
+}
+.w5-content-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

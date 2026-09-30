@@ -49,8 +49,8 @@ async function proxy(
         ...cookieOptions,
         maxAge: 7 * 86400,
       });
+    // A late expired response must not erase a newer sign-in from another tab.
     if (
-      upstream.status === 401 ||
       ["identity/logout", "identity/revoke-sessions"].includes(path.join("/"))
     )
       response.cookies.delete(sessionCookie);
