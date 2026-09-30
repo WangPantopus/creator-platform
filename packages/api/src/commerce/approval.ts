@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { SignedActCommand } from "../schemas.js";
-import { IdempotencyKey } from "./contracts.js";
+import type { SignedActCommand } from "../schemas.ts";
+import { IdempotencyKey } from "./contracts.ts";
 
 export const CreateReplyDraft = z.strictObject({
   sourceMessageId: z.uuid(),

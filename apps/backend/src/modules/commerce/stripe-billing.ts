@@ -36,7 +36,7 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
   constructor(
     private readonly stripe: Stripe,
     private readonly tierForPrice: (priceId: string) => Promise<TierBinding>,
-    collectionAccount: "platform" | string,
+    private readonly collectionAccount: "platform" | string,
   ) {
     invariant(
       collectionAccount === "platform" ||
@@ -48,6 +48,20 @@ export class StripeMembershipBilling implements MembershipBillingProvider {
       collectionAccount === "platform"
         ? {}
         : { stripeAccount: collectionAccount };
+  }
+  /** Share the same verified cash allocation with other monthly products,
+   * without duplicating invoice/payment/credit-note accounting. */
+  usesConnection(stripe: Stripe, collectionAccount: string) {
+    return (
+      this.stripe === stripe && this.collectionAccount === collectionAccount
+    );
+  }
+  async confirmedInvoice(
+    invoice: Stripe.Invoice,
+    lines: Stripe.InvoiceLineItem[],
+  ) {
+    const cash = await this.invoiceCash(invoice, lines);
+    return { cash, adjustments: await this.invoiceRefunds(invoice, cash) };
   }
   private async items(subscriptionId: string) {
     return collect(
