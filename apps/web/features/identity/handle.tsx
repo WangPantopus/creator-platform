@@ -62,7 +62,11 @@ export function HandleForm({
             />
           </svg>
         </a>
-        <span className="qv-meta">SIGNED IN WITH PANTOPUS</span>
+        <span className="qv-meta">
+          {identity.session.mode === "development"
+            ? "DEVELOPMENT SIGN-IN"
+            : "SIGNED IN WITH PANTOPUS"}
+        </span>
       </div>
       <h1>How creators will know you</h1>
       <div className="qv-field">

@@ -179,7 +179,7 @@ struct NativeHandleForm: View {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
                             SwiftUI.Button { model.destination = "/you" } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text("SIGNED IN WITH PANTOPUS").qText("meta")
+                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("meta")
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
