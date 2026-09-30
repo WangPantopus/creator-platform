@@ -96,6 +96,8 @@ export class GrowthService {
   }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
+    if (item.state === "withdrawn")
+      return this.withdrawContent(item.creatorId, item.id, item.version);
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
@@ -104,8 +106,38 @@ export class GrowthService {
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, item.creatorId))) return;
       await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.content:${item.id}`],
+      );
+      const prior = (
+        await client.query(
+          "SELECT creator_id,version,state,document FROM growth.content_public WHERE id=$1",
+          [item.id],
+        )
+      ).rows[0];
+      if (prior && prior.creator_id !== item.creatorId)
+        throw new DomainError(
+          "content_projection_conflict",
+          copy.growthErrorEntryIdConflict,
+          409,
+        );
+      if (
+        prior?.version > item.version ||
+        (prior?.version === item.version && prior.state === "withdrawn")
+      )
+        return;
+      if (prior?.version === item.version) {
+        if (contentHash(prior.document) !== contentHash(item))
+          throw new DomainError(
+            "content_projection_conflict",
+            copy.growthErrorEntryIdConflict,
+            409,
+          );
+        return;
+      }
+      await client.query(
         `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
-      ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document WHERE growth.content_public.version<excluded.version`,
+      ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document,published_at=excluded.published_at WHERE growth.content_public.version<excluded.version`,
         [
           item.id,
           item.creatorId,
@@ -113,6 +145,43 @@ export class GrowthService {
           item.state,
           item,
           item.publishedAt,
+        ],
+      );
+    });
+  }
+  /** W5 withdraws without changing the immutable content version. Negative
+   * state wins that version, including when it arrives before publication.
+   * Keep only an opaque tombstone, never a private replacement revision. */
+  async withdrawContent(creatorId: string, id: string, version: number) {
+    z.uuid().parse(creatorId);
+    z.uuid().parse(id);
+    z.int().positive().parse(version);
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, creatorId))) return;
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.content:${id}`],
+      );
+      const prior = (
+        await client.query(
+          "SELECT creator_id FROM growth.content_public WHERE id=$1",
+          [id],
+        )
+      ).rows[0];
+      if (prior && prior.creator_id !== creatorId)
+        throw new DomainError(
+          "content_projection_conflict",
+          copy.growthErrorEntryIdConflict,
+          409,
+        );
+      await client.query(
+        `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,'withdrawn',$4,now())
+         ON CONFLICT(id) DO UPDATE SET version=excluded.version,state='withdrawn',document=excluded.document WHERE growth.content_public.version<=excluded.version`,
+        [
+          id,
+          creatorId,
+          version,
+          { id, creatorId, version, state: "withdrawn" },
         ],
       );
     });

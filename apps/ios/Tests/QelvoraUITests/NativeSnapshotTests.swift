@@ -71,8 +71,9 @@
       _ = NSApplication.shared
       QelvoraFonts.register()
       let host = NSHostingView(
-        rootView: view.transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
+        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }
+          .frame(
+            width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)

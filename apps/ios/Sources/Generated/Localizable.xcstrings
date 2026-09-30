@@ -6446,6 +6446,28 @@
           }
         }
       }
+    },
+    "This content effect requires its owner adapter.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This content effect requires its owner adapter."
+          }
+        }
+      }
+    },
+    "The current content version is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current content version is unavailable."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -28,6 +28,7 @@ export async function createConfiguredBackend(input: {
     database: Database;
     access: AccessService;
     conversation: ConversationService;
+    signing: SignedActService;
     identity:
       | import("./modules/identity/router.js").IdentityRuntime
       | undefined;
@@ -95,6 +96,7 @@ export async function createConfiguredBackend(input: {
         database,
         access,
         conversation,
+        signing,
         identity: platformIdentity,
       })) ?? [];
   } catch (error) {

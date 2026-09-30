@@ -25,6 +25,10 @@ export interface GrowthEventSource {
   ): Promise<readonly { id: string; event: GrowthEvent | null }[]>;
   acknowledge(id: string): Promise<void>;
 }
+/** Host enumeration returns currently authorized scopes, not client IDs. */
+export type GrowthEventSources =
+  | readonly GrowthEventSource[]
+  | (() => Promise<readonly GrowthEventSource[]>);
 
 /** Commit to the W7 inbox before acknowledging the owner outbox. Restarts are safe. */
 export class GrowthRelay {

@@ -590,7 +590,9 @@ export const copy = {
   "growthEmailLinkUnavailable": "This email link is unavailable.",
   "growthEmailPreferences": "Email preferences",
   "growthUnsubscribed": "Unsubscribed",
-  "growthEmailServiceUnavailable": "Email service unavailable"
+  "growthEmailServiceUnavailable": "Email service unavailable",
+  "growthErrorContentEffectUnconfigured": "This content effect requires its owner adapter.",
+  "growthErrorContentVersionUnavailable": "The current content version is unavailable."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

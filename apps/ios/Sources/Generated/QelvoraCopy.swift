@@ -592,7 +592,9 @@ public enum QelvoraCopy {
     "growthEmailLinkUnavailable": "This email link is unavailable.",
     "growthEmailPreferences": "Email preferences",
     "growthUnsubscribed": "Unsubscribed",
-    "growthEmailServiceUnavailable": "Email service unavailable"
+    "growthEmailServiceUnavailable": "Email service unavailable",
+    "growthErrorContentEffectUnconfigured": "This content effect requires its owner adapter.",
+    "growthErrorContentVersionUnavailable": "The current content version is unavailable."
   ]
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
     guard var result = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }

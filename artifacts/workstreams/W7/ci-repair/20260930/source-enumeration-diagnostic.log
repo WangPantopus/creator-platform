@@ -1,0 +1,25 @@
+Manual injected source-enumeration failure; existing leased W7 database, no producer or provider acceptance.
+Before: {
+  persistence: 'available',
+  producerSources: null,
+  producerReadiness: 'pending',
+  deliveryProvider: false,
+  activationSource: false,
+  privacyOwnership: false,
+  experimentsEnabled: false
+}
+After: {
+  persistence: 'available',
+  producerSources: null,
+  producerReadiness: 'unavailable',
+  deliveryProvider: false,
+  activationSource: false,
+  privacyOwnership: false,
+  experimentsEnabled: false
+}
+Observed: [
+  { name: 'growth_worker_failure', value: 1 },
+  { name: 'growth_relay_claimed', value: 0 },
+  { name: 'growth_delivery_claimed', value: 0 }
+]
+PASS unavailable enumeration remains explicit and does not block independent recovery.

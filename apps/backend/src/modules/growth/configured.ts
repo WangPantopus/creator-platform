@@ -7,7 +7,7 @@ import { canonicalCreatorOwner } from "./integration.js";
 import { createGrowthRuntime } from "./runtime.js";
 import type { GrowthPrivacyScope } from "./lifecycle.js";
 import type { DeliveryProvider } from "./notifications.js";
-import type { GrowthEventSource } from "./relay.js";
+import type { GrowthEventSources } from "./relay.js";
 import type { ActivationSource, ThanksPermission } from "./retention.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
@@ -19,7 +19,7 @@ export async function configureGrowthForBackend(
     privacyScope?: GrowthPrivacyScope;
     assertAllowed?: Parameters<typeof canonicalCreatorOwner>[1];
     provider?: DeliveryProvider;
-    sources?: readonly GrowthEventSource[];
+    sources?: GrowthEventSources;
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
     experimentsEnabled?: boolean;

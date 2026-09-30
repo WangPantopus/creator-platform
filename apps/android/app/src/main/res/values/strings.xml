@@ -593,4 +593,6 @@
   <string name="growth_email_preferences" formatted="false">Email preferences</string>
   <string name="growth_unsubscribed" formatted="false">Unsubscribed</string>
   <string name="growth_email_service_unavailable" formatted="false">Email service unavailable</string>
+  <string name="growth_error_content_effect_unconfigured" formatted="false">This content effect requires its owner adapter.</string>
+  <string name="growth_error_content_version_unavailable" formatted="false">The current content version is unavailable.</string>
 </resources>

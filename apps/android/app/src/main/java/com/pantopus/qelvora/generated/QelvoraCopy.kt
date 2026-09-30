@@ -592,7 +592,9 @@ object QelvoraCopy {
     "growthEmailLinkUnavailable" to "This email link is unavailable.",
     "growthEmailPreferences" to "Email preferences",
     "growthUnsubscribed" to "Unsubscribed",
-    "growthEmailServiceUnavailable" to "Email service unavailable"
+    "growthEmailServiceUnavailable" to "Email service unavailable",
+    "growthErrorContentEffectUnconfigured" to "This content effect requires its owner adapter.",
+    "growthErrorContentVersionUnavailable" to "The current content version is unavailable."
   )
   fun text(key: String, values: Map<String, String> = emptyMap()): String = values.entries.fold(strings.getValue(key)) { text, (key, value) -> text.replace("{$key}", value) }
   const val brandName = "Qelvora"

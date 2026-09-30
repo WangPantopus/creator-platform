@@ -2,6 +2,9 @@ name: Foundation checks
 on:
   push:
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   web-and-backend:
     runs-on: ubuntu-latest
@@ -59,7 +62,6 @@ jobs:
           sw_vers
           xcodebuild -version
           swift --version
-      - run: swift test --package-path apps/ios
       - run: brew install xcodegen
       - run: xcodegen generate --spec apps/ios/project.yml
       - name: Select an available iPhone simulator
@@ -72,6 +74,9 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
       - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+      - name: Check native package and exact snapshots
+        if: ${{ !cancelled() }}
+        run: swift test --package-path apps/ios
       - uses: actions/upload-artifact@v4
         if: always()
         with:
