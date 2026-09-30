@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-30",
+  "parentRevision": "8c4a0d612c8804a793f9237440d40d3177b6d802",
+  "checks": {
+    "web": "12/13 initial pass; remaining Night64 rerun passes after bounded VM budget100->1000ms; all13 existing cases covered",
+    "iosUI": "2/2 existing cases;59.686s; canonical shipping shell Account-status message selector",
+    "webBackend": "current production builds, scoped ESLint and Prettier pass",
+    "rename": "FolioPreview generation/backend/web/normally signed iOS/Android builds pass; base8c4a0d6 plus current web cookie/render-source repairs rebuilt"
+  },
+  "browser": {
+    "developmentCookie": "qelvora_session_3001; continuation/return cookies use same configured-port suffix",
+    "observation": "Before isolation, Account reload arrived without cookie while DB session remained valid and repeated HTTP cookie-jar reads passed. After isolation, browser reload and ready-backend restart preserve synthetic Account. Concurrent same-host branches use shared cookies by default; no specific peer action is attributed.",
+    "screenshot": "integrated-account-cookie-scoped.png",
+    "production": "Standard cookie names, HttpOnly/SameSite=Lax/Secure, and server session authority unchanged",
+    "limitations": "One browser jar; no independent-client/native/genuine-identity or complete release acceptance"
+  },
+  "pullRequest": {
+    "url": "https://github.com/WangPantopus/creator-platform/pull/6",
+    "metadataWrite": "Local gh authenticated as WangPantopus; title/body edit succeeded. Prior connector403 is historical.",
+    "mergeGate": "Final pushed-head CI required before merge; macOS jobs currently queued."
+  },
+  "logs": {
+    "webVisualInitial": {
+      "path": "/private/tmp/creator-w1-integrated-web-visual.log",
+      "sha256": "c6fa5c0790cff4e7d292181f70222ee7213f2397aee78dabf137d182d06b5893"
+    },
+    "webNightRerun": {
+      "path": "/private/tmp/creator-w1-integrated-web-night-final.log",
+      "sha256": "ff226ec53828fa8a15f0fb53ddb491a2b99e11f48c715b60a2bd712d38f71bfc"
+    },
+    "backendBuildFinal": {
+      "path": "/private/tmp/creator-w1-integrated-backend-build-final.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "webBuildFinal": {
+      "path": "/private/tmp/creator-w1-integrated-web-build-scoped-cookie.log",
+      "sha256": "f4f4346b4fcc9a42607d87120b93bc3fa49119d307a090d2fa14acae97088204"
+    },
+    "iosUIFinal": {
+      "path": "/private/tmp/creator-w1-integrated-ios-ui-final.log",
+      "sha256": "dbe21b9deb567177b36ec813e4845f2794e7794399f5b7cf8438d5e87096692c"
+    },
+    "renamedBackend": {
+      "path": "/private/tmp/creator-w1-rename-integrated-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "renamedWebFinal": {
+      "path": "/private/tmp/creator-w1-rename-integrated-web-scoped-cookie.log",
+      "sha256": "74ff4f80da66d624c4c5b7f586b052b3ea50b98655983154da240642862d908f"
+    },
+    "renamedIOS": {
+      "path": "/private/tmp/creator-w1-rename-integrated-ios.log",
+      "sha256": "203439e077b8a4c4e1e17b1936a8c7b949f39214a14548015e4ba667026d96c2"
+    },
+    "renamedAndroid": {
+      "path": "/private/tmp/creator-w1-rename-integrated-android.log",
+      "sha256": "27eb59429256c9df88a0e0885455e274fe7422c6d25fc5ee85a9aba28e95735b"
+    }
+  },
+  "sourceSha256": {
+    "apps/web/lib/session.ts": "04fdcaa34a92e8b2d0c979ef8f46b987c8825632db51d723b6cc7b74454e5937",
+    "apps/web/lib/design.tsx": "b79a0f8e01dd5431260e4de7ccda4d51ec775637f68bf1fae1d130f6cd49b451",
+    "apps/ios/UITests/FoundationFlowTests.swift": "0ec81c7dae8869f6f12879005d66c369ce6bd4ed8eac25409814677e80fe2c82"
+  },
+  "release": "Not release-ready: approved production identity/RP/domains/legal/provider/economic/retention/recovery inputs, physical/native/complete operated design acceptance remain required."
+}

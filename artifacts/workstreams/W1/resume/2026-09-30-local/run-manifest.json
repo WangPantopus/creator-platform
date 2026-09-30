@@ -264,6 +264,8 @@
     "url": "https://github.com/WangPantopus/creator-platform/pull/6",
     "draft": true,
     "mergeReady": false,
-    "descriptionUpdate": "connector403; browser signed out; prepared pr-description.txt; login question pending"
-  }
+    "descriptionUpdate": "CLI WangPantopus title/body edit succeeded; prior connector403/browser limitations superseded"
+  },
+  "initialSnapshotPreserved": true,
+  "currentReconciliation": "final-local-checks.json"
 }
