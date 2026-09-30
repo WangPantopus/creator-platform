@@ -1,0 +1,54 @@
+-- W1 additive identity migration. Apply only to a W8-approved database.
+BEGIN;
+SET LOCAL ROLE creator_owner;
+ALTER TABLE creator.fan_profile ADD COLUMN intro text NOT NULL DEFAULT '' CHECK(length(intro)<=240), ADD COLUMN version integer NOT NULL DEFAULT 1;
+ALTER TABLE creator.creator_profile DROP CONSTRAINT creator_profile_verification_check;
+ALTER TABLE creator.creator_profile ADD CONSTRAINT creator_profile_verification_check CHECK(verification IN ('pending','verified','rejected','revoked'));
+ALTER TABLE creator.creator_profile ADD COLUMN version integer NOT NULL DEFAULT 1, ADD COLUMN recovery_required boolean NOT NULL DEFAULT false, ADD COLUMN recovery_started_at timestamptz;
+ALTER TABLE creator.passkey_credential ADD COLUMN created_at timestamptz NOT NULL DEFAULT now();
+ALTER TABLE creator.signed_challenge ADD COLUMN command jsonb;
+CREATE TABLE creator.auth_continuation(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), return_to text NOT NULL, adapter_state text NOT NULL UNIQUE, expires_at timestamptz NOT NULL, used_at timestamptz);
+CREATE INDEX auth_continuation_expiry ON creator.auth_continuation(expires_at);
+CREATE TABLE creator.identity_session(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), account_id uuid NOT NULL, token_hash text NOT NULL UNIQUE, upstream_cipher text NOT NULL, mode text NOT NULL CHECK(mode IN ('development','pantopus')), created_at timestamptz NOT NULL DEFAULT now(), expires_at timestamptz NOT NULL, refresh_until timestamptz NOT NULL, revoked_at timestamptz);
+CREATE INDEX identity_session_account ON creator.identity_session(account_id) WHERE revoked_at IS NULL;
+CREATE TABLE creator.creator_proof(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), account_id uuid NOT NULL, creator_id uuid NOT NULL REFERENCES creator.creator_profile(id), code text NOT NULL, platform text NOT NULL CHECK(platform IN ('instagram','youtube')), account_url text NOT NULL, post_url text, state text NOT NULL DEFAULT 'challenge' CHECK(state IN ('challenge','pending','approved','rejected','revoked')), expires_at timestamptz NOT NULL, submitted_at timestamptz, reviewed_at timestamptz, reviewer_account_id uuid, review_case_id uuid, reason text);
+CREATE INDEX creator_proof_pending ON creator.creator_proof(creator_id,state,expires_at);
+CREATE TABLE creator.passkey_registration(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), account_id uuid NOT NULL, challenge text NOT NULL UNIQUE, expires_at timestamptz NOT NULL, used_at timestamptz);
+CREATE TABLE creator.team_invitation(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), creator_id uuid NOT NULL REFERENCES creator.creator_profile(id), account_id uuid NOT NULL, roles text[] NOT NULL CHECK(cardinality(roles)>0 AND roles <@ ARRAY['triage','drafter','publisher','scheduler']::text[]), expires_at timestamptz NOT NULL, accepted_at timestamptz, revoked_at timestamptz);
+CREATE INDEX team_invitation_account ON creator.team_invitation(account_id,expires_at) WHERE accepted_at IS NULL AND revoked_at IS NULL;
+CREATE TABLE creator.signed_publication(signed_act_id uuid PRIMARY KEY REFERENCES creator.signed_act(id), account_id uuid NOT NULL, command jsonb NOT NULL, public_content boolean NOT NULL DEFAULT false, withdrawn_at timestamptz);
+CREATE TABLE creator.identity_event(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), account_id uuid NOT NULL, kind text NOT NULL, aggregate_id uuid NOT NULL, version integer NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), published_at timestamptz);
+CREATE INDEX identity_event_pending ON creator.identity_event(created_at) WHERE published_at IS NULL;
+DO $$ DECLARE relation text; BEGIN
+  FOREACH relation IN ARRAY ARRAY['creator_proof','passkey_registration','signed_publication','identity_event'] LOOP
+    EXECUTE format('ALTER TABLE creator.%I ENABLE ROW LEVEL SECURITY',relation);
+    EXECUTE format('ALTER TABLE creator.%I FORCE ROW LEVEL SECURITY',relation);
+    EXECUTE format('CREATE POLICY account_scope ON creator.%I USING(account_id=nullif(current_setting(''app.account_id'',true),'''')::uuid) WITH CHECK(account_id=nullif(current_setting(''app.account_id'',true),'''')::uuid)',relation);
+  END LOOP;
+END $$;
+ALTER TABLE creator.team_invitation ENABLE ROW LEVEL SECURITY;
+ALTER TABLE creator.team_invitation FORCE ROW LEVEL SECURITY;
+CREATE POLICY invitation_scope ON creator.team_invitation USING(account_id=nullif(current_setting('app.account_id',true),'')::uuid OR EXISTS(SELECT 1 FROM creator.creator_profile cp WHERE cp.id=creator_id AND cp.account_id=nullif(current_setting('app.account_id',true),'')::uuid));
+ALTER TABLE creator.fan_profile ENABLE ROW LEVEL SECURITY;
+ALTER TABLE creator.fan_profile FORCE ROW LEVEL SECURITY;
+CREATE POLICY fan_public_identity ON creator.fan_profile FOR SELECT USING(true);
+CREATE POLICY fan_owned_insert ON creator.fan_profile FOR INSERT WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+CREATE POLICY fan_owned_update ON creator.fan_profile FOR UPDATE USING(account_id=nullif(current_setting('app.account_id',true),'')::uuid) WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+ALTER TABLE creator.creator_profile ENABLE ROW LEVEL SECURITY;
+ALTER TABLE creator.creator_profile FORCE ROW LEVEL SECURITY;
+CREATE POLICY creator_public_identity ON creator.creator_profile FOR SELECT USING(true);
+CREATE POLICY creator_owned_insert ON creator.creator_profile FOR INSERT WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+CREATE POLICY creator_owned_update ON creator.creator_profile FOR UPDATE USING(account_id=nullif(current_setting('app.account_id',true),'')::uuid) WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+-- Public projection contains no fan account, credential, challenge, assertion or private content.
+CREATE TABLE creator.signed_verification(id uuid PRIMARY KEY REFERENCES creator.signed_act(id), account_id uuid NOT NULL, creator_id uuid NOT NULL, creator_name text NOT NULL, act_type text NOT NULL, content_hash text NOT NULL, verified_at timestamptz NOT NULL, key_revoked boolean NOT NULL DEFAULT false, creator_revoked boolean NOT NULL DEFAULT false, withdrawn boolean NOT NULL DEFAULT false, public_command jsonb);
+ALTER TABLE creator.signed_verification ENABLE ROW LEVEL SECURITY;
+ALTER TABLE creator.signed_verification FORCE ROW LEVEL SECURITY;
+CREATE POLICY public_metadata ON creator.signed_verification FOR SELECT USING(true);
+CREATE POLICY owner_insert ON creator.signed_verification FOR INSERT WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+CREATE POLICY owner_update ON creator.signed_verification FOR UPDATE USING(account_id=nullif(current_setting('app.account_id',true),'')::uuid) WITH CHECK(account_id=nullif(current_setting('app.account_id',true),'')::uuid);
+GRANT SELECT,INSERT,UPDATE ON creator.signed_verification TO creator_runtime;
+GRANT SELECT,INSERT,UPDATE ON creator.auth_continuation,creator.identity_session,creator.creator_proof,creator.passkey_registration,creator.team_invitation,creator.signed_publication TO creator_runtime;
+GRANT SELECT,INSERT,UPDATE ON creator.fan_profile,creator.creator_profile,creator.team_membership TO creator_runtime;
+GRANT SELECT,INSERT,UPDATE ON creator.identity_event TO creator_runtime;
+INSERT INTO creator.schema_migration(version) VALUES('0002_w1_identity');
+COMMIT;

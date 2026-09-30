@@ -1,0 +1,47 @@
+{
+  "capturedAt": "2026-09-30T03:05:17.899Z",
+  "cases": [
+    {
+      "id": "7f05d9bd-f380-444d-a871-f6e1c9c75388",
+      "number": "1",
+      "state": "resolved",
+      "version": 4
+    },
+    {
+      "id": "7f284d0f-d4c3-45b1-ba37-8d59086e32e6",
+      "number": "2",
+      "state": "action_pending",
+      "version": 2
+    },
+    {
+      "id": "cca866ae-5143-42b8-a089-4723d915ef0c",
+      "number": "3",
+      "state": "open",
+      "version": 1
+    }
+  ],
+  "effects": [
+    {
+      "id": "27d23ac0-5fbe-48fb-8a34-3d278ace2e13",
+      "state": "blocked",
+      "attempts": 2,
+      "decision_version": 2,
+      "actor_account_id": "10000000-0000-4000-8000-000000000004",
+      "error_code": "effect_hook_unavailable"
+    }
+  ],
+  "retryEvents": 1,
+  "blocks": 1,
+  "tombstones": 1,
+  "privacyTasks": [
+    {
+      "state": "blocked",
+      "count": 28
+    },
+    {
+      "state": "complete",
+      "count": 4
+    }
+  ],
+  "ownershipSnapshots": 3
+}

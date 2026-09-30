@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "local": {
+    "identity": "explicit_synthetic_only",
+    "database": "creator_w8",
+    "ports": { "web": 3008, "api": 4108, "postgres": 55438 },
+    "providerMode": "unconfigured",
+    "externalPayments": false,
+    "push": false
+  },
+  "review": {
+    "identity": "approved_sandbox_adapter_required",
+    "data": "synthetic_only",
+    "credentials": "unique_per_review",
+    "queues": "unique_per_review",
+    "publicTraffic": false
+  },
+  "staging": {
+    "identity": "approved_sandbox_adapter_required",
+    "data": "synthetic_only",
+    "credentials": "staging_secret_manager",
+    "providerProjects": "dedicated_sandboxes",
+    "publicTraffic": false,
+    "releaseGate": "docs/operations/W8-release.md"
+  },
+  "production": {
+    "identity": "Pantopus_verified_opaque_account_and_eligibility",
+    "data": "production_only",
+    "credentials": "production_secret_manager",
+    "providerProjects": "dedicated_production",
+    "publicTraffic": "human_release_approval_required",
+    "releaseGate": "docs/operations/W8-release.md"
+  },
+  "requiredIsolation": [
+    "database",
+    "object_bucket",
+    "queue_namespace",
+    "provider_project",
+    "webhook_signing_key",
+    "identity_session_key",
+    "passkey_rp_id",
+    "push_credentials",
+    "billing_catalog"
+  ],
+  "poolBudgets": {
+    "interactive": {
+      "replicas": 2,
+      "maxConnectionsPerReplica": 8,
+      "requestTimeoutMs": 15000
+    },
+    "trustWorker": {
+      "replicas": 1,
+      "maxConnectionsPerReplica": 4,
+      "privacyConcurrency": 2,
+      "effectConcurrency": 1,
+      "leaseSeconds": 60,
+      "hookDeadlineSeconds": 45
+    },
+    "generation": "W2_capacity_and_cost_policy_required",
+    "ingestion": "W2_cpu_memory_queue_budget_required"
+  },
+  "targets": {
+    "monthlyInteractiveAvailability": 0.999,
+    "rpoSeconds": 300,
+    "rtoSeconds": 3600,
+    "acceptedMessageP95Ms": 300,
+    "warmApprovedVisibleP95Ms": 2500,
+    "coldApprovedVisibleP95Ms": 4000,
+    "takeoverP95Ms": 500,
+    "revocationMaxMs": 5000
+  },
+  "targetStatus": "not_proven_by_local_synthetic_evidence"
+}

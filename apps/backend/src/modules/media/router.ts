@@ -1,0 +1,264 @@
+import express, {
+  type Request,
+  type Response,
+  type NextFunction,
+} from "express";
+import { createReadStream } from "node:fs";
+import { pipeline } from "node:stream/promises";
+import { z, ZodError } from "zod";
+import { DomainError } from "../../core/errors.js";
+import type { ThreadScope } from "../access/scope.js";
+import type { MediaService } from "./service.js";
+import type { SessionService } from "../session/service.js";
+import type { AvailabilityService } from "../session/availability.js";
+import { visibleSession } from "../session/service.js";
+import type { CallSession } from "../../../../../packages/api/src/session.js";
+
+export type W6RouterDependencies = {
+  scopeFor: (request: Request) => Promise<ThreadScope>;
+  media?: MediaService;
+  sessions?: SessionService;
+  availability?: AvailabilityService;
+};
+/** W1 mounts before its terminal404/error handler. No identity inference in W6. */
+export function createW6Router(dependencies: W6RouterDependencies) {
+  const router = express.Router();
+  router.use((_req, res, next) => {
+    res.setHeader("Cache-Control", "private, no-store");
+    res.setHeader("Referrer-Policy", "no-referrer");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  });
+  router.get("/capabilities", (_req, res) =>
+    res.json({
+      mediaAvailable: Boolean(dependencies.media),
+      callsAvailable: Boolean(
+        dependencies.sessions &&
+          dependencies.sessions.provider.name !== "unconfigured" &&
+          dependencies.sessions.provider.supportsSingleUseAdmission,
+      ),
+      aiAudioAvailable: false,
+      reason: !dependencies.media
+        ? "media_unconfigured"
+        : "licensed_ai_audio_and_provider_verification_required",
+    }),
+  );
+  router.use(express.json({ limit: "64kb" }));
+  const root = "/threads/:creatorId/:fanId";
+  const media = () => {
+    if (!dependencies.media)
+      throw new DomainError(
+        "media_unconfigured",
+        "Uploading and playback are not connected yet.",
+        503,
+      );
+    return dependencies.media;
+  };
+  const session = () => {
+    if (!dependencies.sessions)
+      throw new DomainError(
+        "calls_unconfigured",
+        "Calling is not connected yet.",
+        503,
+      );
+    return dependencies.sessions;
+  };
+  const scope = async (req: Request) => {
+    z.uuid().parse(req.params.creatorId);
+    z.uuid().parse(req.params.fanId);
+    return dependencies.scopeFor(req);
+  };
+  const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
+  const callResponse = async (
+    req: Request,
+    res: Response,
+    run: (scope: ThreadScope) => Promise<CallSession>,
+  ) => {
+    const currentScope = await scope(req);
+    res.json(visibleSession(currentScope, await run(currentScope)));
+  };
+  router.get(`${root}/call-availability`, async (req, res) => {
+    if (!dependencies.availability)
+      throw new DomainError(
+        "availability_unconfigured",
+        "Call availability is not connected yet.",
+        503,
+      );
+    res.json(await dependencies.availability.read(await scope(req)));
+  });
+  router.put(`${root}/call-availability`, async (req, res) => {
+    if (!dependencies.availability)
+      throw new DomainError(
+        "availability_unconfigured",
+        "Call availability is not connected yet.",
+        503,
+      );
+    res.json(await dependencies.availability.save(await scope(req), req.body));
+  });
+  router.post(`${root}/media`, async (req, res) =>
+    res.status(201).json(await media().begin(await scope(req), req.body)),
+  );
+  router.get(`${root}/media/:assetId`, async (req, res) =>
+    res.json(await media().read(await scope(req), id(req))),
+  );
+  router.post(`${root}/media/:assetId/resume`, async (req, res) =>
+    res.json(await media().resume(await scope(req), id(req))),
+  );
+  router.put(
+    `${root}/media/:assetId/upload`,
+    express.raw({ type: "application/octet-stream", limit: "1mb" }),
+    async (req, res) => {
+      if (!Buffer.isBuffer(req.body))
+        throw new DomainError(
+          "media_chunk_invalid",
+          "Send a binary upload chunk.",
+          400,
+        );
+      res.json(
+        await media().chunk(
+          await scope(req),
+          id(req),
+          z.string().parse(req.query.ticket),
+          Number(req.headers["upload-offset"]),
+          req.body,
+        ),
+      );
+    },
+  );
+  router.post(`${root}/media/:assetId/finish`, async (req, res) =>
+    res.json(await media().finish(await scope(req), id(req))),
+  );
+  router.post(`${root}/media/:assetId/sign`, async (req, res) =>
+    res.json(await media().sign(await scope(req), id(req), req.body)),
+  );
+  router.get(`${root}/media/:assetId/signing-command`, async (req, res) =>
+    res.json(await media().signingCommand(await scope(req), id(req))),
+  );
+  router.delete(`${root}/media/:assetId`, async (req, res) => {
+    await media().revoke(await scope(req), id(req));
+    res.status(202).json({ state: "revoked", deletion: "pending" });
+  });
+  router.post(`${root}/media/:assetId/playback`, async (req, res) =>
+    res.json(await media().playback(await scope(req), id(req))),
+  );
+  router.get(`${root}/media/:assetId/play`, async (req, res) => {
+    const result = await media().download(
+      await scope(req),
+      id(req),
+      z.string().parse(req.query.ticket),
+    );
+    const range = req.headers.range;
+    let start = 0;
+    let end = result.size - 1;
+    if (range) {
+      const match = /^bytes=(\d*)-(\d*)$/u.exec(range);
+      if (!match || (!match[1] && !match[2])) {
+        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+        res.end();
+        return;
+      }
+      if (!match[1]) start = Math.max(0, result.size - Number(match[2]));
+      else {
+        start = Number(match[1]);
+        if (match[2]) end = Math.min(end, Number(match[2]));
+      }
+      if (
+        !Number.isSafeInteger(start) ||
+        !Number.isSafeInteger(end) ||
+        start > end ||
+        start >= result.size
+      ) {
+        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+        res.end();
+        return;
+      }
+      res
+        .status(206)
+        .setHeader("Content-Range", `bytes ${start}-${end}/${result.size}`);
+    }
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Content-Type", result.asset.mimeType);
+    res.setHeader("Content-Length", end - start + 1);
+    await pipeline(createReadStream(result.file, { start, end }), res);
+  });
+  router.get(`${root}/call-offers`, async (req, res) =>
+    res.json(await session().offers(await scope(req))),
+  );
+  router.get(`${root}/call-offers/context/:commitmentId`, async (req, res) =>
+    res.json(
+      await session().offerContext(await scope(req), id(req, "commitmentId")),
+    ),
+  );
+  router.post(`${root}/call-offers`, async (req, res) =>
+    res.status(201).json(await session().offer(await scope(req), req.body)),
+  );
+  router.post(`${root}/call-offers/:offerId/select`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().select(current, id(req, "offerId"), req.body),
+    ),
+  );
+  router.get(`${root}/calls/:sessionId`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().read(current, id(req, "sessionId")),
+    ),
+  );
+  router.post(`${root}/calls/:sessionId/join`, async (req, res) =>
+    res.json(await session().join(await scope(req), id(req, "sessionId"))),
+  );
+  router.post(`${root}/calls/:sessionId/consent`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().consent(current, id(req, "sessionId"), req.body),
+    ),
+  );
+  router.post(`${root}/calls/:sessionId/end`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().end(current, id(req, "sessionId"), req.body),
+    ),
+  );
+  router.post(`${root}/calls/:sessionId/summary-note`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().summaryNote(current, id(req, "sessionId"), req.body),
+    ),
+  );
+  router.post(`${root}/calls/:sessionId/delete-summary`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().deleteSummary(current, id(req, "sessionId"), req.body),
+    ),
+  );
+  router.post(`${root}/calls/:sessionId/cancel`, async (req, res) =>
+    callResponse(req, res, (current) =>
+      session().cancel(current, id(req, "sessionId"), req.body),
+    ),
+  );
+  router.use(
+    (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      void _next;
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
+      const domain =
+        error instanceof DomainError
+          ? error
+          : error instanceof ZodError || error instanceof SyntaxError
+            ? new DomainError(
+                "invalid_request",
+                "The request does not match the media contract.",
+                400,
+              )
+            : new DomainError(
+                "media_service_unavailable",
+                "Media is unavailable. Try again.",
+                503,
+              );
+      res.status(domain.status).json({
+        error: {
+          code: domain.code,
+          message: domain.message,
+          requestId: res.locals.requestId,
+        },
+      });
+    },
+  );
+  return router;
+}

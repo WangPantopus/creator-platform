@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Packet.dc.html",
+    "theme": "light",
+    "pixels": 56,
+    "maxChannelDelta": 1
+  },
+  {
+    "name": "Sources.dc.html",
+    "theme": "light",
+    "pixels": 49,
+    "maxChannelDelta": 1
+  },
+  {
+    "name": "OpsCase.dc.html",
+    "theme": "light",
+    "pixels": 49,
+    "maxChannelDelta": 1
+  },
+  {
+    "name": "Packet.dc.html",
+    "theme": "night",
+    "pixels": 40,
+    "maxChannelDelta": 1
+  },
+  {
+    "name": "Sources.dc.html",
+    "theme": "night",
+    "pixels": 54,
+    "maxChannelDelta": 1
+  },
+  {
+    "name": "OpsCase.dc.html",
+    "theme": "night",
+    "pixels": 54,
+    "maxChannelDelta": 1
+  }
+]
