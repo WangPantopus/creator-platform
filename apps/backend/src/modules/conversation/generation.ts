@@ -63,17 +63,19 @@ export class ConversationGenerationProcessor {
           last_sequence: number;
           text: string;
           epoch: number;
+          fan_message_id: string;
+          ai_message_id: string;
         }>(
-          `SELECT g.id,g.last_sequence,g.epoch,m.text FROM creator.generation g JOIN creator.message m ON m.id=g.fan_message_id AND m.thread_id=g.thread_id AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3 AND g.state IN('queued','generating') AND (g.lease_until IS NULL OR g.lease_until<now()) ORDER BY g.accepted_at LIMIT 1 FOR UPDATE OF g`,
+          `SELECT g.id,g.last_sequence,g.epoch,g.fan_message_id,g.ai_message_id,m.text FROM creator.generation g JOIN creator.message m ON m.id=g.fan_message_id AND m.thread_id=g.thread_id AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3 AND g.state IN('queued','generating') AND (g.lease_until IS NULL OR g.lease_until<now()) ORDER BY g.accepted_at LIMIT 1 FOR UPDATE OF g`,
           [scope.threadId, scope.creatorId, scope.fanId],
         )
       ).rows[0];
       if (!row) return null;
-      await client.query(
-        "UPDATE creator.generation SET worker_token=$1,lease_until=now()+interval '60 seconds',state='generating' WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
+      const claimed = await client.query<{ context_revision: number }>(
+        "UPDATE creator.generation SET worker_token=$1,lease_until=now()+interval '60 seconds',state='generating',context_revision=(SELECT revision FROM creator.thread WHERE id=$3 AND creator_id=$4 AND fan_id=$5) WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5 RETURNING context_revision",
         [token, row.id, scope.threadId, scope.creatorId, scope.fanId],
       );
-      return row;
+      return { ...row, contextRevision: claimed.rows[0]!.context_revision };
     });
     if (!job) return;
     // A crashed stream with visible text is terminal. Never append a newly
@@ -139,12 +141,15 @@ export class ConversationGenerationProcessor {
       await this.conversations.complete(scope, job.id, false, token);
       if (this.generator.extract) {
         const snapshot = await this.memory.context(scope);
+        if (
+          snapshot.epoch !== job.epoch ||
+          snapshot.revision !== job.contextRevision + emitted
+        )
+          return;
+        snapshot.provenanceMessageId = job.fan_message_id;
         const page = await this.conversations.read(scope);
         const answer = page.messages.find(
-          (m) =>
-            m.authorKind === "ai" &&
-            m.controlEpoch === job.epoch &&
-            m.sequence === page.messages.at(-1)?.sequence,
+          (m) => m.id === job.ai_message_id && m.authorKind === "ai",
         );
         if (answer)
           await this.generator.extract(

@@ -1,3 +1,5 @@
+import type { PoolClient } from "pg";
+import type { ApprovedSentence } from "../agent/runtime.js";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { ConversationService } from "./service.js";
@@ -17,24 +19,32 @@ export function createConversationRuntime(input: {
   conversation: ConversationService;
   policy?: ProviderPolicy;
   generator?: ConversationGenerator;
+  generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
   semantics?: SemanticExclusionPort;
-  assertReady?: (scope: ThreadScope) => Promise<void>;
+  assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
+  assertApproved?: (
+    scope: ThreadScope,
+    client: PoolClient,
+    sentence: ApprovedSentence,
+  ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
   const memory = new MemoryService(input.database, input.semantics);
-  const processor = input.generator
+  const generator = input.generator ?? input.generatorFactory?.(memory);
+  const processor = generator
     ? new ConversationGenerationProcessor(
         input.database,
         input.conversation,
         memory,
-        input.generator,
+        generator,
       )
     : undefined;
   input.conversation.configureDelivery({
     ...(input.policy ? { policyVersion: input.policy.version } : {}),
     ...(input.allowance ? { allowance: input.allowance } : {}),
     ...(input.assertReady ? { assertReady: input.assertReady } : {}),
+    ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
     ...(input.citation ? { citation: input.citation } : {}),
   });
   const feature = new ConversationFeature(
@@ -44,9 +54,11 @@ export function createConversationRuntime(input: {
     memory,
     input.policy,
     Boolean(
-      input.generator &&
+      generator &&
         input.allowance &&
         input.citation &&
+        input.assertReady &&
+        input.assertApproved &&
         input.policy?.verified,
     ),
     (scope) => processor?.schedule(scope),

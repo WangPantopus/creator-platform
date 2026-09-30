@@ -95,6 +95,7 @@ export const TeamReplySchema = z.strictObject({
 });
 export const AuditEntrySchema = z.strictObject({
   id: IdSchema,
+  readerAccountId: IdSchema,
   role: z.enum(["creator", "triage", "ops"]),
   readAt: z.string(),
 });
