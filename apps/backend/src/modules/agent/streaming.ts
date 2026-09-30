@@ -3,6 +3,7 @@ import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError } from "../../core/errors.js";
 import { ReplySchema, type ModelConfiguration } from "./model.js";
 import { responseUsage } from "./response-usage.js";
+import { contentHash } from "../../core/canonical.js";
 export type ReplySentence = z.infer<typeof ReplySchema>["sentences"][number];
 export type StreamProposal = { sentence: ReplySentence } | { usage: Usage };
 
@@ -73,6 +74,11 @@ export async function* streamResponses(
       stream: true,
       max_output_tokens: 2000,
       instructions,
+      prompt_cache_key: contentHash({
+        model,
+        instructions,
+        schema: "agent_reply",
+      }),
       input: [{ role: "user", content: context.join("\n\n") }],
       text: {
         format: {

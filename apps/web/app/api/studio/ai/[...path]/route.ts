@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
-import { currentSession, sessionCookie } from "../../../../../lib/session";
+import { SessionSchema } from "@qelvora/api";
+import { platformFetch, sessionCookie } from "../../../../../lib/session";
 export const runtime = "nodejs";
 const allowed =
   /^(?:state|draft|interview|status|sources(?:\/[0-9a-f-]{36})?|sponsors|license|corrections|style-card|preview|comparisons|evaluations(?:\/cancel)?|publish|pause|versions(?:\/[0-9a-f-]{36}\/rollback)?|export)$/u;
@@ -51,7 +52,34 @@ async function bridge(
       },
       { status: 401 },
     );
-  const session = development ? null : await currentSession();
+  let session: ReturnType<typeof SessionSchema.parse> | null = null;
+  if (!development) {
+    try {
+      const response = await platformFetch("/v1/identity/session");
+      if (response.status === 401 || response.status === 403)
+        return Response.json(
+          {
+            error: {
+              code: "session_required",
+              message: "Continue with Pantopus to configure your AI.",
+            },
+          },
+          { status: 401 },
+        );
+      if (!response.ok) throw new Error("Session authority unavailable");
+      session = SessionSchema.parse(await response.json());
+    } catch {
+      return Response.json(
+        {
+          error: {
+            code: "identity_unavailable",
+            message: "Pantopus sign-in is temporarily unavailable. Try again.",
+          },
+        },
+        { status: 503 },
+      );
+    }
+  }
   const creatorId = development
     ? process.env.W2_CREATOR_ID
     : session?.creator?.id;

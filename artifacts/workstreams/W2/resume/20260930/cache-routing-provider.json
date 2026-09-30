@@ -1,0 +1,75 @@
+{
+  "synthetic": true,
+  "observedAt": "2026-09-30T23:27:30.950Z",
+  "adapter": "responses-v3-cache-routing",
+  "modelFingerprint": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+  "request": "Four bounded identical synthetic structured operations using stable instruction/schema/model cache routing key. No saved Studio state changed.",
+  "receipts": [
+    {
+      "attempt": 1,
+      "elapsedMs": 1655,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 21059,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8435
+      }
+    },
+    {
+      "attempt": 2,
+      "elapsedMs": 791,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 21059,
+        "outputTokens": 7,
+        "cachedInputTokens": 20864,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 2176
+      }
+    },
+    {
+      "attempt": 3,
+      "elapsedMs": 698,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 21059,
+        "outputTokens": 7,
+        "cachedInputTokens": 20864,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 2176
+      }
+    },
+    {
+      "attempt": 4,
+      "elapsedMs": 830,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 21059,
+        "outputTokens": 7,
+        "cachedInputTokens": 20864,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 2176
+      }
+    }
+  ],
+  "nonzeroCacheObserved": true,
+  "limits": "Provider cache availability is not guaranteed; these individual calls do not establish warm/cold or p95 latency."
+}
