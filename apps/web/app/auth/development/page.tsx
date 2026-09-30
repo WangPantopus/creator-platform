@@ -8,7 +8,7 @@ export default async function Page({
 }) {
   const { continuationId } = await searchParams;
   const current = (await cookies()).get(continuationCookie)?.value;
-  const response = await platformFetch("/v1/identity/capabilities");
+  const response = await platformFetch("/v1/identity/capabilities", {}, false);
   const capabilities = await response.json();
   if (
     process.env.NODE_ENV !== "development" ||

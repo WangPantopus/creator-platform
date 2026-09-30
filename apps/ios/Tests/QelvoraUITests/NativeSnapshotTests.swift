@@ -7,6 +7,9 @@
 
   @MainActor
   final class NativeSnapshotTests: XCTestCase {
+    private final class CaptureWindow: NSWindow {
+      override var backingScaleFactor: CGFloat { 2 }
+    }
     private let size = CGSize(width: 390, height: 844)
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
@@ -82,14 +85,15 @@
       _ = NSApplication.shared
       QelvoraFonts.register()
       let host = NSHostingView(
-        rootView: view.transaction { $0.disablesAnimations = true }.frame(
+        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }.frame(
           width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
+      let window = CaptureWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
       let colorSpace = captureColorSpace
       window.colorSpace = colorSpace
       window.contentView = host
+      host.viewDidChangeBackingProperties()
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
