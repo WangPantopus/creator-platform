@@ -60,14 +60,14 @@
   },
   "processes": {
     "web": {
-      "pid": 11183,
-      "executionSession": 53429
+      "pid": 28947,
+      "executionSession": 93852
     },
     "api": {
       "pid": 24758,
       "executionSession": 81605
     },
-    "observedAt": "2026-09-30T23:48:59.204038+00:00",
+    "observedAt": "2026-09-30T23:56:59.582373+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -90,7 +90,8 @@
       "W2_DEVELOPMENT_SESSION": "development:10000000-0000-4000-8000-000000000001",
       "W2_CREATOR_ID": "20000000-0000-4000-8000-000000000002",
       "W2_API_URL": "http://127.0.0.1:4102",
-      "CREATOR_NEXT_OUTPUT": ".next-w2-review"
+      "CREATOR_NEXT_OUTPUT": ".next-w2-review",
+      "WEB_ORIGIN": "http://127.0.0.1:3002"
     },
     "command": "node node_modules/next/dist/bin/next dev --webpack -H 127.0.0.1 -p 3002"
   },
@@ -103,8 +104,8 @@
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-09-30T23:48:59.204038+00:00",
-    "webPort3002": "loopback listener, PID11183",
+    "observedAt": "2026-09-30T23:56:59.582373+00:00",
+    "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
     "apiPort4102": "loopback listener, PID24758",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",

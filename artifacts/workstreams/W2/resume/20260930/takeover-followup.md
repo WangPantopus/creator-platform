@@ -136,3 +136,5 @@ browser observation, not 200% text, reduced-motion, VoiceOver/TalkBack or popula
 artboard acceptance. The owned browser viewport override is reset after captures.
 
 The subsequent [per-call journal and canonical audience continuation](journal-and-audience-followup.md) supersedes the earlier per-pipeline final-write journal and unpublished-W4 descriptions. It records actual matched provider cost, cancellation uncertainty, the canonical audience/pass-cycle producer import and successful PR1 metadata update.
+
+The latest [configured-origin and outbox producer reconciliation](origin-and-outbox-followup.md) preserves W1 configured authority and W7 publication selection before the bounded event page. This supersedes earlier Host-based mutation checks and unfiltered publication consumer descriptions.

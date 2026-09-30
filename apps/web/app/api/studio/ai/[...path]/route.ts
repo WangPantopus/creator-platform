@@ -1,11 +1,13 @@
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
 import { SessionSchema } from "@qelvora/api";
 import { platformFetch, sessionCookie } from "../../../../../lib/session";
+import { sameRequestOrigin } from "../../../../../lib/request-origin";
 export const runtime = "nodejs";
 const allowed =
   /^(?:state|draft|interview|status|sources(?:\/[0-9a-f-]{36})?|sponsors|license|corrections|style-card|preview|comparisons|evaluations(?:\/cancel)?|publish|pause|versions(?:\/[0-9a-f-]{36}\/rollback)?|export)$/u;
 async function bridge(
-  request: Request,
+  request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await context.params).path.join("/");
@@ -19,8 +21,7 @@ async function bridge(
       },
       { status: 404 },
     );
-  const origin = `${new URL(request.url).protocol}//${request.headers.get("host") ?? new URL(request.url).host}`;
-  if (request.method !== "GET" && request.headers.get("origin") !== origin)
+  if (request.method !== "GET" && !sameRequestOrigin(request))
     return Response.json(
       {
         error: {
