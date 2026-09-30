@@ -6,7 +6,11 @@ import type {
 import { SessionService } from "./service.js";
 import { withDeadline } from "../media/deadline.js";
 import { DomainError } from "../../core/errors.js";
-import { validateProviderState, validateRecordingState } from "./provider.js";
+import {
+  validateProviderState,
+  validateRecordingDeletion,
+  validateRecordingState,
+} from "./provider.js";
 
 export interface CallEffects {
   summarize(input: {
@@ -96,6 +100,7 @@ export class SessionWorker {
     });
     if (!effect) return;
     let externalUnconfirmed = false;
+    let recordingDeletionReference: string | null = null;
     try {
       const cleanup = [
         "close_room",
@@ -385,10 +390,12 @@ export class SessionWorker {
         if (!effect.payload.purpose || !this.effects.purgeConsentAssets)
           throw new Error("consent_purge_adapter_unconfigured");
         if (effect.payload.purpose === "recording")
-          await withDeadline(
-            this.sessions.provider.deleteRecording(row.room_id, effect.key),
-            5000,
-          );
+          recordingDeletionReference = validateRecordingDeletion(
+            await withDeadline(
+              this.sessions.provider.deleteRecording(row.room_id, effect.key),
+              5000,
+            ),
+          ).reference;
         await this.effects.purgeConsentAssets(
           scope,
           effect.session_id,
@@ -398,8 +405,14 @@ export class SessionWorker {
       } else throw new Error("call_effect_unavailable");
       await this.sessions.db.withThread(scope, async (client) => {
         await client.query(
-          "UPDATE creator.call_effect SET completed_at=now(),lease_until=NULL,failure_code=NULL WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND lease_until=$4",
-          [effect.id, scope.creatorId, scope.fanId, effect.lease],
+          "UPDATE creator.call_effect SET completed_at=now(),lease_until=NULL,failure_code=NULL,payload=CASE WHEN $5::text IS NULL THEN payload ELSE payload||jsonb_build_object('recordingDeletionReference',$5::text) END WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND lease_until=$4",
+          [
+            effect.id,
+            scope.creatorId,
+            scope.fanId,
+            effect.lease,
+            recordingDeletionReference,
+          ],
         );
       });
     } catch (error) {

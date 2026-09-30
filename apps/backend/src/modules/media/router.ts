@@ -9,14 +9,19 @@ import { z, ZodError } from "zod";
 import { DomainError } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import type { MediaService } from "./service.js";
+import type { CreatorMediaService } from "./creator-service.js";
+import type { CreatorScope } from "../identity/creator-scope.js";
 import type { SessionService } from "../session/service.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
+import { withDeadline } from "./deadline.js";
 import type { CallSession } from "../../../../../packages/api/src/session.js";
 
 export type W6RouterDependencies = {
   scopeFor: (request: Request) => Promise<ThreadScope>;
   media?: MediaService;
+  creatorMedia?: CreatorMediaService;
+  creatorScopeFor?: (request: Request) => Promise<CreatorScope>;
   sessions?: SessionService;
   availability?: AvailabilityService;
 };
@@ -69,6 +74,130 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     return dependencies.scopeFor(req);
   };
   const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
+  const creatorMedia = () => {
+    if (!dependencies.creatorMedia || !dependencies.creatorScopeFor)
+      throw new DomainError(
+        "creator_media_unconfigured",
+        "Creator media is not connected yet.",
+        503,
+      );
+    return dependencies.creatorMedia;
+  };
+  const creatorScope = async (req: Request) => {
+    z.uuid().parse(req.params.creatorId);
+    if (!dependencies.creatorScopeFor)
+      throw new DomainError(
+        "creator_scope_unconfigured",
+        "Creator operations are not connected yet.",
+        503,
+      );
+    return dependencies.creatorScopeFor!(req);
+  };
+  const creatorAvailability = () => {
+    if (!dependencies.availability)
+      throw new DomainError(
+        "availability_unconfigured",
+        "Call availability is not connected yet.",
+        503,
+      );
+    return dependencies.availability;
+  };
+  router.get("/creators/:creatorId/call-availability", async (req, res) =>
+    res.json(await creatorAvailability().readCreator(await creatorScope(req))),
+  );
+  router.put("/creators/:creatorId/call-availability", async (req, res) =>
+    res.json(
+      await creatorAvailability().saveCreator(
+        await creatorScope(req),
+        req.body,
+      ),
+    ),
+  );
+  const creatorRoot = "/creators/:creatorId/media";
+  router.post(creatorRoot, async (req, res) =>
+    res
+      .status(201)
+      .json(await creatorMedia().begin(await creatorScope(req), req.body)),
+  );
+  router.get(`${creatorRoot}/:assetId`, async (req, res) =>
+    res.json(await creatorMedia().read(await creatorScope(req), id(req))),
+  );
+  router.post(`${creatorRoot}/:assetId/resume`, async (req, res) =>
+    res.json(await creatorMedia().resume(await creatorScope(req), id(req))),
+  );
+  router.put(
+    `${creatorRoot}/:assetId/upload`,
+    express.raw({ type: "application/octet-stream", limit: "1mb" }),
+    async (req, res) => {
+      if (!Buffer.isBuffer(req.body))
+        throw new DomainError(
+          "media_chunk_invalid",
+          "Send a binary upload chunk.",
+          400,
+        );
+      res.json(
+        await creatorMedia().chunk(
+          await creatorScope(req),
+          id(req),
+          z.string().parse(req.query.ticket),
+          Number(req.headers["upload-offset"]),
+          req.body,
+        ),
+      );
+    },
+  );
+  router.post(`${creatorRoot}/:assetId/finish`, async (req, res) =>
+    res.json(await creatorMedia().finish(await creatorScope(req), id(req))),
+  );
+  router.delete(`${creatorRoot}/:assetId`, async (req, res) => {
+    await creatorMedia().revoke(await creatorScope(req), id(req));
+    res.status(202).json({ state: "revoked", deletion: "pending" });
+  });
+  router.post(`${creatorRoot}/:assetId/playback`, async (req, res) =>
+    res.json(await creatorMedia().playback(await creatorScope(req), id(req))),
+  );
+  router.get(`${creatorRoot}/:assetId/play`, async (req, res) => {
+    const service = creatorMedia();
+    const current = await creatorScope(req);
+    const assetId = id(req);
+    const result = await service.download(
+      current,
+      assetId,
+      z.string().parse(req.query.ticket),
+    );
+    await streamMedia(req, res, result, () =>
+      service.assertPlaybackCurrent(
+        current,
+        assetId,
+        result.asset.version,
+        result.accessEpoch,
+      ),
+    );
+  });
+  router.get(`${root}/creator-media/:assetId`, async (req, res) =>
+    res.json(await creatorMedia().read(await scope(req), id(req))),
+  );
+  router.post(`${root}/creator-media/:assetId/playback`, async (req, res) =>
+    res.json(await creatorMedia().playback(await scope(req), id(req))),
+  );
+  router.get(`${root}/creator-media/:assetId/play`, async (req, res) => {
+    const service = creatorMedia();
+    const current = await scope(req);
+    const assetId = id(req);
+    const result = await service.download(
+      current,
+      assetId,
+      z.string().parse(req.query.ticket),
+    );
+    await streamMedia(req, res, result, () =>
+      service.assertPlaybackCurrent(
+        current,
+        assetId,
+        result.asset.version,
+        result.accessEpoch,
+      ),
+    );
+  });
   const callResponse = async (
     req: Request,
     res: Response,
@@ -142,44 +271,21 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     res.json(await media().playback(await scope(req), id(req))),
   );
   router.get(`${root}/media/:assetId/play`, async (req, res) => {
-    const result = await media().download(
-      await scope(req),
-      id(req),
+    const service = media();
+    const currentScope = await scope(req);
+    const assetId = id(req);
+    const result = await service.download(
+      currentScope,
+      assetId,
       z.string().parse(req.query.ticket),
     );
-    const range = req.headers.range;
-    let start = 0;
-    let end = result.size - 1;
-    if (range) {
-      const match = /^bytes=(\d*)-(\d*)$/u.exec(range);
-      if (!match || (!match[1] && !match[2])) {
-        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
-        res.end();
-        return;
-      }
-      if (!match[1]) start = Math.max(0, result.size - Number(match[2]));
-      else {
-        start = Number(match[1]);
-        if (match[2]) end = Math.min(end, Number(match[2]));
-      }
-      if (
-        !Number.isSafeInteger(start) ||
-        !Number.isSafeInteger(end) ||
-        start > end ||
-        start >= result.size
-      ) {
-        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
-        res.end();
-        return;
-      }
-      res
-        .status(206)
-        .setHeader("Content-Range", `bytes ${start}-${end}/${result.size}`);
-    }
-    res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("Content-Type", result.asset.mimeType);
-    res.setHeader("Content-Length", end - start + 1);
-    await pipeline(createReadStream(result.file, { start, end }), res);
+    await streamMedia(req, res, result, () =>
+      service.assertPlaybackCurrent(
+        currentScope,
+        assetId,
+        result.asset.version,
+      ),
+    );
   });
   router.get(`${root}/call-offers`, async (req, res) =>
     res.json(await session().offers(await scope(req))),
@@ -261,4 +367,64 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     },
   );
   return router;
+}
+
+async function streamMedia(
+  req: Request,
+  res: Response,
+  result: { file: string; size: number; asset: { mimeType: string } },
+  assertCurrent: () => Promise<void>,
+) {
+  const range = req.headers.range;
+  let start = 0;
+  let end = result.size - 1;
+  if (range) {
+    const match = /^bytes=(\d*)-(\d*)$/u.exec(range);
+    if (!match || (!match[1] && !match[2])) {
+      res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+      res.end();
+      return;
+    }
+    if (!match[1]) start = Math.max(0, result.size - Number(match[2]));
+    else {
+      start = Number(match[1]);
+      if (match[2]) end = Math.min(end, Number(match[2]));
+    }
+    if (
+      !Number.isSafeInteger(start) ||
+      !Number.isSafeInteger(end) ||
+      start > end ||
+      start >= result.size
+    ) {
+      res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+      res.end();
+      return;
+    }
+    res
+      .status(206)
+      .setHeader("Content-Range", `bytes ${start}-${end}/${result.size}`);
+  }
+  res.setHeader("Accept-Ranges", "bytes");
+  res.setHeader("Content-Type", result.asset.mimeType);
+  res.setHeader("Content-Length", end - start + 1);
+  const controller = new AbortController();
+  let checking = false;
+  // A slow or backpressured response can outlive its initial range authorization.
+  // Fail closed on unavailable authority; bound the serialized checks and release them with the stream.
+  const recheck = setInterval(() => {
+    if (checking || controller.signal.aborted) return;
+    checking = true;
+    const pending = assertCurrent().finally(() => {
+      checking = false;
+    });
+    void withDeadline(pending, 1000).catch(() => controller.abort());
+  }, 1000);
+  try {
+    await pipeline(createReadStream(result.file, { start, end }), res, {
+      signal: controller.signal,
+    });
+  } finally {
+    clearInterval(recheck);
+    controller.abort();
+  }
 }

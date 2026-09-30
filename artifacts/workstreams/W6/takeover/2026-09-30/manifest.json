@@ -1,0 +1,82 @@
+{
+  "recordedAt": "2026-09-30T23:51:21Z",
+  "worktree": "/Users/yingpengwang/.codex/worktrees/970d/creator-platform",
+  "branch": "codex/w6-calls-media-handoff",
+  "initialRevision": "d52e449",
+  "consumedProducers": {
+    "creatorScope": "2557d46072db50419cb340cf4fe9d87e4dd4853c",
+    "creatorTransaction": "abf6543c8480a2d8cb378e2ba1a162f6293ae65c"
+  },
+  "sourceSHA256": {
+    "apps/backend/src/modules/media/ai-audio.ts": "b1ee612b6254dd27460612026a9832af59490e44f69fb76592a984a54811b335",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "c0d18225869c2407e3daa602af7b27cf56065d729cdca1a300a1e62e66fae872",
+    "apps/backend/src/modules/media/creator-scope.sql": "73623261f537b4df65c46bafdbfedf80f1a92f0505d5e8e9420522cfcf5e2016",
+    "apps/backend/src/modules/media/creator-service.ts": "e4d38ffc36e2253f5ba9b94463fa0d71d9ab447969c60e6ff53bf9cc5fc59f2d",
+    "apps/backend/src/modules/media/creator-worker.ts": "009111feed6958c724127d6ccab8d4adad4c9a9920be7550a97a047527dd05eb",
+    "apps/backend/src/modules/media/lifecycle.ts": "d392df9dad5644acf1ab5f141edfe937bf8ebace195cc7d0efb70dd43d6b5b68",
+    "apps/backend/src/modules/media/processor.ts": "d329433f578779e00e14fc68e4e9a0f42b2b8e5ccb335b0094a1cdffbbc0f59b",
+    "apps/backend/src/modules/media/registration.ts": "3496546ec127799dead4379e72e17e8cb20387be2e05c81e8b7966b2208e8ffa",
+    "apps/backend/src/modules/media/router.ts": "23c19b733f826974f0f989977cef79f654eded096a88d961ff0d96d99eee7243",
+    "apps/backend/src/modules/media/service.ts": "7898b1f19deb262c3c731068404acd8316cbbea536b4c8728350b8556a606424",
+    "apps/backend/src/modules/media/storage.ts": "a15e5bb964baf0eda81395f626c611ceccd0832a40ede1a9711b52f18921f15f",
+    "apps/backend/src/modules/media/worker.ts": "45a6e55f1ee67dfe2c196f0f9b8c2668ffe09c6bf4747098f2872bd0d445afbd",
+    "apps/backend/src/modules/session/availability.ts": "36c7f767d3e124ba2fb1a1d707de1d60548094ef13aa0a770e898238ffb63357",
+    "apps/backend/src/modules/session/commerce.ts": "cc14393b0f968e9f37dc83fb18c5dd3db8ffaa9f62814398e6ae7000536fc4ae",
+    "apps/backend/src/modules/session/provider.ts": "cf5fd0ba9aec952eefbc45fc7102f6ade517935c2ef08c8d1a4073d2355faec6",
+    "apps/backend/src/modules/session/worker.ts": "39ef9b1887d7b187ef1ad1a3d7875092fac2cd14980c54e80a1dca576a853c4d",
+    "packages/api/src/media-openapi.ts": "0cb3256ffa4442b5ad884e4fa264ce37c091a74c9ad7257f8b2655677ea94991",
+    "packages/api/src/media.ts": "0e3a1a34667478e8426aad430fdadf5670d596778bca17791f7b2cd50a55d8bf",
+    "packages/api/src/session.ts": "9fad71027f65b3e55e93f25106ed379d25c94607fdaecbc47e89cc1bd651bb92"
+  },
+  "existingBackendChecks": {
+    "tests": 18,
+    "failures": 0,
+    "durationSeconds": 116.7,
+    "isolationPairs": 10000,
+    "newCasesOrSuites": 0
+  },
+  "backendProductionBuild": "passed",
+  "changedSourceLint": "passed",
+  "generationConsistency": {
+    "resources": 12,
+    "operations": 31,
+    "result": "passed; W1 new path composition still pending"
+  },
+  "swiftLibrary": {
+    "target": "QelvoraUI",
+    "platform": "macOS",
+    "durationSeconds": 10.46,
+    "result": "passed; not iOS functional/hardware proof"
+  },
+  "preservedCI": {
+    "runId": 36780139572,
+    "revision": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+    "backendWeb": "success",
+    "androidRuntime": "success",
+    "androidFoundation": "success",
+    "webVisual": "queued",
+    "iosFoundation": "queued",
+    "iosReviewAvailable": false
+  },
+  "creatorMigration": "unallocated/unapplied",
+  "availabilityMigration": "unallocated/unapplied",
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "newTestFiles": 0,
+  "changedSnapshotThresholds": 0,
+  "freshGoldenImages": 0,
+  "paidRequests": 0,
+  "providerOrSignerCredentialsAccessed": false,
+  "openAcceptance": [
+    "real record/upload/process/sign/publish/deliver/play",
+    "provider one-use admission and complete history",
+    "real recording purge/archive and approved retention",
+    "all D16 outcomes and process-restart proof",
+    "native transport/incoming and physical iPhone/Android",
+    "W2 licensed marked later-gate audio",
+    "measured latency/cost"
+  ]
+}

@@ -38,7 +38,11 @@ export interface CallProvider {
     enabled: boolean,
     idempotencyKey: string,
   ): Promise<{ recording: boolean }>;
-  deleteRecording(roomId: string, idempotencyKey: string): Promise<void>;
+  /** Confirm deletion of retained recordings/egress artifacts, not only that recording stopped. */
+  deleteRecording(
+    roomId: string,
+    idempotencyKey: string,
+  ): Promise<{ deleted: boolean; reference: string }>;
 }
 export function validateProviderState(
   state: Awaited<ReturnType<CallProvider["state"]>>,
@@ -65,6 +69,20 @@ export function validateRecordingState(
     "Recording state is awaiting valid provider confirmation.",
   );
   return state;
+}
+export function validateRecordingDeletion(
+  result: Awaited<ReturnType<CallProvider["deleteRecording"]>>,
+) {
+  invariant(
+    result &&
+      result.deleted === true &&
+      typeof result.reference === "string" &&
+      result.reference.trim().length > 0 &&
+      result.reference.length <= 2000,
+    "call_provider_deletion_unconfirmed",
+    "Recording deletion is awaiting provider confirmation.",
+  );
+  return result;
 }
 export class UnavailableCallProvider implements CallProvider {
   readonly name = "unconfigured";
@@ -94,7 +112,7 @@ export class UnavailableCallProvider implements CallProvider {
   async setRecording(): Promise<{ recording: boolean }> {
     return this.unavailable();
   }
-  async deleteRecording(): Promise<void> {
-    this.unavailable();
+  async deleteRecording(): ReturnType<CallProvider["deleteRecording"]> {
+    return this.unavailable();
   }
 }

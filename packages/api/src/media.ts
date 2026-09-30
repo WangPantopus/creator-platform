@@ -81,3 +81,58 @@ export type PlaybackTicket = {
   expiresAt: string;
   asset: MediaAsset;
 };
+
+/** Creator-owned objects use real W5 content/W2 source or interview IDs, never a fabricated fan thread. */
+export const CreatorMediaPurposeSchema = z.enum([
+  "source_audio",
+  "interview_audio",
+  "post_photo",
+  "human_note",
+]);
+export const CreatorMediaUploadRequestSchema = UploadRequestSchema.extend({
+  purpose: CreatorMediaPurposeSchema,
+  objectId: z.uuid(),
+});
+export const CreatorMediaAssetSchema = MediaAssetSchema.omit({
+  threadId: true,
+}).extend({
+  creatorId: z.uuid(),
+  objectId: z.uuid(),
+  ownerAccountId: z.uuid(),
+  purpose: CreatorMediaPurposeSchema,
+});
+export const CreatorMediaUploadTicketSchema = z.strictObject({
+  asset: CreatorMediaAssetSchema,
+  url: z.url(),
+  expiresAt: z.iso.datetime(),
+  chunkBytes: z.number().int().positive().max(1048576),
+});
+export const CreatorMediaPlaybackTicketSchema =
+  CreatorMediaUploadTicketSchema.omit({ chunkBytes: true });
+export const MediaRevocationSchema = z.strictObject({
+  state: z.literal("revoked"),
+  deletion: z.literal("pending"),
+});
+/** Exact immutable processed bytes reviewed by the creator before W1 signs the publication. */
+export const ProcessedMediaEvidenceSchema = z.strictObject({
+  assetId: z.uuid(),
+  version: z.number().int().positive(),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+  bytes: z.number().int().positive().max(268_435_456),
+  mimeType: z.enum(["audio/mp4", "image/png"]),
+  durationMs: z.number().int().positive().max(3_600_000).nullable(),
+});
+export type CreatorMediaPurpose = z.infer<typeof CreatorMediaPurposeSchema>;
+export type CreatorMediaUploadRequest = z.infer<
+  typeof CreatorMediaUploadRequestSchema
+>;
+export type CreatorMediaAsset = z.infer<typeof CreatorMediaAssetSchema>;
+export type ProcessedMediaEvidence = z.infer<
+  typeof ProcessedMediaEvidenceSchema
+>;
+export type CreatorMediaUploadTicket = z.infer<
+  typeof CreatorMediaUploadTicketSchema
+>;
+export type CreatorMediaPlaybackTicket = z.infer<
+  typeof CreatorMediaPlaybackTicketSchema
+>;

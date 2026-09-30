@@ -416,6 +416,178 @@ data class APICommerceVersionCommand(
 )
 
 @Serializable
+data class APIMediaCreatorMediaAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaAssetPurpose,
+  val `state`: APIMediaCreatorMediaAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaCreatorMediaPlaybackTicket(
+  val `asset`: APIMediaCreatorMediaPlaybackTicketAsset,
+  val `url`: String,
+  val `expiresAt`: String
+)
+
+@Serializable
+data class APIMediaCreatorMediaPlaybackTicketAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaPlaybackTicketAssetPurpose,
+  val `state`: APIMediaCreatorMediaPlaybackTicketAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaPlaybackTicketAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaPlaybackTicketAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
+enum class APIMediaCreatorMediaPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+data class APIMediaCreatorMediaUploadRequest(
+  val `purpose`: APIMediaCreatorMediaUploadRequestPurpose,
+  val `mimeType`: APIMediaCreatorMediaUploadRequestMimeType,
+  val `bytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `idempotencyKey`: String,
+  val `objectId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaUploadRequestPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaUploadRequestMimeType {
+  @SerialName("audio/webm") AUDIO_WEBM,
+  @SerialName("audio/mp4") AUDIO_MP4,
+  @SerialName("audio/ogg") AUDIO_OGG,
+  @SerialName("audio/wav") AUDIO_WAV,
+  @SerialName("image/jpeg") IMAGE_JPEG,
+  @SerialName("image/png") IMAGE_PNG
+}
+
+@Serializable
+data class APIMediaCreatorMediaUploadTicket(
+  val `asset`: APIMediaCreatorMediaUploadTicketAsset,
+  val `url`: String,
+  val `expiresAt`: String,
+  val `chunkBytes`: Long
+)
+
+@Serializable
+data class APIMediaCreatorMediaUploadTicketAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaUploadTicketAssetPurpose,
+  val `state`: APIMediaCreatorMediaUploadTicketAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaUploadTicketAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaUploadTicketAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
 data class APIMediaMediaAsset(
   val `id`: String,
   val `threadId`: String,
@@ -470,6 +642,22 @@ enum class APIMediaMediaPurpose {
 }
 
 @Serializable
+data class APIMediaMediaRevocation(
+  val `state`: APIMediaMediaRevocationState,
+  val `deletion`: APIMediaMediaRevocationDeletion
+)
+
+@Serializable
+enum class APIMediaMediaRevocationState {
+  @SerialName("revoked") REVOKED
+}
+
+@Serializable
+enum class APIMediaMediaRevocationDeletion {
+  @SerialName("pending") PENDING
+}
+
+@Serializable
 data class APIMediaMediaSign(
   val `signedActId`: String,
   val `version`: Long,
@@ -485,6 +673,22 @@ enum class APIMediaMediaState {
   @SerialName("rejected") REJECTED,
   @SerialName("revoked") REVOKED,
   @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaProcessedMediaEvidence(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `bytes`: Long,
+  val `mimeType`: APIMediaProcessedMediaEvidenceMimeType,
+  val `durationMs`: Long? = null
+)
+
+@Serializable
+enum class APIMediaProcessedMediaEvidenceMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4,
+  @SerialName("image/png") IMAGE_PNG
 }
 
 @Serializable
@@ -518,6 +722,48 @@ enum class APIMediaUploadRequestMimeType {
   @SerialName("image/jpeg") IMAGE_JPEG,
   @SerialName("image/png") IMAGE_PNG
 }
+
+@Serializable
+data class APICallAvailabilityCommand(
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityCommandWindowsItem>,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APICallAvailabilityCommandWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+@Serializable
+data class APICallAvailability(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+@Serializable
+data class APICallAvailabilityView(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityViewWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityViewWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
 
 @Serializable
 enum class APICallCallConsentPurpose {

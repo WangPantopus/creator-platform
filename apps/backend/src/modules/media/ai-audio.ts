@@ -55,7 +55,7 @@ export class LicensedAudioIngestor {
       }),
     );
     invariant(
-      authorization?.enabledAfterPilot &&
+      authorization?.enabledAfterPilot === true &&
         this.marker &&
         Date.parse(authorization.expiresAt) > Date.now(),
       "ai_audio_unavailable",
@@ -92,9 +92,9 @@ export class LicensedAudioIngestor {
       60_000,
     );
     invariant(
-      marked.c2paVerified &&
-        marked.watermarkVerified &&
-        marked.spokenLabelVerified &&
+      marked.c2paVerified === true &&
+        marked.watermarkVerified === true &&
+        marked.spokenLabelVerified === true &&
         marked.transform === "m4a_original" &&
         Buffer.isBuffer(marked.bytes) &&
         marked.bytes.length > 0 &&
@@ -102,7 +102,8 @@ export class LicensedAudioIngestor {
         Number.isSafeInteger(marked.durationMs) &&
         marked.durationMs > 0 &&
         marked.durationMs <= limits.maxDurationMs &&
-        marked.verificationReference.length > 0 &&
+        typeof marked.verificationReference === "string" &&
+        marked.verificationReference.trim().length > 0 &&
         marked.verificationReference.length <= 2000,
       "ai_audio_marking_invalid",
       "AI audio marking could not be verified.",
@@ -113,7 +114,7 @@ export class LicensedAudioIngestor {
         const current = await this.policy.authorization(scope, client);
         const currentLimits = await this.media.ingestionPolicy(scope, client);
         invariant(
-          current?.enabledAfterPilot &&
+          current?.enabledAfterPilot === true &&
             current.licenseId === authorization.licenseId &&
             current.licenseRevision === authorization.licenseRevision &&
             current.voiceAssetId === authorization.voiceAssetId &&

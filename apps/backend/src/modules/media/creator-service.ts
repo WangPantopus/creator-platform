@@ -1,0 +1,607 @@
+import { randomUUID } from "node:crypto";
+import type { PoolClient } from "pg";
+import type { SignedActCommand } from "@qelvora/api";
+import {
+  CreatorMediaAssetSchema,
+  CreatorMediaUploadRequestSchema,
+  ProcessedMediaEvidenceSchema,
+  type CreatorMediaAsset,
+  type CreatorMediaPurpose,
+  type MediaPolicy,
+  type ProcessedMediaEvidence,
+} from "../../../../../packages/api/src/media.js";
+import type {
+  CreatorIdentityAuthority,
+  CreatorScope,
+} from "../identity/creator-scope.js";
+import type { ThreadScope } from "../access/scope.js";
+import type { Database } from "../../db/database.js";
+import { invariant } from "../../core/errors.js";
+import { idempotent } from "../../core/idempotency.js";
+import { contentHash } from "../../core/canonical.js";
+import { CreatorMediaTickets, PrivateMediaStorage } from "./storage.js";
+
+export type CreatorMediaReadScope = CreatorScope | ThreadScope;
+export interface CreatorMediaAuthority {
+  /** W5/W2 validate the real object, current purpose/audience/consent and approved limits. */
+  policy(
+    scope: CreatorMediaReadScope,
+    objectId: string,
+    purpose: CreatorMediaPurpose,
+    operation: "upload" | "read",
+    client: PoolClient,
+  ): Promise<MediaPolicy | null>;
+  denied(scope: CreatorMediaReadScope, client: PoolClient): Promise<boolean>;
+  /** Owners must still have current object/purpose authority. For audience reads,
+   * W5 requires this exact asset/version/SHA in the current published revision,
+   * genuine publication binding and current audience grants in this same client.
+   * Retain current object/grant row locks through commit, before W6 asset locks. */
+  currentAssetRead(
+    scope: CreatorMediaReadScope,
+    objectId: string,
+    asset: CreatorMediaAsset,
+    client: PoolClient,
+  ): Promise<boolean>;
+}
+export type CreatorAssetRow = {
+  id: string;
+  creator_id: string;
+  object_id: string;
+  owner_account_id: string;
+  purpose: CreatorMediaPurpose;
+  state: CreatorMediaAsset["state"];
+  version: number;
+  access_epoch: number;
+  mime_type: string;
+  bytes: number;
+  uploaded_bytes: number;
+  duration_ms: number | null;
+  input_sha256: string;
+  output_sha256: string | null;
+  waveform: number[];
+  signed_act_id: string | null;
+  expires_at: Date;
+  failure_code: string | null;
+  provenance: CreatorMediaAsset["provenance"];
+  max_duration_ms: number;
+  max_bytes: number;
+};
+export function creatorAssetView(row: CreatorAssetRow): CreatorMediaAsset {
+  return CreatorMediaAssetSchema.parse({
+    id: row.id,
+    creatorId: row.creator_id,
+    objectId: row.object_id,
+    ownerAccountId: row.owner_account_id,
+    purpose: row.purpose,
+    state: row.state,
+    version: row.version,
+    mimeType: row.mime_type,
+    bytes: Number(row.bytes),
+    uploadedBytes: Number(row.uploaded_bytes),
+    durationMs: row.duration_ms,
+    sha256: row.output_sha256 ?? row.input_sha256,
+    waveform: row.waveform,
+    signedActId: row.signed_act_id,
+    expiresAt: row.expires_at.toISOString(),
+    failureCode: row.failure_code,
+    provenance: row.provenance,
+  });
+}
+function account(scope: CreatorMediaReadScope) {
+  return "accountId" in scope ? scope.accountId : scope.actorAccountId;
+}
+export class CreatorMediaService {
+  readonly chunkBytes = 1024 * 1024;
+  constructor(
+    readonly identity: CreatorIdentityAuthority,
+    readonly db: Database,
+    readonly storage: PrivateMediaStorage,
+    readonly tickets: CreatorMediaTickets,
+    private readonly authority: CreatorMediaAuthority,
+  ) {}
+  transaction<T>(
+    scope: CreatorMediaReadScope,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    if ("accountId" in scope) return this.identity.withCreator(scope, work);
+    invariant(
+      scope.authority !== "triage",
+      "media_participant_required",
+      "This media is unavailable.",
+    );
+    return this.db.withThread(scope, work);
+  }
+  private async allowed(scope: CreatorMediaReadScope, client: PoolClient) {
+    invariant(
+      (await this.authority.denied(scope, client)) === false,
+      "media_revoked",
+      "This media is no longer available.",
+    );
+  }
+  async row(
+    scope: CreatorMediaReadScope,
+    client: PoolClient,
+    id: string,
+    lock = false,
+  ): Promise<CreatorAssetRow> {
+    await this.allowed(scope, client);
+    const row = (
+      await client.query<CreatorAssetRow>(
+        "SELECT * FROM creator.creator_media_asset WHERE id=$1 AND creator_id=$2",
+        [id, scope.creatorId],
+      )
+    ).rows[0];
+    invariant(
+      row &&
+        !["revoked", "deleted"].includes(row.state) &&
+        row.expires_at > new Date(),
+      "media_unavailable",
+      "This media is unavailable.",
+    );
+    invariant(
+      await this.authority.policy(
+        scope,
+        row.object_id,
+        row.purpose,
+        "read",
+        client,
+      ),
+      "media_access_denied",
+      "This media is unavailable.",
+    );
+    invariant(
+      (await this.authority.currentAssetRead(
+        scope,
+        row.object_id,
+        creatorAssetView(row),
+        client,
+      )) === true,
+      "media_access_denied",
+      "This exact media is no longer available in the current content.",
+    );
+    if (!lock) return row;
+    // W5/W2 object/current-role locks precede asset locks. Reconcile a racing
+    // processor/revocation after acquiring the asset lock; never apply an earlier read.
+    const current = (
+      await client.query<CreatorAssetRow>(
+        "SELECT * FROM creator.creator_media_asset WHERE id=$1 AND creator_id=$2 FOR UPDATE",
+        [id, scope.creatorId],
+      )
+    ).rows[0];
+    invariant(
+      current &&
+        contentHash(creatorAssetView(current)) ===
+          contentHash(creatorAssetView(row)),
+      "media_version_changed",
+      "This media changed. Refresh before continuing.",
+    );
+    return current;
+  }
+  async begin(scope: CreatorScope, input: unknown) {
+    const body = CreatorMediaUploadRequestSchema.parse(input);
+    return this.transaction(scope, async (client) => {
+      await this.identity.authorizeInTransaction(
+        scope,
+        client,
+        body.purpose === "human_note" ? "verified" : "owned",
+      );
+      await this.allowed(scope, client);
+      const policy = await this.authority.policy(
+        scope,
+        body.objectId,
+        body.purpose,
+        "upload",
+        client,
+      );
+      invariant(
+        policy &&
+          Number.isSafeInteger(policy.maxBytes) &&
+          policy.maxBytes > 0 &&
+          policy.maxBytes <= 268435456 &&
+          Number.isSafeInteger(policy.maxDurationMs) &&
+          policy.maxDurationMs > 0 &&
+          policy.maxDurationMs <= 3600000 &&
+          Number.isSafeInteger(policy.retentionSeconds) &&
+          policy.retentionSeconds > 0,
+        "media_policy_unavailable",
+        "The content's media policy is unavailable.",
+      );
+      const maxDuration =
+        body.purpose === "human_note"
+          ? Math.min(60000, policy.maxDurationMs)
+          : policy.maxDurationMs;
+      const audio = body.mimeType.startsWith("audio/");
+      invariant(
+        (body.purpose === "post_photo"
+          ? body.mimeType.startsWith("image/")
+          : audio) &&
+          (!audio || body.durationMs) &&
+          body.bytes <= policy.maxBytes &&
+          (!body.durationMs || body.durationMs <= maxDuration),
+        "media_limit_exceeded",
+        "Choose a supported file within this content's limit.",
+      );
+      const asset = await idempotent(
+        client,
+        { actorAccountId: scope.accountId, threadId: null },
+        "media.creator.begin",
+        body.idempotencyKey,
+        { creatorId: scope.creatorId, ...body },
+        async () => {
+          const row = (
+            await client.query<CreatorAssetRow>(
+              "INSERT INTO creator.creator_media_asset(id,creator_id,object_id,owner_account_id,purpose,state,mime_type,bytes,input_sha256,duration_ms,max_duration_ms,max_bytes,expires_at) VALUES($1,$2,$3,$4,$5,'uploading',$6,$7,$8,$9,$10,$11,now()+make_interval(secs=>$12)) RETURNING *",
+              [
+                randomUUID(),
+                scope.creatorId,
+                body.objectId,
+                scope.accountId,
+                body.purpose,
+                body.mimeType,
+                body.bytes,
+                body.sha256,
+                body.durationMs ?? null,
+                maxDuration,
+                policy.maxBytes,
+                policy.retentionSeconds,
+              ],
+            )
+          ).rows[0]!;
+          return creatorAssetView(row);
+        },
+      );
+      const currentRow = await this.row(scope, client, asset.id);
+      const current = creatorAssetView(currentRow);
+      return {
+        asset: current,
+        chunkBytes: this.chunkBytes,
+        ...this.tickets.issue({
+          assetId: asset.id,
+          objectId: current.objectId,
+          creatorId: scope.creatorId,
+          accountId: scope.accountId,
+          operation: "upload",
+          version: current.version,
+          accessEpoch: currentRow.access_epoch,
+        }),
+      };
+    });
+  }
+  async read(scope: CreatorMediaReadScope, id: string) {
+    return this.transaction(scope, async (client) =>
+      creatorAssetView(await this.row(scope, client, id)),
+    );
+  }
+  async resume(scope: CreatorScope, id: string) {
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      invariant(
+        row.owner_account_id === scope.accountId && row.state === "uploading",
+        "upload_unavailable",
+        "This upload cannot be resumed.",
+      );
+      return {
+        asset: creatorAssetView(row),
+        chunkBytes: this.chunkBytes,
+        ...this.tickets.issue({
+          assetId: id,
+          objectId: row.object_id,
+          creatorId: scope.creatorId,
+          accountId: scope.accountId,
+          operation: "upload",
+          version: row.version,
+          accessEpoch: row.access_epoch,
+        }),
+      };
+    });
+  }
+  async chunk(
+    scope: CreatorScope,
+    id: string,
+    token: string,
+    offset: number,
+    bytes: Buffer,
+  ) {
+    const ticket = this.tickets.verify(token, scope, id, "upload");
+    invariant(
+      Number.isSafeInteger(offset) &&
+        offset >= 0 &&
+        bytes.length > 0 &&
+        bytes.length <= this.chunkBytes,
+      "chunk_invalid",
+      "The upload chunk is invalid.",
+    );
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id, true);
+      invariant(
+        row.owner_account_id === scope.accountId &&
+          row.object_id === ticket.objectId &&
+          row.version === ticket.version &&
+          row.access_epoch === ticket.accessEpoch &&
+          row.state === "uploading",
+        "upload_unavailable",
+        "This upload is unavailable.",
+      );
+      invariant(
+        offset === Number(row.uploaded_bytes),
+        "upload_offset_conflict",
+        "Refresh the upload position before retrying.",
+      );
+      invariant(
+        offset + bytes.length <= Number(row.bytes),
+        "upload_size_invalid",
+        "The file is larger than declared.",
+      );
+      await this.storage.putChunk(id, offset, bytes);
+      const updated = await client.query<CreatorAssetRow>(
+        "UPDATE creator.creator_media_asset SET uploaded_bytes=$3 WHERE id=$1 AND creator_id=$2 RETURNING *",
+        [id, scope.creatorId, offset + bytes.length],
+      );
+      return creatorAssetView(updated.rows[0]!);
+    });
+  }
+  async finish(scope: CreatorScope, id: string) {
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id, true);
+      invariant(
+        row.owner_account_id === scope.accountId,
+        "upload_owner_required",
+        "Only the uploader can finish this file.",
+      );
+      if (row.state !== "uploading") return creatorAssetView(row);
+      invariant(
+        Number(row.uploaded_bytes) === Number(row.bytes),
+        "upload_incomplete",
+        "The upload is incomplete.",
+      );
+      const updated = await client.query<CreatorAssetRow>(
+        "UPDATE creator.creator_media_asset SET state='quarantined',job_available_at=now() WHERE id=$1 AND creator_id=$2 RETURNING *",
+        [id, scope.creatorId],
+      );
+      return creatorAssetView(updated.rows[0]!);
+    });
+  }
+  async revoke(scope: CreatorScope, id: string) {
+    await this.transaction(scope, async (client) => {
+      const row = (
+        await client.query<CreatorAssetRow>(
+          "SELECT * FROM creator.creator_media_asset WHERE id=$1 AND creator_id=$2 FOR UPDATE",
+          [id, scope.creatorId],
+        )
+      ).rows[0];
+      invariant(
+        row && row.owner_account_id === scope.accountId,
+        "media_owner_required",
+        "Only the media owner can remove this asset.",
+      );
+      if (["revoked", "deleted"].includes(row.state)) return;
+      await client.query(
+        "UPDATE creator.creator_media_asset SET state='revoked',version=version+1,delete_pending=true,job_available_at=now() WHERE id=$1 AND creator_id=$2",
+        [id, scope.creatorId],
+      );
+    });
+  }
+  /** W5 review/publish use this exact processed snapshot in their current transaction. */
+  async evidence(
+    scope: CreatorScope,
+    client: PoolClient,
+    objectId: string,
+    id: string,
+  ) {
+    await this.identity.authorizeInTransaction(scope, client, "verified");
+    const row = await this.row(scope, client, id, true);
+    invariant(
+      row.object_id === objectId &&
+        row.owner_account_id === scope.accountId &&
+        row.state === "ready",
+      "media_not_ready",
+      "This content's exact media is still processing.",
+    );
+    return ProcessedMediaEvidenceSchema.parse({
+      assetId: row.id,
+      version: row.version,
+      sha256: row.output_sha256,
+      bytes: Number(row.bytes),
+      mimeType: row.mime_type,
+      durationMs: row.duration_ms,
+    });
+  }
+  /** W5 consumes once, then binds that genuine publication to immutable media in the same transaction. */
+  async attachPublication(
+    scope: CreatorScope,
+    client: PoolClient,
+    objectId: string,
+    signedActId: string,
+    command: SignedActCommand,
+    evidence: readonly ProcessedMediaEvidence[],
+  ) {
+    await this.identity.authorizeInTransaction(scope, client, "verified");
+    const content = command.content;
+    invariant(
+      command.subjectId === objectId &&
+        ["broadcast", "reply"].includes(command.actType) &&
+        content !== null &&
+        typeof content === "object" &&
+        !Array.isArray(content) &&
+        content.kind === "content_publication" &&
+        content.creatorId === scope.creatorId &&
+        Array.isArray(content.mediaEvidence) &&
+        contentHash(content.mediaEvidence) === contentHash(evidence) &&
+        evidence.length <= 64 &&
+        new Set(evidence.map((item) => item.assetId)).size === evidence.length,
+      "media_signature_mismatch",
+      "The exact content and media review changed.",
+    );
+    const publication = await client.query(
+      "SELECT sa.id FROM creator.signed_act sa JOIN creator.signed_act_consumption sac ON sac.signed_act_id=sa.id AND sac.account_id=sa.account_id JOIN creator.signed_publication sp ON sp.signed_act_id=sa.id AND sp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.subject_id=$4 AND sa.content_hash=$5 AND sp.command=$6::jsonb AND sp.withdrawn_at IS NULL",
+      [
+        signedActId,
+        scope.accountId,
+        scope.creatorId,
+        objectId,
+        contentHash(command),
+        JSON.stringify(command),
+      ],
+    );
+    invariant(
+      publication.rowCount === 1,
+      "media_signature_mismatch",
+      "This exact publication signature is unavailable.",
+    );
+    for (const expected of [...evidence].sort((a, b) =>
+      a.assetId.localeCompare(b.assetId),
+    )) {
+      const proof = ProcessedMediaEvidenceSchema.parse(expected);
+      const current = await this.evidence(
+        scope,
+        client,
+        objectId,
+        proof.assetId,
+      );
+      const asset = await this.row(scope, client, proof.assetId);
+      invariant(
+        ["human_note", "post_photo"].includes(asset.purpose),
+        "media_publication_purpose_invalid",
+        "Source and interview audio require their own reviewed purpose authority.",
+      );
+      invariant(
+        contentHash(current) === contentHash(proof),
+        "media_version_changed",
+        "This content's exact media changed.",
+      );
+      await client.query(
+        "INSERT INTO creator.creator_media_publication(asset_id,creator_id,object_id,account_id,signed_act_id,evidence) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(asset_id,signed_act_id) DO NOTHING",
+        [
+          proof.assetId,
+          scope.creatorId,
+          objectId,
+          scope.accountId,
+          signedActId,
+          JSON.stringify(proof),
+        ],
+      );
+      await client.query(
+        "UPDATE creator.creator_media_asset SET signed_act_id=$3,manifest_pending=true,job_available_at=now() WHERE id=$1 AND creator_id=$2 AND signed_act_id IS NULL",
+        [proof.assetId, scope.creatorId, signedActId],
+      );
+    }
+  }
+  /** W5 withdraws/unpublishes the real content in this same transaction and its
+   * current object policy denies readers. Invalidate tickets without changing the
+   * signed processed snapshot or deleting media permitted in a future revision.
+   * Owner erasure/expiry uses the separate durable revoke/delete path. */
+  async withdraw(scope: CreatorScope, client: PoolClient, objectId: string) {
+    await this.identity.authorizeInTransaction(scope, client, "owned");
+    await client.query(
+      "SELECT id FROM creator.creator_media_asset WHERE creator_id=$1 AND object_id=$2 AND owner_account_id=$3 ORDER BY id FOR UPDATE",
+      [scope.creatorId, objectId, scope.accountId],
+    );
+    await client.query(
+      "UPDATE creator.creator_media_asset SET access_epoch=access_epoch+1 WHERE creator_id=$1 AND object_id=$2 AND owner_account_id=$3 AND state NOT IN('revoked','deleted')",
+      [scope.creatorId, objectId, scope.accountId],
+    );
+  }
+  async readyForPublication(
+    scope: CreatorScope,
+    client: PoolClient,
+    objectId: string,
+    expected: ProcessedMediaEvidence,
+  ) {
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const current = await this.evidence(scope, client, objectId, proof.assetId);
+    if (contentHash(current) !== contentHash(proof)) return false;
+    const row = await this.row(scope, client, proof.assetId);
+    return Boolean(
+      row.signed_act_id &&
+        row.provenance?.c2paVerified === true &&
+        row.provenance.processedMediaSha256 === proof.sha256 &&
+        row.provenance.signedActId === row.signed_act_id,
+    );
+  }
+  async playback(scope: CreatorMediaReadScope, id: string) {
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      invariant(
+        row.state === "ready",
+        "media_processing",
+        "This media is still processing.",
+      );
+      if (row.owner_account_id !== account(scope))
+        invariant(
+          row.signed_act_id && row.provenance?.c2paVerified === true,
+          "media_provenance_pending",
+          "This media is awaiting its signature and content credentials.",
+        );
+      return {
+        asset: creatorAssetView(row),
+        ...this.tickets.issue(
+          {
+            assetId: id,
+            objectId: row.object_id,
+            accountId: account(scope),
+            creatorId: scope.creatorId,
+            ...("accountId" in scope ? {} : { fanId: scope.fanId }),
+            operation: "play",
+            version: row.version,
+            accessEpoch: row.access_epoch,
+          },
+          60,
+        ),
+      };
+    });
+  }
+  async download(scope: CreatorMediaReadScope, id: string, token: string) {
+    const ticket = this.tickets.verify(
+      token,
+      {
+        accountId: account(scope),
+        creatorId: scope.creatorId,
+        ...("accountId" in scope ? {} : { fanId: scope.fanId }),
+      },
+      id,
+      "play",
+    );
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      invariant(
+        row.state === "ready" &&
+          (row.owner_account_id === account(scope) ||
+            (row.signed_act_id && row.provenance?.c2paVerified === true)),
+        "media_not_ready",
+        "This media is unavailable.",
+      );
+      invariant(
+        row.version === ticket.version &&
+          row.object_id === ticket.objectId &&
+          row.access_epoch === ticket.accessEpoch,
+        "media_version_changed",
+        "Request a new media link.",
+      );
+      return {
+        asset: creatorAssetView(row),
+        accessEpoch: row.access_epoch,
+        file: this.storage.file(id, "output"),
+        size: await this.storage.size(id),
+      };
+    });
+  }
+  async assertPlaybackCurrent(
+    scope: CreatorMediaReadScope,
+    id: string,
+    version: number,
+    accessEpoch: number,
+  ) {
+    await this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      invariant(
+        row.state === "ready" &&
+          row.version === version &&
+          row.access_epoch === accessEpoch &&
+          (row.owner_account_id === account(scope) ||
+            (row.signed_act_id && row.provenance?.c2paVerified === true)),
+        "media_version_changed",
+        "This media is no longer available.",
+      );
+    });
+  }
+}
