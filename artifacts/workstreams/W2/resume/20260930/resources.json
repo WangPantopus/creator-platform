@@ -4,10 +4,14 @@
   "sourceBranch": "codex/w2-creator-ai-handoff",
   "foundation": "22aa088",
   "workspace": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform",
-  "ports": { "web": 3002, "api": 4102, "postgres": 55442 },
+  "ports": {
+    "web": 3002,
+    "api": 4102,
+    "postgres": 55442
+  },
   "database": "creator_w2_resume",
   "runtimeRole": "creator_runtime (non-owner, forced RLS)",
-  "migrations": "canonical 0001–0031; immutable histories preserved",
+  "migrations": "canonical 0001\u20130031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
   "builds": "isolated worktree .next and backend dist",
@@ -24,17 +28,28 @@
     "publication": "disabled: no reviewed license/current verification, cap zero"
   },
   "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
-  "reviewRuntime": "Own web/API/database left running for review; stop only these named resources when released",
+  "reviewRuntime": "Primary Studio API restarted with the usage-journal fix; web/API/database on 3002/4102/55442 retained for review",
   "existingTestCluster": {
     "container": "creator-platform-w2-checks-20260930",
     "port": 55449,
-    "database": "creator_w2_test",
+    "database": "creator_w2_foundation_test",
     "purpose": "Existing tests reset schema/runtime password; isolated from Studio and peers",
     "disposable": true,
-    "state": "removed after existing-test evidence captured"
+    "state": "Removed after local checks; remote backend/root checks pass on isolated CI PostgreSQL"
   },
   "preflight": "Ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
   "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
-  "git": "Existing PR #1 draft; checkpoint pushes work, metadata update 403; no merge with failed checks/open gates"
+  "git": "PR #1 tracks pushed W2 checkpoints; metadata write still 403; no merge with failed checks. Production acceptance remains separately gated.",
+  "nativeVerificationTools": {
+    "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
+    "location": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930",
+    "state": "Released after verification; moved to Trash for recoverable cleanup",
+    "isolated": "Own SDK and Gradle home; no peer devices or caches used"
+  },
+  "temporaryIngestionWorker": {
+    "port": 4202,
+    "creatorId": "20000000-0000-4000-8000-000000000003",
+    "state": "Stopped after genuine import/process-loss/reclaim receipts; port released"
+  }
 }
