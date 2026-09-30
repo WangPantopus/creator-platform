@@ -1,5 +1,5 @@
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
-import { cookies } from "next/headers";
+import { currentSession } from "../../../../lib/session";
 import { Button, Notice } from "@qelvora/ui-web";
 import { growthRequest } from "../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../features/growth/shell";
@@ -34,8 +34,7 @@ export default async function ContextualChat({
           growthCopy.growthThisPostCannotBeUsedAsConversationContext,
         );
     }
-    const jar = await cookies();
-    const signedIn = Boolean(jar.get("qelvora_session"));
+    const signedIn = Boolean(await currentSession());
     const returnTo = `/creators/${handle}/chat${context ? `?context=${context}` : ""}`;
     return (
       <GrowthShell>

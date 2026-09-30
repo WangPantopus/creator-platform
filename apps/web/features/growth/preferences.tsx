@@ -121,6 +121,7 @@ export function PreferenceForm({
       <label>
         <input
           type="checkbox"
+          disabled={busy}
           checked={value.push}
           onChange={(e) => update({ push: e.target.checked })}
         />
@@ -129,6 +130,7 @@ export function PreferenceForm({
       <label>
         <input
           type="checkbox"
+          disabled={busy}
           checked={value.email}
           onChange={(e) => update({ email: e.target.checked })}
         />
@@ -137,12 +139,13 @@ export function PreferenceForm({
       <label>
         <input
           type="checkbox"
+          disabled={busy}
           checked={value.hideSensitive}
           onChange={(e) => update({ hideSensitive: e.target.checked })}
         />
         {growthCopy.growthHideSensitivePreviews}
       </label>
-      <fieldset>
+      <fieldset disabled={busy}>
         <legend>{growthCopy.growthQuietHours}</legend>
         <label>
           {growthCopy.growthFrom}
@@ -196,7 +199,7 @@ export function PreferenceForm({
           {growthCopy.growthLeaveBothTimesEmptyForNoQuietHoursMatchingTimes}
         </p>
       </fieldset>
-      <fieldset>
+      <fieldset disabled={busy}>
         <legend>{growthCopy.growthUpdatesFromCreators}</legend>
         {creators.length ? (
           creators.map((creator) => (
@@ -221,11 +224,13 @@ export function PreferenceForm({
           </p>
         )}
       </fieldset>
-      <fieldset>
+      <fieldset disabled={busy}>
         <legend>{growthCopy.growthNotificationTypes}</legend>
         {kinds.map((kind) => (
-          <div key={kind}>
-            <strong>{notificationKindLabel(kind)}</strong>
+          <div key={kind} role="group" aria-labelledby={`${errorId}-${kind}`}>
+            <strong id={`${errorId}-${kind}`}>
+              {notificationKindLabel(kind)}
+            </strong>
             {(["push", "email"] as const).map((channel) => {
               const key =
                 channel === "push" ? "disabledPushTypes" : "disabledEmailTypes";
@@ -233,6 +238,7 @@ export function PreferenceForm({
                 <label key={channel}>
                   <input
                     type="checkbox"
+                    aria-labelledby={`${errorId}-${kind}-${channel} ${errorId}-${kind}`}
                     checked={!value[key].includes(kind)}
                     onChange={(e) =>
                       update({
@@ -242,9 +248,11 @@ export function PreferenceForm({
                       })
                     }
                   />
-                  {channel === "push"
-                    ? growthCopy.growthPush
-                    : growthCopy.growthEmail}
+                  <span id={`${errorId}-${kind}-${channel}`}>
+                    {channel === "push"
+                      ? growthCopy.growthPush
+                      : growthCopy.growthEmail}
+                  </span>
                 </label>
               );
             })}

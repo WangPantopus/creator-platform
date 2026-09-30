@@ -2,13 +2,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Notice } from "@qelvora/ui-web";
+import type { Session } from "@qelvora/api";
 
 export function HandleForm({
   returnTo,
+  mode,
   initialHandle = "",
   initialIntro = "",
 }: {
   returnTo: string;
+  mode: Session["mode"];
   initialHandle?: string;
   initialIntro?: string;
 }) {
@@ -19,7 +22,7 @@ export function HandleForm({
   const [saving, setSaving] = useState(false);
   return (
     <form
-      className="identity-handle"
+      className="qv identity-handle"
       onSubmit={async (event) => {
         event.preventDefault();
         if (saving) return;
@@ -66,7 +69,11 @@ export function HandleForm({
             />
           </svg>
         </a>
-        <span className="qv-meta">SIGNED IN WITH PANTOPUS</span>
+        <span className="qv-meta">
+          {mode === "development"
+            ? "DEVELOPMENT SIGN-IN"
+            : "SIGNED IN WITH PANTOPUS"}
+        </span>
       </div>
       <h1>How creators will know you</h1>
       <div className="qv-field">

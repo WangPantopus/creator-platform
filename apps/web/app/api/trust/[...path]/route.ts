@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sessionCookie } from "../../../../lib/session";
 
 const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download)?|operations\/(metrics|audits))$/i;
@@ -84,7 +85,7 @@ async function forward(
     if (value) url.searchParams.set(key, value);
   }
   const token = request.cookies.get(
-    development ? "w8_local_session" : "qelvora_session",
+    development ? "w8_local_session" : sessionCookie,
   )?.value;
   try {
     const body = request.method === "POST" ? await request.text() : undefined;

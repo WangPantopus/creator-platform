@@ -53,7 +53,10 @@ for (const theme of ["light", "night"] as const)
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
         maxDiffPixels: 0,
       });
@@ -65,8 +68,12 @@ for (const theme of ["light", "night"] as const)
       await page.screenshot({
         path: `test-results/${screen.name}-${theme}-implementation.png`,
         animations: "disabled",
+        caret: "initial",
       });
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await test
         .info()
         .attach("implementation", { body: actual, contentType: "image/png" });

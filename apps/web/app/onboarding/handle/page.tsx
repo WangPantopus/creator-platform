@@ -17,6 +17,7 @@ export default async function Page({
     <main className="foundation">
       <HandleForm
         returnTo={returnTo}
+        mode={session.mode}
         initialHandle={session.fan?.handle}
         initialIntro={session.fan?.intro}
       />

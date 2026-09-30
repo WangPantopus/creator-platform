@@ -814,50 +814,54 @@ export class GrowthService {
   }
   async funnel(actor: Actor) {
     const creatorId = await this.requireCreator(actor);
-    const result = await this.db.worker.query(
-      `SELECT type,count(DISTINCT actor_key)::int AS actors,count(*)::int AS events FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' AND type<>'capability_unavailable' GROUP BY type HAVING count(DISTINCT actor_key)>=5 ORDER BY type`,
-      [creatorId],
-    );
-    const cohorts = await this.db.worker.query(
-      `SELECT document->>'role' AS role,document->>'cohort' AS cohort,document->>'surface' AS surface,document->>'userState' AS user_state,type,count(DISTINCT actor_key)::int AS actors FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY 1,2,3,4,5 HAVING count(DISTINCT actor_key)>=5 ORDER BY 1,2,3,4,5`,
-      [creatorId],
-    );
-    const returns = [];
-    for (const day of [1, 7, 30]) {
-      const row = (
-        await this.db.worker.query(
-          `WITH first_arrivals AS (SELECT actor_key,(min(occurred_at) AT TIME ZONE 'UTC')::date AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), closed AS (SELECT * FROM first_arrivals WHERE started>=(now() AT TIME ZONE 'UTC')::date-60 AND started<(now() AT TIME ZONE 'UTC')::date-$2::int) SELECT count(*)::int AS eligible,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM growth.metric r WHERE r.creator_id=$1 AND r.actor_key=closed.actor_key AND r.type='return' AND r.document->>'capability'='available' AND (r.occurred_at AT TIME ZONE 'UTC')::date=closed.started+$2::int))::int AS returned FROM closed`,
-          [creatorId, day],
+    return this.db.workerActor(actor, creatorId, async (client) => {
+      const result = await client.query(
+        `SELECT type,count(DISTINCT actor_key)::int AS actors,count(*)::int AS events FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' AND type<>'capability_unavailable' GROUP BY type HAVING count(DISTINCT actor_key)>=5 ORDER BY type`,
+        [creatorId],
+      );
+      const cohorts = await client.query(
+        `SELECT document->>'role' AS role,document->>'cohort' AS cohort,document->>'surface' AS surface,document->>'userState' AS user_state,type,count(DISTINCT actor_key)::int AS actors FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY 1,2,3,4,5 HAVING count(DISTINCT actor_key)>=5 ORDER BY 1,2,3,4,5`,
+        [creatorId],
+      );
+      const returns = [];
+      for (const day of [1, 7, 30]) {
+        const row = (
+          await client.query(
+            `WITH first_arrivals AS (SELECT actor_key,(min(occurred_at) AT TIME ZONE 'UTC')::date AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), closed AS (SELECT * FROM first_arrivals WHERE started>=(now() AT TIME ZONE 'UTC')::date-60 AND started<(now() AT TIME ZONE 'UTC')::date-$2::int) SELECT count(*)::int AS eligible,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM growth.metric r WHERE r.creator_id=$1 AND r.actor_key=closed.actor_key AND r.type='return' AND r.document->>'capability'='available' AND (r.occurred_at AT TIME ZONE 'UTC')::date=closed.started+$2::int))::int AS returned FROM closed`,
+            [creatorId, day],
+          )
+        ).rows[0];
+        const visible =
+          Number(row.eligible) >= 5 &&
+          (Number(row.returned) === 0 || Number(row.returned) >= 5);
+        returns.push({
+          day,
+          eligible: Number(row.eligible) >= 5 ? Number(row.eligible) : null,
+          returned: visible ? Number(row.returned) : null,
+          rate: visible ? Number(row.returned) / Number(row.eligible) : null,
+        });
+      }
+      const useful = (
+        await client.query(
+          `WITH arrivals AS (SELECT actor_key,min(occurred_at) AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), durations AS (SELECT a.actor_key,extract(epoch FROM min(m.occurred_at)-a.started) AS seconds FROM arrivals a JOIN growth.metric m USING(actor_key) WHERE m.creator_id=$1 AND m.type='useful_answer' AND m.document->>'capability'='available' AND m.occurred_at>=a.started AND a.started>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' GROUP BY a.actor_key,a.started) SELECT count(*)::int AS observations,percentile_cont(0.5) WITHIN GROUP(ORDER BY seconds) AS median_seconds FROM durations`,
+          [creatorId],
         )
       ).rows[0];
-      const visible =
-        Number(row.eligible) >= 5 &&
-        (Number(row.returned) === 0 || Number(row.returned) >= 5);
-      returns.push({
-        day,
-        eligible: Number(row.eligible) >= 5 ? Number(row.eligible) : null,
-        returned: visible ? Number(row.returned) : null,
-        rate: visible ? Number(row.returned) / Number(row.eligible) : null,
-      });
-    }
-    const useful = (
-      await this.db.worker.query(
-        `WITH arrivals AS (SELECT actor_key,min(occurred_at) AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), durations AS (SELECT a.actor_key,extract(epoch FROM min(m.occurred_at)-a.started) AS seconds FROM arrivals a JOIN growth.metric m USING(actor_key) WHERE m.creator_id=$1 AND m.type='useful_answer' AND m.document->>'capability'='available' AND m.occurred_at>=a.started AND a.started>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' GROUP BY a.actor_key,a.started) SELECT count(*)::int AS observations,percentile_cont(0.5) WITHIN GROUP(ORDER BY seconds) AS median_seconds FROM durations`,
-        [creatorId],
-      )
-    ).rows[0];
-    return {
-      schemaVersion: 2,
-      windowDays: 30,
-      minimumDistinctActors: 5,
-      counts: result.rows,
-      cohorts: cohorts.rows,
-      returns,
-      timeToUsefulAnswerSeconds:
-        Number(useful.observations) >= 5 ? Number(useful.median_seconds) : null,
-      denominator: copy.growthMeasurementDenominator,
-      retention: copy.growthMeasurementRetention,
-    };
+      return {
+        schemaVersion: 2,
+        windowDays: 30,
+        minimumDistinctActors: 5,
+        counts: result.rows,
+        cohorts: cohorts.rows,
+        returns,
+        timeToUsefulAnswerSeconds:
+          Number(useful.observations) >= 5
+            ? Number(useful.median_seconds)
+            : null,
+        denominator: copy.growthMeasurementDenominator,
+        retention: copy.growthMeasurementRetention,
+      };
+    });
   }
   async experiments(actor: Actor) {
     const creatorId = await this.requireCreator(actor);

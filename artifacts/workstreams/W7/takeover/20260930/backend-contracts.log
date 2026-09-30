@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/backend
+
+ ✓ tests/contracts.test.ts (9 tests) 77ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  16:48:06
+   Duration  815ms (transform 173ms, setup 0ms, collect 462ms, tests 77ms, environment 0ms, prepare 79ms)
+

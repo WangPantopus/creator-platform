@@ -1,0 +1,195 @@
+{
+  "scope": "Actual W7 development settings DOM after successful save; metadata verification only, no VoiceOver/provider acceptance.",
+  "controls": [
+    {
+      "checked": false,
+      "disabled": false,
+      "name": "Push ai reply"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email ai reply"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push approved draft"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email approved draft"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push personal reply"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email personal reply"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push request status"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email request status"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push call reminder"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email call reminder"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push answered publicly"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email answered publicly"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push content match"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email content match"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push announcement"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email announcement"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push creator offer"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email creator offer"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push slot change"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email slot change"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push new packet"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email new packet"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push commitment due"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email commitment due"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push guardrail"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email guardrail"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push pool share"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email pool share"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push note"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email note"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push reaction"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email reaction"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push public answer"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email public answer"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push spending reminder"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email spending reminder"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Push weekly impact"
+    },
+    {
+      "checked": true,
+      "disabled": false,
+      "name": "Email weekly impact"
+    }
+  ]
+}

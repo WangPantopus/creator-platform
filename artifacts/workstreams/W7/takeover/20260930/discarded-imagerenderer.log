@@ -1,0 +1,1780 @@
+Fetching https://github.com/swiftlang/swift-syntax from cache
+Fetching https://github.com/pointfreeco/swift-snapshot-testing.git from cache
+Fetching https://github.com/pointfreeco/swift-issue-reporting from cache
+Fetching https://github.com/pointfreeco/swift-custom-dump from cache
+Fetched https://github.com/pointfreeco/swift-custom-dump from cache (0.05s)
+Fetched https://github.com/pointfreeco/swift-issue-reporting from cache (0.05s)
+Fetched https://github.com/pointfreeco/swift-snapshot-testing.git from cache (0.07s)
+Fetched https://github.com/swiftlang/swift-syntax from cache (0.08s)
+Creating working copy for https://github.com/pointfreeco/swift-snapshot-testing.git
+Creating working copy for https://github.com/pointfreeco/swift-custom-dump
+Creating working copy for https://github.com/pointfreeco/swift-issue-reporting
+Creating working copy for https://github.com/swiftlang/swift-syntax
+Working copy of https://github.com/pointfreeco/swift-custom-dump resolved at 1.7.3
+Working copy of https://github.com/pointfreeco/swift-issue-reporting resolved at 2.1.1
+Working copy of https://github.com/pointfreeco/swift-snapshot-testing.git resolved at 1.19.6
+Working copy of https://github.com/swiftlang/swift-syntax resolved at 604.0.0
+Updating https://github.com/pointfreeco/swift-custom-dump
+Updating https://github.com/swiftlang/swift-syntax
+Updating https://github.com/pointfreeco/swift-snapshot-testing.git
+Updated https://github.com/swiftlang/swift-syntax (0.61s)
+Updated https://github.com/pointfreeco/swift-snapshot-testing.git (0.61s)
+Updated https://github.com/pointfreeco/swift-custom-dump (0.61s)
+Computing version for https://github.com/pointfreeco/swift-snapshot-testing.git
+Computed https://github.com/pointfreeco/swift-snapshot-testing.git at 1.19.6 (1.71s)
+Computing version for https://github.com/swiftlang/swift-syntax
+Computed https://github.com/swiftlang/swift-syntax at 604.0.0 (0.95s)
+Computing version for https://github.com/pointfreeco/swift-custom-dump
+Computed https://github.com/pointfreeco/swift-custom-dump at 1.7.3 (0.84s)
+Fetching https://github.com/pointfreeco/xctest-dynamic-overlay from cache
+Fetched https://github.com/pointfreeco/xctest-dynamic-overlay from cache (0.34s)
+Computing version for https://github.com/pointfreeco/xctest-dynamic-overlay
+Computed https://github.com/pointfreeco/xctest-dynamic-overlay at 1.13.1 (1.38s)
+Removing https://github.com/pointfreeco/swift-issue-reporting
+Creating working copy for https://github.com/pointfreeco/xctest-dynamic-overlay
+Working copy of https://github.com/pointfreeco/xctest-dynamic-overlay resolved at 1.13.1
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+Building for debugging...
+[0/24] /private/tmp/creator-w7-takeover-ios/package/x86_64-apple-macosx/debug/QelvoraNativePackageTests.derived/runner.swift
+[1/24] Write sources
+[3/24] Write qelvora-native-snapshots-entitlement.plist
+[4/24] Write sources
+[6/24] Copying Geist-OFL.txt
+[7/24] Copying Geist-Italic.ttf
+[8/24] Copying GeistMono-OFL.txt
+[8/24] Copying GeistMono.ttf
+[8/24] Write sources
+[9/24] Copying Newsreader-Italic.ttf
+[9/24] Copying Geist.ttf
+[9/24] Copying GeistMono-Italic.ttf
+[9/24] Copying Newsreader.ttf
+[10/24] Copying Newsreader-OFL.txt
+[11/24] Copying Glyphs.json
+[14/24] Copying Localizable.xcstrings
+[18/24] Write swift-version--58304C5D6DBC2206.txt
+[20/91] Compiling SnapshotTesting CGPath.swift
+[21/91] Compiling SnapshotTesting NSImage.swift
+[22/91] Compiling SnapshotTesting SpriteKit.swift
+[23/91] Compiling SnapshotTesting String.swift
+[24/91] Compiling SnapshotTesting AssertSnapshot.swift
+[25/91] Compiling SnapshotTesting Async.swift
+[26/93] Compiling QelvoraUI Welcome.swift
+[27/93] Compiling QelvoraUI resource_bundle_accessor.swift
+[28/93] Compiling QelvoraUI NativeCallCoordinator.swift
+[29/93] Compiling QelvoraUI NativeCallOffers.swift
+[30/93] Compiling SnapshotTesting XCTAttachment.swift
+[31/93] Compiling SnapshotTesting Diff.swift
+[32/93] Compiling QelvoraUI ThreadComponents.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[33/93] Compiling SnapshotTesting SnapshotTestingConfiguration.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[34/93] Compiling QelvoraUI Navigation.swift
+[35/93] Compiling QelvoraUI Overlays.swift
+[36/93] Compiling QelvoraUI AccessComponents.swift
+[37/93] Compiling QelvoraUI Catalog.swift
+[38/93] Compiling QelvoraUI CommerceClient.swift
+[39/93] Compiling QelvoraUI GrowthPreferences.swift
+[40/93] Compiling SnapshotTesting CALayer.swift
+[41/93] Compiling QelvoraUI ComponentPreview.swift
+[42/93] Compiling QelvoraUI Controls.swift
+[43/93] Compiling QelvoraUI NativeCallView.swift
+[44/93] Compiling QelvoraUI NativeMediaClient.swift
+[45/93] Compiling QelvoraUI QelvoraAPI.swift
+[46/93] Compiling QelvoraUI QelvoraCopy.swift
+[47/93] Compiling QelvoraUI QelvoraTokens.swift
+[48/93] Compiling QelvoraUI DeliveryProtocol.swift
+[49/93] Compiling QelvoraUI FanShell.swift
+[50/93] Compiling QelvoraUI CommerceFeature.swift
+[51/93] Compiling QelvoraUI StoreMembership.swift
+[52/93] Compiling QelvoraUI StoreMembershipPane.swift
+[53/93] Emitting module QelvoraUI
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[54/93] Compiling SnapshotTesting Encodable.swift
+[55/93] Compiling SnapshotTesting NSBezierPath.swift
+[56/95] Compiling NativeSnapshots main.swift
+[57/95] Emitting module NativeSnapshots
+[57/95] Write Objects.LinkFileList
+[58/95] Linking qelvora-native-snapshots
+[59/95] Applying qelvora-native-snapshots
+[75/97] Compiling SnapshotTesting UIViewController.swift
+[76/97] Compiling SnapshotTesting URLRequest.swift
+[87/97] Emitting module SnapshotTesting
+[96/102] Compiling QelvoraUITests NativeSnapshotTests.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:135:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+133 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+134 |       }
+135 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+136 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+137 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[97/102] Emitting module QelvoraUITests
+[98/102] Compiling QelvoraUITests DeliveryProtocolTests.swift
+[99/102] Compiling QelvoraUITests IdentityTests.swift
+[100/102] Compiling QelvoraUITests GeneratedContractTests.swift
+[101/104] Emitting module QelvoraNativePackageTests
+[102/104] Compiling QelvoraNativePackageTests runner.swift
+[102/104] Write Objects.LinkFileList
+[103/104] Linking QelvoraNativePackageTests
+Build complete! (47.20s)
+Test Suite 'Selected tests' started at 2026-09-30 16:19:02.309.
+Test Suite 'QelvoraNativePackageTests.xctest' started at 2026-09-30 16:19:02.310.
+Test Suite 'NativeSnapshotTests' started at 2026-09-30 16:19:02.310.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' started.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:40: error: -[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces] : failed - Snapshot "light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+52123 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:40: error: -[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces] : failed - Snapshot "night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+24311 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' failed (2.016 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' started.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Mark.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+7589 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Seal.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+27697 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Avatar.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+31571 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AuthorLabel.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+26415 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IdentityStrip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+345096 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ThreadHeader.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+44264 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SignedMarker.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+70858 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SystemLine.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+31258 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Message.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+747370 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Note.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+588248 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ReactionChip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+27547 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CitationChip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+30012 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "MemoryChip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+232692 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Correction.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+241519 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ContextCard.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+90303 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "VoiceNote.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+406942 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Composer.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+462139 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "StepIn.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+44761 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AccessLines.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+26232 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ModeList.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+209222 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IncludeList.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+358632 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TermsBlock.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+269867 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EtaLine.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+9988 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "RequestStatus.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+238521 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Receipt.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+394578 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SpendLimit.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+168276 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "QueueCard.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+519487 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CapacityHeader.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+181431 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "LabelPreview.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+23354 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SigningSheet.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+589958 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AuditBanner.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+82716 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SourceRow.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+297857 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Button.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+96199 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TabBar.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+113770 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Segmented.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+71417 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Notice.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+298547 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "NotificationRow.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+201387 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EmptyState.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+20450 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ShareCard.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+455146 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CallChip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+117119 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ReservedLabel.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+33447 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Countdown.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+45105 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "InsteadMenu.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+464128 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TestConsole.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+471127 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "VersionList.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+284742 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "DigestItem.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+322426 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "StudioTabBar.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+115725 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Sidebar.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+596681 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Sheet.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+583940 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Dialog.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+987889 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Toast.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+82696 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EmailFrame.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+617107 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Mark.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+7478 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Seal.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+23546 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Avatar.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+29154 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AuthorLabel.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+27492 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IdentityStrip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+346792 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ThreadHeader.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+42214 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SignedMarker.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+70992 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SystemLine.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+31465 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Message.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+751759 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Note.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+594538 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ReactionChip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+29298 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CitationChip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+30812 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "MemoryChip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+233520 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Correction.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+245469 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ContextCard.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+90676 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "VoiceNote.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+410002 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Composer.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+494525 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "StepIn.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+72838 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AccessLines.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+28001 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ModeList.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+210746 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IncludeList.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+360228 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TermsBlock.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+271277 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EtaLine.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+10151 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "RequestStatus.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+239646 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Receipt.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+395591 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SpendLimit.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+169581 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "QueueCard.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+520950 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CapacityHeader.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+183096 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "LabelPreview.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+23901 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SigningSheet.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+592782 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "AuditBanner.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+82742 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "SourceRow.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+298808 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Button.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+97060 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TabBar.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+113937 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Segmented.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+71492 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Notice.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+299060 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "NotificationRow.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+204455 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EmptyState.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+20876 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ShareCard.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+464242 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CallChip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+114917 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ReservedLabel.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+33789 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Countdown.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+45504 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "InsteadMenu.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+466728 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "TestConsole.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+473355 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "VersionList.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+285431 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "DigestItem.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+323623 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+Context leak detected, CoreAnalytics returned false
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "StudioTabBar.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+115895 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Sidebar.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+597477 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Sheet.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+585851 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Dialog.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+935614 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Toast.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+82873 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "EmailFrame.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+621532 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' failed (29.505 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' started.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:17: error: -[QelvoraUITests.NativeSnapshotTests testWelcomeThemes] : failed - Snapshot "light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testWelcomeThemes.light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+163363 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:17: error: -[QelvoraUITests.NativeSnapshotTests testWelcomeThemes] : failed - Snapshot "night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testWelcomeThemes.night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+164914 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' failed (0.611 seconds).
+Test Suite 'NativeSnapshotTests' failed at 2026-09-30 16:19:34.443.
+	 Executed 3 tests, with 108 failures (0 unexpected) in 32.132 (32.133) seconds
+Test Suite 'QelvoraNativePackageTests.xctest' failed at 2026-09-30 16:19:34.443.
+	 Executed 3 tests, with 108 failures (0 unexpected) in 32.132 (32.133) seconds
+Test Suite 'Selected tests' failed at 2026-09-30 16:19:34.443.
+	 Executed 3 tests, with 108 failures (0 unexpected) in 32.132 (32.134) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: x86_64-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -1,0 +1,90 @@
+[WebServer] (node:21921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:21924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:21943) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:21949) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:21960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light (547ms)
+(node:21995) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:22010) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/visual/foundation.spec.ts:32:9 › creator-home matches approved design in light (1.8s)
+  ✘  3 tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light (482ms)
+(node:22025) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:22050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in night (888ms)
+[WebServer] (node:22058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 tests/visual/foundation.spec.ts:32:9 › creator-home matches approved design in night (947ms)
+[WebServer] (node:22063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in night (832ms)
+  ✓  7 tests/visual/foundation.spec.ts:90:5 › unconfigured Pantopus sign-in does not create a local identity and preserves arrival (1.8s)
+
+
+  1) tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light ───────────────
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: welcome.light.png
+
+
+      58 |         caret: "initial",
+      59 |       });
+    > 60 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      61 |         maxDiffPixels: 0,
+      62 |       });
+      63 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/foundation.spec.ts:60:24
+
+    attachment #1: welcome-light (image/png) ───────────────────────────────────────────────────────
+    Expected: tests/visual/baselines/welcome-light.png
+    Received: test-results/foundation-welcome-matches-approved-design-in-light/welcome-light-actual.png
+    Diff:     test-results/foundation-welcome-matches-approved-design-in-light/welcome-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-welcome-matches-approved-design-in-light/error-context.md
+
+  2) tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light ────────
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: handle-preview.light.png
+
+
+      58 |         caret: "initial",
+      59 |       });
+    > 60 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      61 |         maxDiffPixels: 0,
+      62 |       });
+      63 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/foundation.spec.ts:60:24
+
+    attachment #1: handle-preview-light (image/png) ────────────────────────────────────────────────
+    Expected: tests/visual/baselines/handle-preview-light.png
+    Received: test-results/foundation-handle-preview-matches-approved-design-in-light/handle-preview-light-actual.png
+    Diff:     test-results/foundation-handle-preview-matches-approved-design-in-light/handle-preview-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-handle-preview-matches-approved-design-in-light/error-context.md
+
+  2 failed
+    tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light ────────────────
+    tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light ─────────
+  5 passed (14.9s)
