@@ -27,7 +27,7 @@ struct GrowthNotificationSettings: View {
                 Toggle("Hide sensitive previews", isOn: field(\.hideSensitive))
                 TextField("Quiet hours from · HH:mm", text: $from).textFieldStyle(.roundedBorder)
                 TextField("Quiet hours until · HH:mm", text: $until).textFieldStyle(.roundedBorder)
-                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).textInputAutocapitalization(.never)
+                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).growthTimeZoneInput()
                 Text("Leave both times empty for no quiet hours.").qText("caption")
                 ForEach(creators) {creator in Toggle(creator.name + " · push and email", isOn: allowed(\.mutedCreators, creator.id))}
                 ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(kind.replacingOccurrences(of: "_", with: " ")).qText("label");Toggle("Push", isOn: allowed(\.disabledPushTypes, kind));Toggle("Email", isOn: allowed(\.disabledEmailTypes, kind))}}
@@ -43,4 +43,14 @@ struct GrowthNotificationSettings: View {
     private func minute(_ text: String) throws -> Int? {if text.isEmpty {return nil};let parts = text.split(separator: ":");guard parts.count == 2, let hour = Int(parts[0]), let minute = Int(parts[1]), (0...23).contains(hour), (0...59).contains(minute) else {throw URLError(.cannotParseResponse)};return hour * 60 + minute}
     private func load() async {guard let client else {message = "The growth service is not configured.";return};busy = true;defer {busy = false};do {value = try await client.request("preferences");let directory: PreferenceCreators = try await client.request("preferences/creators");creators = directory.creators;from = time(value?.quietStart);until = time(value?.quietEnd);message = ""} catch {message = "Settings need a current signed-in account and network connection."}}
     private func save() async {guard let client, var current = value else {return};busy = true;defer {busy = false};do {current.quietStart = try minute(from);current.quietEnd = try minute(until);guard (current.quietStart == nil) == (current.quietEnd == nil) else {throw URLError(.cannotParseResponse)};let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current));value = updated;message = "Preferences saved. Your in-app record remains available."} catch {message = "Preferences were not saved. Check both quiet-hour times and reconnect."}}
+}
+
+private extension View {
+    @ViewBuilder func growthTimeZoneInput() -> some View {
+        #if os(iOS)
+        self.textInputAutocapitalization(.never)
+        #else
+        self
+        #endif
+    }
 }
