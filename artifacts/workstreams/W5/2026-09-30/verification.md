@@ -1,0 +1,15 @@
+# W5 verification — 2026-09-30
+
+These records establish the stated local transitions only. No tests were added. No paid AI or fake passkey/payment/delivery records were used.
+
+- Backend/web `tsc --noEmit`: pass.
+- Targeted backend/content/Studio/API and web feature ESLint: pass at the checkpoint.
+- Production `next build` with `CREATOR_NEXT_OUTPUT=.next-w5-build`: pass; final latest build checked again before push.
+- Full `QelvoraApp` iOS Simulator build: pass, all shipping owner sources included. Installed/launched on W5-only UUID9E7B3B43-955F-4473-8CE0-6BFEAE685D27 with API4105. Light/Night launch PNGs show sign-in, not W5 content acceptance.
+- Canonical migrations through0031 then additive W5 SQL0032–0037 applied to W5 DB; independent upgrade DB and checksum rerun: pass. Runtime role neither superuser nor BYPASSRLS;14 W5 tables ENABLE and FORCE RLS.
+- `http-acceptance.json`: real W1 synthetic sessions, persisted team draft/exact idempotent retry, team publication (unsigned/team identity), two fan reads/Thanks, creator digest denial, unpublish/current deep-link denial, both own withdrawals after removal and stale edit denial.
+- `http-coordination-acceptance.json`: current W4 audience options, explicitly missing live producer, actual W2 revision, canonical W1 invite/identical recovery/wrong-recipient denial/recipient acceptance/current role/removal. Thanks changes emit durable events. Distribution drain attempts leave them blocked; no downstream receipt claimed.
+- Browser sign-in fails visibly; `browser-signin-blocker.jpg` records it. HTTP cookie success does not establish browser success. Root cause unproven; no auth injection.
+- `shared-integration.patch` checks cleanly but is unapplied pending required shared-edit approval; generated files untouched. Android SDK acceptance pending; no APK proof.
+
+Not yet measured/verified: genuine creator-signed Note/two private replies/reaction; canonical payment and Approval/voice/provider journeys; integrated fan native content; source/audience races/end-to-end distribution/privacy completion; source-aligned responsive Light/Night layouts; p95, assistive technology and physical devices. Workstream remains incomplete and not release ready.
