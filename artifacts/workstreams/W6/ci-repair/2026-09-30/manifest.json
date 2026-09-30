@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-09-30T17:46:19.431949+00:00",
+  "parentRevision": "598ee825a67b9baf5c39aeda313a08721b246eb5",
+  "sourceSHA256": {
+    ".github/workflows/ci.yml": "e3ec6e6c9d92ce07eab715100c8f06fe35ca73a2df2552fbd6748df23d8ddd81",
+    "apps/android/app/src/androidTest/java/com/pantopus/qelvora/NativeAcceptanceTest.kt": "3684967ae3a18c7400c3574dcb50545b649d092abe1a0b572ff93a0c73a98b38",
+    "apps/backend/src/config.ts": "0624538531d5ba9308c7dc7e2aaa7bb6608df51e834452da3e0a16eeed30ea23",
+    "apps/backend/src/server.ts": "299a1c915854a2baf62e686880566800557891142864f7709b6d0c1312e5940f",
+    "apps/backend/tests/contracts.test.ts": "06ee698214de1fbf24bb2928184b3c02c806bcb08452bad638d6ccf15ccdce05",
+    "apps/backend/tests/postgres.integration.test.ts": "f756cd795fbfd84a37fda24afe9bf40682621abd77e72a64ee539ccb95a74abd",
+    "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift": "f6d64ad2832f348a6aa7eaeec3b5bccfc0564c790171a8db864e963bda418a29",
+    "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift": "6725745f7fcd013f6c153544b5aa98265872f7166a4827859a006d71b9d5c3be",
+    "apps/ios/Sources/QelvoraUI/Trust.swift": "a75e4c7b17d580c2fe8e6f8348920530bec0a7fdfa210b64dcc1db39b43729b6",
+    "apps/web/app/auth/development/page.tsx": "14d60d172d2b825e4ee00bc812608eebc9e051054584e3125340aec03f4b6d0d",
+    "apps/web/app/globals.css": "aaa9fd6b4e372c20c8e6a34f0e0a90fad16937efc1757a7532324484f0f8e5cf",
+    "apps/web/app/unsubscribe/[token]/route.ts": "65e4f670aca15276f3c44e49e44a69d2a6b4885be1032b80d78633d576fa3c95",
+    "apps/web/features/identity/welcome.tsx": "ae76e74651dbb01baef0a9179ca2cbdd5a21603aefc72fb8e26ae07bf6314fd2",
+    "tests/visual/auth-contract.spec.ts": "1783238abe3b931b1a2f04f4c0d8ef9977539e1356c171f85f8a24608ed6ef01",
+    "tests/visual/foundation.spec.ts": "ef097ededaa7916713c3ff6f5d47bbbd0279e8c63f68726113f1e6e8f3ed5ad8"
+  },
+  "newTestCases": 0,
+  "goldenChanges": 0,
+  "assertionToleranceChanges": 0,
+  "openaiRequests": 0,
+  "postgresResults": {
+    "passed": 17,
+    "timedOut": 1,
+    "timeoutMs": 120000,
+    "randomPairs": 10000
+  },
+  "visualTargetedRerun": {
+    "name": "Handle Night reference composition",
+    "passed": true
+  },
+  "remoteCI": "pending publication"
+}

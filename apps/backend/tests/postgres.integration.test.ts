@@ -66,12 +66,15 @@ describe.skipIf(!adminUrl)(
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
       await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
-      await admin.query(
-        await readFile(
-          new URL("../migrations/0001_foundation.sql", import.meta.url),
-          "utf8",
-        ),
-      );
+      // The current scoped database also locks owned identity profiles. Apply
+      // their production RLS/grants instead of widening the fixture role.
+      for (const migration of ["0001_foundation", "0002_w1_identity"])
+        await admin.query(
+          await readFile(
+            new URL(`../migrations/${migration}.sql`, import.meta.url),
+            "utf8",
+          ),
+        );
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );

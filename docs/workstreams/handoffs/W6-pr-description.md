@@ -19,11 +19,11 @@ The prerequisite commit `1a94db3` preserves existing shared app foundations and 
 
 ## Validation
 
-Current backend/web TypeScript and production builds, targeted W6 ESLint/format and generated consistency (12 resources, 31 operations) pass. Current Swift QelvoraUI builds for the iOS Simulator. The actual browser recorder was operated at 390×844 through permission-request cancellation and retry; the AI-audio unavailable gate was inspected. No new test code, provider fixtures or paid AI requests were used.
+Current backend/web TypeScript and production builds, targeted W6 ESLint/format and generated consistency (12 resources, 31 operations) pass. Current Swift QelvoraUI builds for the iOS Simulator. The actual browser recorder was operated at 390×844 through permission-request cancellation and retry; the AI-audio unavailable gate was inspected. No new test files/cases/suites, provider fixtures or paid AI requests were used. The founder subsequently authorized correcting existing checks and shared CI failures.
 
 Current Android sources compiled and packaged in GitHub's runtime job; three existing foundation checks passed, with arrival-context removal failing. Local Android compilation and personally operated current native app journeys remain unverified: the local JDK/Android SDK/XcodeGen and native UI control are unavailable. Historical native launch evidence is dated separately. Browser microphone input remains unavailable for real recording.
 
-All five foundation CI jobs failed on `796d4e8`: shared formatting, Swift macOS modifiers, Android SDK setup, and separate web/Android arrival/design failures. Trust release compilation passed. The nine-file shared proposal passes isolated macOS/iOS Simulator library builds and awaits its edit lease; it does not repair the separate arrival/design failures. Precise results and the unapplied proposal are recorded in the [CI triage](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/ci-triage.md).
+All five foundation CI jobs failed on `796d4e8`: shared formatting, Swift macOS modifiers, Android SDK setup, and separate web/Android arrival/design failures. Trust release compilation passed. The founder subsequently authorized applying the nine-file shared proposal and correcting existing auth/reference-composition/PostgreSQL setup checks. Current local results and remaining runner-dependent failures are recorded in the authorized CI repair evidence. Precise results and the unapplied proposal are recorded in the [CI triage](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/ci-triage.md).
 
 ## Integration gates — draft
 

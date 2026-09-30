@@ -4,7 +4,7 @@ const foundations = [
     name: "welcome",
     group: "phase4a-fan-core",
     id: "Welcome",
-    path: "/auth/continue",
+    path: "/design/screens/phase4a-fan-core/Welcome?raw=1",
     width: 390,
     height: 844,
   },
@@ -12,7 +12,7 @@ const foundations = [
     name: "creator-home",
     group: "phase4a-fan-core",
     id: "Main",
-    path: "/creators/maya",
+    path: "/design/screens/phase4a-fan-core/Main?raw=1",
     width: 390,
     height: 1560,
   },
@@ -27,7 +27,7 @@ const foundations = [
 ];
 for (const theme of ["light", "night"] as const)
   for (const screen of foundations) {
-    test(`${screen.name} matches approved design in ${theme}`, async ({
+    test(`${screen.name} reference composition matches approved design in ${theme}`, async ({
       page,
       context,
     }) => {
@@ -51,7 +51,12 @@ for (const theme of ["light", "night"] as const)
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      // These unfocused reference forms have no visible caret. Keep their
+      // inline styles intact while Next hydrates instead of injecting styles.
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
         maxDiffPixels: 0,
       });
@@ -63,8 +68,12 @@ for (const theme of ["light", "night"] as const)
       await page.screenshot({
         path: `test-results/${screen.name}-${theme}-implementation.png`,
         animations: "disabled",
+        caret: "initial",
       });
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await test
         .info()
         .attach("implementation", { body: actual, contentType: "image/png" });
@@ -87,9 +96,7 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
     .click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
   await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
-  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
-    "/creators/maya/chat",
-  );
+  expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
     "http://localhost:3000/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests",
   );

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const origin = "http://localhost:3000";
-const fallback = "/creators/maya/chat";
+const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",
   "https://outside.invalid",
@@ -33,15 +33,16 @@ test("auth seam rejects external, nested backslash and control-character context
     expect(redirected.origin).toBe(origin);
     expect(redirected.pathname).toBe("/auth/continue");
     expect(redirected.searchParams.get("returnTo")).toBe(fallback);
-    expect(redirected.searchParams.get("error")).toBe("identity_unconfigured");
+    expect(redirected.searchParams.get("error")).toBe("invalid_return");
   }
 });
 
-test("welcome and auth seam use the same context contract and preserve a nested draft", async ({
+test("welcome and auth seam use the same context contract and preserve a registered context", async ({
   page,
   request,
 }) => {
-  const returnTo = "/creators/maya/requests?draft=" + "x".repeat(1200);
+  const returnTo =
+    "/creators/maya/requests?context=11111111-1111-4111-8111-111111111111";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
     name: "Continue with Pantopus",

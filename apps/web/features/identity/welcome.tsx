@@ -56,13 +56,11 @@ export function IdentityWelcome({
           />
         )}
         {error && (
-          <div role="alert">
-            <Notice tone="error" title={copy.pantopusUnavailableTitle}>
-              {error === "invalid_return"
-                ? "This arrival link is unavailable. You can continue to Home."
-                : copy.pantopusUnavailable}
-            </Notice>
-          </div>
+          <Notice tone="error" title={copy.pantopusUnavailableTitle}>
+            {error === "invalid_return"
+              ? "This arrival link is unavailable. You can continue to Home."
+              : copy.pantopusUnavailable}
+          </Notice>
         )}
         <a
           className="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block"
