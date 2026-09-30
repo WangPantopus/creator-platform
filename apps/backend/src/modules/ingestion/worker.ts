@@ -3,6 +3,7 @@ import { bump, event } from "../agent/repository.js";
 import type { AgentModel } from "../agent/model.js";
 import { DomainError } from "../../core/errors.js";
 import { chunkText } from "./chunking.js";
+import { withProviderUsage } from "../agent/provider-usage.js";
 
 /** Creator-keyed durable work with a lease; abandoned jobs are reclaimed after restart. */
 export class IngestionWorker {
@@ -48,7 +49,7 @@ export class IngestionWorker {
           "UPDATE creator.ai_ingestion SET state='running',attempts=attempts+1,lease_until=now()+interval '3 minutes' WHERE id=$1 AND creator_id=$2",
           [row.id, scope.creatorId],
         );
-        return row;
+        return { ...row, attempts: row.attempts + 1 };
       });
       if (!job) return;
       try {
@@ -58,7 +59,7 @@ export class IngestionWorker {
             "Embedding provider is not configured; review is saved. Retry once it is connected.",
             503,
           );
-        if (job.attempts >= 5)
+        if (job.attempts > 5)
           throw new DomainError(
             "ingestion_attempt_limit",
             "This import reached its retry limit. Revise the source to start again.",
@@ -69,9 +70,18 @@ export class IngestionWorker {
         for (let offset = 0; offset < chunks.length; offset += 16) {
           signal.throwIfAborted();
           const batch = chunks.slice(offset, offset + 16);
-          const embedded = await this.model.embed(
-            batch.map((c) => c.text),
+          const embedded = await withProviderUsage(
+            this.repository,
+            scope,
+            this.model,
+            job.source_id,
+            "ingestion",
             signal,
+            () =>
+              this.model!.embed(
+                batch.map((c) => c.text),
+                signal,
+              ),
           );
           batch.forEach((chunk, index) =>
             vectorById.set(chunk.id, embedded.vectors[index]!),
@@ -79,18 +89,11 @@ export class IngestionWorker {
           const valid = await this.repository.transaction(
             scope,
             async (client) => {
-              await client.query(
-                "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,$5,$6,$7,'ingestion',0)",
-                [
-                  scope.creatorId,
-                  job.source_id,
-                  embedded.usage.provider,
-                  embedded.usage.model,
-                  embedded.usage.inputTokens,
-                  0,
-                  embedded.usage.costMicros,
-                ],
+              const owned = await client.query(
+                "UPDATE creator.ai_ingestion SET lease_until=now()+interval '3 minutes' WHERE id=$1 AND creator_id=$2 AND state='running' AND attempts=$3 AND lease_until>now() RETURNING id",
+                [job.id, scope.creatorId, job.attempts],
               );
+              if (!owned.rowCount) return false;
               const updated = await client.query(
                 "UPDATE creator.ai_source SET progress=$4 WHERE id=$1 AND creator_id=$2 AND revision=$3 AND state='processing' RETURNING id",
                 [
@@ -104,16 +107,17 @@ export class IngestionWorker {
                     ),
                 ],
               );
-              await client.query(
-                "UPDATE creator.ai_ingestion SET lease_until=now()+interval '3 minutes' WHERE id=$1 AND creator_id=$2 AND state='running'",
-                [job.id, scope.creatorId],
-              );
               return updated.rowCount === 1;
             },
           );
           if (!valid) return;
         }
         await this.repository.transaction(scope, async (client, workspace) => {
+          const owned = await client.query(
+            "SELECT id FROM creator.ai_ingestion WHERE id=$1 AND creator_id=$2 AND state='running' AND attempts=$3 AND lease_until>now() FOR UPDATE",
+            [job.id, scope.creatorId, job.attempts],
+          );
+          if (!owned.rowCount) return;
           const current = await client.query(
             "SELECT id FROM creator.ai_source WHERE id=$1 AND creator_id=$2 AND revision=$3 AND state='processing' FOR UPDATE",
             [job.source_id, scope.creatorId, job.source_revision],
@@ -168,10 +172,11 @@ export class IngestionWorker {
               ? "Import interrupted; retry to resume."
               : "Source processing did not finish. Retry the import.";
         await this.repository.transaction(scope, async (client) => {
-          await client.query(
-            "UPDATE creator.ai_ingestion SET state='failed',lease_until=NULL,error=$3 WHERE id=$1 AND creator_id=$2 AND state='running'",
-            [job.id, scope.creatorId, message],
+          const owned = await client.query(
+            "UPDATE creator.ai_ingestion SET state='failed',lease_until=NULL,error=$3 WHERE id=$1 AND creator_id=$2 AND state='running' AND attempts=$4 AND lease_until>now() RETURNING id",
+            [job.id, scope.creatorId, message, job.attempts],
           );
+          if (!owned.rowCount) return;
           await client.query(
             "UPDATE creator.ai_source SET state='failed',index_state='failed',error=$4 WHERE id=$1 AND creator_id=$2 AND revision=$3 AND state='processing'",
             [job.source_id, scope.creatorId, job.source_revision, message],

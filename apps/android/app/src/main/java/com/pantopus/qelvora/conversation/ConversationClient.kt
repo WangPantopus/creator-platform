@@ -3,6 +3,7 @@ package com.pantopus.qelvora.conversation
 import com.pantopus.qelvora.generated.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
@@ -65,6 +66,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                 while(true) { val count=stream.read(buffer);if(count<0) break;if(output.size()+count>1_000_000) throw ConversationFailure(503,"This conversation response is too large. Refresh to try again.");output.write(buffer,0,count) }
                 output.toString("UTF-8")
             }.orEmpty()
+            coroutineContext.ensureActive()
             if (!publicRead && token() != credential) throw ConversationFailure(401,"Your account changed. Open this conversation again.")
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
             if (status !in 200..299) {
@@ -76,4 +78,6 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))
     suspend fun replay(path: String, cursor: Long): List<APIFrame> = json.decodeFromJsonElement(request("$path/events?cursor=$cursor"))
+    fun frames(page: ConversationPage, cursor: Long) = ConversationRealtime.frames(
+        baseURL, expectedAccountId ?: throw ConversationFailure(401, "Reopen this page with your current account."), token, page, cursor)
 }

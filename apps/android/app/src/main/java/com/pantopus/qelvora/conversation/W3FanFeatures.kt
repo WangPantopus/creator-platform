@@ -27,12 +27,19 @@ import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.collect
+import kotlin.random.Random
 import kotlinx.serialization.json.*
 import java.util.UUID
 
 object W3FanFeatures {
     /** W1 calls this on sign-out/revocation alongside credential purge. */
-    suspend fun clearPrivateState(context: android.content.Context) = ConversationResumeStorage(context).purge()
+    suspend fun clearPrivateState(context: android.content.Context) {
+        ConversationRealtime.purge()
+        ConversationResumeStorage(context).purge()
+    }
     fun registration(baseURL: String?) = FanFeatureRegistration(matches = {
         val path = it.substringBefore('?'); path == "/you" || path.startsWith("/threads/") || (path.startsWith("/creators/") && path.endsWith("/chat"))
     }, screen = { session ->
@@ -57,18 +64,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val resumeStorage = remember(context) { ConversationResumeStorage(context) }
     val storageScope = "$baseURL/$root"
     var resumeActivated by remember(root, accountId) { mutableStateOf(false) }
-    var resumeCursor by remember(root, accountId) { mutableStateOf<Long?>(null) }
-    var page by remember(root) { mutableStateOf<ConversationPage?>(null) }
-    var older by remember(root) { mutableStateOf<List<ConversationMessage>>(emptyList()) }
-    var before by remember(root) { mutableStateOf<Long?>(null) }
-    var gate by remember(root) { mutableStateOf<ThreadDeliveryGate?>(null) }
-    var draft by remember(root) { mutableStateOf("") }
-    var pending by remember(root) { mutableStateOf<PendingMessage?>(null) }
-    var error by remember(root) { mutableStateOf("") }
-    var offline by remember(root) { mutableStateOf(false) }
-    var busy by remember(root) { mutableStateOf(false) }
-    var privacy by remember(root) { mutableStateOf(false) }
-    var source by remember(root) { mutableStateOf<Pair<String,String>?>(null) }
+    var page by remember(root, accountId) { mutableStateOf<ConversationPage?>(null) }
+    var older by remember(root, accountId) { mutableStateOf<List<ConversationMessage>>(emptyList()) }
+    var before by remember(root, accountId) { mutableStateOf<Long?>(null) }
+    var gate by remember(root, accountId) { mutableStateOf<ThreadDeliveryGate?>(null) }
+    var draft by remember(root, accountId) { mutableStateOf("") }
+    var pending by remember(root, accountId) { mutableStateOf<PendingMessage?>(null) }
+    var error by remember(root, accountId) { mutableStateOf("") }
+    var offline by remember(root, accountId) { mutableStateOf(true) }
+    var transportReady by remember(root, accountId) { mutableStateOf(false) }
+    var busy by remember(root, accountId) { mutableStateOf(false) }
+    var privacy by remember(root, accountId) { mutableStateOf(false) }
+    var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val presenceId = remember(root) { UUID.randomUUID().toString() }
@@ -89,13 +96,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val fail: (Throwable) -> Unit = { failure ->
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
-        offline = failure !is ConversationFailure
-        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { page = null; older = emptyList(); draft = ""; pending = null; gate = null; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        offline = true
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
     }
     suspend fun refresh() {
         try {
             if (!resumeActivated) {
-                try { resumeStorage.activate(accountId); resumeCursor = resumeStorage.cursor(accountId, storageScope)?.cursor } catch (failure: Exception) { if (failure is CancellationException) throw failure }
+                try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
@@ -103,14 +110,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
-                offline = false; error = ""
+                offline = !transportReady; error = ""
                 pending?.let { item -> if (client.request("$root/messages/status/${item.key}").jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
         } catch (failure: Throwable) { fail(failure) }
     }
     suspend fun send(retry: Boolean = false) {
         val current = page ?: return
-        if (busy || offline || (!retry && draft.isBlank())) return
+        if (busy || offline || !foreground || privacy || !current.canSend || (!retry && draft.isBlank())) return
         val item = if (retry) pending ?: return else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
         pending = item; busy = true
         try {
@@ -121,22 +128,40 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
         finally { busy = false }
     }
-    LaunchedEffect(root, session.session?.accountId) {
-        refresh()
-        var ticks = 0
-        while (true) {
-            delay(if (offline) 3000 else 300)
+    LaunchedEffect(root, accountId, foreground, privacy) {
+        transportReady = false; offline = true
+        if (!foreground || privacy) return@LaunchedEffect
+        var backoff = 1000L
+        while (isActive) {
             try {
+                refresh()
+                val current = page
                 val currentGate = gate
-                if (currentGate == null || offline) refresh()
-                else {
-                    val frames = client.replay(root, minOf(resumeCursor ?: currentGate.cursor, currentGate.cursor))
-                    resumeCursor = null
-                    var changed = false
-                    frames.forEach { if (currentGate.receive(it).isNotEmpty()) changed = true }
-                    if (changed || ++ticks % 16 == 0) refresh()
+                if (current != null && currentGate != null && error.isEmpty()) coroutineScope {
+                    val metadata = launch { while (isActive) { delay(15000); refresh() } }
+                    try {
+                        // A cursor without cached content is not a checkpoint.
+                        // The freshly authorized atomic page is the resume base.
+                        client.frames(current, current.cursor).collect { event ->
+                            when (event) {
+                                ConversationRealtimeEvent.Connected -> {
+                                    transportReady = true; backoff = 1000L
+                                    refresh()
+                                }
+                                is ConversationRealtimeEvent.Frame -> {
+                                    val delivery = gate ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
+                                    if (delivery.receive(event.value).isNotEmpty()) refresh()
+                                }
+                            }
+                        }
+                    } finally { metadata.cancel() }
                 }
-            } catch (failure: Throwable) { fail(failure) }
+            } catch (failure: Throwable) {
+                fail(failure)
+                if (failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
+            } finally { transportReady = false; offline = true }
+            delay(backoff + Random.nextLong(0, backoff / 4 + 1))
+            backoff = minOf(15000L, backoff * 2)
         }
     }
     if (privacy) {
@@ -171,14 +196,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
                     ConversationMessageRow(message, current.creatorName, current.control, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
                 }
-                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption")); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption")); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
+                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption")); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption")); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
             }
             Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI" }.background(qColor("surface")).padding(12.dp), textStyle = qText("body"), maxLines = 5)
-                    Button("Send", variant = ButtonVariant.AI, disabled = !current.canSend || offline || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+                    Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
                 }
                 Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
                 Row { Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }; Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") } }

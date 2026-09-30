@@ -6,6 +6,7 @@ import { readConfig } from "../../config.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { createConversationRuntime } from "./runtime.js";
 import { ProviderPolicySchema } from "../../../../../packages/api/src/conversation/contracts.js";
+import { syntheticDraftPreview } from "./development-preview.js";
 
 if (
   process.env.NODE_ENV !== "development" ||
@@ -23,6 +24,7 @@ const policy = process.env.W3_PROVIDER_POLICY_FILE
     )
   : undefined;
 let conversations: ReturnType<typeof createConversationRuntime> | undefined;
+let preview: ReturnType<typeof syntheticDraftPreview> | undefined;
 const backend = await createConfiguredBackend({
   config,
   identity: new DevelopmentIdentityAdapter(config.allowedOrigin, "development"),
@@ -36,16 +38,22 @@ const backend = await createConfiguredBackend({
       ...runtime,
       ...(policy ? { policy } : {}),
     });
-    return [conversations.registration];
+    if (process.env.W3_SYNTHETIC_PREVIEW === "true")
+      preview = syntheticDraftPreview(runtime.pool, config.allowedOrigin);
+    return [
+      conversations.registration,
+      ...(preview ? [preview.registration] : []),
+    ];
   },
 });
 backend.server.listen(config.port, "127.0.0.1", () =>
   process.stdout.write(
-    `W3 API on ${config.port}; development identity; AI generation unavailable.\n`,
+    `W3 API on ${config.port}; development identity; fan generation unavailable; synthetic draft preview ${preview?.providerConfigured ? "configured" : "unavailable"}.\n`,
   ),
 );
 const close = () => {
   conversations?.close();
+  preview?.close();
   void backend.close().then(() => process.exit(0));
 };
 process.on("SIGTERM", close);

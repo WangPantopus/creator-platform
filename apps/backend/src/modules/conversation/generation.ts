@@ -158,6 +158,8 @@ export class ConversationGenerationProcessor {
     let emitted = 0;
     const context: ConversationContextPort = {
       current: (scope) => this.memory.context(scope),
+      assertProcessorConsent: (scope) =>
+        this.conversations.assertProcessorConsent(scope),
       assertDeliveryCurrent: async (current, expected) => {
         await this.db.withThread(current, async (client) => {
           const row = (

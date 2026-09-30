@@ -112,6 +112,9 @@ export const BoundaryNames = [
 export type Usage = {
   inputTokens: number;
   outputTokens: number;
+  /** Subsets of inputTokens; null denotes an unavailable provider counter. */
+  cachedInputTokens?: number | null;
+  cacheWriteInputTokens?: number | null;
   costMicros: number | null;
   model: string;
   provider: string;
@@ -132,6 +135,13 @@ export type EvaluationCase = {
   prompt: string;
   answer: string;
   reason: string;
+  withheld?: {
+    text: string;
+    category: string;
+    allowed?: boolean;
+    supported?: boolean;
+    requiresEvidence?: boolean;
+  };
   citations: string[];
   usage: Usage | null;
   pipelineUsage?: Usage[];
@@ -201,6 +211,7 @@ export type License = {
   estateOptInReference?: string;
 };
 export type StudioState = {
+  actorAccountId: string;
   creator: { id: string; name: string; verification: string };
   development: boolean;
   revision: number;
@@ -209,7 +220,9 @@ export type StudioState = {
   status: { text: string; expiresAt: string } | null;
   sources: Source[];
   versions: Version[];
+  liveVersion: Version | null;
   evaluation: Evaluation | null;
+  evaluationCurrent: boolean;
   license: License | null;
   sponsors: {
     id: string;

@@ -1657,8 +1657,8 @@ export function CreatorAI({ section }: { section: string }) {
                           <>
                             <AuthorLabel kind="ai" name={state.creator.name} />
                             {preview.sentences.map((sentence, index) => (
-                              <p key={index}>
-                                {sentence.text}
+                              <div key={index}>
+                                <p>{sentence.text}</p>
                                 {sentence.citations.map((id) => (
                                   <details key={id}>
                                     <summary>Open authorized passage</summary>
@@ -1666,13 +1666,13 @@ export function CreatorAI({ section }: { section: string }) {
                                       ?.text ?? "No longer accessible to you"}
                                   </details>
                                 ))}
-                              </p>
+                              </div>
                             ))}
                             <p className="qv-help">
                               Pipeline {preview.durationMs} ms · first approved{" "}
                               {preview.firstApprovedMs ?? "withheld"} ms · cost{" "}
                               {preview.usage.some((u) => u.costMicros === null)
-                                ? "requires reviewed rates"
+                                ? "awaiting provider usage or rate reconciliation"
                                 : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
                             </p>
                           </>
