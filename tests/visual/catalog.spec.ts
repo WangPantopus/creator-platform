@@ -37,7 +37,7 @@ for (const theme of ["light", "night"] as const) {
       await page.setViewportSize({ width: screen.w, height: screen.h });
       await reference.setViewportSize({ width: screen.w, height: screen.h });
       await reference.goto(
-        `http://127.0.0.1:3101/${screen.group}/${screen.file}?step=${process.env.VISUAL_STEP ?? 0}`,
+        `http://127.0.0.1:${process.env.REFERENCE_PORT ?? 3101}/${screen.group}/${screen.file}?step=${process.env.VISUAL_STEP ?? 0}`,
       );
       await reference.locator("x-dc > div").first().waitFor();
       await reference.evaluate((mode) => {
@@ -46,7 +46,7 @@ for (const theme of ["light", "night"] as const) {
       await reference.evaluate(() => document.fonts.ready);
       const expected = await reference.screenshot({ animations: "disabled" });
       await page.goto(
-        `http://localhost:3000/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
+        `/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
       );
       await page.locator(".preview-board > div").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -122,7 +122,9 @@ for (const theme of ["light", "night"] as const) {
       (name) =>
         !process.env.VISUAL_COMPONENT || name === process.env.VISUAL_COMPONENT,
     )) {
-      await reference.goto(`http://127.0.0.1:3101/component/${name}`);
+      await reference.goto(
+        `http://127.0.0.1:${process.env.REFERENCE_PORT ?? 3101}/component/${name}`,
+      );
       await reference.locator("#root > *").first().waitFor();
       await reference.evaluate((mode) => {
         document.documentElement.dataset.theme = mode;
@@ -132,9 +134,7 @@ for (const theme of ["light", "night"] as const) {
         animations: "disabled",
         fullPage: true,
       });
-      await page.goto(
-        `http://localhost:3000/design/components/${name}?raw=1&theme=${theme}`,
-      );
+      await page.goto(`/design/components/${name}?raw=1&theme=${theme}`);
       await page.locator("main > div > *").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
       const actual = await page.screenshot({

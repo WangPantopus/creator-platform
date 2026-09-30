@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const origin = "http://localhost:3000";
-const fallback = "/creators/maya/chat";
+const origin = `http://localhost:${process.env.CREATOR_VISUAL_PORT ?? 3000}`;
+const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",
   "https://outside.invalid",
@@ -10,6 +10,8 @@ const invalidPaths = [
   "/creators/maya/nested\tdraft",
   "/creators/maya/nested\r\ndraft",
   "/" + "x".repeat(2048),
+  "/creators/maya/requests?draft=" + "x".repeat(1200),
+  "/creators/maya?context=kiln",
 ];
 
 function authURL(path: string, returnTo: string) {
@@ -33,15 +35,16 @@ test("auth seam rejects external, nested backslash and control-character context
     expect(redirected.origin).toBe(origin);
     expect(redirected.pathname).toBe("/auth/continue");
     expect(redirected.searchParams.get("returnTo")).toBe(fallback);
-    expect(redirected.searchParams.get("error")).toBe("identity_unconfigured");
+    expect(redirected.searchParams.get("error")).toBe("invalid_return");
   }
 });
 
-test("welcome and auth seam use the same context contract and preserve a nested draft", async ({
+test("welcome and auth seam preserve an opaque context without draft content", async ({
   page,
   request,
 }) => {
-  const returnTo = "/creators/maya/requests?draft=" + "x".repeat(1200);
+  const returnTo =
+    "/creators/maya/requests?context=00000000-0000-4000-8000-000000000001";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
     name: "Continue with Pantopus",

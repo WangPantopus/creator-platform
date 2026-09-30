@@ -76,6 +76,9 @@
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      // Device RGB inherits the attached display profile, which differs between
+      // developer machines and CI. Tokens are defined in sRGB.
+      window.colorSpace = .sRGB
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {

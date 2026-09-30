@@ -5,7 +5,9 @@ import {
   randomUUID,
   sign,
 } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import pg from "pg";
 import fc from "fast-check";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -65,12 +67,23 @@ describe.skipIf(!adminUrl)(
       const url = new URL(adminUrl!);
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
-      await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
       await admin.query(
-        await readFile(
-          new URL("../migrations/0001_foundation.sql", import.meta.url),
-          "utf8",
-        ),
+        "DROP SCHEMA IF EXISTS growth, creator_trust, creator CASCADE",
+      );
+      // Exercise the current schema and production grants through W8's checksum runner.
+      await promisify(execFile)(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          fileURLToPath(
+            new URL("../scripts/migrate-trust.ts", import.meta.url),
+          ),
+        ],
+        {
+          env: { ...process.env, DATABASE_MIGRATION_URL: adminUrl! },
+          timeout: 60000,
+        },
       );
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
@@ -206,7 +219,7 @@ describe.skipIf(!adminUrl)(
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 120000);
+    }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",

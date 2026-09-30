@@ -52,7 +52,7 @@ jobs:
     runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
-      - run: swift test --package-path apps/ios
+      - run: SNAPSHOT_ARTIFACTS="$PWD/artifacts/ios/snapshots" swift test --package-path apps/ios
       - run: brew install xcodegen
       - run: xcodegen generate --spec apps/ios/project.yml
       - name: Select an available iPhone simulator

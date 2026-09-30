@@ -21,6 +21,9 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
+        // Arrival metadata is a component input, never fabricated by the shipping host.
+        compose.activity.runOnUiThread { compose.activity.setContent { QelvoraTheme(false) { Welcome(contextSource = "You came from Maya's page", contextTitle = "Maya · Ceramics · Kiln Club") } } }
+        compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertIsDisplayed()
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()
     }
