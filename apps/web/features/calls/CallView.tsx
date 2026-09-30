@@ -5,7 +5,7 @@ import type {
   CallSession,
   CallConsentPurpose,
 } from "../../../../packages/api/src/session";
-import { mediaRequest } from "../media/api";
+import { mediaRequest, MediaRequestError } from "../media/api";
 import { webCallTransport, type WebCallTransport } from "./transport";
 import "../media/media.css";
 
@@ -39,6 +39,20 @@ export function CallView({
   const stream = useRef<MediaStream | null>(null);
   const remote = useRef<HTMLVideoElement | null>(null);
   const transport = useRef<WebCallTransport | null>(null);
+  const mediaEpoch = useRef(0);
+  function disconnectMedia() {
+    mediaEpoch.current++;
+    stream.current?.getTracks().forEach((track) => track.stop());
+    stream.current = null;
+    const adapter = transport.current;
+    transport.current = null;
+    void adapter?.disconnect().catch(() => undefined);
+    if (video.current) video.current.srcObject = null;
+    if (remote.current) remote.current.srcObject = null;
+    setPreviewing(false);
+    setRemoteMedia(null);
+    setLocalState("disconnected");
+  }
   const connected =
     session?.state === "connected" && localState === "connected";
   useEffect(() => {
@@ -65,12 +79,23 @@ export function CallView({
       try {
         const value = await mediaRequest<CallSession>(root);
         if (active) {
-          setSession(value);
+          setSession((prior) =>
+            prior && prior.id === value.id && prior.version > value.version
+              ? prior
+              : value,
+          );
           setStale(false);
           setFetchError(null);
         }
       } catch (e) {
         if (active) {
+          if (
+            e instanceof MediaRequestError &&
+            [401, 403, 404].includes(e.status)
+          ) {
+            disconnectMedia();
+            setSession(null);
+          }
           setStale(true);
           setFetchError(
             e instanceof Error ? e.message : "The call is unavailable.",
@@ -87,28 +112,42 @@ export function CallView({
     return () => {
       active = false;
       clearInterval(timer);
-      stream.current?.getTracks().forEach((t) => t.stop());
-      void transport.current?.disconnect();
+      disconnectMedia();
     };
   }, [root]);
   useEffect(() => {
     if (session && ["ending", "ended", "cancelled"].includes(session.state)) {
-      stream.current?.getTracks().forEach((t) => t.stop());
-      void transport.current?.disconnect();
+      disconnectMedia();
     }
   }, [session?.state]);
   async function preflight() {
+    if (
+      !session ||
+      !role ||
+      busy ||
+      stale ||
+      transport.current ||
+      ["ending", "ended", "cancelled"].includes(session.state)
+    )
+      return;
+    const epoch = ++mediaEpoch.current;
+    setError(null);
     try {
       stream.current?.getTracks().forEach((t) => t.stop());
       const current = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: session?.mediaMode === "video",
       });
+      if (epoch !== mediaEpoch.current) {
+        current.getTracks().forEach((track) => track.stop());
+        return;
+      }
       stream.current = current;
       setPreviewing(true);
       setCamera(session?.mediaMode === "video");
       if (video.current) video.current.srcObject = current;
     } catch {
+      if (epoch !== mediaEpoch.current) return;
       setError(
         "Camera or microphone access is off or unavailable. Check your device settings and try again.",
       );
@@ -120,6 +159,7 @@ export function CallView({
   }, [previewing]);
   async function join() {
     if (!role || busy || stale) return;
+    if (transport.current && localState !== "disconnected") return;
     setError(null);
     const adapter = webCallTransport();
     if (!adapter) {
@@ -127,22 +167,31 @@ export function CallView({
       return;
     }
     setBusy(true);
+    const epoch = ++mediaEpoch.current;
     try {
       const token = await mediaRequest<{ token: string; url: string }>(
         `${root}/join`,
         { method: "POST", body: "{}" },
       );
+      if (epoch !== mediaEpoch.current) return;
       transport.current = adapter;
       await adapter.connect({
         ...token,
         microphone: stream.current,
         camera,
         onRemote: (value) => {
-          setRemoteMedia(value);
+          if (epoch === mediaEpoch.current) setRemoteMedia(value);
         },
-        onState: setLocalState,
+        onState: (value) => {
+          if (epoch === mediaEpoch.current) setLocalState(value);
+        },
       });
+      if (epoch !== mediaEpoch.current) await adapter.disconnect();
     } catch (e) {
+      await adapter.disconnect().catch(() => undefined);
+      if (epoch !== mediaEpoch.current) return;
+      transport.current = null;
+      setLocalState("disconnected");
       setError(
         e instanceof Error
           ? e.message
@@ -285,8 +334,17 @@ export function CallView({
           name={session.creatorName}
           time={clock(session.connectedMilliseconds)}
           end={clock(session.durationSeconds * 1000)}
-          recording={session.recordingState === "on"}
+          recording={["on", "stopping"].includes(session.recordingState)}
         />
+      )}
+      {["starting", "stopping", "blocked"].includes(session.recordingState) && (
+        <p className="w6-notice" role="status">
+          {session.recordingState === "starting"
+            ? "Recording requested · waiting for provider confirmation"
+            : session.recordingState === "stopping"
+              ? "Recording is stopping · awaiting provider confirmation"
+              : "Recording state could not be confirmed"}
+        </p>
       )}
       {!connected && !ended && (
         <Countdown tone="soon">
@@ -323,7 +381,13 @@ export function CallView({
               <dt>Attachments</dt>
               <dd>{session.packet.attachmentIds.length} shared files</dd>
               <dt>Recording</dt>
-              <dd>{session.recordingState === "on" ? "Recording" : "Off"}</dd>
+              <dd>
+                {["on", "stopping"].includes(session.recordingState)
+                  ? "Recording"
+                  : session.recordingState === "off"
+                    ? "Off"
+                    : "Awaiting confirmation"}
+              </dd>
               <dt>If either of you drops</dt>
               <dd>
                 Timer pauses, up to {session.reconnectBudgetSeconds / 60} min
@@ -535,7 +599,7 @@ export function CallView({
             <dt>Recording</dt>
             <dd>
               {session.recordingOccurred
-                ? "Recorded with consent"
+                ? "Recording occurred · check the consent history"
                 : "No recording was confirmed"}
             </dd>
             <dt>Settlement</dt>
@@ -553,7 +617,12 @@ export function CallView({
         <div className="w6-bottom">
           <button
             className="qv-btn qv-btn--maya qv-btn--lg"
-            disabled={busy || stale || !role}
+            disabled={
+              busy ||
+              stale ||
+              !role ||
+              (transport.current !== null && localState !== "disconnected")
+            }
             onClick={() => {
               void join();
             }}

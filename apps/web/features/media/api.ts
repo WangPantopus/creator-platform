@@ -3,6 +3,16 @@ import type {
   UploadTicket,
 } from "../../../../packages/api/src/media";
 
+export class MediaRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+  }
+}
+
 export async function mediaRequest<T>(
   path: string,
   init: RequestInit = {},
@@ -17,8 +27,10 @@ export async function mediaRequest<T>(
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
-    throw new Error(
+    throw new MediaRequestError(
       error?.error?.message ?? "Media is unavailable. Try again.",
+      response.status,
+      error?.error?.code,
     );
   }
   return response.json() as Promise<T>;
@@ -29,6 +41,8 @@ export async function uploadRecording(input: {
   purpose: "human_note" | "human_reply" | "interview_audio";
   blob: Blob;
   durationMs: number;
+  /** Retain with the recording, including when the initial response is lost. */
+  idempotencyKey: string;
   signal: AbortSignal;
   progress: (ratio: number) => void;
   resumed?: UploadTicket;
@@ -42,23 +56,20 @@ export async function uploadRecording(input: {
   )
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("");
-  let ticket = input.resumed
-    ? await mediaRequest<UploadTicket>(
-        `${family}/${input.resumed.asset.id}/resume`,
-        { method: "POST", body: "{}", signal: input.signal },
-      )
-    : await mediaRequest<UploadTicket>(family, {
-        method: "POST",
-        body: JSON.stringify({
-          purpose: input.purpose,
-          mimeType: input.blob.type,
-          bytes: input.blob.size,
-          durationMs: input.durationMs,
-          sha256: digest,
-          idempotencyKey: crypto.randomUUID(),
-        }),
-        signal: input.signal,
-      });
+  let ticket =
+    input.resumed ??
+    (await mediaRequest<UploadTicket>(family, {
+      method: "POST",
+      body: JSON.stringify({
+        purpose: input.purpose,
+        mimeType: input.blob.type,
+        bytes: input.blob.size,
+        durationMs: input.durationMs,
+        sha256: digest,
+        idempotencyKey: input.idempotencyKey,
+      }),
+      signal: input.signal,
+    }));
   const validateTicket = () => {
     if (
       ticket.asset.sha256 !== digest ||
@@ -75,8 +86,35 @@ export async function uploadRecording(input: {
       );
   };
   validateTicket();
+  const assetId = ticket.asset.id;
+  input.onTicket(ticket);
+  // A finish response may be lost after the worker has already claimed or processed the asset.
+  const current = await mediaRequest<MediaAsset>(
+    `${family}/${ticket.asset.id}`,
+    {
+      signal: input.signal,
+    },
+  );
+  if (current.id !== assetId)
+    throw new Error("The saved upload could not be confirmed.");
+  if (
+    ["quarantined", "processing", "ready", "rejected"].includes(current.state)
+  )
+    return current;
+  ticket = await mediaRequest<UploadTicket>(
+    `${family}/${ticket.asset.id}/resume`,
+    {
+      method: "POST",
+      body: "{}",
+      signal: input.signal,
+    },
+  );
+  validateTicket();
+  if (ticket.asset.id !== assetId)
+    throw new Error("The resumed upload changed.");
   input.onTicket(ticket);
   let offset = ticket.asset.uploadedBytes;
+  input.progress(offset / input.blob.size);
   while (offset < input.blob.size) {
     if (Date.parse(ticket.expiresAt) <= Date.now() + 5000) {
       ticket = await mediaRequest<UploadTicket>(
@@ -84,6 +122,8 @@ export async function uploadRecording(input: {
         { method: "POST", body: "{}", signal: input.signal },
       );
       validateTicket();
+      if (ticket.asset.id !== assetId)
+        throw new Error("The resumed upload changed.");
       offset = ticket.asset.uploadedBytes;
       input.onTicket(ticket);
     }
@@ -101,11 +141,7 @@ export async function uploadRecording(input: {
         signal: input.signal,
       },
     );
-    if (
-      !Number.isSafeInteger(asset.uploadedBytes) ||
-      asset.uploadedBytes <= offset ||
-      asset.uploadedBytes > next
-    )
+    if (asset.id !== assetId || asset.uploadedBytes !== next)
       throw new Error(
         "Upload progress could not be confirmed. Resume this recording.",
       );

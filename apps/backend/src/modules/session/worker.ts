@@ -96,6 +96,7 @@ export class SessionWorker {
     try {
       const cleanup = [
         "purge_consent_assets",
+        "sync_recording",
         "settle_evidence",
         "handback",
         "outcome_notice",
@@ -143,19 +144,25 @@ export class SessionWorker {
         );
         const enabled =
           both &&
+          !row.revoked_at &&
           !["ending", "ended", "cancelled"].includes(row.document.state);
+        if (enabled)
+          await this.sessions.db.withThread(scope, (client) =>
+            this.sessions.row(scope, client, effect.session_id),
+          );
         const truth = await withDeadline(
           this.sessions.provider.setRecording(row.room_id, enabled, effect.key),
           5000,
         );
         await this.sessions.db
           .withThread(scope, async (client) => {
-            const current = await this.sessions.row(
+            const current = await this.sessions.lifecycleRow(
               scope,
               client,
               effect.session_id,
               true,
             );
+            if (!current) throw new Error("session_unavailable");
             const permitted = ["creator", "fan"].every((role) =>
               current.document.consents.some(
                 (c) =>
@@ -165,11 +172,14 @@ export class SessionWorker {
             if (
               truth.recording &&
               (!permitted ||
+                current.revoked_at ||
                 ["ending", "ended", "cancelled"].includes(
                   current.document.state,
                 ))
             )
               throw new Error("consent_changed_during_recording");
+            if (truth.recording)
+              await this.sessions.row(scope, client, effect.session_id);
             await this.sessions.persist(scope, client, {
               ...current.document,
               recordingState: truth.recording ? "on" : "off",
