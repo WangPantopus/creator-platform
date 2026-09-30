@@ -153,5 +153,19 @@
     "evaluationState": "passed",
     "cases": 7,
     "publicationAvailable": false
+  },
+  "followUp": {
+    "observedAt": "2026-09-30T22:45:06.756Z",
+    "webPort3002": "no listener",
+    "apiPort4102": "no listener",
+    "postgresPort55442": "no listener",
+    "docker": "Daemon unavailable at configured desktop socket; no engine restart/prune/delete attempted",
+    "privateRuntimeConfiguration": "runtime.env, provider.env and postgres.env previously verified retained are now absent",
+    "openAISecretReference": "Exists; never printed/copied",
+    "liveWebOutput": "Still exists",
+    "removedTargets": "All 23 remain absent",
+    "sourceHashManifest": "All 63 entries unchanged",
+    "volumeOwnershipCleanup": "Not verifiable while daemon offline; no volume deletion attempted",
+    "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
   }
 }

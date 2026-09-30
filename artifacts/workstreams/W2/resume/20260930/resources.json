@@ -11,7 +11,7 @@
   },
   "database": "creator_w2_resume",
   "runtimeRole": "creator_runtime (non-owner, forced RLS)",
-  "migrations": "canonical 0001–0031; immutable histories preserved",
+  "migrations": "canonical 0001\u20130031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
   "builds": "Retained only active apps/web/.next-w2-review; inactive web/backend/native build outputs and task caches deleted after handoff",
@@ -30,8 +30,8 @@
     "modelFingerprint": "192a3a3dabede8d932914ab78d5a5fba50deeba62f1cfcab38d8985cf4e80d9c",
     "rates": "Explicit synthetic ordinary/output/cache-read/cache-write prices in private provider.env; no production approval"
   },
-  "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
-  "reviewRuntime": "Retained for successor: API restarted with cache accounting and exclusive-first thread locking; Studio companion revision 16/current seven-case pass, publication disabled",
+  "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (previously retained mode-600 files; absent at latest follow-up)",
+  "reviewRuntime": "Historical retained review state; currently no listeners on 3002/4102/55442, Docker daemon unavailable and temporary configuration absent. Recover saved container/configuration before launch.",
   "existingTestCluster": {
     "container": "creator-platform-w2-checks-20260930",
     "port": 55449,
@@ -41,7 +41,7 @@
     "state": "Removed again after unchanged deadlock reproduction and full 18-case/10,000-pair verification; port 55449 released",
     "latestVerification": "deadlock-remediation.json"
   },
-  "preflight": "Ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved.",
+  "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
   "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
   "git": "PR #1 tracks pushed W2 checkpoints; metadata write still 403; no merge with failed checks. Production acceptance remains separately gated.",
@@ -67,7 +67,8 @@
       "executionSession": 79779
     },
     "observedAt": "2026-09-30T21:38:59.985Z",
-    "warning": "Inspect current listener identity before stopping/restarting; these PIDs are observations."
+    "warning": "Inspect current listener identity before stopping/restarting; these PIDs are observations.",
+    "current": "No review listeners at latest follow-up; saved PIDs above are historical"
   },
   "currentDraft": {
     "revision": 16,
@@ -78,7 +79,8 @@
     "cases": 7,
     "verification": "pending",
     "activeLicense": false,
-    "dailyCostCapMicros": 0
+    "dailyCostCapMicros": 0,
+    "observedAt": "Cleanup-time observation; database/draft/evaluation currently unverified while Docker unavailable"
   },
   "webLaunch": {
     "cwd": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web",
@@ -97,6 +99,20 @@
     "allocatedKiBRemoved": 4744680,
     "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
     "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
-    "retained": "Review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret"
+    "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
+  },
+  "latestAvailability": {
+    "observedAt": "2026-09-30T22:45:06.756Z",
+    "webPort3002": "no listener",
+    "apiPort4102": "no listener",
+    "postgresPort55442": "no listener",
+    "docker": "Daemon unavailable at configured desktop socket; no engine restart/prune/delete attempted",
+    "privateRuntimeConfiguration": "runtime.env, provider.env and postgres.env previously verified retained are now absent",
+    "openAISecretReference": "Exists; never printed/copied",
+    "liveWebOutput": "Still exists",
+    "removedTargets": "All 23 remain absent",
+    "sourceHashManifest": "All 63 entries unchanged",
+    "volumeOwnershipCleanup": "Not verifiable while daemon offline; no volume deletion attempted",
+    "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
   }
 }
