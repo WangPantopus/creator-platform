@@ -118,6 +118,35 @@ export async function exportCommerceFinancial(
           ["id"],
           parameters,
         );
+        const approvalSchema = (
+          await client.query<{
+            drafts: string | null;
+            approvals: string | null;
+          }>(
+            "SELECT to_regclass('creator.commerce_reply_draft')::text AS drafts,to_regclass('creator.commerce_approval')::text AS approvals",
+          )
+        ).rows[0]!;
+        invariant(
+          Boolean(approvalSchema.drafts) === Boolean(approvalSchema.approvals),
+          "approval_schema_incomplete",
+          "Draft approval history needs schema reconciliation before this export can complete.",
+        );
+        if (approvalSchema.approvals) {
+          await page(
+            "replyDrafts",
+            "SELECT * FROM creator.commerce_reply_draft",
+            packetScope,
+            ["id"],
+            parameters,
+          );
+          await page(
+            "approvals",
+            "SELECT * FROM creator.commerce_approval",
+            packetScope,
+            ["id"],
+            parameters,
+          );
+        }
         await page(
           "authorizationHistory",
           "SELECT packet_id,attempt,snapshot,created_at FROM creator.commerce_authorization_lineage",

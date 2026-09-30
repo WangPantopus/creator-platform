@@ -139,10 +139,13 @@ export function commercePrivacyHook(
             "privacy_scope_invalid",
             "A complete, verified commerce export scope is required.",
           );
+          const exportCreator =
+            input.scope === "account" ? null : input.creatorId;
+          const exportThread = input.scope === "thread" ? input.threadId : null;
           const packets = (
             await client.query(
               "SELECT id,creator_id,fan_id,thread_id,snapshot,disclosure,visibility,state,payment_state,created_at,submitted_at,accepted_at FROM creator.commerce_packet WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY created_at,id LIMIT 2001",
-              [input.creatorId, input.threadId],
+              [exportCreator, exportThread],
             )
           ).rows;
           const ids = packets.map((row) => row.id);
@@ -184,6 +187,30 @@ export function commercePrivacyHook(
             data[name] = rows;
           };
           const commitmentIds = commitments.map((row) => row.id);
+          const approvalSchema = (
+            await client.query<{
+              drafts: string | null;
+              approvals: string | null;
+            }>(
+              "SELECT to_regclass('creator.commerce_reply_draft')::text AS drafts,to_regclass('creator.commerce_approval')::text AS approvals",
+            )
+          ).rows[0]!;
+          invariant(
+            Boolean(approvalSchema.drafts) ===
+              Boolean(approvalSchema.approvals),
+            "approval_schema_incomplete",
+            "Draft approval history needs schema reconciliation before this export can complete.",
+          );
+          if (approvalSchema.approvals)
+            for (const [name, relation] of [
+              ["replyDrafts", "commerce_reply_draft"],
+              ["approvals", "commerce_approval"],
+            ] as const)
+              await bounded(
+                name,
+                `SELECT * FROM creator.${relation} WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY id LIMIT 2001`,
+                [exportCreator, exportThread],
+              );
           await bounded(
             "authorizationHistory",
             "SELECT packet_id,attempt,snapshot,created_at FROM creator.commerce_authorization_lineage WHERE packet_id=ANY($1::uuid[]) ORDER BY packet_id,attempt LIMIT 2001",

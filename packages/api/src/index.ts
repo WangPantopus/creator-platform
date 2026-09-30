@@ -6,5 +6,6 @@ export * from "./identity.ts";
 export * from "./consent.ts";
 export * as agentContracts from "./agent/contracts.ts";
 export * as commerceContracts from "./commerce/contracts.ts";
+export * as commerceApprovalContracts from "./commerce/approval.ts";
 export * as mediaContracts from "./media.ts";
 export * as callContracts from "./session.ts";

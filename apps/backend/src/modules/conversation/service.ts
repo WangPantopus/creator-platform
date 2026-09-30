@@ -23,6 +23,8 @@ import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
+import { DeliverApprovedDraft } from "../../../../../packages/api/src/commerce/approval.js";
+import type { CommerceApprovals } from "../commerce/approvals.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -63,6 +65,20 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private approvals?: Pick<
+    CommerceApprovals,
+    "prepareDelivery" | "recordDelivery"
+  >;
+  configureApprovals(
+    producer: Pick<CommerceApprovals, "prepareDelivery" | "recordDelivery">,
+  ) {
+    invariant(
+      !this.approvals,
+      "approvals_already_configured",
+      "Draft approval is already configured.",
+    );
+    this.approvals = producer;
+  }
   constructor(
     private readonly db: Database,
     private readonly access: AccessService,
@@ -92,20 +108,23 @@ export class ConversationService {
     epoch: number,
     state: Message["deliveryState"],
     signing?: { id: string; hash: string },
+    approvalId?: string,
   ): Promise<Message> {
     const seq = await client.query<{ message_sequence: number }>(
       "UPDATE creator.thread SET message_sequence=message_sequence+1, revision=revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3 RETURNING message_sequence",
       [scope.threadId, scope.creatorId, scope.fanId],
     );
     const result = await client.query<MessageRow>(
-      "INSERT INTO creator.message(id,thread_id,creator_id,fan_id,author_kind,author_account_id,text,delivery_state,control_epoch,sequence,signed_act_id,signed_content_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *",
+      `INSERT INTO creator.message(id,thread_id,creator_id,fan_id,author_kind,author_account_id,text,delivery_state,control_epoch,sequence,signed_act_id,signed_content_hash${approvalId ? ",approval_id" : ""}) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12${approvalId ? ",$13" : ""}) RETURNING *`,
       [
         randomUUID(),
         scope.threadId,
         scope.creatorId,
         scope.fanId,
         author,
-        author === "fan" || author === "human_creator"
+        author === "fan" ||
+        author === "human_creator" ||
+        author === "approved_draft"
           ? scope.actorAccountId
           : null,
         text,
@@ -114,6 +133,7 @@ export class ConversationService {
         seq.rows[0]!.message_sequence,
         signing?.id ?? null,
         signing?.hash ?? null,
+        ...(approvalId ? [approvalId] : []),
       ],
     );
     return message(result.rows[0]!);
@@ -529,6 +549,68 @@ export class ConversationService {
             kind: "delivered",
             messageId: output.id,
             authorKind: "human_creator",
+            text: output.text,
+            generationId: null,
+            sequence: 0,
+          });
+          return output;
+        },
+      ),
+    );
+  }
+  async approvedDraft(scope: ThreadScope, raw: unknown): Promise<Message> {
+    const body = DeliverApprovedDraft.parse(raw);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can publish an approved draft.",
+    );
+    const approvals = this.approvals;
+    invariant(
+      approvals,
+      "approval_unconfigured",
+      "Exact-version draft approval is not connected yet.",
+    );
+    return this.db.withThread(scope, (client) =>
+      idempotent(
+        client,
+        scope,
+        "approvedDraft",
+        body.idempotencyKey,
+        body,
+        async () => {
+          const thread = await this.lockThread(client, scope);
+          invariant(
+            thread.control === "human_active",
+            "takeover_required",
+            "The creator must take over before publishing an approved draft.",
+          );
+          const approved = await approvals.prepareDelivery(
+            client,
+            scope,
+            body.approvalId,
+          );
+          const output = await this.insertMessage(
+            client,
+            scope,
+            "approved_draft",
+            approved.text,
+            thread.control_epoch,
+            "delivered",
+            approved.signing,
+            approved.approvalId,
+          );
+          await approvals.recordDelivery(
+            client,
+            scope,
+            body.approvalId,
+            output.id,
+          );
+          await appendFrame(client, scope, {
+            epoch: thread.control_epoch,
+            kind: "delivered",
+            messageId: output.id,
+            authorKind: "approved_draft",
             text: output.text,
             generationId: null,
             sequence: 0,

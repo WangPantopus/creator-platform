@@ -1652,6 +1652,53 @@ export class CommerceService {
             "A delivered exact creator-signed reply is required.",
           );
           await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`commerce.delivery:${message.id}`],
+          );
+          const reused = await client.query(
+            "SELECT id FROM creator.commerce_commitment WHERE delivered_message_id=$1 AND id<>$2 LIMIT 1",
+            [message.id, c.id],
+          );
+          invariant(
+            reused.rowCount === 0,
+            "delivery_already_used",
+            "This reply already fulfilled another paid commitment. Deliver the promised reply for this request.",
+          );
+          if (message.author_kind === "approved_draft") {
+            const available = (
+              await client.query<{ relation: string | null }>(
+                "SELECT to_regclass('creator.commerce_approval')::text AS relation",
+              )
+            ).rows[0]?.relation;
+            invariant(
+              available,
+              "approval_unconfigured",
+              "Exact-version personal Approval must be connected before an approved draft fulfills this request.",
+            );
+            const approval = await client.query(
+              `SELECT a.id FROM creator.commerce_approval a JOIN creator.message m ON m.approval_id=a.id
+               JOIN creator.commerce_reply_draft d ON d.id=a.draft_id
+               JOIN creator.creator_profile cp ON cp.id=a.creator_id
+               JOIN creator.signed_act sa ON sa.id=a.signed_act_id JOIN creator.passkey_credential pc ON pc.id=sa.credential_id
+               WHERE m.id=$1 AND a.delivered_message_id=m.id AND a.thread_id=$2 AND a.creator_id=$3 AND a.fan_id=$4
+               AND a.approver_account_id=$5 AND a.text=m.text AND a.signed_act_id=m.signed_act_id
+               AND a.content_hash=m.signed_content_hash AND a.invalidated_at IS NULL
+               AND a.creator_epoch=cp.commerce_approval_epoch AND a.key_epoch=pc.commerce_approval_epoch`,
+              [
+                message.id,
+                scope.threadId,
+                scope.creatorId,
+                scope.fanId,
+                scope.creatorAccountId,
+              ],
+            );
+            invariant(
+              approval.rowCount === 1,
+              "approval_invalidated",
+              "This reply needs its exact personal Approval before fulfilling the request.",
+            );
+          }
+          await client.query(
             `UPDATE creator.commerce_commitment SET state='delivered',delivered_at=now(),delivered_message_id=$2,evidence=$3,payout_release_at=now()+interval '7 days',version=version+1 WHERE id=$1`,
             [
               c.id,
