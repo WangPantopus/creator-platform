@@ -78,7 +78,7 @@
       "result": "web notice now reflects stored challenge; no immutable SQL or reference-artboard edit; retention decision remains W8/Q10"
     }
   ],
-  "updatedAt": "2026-09-30T09:10:37.167741+00:00",
+  "updatedAt": "2026-09-30T09:22:15.786927+00:00",
   "checkpointBlobAudit": {
     "total": 841,
     "unchangedAtStartingTip": 837,
@@ -99,11 +99,22 @@
     "backendBuild": "passed",
     "webProduction": "passed including restore/expired continuation/account keys/rotation error preservation",
     "iosSignedSimulator": "normally signed generic iOS Simulator build passed after shared platform helpers",
-    "rename": "disposable FolioPreview regenerated; backend/web/signed iOS builds passed; final web-only guards being checked before push",
+    "rename": "current disposable FolioPreview regenerated; backend/web/normally signed generic iOS Simulator builds passed; final web account/rotation guards included",
     "androidLocal": "pending SDK license/toolchain decision; no fresh build claim",
     "existingBackendTests": "8passed/1failed/9skipped; core-only migration fixture/grants and stale context target assertion",
     "existingSwiftTests": "compiled package;18tests/110 image failures on current OS; baselines untouched",
-    "preResumeCI": "trust compilation passed; five foundation jobs failed; diagnostics preserved in status; not merge-ready"
+    "preResumeCI": "trust compilation passed; five foundation jobs failed; diagnostics preserved in status; not merge-ready",
+    "freshCI": {
+      "headRevision": "fb512c538c631a6166147c700184c90569d49148",
+      "webAndBackend": "failure: core-only migration fixture permission denied for fan_profile; malformed old target expected503/actual400",
+      "trustCompile": "success",
+      "run": "https://github.com/WangPantopus/creator-platform/actions/runs/36694550225",
+      "iosFoundation": "compiled package then failed110 stored image comparisons on CI as well as locally; cause not established",
+      "androidFoundation": "SDK setup fixed; compileDebugKotlin/assembleDebug passed; testDebugUnitTest19cases/4image failures; no local Android acceptance claim",
+      "androidRuntime": "compiled/installed; arrivalContextCanBeRemoved fails because sample Remove-post control absent",
+      "webVisual": "7failed/6passed; target expectations, exact reference pixels, unavailable creator-heading context",
+      "androidEvidenceRun": "https://github.com/WangPantopus/creator-platform/actions/runs/36694543996/job/109819251579"
+    }
   },
   "resources": {
     "active": ["API4101", "web3001", "W1 DB55431"],
@@ -245,5 +256,14 @@
     "apps/web/features/identity/welcome.tsx": "dd143a372a8f8f4f67112f682a6c41e96238d79cc79e0f7f2c67db571418ae4d",
     "apps/web/lib/session.ts": "da9ccff29aed80be9b7f50d62ec6d66d53fb2505048e3bbb2671677f854d5263",
     "packages/ui-web/src/components.ts": "0c855ef9cb568283ef60551cd618035af73033f3def7baf1f3896202b8fa5119"
+  },
+  "implementationRevision": "e9769876a5d1da78c3e376df61dfea50e4dd02c3",
+  "mainMergeRevision": "fb512c538c631a6166147c700184c90569d49148",
+  "mainMerged": "2e337a1; conflicts limited to two W5 documents, both restored exactly from main",
+  "pullRequest": {
+    "url": "https://github.com/WangPantopus/creator-platform/pull/6",
+    "draft": true,
+    "mergeReady": false,
+    "descriptionUpdate": "connector403; browser signed out; prepared pr-description.txt; login question pending"
   }
 }
