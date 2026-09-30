@@ -1,5 +1,9 @@
 # W2 handoff — Creator AI, knowledge, and model runtime
 
+**September 30 continuation — read first:** The successor resumed this branch, integrated reviewed foundation `22aa088` and current main `2e337a1`, and personally implemented/operated the current checkpoint. The founder granted narrow shared integration edits and supplied a server-only OpenAI secret reference for synthetic verification; production policy/licensing remain unapproved. Actual source embedding, cited previews, both-mode boundary/correction evaluations, cancellation/stale/retry recovery, complete 72 MB export/history and trust-role purge replay now have evidence. Current [record](../../../artifacts/workstreams/W2/resume/20260930/README.md), [R01–R14 matrix](../../../artifacts/workstreams/W2/resume/20260930/finish-matrix.md), [checks](../../../artifacts/workstreams/W2/resume/20260930/checks.md) and resources supersede older provider/build/resource claims below. Existing draft PR #1 receives pushed checkpoints; no merge while full acceptance and two foundation test failures remain. GitHub metadata writes returned 403. Preserve all original work packages; this update does not narrow them.
+
+The September 29 body below is historical handoff context. Its uncommitted-foundation/fresh-clone limitations, unavailable provider, old hook names and export implementation have since changed; inspect current code and the continuation record before acting on those statements.
+
 Prepared 2026-09-29, America/Los_Angeles. The founder explicitly hands all remaining W2 work to the successor primary. Continue the existing implementation; do not regenerate or restart it. This handoff includes implemented work, personally exercised evidence, known gaps, dependencies and the complete finish criteria. The [paste-ready resume prompt](W2-creator-ai-resume.md) is the successor's execution instruction.
 
 ## Original assignment and authority

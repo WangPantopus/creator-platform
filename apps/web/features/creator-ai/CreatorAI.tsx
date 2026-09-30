@@ -724,8 +724,9 @@ export function CreatorAI({ section }: { section: string }) {
             {current === "overview" && (
               <>
                 <p className="w2-intro">
-                  Trained on your public voice only. It never says “I feel”, “I
-                  remember you”, or promises your time.
+                  Uses your approved writing and sources. It stays labeled as AI
+                  and never claims human feelings, memories or promises your
+                  time.
                 </p>
                 <section className="w2-live">
                   <div className="w2-between">
