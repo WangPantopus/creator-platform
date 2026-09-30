@@ -1,0 +1,91 @@
+{
+  "recordedAt": "2026-09-30T21:17:00Z",
+  "workspace": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform",
+  "branch": "codex/w5-studio-content",
+  "applicationCheckpoint": "eedf35fc82544ab9216384896b84e376f2c323f4",
+  "documentation": "subsequent handoff commit; inspect actual HEAD",
+  "main": "2e337a1; fetched/included, already up to date",
+  "devServers": {
+    "web": {
+      "port": 3005,
+      "previousPid": 61338,
+      "previousSession": 90116,
+      "status": "gracefully stopped exit130; listener/PID absence verified"
+    },
+    "backend": {
+      "port": 4105,
+      "previousPid": 74746,
+      "previousSession": 1199,
+      "status": "gracefully stopped exit130; listener/PID absence verified"
+    }
+  },
+  "retained": {
+    "docker": [
+      {
+        "name": "creator-platform-w5-local",
+        "running": true,
+        "port": 55435,
+        "databases": ["creator_w5", "creator_w5_upgrade"]
+      },
+      {
+        "name": "creator-platform-w5-ci",
+        "running": true,
+        "port": 51360,
+        "databases": ["creator_foundation"]
+      }
+    ],
+    "privateDevelopmentKey": {
+      "path": "/private/tmp/creator-w5-session-key",
+      "mode": "0600",
+      "contentsNeverPrinted": true
+    },
+    "outputs": [
+      "apps/web/.next-w5",
+      "apps/web/.next-w5-build",
+      "/private/tmp/creator-w5-ios-*",
+      "/private/tmp/creator-w5-swift",
+      "/private/tmp/creator-w5-android",
+      "/private/tmp/creator-w5-tools"
+    ],
+    "ios": {
+      "name": "Creator Platform W5",
+      "id": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
+      "model": "iPhone17",
+      "runtime": "iOS26.5",
+      "state": "Shutdown"
+    },
+    "android": {
+      "avd": "CreatorPlatform_W5",
+      "emulatorPort": 5590,
+      "emulatorListening": false,
+      "adbPort": 5045,
+      "adbPid": 60626,
+      "adb": "own idle daemon retained; verify transport/AVD before use",
+      "transport": "127.0.0.1:5591"
+    }
+  },
+  "browser": {
+    "temporaryViewportReset": true,
+    "cookieLossUnresolved": true,
+    "nativeInputAvailable": false
+  },
+  "PR": {
+    "exists": false,
+    "creation": "connector403",
+    "sshPush": true
+  },
+  "OpenAI": {
+    "keyLoaded": false,
+    "paidCalls": 0
+  },
+  "unverified": [
+    "real signing/two-fan replies/reaction",
+    "native content/media/provider/a11y/device/performance acceptance",
+    "headless capture/profile repair",
+    "current W3/W4/W6/W7/W8 producer integrations",
+    "W7/W5 immutable migration reconciliation"
+  ],
+  "peers": {
+    "sourceProcessesDatabasesDevicesOutputsPreserved": true
+  }
+}

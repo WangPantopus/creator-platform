@@ -1,5 +1,13 @@
 # W5 verification — 2026-09-30
 
+## Current handoff ledger
+
+Application eedf35f is pushed; web/backend and Android runtime pass in run36777448626, macOS jobs queued. Prior7b167fb run36763954818 has4 green jobs including Android foundation and exact web visual; iOS110 strict comparisons fail. Hosted-coordinate repair is unverified on CI and reference/candidate color profiles differ. No Swift/web golden/threshold change. Final resources/remaining work are in handoffs/W5.md and handoff-state.json. Dev servers are stopped, databases/caches preserved, viewport reset. PR creation retried403; no PR/merge.
+
+Entries below are cumulative measurements at their stated checkpoints; earlier counts/queued states are historical and do not override this ledger. Current contract78 operations/migration38 entries/FORCE-RLS16 tables. No workstream-complete/release-ready claim.
+
+## Cumulative observations
+
 These records establish the stated local transitions only. No new tests or suites were added; existing CI tests were maintained for the current contracts, with assertions preserved. No paid AI or fake passkey/payment/delivery records were used.
 
 - Backend/web `tsc --noEmit`: pass.
