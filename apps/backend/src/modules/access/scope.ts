@@ -8,6 +8,7 @@ export type ScopeRestriction = (
   actor: Actor,
   creatorId: string,
   threadId: string,
+  participants: Readonly<{ fanAccountId: string; creatorAccountId: string }>,
 ) => Promise<void>;
 
 const threadScopeBrand: unique symbol = Symbol("ThreadScope");
@@ -17,6 +18,7 @@ export type ThreadScope = Readonly<{
   threadId: string;
   creatorId: string;
   fanId: string;
+  fanAccountId: string;
   actorAccountId: string;
   creatorAccountId: string;
   creatorName: string;
@@ -94,7 +96,10 @@ export class AccessService {
           "This conversation is unavailable.",
           404,
         );
-      await this.assertAllowed?.(actor, creatorId, thread.id);
+      await this.assertAllowed?.(actor, creatorId, thread.id, {
+        fanAccountId: pair.fanAccountId,
+        creatorAccountId: pair.creatorAccountId,
+      });
       if (authority !== "fan" && auditOpen)
         await client.query(
           "INSERT INTO creator.thread_audit (thread_id, creator_id, fan_id, reader_account_id, role) VALUES ($1,$2,$3,$4,$5)",
@@ -106,6 +111,7 @@ export class AccessService {
         threadId: thread.id,
         creatorId,
         fanId,
+        fanAccountId: pair.fanAccountId,
         actorAccountId: actor.accountId,
         creatorAccountId: pair.creatorAccountId,
         creatorName: pair.creatorName,

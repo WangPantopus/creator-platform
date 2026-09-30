@@ -16,6 +16,21 @@ import { IdentityProfiles } from "./modules/identity/profiles.js";
 import { PasskeyService } from "./modules/identity/passkeys.js";
 import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
+import { createTrustRuntime } from "./operations/runtime.js";
+import { resolveActor } from "./modules/identity/adapter.js";
+import { DomainError } from "./core/errors.js";
+
+export type BackendRuntime = {
+  pool: pg.Pool;
+  database: Database;
+  access: AccessService;
+  conversation: ConversationService;
+  identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
+};
+type TrustConfiguration = Omit<
+  Parameters<typeof createTrustRuntime>[0],
+  "actor" | "origin"
+>;
 
 /** Pantopus host imports this seam; adapter code is never inferred from a session token. */
 export async function createConfiguredBackend(input: {
@@ -23,23 +38,32 @@ export async function createConfiguredBackend(input: {
   identity: PantopusIdentityAdapter;
   guardrails: GuardrailProvider;
   signedSubjectPolicies?: readonly SignedSubjectPolicy[];
-  registerFeatures?: (runtime: {
-    pool: pg.Pool;
-    database: Database;
-    access: AccessService;
-    conversation: ConversationService;
-    identity:
-      | import("./modules/identity/router.js").IdentityRuntime
-      | undefined;
-  }) => Promise<readonly FeatureRegistration[]>;
+  registerFeatures?: (
+    runtime: BackendRuntime,
+  ) => Promise<readonly FeatureRegistration[]>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  trust?:
+    | TrustConfiguration
+    | ((runtime: BackendRuntime) => Promise<TrustConfiguration>);
 }) {
   if (!input.config.featureEnabled || !input.config.databaseUrl)
     throw new Error(
       "Enable the feature and provide a non-owner runtime DATABASE_URL.",
+    );
+  if (input.trust && input.identity.mode === "development")
+    throw new Error(
+      "Deployed trust requires the configured Pantopus identity adapter.",
+    );
+  if (
+    input.identity.mode !== "development" &&
+    !input.trust &&
+    !(input.assertActorAllowed && input.assertScopeAllowed)
+  )
+    throw new Error(
+      "Configured identity requires both trust denial callbacks or a composed trust runtime.",
     );
   const pool = new pg.Pool({
     connectionString: input.config.databaseUrl,
@@ -47,14 +71,25 @@ export async function createConfiguredBackend(input: {
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
   });
-  const database = new Database(pool, undefined, input.assertScopeAllowed);
+  let trust: Awaited<ReturnType<typeof createTrustRuntime>> | undefined;
+  const assertScopeAllowed: ScopeRestriction = async (...scope) => {
+    await input.assertScopeAllowed?.(...scope);
+    await trust?.assertScopeAllowed(...scope);
+  };
+  const assertActorAllowed = async (
+    actor: import("./modules/identity/adapter.js").Actor,
+  ) => {
+    await input.assertActorAllowed?.(actor);
+    await trust?.assertActorAllowed(actor);
+  };
+  const database = new Database(pool, undefined, assertScopeAllowed);
   try {
     await database.assertRuntimeRole();
   } catch (error) {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, input.assertScopeAllowed);
+  const access = new AccessService(pool, undefined, assertScopeAllowed);
   const conversation = new ConversationService(
     database,
     access,
@@ -88,16 +123,38 @@ export async function createConfiguredBackend(input: {
       }
     : undefined;
   let features: readonly FeatureRegistration[];
+  const backendRuntime: BackendRuntime = {
+    pool,
+    database,
+    access,
+    conversation,
+    identity: platformIdentity,
+  };
   try {
-    features =
-      (await input.registerFeatures?.({
-        pool,
-        database,
-        access,
-        conversation,
-        identity: platformIdentity,
-      })) ?? [];
+    if (input.trust) {
+      const configuration =
+        typeof input.trust === "function"
+          ? await input.trust(backendRuntime)
+          : input.trust;
+      trust = await createTrustRuntime({
+        ...configuration,
+        origin: input.config.allowedOrigin,
+        actor: async (request) => {
+          const token =
+            request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+          if (!token)
+            throw new DomainError(
+              "session_required",
+              "Continue with Pantopus to use this app.",
+              401,
+            );
+          return resolveActor(sessions ?? input.identity, token);
+        },
+      });
+    }
+    features = (await input.registerFeatures?.(backendRuntime)) ?? [];
   } catch (error) {
+    await trust?.stop();
     await pool.end();
     throw error;
   }
@@ -110,9 +167,8 @@ export async function createConfiguredBackend(input: {
       signing,
       generationAvailable: false,
       features,
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
-        : {}),
+      ...(trust ? { trustRouter: trust.router } : {}),
+      assertActorAllowed,
     }),
   );
   const sockets = attachRealtime(
@@ -122,21 +178,22 @@ export async function createConfiguredBackend(input: {
     conversation,
     input.config.allowedOrigin,
     {
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
-        : {}),
+      assertActorAllowed,
       ...(sessions
         ? { resolveSession: (token: string) => sessions.resolve(token) }
         : {}),
     },
   );
+  await trust?.start();
   return {
     server,
     pool,
     identity: platformIdentity,
+    trust,
     close: async () => {
       for (const connection of sockets.clients)
         connection.close(1001, "Server shutdown");
+      await trust?.stop();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),
       );

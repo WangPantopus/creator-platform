@@ -20,6 +20,8 @@ import {
 import { Readiness, type Probe } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { TrustTelemetry } from "./telemetry.js";
+import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
+import type { ScopeRestriction } from "../modules/access/scope.js";
 
 /** W1 mounts this runtime in the canonical backend; no development identity fallback. */
 export async function createTrustRuntime(options: {
@@ -97,6 +99,24 @@ export async function createTrustRuntime(options: {
   await new TrustStore(options.workerPool).assertRole(true);
   const service = new TrustService(store, options.dependencies);
   const telemetry = new TrustTelemetry(options.environment, options.release);
+  const restored = async () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return (
+        (await Promise.race([
+          options.restoreReady(),
+          new Promise<false>((resolve) => {
+            timer = setTimeout(() => resolve(false), 2000);
+            timer.unref();
+          }),
+        ])) === true
+      );
+    } catch {
+      return false;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  };
   const poolError = () => telemetry.increment("database_connection_errors");
   options.apiPool.on("error", poolError);
   options.workerPool.on("error", poolError);
@@ -114,7 +134,7 @@ export async function createTrustRuntime(options: {
         name: "restoration_denial",
         required: true,
         run: async () => ({
-          state: (await options.restoreReady()) ? "available" : "unavailable",
+          state: (await restored()) ? "available" : "unavailable",
           code: "tombstone_replay_gate",
         }),
       },
@@ -164,7 +184,7 @@ export async function createTrustRuntime(options: {
     service,
     origin: origin.origin,
     actor: async (request) => {
-      if (!(await options.restoreReady()))
+      if (!(await restored()))
         throw new DomainError(
           "restoration_pending",
           "Restored data remains unavailable until deletion controls have been reapplied.",
@@ -180,7 +200,7 @@ export async function createTrustRuntime(options: {
   // Pass these into W1's configured backend. Restoration denial must cover
   // conversation/realtime entrypoints as well as the trust router.
   const assertActorAllowed = async (actor: Actor) => {
-    if (!(await options.restoreReady()))
+    if (!(await restored()))
       throw new DomainError(
         "restoration_pending",
         "Restored data remains unavailable until deletion controls have been reapplied.",
@@ -188,18 +208,20 @@ export async function createTrustRuntime(options: {
       );
     await service.assertAllowed(actor);
   };
-  const assertScopeAllowed = async (
-    actor: Actor,
-    creatorId: string,
-    threadId: string,
+  const restrictScope = trustScopeRestriction(service, options.workerPool);
+  const assertScopeAllowed: ScopeRestriction = async (
+    actor,
+    creatorId,
+    threadId,
+    participants,
   ) => {
-    if (!(await options.restoreReady()))
+    if (!(await restored()))
       throw new DomainError(
         "restoration_pending",
         "Restored data remains unavailable until deletion controls have been reapplied.",
         503,
       );
-    await service.assertAllowed(actor, creatorId, threadId);
+    await restrictScope(actor, creatorId, threadId, participants);
   };
   return {
     router,

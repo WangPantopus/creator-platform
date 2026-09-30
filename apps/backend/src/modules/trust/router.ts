@@ -81,7 +81,19 @@ export function createTrustRouter(options: TrustRouterOptions) {
   });
   router.use(express.json({ limit: "64kb" }));
   const id = (req: Request) => z.uuid().parse(req.params.id);
-  const actor = (req: Request) => options.actor(req);
+  const actor = async (req: Request) => {
+    const current = await options.actor(req);
+    // Preserve personal support/appeals/privacy progress after a denial while
+    // preventing a suspended operations account from reading or deciding cases.
+    if (
+      req.path.startsWith("/v1/trust/operations/") ||
+      req.path === "/v1/trust/cases" ||
+      (/^\/v1\/trust\/cases\/[^/]+(?:\/|$)/u.test(req.path) &&
+        !req.path.endsWith("/appeals"))
+    )
+      await options.service.assertAllowed(current);
+    return current;
+  };
   router.get("/health/live", (_req, res) => res.json({ alive: true }));
   router.get("/health/ready", async (_req, res) => {
     const state = await options.readiness.inspect();

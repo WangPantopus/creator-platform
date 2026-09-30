@@ -1,5 +1,7 @@
 # Release gates and trust preparation
 
+**2026-09-30 update:** [resumed evidence](../../artifacts/workstreams/W8/resume/20260930-local/README.md) records current browser/denial/build checks and two existing-suite incompatibilities. Canonical configured trust composition and digest-pinned minimal non-root image are now implemented; no deployment/signing/real-provider readiness is claimed. PR #7 remains draft until its review/merge gates are resolved. The OpenAI key location supplied by the user is server-only and was not read/used; model credentials alone do not establish identity, refunds, storage, calls, notices, WAL, staging or staffed safety.
+
 Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
 
 Qelvora remains a replaceable placeholder. No store account, final domain, billing price, legal approval or production credential is inferred. Nothing here authorizes publication or fees.

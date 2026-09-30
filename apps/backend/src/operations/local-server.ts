@@ -17,6 +17,7 @@ import { SessionService } from "../modules/identity/sessions.js";
 import { DevelopmentIdentityAdapter } from "../modules/identity/development.js";
 import { IdentityProfiles } from "../modules/identity/profiles.js";
 import { IdentityContinueSchema, SessionSchema } from "@qelvora/api";
+import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
 
 // Explicit local harness, never imported by production bootstrap. No production identity fallback.
 if (
@@ -67,18 +68,14 @@ const conversationPool = new pg.Pool({
 });
 const store = new TrustStore(pool);
 await store.assertRole();
-const db: Database = new Database(
-  conversationPool,
-  undefined,
-  (actor, creatorId, threadId) =>
-    service.assertAllowed(actor, creatorId, threadId),
+const db: Database = new Database(conversationPool, undefined, (...scope) =>
+  trustScopeRestriction(service, workerPool)(...scope),
 );
 await db.assertRuntimeRole();
 const access: AccessService = new AccessService(
   conversationPool,
   undefined,
-  (actor, creatorId, threadId) =>
-    service.assertAllowed(actor, creatorId, threadId),
+  (...scope) => trustScopeRestriction(service, workerPool)(...scope),
 );
 const nativeIdentity = new SessionService(
   conversationPool,

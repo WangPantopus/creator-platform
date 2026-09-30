@@ -1,5 +1,7 @@
 # W8 security review and release findings
 
+**2026-09-30 current checks:** [resumed evidence](../../artifacts/workstreams/W8/resume/20260930-local/README.md). Current scoped access/database paths pass W1's repaired row locking; fan blocks deny both participants, including issued scopes. Canonical composition is implemented, personal privacy progress remains available, restricted Ops reads/actions deny, and web private forms/consent clear on account change. Fresh-verification dates, readiness responses and worker receipts/export presence are validated. CI/image digests are pinned and the actual non-root image builds. Production adapter/staging/in-flight-generation proof, eight-domain privacy, safety/legal and native gates remain open; historical statements below are not current runtime state.
+
 Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
 
 2026-09-29 PDT / 2026-09-30 UTC. Source inspection plus specified actual local checks; no production certificate. Only synthetic W8 data was used. No private parent-app data or secrets enter artifacts.

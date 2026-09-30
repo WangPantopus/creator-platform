@@ -52,6 +52,7 @@ export type ApplicationDependencies = {
   generationAvailable?: boolean;
   platformIdentity?: IdentityRuntime;
   features?: readonly FeatureRegistration[];
+  trustRouter?: Router;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -86,12 +87,16 @@ export function createApp(
       }
       const resolved =
         await dependencies.platformIdentity!.sessions.resolve(token);
-      await dependencies.assertActorAllowed?.(resolved.actor);
+      // Trust retains authenticated support, appeals and privacy progress for
+      // closed accounts. Its router enforces operation-specific authority.
+      if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
+        await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
         { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },
         next,
       );
     });
+  if (dependencies.trustRouter) app.use(dependencies.trustRouter);
   app.get("/health", (_req, res) =>
     res.json({
       status: "ok",

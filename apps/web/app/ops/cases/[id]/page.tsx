@@ -11,6 +11,7 @@ import {
   TrustError,
   TrustSession,
   useTrust,
+  useTrustSession,
   trustApi,
   caseLabel,
   dateLabel,
@@ -63,22 +64,20 @@ export default function CasePage({
     );
     return () => window.clearTimeout(timer);
   }, [data?.access_expires_at, refresh]);
-  useEffect(() => {
-    const clear = () => {
-      dialog.current?.close();
-      setPurpose("");
-      setReason("");
-      setAmount("");
-      setRetryReason("");
-      setActionError(null);
-      key.current = null;
-      retryKey.current = null;
-    };
-    window.addEventListener("trust-session", clear);
-    return () => window.removeEventListener("trust-session", clear);
-  }, []);
+  const epoch = useTrustSession(() => {
+    dialog.current?.close();
+    setPurpose("");
+    setReason("");
+    setAmount("");
+    setRetryReason("");
+    setActionError(null);
+    setBusy(false);
+    key.current = null;
+    retryKey.current = null;
+  });
   const confirm = async () => {
     if (!data) return;
+    const current = epoch.current;
     setBusy(true);
     setActionError(null);
     key.current ??= crypto.randomUUID();
@@ -92,17 +91,19 @@ export default function CasePage({
           : {}),
         idempotencyKey: key.current,
       });
+      if (epoch.current !== current) return;
       dialog.current?.close();
       key.current = null;
       await refresh();
     } catch (error) {
+      if (epoch.current !== current) return;
       setActionError(
         error instanceof TrustError
           ? error
           : new TrustError("Reconnect and retry the same action.", "offline"),
       );
     } finally {
-      setBusy(false);
+      if (epoch.current === current) setBusy(false);
     }
   };
   const reset = () => {
@@ -110,6 +111,7 @@ export default function CasePage({
   };
   const recover = async () => {
     if (!data) return;
+    const current = epoch.current;
     setBusy(true);
     setActionError(null);
     retryKey.current ??= crypto.randomUUID();
@@ -119,10 +121,12 @@ export default function CasePage({
         reason: retryReason,
         idempotencyKey: retryKey.current,
       });
+      if (epoch.current !== current) return;
       retryKey.current = null;
       setRetryReason("");
       await refresh();
     } catch (error) {
+      if (epoch.current !== current) return;
       setActionError(
         error instanceof TrustError
           ? error
@@ -132,7 +136,7 @@ export default function CasePage({
             ),
       );
     } finally {
-      setBusy(false);
+      if (epoch.current === current) setBusy(false);
     }
   };
   const caseChoices =
@@ -205,6 +209,7 @@ export default function CasePage({
               className="ops-resolution"
               onSubmit={async (event) => {
                 event.preventDefault();
+                const current = epoch.current;
                 setBusy(true);
                 setActionError(null);
                 try {
@@ -212,15 +217,17 @@ export default function CasePage({
                     purpose,
                     minutes: 15,
                   });
+                  if (epoch.current !== current) return;
                   await refresh();
                 } catch (error) {
+                  if (epoch.current !== current) return;
                   setActionError(
                     error instanceof TrustError
                       ? error
                       : new TrustError("This case is unavailable.", "offline"),
                   );
                 } finally {
-                  setBusy(false);
+                  if (epoch.current === current) setBusy(false);
                 }
               }}
             >

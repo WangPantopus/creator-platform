@@ -1,5 +1,7 @@
 # Trust operation and recovery
 
+**Current resumed environment, 2026-09-30:** Docker `creator-platform-w8-resume-20260930`, loopback55438, database `creator_w8`, same three non-owner URLs; web3008/API4108. Use this name instead of the former container in historical commands. The fresh database applied all28 canonical migrations through0031 and the distinctly synthetic W8 seed; old checkpoint data/recovery files were absent and are not reproduced. Next build/dev output overrides are `.next-w8-build`/`.next-w8-resume` in this isolated worktree. Native historical devices remain released. [Current evidence](../../artifacts/workstreams/W8/resume/20260930-local/README.md) records actor sessions/cases, denial observations, image build and open gates. Preserve these new blocks/jobs/cases; do not clear them for a happy path.
+
 After handoff the user authorized releasing W8 servers/devices/builds/private caches. The former simulator UUID and AVD below are deleted, copies/outputs removed, and port leases released. Read the [release receipt](../../artifacts/workstreams/W8/handoff/20260929/resource-release.md); reserve fresh isolated resources and update launch destinations before using these historical commands. Docker service503 blocks container/image cleanup.
 
 Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.

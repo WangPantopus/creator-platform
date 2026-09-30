@@ -102,6 +102,9 @@ async function forward(
       method: request.method,
       headers: {
         "Content-Type": "application/json",
+        ...(request.headers.get("x-correlation-id")
+          ? { "X-Correlation-Id": request.headers.get("x-correlation-id")! }
+          : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       ...(body ? { body } : {}),

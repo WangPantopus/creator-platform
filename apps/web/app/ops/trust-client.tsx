@@ -13,7 +13,10 @@ export class TrustError extends Error {
 export async function trustApi<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`/api/trust/${path}`, {
     method: body === undefined ? "GET" : "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Correlation-Id": crypto.randomUUID(),
+    },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     cache: "no-store",
   });
@@ -25,6 +28,26 @@ export async function trustApi<T>(path: string, body?: unknown): Promise<T> {
       result.error?.correlationId,
     );
   return result as T;
+}
+/** Invalidate form results as well as reads when the current account changes. */
+export function useTrustSession(reset: () => void) {
+  const epoch = useRef(0);
+  const resetRef = useRef(reset);
+  useEffect(() => {
+    resetRef.current = reset;
+  });
+  useEffect(() => {
+    const clear = () => {
+      epoch.current++;
+      resetRef.current();
+    };
+    window.addEventListener("trust-session", clear);
+    return () => {
+      epoch.current++;
+      window.removeEventListener("trust-session", clear);
+    };
+  }, []);
+  return epoch;
 }
 export function useTrust<T>(path: string) {
   const [data, setData] = useState<T | null>(null);
@@ -63,9 +86,23 @@ export function useTrust<T>(path: string) {
 }
 export function TrustSession() {
   const { data } = useTrust<{ localDevelopment: boolean }>("capabilities");
+  const session = useTrust<{ accountId: string }>("session");
   const [actor, setActor] = useState("fan");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!data?.localDevelopment || !session.data) return;
+    const accountActors: Record<string, string> = {
+      "10000000-0000-4000-8000-000000000001": "fan",
+      "10000000-0000-4000-8000-000000000002": "other_fan",
+      "10000000-0000-4000-8000-000000000003": "creator",
+      "10000000-0000-4000-8000-000000000004": "safety",
+      "10000000-0000-4000-8000-000000000005": "appeals",
+      "10000000-0000-4000-8000-000000000006": "verification",
+    };
+    const selected = accountActors[session.data.accountId];
+    if (selected) setActor(selected);
+  }, [data?.localDevelopment, session.data?.accountId]);
   if (!data?.localDevelopment)
     return (
       <a className="qv-link-btn" href="/api/auth/continue?returnTo=/support">
@@ -116,9 +153,20 @@ export function TrustSession() {
       </button>
       <button
         className="qv-link-btn"
+        disabled={busy}
         onClick={async () => {
-          await trustApi("dev/logout", {});
-          window.dispatchEvent(new Event("trust-session"));
+          setBusy(true);
+          try {
+            await trustApi("dev/logout", {});
+            window.dispatchEvent(new Event("trust-session"));
+            setError("");
+          } catch (error) {
+            setError(
+              error instanceof Error ? error.message : "Sign out unavailable.",
+            );
+          } finally {
+            setBusy(false);
+          }
         }}
       >
         Sign out

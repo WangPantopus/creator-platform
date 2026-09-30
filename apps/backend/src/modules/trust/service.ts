@@ -136,8 +136,8 @@ export class TrustService {
       ? await this.dependencies.evidence(actor, input)
       : { items: [] };
     if (
-      Buffer.byteLength(JSON.stringify(evidence.items.slice(0, 12))) >
-      512 * 1024
+      evidence.items.length > 12 ||
+      Buffer.byteLength(JSON.stringify(evidence.items)) > 512 * 1024
     )
       throw new DomainError(
         "evidence_too_large",
@@ -178,7 +178,7 @@ export class TrustService {
               ],
             );
             const result = created.rows[0]!;
-            for (const item of evidence.items.slice(0, 12))
+            for (const item of evidence.items)
               await client.query(
                 "INSERT INTO creator_trust.case_evidence(case_id,category,snapshot,expires_at) VALUES($1,$2,$3,now()+interval '12 months')",
                 [result.id, item.category, JSON.stringify(item)],
@@ -708,7 +708,19 @@ export class TrustService {
         "Reconnect your account before requesting data changes.",
         503,
       );
-    const verified = await this.dependencies.verifyPrivacy(actor, input);
+    const verification = z
+      .strictObject({
+        verifiedAt: z.date(),
+        reference: z.string().trim().min(8).max(200),
+      })
+      .safeParse(await this.dependencies.verifyPrivacy(actor, input));
+    if (!verification.success)
+      throw new DomainError(
+        "fresh_verification_required",
+        "Verify your account again.",
+        401,
+      );
+    const verified = verification.data;
     if (
       verified.verifiedAt.getTime() < Date.now() - 5 * 60_000 ||
       verified.verifiedAt.getTime() > Date.now() + 30_000

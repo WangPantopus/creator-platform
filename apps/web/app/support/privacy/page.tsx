@@ -7,6 +7,7 @@ import {
   TrustError,
   TrustSession,
   useTrust,
+  useTrustSession,
   trustApi,
   dateLabel,
 } from "../../ops/trust-client";
@@ -16,6 +17,11 @@ function Job({ id }: { id: string }) {
     `privacy/jobs/${id}`,
   );
   const [actionError, setError] = useState<TrustError | null>(null);
+  const [busy, setBusy] = useState(false);
+  const epoch = useTrustSession(() => {
+    setError(null);
+    setBusy(false);
+  });
   return (
     <article className="trust-job">
       <ErrorState error={error} retry={() => void refresh()} />
@@ -54,17 +60,24 @@ function Job({ id }: { id: string }) {
             {data.state !== "complete" && (
               <button
                 className="qv-btn qv-btn--secondary"
+                disabled={busy}
                 onClick={async () => {
+                  const current = epoch.current;
+                  setBusy(true);
                   try {
                     await trustApi(`privacy/jobs/${id}/retry`, {});
+                    if (epoch.current !== current) return;
                     setError(null);
                     await refresh();
                   } catch (error) {
+                    if (epoch.current !== current) return;
                     setError(
                       error instanceof TrustError
                         ? error
                         : new TrustError("Retry unavailable.", "offline"),
                     );
+                  } finally {
+                    if (epoch.current === current) setBusy(false);
                   }
                 }}
               >
@@ -104,7 +117,20 @@ export default function PrivacyPage() {
   const [result, setResult] = useState("");
   const key = useRef<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const epoch = useTrustSession(() => {
+    dialog.current?.close();
+    setKind("export");
+    setScope("account");
+    setCreator("");
+    setThread("");
+    setProof("");
+    setBusy(false);
+    setError(null);
+    setResult("");
+    key.current = null;
+  });
   const run = async () => {
+    const current = epoch.current;
     setBusy(true);
     setError(null);
     key.current ??= crypto.randomUUID();
@@ -120,6 +146,7 @@ export default function PrivacyPage() {
           idempotencyKey: key.current,
         },
       );
+      if (epoch.current !== current) return;
       setResult(
         job.immediateDeny
           ? "Your deletion request is saved and its scope is denied now. Purge is complete only when every domain acknowledges it."
@@ -129,6 +156,7 @@ export default function PrivacyPage() {
       key.current = null;
       await refresh();
     } catch (error) {
+      if (epoch.current !== current) return;
       setError(
         error instanceof TrustError
           ? error
@@ -138,7 +166,7 @@ export default function PrivacyPage() {
             ),
       );
     } finally {
-      setBusy(false);
+      if (epoch.current === current) setBusy(false);
     }
   };
   return (

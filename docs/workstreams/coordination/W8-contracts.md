@@ -1,5 +1,15 @@
 # W8 contract, migration and runtime register
 
+## 2026-09-30 resumed lease and additive seam
+
+The human user authorized a narrow temporary W8-branch edit lease for `apps/backend/src/integration.ts`, `app.ts`, `db/database.ts` and `modules/access/scope.ts`. No peer worktree was edited. Current W8 resources: web3008/API4108, Docker `creator-platform-w8-resume-20260930`/loopback55438, synthetic `creator_w8`; separate `creator_w8_foundation_test` for the unchanged existing suite; Next `.next-w8-resume`/`.next-w8-build`. Historical resources below are not active reservations. No native device is newly reserved.
+
+`ScopeRestriction` now receives a fourth, W1-verified participant argument `{fanAccountId,creatorAccountId}`. `ThreadScope` carries the fan account, and Database obtains its current value from its authority query on every operation. W8's coordinator restriction checks deny metadata for both participants, including fan blocks and immutable deleted-creator ownership. Existing three-argument callbacks remain callable implementations but should adopt the participant-aware W8 seam.
+
+`createConfiguredBackend({trust})` accepts reviewed trust options or an async factory receiving the canonical pool/database/access/conversation/identity runtime. It supplies canonical actor resolution and exact origin, mounts the trust router, composes both existing/W8 denial callbacks, starts/drains the worker and exposes `trust` to the host. Non-development identity requires composed trust or both explicit denial callbacks; development identity cannot be used for the deployed trust runtime. Trust paths preserve authenticated support/appeal/privacy progress, with operation-specific denial for case reviewers. Supplied trust pools remain host-owned and must be closed by the host after backend drain.
+
+Current acceptance and known existing-suite incompatibilities: [resumed evidence](../../../artifacts/workstreams/W8/resume/20260930-local/README.md). No private-domain RLS/grant or immutable migration was changed. This additive register announces the seam locally; no peer chat was messaged.
+
 **Post-handoff resource release:** [PR #7](https://github.com/WangPantopus/creator-platform/pull/7) targets main. At the user's request, W8 servers/devices/builds/private caches/temp credentials are released; the former leases below are historical. Read the [resource-release record](../../../artifacts/workstreams/W8/handoff/20260929/resource-release.md) and receipt before recreating isolated resources. Docker cleanup remains blocked by Docker Desktop503; current DB state/volumes were not deleted. The complete resume prompt and all original remaining work still apply.
 
 Continuation authority: [full W8 handoff](../handoffs/W8.md) and [next-agent prompt](../handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
