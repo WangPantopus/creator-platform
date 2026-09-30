@@ -117,7 +117,7 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Monthly spending limit").qText("body-strong")
                 HStack { Button("Choose an amount", variant: .secondary) { choice = "amount" }; Button("No limit", variant: .secondary) { choice = "none" } }
-                if choice == "amount" { TextField("Amount in \(data.policy.currency)", text: $amount).keyboardType(.decimalPad).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
+                if choice == "amount" { monthlyAmountField(data.policy.currency).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
                 Toggle("Remind me at 50% and 100%", isOn: $reminders).qText("body")
                 Text("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.").qText("caption")
                 Button(busy ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: busy || choice.isEmpty) { Task {
@@ -127,6 +127,13 @@ struct CommerceFeature: View {
             ForEach(data.spendingNotices) { notice in Text("You’ve reached \(notice.threshold)% of your monthly limit.").qText("body") }
             Notice(title: "AI time", children: "Your time summary is unavailable until conversation activity is connected.")
         }
+    }
+    @ViewBuilder private func monthlyAmountField(_ currency: String) -> some View {
+        #if os(iOS)
+        TextField("Amount in \(currency)", text: $amount).keyboardType(.decimalPad)
+        #else
+        TextField("Amount in \(currency)", text: $amount)
+        #endif
     }
     private func access(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {

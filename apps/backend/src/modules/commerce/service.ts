@@ -1948,19 +1948,28 @@ export class CommerceService {
               : await this.provider.release(intentId, effect.provider_key);
           await this.applyIntent(actor, effect, intent);
         } else if (effect.operation === "refund") {
+          const recovered = !effect.provider_ref
+            ? await this.provider.recoverRefund?.({
+                intentId,
+                amount: effect.request.amount,
+                key: effect.provider_key,
+              })
+            : undefined;
           invariant(
             effect.provider_ref ||
+              recovered ||
               Date.now() - effect.created_at.getTime() < 23 * 3600000,
             "operator_reconciliation_required",
             "The original refund needs provider reconciliation; no second refund is attempted.",
           );
           const refund = effect.provider_ref
             ? await this.provider.fetchRefund(effect.provider_ref)
-            : await this.provider.refund(
+            : (recovered ??
+              (await this.provider.refund(
                 intentId,
                 effect.request.amount,
                 effect.provider_key,
-              );
+              )));
           await this.account(actor, async (client) => {
             const p = await this.lockPacket(client, effect.packet_id);
             await this.fenceEffect(client, effect);

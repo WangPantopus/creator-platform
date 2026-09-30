@@ -27,6 +27,7 @@ export function createCommerceRouter(input: {
       nativeReplyPurchase: false,
       membershipAvailable: input.extended?.billing?.configured ?? false,
       passEnabled: input.service?.policy.passEnabled ?? false,
+      payoutsAvailable: input.extended?.settlement?.configured ?? false,
     }),
   );
   router.get("/overview", async (req, res) => {
@@ -51,6 +52,34 @@ export function createCommerceRouter(input: {
         membershipAvailable: input.extended?.billing?.configured ?? false,
       },
     });
+  });
+  router.post("/packets/:packetId/reconcile-money", async (req, res) => {
+    if (!input.extended?.money)
+      throw new DomainError(
+        "money_reconciliation_unavailable",
+        "Current provider statements are not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.money.reconcile(
+        await input.actorFor(req),
+        id(req.params.packetId),
+      ),
+    );
+  });
+  router.post("/commitments/:commitmentId/release", async (req, res) => {
+    if (!input.extended?.settlement?.configured)
+      throw new DomainError(
+        "payout_unavailable",
+        "Payout transfers are not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.settlement.release(
+        await input.actorFor(req),
+        id(req.params.commitmentId),
+      ),
+    );
   });
   router.post("/memberships/start", async (req, res) => {
     if (!input.extended?.billing)

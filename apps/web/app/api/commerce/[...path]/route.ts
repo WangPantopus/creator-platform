@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { platformFetch } from "../../../../lib/session";
 const route =
-  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
+  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|commitments\/[a-f0-9-]{36}\/release|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|reconcile-money|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
 async function proxy(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },

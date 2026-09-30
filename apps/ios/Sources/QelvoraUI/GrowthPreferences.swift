@@ -27,7 +27,11 @@ struct GrowthNotificationSettings: View {
                 Toggle("Hide sensitive previews", isOn: field(\.hideSensitive))
                 TextField("Quiet hours from · HH:mm", text: $from).textFieldStyle(.roundedBorder)
                 TextField("Quiet hours until · HH:mm", text: $until).textFieldStyle(.roundedBorder)
+                #if os(iOS)
                 TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).textInputAutocapitalization(.never)
+                #else
+                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder)
+                #endif
                 Text("Leave both times empty for no quiet hours.").qText("caption")
                 ForEach(creators) {creator in Toggle(creator.name + " · push and email", isOn: allowed(\.mutedCreators, creator.id))}
                 ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(kind.replacingOccurrences(of: "_", with: " ")).qText("label");Toggle("Push", isOn: allowed(\.disabledPushTypes, kind));Toggle("Email", isOn: allowed(\.disabledEmailTypes, kind))}}

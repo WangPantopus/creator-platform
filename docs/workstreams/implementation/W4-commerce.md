@@ -4,6 +4,8 @@
 
 `financial-export.ts` pages complete forced-RLS collections in one repeatable snapshot, resolves linked grants per authorized pair, hashes exact staged pages and publishes only through the W8 writer’s final fence. `audience.ts` projects genuine tier/group authority with a five-second maximum lease. Current actor denials can be injected into every commerce account transaction. Tier command replay resolves completed idempotent commands before provider availability checks. No applied migration history changed.
 
+`stripe-connect.ts` implements actual provider balance transactions, charge/refund/dispute lineage, configured fee/reserve allocation, Connect verification and source-charge transfers with confirmed reversal receipts. Refund metadata and transfer groups recover original unknown references before new-write age gates. Reversal adjustments preserve append-only ledger causes; changed post-transfer funds/account eligibility requires durable compensation. `MoneyReconciliation` permits signed net liabilities while every ledger amount remains nonnegative. These providers require approved server authority/economics and have no paid acceptance yet.
+
 These additions supersede dated “missing adapter/client” descriptions below where specified; provider/host acceptance and external policy gates remain explicit in the current status and evidence.
 
 # W4 commerce implementation and recovery
