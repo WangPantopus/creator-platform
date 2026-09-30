@@ -43,6 +43,13 @@ export interface LicenseVerifier {
   ): Promise<License>;
   /** Rechecks current reviewed policy, signed proof and creator authority. */
   isCurrent(scope: CreatorScope, license: License): Promise<boolean>;
+  /** Holds the canonical policy/signature authority until the caller commits.
+   * Required for durable fan delivery; a separate preflight cannot close revocation races. */
+  isCurrentInTransaction?(
+    scope: CreatorScope,
+    license: License,
+    client: PoolClient,
+  ): Promise<boolean>;
 }
 const emptyThread: ThreadSnapshot = {
   revision: 0,
@@ -80,11 +87,21 @@ export class AgentService {
     this.repository = repository;
     this.pipeline = pipeline;
   }
-  async currentLicense(scope: CreatorScope, license: License | null) {
+  async currentLicense(
+    scope: CreatorScope,
+    license: License | null,
+    client?: PoolClient,
+  ) {
     return license &&
       licensed(license) &&
       this.licenseVerifier &&
-      (await this.licenseVerifier.isCurrent(scope, license))
+      (client
+        ? await this.licenseVerifier.isCurrentInTransaction?.(
+            scope,
+            license,
+            client,
+          )
+        : await this.licenseVerifier.isCurrent(scope, license))
       ? license
       : null;
   }

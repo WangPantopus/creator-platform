@@ -85,6 +85,36 @@ export class ConversationService {
   configureDelivery(delivery: typeof this.delivery) {
     this.delivery = delivery;
   }
+  /** Revalidate the current configured policy before every remote fan-text call.
+   * A thread's historical notice alone is not current processor consent. */
+  async assertProcessorConsent(scope: ThreadScope) {
+    invariant(
+      this.delivery.policyVersion,
+      "processor_consent_unavailable",
+      "Current AI processor policy is unavailable.",
+    );
+    await this.db.withThread(scope, async (client) => {
+      const current = await client.query(
+        `SELECT t.id FROM creator.thread t
+         WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3
+         AND t.processor_consent_version=$4
+         AND EXISTS(SELECT 1 FROM creator.processor_consent c
+           WHERE c.thread_id=t.id AND c.creator_id=$2 AND c.fan_id=$3
+           AND c.version=$4 AND c.withdrawn_at IS NULL)`,
+        [
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+          this.delivery.policyVersion,
+        ],
+      );
+      invariant(
+        current.rowCount === 1,
+        "processor_consent_required",
+        "Review the current AI providers before messaging.",
+      );
+    });
+  }
   private async settle(
     client: PoolClient,
     scope: ThreadScope,

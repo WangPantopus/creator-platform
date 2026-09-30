@@ -78,6 +78,11 @@ export function createAgentDomain(input: {
       conversation: Boolean(
         runtime && input.conversation?.assertProcessorConsent,
       ),
+      atomicDelivery: Boolean(
+        runtime &&
+          input.audience?.currentInTransaction &&
+          input.licenseVerifier?.isCurrentInTransaction,
+      ),
       shadow: Boolean(input.shadowFeed),
       trust: Boolean(input.trust && input.settleDeparture),
       exports: Boolean(input.exports),

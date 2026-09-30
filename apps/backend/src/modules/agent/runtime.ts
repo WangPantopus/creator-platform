@@ -7,6 +7,7 @@ import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { reserveCreatorCost, settleCreatorCost } from "./budget.js";
 import { AgentService } from "./service.js";
+import { assertAgentDelivery } from "./delivery-authority.js";
 import {
   licenseRow,
   sourceRows,
@@ -32,6 +33,11 @@ export interface ConversationContextPort {
 }
 export interface AudiencePort {
   current(scope: ThreadScope): Promise<AudienceSnapshot>;
+  /** Canonical W4 authority, locked through the caller's sentence commit. */
+  currentInTransaction?(
+    scope: ThreadScope,
+    client: PoolClient,
+  ): Promise<AudienceSnapshot>;
 }
 export type ApprovedSentence = {
   text: string;
@@ -51,6 +57,23 @@ export class LiveAgentRuntime {
   interruptCreator(creatorId: string) {
     for (const controller of this.active.get(creatorId) ?? [])
       controller.abort();
+  }
+  /** W3 invokes these inside its existing acceptance/release transaction. */
+  async assertReady(scope: ThreadScope, client: PoolClient) {
+    await assertAgentDelivery(this.service, this.audiences, scope, client);
+  }
+  async assertApproved(
+    scope: ThreadScope,
+    client: PoolClient,
+    sentence: ApprovedSentence,
+  ) {
+    await assertAgentDelivery(
+      this.service,
+      this.audiences,
+      scope,
+      client,
+      sentence,
+    );
   }
   /** W3 calls before a paid generation reservation. Safety needs current thread authority, never a license or grant. */
   async routeSafety(

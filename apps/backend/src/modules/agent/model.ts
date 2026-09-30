@@ -2,6 +2,11 @@ import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import { streamResponses, type StreamProposal } from "./streaming.js";
 import { contentHash } from "../../core/canonical.js";
+import {
+  ModelRateSchema,
+  responseUsage,
+  type ModelRate,
+} from "./response-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 
 export const ReplySchema = z.strictObject({
@@ -84,10 +89,7 @@ export type ModelConfiguration = {
   smallModel: string;
   largeModel: string;
   embeddingModel: string;
-  rates?: Record<
-    string,
-    { inputMicrosPerMillion: number; outputMicrosPerMillion: number }
-  >;
+  rates?: Record<string, ModelRate>;
   policyReference: string;
 };
 /** No model defaults, credentials, rate assumptions or provider training guarantees. */
@@ -95,16 +97,33 @@ export class OpenAIResponsesModel implements AgentModel {
   readonly fingerprint: string;
   readonly embeddingModel: string;
   get pricingConfigured() {
-    return [
-      this.configuration.smallModel,
-      this.configuration.largeModel,
-      this.configuration.embeddingModel,
-    ].every((model) => Boolean(this.configuration.rates?.[model]));
+    return (
+      [
+        this.configuration.smallModel,
+        this.configuration.largeModel,
+        this.configuration.embeddingModel,
+      ].every((model) => Boolean(this.configuration.rates?.[model])) &&
+      [this.configuration.smallModel, this.configuration.largeModel].every(
+        (model) => {
+          const rate = this.configuration.rates?.[model];
+          return (
+            rate?.cachedInputMicrosPerMillion !== undefined &&
+            rate.cacheWriteMicrosPerMillion !== undefined
+          );
+        },
+      )
+    );
   }
   maximumRunCostMicros(prefixBytes: number) {
     if (!this.pricingConfigured) return null;
     const rates = Object.values(this.configuration.rates!);
-    const input = Math.max(...rates.map((r) => r.inputMicrosPerMillion));
+    const input = Math.max(
+      ...rates.flatMap((r) => [
+        r.inputMicrosPerMillion,
+        r.cachedInputMicrosPerMillion ?? 0,
+        r.cacheWriteMicrosPerMillion ?? 0,
+      ]),
+    );
     const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
     return Math.ceil(
       ((prefixBytes + 80_000) * 20 * input + 40_000 * output) / 1_000_000,
@@ -150,7 +169,7 @@ export class OpenAIResponsesModel implements AgentModel {
     const { apiKey: _apiKey, ...publicConfiguration } = configuration;
     void _apiKey;
     this.fingerprint = contentHash({
-      adapter: "responses-v1",
+      adapter: "responses-v3-cache-routing",
       ...publicConfiguration,
     });
   }
@@ -283,6 +302,11 @@ export class OpenAIResponsesModel implements AgentModel {
         store: false,
         max_output_tokens: 2000,
         instructions,
+        prompt_cache_key: contentHash({
+          model,
+          instructions,
+          schema: jsonSchema,
+        }),
         input: [{ role: "user", content: context.join("\n\n") }],
         text: {
           format: {
@@ -316,28 +340,10 @@ export class OpenAIResponsesModel implements AgentModel {
       .filter((item) => item.type === "output_text")
       .map((item) => item.text ?? "")
       .join("");
-    const usage = z
-      .object({
-        input_tokens: z.number().int().nonnegative(),
-        output_tokens: z.number().int().nonnegative(),
-      })
-      .parse(result.usage);
     const rate = this.configuration.rates?.[model];
     return {
       value: schema.parse(JSON.parse(text)),
-      usage: {
-        inputTokens: usage.input_tokens,
-        outputTokens: usage.output_tokens,
-        costMicros: rate
-          ? Math.ceil(
-              (usage.input_tokens * rate.inputMicrosPerMillion +
-                usage.output_tokens * rate.outputMicrosPerMillion) /
-                1_000_000,
-            )
-          : null,
-        model,
-        provider: "OpenAI",
-      },
+      usage: responseUsage(result.usage, model, rate),
     };
   }
 }
@@ -355,13 +361,7 @@ export function modelFromEnvironment(
   let rates: ModelConfiguration["rates"];
   if (env.W2_MODEL_RATES_JSON)
     rates = z
-      .record(
-        z.string(),
-        z.strictObject({
-          inputMicrosPerMillion: z.number().nonnegative(),
-          outputMicrosPerMillion: z.number().nonnegative(),
-        }),
-      )
+      .record(z.string(), ModelRateSchema)
       .parse(JSON.parse(env.W2_MODEL_RATES_JSON));
   return new OpenAIResponsesModel({
     apiKey: env.OPENAI_API_KEY,

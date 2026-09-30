@@ -16,10 +16,7 @@ import { studioFeature } from "./modules/studio/registration.js";
 import type { StudioService } from "./modules/studio/service.js";
 import { createGrowthRouter } from "./modules/growth/router.js";
 import type { GrowthService } from "./modules/growth/service.js";
-import {
-  createW6Router,
-  type W6RouterDependencies,
-} from "./modules/media/router.js";
+import { mediaFeature } from "./modules/media/registration.js";
 import {
   createTrustRouter,
   type TrustRouterOptions,
@@ -40,7 +37,7 @@ export function registerDomainFeatures(input: {
   commerce?: CommerceService;
   extendedCommerce?: ExtendedCommerce;
   growth?: GrowthService;
-  media?: Omit<W6RouterDependencies, "scopeFor">;
+  media?: Parameters<typeof mediaFeature>[0];
   trust?: Omit<TrustRouterOptions, "actor">;
 }): FeatureRegistration[] {
   const registrations: FeatureRegistration[] = [];
@@ -63,12 +60,7 @@ export function registerDomainFeatures(input: {
       path: "/v1/growth",
       router: ({ actorFor }) => createGrowthRouter(input.growth!, actorFor),
     });
-  if (input.media)
-    registrations.push({
-      name: "media",
-      path: "/v1/w6",
-      router: ({ scopeFor }) => createW6Router({ ...input.media, scopeFor }),
-    });
+  if (input.media) registrations.push(mediaFeature(input.media));
   if (input.trust)
     registrations.push({
       name: "trust",
