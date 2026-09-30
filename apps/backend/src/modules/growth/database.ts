@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
 
 export class GrowthDatabase {
   constructor(
@@ -8,6 +9,38 @@ export class GrowthDatabase {
     readonly worker: Pool,
   ) {}
   async ready() {
+    const roles = await Promise.all(
+      [this.runtime, this.worker].map(
+        async (pool) =>
+          (await pool.query("SELECT current_user AS name")).rows[0]?.name,
+      ),
+    );
+    if (roles[0] === roles[1])
+      throw new DomainError(
+        "separate_growth_roles_required",
+        "Growth requires distinct runtime and worker roles.",
+        503,
+      );
+    const runtimeAccess = (
+      await this.runtime.query(
+        "SELECT pg_has_role(current_user,'growth_runtime','MEMBER') AS runtime,pg_has_role(current_user,'growth_worker','MEMBER') AS worker",
+      )
+    ).rows[0];
+    const workerAccess = (
+      await this.worker.query(
+        "SELECT pg_has_role(current_user,'growth_worker','MEMBER') AS worker",
+      )
+    ).rows[0];
+    if (
+      !runtimeAccess?.runtime ||
+      runtimeAccess.worker ||
+      !workerAccess?.worker
+    )
+      throw new DomainError(
+        "unsafe_growth_membership",
+        "Actor persistence must not inherit ETL authority.",
+        503,
+      );
     for (const pool of [this.runtime, this.worker]) {
       const result = await pool.query(`SELECT r.rolsuper,r.rolbypassrls,
         EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON c.relnamespace=n.oid WHERE n.nspname='growth' AND c.relowner=r.oid) AS owns
@@ -44,6 +77,10 @@ export class GrowthDatabase {
         "Adult eligibility is required.",
       );
     return this.transaction(this.runtime, async (client) => {
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        actor.accountId,
+      ]);
+      await assertCurrentSession(client, actor.accountId);
       await client.query(
         "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true)",
         [actor.accountId, creatorId ?? ""],
@@ -58,6 +95,9 @@ export class GrowthDatabase {
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
+      await client.query(
+        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+      );
       const value = await work(client);
       await client.query("COMMIT");
       return value;

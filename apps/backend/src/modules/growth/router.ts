@@ -9,15 +9,23 @@ import { DomainError } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
 import type { GrowthService } from "./service.js";
 import { Retention } from "./retention.js";
+import { Engagement } from "./engagement.js";
+import { GrowthExperiments } from "./experiments.js";
 
 /** W1 mounts this router before its 404, supplies the canonical session resolver. */
 export function createGrowthRouter(
   service: GrowthService,
   actorFor: (request: Request) => Promise<Actor>,
-  options: { retention?: Retention } = {},
+  options: {
+    retention?: Retention;
+    engagement?: Engagement;
+    experiments?: GrowthExperiments;
+  } = {},
 ) {
   const router = Router();
   const retention = options.retention ?? new Retention(service);
+  const engagement = options.engagement ?? new Engagement(service);
+  const experiments = options.experiments ?? new GrowthExperiments(service);
   router.use((_req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -31,7 +39,12 @@ export function createGrowthRouter(
       await service.discover(
         String(req.query.q ?? ""),
         String(req.query.category ?? ""),
-        Number(req.query.offset ?? 0) || 0,
+        z.coerce
+          .number()
+          .int()
+          .min(0)
+          .max(1000)
+          .parse(req.query.offset ?? 0),
       ),
     ),
   );
@@ -88,6 +101,57 @@ export function createGrowthRouter(
   );
   router.get("/discovery-access", async (req, res) =>
     res.json(await service.passDiscovery(await actorFor(req))),
+  );
+  router.post("/engagement/:kind/claim", async (req, res) =>
+    res.json(
+      await engagement.claimPrompt(
+        await actorFor(req),
+        req.params.kind,
+        z.strictObject({ platform: z.enum(["ios", "android"]) }).parse(req.body)
+          .platform,
+      ),
+    ),
+  );
+  router.put("/engagement/:kind/choice", async (req, res) =>
+    res.json(
+      await engagement.choosePrompt(
+        await actorFor(req),
+        req.params.kind,
+        z
+          .strictObject({ choice: z.enum(["later", "declined", "accepted"]) })
+          .parse(req.body).choice,
+      ),
+    ),
+  );
+  router.get("/engagement", async (req, res) =>
+    res.json({ choices: await engagement.choices(await actorFor(req)) }),
+  );
+  router.post("/entry", async (req, res) =>
+    res.json(await engagement.attribute(await actorFor(req), req.body)),
+  );
+  router.post("/referrals", async (req, res) =>
+    res
+      .status(201)
+      .json(await engagement.createReferral(await actorFor(req), req.body)),
+  );
+  router.delete("/invites/:id", async (req, res) =>
+    res.json(
+      await engagement.revokeInvite(await actorFor(req), uuid(req.params.id)),
+    ),
+  );
+  router.get("/experiments/variant/:handle", async (req, res) =>
+    res.json({
+      variant: await experiments.variant(
+        await actorFor(req),
+        String(req.params.handle),
+        z
+          .enum(["creator_landing", "onboarding_message"])
+          .parse(req.query.surface),
+      ),
+    }),
+  );
+  router.put("/experiments/:id/stop", async (req, res) =>
+    res.json(await experiments.stop(await actorFor(req), uuid(req.params.id))),
   );
   router.get("/home", async (req, res) =>
     res.json(await service.home(await actorFor(req))),

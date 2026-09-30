@@ -146,6 +146,11 @@
       "version": "0031_w4_purchase_history",
       "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
       "owner": "W4"
+    },
+    {
+      "version": "0032_growth_continuation",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "owner": "W7"
     }
   ],
   "reserved": [
