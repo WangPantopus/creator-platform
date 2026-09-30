@@ -70,33 +70,48 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
+      let window = NSWindow(
+        contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
+        backing: .buffered, defer: false)
+      window.colorSpace = .sRGB
+      window.isReleasedWhenClosed = false
+      // AppKit's layer cache follows the actual display. Enlarge the rendered
+      // view on a1x host, not the cached pixels, to retain native text and glow.
+      let captureScale = 2 / window.backingScaleFactor
+      let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
       let host = NSHostingView(
         rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }
-          .frame(
-            width: size.width, height: size.height))
-      host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
-        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
-      window.colorSpace = .sRGB
+          .frame(width: size.width, height: size.height)
+          .scaleEffect(captureScale, anchor: .topLeading)
+          .frame(width: canvas.width, height: canvas.height, alignment: .topLeading))
+      host.frame = NSRect(origin: .zero, size: canvas)
+      window.setContentSize(canvas)
       window.contentView = host
+      defer {
+        window.contentView = nil
+        window.close()
+      }
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
       // Match the existing2x references without inheriting a runner display's scale/profile.
-      guard let context = CGContext(
-        data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
-        bitsPerComponent: 8, bytesPerRow: 0,
-        space: CGColorSpace(name: CGColorSpace.sRGB)!,
-        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-      ), let pixels = context.makeImage() else {
+      guard
+        let context = CGContext(
+          data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
+          bitsPerComponent: 8, bytesPerRow: 0,
+          space: CGColorSpace(name: CGColorSpace.sRGB)!,
+          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ), let pixels = context.makeImage()
+      else {
         XCTFail("Snapshot bitmap could not be allocated.", file: file, line: line)
         return
       }
       let bitmap = NSBitmapImageRep(cgImage: pixels)
-      bitmap.size = size
+      bitmap.size = canvas
       host.cacheDisplay(in: host.bounds, to: bitmap)
+      bitmap.size = size
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
       var imageStrategy = Snapshotting<NSImage, NSImage>.image
@@ -150,7 +165,6 @@
       assertSnapshot(
         of: image, as: imageStrategy, named: name, record: record, file: file,
         testName: testName, line: line)
-      window.contentView = nil
     }
   }
 #endif
