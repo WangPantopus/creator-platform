@@ -37,46 +37,57 @@ export function agentActivationSource(
         "activation_authority_invalid",
         "Current creator ownership is required.",
       );
-      const facts = await service.repository.transaction(
-        scope,
-        async (client, workspace, creator) => {
-          const version = (
-            await client.query<{
-              id: string;
-              state: string;
-              published_at: Date;
-              source_set: unknown[];
-            }>(
-              "SELECT id,state,published_at,source_set FROM creator.ai_version WHERE creator_id=$1 AND number=$2",
-              [scope.creatorId, input.agentVersion],
-            )
-          ).rows[0];
-          invariant(
-            version &&
-              version.published_at.valueOf() === input.publishedAt.valueOf() &&
-              input.closedAt.valueOf() ===
-                input.publishedAt.valueOf() + 72 * 3600000,
-            "activation_version_invalid",
-            "The exact published version and closed 72-hour window are required.",
-          );
-          const license = await licenseRow(client, scope.creatorId);
-          const state =
-            creator.verification !== "verified" ||
-            !(await service.currentLicense(scope, license))
-              ? "revoked"
-              : workspace.paused || version.state === "paused"
-                ? "paused"
-                : workspace.live_version_id === version.id &&
-                    version.state === "live"
-                  ? "published"
-                  : "unpublished";
-          return {
-            state: state as "published" | "paused" | "unpublished" | "revoked",
-            sourceCount: version.source_set.length,
-          };
-        },
-      );
+      const readFacts = () =>
+        service.repository.transaction(
+          scope,
+          async (client, workspace, creator) => {
+            const version = (
+              await client.query<{
+                id: string;
+                state: string;
+                published_at: Date;
+                source_set: unknown[];
+              }>(
+                "SELECT id,state,published_at,source_set FROM creator.ai_version WHERE creator_id=$1 AND number=$2",
+                [scope.creatorId, input.agentVersion],
+              )
+            ).rows[0];
+            invariant(
+              version &&
+                version.published_at &&
+                version.published_at.valueOf() ===
+                  input.publishedAt.valueOf() &&
+                input.closedAt.valueOf() ===
+                  input.publishedAt.valueOf() + 72 * 3600000 &&
+                input.closedAt.valueOf() <= Date.now(),
+              "activation_version_invalid",
+              "The exact published version and closed 72-hour window are required.",
+            );
+            const license = await licenseRow(client, scope.creatorId);
+            const state =
+              creator.verification !== "verified" ||
+              !(await service.currentLicense(scope, license))
+                ? "revoked"
+                : workspace.paused || version.state === "paused"
+                  ? "paused"
+                  : workspace.live_version_id === version.id &&
+                      version.state === "live"
+                    ? "published"
+                    : "unpublished";
+            return {
+              state: state as
+                | "published"
+                | "paused"
+                | "unpublished"
+                | "revoked",
+              sourceCount: version.source_set.length,
+            };
+          },
+        );
+      await readFacts();
       const observed = Outcomes.parse(await outcomes.snapshot(input));
+      // Ownership, pause and license may change while W3 gathers the aggregate.
+      const facts = await readFacts();
       return {
         creatorId: input.creatorId,
         agentVersion: input.agentVersion,

@@ -173,6 +173,7 @@ export class AgentLifecycle {
           [scope.creatorId],
         );
       }
+      await assertAuthorized();
       await client.query("COMMIT");
       return receipt;
     } catch (error) {

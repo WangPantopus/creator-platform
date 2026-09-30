@@ -65,6 +65,11 @@ export class LiveAgentRuntime {
     }) => Promise<void>,
   ) {
     assertThreadScope(scope);
+    invariant(
+      message.trim().length > 0 && message.length <= 2000,
+      "message_invalid",
+      "A bounded fan message is required.",
+    );
     signal.throwIfAborted();
     const snapshot = await this.conversations.current(scope);
     let crisis = needsImmediateSafety(message);

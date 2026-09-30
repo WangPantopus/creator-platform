@@ -439,13 +439,18 @@ export function CreatorAI({ section }: { section: string }) {
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
     let cancelled = false;
+    const expectedActor = actorKey.current;
     const load = async () => {
       try {
         const response = await fetch("/api/studio/ai/comparisons", {
           cache: "no-store",
+          headers: expectedActor ? { "X-Studio-Actor": expectedActor } : {},
         });
-        if (response.ok && !cancelled)
-          setComparisons((await response.json()) as typeof comparisons);
+        if (response.ok) {
+          const result = (await response.json()) as typeof comparisons;
+          if (!cancelled && actorKey.current === expectedActor)
+            setComparisons(result);
+        }
       } catch {
         /* Keep the last received comparison during a reconnect. */
       }
@@ -456,7 +461,7 @@ export function CreatorAI({ section }: { section: string }) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [current, state?.creator.id]);
+  }, [current, state?.creator.id, state?.actorAccountId]);
   const api = async (path: string, body?: unknown, method = "POST") => {
     if (!navigator.onLine)
       throw new Error(
@@ -479,6 +484,8 @@ export function CreatorAI({ section }: { section: string }) {
     });
     const result = (await response.json()) as ErrorBody &
       Record<string, unknown>;
+    if (actorKey.current !== expectedActor)
+      throw new Error("Your Studio session changed. Reload before continuing.");
     if (!response.ok)
       throw new Error(
         result.error?.message ?? "The action did not finish. Try again.",
@@ -1573,7 +1580,9 @@ export function CreatorAI({ section }: { section: string }) {
                             DRAFT · REVISION {state.revision}
                           </span>
                           <span className="qv-badge">
-                            {state.evaluation?.state ?? "Not run"}
+                            {state.evaluation && !state.evaluationCurrent
+                              ? `Stale · revision ${state.evaluation.revision}`
+                              : (state.evaluation?.state ?? "Not run")}
                           </span>
                         </div>
                         <ul className="qv-console__list">
@@ -1653,6 +1662,15 @@ export function CreatorAI({ section }: { section: string }) {
                             <p className="qv-console__why">
                               {selectedCase.reason}
                             </p>
+                            {selectedCase.withheld && (
+                              <>
+                                <p className="qv-console__why">
+                                  Withheld before delivery ·{" "}
+                                  {selectedCase.withheld.category}
+                                </p>
+                                <p>{selectedCase.withheld.text}</p>
+                              </>
+                            )}
                           </div>
                         )}
                         <div className="qv-console__foot">
@@ -1752,8 +1770,8 @@ export function CreatorAI({ section }: { section: string }) {
                           <>
                             <AuthorLabel kind="ai" name={state.creator.name} />
                             {preview.sentences.map((sentence, index) => (
-                              <p key={index}>
-                                {sentence.text}
+                              <div key={index}>
+                                <p>{sentence.text}</p>
                                 {sentence.citations.map((id) => (
                                   <details key={id}>
                                     <summary>Open authorized passage</summary>
@@ -1761,13 +1779,13 @@ export function CreatorAI({ section }: { section: string }) {
                                       ?.text ?? "No longer accessible to you"}
                                   </details>
                                 ))}
-                              </p>
+                              </div>
                             ))}
                             <p className="qv-help">
                               Pipeline {preview.durationMs} ms · first approved{" "}
                               {preview.firstApprovedMs ?? "withheld"} ms · cost{" "}
                               {preview.usage.some((u) => u.costMicros === null)
-                                ? "requires reviewed rates"
+                                ? "awaiting provider usage or rate reconciliation"
                                 : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
                             </p>
                           </>
