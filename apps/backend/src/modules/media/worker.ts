@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, stat } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
+import path from "node:path";
 import { z } from "zod";
 import type { ThreadScope } from "../access/scope.js";
 import { MediaService } from "./service.js";
@@ -46,26 +47,54 @@ function processFile(
     });
     // Parser diagnostics can contain file metadata. Never include them in shared logs/evidence.
     child.stderr.resume();
-    child.on("error", (error) => {
+    child.on("error", () => {
       failed = true;
       clearTimeout(timer);
-      reject(error);
+      reject(new Error("media_processor_unavailable"));
     });
     child.on("close", (code) => {
       clearTimeout(timer);
       if (!failed) {
         if (code === 0) resolve(Buffer.concat(chunks));
-        else reject(new Error("media_parse_rejected"));
+        else reject(new MediaProcessError(code));
       }
     });
   });
 }
+class MediaProcessError extends Error {
+  constructor(readonly exitCode: number | null) {
+    super("media_parse_rejected");
+  }
+}
 export class CommandMalwareScanner implements MalwareScanner {
-  constructor(private readonly executable: string) {}
+  /** Configure a current clamscan executable and signature database in the ingestion pool. */
+  constructor(private readonly executable: string) {
+    if (!path.isAbsolute(executable))
+      throw new Error("malware_scanner_path_invalid");
+  }
   async scan(file: string): Promise<"clean" | "infected"> {
     // Configured scanner must be an executable path; arguments never pass through a shell.
-    await processFile(this.executable, ["--no-summary", file], 8192);
-    return "clean";
+    try {
+      // ClamAV can otherwise skip oversized files and return success. Limits must produce alerts.
+      await processFile(
+        this.executable,
+        [
+          "--no-summary",
+          "--max-filesize=268435456",
+          "--max-scansize=536870912",
+          "--max-scantime=55000",
+          "--alert-exceeds-max=yes",
+          "--follow-file-symlinks=0",
+          file,
+        ],
+        8192,
+      );
+      return "clean";
+    } catch (error) {
+      if (error instanceof MediaProcessError && error.exitCode === 1)
+        return "infected";
+      throw new Error("malware_scanner_unavailable");
+    }
   }
 }
 const Probe = z.object({
@@ -352,6 +381,8 @@ export class MediaWorker {
         this.service.storage.file(claimed.id),
         "-map_metadata",
         "-1",
+        "-fs",
+        String(claimed.max_bytes + 1),
       ];
       if (audio)
         args.push(
@@ -386,6 +417,8 @@ export class MediaWorker {
         );
       args.push(staging);
       await processFile(this.ffmpeg, args, 1024);
+      if ((await stat(staging)).size > claimed.max_bytes)
+        throw new Error("media_output_size_invalid");
       const output = await readFile(staging);
       if (output.length > claimed.max_bytes)
         throw new Error("media_output_size_invalid");
@@ -440,7 +473,10 @@ export class MediaWorker {
         error instanceof Error && /^[a-z_]+$/u.test(error.message)
           ? error.message
           : "media_processing_failed";
-      const configuration = reason.endsWith("unconfigured");
+      const configuration =
+        reason.endsWith("unconfigured") ||
+        reason === "media_processor_unavailable" ||
+        reason === "malware_scanner_unavailable";
       await update(
         "UPDATE creator.media_asset SET state=CASE WHEN $4 THEN state ELSE 'rejected' END,failure_code=$5,job_lease_until=NULL,job_available_at=now()+interval '1 minute' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND state NOT IN ('revoked','deleted')",
         [configuration || claimed.manifest_pending, reason],

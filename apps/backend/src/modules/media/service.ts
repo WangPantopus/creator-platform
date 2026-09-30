@@ -204,6 +204,7 @@ export class MediaService {
           policy.maxBytes <= 268435456 &&
           Number.isSafeInteger(policy.maxDurationMs) &&
           policy.maxDurationMs > 0 &&
+          policy.maxDurationMs <= 3_600_000 &&
           Number.isSafeInteger(policy.retentionSeconds) &&
           policy.retentionSeconds > 0,
         "media_policy_unavailable",
@@ -497,13 +498,26 @@ export class MediaService {
   }
   async revoke(scope: ThreadScope, id: string) {
     await this.db.withThread(scope, async (client) => {
-      const row = await this.row(scope, client, id, true);
+      // Cleanup remains retryable after access expiry or a lost deletion response.
+      invariant(
+        scope.authority !== "triage",
+        "media_participant_required",
+        "Only a participant can remove this media.",
+      );
+      const row = (
+        await client.query<AssetRow>(
+          "SELECT * FROM creator.media_asset WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 FOR UPDATE",
+          [id, scope.threadId, scope.creatorId, scope.fanId],
+        )
+      ).rows[0];
+      invariant(row, "media_unavailable", "This media is unavailable.");
       invariant(
         row.owner_account_id === scope.actorAccountId ||
           scope.authority === "creator",
         "media_owner_required",
         "Only the media owner can remove this asset.",
       );
+      if (["revoked", "deleted"].includes(row.state)) return;
       await client.query(
         "UPDATE creator.media_asset SET state='revoked',version=version+1,job_available_at=now(),delete_pending=true WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
         [id, scope.creatorId, scope.fanId],

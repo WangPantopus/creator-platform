@@ -51,18 +51,26 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     var camera by remember(route) { mutableStateOf(false) }
     var localState by remember(route) { mutableStateOf("disconnected") }
     var transport by remember(route) { mutableStateOf<NativeCallScreenTransport?>(null) }
+    var mediaEpoch by remember(route) { mutableStateOf(0) }
+    var active by remember(route) { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
+    fun disconnectMedia() { mediaEpoch++; val current = transport; transport = null; localState = "disconnected"; current?.disconnect() }
     fun role(value: JSONObject): String? = when (model.session?.accountId) { value.getString("creatorAccountId") -> "creator"; value.getString("fanAccountId") -> "fan"; else -> null }
     suspend fun refresh() {
         val api = client ?: return; val currentRoute = route ?: return
         if (busy || fetching) return; fetching = true
         try {
             val value = JSONObject(api.request(currentRoute.path).toString(Charsets.UTF_8))
+            if (!active) return
             if (value.getInt("version") >= (call?.getInt("version") ?: 0)) call = value
             stale = false
-            if (value.getString("state") in listOf("ending", "ended", "cancelled")) { transport?.disconnect(); localState = "disconnected" }
+            if (value.getString("state") in listOf("ending", "ended", "cancelled")) disconnectMedia()
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) { stale = true; notice = "Reconnect to refresh this call. Actions are unavailable until access is confirmed." }
+        catch (error: Exception) {
+            if (!active) return
+            if (error is NativeMediaRequestError && error.status in listOf(401, 403, 404)) { disconnectMedia(); call = null }
+            stale = true; notice = "Reconnect to refresh this call. Actions are unavailable until access is confirmed."
+        }
         finally { fetching = false }
     }
     suspend fun action(name: String, body: JSONObject = JSONObject()) {
@@ -71,27 +79,30 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         try {
             body.put("expectedVersion", value.getInt("version")).put("idempotencyKey", UUID.randomUUID().toString())
             call = JSONObject(api.request(currentRoute.path + "/" + name, "POST", body.toString().toByteArray()).toString(Charsets.UTF_8))
-            if (name == "end") { transport?.disconnect(); localState = "disconnected"; leaving = false }
+            if (name == "end") { disconnectMedia(); leaving = false }
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { notice = "This action could not complete. Refresh the call before trying again."; stale = true }
         finally { busy = false }
     }
     suspend fun join() {
         val value = call ?: return; val api = client ?: return; val currentRoute = route ?: return
-        if (busy || stale || role(value) == null) return
+        if (!active || busy || stale || role(value) == null || (transport != null && localState != "disconnected")) return
         val adapter = NativeCallTransports.create?.invoke(currentRoute.session)
         if (adapter == null) { notice = "Calling is not connected yet. Your booking is unchanged."; return }
         busy = true; notice = null
+        mediaEpoch++; val epoch = mediaEpoch
         try {
             val response = JSONObject(api.request(currentRoute.path + "/join", "POST", "{}".toByteArray()).toString(Charsets.UTF_8))
+            if (!active || epoch != mediaEpoch) return
             transport = adapter; camera = value.getString("mediaMode") == "video"
-            adapter.connect(CallAdmission(response.getString("token"), response.getString("url"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"))) { localState = it }
+            adapter.connect(CallAdmission(response.getString("token"), response.getString("url"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"))) { if (active && epoch == mediaEpoch) localState = it }
+            if (!active || epoch != mediaEpoch) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
-        catch (_: Exception) { adapter.disconnect(); notice = "Connection failed. Rejoin the same call." }
+        catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = "Connection failed. Rejoin the same call." } }
         finally { busy = false }
     }
     LaunchedEffect(route, client) { while (true) { refresh(); delay(1000) } }
-    DisposableEffect(route) { onDispose { transport?.disconnect() } }
+    DisposableEffect(route) { active = true; onDispose { active = false; disconnectMedia() } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {
@@ -100,7 +111,8 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         } else {
             val state = value.getString("state"); val live = state in listOf("connected", "reconnecting", "ending"); val ended = state in listOf("ended", "cancelled")
             val creator = value.getString("creatorName"); val duration = value.getLong("durationSeconds"); val connected = value.getLong("connectedMilliseconds")
-            if (live) CallChip(name = creator, time = callClock(connected), end = callClock(duration * 1000), recording = value.getString("recordingState") == "on")
+            val recording = value.getString("recordingState")
+            if (live) CallChip(name = creator, time = callClock(connected), end = callClock(duration * 1000), recording = recording in listOf("on", "stopping"))
             else {
                 BasicText("${duration / 60}-MINUTE ${value.getString("mediaMode").uppercase()} CALL", style = qText("label").copy(color = qColor("ink-muted")))
                 val title = if (state == "cancelled") "This call was cancelled." else if (ended) { if (value.optString("outcome") == "completed") "You spoke with $creator for ${connected / 60_000} minutes." else "Call outcome: ${value.optString("outcome", "being reconciled").replace('_', ' ')}" } else "${runCatching { DateTimeFormatter.ofPattern("EEEE, HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(value.getString("scheduledAt"))) }.getOrDefault(value.getString("scheduledAt"))} with $creator"
@@ -111,6 +123,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
                 Countdown(countdown, CountdownTone.SOON)
             }
             if (stale) Notice(title = "Connection lost", children = "Displayed times are from the last server update.")
+            if (recording in listOf("starting", "stopping", "blocked")) BasicText(when (recording) { "stopping" -> "Recording stop requested · awaiting provider confirmation"; "starting" -> "Recording start requested · awaiting provider confirmation"; else -> "Recording status needs confirmation" }, style = qText("caption").copy(color = qColor("ink-muted")))
             if (!live && !ended) {
                 BasicText("${duration / 60} minutes, fixed · no overtime charge", style = qText("body").copy(color = qColor("ink")))
                 BasicText("Shared with $creator", style = qText("label").copy(color = qColor("ink-muted")))
@@ -144,7 +157,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             if (state == "ended") {
                 BasicText("Call receipt", style = qText("title").copy(color = qColor("ink")))
                 BasicText("Connected ${callClock(connected)} of ${callClock(duration * 1000)}", style = qText("body").copy(color = qColor("ink")))
-                BasicText(if (value.optBoolean("recordingOccurred")) "Recorded with consent" else "No recording was confirmed", style = qText("caption").copy(color = qColor("ink-muted")))
+                BasicText(if (value.optBoolean("recordingOccurred")) "Recording occurred · check the consent history" else "No recording was confirmed", style = qText("caption").copy(color = qColor("ink-muted")))
                 Button("View Requests for settlement", ButtonVariant.SECONDARY) { model.open("/requests") }
             }
             if (leaving) {

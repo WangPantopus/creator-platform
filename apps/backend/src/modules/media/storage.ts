@@ -134,7 +134,18 @@ export class PrivateMediaStorage {
     try {
       // Rewriting at the committed offset recovers a crash between fsync and DB commit.
       await handle.truncate(offset);
-      await handle.write(bytes, 0, bytes.length, offset);
+      let written = 0;
+      while (written < bytes.length) {
+        const result = await handle.write(
+          bytes,
+          written,
+          bytes.length - written,
+          offset + written,
+        );
+        if (!result.bytesWritten)
+          throw new Error("media_storage_write_incomplete");
+        written += result.bytesWritten;
+      }
       await handle.sync();
     } finally {
       await handle.close();

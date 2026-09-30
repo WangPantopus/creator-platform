@@ -44,6 +44,8 @@ private struct NativeCallDocument: Decodable, Sendable {
     @State private var camera = false
     @State private var localState = "disconnected"
     @State private var transport: (any NativeCallScreenTransport)?
+    @State private var mediaEpoch = 0
+    @State private var active = true
     public init(baseURL: URL?, destination: String, actorAccountID: String?, open: @escaping (String) -> Void = { _ in }) {
         route = NativeCallRoute(destination: destination); self.actorAccountID = actorAccountID; self.open = open
         client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
@@ -62,10 +64,20 @@ private struct NativeCallDocument: Decodable, Sendable {
         guard !fetching, !busy, let client, let route else { return }; fetching = true; defer { fetching = false }
         do {
             let value = try JSONDecoder().decode(NativeCallDocument.self, from: await client.request(path: route.path))
+            try Task.checkCancellation()
+            guard active else { return }
             if value.version >= (call?.version ?? 0) { call = value }; stale = false
-            if ["ending", "ended", "cancelled"].contains(value.state) { await transport?.disconnect(); localState = "disconnected" }
+            if ["ending", "ended", "cancelled"].contains(value.state) { await disconnectMedia() }
         } catch is CancellationError { }
-        catch { stale = true; self.error = "Reconnect to refresh this call. Actions are unavailable until access is confirmed." }
+        catch {
+            guard active else { return }
+            if let failure = error as? NativeMediaRequestError, [401, 403, 404].contains(failure.status) { await disconnectMedia(); call = nil }
+            stale = true; self.error = "Reconnect to refresh this call. Actions are unavailable until access is confirmed."
+        }
+    }
+    private func disconnectMedia() async {
+        mediaEpoch += 1; let current = transport; transport = nil; localState = "disconnected"
+        await current?.disconnect()
     }
     private func action(_ name: String, values: [String: Any] = [:]) async {
         guard !busy, !stale, let call, role(call) != nil, let client, let route else { return }; busy = true; error = nil; defer { busy = false }
@@ -73,18 +85,26 @@ private struct NativeCallDocument: Decodable, Sendable {
             var body = values; body["expectedVersion"] = call.version; body["idempotencyKey"] = UUID().uuidString
             let result = try await client.request(path: route.path + "/" + name, method: "POST", body: JSONSerialization.data(withJSONObject: body))
             self.call = try JSONDecoder().decode(NativeCallDocument.self, from: result)
-            if name == "end" { await transport?.disconnect(); localState = "disconnected"; leaving = false }
+            if name == "end" { await disconnectMedia(); leaving = false }
         } catch { self.error = "This action could not complete. Refresh the call before trying again."; stale = true }
     }
     private func join() async {
-        guard !busy, !stale, let call, role(call) != nil, let client, let route else { return }
+        guard active, !busy, !stale, transport == nil || localState == "disconnected", let call, role(call) != nil, let client, let route else { return }
         guard let adapter = NativeCallTransports.create?(route.sessionID) else { error = "Calling is not connected yet. Your booking is unchanged."; return }
         busy = true; error = nil; defer { busy = false }
+        mediaEpoch += 1; let epoch = mediaEpoch
         do {
             let admission = try JSONDecoder().decode(NativeCallAdmission.self, from: await client.request(path: route.path + "/join", method: "POST", body: Data("{}".utf8)))
+            try Task.checkCancellation()
+            guard active, epoch == mediaEpoch else { return }
             transport = adapter; camera = call.mediaMode == "video"
-            try await adapter.connect(admission: admission, onState: { localState = $0 })
-        } catch { await adapter.disconnect(); self.error = "Connection failed. Rejoin the same call." }
+            try await adapter.connect(admission: admission, onState: { if active && epoch == mediaEpoch { localState = $0 } })
+            if !active || epoch != mediaEpoch { await adapter.disconnect() }
+        } catch {
+            await adapter.disconnect()
+            guard active, epoch == mediaEpoch else { return }
+            transport = nil; localState = "disconnected"; self.error = "Connection failed. Rejoin the same call."
+        }
     }
     public var body: some View {
         ScrollView {
@@ -92,7 +112,8 @@ private struct NativeCallDocument: Decodable, Sendable {
                 if let call {
                     let live = ["connected", "reconnecting", "ending"].contains(call.state)
                     let ended = ["ended", "cancelled"].contains(call.state)
-                    if live { CallChip(name: call.creatorName, time: clock(call.connectedMilliseconds), end: clock(call.durationSeconds * 1000), recording: call.recordingState == "on") }
+                    if live { CallChip(name: call.creatorName, time: clock(call.connectedMilliseconds), end: clock(call.durationSeconds * 1000), recording: ["on", "stopping"].contains(call.recordingState)) }
+                    if ["starting", "stopping", "blocked"].contains(call.recordingState) { Text(call.recordingState == "stopping" ? "Recording stop requested · awaiting provider confirmation" : call.recordingState == "starting" ? "Recording start requested · awaiting provider confirmation" : "Recording status needs confirmation").qText("caption") }
                     else {
                         Text("\(call.durationSeconds / 60)-MINUTE \(call.mediaMode.uppercased()) CALL").qText("label")
                         Text(ended ? (call.state == "cancelled" ? "This call was cancelled." : call.outcome == "completed" ? "You spoke with \(call.creatorName) for \(call.connectedMilliseconds / 60000) minutes." : "Call outcome: \(call.outcome?.replacingOccurrences(of: "_", with: " ") ?? "being reconciled")") : "\(date(call.scheduledAt)?.formatted(date: .complete, time: .shortened) ?? call.scheduledAt) with \(call.creatorName)").qText("display-md")
@@ -127,7 +148,7 @@ private struct NativeCallDocument: Decodable, Sendable {
                     }
                     if call.state == "ended" {
                         Text("Call receipt").qText("title"); Text("Connected \(clock(call.connectedMilliseconds)) of \(clock(call.durationSeconds * 1000))").qText("body")
-                        Text(call.recordingOccurred == true ? "Recorded with consent" : "No recording was confirmed").qText("caption")
+                        Text(call.recordingOccurred == true ? "Recording occurred · check the consent history" : "No recording was confirmed").qText("caption")
                         Button("View Requests for settlement", variant: .secondary) { open("/requests") }
                     }
                 } else {
@@ -139,7 +160,8 @@ private struct NativeCallDocument: Decodable, Sendable {
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
             .task { while !Task.isCancelled { await refresh(); do { try await Task.sleep(for: .seconds(1)) } catch { return } } }
-            .onDisappear { let current = transport; Task { await current?.disconnect() } }
+            .onAppear { active = true }
+            .onDisappear { active = false; mediaEpoch += 1; let current = transport; transport = nil; localState = "disconnected"; Task { await current?.disconnect() } }
             .confirmationDialog("End this call?", isPresented: $leaving, titleVisibility: .visible) {
                 SwiftUI.Button("End by choice") { if let call { Task { await action("end", values: role(call) == "fan" ? ["fanChoice": "end_by_choice"] : [:]) } } }
                 if let call, role(call) == "fan" { SwiftUI.Button("Technical problem") { Task { await action("end", values: ["fanChoice": "technical_problem"]) } } }
