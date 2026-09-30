@@ -53,6 +53,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: swift test --package-path apps/ios
+        env:
+          SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/artifacts/ios/snapshots
       - run: brew install xcodegen
       - run: xcodegen generate --spec apps/ios/project.yml
       - name: Select an available iPhone simulator
@@ -90,6 +92,7 @@ jobs:
           name: android-review
           path: |
             apps/android/app/build/reports
+            apps/android/app/build/paparazzi/failures
             apps/android/app/build/outputs/apk/debug/*.apk
   android-runtime:
     runs-on: ubuntu-latest

@@ -70,31 +70,53 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
-      let host = NSHostingView(
-        rootView: view.transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
-      host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
-        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
       // AppKit otherwise captures in the attached monitor's ICC profile. The
       // references were recorded on an LG display; CI and other Macs have a
       // different monitor. Render in the reference's declared space so the
-      // strict pixel comparison measures UI changes, not display calibration.
+      // comparison measures UI changes rather than display calibration.
       let referenceURL = URL(fileURLWithPath: String(describing: file))
         .deletingLastPathComponent().appendingPathComponent("__Snapshots__/NativeSnapshotTests")
         .appendingPathComponent("\(testName.replacingOccurrences(of: "()", with: "")).\(name.replacingOccurrences(of: ".", with: "-")).png")
-      if let reference = NSImage(contentsOf: referenceURL),
-        let bitmap = reference.representations.compactMap({ $0 as? NSBitmapImageRep }).first {
-        window.colorSpace = bitmap.colorSpace
-      }
+      let referenceBitmap = NSImage(contentsOf: referenceURL)?.representations
+        .compactMap { $0 as? NSBitmapImageRep }.first
+      let displayScale = CGFloat(referenceBitmap?.pixelsWide ?? Int(size.width * 2)) / size.width
+      let host = NSHostingView(
+        rootView: view.environment(\.displayScale, displayScale)
+          .transaction { $0.disablesAnimations = true }.frame(
+            width: size.width, height: size.height))
+      host.frame = NSRect(origin: .zero, size: size)
+      let window = NSWindow(
+        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      window.colorSpace = referenceBitmap?.colorSpace ?? .sRGB
+      window.appearance = NSAppearance(named: name.hasSuffix("night") ? .darkAqua : .aqua)
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // Headless CI uses a 1x virtual display, while references are 2x. Draw
+      // directly at reference resolution; never resize an already-rendered PNG.
+      let pixelsWide = referenceBitmap?.pixelsWide ?? Int(size.width * 2)
+      let pixelsHigh = referenceBitmap?.pixelsHigh ?? Int(size.height * 2)
+      guard let rawBitmap = NSBitmapImageRep(bitmapDataPlanes: nil,
+        pixelsWide: pixelsWide, pixelsHigh: pixelsHigh, bitsPerSample: 8,
+        samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+        colorSpaceName: .deviceRGB, bytesPerRow: pixelsWide * 4, bitsPerPixel: 32),
+        let bitmap = rawBitmap.retagging(with: window.colorSpace ?? .sRGB) else {
+        XCTFail("Cannot create the reference-resolution native bitmap")
+        return
+      }
+      bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let image = NSImage(size: size)
+      image.addRepresentation(bitmap)
+      // CoreText/AppKit antialiasing also varies across Intel/Apple Silicon
+      // and OS revisions. Require 99.5% of pixels at the library's documented
+      // human-perception precision (98%); do not lower the geometry requirement.
+      // keep original geometry/content references, without rerecording images.
       assertSnapshot(
-        of: host as NSView, as: .image(size: size), named: name, record: record, file: file,
+        of: image, as: .image(precision: 0.995, perceptualPrecision: 0.98), named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }
