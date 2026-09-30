@@ -36,6 +36,8 @@ export function createCommerceRouter(input: {
     );
     res.json({
       ...value,
+      tierCatalog:
+        (await input.extended?.tiers?.choices(await input.actorFor(req))) ?? [],
       policy: {
         ...value.policy,
         passEnabled: input.extended?.pass?.configured ?? false,
@@ -127,6 +129,26 @@ export function createCommerceRouter(input: {
   });
   router.post("/spend-limit", async (req, res) =>
     res.json(await service().setLimit(await input.actorFor(req), req.body)),
+  );
+  const saveTier = async (req: Request, tierId?: string) => {
+    if (!input.extended?.tiers)
+      throw new DomainError(
+        "tiers_unconfigured",
+        "Membership editing is unavailable.",
+        503,
+      );
+    return input.extended.tiers.save(
+      await input.actorFor(req),
+      id(req.params.creatorId),
+      tierId,
+      req.body,
+    );
+  };
+  router.post("/creators/:creatorId/tiers", async (req, res) =>
+    res.json(await saveTier(req)),
+  );
+  router.post("/creators/:creatorId/tiers/:tierId", async (req, res) =>
+    res.json(await saveTier(req, id(req.params.tierId))),
   );
   router.post("/creators/:creatorId/modes", async (req, res) =>
     res.json(

@@ -1,5 +1,12 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { DomainError } from "../../core/errors.js";
+import Stripe from "stripe";
+import { z } from "zod";
+import { DomainError, invariant } from "../../core/errors.js";
+import {
+  stripeAccountOptions,
+  stripeClient,
+  stripeOperation,
+} from "./stripe.js";
 
 export type Intent = {
   id: string;
@@ -43,137 +50,146 @@ export interface PaymentProvider {
 
 export class StripePaymentProvider implements PaymentProvider {
   readonly name = "stripe";
-  constructor(
-    private readonly secret: string,
-    private readonly version: string,
-  ) {
-    if (!secret.startsWith("sk_test_") || !version)
-      throw new Error(
-        "W4 payments require an explicitly configured Stripe sandbox and API version.",
-      );
+  readonly client: Stripe;
+  private readonly options: Stripe.RequestOptions;
+  constructor(secret: string, version: string, collectionAccount = "platform") {
+    this.client = stripeClient(secret, version);
+    this.options = stripeAccountOptions(collectionAccount);
   }
-  async request(
-    path: string,
-    method: "GET" | "POST",
-    values: Record<string, string> = {},
-    key?: string,
-  ): Promise<Record<string, unknown>> {
-    const response = await fetch(`https://api.stripe.com/v1/${path}`, {
-      method,
-      signal: AbortSignal.timeout(10000),
-      headers: {
-        Authorization: `Bearer ${this.secret}`,
-        "Stripe-Version": this.version,
-        ...(method === "POST"
-          ? { "Content-Type": "application/x-www-form-urlencoded" }
-          : {}),
-        ...(key ? { "Idempotency-Key": key } : {}),
-      },
-      ...(method === "POST" ? { body: new URLSearchParams(values) } : {}),
-    });
-    const body = (await response.json()) as Record<string, unknown>;
-    // Never log the response: it can contain billing identifiers or a client secret.
-    if (!response.ok)
-      throw new DomainError(
-        response.status >= 500 ? "provider_unknown" : "provider_rejected",
-        response.status >= 500
-          ? "Confirming payment. Check this request again shortly."
-          : "Payment did not go through. No acceptance was recorded.",
-        response.status >= 500 ? 503 : 409,
-      );
-    return body;
-  }
-  private intent(body: Record<string, unknown>): Intent {
-    const charge = body.latest_charge as {
-      payment_method_details?: { card?: { capture_before?: number } };
-      amount_refunded?: number;
-    } | null;
-    const timestamp = charge?.payment_method_details?.card?.capture_before;
+  private intent(body: Stripe.PaymentIntent): Intent {
+    invariant(
+      !body.livemode,
+      "provider_environment_mismatch",
+      "Sandbox payment truth is required.",
+    );
+    const charge = body.latest_charge;
+    invariant(
+      charge === null || typeof charge !== "string",
+      "provider_incomplete",
+      "The current charge must be retrieved before settlement.",
+    );
+    const captured = charge?.payment_method_details?.card?.capture_before;
     return {
-      id: String(body.id),
-      amount: Number(body.amount),
-      currency: String(body.currency).toUpperCase(),
-      status: body.status as Intent["status"],
-      captureBefore: timestamp ? new Date(timestamp * 1000) : null,
-      clientSecret:
-        typeof body.client_secret === "string" ? body.client_secret : null,
-      amountReceived: Number(body.amount_received ?? 0),
-      refunded: Number(charge?.amount_refunded ?? 0),
-      metadata: (body.metadata ?? {}) as Record<string, string>,
+      id: body.id,
+      amount: body.amount,
+      currency: body.currency.toUpperCase(),
+      status: z
+        .enum([
+          "requires_payment_method",
+          "requires_confirmation",
+          "requires_action",
+          "processing",
+          "requires_capture",
+          "canceled",
+          "succeeded",
+        ])
+        .parse(body.status),
+      captureBefore: captured ? new Date(captured * 1000) : null,
+      clientSecret: body.client_secret,
+      amountReceived: body.amount_received,
+      refunded: charge?.amount_refunded ?? 0,
+      metadata: body.metadata,
     };
   }
-  async authorize(input: {
-    packetId: string;
-    amount: number;
-    currency: string;
-    paymentMethodId: string;
-    key: string;
-  }) {
-    return this.intent(
-      await this.request(
-        "payment_intents",
-        "POST",
-        {
-          amount: String(input.amount),
-          currency: input.currency.toLowerCase(),
-          payment_method: input.paymentMethodId,
-          capture_method: "manual",
-          confirm: "true",
-          "payment_method_types[]": "card",
-          use_stripe_sdk: "true",
-          "metadata[packet_id]": input.packetId,
-          "expand[]": "latest_charge",
-        },
-        input.key,
-      ),
-    );
+  async authorize(input: Parameters<PaymentProvider["authorize"]>[0]) {
+    return stripeOperation(async () => {
+      try {
+        return this.intent(
+          await this.client.paymentIntents.create(
+            {
+              amount: input.amount,
+              currency: input.currency.toLowerCase(),
+              payment_method: input.paymentMethodId,
+              capture_method: "manual",
+              confirm: true,
+              payment_method_types: ["card"],
+              use_stripe_sdk: true,
+              metadata: { packet_id: input.packetId },
+              expand: ["latest_charge"],
+            },
+            { ...this.options, idempotencyKey: input.key },
+          ),
+        );
+      } catch (error) {
+        // A card rejection can still create an intent. Preserve that reference so
+        // failed authorization releases capacity from current truth rather than a guess.
+        if (
+          error instanceof Stripe.errors.StripeCardError &&
+          error.payment_intent
+        ) {
+          const reference =
+            typeof error.payment_intent === "string"
+              ? error.payment_intent
+              : error.payment_intent.id;
+          return this.fetchIntent(reference);
+        }
+        throw error;
+      }
+    });
   }
   async fetchIntent(id: string) {
-    return this.intent(
-      await this.request(
-        `payment_intents/${encodeURIComponent(id)}?expand[]=latest_charge`,
-        "GET",
+    return stripeOperation(async () =>
+      this.intent(
+        await this.client.paymentIntents.retrieve(
+          id,
+          {
+            expand: ["latest_charge"],
+          },
+          this.options,
+        ),
       ),
     );
   }
   async capture(id: string, key: string) {
-    return this.intent(
-      await this.request(
-        `payment_intents/${encodeURIComponent(id)}/capture`,
-        "POST",
-        { "expand[]": "latest_charge" },
-        key,
+    return stripeOperation(async () =>
+      this.intent(
+        await this.client.paymentIntents.capture(
+          id,
+          { expand: ["latest_charge"] },
+          { ...this.options, idempotencyKey: key },
+        ),
       ),
     );
   }
   async release(id: string, key: string) {
-    return this.intent(
-      await this.request(
-        `payment_intents/${encodeURIComponent(id)}/cancel`,
-        "POST",
-        { "expand[]": "latest_charge" },
-        key,
+    return stripeOperation(async () =>
+      this.intent(
+        await this.client.paymentIntents.cancel(
+          id,
+          { expand: ["latest_charge"] },
+          { ...this.options, idempotencyKey: key },
+        ),
       ),
     );
   }
-  async refund(id: string, amount: number, key: string) {
-    const body = await this.request(
-      "refunds",
-      "POST",
-      { payment_intent: id, amount: String(amount) },
-      key,
-    );
+  private refundResult(body: Stripe.Refund) {
+    // Unknown/new statuses remain pending. They must never be treated as confirmed cash.
     return {
-      id: String(body.id),
-      state: String(body.status) as "pending" | "succeeded" | "failed",
+      id: body.id,
+      state:
+        body.status === "succeeded"
+          ? ("succeeded" as const)
+          : ["failed", "canceled"].includes(body.status ?? "")
+            ? ("failed" as const)
+            : ("pending" as const),
     };
   }
+  async refund(id: string, amount: number, key: string) {
+    return stripeOperation(async () =>
+      this.refundResult(
+        await this.client.refunds.create(
+          { payment_intent: id, amount },
+          { ...this.options, idempotencyKey: key },
+        ),
+      ),
+    );
+  }
   async fetchRefund(id: string) {
-    const body = await this.request(`refunds/${encodeURIComponent(id)}`, "GET");
-    return {
-      id: String(body.id),
-      state: String(body.status) as "pending" | "succeeded" | "failed",
-    };
+    return stripeOperation(async () =>
+      this.refundResult(
+        await this.client.refunds.retrieve(id, {}, this.options),
+      ),
+    );
   }
 }
 

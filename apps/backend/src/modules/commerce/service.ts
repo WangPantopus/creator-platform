@@ -207,7 +207,7 @@ export class CommerceService {
   private async creator(client: PoolClient, actor: Actor, creatorId: string) {
     const row = (
       await client.query<{ id: string; display_name: string }>(
-        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified'",
+        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required",
         [creatorId, actor.accountId],
       )
     ).rows[0];
@@ -292,8 +292,8 @@ export class CommerceService {
       if (fan) await this.effectiveLimit(client, fan.id, this.policy.currency);
       const tiers = (
         await client.query(
-          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.state='active' AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
-          [creatorId ?? null],
+          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.state,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE (t.state='active' OR cp.account_id=$2) AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
+          [creatorId ?? null, actor.accountId],
         )
       ).rows;
       const limits = fan
@@ -1880,7 +1880,8 @@ export class CommerceService {
         }
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
-          Date.now() - effect.created_at.getTime() < 23 * 3600000,
+          packet.intent_ref !== null ||
+            Date.now() - effect.created_at.getTime() < 23 * 3600000,
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
@@ -2051,7 +2052,8 @@ export class CommerceService {
     invariant(
       own.rows[0] &&
         (effect.reconciliation
-          ? own.rows[0].state !== "processing"
+          ? own.rows[0].state !== "processing" &&
+            own.rows[0].attempt === effect.attempt
           : own.rows[0].state === "processing" &&
             own.rows[0].attempt === effect.attempt),
       "effect_lease_lost",

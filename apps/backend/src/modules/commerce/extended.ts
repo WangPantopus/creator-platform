@@ -43,6 +43,7 @@ export class ExtendedCommerce {
     private readonly stores?: StoreEntitlementVerifier,
     readonly pass?: import("./pass.js").PassCommerce,
     readonly billing?: import("./billing.js").MembershipBilling,
+    readonly tiers?: import("./tiers.js").CommerceTiers,
   ) {}
   async storePurchase(
     actor: Actor,
@@ -68,6 +69,11 @@ export class ExtendedCommerce {
     );
     const verified = await this.stores.verifyAndFetchCurrent(input, actor);
     invariant(
+      verified.provider === input.platform,
+      "store_provider_conflict",
+      "The verified purchase does not match this store.",
+    );
+    invariant(
       verified.accountId === actor.accountId,
       "purchase_link_conflict",
       "This purchase belongs to another account.",
@@ -88,6 +94,10 @@ export class ExtendedCommerce {
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`store:${verified.provider}:${verified.originalReference}`],
+      );
+      await client.query(
+        "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+        [`commerce.tier:${verified.tierId}`],
       );
       const tier = (
         await client.query<{
@@ -151,6 +161,20 @@ export class ExtendedCommerce {
         "purchase_link_conflict",
         "The original purchase is linked to another account.",
       );
+      const currentPeriod =
+        ["active", "grace", "cancelled"].includes(verified.state) &&
+        verified.startsAt <= new Date() &&
+        verified.endsAt > new Date();
+      invariant(
+        !currentPeriod ||
+          (tier.state === "active" &&
+            tier.verification === "verified" &&
+            !tier.recovery_required &&
+            (!tier.ai_allowance ||
+              this.service.policy.costAllowanceIntegrated === true)),
+        "store_access_unavailable",
+        "The purchase was verified, but membership access is not available yet. Restore it when access is available.",
+      );
       await client.query(
         `INSERT INTO creator.commerce_membership(creator_id,fan_id,tier_id,provider,provider_ref,state,period_start,period_end,cancel_at_end,purchased_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(provider_ref) DO UPDATE SET state=excluded.state,first_used_at=CASE WHEN creator.commerce_membership.period_start=excluded.period_start THEN creator.commerce_membership.first_used_at ELSE NULL END,period_start=excluded.period_start,period_end=excluded.period_end,cancel_at_end=excluded.cancel_at_end,purchased_at=excluded.purchased_at,version=creator.commerce_membership.version+1`,
         [
@@ -172,7 +196,7 @@ export class ExtendedCommerce {
         [verified.creatorId, fan.id],
       );
       const active =
-        ["active", "grace", "cancelled"].includes(verified.state) &&
+        currentPeriod &&
         tier.state === "active" &&
         tier.verification === "verified" &&
         !tier.recovery_required &&
@@ -227,6 +251,7 @@ export class ExtendedCommerce {
       }
       return {
         serverVerified: true,
+        accessGranted: active,
         state: verified.state,
         validUntil: verified.endsAt.toISOString(),
       };

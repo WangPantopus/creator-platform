@@ -166,7 +166,12 @@ export class ConversationService {
           "processor_consent_required",
           "Consent to the configured AI providers is required before messaging.",
         );
-        const grantId = await this.access.reserveAllowance(scope, client);
+        const generationId = randomUUID();
+        const grantId = await this.access.reserveAllowance(
+          scope,
+          client,
+          generationId,
+        );
         const fan = await this.insertMessage(
           client,
           scope,
@@ -183,7 +188,6 @@ export class ConversationService {
           thread.control_epoch,
           "generating",
         );
-        const generationId = randomUUID();
         await client.query(
           "INSERT INTO creator.generation(id,thread_id,creator_id,fan_id,fan_message_id,ai_message_id,grant_id,epoch,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)",
           [
@@ -358,7 +362,8 @@ export class ConversationService {
         scope,
         client,
         generation.grant_id,
-        !failed,
+        !failed || generation.last_sequence > 0,
+        generation.id,
       );
       return appendFrame(client, scope, {
         epoch: generation.epoch,
@@ -437,6 +442,7 @@ export class ConversationService {
               client,
               generation.grant_id,
               generation.last_sequence > 0,
+              generation.id,
             );
             await appendFrame(client, scope, {
               epoch: generation.epoch,

@@ -116,9 +116,19 @@ type Overview = {
     creator_id: string;
     name: string;
     version: number;
-    catalog: { web?: { amount: number; currency: string; interval: "month" } };
+    state: string;
+    capabilities: string[];
+    ai_allowance: number;
+    catalog: {
+      key?: string;
+      web?: { amount: number; currency: string; interval: "month" };
+    };
   }[];
   spendingNotices: { id: string; threshold: number; created_at: string }[];
+  tierCatalog: {
+    creatorId: string;
+    products: { key: string; label: string }[];
+  }[];
   payoutAccounts: { creator_id: string; state: string; details_due: boolean }[];
   limits: Limit[];
   exposure: {
@@ -350,6 +360,7 @@ export function CommerceScreen({
   const pending = useRef(new Map<string, string>());
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [editingModeId, setEditingModeId] = useState<string | null>(null);
+  const [editingTierId, setEditingTierId] = useState<string | null>(null);
   const [checkout, setCheckout] = useState(false),
     [disclosure, setDisclosure] = useState<{
       messages: {
@@ -741,6 +752,7 @@ export function CommerceScreen({
                     </p>
                   ))}
                   <LimitForm
+                    key={`${currency}:${limit?.version ?? 0}`}
                     currency={currency}
                     limit={limit}
                     busy={busy}
@@ -1443,43 +1455,45 @@ export function CommerceScreen({
                       )}
                     </section>
                   ))}
-                  {data.tiers.map((t) => (
-                    <section className="commerce-card" key={t.id}>
-                      <h2>{t.name}</h2>
-                      {t.catalog.web ? (
-                        <>
-                          <p>
-                            {money(
-                              t.catalog.web.amount,
-                              t.catalog.web.currency,
-                            )}{" "}
-                            per month
-                          </p>
-                          <Button
-                            disabled={
-                              busy ||
-                              !limit ||
-                              !data.capabilities.membershipAvailable ||
-                              !data.capabilities.stripePublishableKey ||
-                              data.memberships.some(
-                                (m) =>
-                                  m.creator_id === t.creator_id &&
-                                  ["active", "grace", "cancelled"].includes(
-                                    m.state,
-                                  ) &&
-                                  Date.parse(m.period_end) > Date.now(),
-                              )
-                            }
-                            onClick={() => setMembershipTier(t.id)}
-                          >
-                            Subscribe
-                          </Button>
-                        </>
-                      ) : (
-                        <p>Membership price is unavailable.</p>
-                      )}
-                    </section>
-                  ))}
+                  {data.tiers
+                    .filter((t) => t.state === "active")
+                    .map((t) => (
+                      <section className="commerce-card" key={t.id}>
+                        <h2>{t.name}</h2>
+                        {t.catalog.web ? (
+                          <>
+                            <p>
+                              {money(
+                                t.catalog.web.amount,
+                                t.catalog.web.currency,
+                              )}{" "}
+                              per month
+                            </p>
+                            <Button
+                              disabled={
+                                busy ||
+                                !limit ||
+                                !data.capabilities.membershipAvailable ||
+                                !data.capabilities.stripePublishableKey ||
+                                data.memberships.some(
+                                  (m) =>
+                                    m.creator_id === t.creator_id &&
+                                    ["active", "grace", "cancelled"].includes(
+                                      m.state,
+                                    ) &&
+                                    Date.parse(m.period_end) > Date.now(),
+                                )
+                              }
+                              onClick={() => setMembershipTier(t.id)}
+                            >
+                              Subscribe
+                            </Button>
+                          </>
+                        ) : (
+                          <p>Membership price is unavailable.</p>
+                        )}
+                      </section>
+                    ))}
                   {selectedTier?.catalog.web &&
                     data.capabilities.stripePublishableKey && (
                       <CardEntry
@@ -1667,10 +1681,55 @@ export function CommerceScreen({
                         }
                       />
                       <div className="commerce-two">
-                        <Empty title="Membership">
-                          Tier publishing waits for a configured billing
-                          catalog.
-                        </Empty>
+                        <section className="commerce-card">
+                          <h2>Membership tiers</h2>
+                          {data.tiers
+                            .filter(
+                              (t) =>
+                                t.creator_id ===
+                                (creatorId ?? data.owned[0]?.id),
+                            )
+                            .map((t) => (
+                              <div key={t.id} className="commerce-row">
+                                <div>
+                                  <h3>{t.name}</h3>
+                                  <p>
+                                    {t.state} ·{" "}
+                                    {t.catalog.web
+                                      ? `${money(t.catalog.web.amount, t.catalog.web.currency)} per month`
+                                      : "Price not set"}
+                                  </p>
+                                </div>
+                                <Button
+                                  disabled={busy}
+                                  onClick={() => setEditingTierId(t.id)}
+                                >
+                                  Edit {t.name}
+                                </Button>
+                              </div>
+                            ))}
+                          <TierForm
+                            key={editingTierId ?? "new-tier"}
+                            existing={data.tiers.find(
+                              (t) => t.id === editingTierId,
+                            )}
+                            products={
+                              data.tierCatalog?.find(
+                                (c) =>
+                                  c.creatorId ===
+                                  (creatorId ?? data.owned[0]?.id),
+                              )?.products ?? []
+                            }
+                            busy={busy}
+                            onNew={() => setEditingTierId(null)}
+                            onSave={(body) =>
+                              void command(
+                                `creators/${creatorId ?? data.owned[0]!.id}/tiers${editingTierId ? `/${editingTierId}` : ""}`,
+                                body,
+                              )
+                            }
+                          />
+                        </section>
                         <Empty title="Call windows">
                           Scheduling uses the current creator and fan time zones
                           when the call service is connected.
@@ -1801,8 +1860,12 @@ function LimitForm({
   busy: boolean;
   save: (body: Record<string, unknown>) => void;
 }) {
-  const [amount, setAmount] = useState(""),
-    [none, setNone] = useState(false),
+  const [amount, setAmount] = useState(
+      decimalInput(limit?.pending_amount ?? limit?.amount ?? null, currency),
+    ),
+    [none, setNone] = useState(
+      limit?.pending_none ?? limit?.explicit_none ?? false,
+    ),
     [reminders, setReminders] = useState(limit?.reminders_on ?? true),
     [error, setError] = useState("");
   function submit(e: FormEvent) {
@@ -2084,6 +2147,143 @@ function ModeForm({
         {existing && (
           <Button disabled={busy} onClick={onNew}>
             Add another mode
+          </Button>
+        )}
+      </div>
+    </form>
+  );
+}
+
+function TierForm({
+  existing,
+  products,
+  busy,
+  onSave,
+  onNew,
+}: {
+  existing?: Overview["tiers"][number];
+  products: { key: string; label: string }[];
+  busy: boolean;
+  onSave: (body: Record<string, unknown>) => void;
+  onNew: () => void;
+}) {
+  const [name, setName] = useState(existing?.name ?? "");
+  const [capabilities, setCapabilities] = useState(
+    existing?.capabilities ?? [],
+  );
+  const [allowance, setAllowance] = useState(
+    existing ? String(existing.ai_allowance) : "",
+  );
+  const [state, setState] = useState(existing?.state ?? "draft");
+  const [catalogKey, setCatalogKey] = useState(existing?.catalog.key ?? "");
+  const includesAI = capabilities.includes("ai_message");
+  return (
+    <form
+      className="commerce-mode-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave({
+          name,
+          capabilities,
+          aiAllowance: includesAI ? Number(allowance) : 0,
+          state,
+          catalogKey: catalogKey || null,
+          version: existing?.version ?? 0,
+        });
+      }}
+    >
+      <h3>{existing ? `Edit ${existing.name}` : "Add a membership tier"}</h3>
+      <p>
+        Save a draft while you choose benefits. Publishing requires a verified
+        membership product. Keep purchased benefits and prices intact; use a new
+        tier to change them.
+      </p>
+      <label className="commerce-field">
+        Tier name
+        <input
+          required
+          maxLength={100}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <fieldset>
+        <legend>Included access</legend>
+        {[
+          ["ai_message", "AI conversations"],
+          ["note", "Creator Notes"],
+          ["request", "Human request access"],
+        ].map(([key, label]) => (
+          <label key={key} className="commerce-check">
+            <input
+              type="checkbox"
+              checked={capabilities.includes(key!)}
+              onChange={(e) =>
+                setCapabilities((current) =>
+                  e.target.checked
+                    ? [...current, key!]
+                    : current.filter((v) => v !== key),
+                )
+              }
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      {includesAI && (
+        <label className="commerce-field">
+          AI allowance (cost units)
+          <input
+            type="number"
+            min={1}
+            max={2147483647}
+            required
+            value={allowance}
+            onChange={(e) => setAllowance(e.target.value)}
+          />
+          <span>
+            Equivalent membership and pass allowances do not add together.
+          </span>
+        </label>
+      )}
+      <label className="commerce-field">
+        Membership product
+        <select
+          value={catalogKey}
+          onChange={(e) => setCatalogKey(e.target.value)}
+        >
+          <option value="">No product selected</option>
+          {existing?.catalog.key &&
+            !products.some((p) => p.key === existing.catalog.key) && (
+              <option value={existing.catalog.key}>Current product</option>
+            )}
+          {products.map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {!products.length && (
+        <p>Products are not configured yet. You can save a draft now.</p>
+      )}
+      <label className="commerce-field">
+        Availability
+        <select value={state} onChange={(e) => setState(e.target.value)}>
+          <option value="draft">Draft</option>
+          <option value="active" disabled={!products.length}>
+            Published
+          </option>
+          <option value="paused">Paused</option>
+        </select>
+      </label>
+      <div className="commerce-actions">
+        <Button type="submit" disabled={busy || (includesAI && !allowance)}>
+          Save tier
+        </Button>
+        {existing && (
+          <Button disabled={busy} onClick={onNew}>
+            Add another tier
           </Button>
         )}
       </div>
