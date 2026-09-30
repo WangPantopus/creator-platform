@@ -1,5 +1,7 @@
 # Resume execution prompt — W7 — finish from the handoff
 
+**Current handoff:** [a66ce6e code checkpoint and exact continuation state](../handoffs/W7-2026-09-30.md); [comprehensive incoming-agent prompt](W7-next-agent.md). Read these first; prior checkpoint facts remain historical.
+
 **Native CI and owner-directory checkpoint, 2026-09-30:** All18 existing Swift checks/110 preserved image comparisons and full signed iOS build pass after consuming W1’s reviewed sRGB rounding contract and italic token fixes. iOS CI now uses macOS26 Intel/Xcode26.5. Home consumes W3’s two bounded50-row pages; larger accounts fail visibly. Android builds/installs but System UI ANR persists after preserved-data renderer recovery; native tap-through remains blocked. [Exact policy/source/evidence](../../../artifacts/workstreams/W7/ci-repair/20260930/native-color-contract.md). No new test case or paid AI call.
 
 **Native preferences recovery, 2026-09-30:** Both native clients now commit reloads atomically, preserve drafts after failed reads, validate/focus invalid quiet hours and time zones, and use shared field-error copy. Swift package, full signed iOS and full Android builds pass. iOS install/launch reaches canonical sign-in; native field tap-through/accessibility remains unverified because native UI control is unavailable. Shared catalog has605 keys. [Exact evidence and limits](../../../artifacts/workstreams/W7/resume/20260930/native-preferences.md). Parentf406b09 backend/Android runtime/Trust and all13 web checks pass; matching native CI remains queued.
