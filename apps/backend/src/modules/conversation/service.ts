@@ -109,6 +109,7 @@ export class ConversationService {
         client,
         generation.grant_id,
         consumed,
+        generation.id,
       );
   }
   async releaseApprovedSentence(
@@ -269,10 +270,10 @@ export class ConversationService {
             client,
             body.idempotencyKey,
           );
+          const generationId = randomUUID();
           const grantId =
             reservation?.grantId ??
-            (await this.access.reserveAllowance(scope, client));
-          const generationId = randomUUID();
+            (await this.access.reserveAllowance(scope, client, generationId));
           const fan = await this.insertMessage(
             client,
             scope,
@@ -576,7 +577,7 @@ export class ConversationService {
           scope.fanId,
         ],
       );
-      await this.settle(client, scope, generation, !failed);
+      await this.settle(client, scope, generation, !failed || generation.last_sequence > 0);
       await client.query(
         "UPDATE creator.generation SET completed_at=now(),worker_token=NULL,lease_until=NULL WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
         [generationId, scope.threadId, scope.creatorId, scope.fanId],
@@ -658,6 +659,7 @@ export class ConversationService {
               scope,
               generation,
               generation.last_sequence > 0,
+              generation.id,
             );
             await appendFrame(client, scope, {
               epoch: generation.epoch,

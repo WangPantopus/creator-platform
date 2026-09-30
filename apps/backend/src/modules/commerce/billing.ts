@@ -23,6 +23,8 @@ export interface PaidMembershipLine {
     paidMinor: number;
     currency: string;
   };
+  /** Confirmed cash allocated by the provider to this exact invoice line. */
+  refunds?: readonly { reference: string; cause: string; amount: number }[];
 }
 export interface BillingTruth {
   accountId: string;
@@ -459,7 +461,7 @@ export class MembershipBilling {
                 effect.fan_id,
                 r.amount,
                 receipt.currency,
-                effect.provider_key,
+                `credit_note:${result.id}:${receipt.line_ref}`,
                 result.id,
                 JSON.stringify({
                   membershipId: receipt.membership_id,
@@ -682,9 +684,13 @@ export class MembershipBilling {
           "billing_period_invalid",
           "The paid billing period is invalid.",
         );
+        await client.query(
+          "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+          [`commerce.tier:${line.tierId}`],
+        );
         const tier = (
           await client.query(
-            "SELECT * FROM creator.commerce_tier WHERE id=$1 AND creator_id=$2",
+            "SELECT t.*,cp.verification,cp.recovery_required FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2",
             [line.tierId, line.creatorId],
           )
         ).rows[0];
@@ -714,6 +720,22 @@ export class MembershipBilling {
           line.startsAt <= new Date() &&
           line.endsAt > new Date();
         if (active) {
+          invariant(
+            tier.verification === "verified" && !tier.recovery_required,
+            "creator_unavailable",
+            "Current creator authority is required before restoring paid access.",
+          );
+          const storedReceipt = prior
+            ? await client.query(
+                "SELECT id FROM creator.commerce_membership_receipt WHERE membership_id=$1 AND period_start=$2 AND period_end=$3 LIMIT 1",
+                [prior.id, line.startsAt, line.endsAt],
+              )
+            : undefined;
+          invariant(
+            line.receipt || storedReceipt?.rowCount,
+            "paid_period_unverified",
+            "A confirmed receipt for this paid period is required before granting access.",
+          );
           invariant(
             !tier.ai_allowance || this.service.policy.costAllowanceIntegrated,
             "allowance_integration_unavailable",
@@ -838,6 +860,36 @@ export class MembershipBilling {
               }),
             ],
           );
+          const refunds = line.refunds ?? [];
+          invariant(
+            refunds.every(
+              (refund) =>
+                Number.isSafeInteger(refund.amount) && refund.amount > 0,
+            ) &&
+              refunds.reduce(
+                (sum, refund) => sum + BigInt(refund.amount),
+                0n,
+              ) <= BigInt(receipt.paidMinor),
+            "billing_refund_invalid",
+            "Confirmed refunds must reconcile with the actual paid line.",
+          );
+          for (const refund of refunds) {
+            await client.query(
+              "INSERT INTO creator.commerce_ledger(creator_id,fan_id,kind,amount,currency,cause,provider_ref,refs) VALUES($1,$2,'refund',$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING",
+              [
+                line.creatorId,
+                account.fan_id,
+                refund.amount,
+                receipt.currency,
+                refund.cause,
+                refund.reference,
+                JSON.stringify({
+                  membershipId: member.id,
+                  invoiceId: receipt.invoiceReference,
+                }),
+              ],
+            );
+          }
         }
       }
       const removed = (

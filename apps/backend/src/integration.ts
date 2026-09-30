@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import type { Router } from "express";
 import pg from "pg";
 import { createApp, type FeatureRegistration } from "./app.js";
 import type { BackendConfig } from "./config.js";
@@ -39,6 +40,8 @@ export async function createConfiguredBackend(input: {
   identity: PantopusIdentityAdapter;
   guardrails: GuardrailProvider;
   signedSubjectPolicies?: readonly SignedSubjectPolicy[];
+  /** Construct with the separately configured INSERT-only notification role. */
+  stripeNotifications?: Router;
   registerFeatures?: (
     runtime: BackendRuntime,
   ) => Promise<readonly FeatureRegistration[]>;
@@ -181,6 +184,9 @@ export async function createConfiguredBackend(input: {
       features,
       ...(trust ? { trustRouter: trust.router } : {}),
       assertActorAllowed,
+      ...(input.stripeNotifications
+        ? { stripeNotifications: input.stripeNotifications }
+        : {}),
     }),
   );
   const sockets = attachRealtime(
