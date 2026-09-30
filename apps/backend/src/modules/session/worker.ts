@@ -6,7 +6,7 @@ import type {
 import { SessionService } from "./service.js";
 import { withDeadline } from "../media/deadline.js";
 import { DomainError } from "../../core/errors.js";
-import { validateRecordingState } from "./provider.js";
+import { validateProviderState, validateRecordingState } from "./provider.js";
 
 export interface CallEffects {
   summarize(input: {
@@ -98,6 +98,7 @@ export class SessionWorker {
     let externalUnconfirmed = false;
     try {
       const cleanup = [
+        "close_room",
         "purge_consent_assets",
         "sync_recording",
         "settle_evidence",
@@ -140,6 +141,47 @@ export class SessionWorker {
           );
           throw error;
         }
+      } else if (effect.kind === "close_room") {
+        if (
+          !row.revoked_at &&
+          !["ending", "ended", "cancelled"].includes(row.document.state)
+        )
+          throw new Error("room_closure_denied");
+        await withDeadline(this.sessions.provider.closeRoom(row.room_id), 5000);
+        const recording = validateRecordingState(
+          await withDeadline(
+            this.sessions.provider.setRecording(
+              row.room_id,
+              false,
+              `${effect.key}:off`,
+            ),
+            5000,
+          ),
+        );
+        const truth = validateProviderState(
+          await withDeadline(this.sessions.provider.state(row.room_id), 5000),
+        );
+        if (recording.recording || !truth.closed || truth.recording)
+          throw new Error("room_closure_unconfirmed");
+        await this.sessions.db.withThread(scope, async (client) => {
+          const current = await this.sessions.lifecycleRow(
+            scope,
+            client,
+            effect.session_id,
+            true,
+          );
+          if (!current) throw new Error("session_unavailable");
+          if (
+            !current.revoked_at &&
+            !["ending", "ended", "cancelled"].includes(current.document.state)
+          )
+            throw new Error("room_closure_changed");
+          await this.sessions.persist(scope, client, {
+            ...current.document,
+            recordingState: "off",
+            present: [],
+          });
+        });
       } else if (effect.kind === "sync_recording") {
         // Read current consent rather than event order, then recheck after the external effect.
         const both = ["creator", "fan"].every((role) =>

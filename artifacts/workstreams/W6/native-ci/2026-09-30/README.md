@@ -32,6 +32,12 @@ Provider history requires actual booleans, an evidence reference for complete hi
 
 Latest published producer audit: main remains `2e337a1`; W4 scheduling/retained authority is unchanged on `c71d1c8`. W8 `bf44ada` now allocates through0043 and provides a worker-owned media metadata export hook, while actual nonempty binary archive and erasure still require supplied adapters/approved retention. Its registry still does not allocate `session/availability.sql`. W2 `26c6c9b`, W3 `a0a0025`, current W5 implementation `7b167fb` and W7 `15fd650` still provide no concrete MediaService/MediaAuthority or supported CallProvider instantiation. W5 exposes a current-media validation consumer; it does not configure W6's store/scanner/C2PA/creator-wide authority. These are current source observations, superseding the older through0031 producer inventory without importing unapplied shared registry changes.
 
+## Cancellation while an early join is in flight
+
+An early join can create a waiting room before cancellation commits, while cancelled sessions are excluded from periodic reconciliation. Cancellation now writes a durable `close_room` intent. End/authorization denial after external creation/token work renews a lease-fenced closure intent, covering responses that arrive after an earlier cleanup. The worker uses lifecycle authority and confirms room closure plus recording off before acknowledging the effect. It preserves occurrence history and emits no C07 outcome or monetary decision. This adds only an internal effect kind to the existing text column, with no shared enum or migration change. Backend build, ESLint and formatting pass; real provider race/restart acceptance remains open.
+
+After the current font-source correction, reran the three existing local Swift snapshot cases:110 image differences remain in101.268s on macOS26/Xcode26. Personally viewed the old/current Mark composition; matching macOS27 artifacts remain required before changing additional baselines. The exact pixel assertion remains unchanged.
+
 ## Owned resources and acceptance limits
 
 Official Temurin21.0.12.1 and Android command-line archives were checksum-verified and extracted under `/tmp/qelvora-w6-android-toolchain-20260930`. SDK35, required build tools, Gradle cache/output and Swift capture/scratch paths are isolated from peers. No emulator or physical phone was operated in this checkpoint. The owned PostgreSQL container remains stopped/preserved; the supplied OpenAI env file was not accessed.

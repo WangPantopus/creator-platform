@@ -875,5 +875,30 @@
     "iosFoundation": "queued",
     "trustRun": 36764832075,
     "trustCompilation": "success"
+  },
+  "cancelledWaitingRoomClosure": {
+    "sourceSha256": {
+      "apps/backend/src/modules/session/service.ts": "3f250446fb1330bb3a11383c7de510967722a0788c1471e1a0f6f6c7a0c870d6",
+      "apps/backend/src/modules/session/worker.ts": "d5e5d140e9c419cd9349c7099d47f33af2fed41e2530f89ce0dfbcb37a0b7a11"
+    },
+    "behavior": "Existing durable call_effect gains close_room intent on cancellation and renewed lease-fenced intent on authorization/end denial after external join work. Closure requires provider room closed and recording off; it produces no settlement evidence or cancellation economics.",
+    "checks": {
+      "backendBuild": "passed",
+      "eslint": "passed",
+      "prettier": "passed"
+    },
+    "acceptance": "Real provider cancellation/late-response/restart scenarios remain unverified."
+  },
+  "currentLocalSwiftSnapshots": {
+    "sourceHead": "82f40efa6f60aaa24e19a2a24a468f20edbd602b with unchanged current Swift sources",
+    "host": "macOS26.7 / Xcode26.5 / x86_64",
+    "existingCases": 3,
+    "imageAssertions": 110,
+    "failures": 110,
+    "durationSeconds": 101.268,
+    "precision": 1,
+    "artifactPath": "/tmp/qelvora-w6-swift-current-snapshots-20260930",
+    "logPath": "/tmp/qelvora-w6-swift-current-snapshots-20260930.log",
+    "interpretation": "After consuming italic font correction, uniform sRGB backgrounds align and Mark composition appears unchanged. Matching macOS27 runner artifacts are still required to explain remaining pixel differences; no reference refresh or tolerance relaxation performed."
   }
 }
