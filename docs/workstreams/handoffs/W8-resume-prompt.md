@@ -1,5 +1,7 @@
 # Resume prompt — W8 — trust operations, reliability and release
 
+**2026-09-30 continuation:** use the current branch tip and [resumed evidence](../../../artifacts/workstreams/W8/resume/20260930-local/README.md) before the historical checkpoints below. Main's W5 documentation is preserved. Current local W8 resources are web3008/API4108 and Docker `creator-platform-w8-resume-20260930` on55438; the original resources were released. Canonical participant denial, fresh-session/privacy defaults, scoped evidence, deletion replay and ownership-preserving journal schema2 are implemented. Current actual browser report/independent appeal, account switching, non-owner denial and isolated recovery observations are recorded. Seven missing privacy hooks, real effects/notices, identity-erasure reauthentication, staging and native/accessibility acceptance remain gates. Existing suite compatibility failures and GitHub PR metadata403 remain visible; do not mark the draft PR ready from build success alone. Read the status/register for the narrow human-authorized shared-file lease and its current disposition.
+
 Copy everything below into the next primary agent's assignment. The linked handoff contains the detailed inventory, preserved cases, migration mappings, measured evidence and file map.
 
 ---

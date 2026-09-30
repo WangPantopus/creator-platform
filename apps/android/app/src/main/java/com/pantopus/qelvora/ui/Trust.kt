@@ -35,6 +35,7 @@ class TrustClient(private val baseURL: String, private val token: () -> String?)
         val connection = URL(baseURL.trimEnd('/') + "/v1/trust/" + path).openConnection() as HttpURLConnection
         try {
             connection.requestMethod = if (input == null) "GET" else "POST"
+            connection.setRequestProperty("X-Correlation-Id", UUID.randomUUID().toString())
             connection.connectTimeout = 5000; connection.readTimeout = 15000; connection.useCaches = false
             connection.setRequestProperty("Content-Type", "application/json")
             // Public help must remain reachable when secure account storage is unavailable.
@@ -74,6 +75,8 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     var jobs by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var selectedJob by remember { mutableStateOf<JsonObject?>(null) }
     var local by remember { mutableStateOf(false) }
+    var verificationConfigured by remember { mutableStateOf(false) }
+    var verificationMethod by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var result by remember { mutableStateOf("") }
@@ -116,7 +119,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         if (client == null) { error = "The trust service is not configured."; return }
         busy = true
         try {
-            local = client.request("capabilities")["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
+            val capability = client.request("capabilities")
+            local = capability["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
+            verificationConfigured = capability.text("actorVerification") == "configured"
+            verificationMethod = capability.text("verificationMethod")
             help = client.request("help")
             if (route.startsWith("/trust") || route.contains("feedback")) { }
             else if (route.contains("access")) history = client.request("access-history").items()
@@ -142,7 +148,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         catch (failure: Exception) { selectedJob = null; error = failure.message ?: "Reconnect and try again." }
     }
     suspend fun privacyCommand(action: String) {
-        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
+        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
         perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
     }
     LaunchedEffect(route) { load() }
@@ -181,8 +187,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             if (scope != "account") TrustField("Creator ID", creatorId) { creatorId = it }
             if (scope == "thread") TrustField("Conversation ID", threadId) { threadId = it }
             if (local) { TrustText("Synthetic local account: type LOCAL DEVELOPMENT to confirm.", "caption"); TrustField("Local confirmation", proof) { proof = it } }
+            else if (verificationMethod == "current_session") TrustText("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.", "caption")
+            else if (verificationConfigured) TrustField("Account verification receipt", proof) { proof = it }
             else TrustText("Fresh account verification must be connected before requesting data changes.", "caption")
-            val disabled = busy || !local || proof != "LOCAL DEVELOPMENT" || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
+            val disabled = busy || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { coroutine.launch { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
             jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state"), ButtonVariant.QUIET, block = true) { coroutine.launch { jobDetail(job.text("id")) } } }

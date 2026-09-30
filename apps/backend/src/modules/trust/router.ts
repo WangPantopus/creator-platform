@@ -108,6 +108,10 @@ export function createTrustRouter(options: TrustRouterOptions) {
       actorVerification: options.service.dependencies.verifyPrivacy
         ? "configured"
         : "unavailable",
+      verificationMethod: options.localDevelopment
+        ? "local_confirmation"
+        : (options.service.dependencies.privacyVerificationMethod ??
+          "external_receipt"),
       privacyDomains: [
         "identity",
         "conversation",

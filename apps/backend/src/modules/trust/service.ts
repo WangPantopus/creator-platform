@@ -55,6 +55,7 @@ const effectTypes: Partial<Record<DecisionCommand["resolution"], string>> = {
   reject_verification: "identity.reject_verification",
 };
 export type TrustDependencies = {
+  privacyVerificationMethod?: "current_session" | "external_receipt";
   evidence?: (
     actor: Actor,
     input: ReportCommand,
@@ -730,6 +731,20 @@ export class TrustService {
         "Verify your account again.",
         401,
       );
+    const { proof, ...immutable } = input;
+    void proof;
+    // Successful deletion can remove the original authority objects. A fresh,
+    // same-account replay returns only its original minimal job acknowledgment.
+    const prior = await this.store.actor(actor, (client) =>
+      priorCommand<{
+        id: string;
+        kind: PrivacyCommand["kind"];
+        state: string;
+        immediateDeny: boolean;
+        domainIntegration: string;
+      }>(client, actor, "privacy", input.idempotencyKey, immutable),
+    );
+    if (prior) return prior;
     if (input.scope !== "account") {
       if (!this.dependencies.authorizePrivacyScope)
         throw new DomainError(
@@ -739,8 +754,6 @@ export class TrustService {
         );
       await this.dependencies.authorizePrivacyScope(actor, input);
     }
-    const { proof, ...immutable } = input;
-    void proof;
     return this.store.actor(actor, (client) =>
       command(
         client,

@@ -1,0 +1,9 @@
+{
+  "observedAt": "2026-09-30T08:41:03.558Z",
+  "environment": "isolated synthetic creator_w8",
+  "scope": "seeded recovery creator product account",
+  "jobId": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+  "immediateDeny": true,
+  "providerErasure": "unconfigured",
+  "backupPredatesDeletion": true
+}

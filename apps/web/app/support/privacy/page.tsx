@@ -106,6 +106,7 @@ export default function PrivacyPage() {
   const capability = useTrust<{
     localDevelopment: boolean;
     actorVerification: string;
+    verificationMethod?: string;
   }>("capabilities");
   const [kind, setKind] = useState("export");
   const [scope, setScope] = useState("account");
@@ -140,7 +141,10 @@ export default function PrivacyPage() {
         {
           kind,
           scope,
-          proof,
+          proof:
+            capability.data?.verificationMethod === "current_session"
+              ? "CURRENT_SESSION"
+              : proof,
           ...(scope !== "account" ? { creatorId } : {}),
           ...(scope === "thread" ? { threadId } : {}),
           idempotencyKey: key.current,
@@ -260,22 +264,27 @@ export default function PrivacyPage() {
             />
           </>
         )}
-        <label htmlFor="privacy-proof">
-          {capability.data?.localDevelopment
-            ? "Type LOCAL DEVELOPMENT for this synthetic account"
-            : "Account verification receipt"}
-        </label>
-        <input
-          id="privacy-proof"
-          required
-          autoComplete="off"
-          value={proof}
-          onChange={(event) => setProof(event.target.value)}
-        />
+        {capability.data?.verificationMethod !== "current_session" && (
+          <>
+            <label htmlFor="privacy-proof">
+              {capability.data?.localDevelopment
+                ? "Type LOCAL DEVELOPMENT for this synthetic account"
+                : "Account verification receipt"}
+            </label>
+            <input
+              id="privacy-proof"
+              required
+              autoComplete="off"
+              value={proof}
+              onChange={(event) => setProof(event.target.value)}
+            />
+          </>
+        )}
         {!capability.data?.localDevelopment && (
           <p className="qv-help">
-            Fresh identity verification must be connected before this action is
-            available.
+            {capability.data?.verificationMethod === "current_session"
+              ? "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account."
+              : "Fresh identity verification must be connected before this action is available."}
           </p>
         )}
         <button

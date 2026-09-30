@@ -19,6 +19,7 @@ import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
 import { createTrustRuntime } from "./operations/runtime.js";
 import { resolveActor } from "./modules/identity/adapter.js";
 import { DomainError } from "./core/errors.js";
+import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
 
 export type BackendRuntime = {
   pool: pg.Pool;
@@ -136,8 +137,19 @@ export async function createConfiguredBackend(input: {
         typeof input.trust === "function"
           ? await input.trust(backendRuntime)
           : input.trust;
+      const privacyAuthority = platformIdentity
+        ? trustIdentityAuthority(pool, platformIdentity, access, database)
+        : {};
       trust = await createTrustRuntime({
         ...configuration,
+        dependencies: {
+          ...privacyAuthority,
+          ...configuration.dependencies,
+          privacyVerificationMethod: configuration.dependencies.verifyPrivacy
+            ? (configuration.dependencies.privacyVerificationMethod ??
+              "external_receipt")
+            : privacyAuthority.privacyVerificationMethod,
+        },
         origin: input.config.allowedOrigin,
         actor: async (request) => {
           const token =
