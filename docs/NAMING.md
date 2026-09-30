@@ -10,11 +10,11 @@ documents, and not a substring of any other word, so a case-sensitive
 
 ## The three spellings
 
-| Spelling | Used for | Examples |
-| --- | --- | --- |
-| `Qelvora` | Prose, UI copy, titles, designs | "Welcome to Qelvora", "Qelvora Studio" |
+| Spelling  | Used for                                                                         | Examples                                              |
+| --------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `Qelvora` | Prose, UI copy, titles, designs                                                  | "Welcome to Qelvora", "Qelvora Studio"                |
 | `qelvora` | Code identifiers, package names, URLs, file names, database schemas, CSS classes | `@pantopus/qelvora-web`, `qelvora.app`, `qelvora_api` |
-| `QELVORA` | Environment variables and constants | `QELVORA_API_URL` |
+| `QELVORA` | Environment variables and constants                                              | `QELVORA_API_URL`                                     |
 
 To rename, run three case-sensitive replacements (`Qelvora` → `NewName`,
 `qelvora` → `newname`, `QELVORA` → `NEWNAME`) across the repository, or one
@@ -22,6 +22,12 @@ case-preserving replacement if your editor supports it. Then rename any files or
 folders whose names contain `qelvora`.
 
 ## Rules that keep the replacement clean
+
+New implementation uses `config/brand.json` as its runtime brand source. Run
+`pnpm brand:rename NewName --dry-run` to preview a repository-wide rename, and
+`pnpm brand:rename NewName` to apply it in one command, including text filenames.
+Run `pnpm install && pnpm generate && pnpm check` afterward. The final product
+name is still undecided; Qelvora remains a temporary token.
 
 1. **One unbroken word.** It may be joined to other words (`QelvoraStudio`,
    `qelvora-api`, `qelvoraClient`), but the token itself is never split, spaced
@@ -46,13 +52,13 @@ folders whose names contain `qelvora`.
 
 Log each of these here when it is created, so the rename checklist is complete.
 
-| Item | Why it needs manual work | Status |
-| --- | --- | --- |
-| Logo, wordmark, app icon | A drawn asset; the name's length and letterforms change the design | Not created yet |
-| iOS bundle ID and Android application ID | Cannot be changed after the first store submission. Use `com.pantopus.qelvora` and rename before the first submission | Not created yet |
-| App Store / Play Store listing names | Changed in the store consoles | Not created yet |
-| Domain names and email sender domains | Must be registered; old ones should redirect | Not created yet |
-| Stripe products, prices and statement descriptors | Changed in the Stripe dashboard | Not created yet |
-| OAuth / passkey relying-party IDs | A WebAuthn relying-party ID is tied to a domain; passkeys registered under the old domain stop working after a domain change. Decide the final domain before creators register passkeys | Not created yet |
-| Published design artifacts on claude.ai | Artifact titles and canvases are edited in place, not in this repo | Not created yet |
-| Third-party accounts (analytics, push, model, voice and call providers) | Project names in each provider's console | Not created yet |
+| Item                                                                    | Why it needs manual work                                                                                                                                                                | Status                    |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| Logo, wordmark, app icon                                                | A drawn asset; the name's length and letterforms change the design                                                                                                                      | Not created yet           |
+| iOS bundle ID and Android application ID                                | Cannot be changed after the first store submission. Local hosts use `com.pantopus.qelvora`; the rename command updates source IDs before submission                                     | Local only; not submitted |
+| App Store / Play Store listing names                                    | Changed in the store consoles                                                                                                                                                           | Not created yet           |
+| Domain names and email sender domains                                   | Must be registered; old ones should redirect                                                                                                                                            | Not created yet           |
+| Stripe products, prices and statement descriptors                       | Changed in the Stripe dashboard                                                                                                                                                         | Not created yet           |
+| OAuth / passkey relying-party IDs                                       | A WebAuthn relying-party ID is tied to a domain; passkeys registered under the old domain stop working after a domain change. Decide the final domain before creators register passkeys | Not created yet           |
+| Published design artifacts on claude.ai                                 | Artifact titles and canvases are edited in place, not in this repo                                                                                                                      | Not created yet           |
+| Third-party accounts (analytics, push, model, voice and call providers) | Project names in each provider's console                                                                                                                                                | Not created yet           |

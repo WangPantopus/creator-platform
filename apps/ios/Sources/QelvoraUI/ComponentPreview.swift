@@ -1,0 +1,66 @@
+import SwiftUI
+
+/// Design fixtures only. Network, signing, charging and playback are supplied by the host app.
+public struct NativeComponentPreview: View {
+    public let name: String
+    public init(name: String) { self.name = name; QelvoraFonts.register() }
+    public var body: some View { component }
+    private var component: AnyView {
+        switch name {
+        case "Mark": return AnyView(VStack(alignment: .leading, spacing: QelvoraTokens.space4) { ForEach(AuthorKind.allCases, id: \.rawValue) { Mark(kind: $0, size: QelvoraTokens.glyphSize) } })
+        case "Seal": return AnyView(HStack(spacing: QelvoraTokens.space4) { Seal(size: 16); Seal(size: 22); Seal(size: 30); Seal(size: 44); Seal(size: 22, live: true) })
+        case "Avatar": return AnyView(HStack(spacing: QelvoraTokens.space4) { Avatar(); Avatar(live: true) })
+        case "AuthorLabel": return AnyView(VStack(alignment: .leading, spacing: QelvoraTokens.space4) { ForEach(AuthorKind.allCases, id: \.rawValue) { AuthorLabel(kind: $0, time: "14:38") } })
+        case "IdentityStrip": return AnyView(VStack(spacing: QelvoraTokens.space4) { ForEach(IdentityStripState.allCases, id: \.rawValue) { IdentityStrip(state: $0) } })
+        case "ThreadHeader": return AnyView(VStack { ThreadHeader(); ThreadHeader(live: true) })
+        case "SignedMarker": return AnyView(VStack(alignment: .leading) { SignedMarker(time: "14:38"); SignedMarker(extra: "312 members", onMaya: true).padding(QelvoraTokens.space3).background(QelvoraTokens.color("maya-surface", theme: .light)) })
+        case "SystemLine": return AnyView(VStack(spacing: QelvoraTokens.space4) { SystemLine(children: "Maya left the conversation · you're back with Maya's AI"); SystemLine(variant: .presence, time: "14:38"); SystemLine(variant: .date, children: "TODAY · OCT 4") })
+        case "Message": return AnyView(VStack(alignment: .leading, spacing: QelvoraTokens.space4) { Message(kind: .fan, children: "My satin white keeps crawling at the rim."); Message(children: "Try a thinner coat. Let each layer dry.", time: "14:32", citation: AnyView(CitationChip(title: "Single-dip method", meta: "VIDEO · 2 MIN"))); Message(kind: .humanCreator, children: "Single dip, count to three, and let it drip off.", time: "14:38", live: true); Message(kind: .team, children: "Your workshop seat is confirmed.", time: "16:05"); ForEach(DraftTreatment.allCases, id: \.rawValue) { Message(kind: .approvedDraft, children: "Thin the glaze to 1.45 specific gravity.", time: "OCT 4", treatment: $0) } })
+        case "Note": return AnyView(Note(children: "Opened the kiln this morning. The new celadon test came out the color of shallow water.", audienceSize: "312", time: "09:12", media: "Photo · three test tiles on the kiln shelf"))
+        case "ReactionChip": return AnyView(ReactionChip())
+        case "CitationChip": return AnyView(VStack { CitationChip(title: "Maya's single-dip method", meta: "VIDEO · 2 MIN"); CitationChip(title: "Glaze notes", meta: "PDF · OCT 1", stamp: "PDF"); CitationChip(title: "Old recipe", unavailable: true) })
+        case "MemoryChip": return AnyView(VStack { MemoryChip(text: "You fire cone 6 oxidation."); MemoryChip(text: "Your studio schedule.", variant: .ask) })
+        case "Correction": return AnyView(Correction(aiText: "Fire this glaze to cone 8.", aiTime: "14:32", children: "I use cone 6 for this recipe. The higher firing changes the surface.", time: "14:38"))
+        case "ContextCard": return AnyView(ContextCard(source: QelvoraCopy.text("welcomeSource"), title: QelvoraCopy.text("welcomeContext")))
+        case "VoiceNote": return AnyView(VStack { VoiceNote(transcript: "Sponge the rim before it goes into the kiln."); VoiceNote(kind: .ai, transcript: "Maya's AI: let the coat dry before a second dip.") })
+        case "Composer": return AnyView(VStack { ForEach(ComposerState.allCases, id: \.rawValue) { Composer(state: $0) } })
+        case "StepIn": return AnyView(VStack(alignment: .leading) { StepIn(); StepIn(disabled: true) })
+        case "AccessLines": return AnyView(AccessLines())
+        case "ModeList": return AnyView(ModeList(modes: [.init(id: "written", title: "Written reply", meta: "Within 48 hours", price: "$25", selected: true), .init(id: "voice", title: "Voice note", meta: "Within 48 hours", price: "$40"), .init(id: "call", title: "Ten-minute call", meta: "Fully booked this week", price: "$75", disabled: true)]))
+        case "IncludeList": return AnyView(IncludeList(summary: "My satin white crawls at the rim. Cone 6, dipped.", items: [.init(id: "photo", label: "Photo of the test tile", help: "One attachment", checked: true), .init(id: "context", label: "Selected conversation context", checked: false)]))
+        case "TermsBlock": return AnyView(TermsBlock())
+        case "EtaLine": return AnyView(EtaLine(ahead: 3))
+        case "RequestStatus": return AnyView(RequestStatus(steps: [.init(id: "sent", label: "Sent to Maya", time: "OCT 4", state: .done), .init(id: "decision", label: "Waiting for Maya's decision", time: "31 H LEFT", state: .current), .init(id: "reply", label: "Reply delivered", state: .todo)], outcome: QelvoraCopy.text("declined", values: ["name": "Maya"])))
+        case "Receipt": return AnyView(Receipt(rows: [.init(id: "mode", label: "Mode", value: "Written reply"), .init(id: "paid", label: "Paid", value: "$25.00"), .init(id: "date", label: "Delivered", value: "OCT 4, 2026")]))
+        case "SpendLimit": return AnyView(SpendLimit())
+        case "QueueCard": return AnyView(VStack { QueueCard(handle: "@kilnfire", mode: "Written reply", price: "$25", due: "DECIDE BY OCT 5", summary: "A satin white glaze is crawling at the rim.", shared: "Summary + photo", draftReady: true); QueueCard(kind: .commitment, handle: "@kilnfire", mode: "Written reply", price: "$25", due: "2 H", summary: "Accepted reply is due.", overdue: true) })
+        case "CapacityHeader": return AnyView(CapacityHeader(rows: [.init(mode: "Written replies", used: 7, limit: 10), .init(mode: "Voice notes", used: 3, limit: 4)], line: "New requests open Monday."))
+        case "LabelPreview": return AnyView(VStack { LabelPreview(); LabelPreview(kind: .humanCreator); LabelPreview(kind: .team) })
+        case "SigningSheet": return AnyView(SigningSheet(rows: [("Fan", "@kilnfire"), ("Mode", "Written reply"), ("Price", "$25.00"), ("Deadline", "OCT 6 · 14:00")]))
+        case "AuditBanner": return AnyView(AuditBanner())
+        case "SourceRow": return AnyView(VStack { SourceRow(title: "Glaze notes", meta: "PDF · OCT 1"); SourceRow(title: "Kiln Club recipe", meta: "PDF · SEP 28", scope: "Kiln Club", state: .candidate); SourceRow(title: "Older recipe", meta: "Access removed", state: .revoked) })
+        case "Button": return AnyView(VStack(alignment: .leading) { ForEach(ButtonVariant.allCases, id: \.rawValue) { Button($0 == .maya ? "Ask Maya to step in" : $0 == .ai ? "Message Maya's AI" : "View request", variant: $0) }; Button("Fully booked", variant: .secondary, disabled: true, disabledReason: "Fully booked this week · opens Monday"); Button(QelvoraCopy.text("continueWithPantopus"), variant: .secondary, size: .lg, block: true) })
+        case "TabBar": return AnyView(TabBar(active: .requests))
+        case "Segmented": return AnyView(Segmented())
+        case "Notice": return AnyView(VStack { ForEach(NoticeTone.allCases, id: \.rawValue) { Notice(tone: $0, title: $0 == .error ? "Payment did not go through" : nil, children: $0 == .offline ? "You're offline. Your message stays on this device." : "Requests still work.") } })
+        case "NotificationRow": return AnyView(VStack(spacing: 0) { NotificationRow(kind: .ai, time: "14:32", unread: true, children: "Your glaze question has a new reply."); NotificationRow(kind: .maya, time: "14:38", children: "Single dip, count to three."); NotificationRow(kind: .note, time: "09:12", children: "Maya shared a Note with Kiln Club."); NotificationRow(kind: .team, time: "16:05", children: "Your workshop seat is confirmed."); NotificationRow(kind: .approved, children: "Prepared by AI, approved by Maya."); NotificationRow(kind: .reaction, children: "Maya reacted to your reply."); NotificationRow(kind: .system, children: "Maya passed · nothing charged.") })
+        case "EmptyState": return AnyView(EmptyState(title: "No requests yet", body: "When you ask Maya to step in, your request appears here.") { Button("Explore Maya's page", variant: .secondary) })
+        case "ShareCard": return AnyView(ShareCard(time: "OCT 4", verify: URL(string: "https://example.invalid/verification/catalog")!, children: "Single dip, count to three, and let it drip off. Then sponge the rim."))
+        case "CallChip": return AnyView(VStack(alignment: .leading) { CallChip(time: "08:42", end: "10:00"); CallChip(time: "08:42", end: "10:00", recording: true) })
+        case "ReservedLabel": return AnyView(VStack { ReservedLabel(); ReservedLabel(kind: .aiCall); ReservedLabel(kind: .aiVideo) })
+        case "Countdown": return AnyView(VStack(alignment: .leading) { Countdown(children: "31 H LEFT TO DECIDE"); Countdown(tone: .soon, children: "2 H LEFT"); Countdown(tone: .overdue, children: "2 H") })
+        case "InsteadMenu": return AnyView(InsteadMenu())
+        case "TestConsole": return AnyView(TestConsole(tests: [.init(name: "Authorship boundary"), .init(name: "Sponsor disclosure"), .init(name: "Scope restriction", state: .fail)], transcript: .init(test: "Scope restriction", fan: "Show me the members-only recipe.", ai: "Here is the recipe.", why: "This source belongs to Kiln Club. The public AI must not quote it.")))
+        case "VersionList": return AnyView(VersionList(versions: [.init(id: "v4", state: .draft, date: "OCT 4", changes: "Scope restrictions updated"), .init(id: "v3", state: .live, date: "OCT 1", changes: "New glaze notes"), .init(id: "v2", date: "SEP 28", changes: "Previous boundary rules")]))
+        case "DigestItem": return AnyView(VStack { DigestItem(time: "14:32", children: "Let each coat dry before a second dip."); DigestItem(filed: true, children: "Fire this recipe to cone 8.") })
+        case "StudioTabBar": return AnyView(StudioTabBar(requests: 12))
+        case "Sidebar": return AnyView(Sidebar(requests: 12))
+        case "Sheet": return AnyView(Sheet(title: "Ask Maya to step in", meta: "WRITTEN REPLY · $25", content: { TermsBlock() }, actions: { Button("Review request", variant: .secondary, block: true) }))
+        case "Dialog": return AnyView(Dialog(title: "Delete this conversation?", confirm: "Delete", destructive: true) { Text("This removes the conversation and its memories from your account.").qText("body") })
+        case "Toast": return AnyView(Toast(children: "Monthly limit updated", action: "View limit"))
+        case "Skeleton": return AnyView(VStack { Skeleton(); Skeleton(kind: .row) })
+        case "EmailFrame": return AnyView(EmailFrame(subject: "Maya replied to your request", time: "OCT 4", children: "Single dip, count to three, and let it drip off.", verificationURL: URL(string: "https://example.invalid/verification/catalog")))
+        default: preconditionFailure("Missing native component fixture: \(name)")
+        }
+    }
+}
