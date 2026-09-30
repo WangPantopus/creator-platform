@@ -1,6 +1,8 @@
 # W2 continuation — 2026-09-30
 
-**Current continuation:** W2 implementation and isolated OpenAI verification have advanced; **W2 is not release-ready**. [Finish matrix](finish-matrix.md) preserves R01–R14 and all nine original work packages. [Checks](checks.md) distinguishes passing checks from two existing foundation test failures. No reviewed license, production policy, creator verification or live fan publication was fabricated.
+**CI continuation:** See [current CI remediation](ci-remediation.md), which supersedes the historical two-failure report below. The founder authorized fixing existing checks and code. Strict reference images/check thresholds remain intact.
+
+**Previous implementation continuation:** W2 implementation and isolated OpenAI verification have advanced; **W2 is not release-ready**. [Finish matrix](finish-matrix.md) preserves R01–R14 and all nine original work packages. [Checks](checks.md) distinguishes passing checks from two existing foundation test failures. No reviewed license, production policy, creator verification or live fan publication was fabricated.
 
 Reviewed foundation `22aa088` was integrated by `bae1fee`; current main `2e337a1` by `92a4d48`. The PR includes the committed foundation and peer interfaces as well as W2; it is not a W2-only diff. The founder authorized narrow shared integration edits, server-only synthetic OpenAI verification, commits/pushes and merge when ready. Checkpoints `515da97`, `9f46de7`, `abc7f64` were pushed; the final continuation commit follows these. Shared checkout, peer services, immutable migrations and existing tests were preserved. No subagent implementation or new engineering tests/scripts were used.
 

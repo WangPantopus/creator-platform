@@ -76,6 +76,17 @@
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      // AppKit otherwise captures in the attached monitor's ICC profile. The
+      // references were recorded on an LG display; CI and other Macs have a
+      // different monitor. Render in the reference's declared space so the
+      // strict pixel comparison measures UI changes, not display calibration.
+      let referenceURL = URL(fileURLWithPath: String(describing: file))
+        .deletingLastPathComponent().appendingPathComponent("__Snapshots__/NativeSnapshotTests")
+        .appendingPathComponent("\(testName.replacingOccurrences(of: "()", with: "")).\(name.replacingOccurrences(of: ".", with: "-")).png")
+      if let reference = NSImage(contentsOf: referenceURL),
+        let bitmap = reference.representations.compactMap({ $0 as? NSBitmapImageRep }).first {
+        window.colorSpace = bitmap.colorSpace
+      }
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {

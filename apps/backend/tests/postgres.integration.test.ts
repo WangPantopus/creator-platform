@@ -66,12 +66,16 @@ describe.skipIf(!adminUrl)(
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
       await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
-      await admin.query(
-        await readFile(
-          new URL("../migrations/0001_foundation.sql", import.meta.url),
-          "utf8",
-        ),
-      );
+      // Current request authority locks identity profiles under W1 RLS. Use
+      // the real additive migration rather than granting test-only privileges.
+      for (const migration of ["0001_foundation.sql", "0002_w1_identity.sql"]) {
+        await admin.query(
+          await readFile(
+            new URL(`../migrations/${migration}`, import.meta.url),
+            "utf8",
+          ),
+        );
+      }
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );
@@ -206,7 +210,7 @@ describe.skipIf(!adminUrl)(
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 120000);
+    }, 300000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",

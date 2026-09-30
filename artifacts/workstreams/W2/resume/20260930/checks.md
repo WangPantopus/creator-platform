@@ -13,7 +13,7 @@ Commands ran in the isolated W2 worktree using bundled Node 24.19.0 and availabl
 
 ## Exact existing failures
 
-`apps/backend/tests/contracts.test.ts:79`, “local backend exposes health and honestly refuses sign-in”: expects 503 `identity_unconfigured` for POST `/v1/identity/continue` with only `returnTo`. Newer W1 input/PKCE validation returns 400. The invalid request does not establish unsafe sign-in; fixture/current owner contract need reconciliation.
+`apps/backend/tests/contracts.test.ts:79`, “local backend exposes health and honestly refuses sign-in”: expects 503 `identity_unconfigured` for POST `/v1/identity/continue` with only `returnTo`. The current W1 return-target allowlist rejects its non-UUID `context=kiln`, returning 400 before provider availability is checked. The earlier claim that PKCE caused this failure was incorrect. The invalid request does not establish unsafe sign-in; fixture/current owner contract need reconciliation.
 
 `apps/backend/tests/postgres.integration.test.ts` beforeAll drops/recreates schema using only immutable `0001_foundation.sql`. Current `Database.withThread` asserts fan ownership through `creator.fan_profile`; runtime permission arrives in later canonical migration 0002. Setup fails with **permission denied for table fan_profile**. Changing historical SQL or weakening ownership would misrepresent the real migration chain. Preserve both; reconcile the owner’s existing harness.
 

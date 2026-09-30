@@ -21,6 +21,16 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
+        // The unconfigured app has no real public creator arrival. Mount the
+        // actual Welcome component with an explicit engineering fixture.
+        compose.activity.runOnUiThread {
+            compose.activity.setContent {
+                QelvoraTheme(false) {
+                    Welcome(showContext = true, contextSource = "Maya · Ceramics · Kiln Club", contextTitle = "Synthetic arrival for context removal")
+                }
+            }
+        }
+        compose.onNodeWithText("Synthetic arrival for context removal").assertIsDisplayed()
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()
     }
