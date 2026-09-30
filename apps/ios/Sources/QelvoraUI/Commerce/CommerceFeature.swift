@@ -144,8 +144,8 @@ struct CommerceFeature: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Requests").qText("display-lg")
             HStack { ForEach(["Open", "Delivered", "Closed"], id: \.self) { label in Button(label, variant: .quiet) { category = label }.accessibilityAddTraits(category == label ? .isSelected : []) } }
-            let visible = data.packets.filter { packet in category == "Delivered" ? packet.commitment_state == "delivered" : category == "Closed" ? ["draft", "declined", "withdrawn", "expired"].contains(packet.state) : !["draft", "declined", "withdrawn", "expired"].contains(packet.state) && packet.commitment_state != "delivered" }
-            if visible.isEmpty { EmptyState(title: "No requests here", body: "Requests appear after you send them. Nothing is held or charged here.") }
+            let visible = data.packets.filter { requestCategory($0) == category }
+            if visible.isEmpty { EmptyState(title: "No requests here", body: data.packets.isEmpty ? "Requests appear after you send them." : "Choose another category to view your requests and retained receipts.") }
             ForEach(visible) { packet in
                 RequestStatus(reqId: reqID(packet.id), mode: packet.snapshot.title, price: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency), outcome: outcome(packet))
                 Button("View request", variant: .secondary, block: true) { Task { await open(packet) } }
@@ -282,8 +282,13 @@ struct CommerceFeature: View {
     private func panel<Content: View>(@ViewBuilder _ content: () -> Content) -> some View { VStack(alignment: .leading, spacing: 12, content: content).frame(maxWidth: .infinity, alignment: .leading).padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12)).overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1)) }
     private func row(_ label: String, _ value: String) -> some View { HStack(alignment: .top) { Text(label).qText("body"); Spacer(); Text(value).qText("data-md").multilineTextAlignment(.trailing) }.accessibilityElement(children: .combine) }
     private func reqID(_ id: String) -> String { "REQ-" + id.prefix(8).uppercased() }
+    private func requestCategory(_ packet: CommercePacket) -> String {
+        if packet.delivered_at != nil || packet.commitment_state == "delivered" { return "Delivered" }
+        if ["draft", "declined", "withdrawn", "expired"].contains(packet.state) || ["refunded", "resolved"].contains(packet.commitment_state ?? "") { return "Closed" }
+        return "Open"
+    }
     private func instant(_ value: String) -> Date? { let format = ISO8601DateFormatter(); format.formatOptions = [.withInternetDateTime, .withFractionalSeconds]; if let date = format.date(from: value) { return date }; format.formatOptions = [.withInternetDateTime]; return format.date(from: value) }
     private func when(_ value: String?) -> String { guard let value else { return "—" }; guard let date = instant(value) else { return value }; return date.formatted(date: .abbreviated, time: .shortened) }
-    private func outcome(_ packet: CommercePacket) -> String { ["released":"Hold released · nothing charged", "failed":"Payment failed · nothing charged", "unknown":"Confirming payment", "requires_action":"Payment authentication needed", "refund_pending":"Refund processing", "refunded":"Refund confirmed"][packet.payment_state] ?? (packet.commitment_state == "delivered" ? "Delivered" : packet.state.replacingOccurrences(of: "_", with: " ")) }
+    private func outcome(_ packet: CommercePacket) -> String { ["released":"Hold released · nothing charged", "failed":"Payment failed · nothing charged", "unknown":"Confirming payment", "requires_action":"Payment authentication needed", "refund_pending":"Refund processing", "refunded":"Refund confirmed"][packet.payment_state] ?? (packet.delivered_at != nil || packet.commitment_state == "delivered" ? "Delivered" : packet.state.replacingOccurrences(of: "_", with: " ")) }
 }
 

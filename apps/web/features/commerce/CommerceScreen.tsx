@@ -13,6 +13,7 @@ import {
   Receipt,
   Seal,
   TermsBlock,
+  type RequestStatusProps,
 } from "@qelvora/ui-web";
 import { copy, formatCopy } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
@@ -222,14 +223,16 @@ function money(amount: number | string | bigint, currency: string) {
   });
   const value = BigInt(amount),
     divisor = 10n ** BigInt(digits),
-    fraction = value % divisor;
+    absolute = value < 0n ? -value : value,
+    whole = absolute / divisor,
+    fraction = absolute % divisor;
   const localizedFraction = new Intl.NumberFormat(undefined, {
     minimumIntegerDigits: Math.max(1, digits),
     maximumFractionDigits: 0,
     useGrouping: false,
   }).format(fraction);
   return formatter
-    .formatToParts(value / divisor)
+    .formatToParts(value < 0n ? (whole === 0n ? -0 : -whole) : whole)
     .map((part) => (part.type === "fraction" ? localizedFraction : part.value))
     .join("");
 }
@@ -320,18 +323,82 @@ function status(p: Packet, name: string) {
   )
     return "Confirming payment · check again shortly";
   if (p.payment_state === "refunded") return "Refund confirmed";
+  if (
+    p.payment_state === "refund_pending" ||
+    p.commitment_state === "refund_pending"
+  )
+    return "Refund processing · wait for confirmation";
   if (p.payment_state === "requires_action")
     return "Your bank needs authentication · nothing shared yet";
   if (p.payment_state === "failed") return copy.paymentFailed;
+  if (p.state === "draft")
+    return p.payment_state === "released"
+      ? "Previous hold released · authorize this request before it is sent"
+      : "Draft · your request has not been sent";
+  if (p.state === "submitting")
+    return "Confirming the bank hold · nothing shared yet";
   if (p.state === "more_info")
     return `${name} asked for more information · your bank hold still expires`;
   if (p.state === "offer_pending")
     return "A changed offer is waiting for your choice";
-  if (p.commitment_state === "delivered")
+  if (p.commitment_state === "resolution_required")
+    return "This service needs resolution · get help with your request";
+  if (p.delivered_at || p.commitment_state === "delivered")
     return "Delivered · your receipt is below";
   return p.state === "accepted"
     ? "Accepted · charged once"
     : "Seen by the queue · charged only on acceptance";
+}
+function requestCategory(p: Packet) {
+  if (p.delivered_at || p.commitment_state === "delivered") return "Delivered";
+  if (
+    ["draft", "declined", "expired", "withdrawn"].includes(p.state) ||
+    ["refunded", "resolved"].includes(p.commitment_state ?? "")
+  )
+    return "Closed";
+  return "Open";
+}
+function requestSteps(p: Packet): RequestStatusProps["steps"] {
+  const steps: NonNullable<RequestStatusProps["steps"]> = [
+    {
+      label: p.submitted_at
+        ? "Request sent · bank hold confirmed"
+        : p.state === "draft"
+          ? "Draft · not sent"
+          : "Bank hold not confirmed",
+      time: p.submitted_at ? date(p.submitted_at) : "",
+      state: p.submitted_at ? "done" : p.state === "draft" ? "todo" : "current",
+    },
+  ];
+  if (p.accepted_at) {
+    steps.push({
+      label: "Accepted · charged only then",
+      time: date(p.accepted_at),
+      state: "done",
+    });
+    steps.push({
+      label: p.delivered_at
+        ? "Delivered"
+        : ["refunded", "resolved"].includes(p.commitment_state ?? "")
+          ? "Delivery not recorded"
+          : "Delivery due",
+      time: date(p.delivered_at ?? p.due_at),
+      state: p.delivered_at
+        ? "done"
+        : ["refunded", "resolved"].includes(p.commitment_state ?? "")
+          ? "todo"
+          : "current",
+    });
+  } else if (
+    ["submitted", "more_info", "offer_pending", "accepting"].includes(p.state)
+  ) {
+    steps.push({
+      label: p.state === "accepting" ? "Confirming charge" : "Decision due",
+      time: date(p.decision_at),
+      state: "current",
+    });
+  }
+  return steps;
 }
 
 type CommerceScreenProps = {
@@ -696,6 +763,31 @@ function CommerceAccountScreen({
     ) ?? [];
   const chosen = modes.find((m) => m.id === selectedMode);
   const limit = data?.limits.find((l) => l.currency === currency);
+  const chosenAmount = chosen
+    ? visibility === "public"
+      ? chosen.public_amount
+      : chosen.amount
+    : null;
+  const chosenAvailable =
+    chosen?.state === "offered" &&
+    chosen.used + chosen.reserved < chosen.weekly_limit &&
+    chosenAmount !== null;
+  const requestLimit = data?.limits.find(
+    (l) => l.currency === chosen?.currency,
+  );
+  const requestReady = Boolean(
+    identityAvailable &&
+      data?.capabilities.paymentsAvailable &&
+      data.capabilities.stripePublishableKey &&
+      data.fan &&
+      activeCreator &&
+      disclosure &&
+      requestLimit &&
+      chosenAvailable &&
+      summary.trim(),
+  );
+  const visiblePackets =
+    data?.packets.filter((p) => requestCategory(p) === filter) ?? [];
   const earningsCreator = data?.owned.find(
     (c) =>
       c.id === (creatorId ?? data.owned[0]?.id) &&
@@ -830,60 +922,36 @@ function CommerceAccountScreen({
                       </button>
                     ))}
                   </div>
-                  {data.packets
-                    .filter((p) =>
-                      filter === "Open"
-                        ? !["declined", "expired", "withdrawn"].includes(
-                            p.state,
-                          ) && p.commitment_state !== "delivered"
-                        : filter === "Delivered"
-                          ? p.commitment_state === "delivered"
-                          : ["declined", "expired", "withdrawn"].includes(
-                              p.state,
-                            ),
-                    )
-                    .map((p) => (
-                      <Link
-                        className="commerce-request-link"
-                        key={p.id}
-                        href={`/commerce/status?packetId=${p.id}`}
-                      >
-                        <RequestStatus
-                          reqId={requestId(p.id)}
-                          mode={p.snapshot.title}
-                          price={money(p.snapshot.amount, p.snapshot.currency)}
-                          steps={[
-                            {
-                              label:
-                                p.state === "accepted"
-                                  ? "Accepted · charged"
-                                  : "Request sent",
-                              time: date(p.submitted_at),
-                              state: "done",
-                            },
-                            {
-                              label:
-                                p.commitment_state === "delivered"
-                                  ? "Delivered"
-                                  : `Decision by ${date(p.decision_at)}`,
-                              time: date(p.delivered_at),
-                              state:
-                                p.commitment_state === "delivered"
-                                  ? "done"
-                                  : "current",
-                            },
-                          ]}
-                          outcome={status(
-                            p,
-                            data.creators.find((c) => c.id === p.creator_id)
-                              ?.display_name ?? "The creator",
-                          )}
-                        />
-                      </Link>
-                    ))}
-                  {!data.packets.length && (
-                    <Empty title="No requests yet">
-                      Your requests and receipts will appear here.{" "}
+                  {visiblePackets.map((p) => (
+                    <Link
+                      className="commerce-request-link"
+                      key={p.id}
+                      href={`/commerce/status?packetId=${p.id}`}
+                    >
+                      <RequestStatus
+                        reqId={requestId(p.id)}
+                        mode={p.snapshot.title}
+                        price={money(p.snapshot.amount, p.snapshot.currency)}
+                        steps={requestSteps(p)}
+                        outcome={status(
+                          p,
+                          data.creators.find((c) => c.id === p.creator_id)
+                            ?.display_name ?? "The creator",
+                        )}
+                      />
+                    </Link>
+                  ))}
+                  {!visiblePackets.length && (
+                    <Empty
+                      title={
+                        data.packets.length
+                          ? `No ${filter.toLowerCase()} requests`
+                          : "No requests yet"
+                      }
+                    >
+                      {data.packets.length
+                        ? "Choose another category to view your requests and retained receipts."
+                        : "Your requests and receipts will appear here."}{" "}
                       <Link href="/commerce/access">See your access</Link>
                     </Empty>
                   )}
@@ -1242,40 +1310,34 @@ function CommerceAccountScreen({
                   {chosen && (
                     <TermsBlock
                       name={name}
-                      price={money(
-                        visibility === "public"
-                          ? (chosen.public_amount ?? 0)
-                          : (chosen.amount ?? 0),
-                        chosen.currency,
-                      )}
+                      price={
+                        chosenAmount === null
+                          ? "Price unavailable"
+                          : money(chosenAmount, chosen.currency)
+                      }
                       deadline={`${chosen.decision_hours} h`}
                     />
                   )}
                   <p className="commerce-help">
-                    Card holds are unavailable until payment setup is complete.
+                    {!data.capabilities.paymentsAvailable ||
+                    !data.capabilities.stripePublishableKey
+                      ? "Card holds are unavailable until payment setup is complete. "
+                      : ""}
                     The server rechecks your access, limit and capacity before
                     any hold.
                   </p>
                   <Button
-                    disabled={
-                      !data.capabilities.paymentsAvailable ||
-                      !data.capabilities.stripePublishableKey ||
-                      !data.fan ||
-                      !disclosure ||
-                      !limit ||
-                      !chosen ||
-                      !summary ||
-                      busy
-                    }
+                    disabled={!requestReady || busy}
                     onClick={() => setCheckout(true)}
                   >
                     Send request
-                    {chosen?.amount
-                      ? ` · ${money(chosen.amount, chosen.currency)} if accepted`
+                    {chosen && chosenAmount !== null
+                      ? ` · ${money(chosenAmount, chosen.currency)} if accepted`
                       : ""}
                   </Button>
                   {checkout &&
                     chosen &&
+                    chosenAvailable &&
                     data.capabilities.stripePublishableKey &&
                     data.fan &&
                     disclosure && (
@@ -1285,11 +1347,15 @@ function CommerceAccountScreen({
                             data.capabilities.stripePublishableKey
                           }
                           busy={busy}
-                          label={`Place hold · ${money(visibility === "public" ? (chosen.public_amount ?? 0) : (chosen.amount ?? 0), chosen.currency)}`}
+                          label={`Place hold · ${money(chosenAmount!, chosen.currency)}`}
                           onCancel={() => setCheckout(false)}
                           onMethod={async (paymentMethodId) => {
+                            if (!requestReady)
+                              throw new Error(
+                                "This request is unavailable. Return to review its current access, limit and capacity.",
+                              );
                             const result = await command("packets", {
-                              creatorId: selectedCreator,
+                              creatorId: activeCreator,
                               fanId: data.fan!.id,
                               modeId: chosen.id,
                               modeVersion: chosen.version,
@@ -1323,7 +1389,7 @@ function CommerceAccountScreen({
                         />
                       </div>
                     )}
-                  {!limit && (
+                  {chosen && !requestLimit && (
                     <Link href="/commerce/spending">
                       Choose your monthly limit
                     </Link>
@@ -1480,32 +1546,19 @@ function CommerceAccountScreen({
                         detail.packet.snapshot.amount,
                         detail.packet.snapshot.currency,
                       )}
-                      steps={[
-                        {
-                          label: "Request sent · hold placed",
-                          time: date(detail.packet.submitted_at),
-                          state: detail.packet.submitted_at
-                            ? "done"
-                            : "current",
-                        },
-                        {
-                          label: "Accepted · charged only then",
-                          time: date(detail.packet.accepted_at),
-                          state: detail.packet.accepted_at ? "done" : "todo",
-                        },
-                        {
-                          label: "Delivered",
-                          time: date(detail.commitment?.delivered_at),
-                          state:
-                            detail.commitment?.state === "delivered"
-                              ? "done"
-                              : "todo",
-                        },
-                      ]}
+                      steps={requestSteps({
+                        ...detail.packet,
+                        commitment_state: detail.commitment?.state,
+                        due_at: detail.commitment?.due_at,
+                        delivered_at:
+                          detail.commitment?.delivered_at ?? undefined,
+                      })}
                       outcome={status(
                         {
                           ...detail.packet,
                           commitment_state: detail.commitment?.state,
+                          delivered_at:
+                            detail.commitment?.delivered_at ?? undefined,
                         },
                         data.creators.find(
                           (c) => c.id === detail.packet.creator_id,
