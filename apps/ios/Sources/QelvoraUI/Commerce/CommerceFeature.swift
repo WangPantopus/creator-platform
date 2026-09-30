@@ -177,10 +177,11 @@ struct CommerceFeature: View {
     private func membership(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Manage membership").qText("display-md")
-            if data.memberships.isEmpty { EmptyState(title: "No memberships yet", body: "Membership products and store verification are not connected.") }
+            if data.memberships.isEmpty { EmptyState(title: "No memberships yet", body: "Choose an available membership or restore your current store purchases.") }
             ForEach(data.memberships) { member in panel { Text(member.name).qText("title"); row("Status", member.state); row("Access until", when(member.period_end)); row("Billing provider", member.provider) } }
-            if let baseURL, let accountID = session.session?.accountId, !storeProductIDs.isEmpty, data.capabilities.storePurchasesAvailable == true {
-                StoreMembershipPane(baseURL: baseURL, productIDs: storeProductIDs, accountID: accountID)
+            let currentProducts = data.tiers.filter { $0.state == "active" }.compactMap { $0.catalog.apple?.productId }
+            if let baseURL, let accountID = session.session?.accountId, data.capabilities.storePurchasesAvailable == true {
+                StoreMembershipPane(baseURL: baseURL, productIDs: currentProducts, accountID: accountID, onVerified: { await refresh() }).id(accountID)
             } else {
                 Notice(title: "Purchase and restore unavailable", children: "Store products must be configured and verified by the server before access is granted.")
             }

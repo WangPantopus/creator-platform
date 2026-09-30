@@ -2,6 +2,10 @@ import type { Actor } from "../identity/adapter.js";
 import type { EffectHook, PrivacyHook } from "../trust/contracts.js";
 import type { CommerceService } from "./service.js";
 import { invariant } from "../../core/errors.js";
+import {
+  exportCommerceFinancial,
+  type FinancialExportSink,
+} from "./financial-export.js";
 
 type EffectInput = Parameters<EffectHook["run"]>[0];
 type PrivacyInput = Parameters<PrivacyHook["run"]>[0];
@@ -99,6 +103,7 @@ export function commerceEffectHooks(
 export function commercePrivacyHook(
   service: CommerceService,
   authority: CommerceOperationsAuthority,
+  exportSink?: FinancialExportSink,
 ): PrivacyHook {
   return {
     domain: "commerce",
@@ -115,6 +120,8 @@ export function commercePrivacyHook(
           "commerce_retention_unconfigured",
           "Commerce deletion requires the configured legal retention and obligation policy.",
         );
+        if (exportSink)
+          return exportCommerceFinancial(service, actor, input, exportSink);
         return service.account(actor, async (client) => {
           const restrictedCreator = await client.query(
             "SELECT 1 FROM creator.creator_profile WHERE account_id=$1 AND verification<>'verified' LIMIT 1",

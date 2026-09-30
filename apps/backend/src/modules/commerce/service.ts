@@ -134,24 +134,32 @@ export class CommerceService {
     private readonly access: AccessService,
     readonly policy: CommercePolicy,
     readonly provider?: PaymentProvider,
+    private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
   ) {}
   async account<T>(
     actor: Actor,
     work: (client: PoolClient) => Promise<T>,
+    options?: { isolation: "repeatable read" },
   ): Promise<T> {
     invariant(
       actor.adultEligible,
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
+    await this.assertActorAllowed?.(actor);
     const client = await this.pool.connect();
     try {
-      await client.query("BEGIN");
+      await client.query(
+        options?.isolation === "repeatable read"
+          ? "BEGIN ISOLATION LEVEL REPEATABLE READ"
+          : "BEGIN",
+      );
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         actor.accountId,
       ]);
       await assertCurrentSession(client, actor.accountId);
       const value = await work(client);
+      await this.assertActorAllowed?.(actor);
       await client.query("COMMIT");
       return value;
     } catch (e) {
@@ -172,6 +180,31 @@ export class CommerceService {
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `${actor.accountId}:${operation}:${key}`,
     ]);
+    const cached = await this.cachedCommand<T>(
+      client,
+      actor,
+      operation,
+      key,
+      body,
+    );
+    if (cached.found) return cached.response;
+    const hash = contentHash({ operation, body });
+    const result = await work();
+    await client.query(
+      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
+      [actor.accountId, operation, key, hash, JSON.stringify(result)],
+    );
+    return result;
+  }
+  /** Read a completed command before provider I/O. Call within current actor
+   * authority; command() still serializes and rechecks after that I/O. */
+  async cachedCommand<T>(
+    client: PoolClient,
+    actor: Actor,
+    operation: string,
+    key: string,
+    body: unknown,
+  ): Promise<{ found: false } | { found: true; response: T }> {
     const hash = contentHash({ operation, body });
     const prior = (
       await client.query<{ request_hash: string; response: T }>(
@@ -185,14 +218,9 @@ export class CommerceService {
         "idempotency_conflict",
         "This retry key was used for another action.",
       );
-      return prior.response;
+      return { found: true, response: prior.response };
     }
-    const result = await work();
-    await client.query(
-      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
-      [actor.accountId, operation, key, hash, JSON.stringify(result)],
-    );
-    return result;
+    return { found: false };
   }
   private async fan(client: PoolClient, actor: Actor) {
     const fan = (

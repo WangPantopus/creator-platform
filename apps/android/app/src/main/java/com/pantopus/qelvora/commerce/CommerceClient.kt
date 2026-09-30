@@ -15,7 +15,10 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceFan(val id: String, val handle: String)
 @Serializable data class CommerceCreator(val id: String, val handle: String, val display_name: String)
 @Serializable data class CommercePolicy(val currency: String, val limitOptions: List<Long>, val passEnabled: Boolean)
-@Serializable data class CommerceCapabilities(val paymentsAvailable: Boolean, val membershipAvailable: Boolean, val nativeReplyPurchase: Boolean)
+@Serializable data class CommerceCapabilities(val paymentsAvailable: Boolean, val membershipAvailable: Boolean, val nativeReplyPurchase: Boolean,val storePurchasesAvailable:Boolean=false)
+@Serializable data class CommerceStoreProduct(val productId:String,val basePlanId:String?=null)
+@Serializable data class CommerceTierCatalog(val apple:CommerceStoreProduct?=null,val google:CommerceStoreProduct?=null)
+@Serializable data class CommerceTier(val id:String,val creator_id:String,val name:String,val state:String="active",val catalog:CommerceTierCatalog)
 @Serializable data class CommerceExposure(val captured: Long, val held: Long, val total: Long, val currency: String)
 @Serializable data class CommerceMode(val id: String, val creator_id: String, val title: String, val kind: String, val amount: String?, val public_amount: String?, val currency: String, val weekly_limit: Int, val used: Int, val reserved: Int, val delivery_hours: Int, val decision_hours: Int, val state: String, val shareable: Boolean, val version: Int)
 @Serializable data class CommerceLimit(val currency: String, val amount: String?, val explicit_none: Boolean, val pending_amount: String?, val effective_at: String?, val reminders_on: Boolean, val version: Int)
@@ -31,7 +34,7 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceCommitment(val id: String, val state: String, val version: Int, val due_at: String, val delivered_at: String?)
 @Serializable data class CommerceShare(val version: Int, val fan_choice: Boolean, val revoked_at: String?)
 @Serializable data class CommerceDetail(val packet: CommercePacket, val commitment: CommerceCommitment?, val share: CommerceShare?)
-@Serializable data class CommerceOverview(val fan: CommerceFan?, val creators: List<CommerceCreator>, val packets: List<CommercePacket>, val modes: List<CommerceMode>, val limits: List<CommerceLimit>, val memberships: List<CommerceMembership>, val slots: List<CommerceSlot>, val policy: CommercePolicy, val capabilities: CommerceCapabilities, val exposure: CommerceExposure?,val pass:List<CommercePass> = emptyList(),val passChoices:CommercePassChoices = CommercePassChoices(),val spendingNotices:List<CommerceSpendingNotice> = emptyList())
+@Serializable data class CommerceOverview(val fan: CommerceFan?, val creators: List<CommerceCreator>, val packets: List<CommercePacket>, val modes: List<CommerceMode>, val limits: List<CommerceLimit>, val memberships: List<CommerceMembership>, val slots: List<CommerceSlot>, val policy: CommercePolicy, val capabilities: CommerceCapabilities, val exposure: CommerceExposure?,val pass:List<CommercePass> = emptyList(),val passChoices:CommercePassChoices = CommercePassChoices(),val spendingNotices:List<CommerceSpendingNotice> = emptyList(),val tiers:List<CommerceTier> = emptyList())
 class CommerceFailure(val status: Int, override val message: String) : Exception(message)
 
 /** Shares canonical OS-encrypted session storage, never a local entitlement authority. */

@@ -15,10 +15,12 @@
     "worker:ingestion": "tsx src/workers/start.ts ingestion"
   },
   "dependencies": {
+    "@apple/app-store-server-library": "3.1.0",
     "@qelvora/api": "workspace:*",
     "@qelvora/copy": "workspace:*",
     "@simplewebauthn/server": "^13.2.2",
     "express": "^5.1.0",
+    "google-auth-library": "11.1.0",
     "pg": "^8.16.3",
     "stripe": "22.6.2",
     "ws": "^8.18.3",

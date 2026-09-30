@@ -38,7 +38,7 @@ export interface TierCatalog {
       currency: string;
       interval: "month";
     };
-    apple?: { productId: string };
+    apple?: { productId: string; subscriptionGroupId?: string };
     google?: { productId: string; basePlanId: string };
   }>;
 }
@@ -51,7 +51,12 @@ const Catalog = z.strictObject({
       interval: z.literal("month"),
     })
     .optional(),
-  apple: z.strictObject({ productId: z.string().min(1).max(200) }).optional(),
+  apple: z
+    .strictObject({
+      productId: z.string().min(1).max(200),
+      subscriptionGroupId: z.string().min(1).max(100).optional(),
+    })
+    .optional(),
   google: z
     .strictObject({
       productId: z.string().min(1).max(200),
@@ -90,6 +95,7 @@ export class CommerceTiers {
     input: unknown,
   ) {
     const body = TierCommand.parse(input);
+    const operation = `tier.save:${creatorId}:${tierId ?? "new"}`;
     // Provider reads never run while holding a catalog or creator database lock.
     const existing = await this.service.account(actor, async (client) => {
       const owner = await client.query(
@@ -101,7 +107,14 @@ export class CommerceTiers {
         "creator_required",
         "Only the verified creator can edit membership tiers.",
       );
-      return tierId
+      const cached = await this.service.cachedCommand<Record<string, unknown>>(
+        client,
+        actor,
+        operation,
+        body.idempotencyKey,
+        body,
+      );
+      const tier = tierId
         ? (
             await client.query(
               "SELECT catalog,version FROM creator.commerce_tier WHERE id=$1 AND creator_id=$2",
@@ -109,7 +122,9 @@ export class CommerceTiers {
             )
           ).rows[0]
         : undefined;
+      return { cached, tier };
     });
+    if (existing.cached.found) return existing.cached.response;
     invariant(
       body.state !== "active" || body.catalogKey,
       "membership_catalog_unavailable",
@@ -117,8 +132,8 @@ export class CommerceTiers {
     );
     const preserveCatalog =
       body.state !== "active" &&
-      existing?.version === body.version &&
-      existing?.catalog?.key === body.catalogKey;
+      existing.tier?.version === body.version &&
+      existing.tier?.catalog?.key === body.catalogKey;
     invariant(
       !body.catalogKey || this.catalog || preserveCatalog,
       "membership_catalog_unavailable",
@@ -126,7 +141,7 @@ export class CommerceTiers {
     );
     const verifiedCatalog = body.catalogKey
       ? preserveCatalog
-        ? existing!.catalog
+        ? existing.tier!.catalog
         : Catalog.parse(await this.catalog!.verify(creatorId, body.catalogKey))
       : {};
     invariant(
@@ -145,7 +160,7 @@ export class CommerceTiers {
       this.service.command(
         client,
         actor,
-        `tier.save:${creatorId}:${tierId ?? "new"}`,
+        operation,
         body.idempotencyKey,
         body,
         async () => {
