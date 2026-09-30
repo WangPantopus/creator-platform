@@ -10,14 +10,8 @@
     "tests": 18,
     "failures": 0,
     "durationSeconds": 184.291,
-    "sourceDimensions": [
-      390,
-      844
-    ],
-    "bitmapDimensions": [
-      780,
-      1688
-    ],
+    "sourceDimensions": [390, 844],
+    "bitmapDimensions": [780, 1688],
     "comparison": "Normalize both original ICC-profiled reference and capture into sRGB. Exact dimensions; at least99.85% of pixels within8 channel units. Native blur/font edge variance calibrated from all110 preserved comparisons; source artboards and Swift baseline PNGs unchanged."
   },
   "iosAppBuild": "Normal signed generic Simulator BUILD SUCCEEDED",

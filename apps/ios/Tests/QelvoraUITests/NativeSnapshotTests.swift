@@ -110,7 +110,7 @@
         // Color-profile rounding and native blur/text rasterization vary across
         // macOS hosts. Require 99.85% of decoded sRGB pixels to match within eight
         // channel units; retain exact dimensions and original failure images.
-        // Byte comparison avoids Core Image's host-dependent dark-color Delta E.
+        // Byte comparison applies the same channel bound in both themes.
         let a = expected.data!.assumingMemoryBound(to: UInt8.self)
         let b = actual.data!.assumingMemoryBound(to: UInt8.self)
         var different = 0
