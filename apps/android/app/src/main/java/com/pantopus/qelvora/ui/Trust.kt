@@ -61,13 +61,20 @@ class TrustClient(private val baseURL: String, private val token: () -> String?)
 fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistration(
     matches = { it.startsWith("/support") || it.startsWith("/trust") },
     allowsSignedOut = { it.startsWith("/trust") },
-    screen = { model -> key(model.session?.accountId) { TrustFanFeature(context, baseURL, model.destination) } }
+    screen = { model ->
+        val account = model.session?.accountId
+        key(account) { TrustFanFeature(context, baseURL, model.destination) {
+            val credential = model.currentToken()
+            check(account != null && model.session?.accountId == account) { "Your account changed. Reopen this screen before continuing." }
+            credential
+        } }
+    }
 )
 
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
-fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support") {
-    val client = remember(baseURL) { baseURL?.let { TrustClient(it) { SecureSessionStorage(context).read() } } }
+fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context).read() }) {
+    val client = remember(baseURL) { baseURL?.let { TrustClient(it, token) } }
     val coroutine = rememberCoroutineScope()
     var route by remember { mutableStateOf(destination) }
     var cases by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
@@ -87,6 +94,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     var reason by remember { mutableStateOf("") }
     var creatorId by remember { mutableStateOf(reportedCreator.takeIf(::validTrustId).orEmpty()) }
     var messageId by remember { mutableStateOf(reportedMessage.takeIf(::validTrustId).orEmpty()) }
+    var requestId by remember { mutableStateOf(entry.getQueryParameter("requestId").orEmpty().takeIf(::validTrustId).orEmpty()) }
     var threadId by remember { mutableStateOf("") }
     var scope by remember { mutableStateOf("account") }
     var proof by remember { mutableStateOf("") }
@@ -152,7 +160,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
     }
     LaunchedEffect(route) { load() }
-    LaunchedEffect(kind,reason,creatorId,messageId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
+    LaunchedEffect(kind,reason,creatorId,messageId,requestId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
         TrustText("Reports are available without paid access. Evidence is limited to what you report.")
@@ -219,14 +227,15 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             TrustText("Report type: " + kind.replace('_', ' '), "label")
             if (kind == "ai_report" || kind == "abuse" || kind == "block") TrustField("Creator ID", creatorId) { creatorId = it }
             if (kind == "ai_report") TrustField("AI message ID", messageId) { messageId = it }
+            if (kind == "support") TrustField("Request ID (optional)", requestId) { requestId = it }
             if (kind == "crisis") TrustCrisisHelp(context,help)
             TrustField("What happened?", reason, true) { reason = it }
-            Button(if(kind=="block") "Block creator" else "Send report", ButtonVariant.SECONDARY, block = true, disabled = busy || reason.trim().length < 12 || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { coroutine.launch {
+            Button(if(kind=="block") "Block creator" else "Send report", ButtonVariant.SECONDARY, block = true, disabled = busy || reason.trim().length < 12 || (kind=="support" && requestId.isNotEmpty() && !validTrustId(requestId)) || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { coroutine.launch {
                 if(kind=="block") {
                     if(perform("blocks",buildJsonObject { put("creatorId",creatorId.lowercase()); put("reason",reason); put("idempotencyKey",key) }) != null) { result="Your block is saved. Enforcement in connected domains follows their current denial checks."; reason=""; load() }
                     return@launch
                 }
-                val input = buildJsonObject { put("kind", kind); put("reason", reason); put("idempotencyKey", key); if (kind!="support" && creatorId.isNotEmpty()) put("creatorId", creatorId.lowercase()); if (kind == "ai_report") put("messageId", messageId.lowercase()) }
+                val input = buildJsonObject { put("kind", kind); put("reason", reason); put("idempotencyKey", key); if (kind!="support" && creatorId.isNotEmpty()) put("creatorId", creatorId.lowercase()); if (kind == "ai_report") put("messageId", messageId.lowercase()); if (kind == "support" && requestId.isNotEmpty()) put("requestId",requestId.lowercase()) }
                 perform("reports", input)?.let { result = "CASE-" + it.text("number") + " is saved. No provider action is implied."; reason = ""; load() }
             } }
             TrustText("Your cases", "title")

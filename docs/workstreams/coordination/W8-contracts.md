@@ -2,6 +2,8 @@
 
 ## 2026-09-30 resumed lease and additive seam
 
+**Lease disposition:** the original human-authorized four-file backend seam lease is returned after source `9f5afcbec6527a66846d86758e3af9958262a995`: `apps/backend/src/integration.ts`, `apps/backend/src/app.ts`, `apps/backend/src/db/database.ts`, `apps/backend/src/modules/access/scope.ts`. All edits are isolated to W8's branch; no peer checkout was touched. A separate formatting-only proposal for five CI-blocking shared files is pending human authorization and has not been applied. W8-owned CI/native/operational records remain within W8 scope.
+
 The human user authorized a narrow temporary W8-branch edit lease for `apps/backend/src/integration.ts`, `app.ts`, `db/database.ts` and `modules/access/scope.ts`. No peer worktree was edited. Current W8 resources: web3008/API4108, Docker `creator-platform-w8-resume-20260930`/loopback55438, synthetic `creator_w8`; separate `creator_w8_foundation_test` for the unchanged existing suite; Next `.next-w8-resume`/`.next-w8-build`. Historical resources below are not active reservations. No native device is newly reserved.
 
 `ScopeRestriction` now receives a fourth, W1-verified participant argument `{fanAccountId,creatorAccountId}`. `ThreadScope` carries the fan account, and Database obtains its current value from its authority query on every operation. W8's coordinator restriction checks deny metadata for both participants, including fan blocks and immutable deleted-creator ownership. Existing three-argument callbacks remain callable implementations but should adopt the participant-aware W8 seam.
