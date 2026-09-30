@@ -47,3 +47,7 @@ Instagram adapter stays disabled until approved API permissions/account and a cr
 ## Handoff checkpoint — 2026-09-29
 
 The [complete handoff](../workstreams/handoffs/W7.md) and [resume execution prompt](../workstreams/prompts/W7-resume.md) record all implemented and remaining work, source/design references, resources and acceptance limits. W1 now registers `/studio/activation`; this supersedes the old C11 request. Fresh full backend and web typechecks both passed during handoff preparation. Earlier peer diagnostics in the evidence history are superseded, not evidence of a continuing compiler blocker. No new native build or full acceptance run was performed for this documentation checkpoint. Consult the [commit/dependency manifest](../../artifacts/workstreams/W7/handoff/20260929/README.md) before branching from the older design-only baseline.
+
+## Resources released after handoff
+
+The founder requested resource cleanup after PR creation. W7 server/devices/temporary copies/builds/caches and development key are removed; recorded launch commands require fresh leased provisioning from current source. W7 Docker container/data removal remains pending the failed engine and explicit approval for a shared Docker restart. See the [cleanup/reprovisioning record](../../artifacts/workstreams/W7/cleanup/20260929/README.md). Do not reuse surviving encrypted rows with a new key. Source and committed evidence are preserved.

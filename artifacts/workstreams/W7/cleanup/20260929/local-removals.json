@@ -1,0 +1,176 @@
+[
+  {
+    "path": "/private/tmp/creator-w7-android",
+    "allocatedKiB": 92524,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-android-full.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-android-latest.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-android-post.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-android-public.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-android.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-cleanup-device-results.json",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-cleanup-simulators.json",
+    "allocatedKiB": 16,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-discover-final.html",
+    "allocatedKiB": 24,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-emulator.log",
+    "allocatedKiB": 12,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-gradle-cache",
+    "allocatedKiB": 3052,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-gradle-threads.txt",
+    "allocatedKiB": 124,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff-backend-typecheck.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff-commit.txt",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff-git-before.json",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff-paths.nul",
+    "allocatedKiB": 8,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff-web-typecheck.log",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-handoff.index",
+    "allocatedKiB": 44,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-ios",
+    "allocatedKiB": 12028,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-ios-derived",
+    "allocatedKiB": 516168,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-ios-package",
+    "allocatedKiB": 369476,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-key",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-pr-body.md",
+    "allocatedKiB": 4,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-swift.log",
+    "allocatedKiB": 36,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-web",
+    "allocatedKiB": 514372,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-xcode-full.log",
+    "allocatedKiB": 72,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-xcode-latest.log",
+    "allocatedKiB": 52,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-xcode-post.log",
+    "allocatedKiB": 40,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-xcode-signed.log",
+    "allocatedKiB": 44,
+    "removed": true
+  },
+  {
+    "path": "/private/tmp/creator-w7-xcode.log",
+    "allocatedKiB": 48,
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w7-ios-derived_SourcePackages_Package.resolved.lock",
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w7-ios-derived_SourcePackages_workspace-state.json.lock",
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w7-ios-package.lock",
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w7-ios-package_Package.resolved.lock",
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w7-ios-package_workspace-state.json.lock",
+    "removed": true
+  },
+  {
+    "path": "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_tmp_creator-w7-ios-derived_SourcePackages_Package.resolved.lock",
+    "removed": true
+  }
+]

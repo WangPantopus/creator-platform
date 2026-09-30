@@ -24,3 +24,7 @@ This handoff turn did not perform a new full runtime acceptance matrix or run ne
 ## Current resource observation
 
 Read-only handoff inspection saw web3007 listening, W7 iOS simulator booted and Android emulator5570 listed. API4107 was not listening. Docker status did not return promptly and is unconfirmed. Sandbox-only simulator/ADB status errors were followed by a permitted host status read; do not interpret sandbox access failure as device destruction. Recheck resources and W7 leases before restarting; no shared emulator/ADB/server was reset in this handoff turn.
+
+## Subsequent release
+
+The [cleanup record](../../cleanup/20260929/README.md) supersedes this historical resource observation. The founder requested releasing W7 server/devices/temp builds/caches/key after creating [PR #2](https://github.com/WangPantopus/creator-platform/pull/2). Fresh provisioning is required; Docker cleanup remains pending. The first handoff commit/source hashes remain historical; later cleanup-document hashes are recorded with the cleanup evidence.
