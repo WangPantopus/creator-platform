@@ -1,0 +1,234 @@
+{
+  "workstream": "W1",
+  "increment": "foundations",
+  "recordedAt": "2026-09-30T02:51:39.553953+00:00",
+  "baseRevision": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+  "revisionNote": "Shared uncommitted checkout; existing user and peer changes preserved.",
+  "implementationOwner": "Primary W1 agent personally implemented, integrated, built, launched and inspected evidence. Research agents only read information.",
+  "newTestCode": false,
+  "releaseReady": false,
+  "contracts": [
+    "C01",
+    "C02",
+    "C11",
+    "D-07",
+    "common consent metadata"
+  ],
+  "sourceReferences": [
+    "D-06",
+    "INV-14",
+    "T14",
+    "ADR9",
+    "INV05",
+    "T34",
+    "BUILD_PROMPT \u00a79",
+    "4A-02",
+    "4A-13",
+    "4B-08",
+    "4C-03",
+    "4D-01",
+    "5.5 REF"
+  ],
+  "environment": {
+    "api": "http://127.0.0.1:4101",
+    "web": "http://localhost:3001",
+    "database": "creator_w1 on 55431",
+    "providerMode": "Explicit loopback development identity; actual isolated PostgreSQL. Production identity, RP and domain providers unconfigured.",
+    "domainFeatures": [],
+    "foundationReady": true,
+    "ready": false,
+    "adbServerPort": 5041
+  },
+  "builds": [
+    {
+      "platform": "web",
+      "result": "passed",
+      "output": "apps/web/.next-w1-build",
+      "evidence": "web-production-build.log",
+      "observedTimingSeconds": {
+        "compile": 4.5,
+        "typeScript": 2.0
+      }
+    },
+    {
+      "platform": "iOS",
+      "result": "passed",
+      "output": "artifacts/workstreams/W1/build/ios",
+      "evidence": "ios-build-final.log"
+    },
+    {
+      "platform": "Android",
+      "result": "passed",
+      "output": "artifacts/workstreams/W1/build/android",
+      "evidence": "android-build-final.log",
+      "observedBuildSeconds": 57
+    }
+  ],
+  "consistency": {
+    "apiBackendWebTypecheck": "passed",
+    "targetedLint": "passed",
+    "generatedResources": "passed: 12 design resources and 31 OpenAPI operations",
+    "brandPreview": "Fresh FolioPreview rename in disposable source copy;353text files/paths and12resources/31operations generated/checked. Live brand unchanged. Renamed copy not compiled. Late C11/root/authority source refresh regenerated and checked the same renamed copy."
+  },
+  "journeys": [
+    {
+      "name": "Web development sign-in, handle save and return",
+      "status": "partial",
+      "actorRole": "synthetic fan, development actor one",
+      "route": "/auth/continue?returnTo=%2Fidentity%2Faccount",
+      "actions": "Prior actual browser continuation/actor selection/public profile save/return. Durable fan handle w1_actor_one version1 inspected.",
+      "limitations": "No current screenshot or latency from that interaction. Two-actor/account-switch/revocation journey not accepted."
+    },
+    {
+      "name": "Web malformed return",
+      "status": "verified diagnostic",
+      "actions": "POST external HTTPS return URL to actual API",
+      "observed": "HTTP400 invalid_request",
+      "correlationId": "53d4d541-011d-4cd0-856d-ce20b44f3058"
+    },
+    {
+      "name": "Public invalid verification route",
+      "status": "partial",
+      "route": "/verify/<invalid-id>",
+      "observed": "HTTP200 renders Signed act unavailable / invalid link",
+      "evidence": "web-invalid-verifier-response.html",
+      "limitations": "HTTP rendering only; valid signed content and sharing/revocation not exercised."
+    },
+    {
+      "name": "Comprehension REF",
+      "status": "partial",
+      "route": "/design/studies/comprehension",
+      "observed": "HTTP200",
+      "evidence": "web-comprehension-response.html",
+      "limitations": "No interactive score/completion or participant T21 acceptance."
+    },
+    {
+      "name": "iOS shipping launch",
+      "status": "partial",
+      "device": "B622C222-8292-46EF-A2B2-A9DA67763DE6, iPhone17, iOS27",
+      "route": "/identity/account",
+      "actorRole": "signed out",
+      "appearance": "Light and Night, final normally signed binary",
+      "capturePixels": [
+        1206,
+        2622
+      ],
+      "observed": "Latest normally signed C11 binary installed/launched and unobstructed Welcome personally inspected in Light/Night. Simulator booted again for final verification and remains at public crisis route.",
+      "evidence": [
+        "ios-final-c11-welcome-light.png",
+        "ios-final-c11-welcome-night.png"
+      ],
+      "limitations": "Does not match 390x844 reference coordinate/content conditions; no tap/type/auth/passkey/assistive-technology acceptance."
+    },
+    {
+      "name": "iOS encoded deep link",
+      "status": "blocked",
+      "route": "qelvora://app/identity%2Faccount",
+      "observed": "OS Open in Qelvora confirmation sheet",
+      "evidence": "ios-encoded-link-system-prompt.png",
+      "limitations": "Native UI control unavailable; sheet not confirmed; app denial not claimed."
+    },
+    {
+      "name": "Android shipping launch",
+      "status": "partial",
+      "device": "emulator-5560, CreatorPlatform_W1, API34, pixel5",
+      "route": "/identity/account",
+      "actorRole": "signed out",
+      "appearance": "Light and Night, latest C11 binary",
+      "capturePixels": [
+        1080,
+        2340
+      ],
+      "observed": "Latest APK installed successfully on the separate W1 recovery image; actual unobstructed Welcome frames personally inspected in Light/Night. First am start -W wait timed out63477ms but rendered later; Night cold launch Status ok, TotalTime6127ms/WaitTime6192ms.",
+      "evidence": [
+        "android-final-welcome-light.png",
+        "android-final-welcome-night.png"
+      ],
+      "recovery": "Original W1 AVD data retained. Separate factory data image in /private/tmp/creator-w1-android-recovery on same leased serial/port; host GPU,2cores,2048MB,no snapshots. Isolated ADB5041. Booted; install succeeded; final captures free of ANR dialogs.",
+      "limitations": "Reference390x844/content conditions not matched. No tap/type/auth/passkey/accessibility acceptance; unavailable native UI control."
+    },
+    {
+      "name": "C11 exact call-offer query",
+      "status": "verified diagnostic",
+      "actorRole": "signed out",
+      "observed": "Actual continuation200 for exact three-ID offer=1;400 for offer=2, misplaced offer=1 and empty extra query field.",
+      "limitations": "Presentation intent only; no call object/booking/payment/participant grant and no completed client sign-in."
+    },
+    {
+      "name": "C11 support/crisis/activation arrivals",
+      "status": "verified diagnostic",
+      "observed": "Actual continuation200 for exact /support creatorId/messageId UUIDs, /trust/crisis and /studio/activation;400 for messageId on /identity/account. Response credentials discarded.",
+      "limitations": "Route registration only; no object authority or completed authentication."
+    },
+    {
+      "name": "Native public crisis route",
+      "status": "verified render, unavailable service",
+      "actorRole": "signed out",
+      "route": "/trust/crisis",
+      "observed": "Latest iOS Light and Android Night render Crisis help protocol with actual endpoint-unavailable notice plus local emergency guidance, without system dialog. Personally inspected.",
+      "evidence": [
+        "ios-final-crisis-light.png",
+        "android-final-crisis-night.png"
+      ],
+      "limitations": "Default local backend has no W8 trust service; no provider case/help data, taps or responder action."
+    },
+    {
+      "name": "Web signed-out root entry",
+      "status": "verified HTTP, UI blocked",
+      "observed": "Removed fixed sample-creator redirect; actual HTTP root now resolves200 to /auth/continue?returnTo=%2Fhome. Authenticated /home/unfinished Handle branches implemented but not manually exercised in this continuation.",
+      "evidence": "web-final-entry-response.html",
+      "limitations": "Current browser control failed; no rendered browser screenshot or active-session acceptance."
+    },
+    {
+      "name": "RLS authority lock repair",
+      "status": "verified operational SQL, client journey unverified",
+      "observed": "Rollback-only transaction in isolated creator_w1 under creator_runtime: old joined profile lock0rows, narrowed thread1, owned fan1, verified creator1, restored triage1; request account restored and0diagnostic profiles remain.",
+      "evidence": "rls-lock-diagnostic.txt",
+      "limitations": "No new test code; SQL diagnostics are not real creator proof or full client/concurrency/W8-denial acceptance."
+    }
+  ],
+  "httpObservations": {
+    "profile": "Heavily loaded shared development Mac, loopback HTTP; individual requests, not end-to-end app cohorts.",
+    "welcomeSeconds": 14.566386,
+    "invalidVerifierSeconds": 0.634356,
+    "invalidVerifierColdSeconds": 11.618687,
+    "comprehensionSeconds": 7.079673,
+    "timeouts": "Welcome15s; comprehension30s",
+    "p95": "unmeasured",
+    "revocationWithinFiveSeconds": "unmeasured",
+    "modelCallLatencyAndCost": "unmeasured"
+  },
+  "controlFailures": [
+    "IAB tabs list/new succeeds; Page.navigate/Emulation.setFocusEmulationEnabled time out on existing/fresh tabs.",
+    "Chrome unavailable through CUA.",
+    "Device Hub attachment times out / Sky Computer Use startup failure."
+  ],
+  "remaining": [
+    "Restore browser/native UI control; complete auth/return/account-switch/revocation, keyboard,200% text, VoiceOver/TalkBack and reference comparisons. W1 emulator recovery now yields clean native captures.",
+    "Pantopus production authorization adapter/callback evidence and native authorization contract.",
+    "Final RP/domain/store identities, associated domains/Digital Asset Links and genuine physical-device passkey evidence.",
+    "W5 named content/Studio consumers/settings, W2 reviewed-license policy, W3 conversation runtime. W4/W6 scheduling/fulfillment factories are now available; execution needs availability allocation, approved grace/providers/effects/retained access and W6 authorized one-ID lookup.",
+    "W8 dedicated trust composition, reviewer/deny/privacy effects, fan-owned block/tombstone visibility for creator/team callers and synchronized denial evidence.",
+    "W8 reconciliation of existing unchecksummed local migrations before full-registry adoption.",
+    "DG-W1-01..05/DI09 and independent 53-component fidelity/accessibility plus latency acceptance.",
+    "W3 generation/send/release must enforce current verified creator/public-AI availability for fan mutations while allowing historical reads. Default generation is disabled."
+  ],
+  "evidence": {
+    "digests": "build-digests.txt",
+    "observations": "runtime-observations.txt",
+    "earlyFailedCaptures": [
+      "ios-welcome-light.png (simulator home before render)",
+      "android-welcome-light.png (empty failed screencap)",
+      "ios-call-return-obscured-unsigned.png (unsigned-build credential error and stale OS prompt)"
+    ]
+  },
+  "fixes": [
+    "Added W6 native callRegistration and exact scoped literal C11 offer=1.",
+    "Separated web CallChip recording live status from a readable non-live timer.",
+    "Split unchanged W8 native privacy progress rendering into private helpers to resolve Swift type-checking timeout.",
+    "Restored normal simulator signing after an unsigned build caused secure-storage failure; fresh signed launch recovered.",
+    "Repaired RLS conversation revalidation without widening grants/policies or changing applied SQL.",
+    "Registered W8 support/crisis/report query arrivals and W7 Studio activation across generated clients.",
+    "Replaced fixed illustrative web-root creator redirect with current-session Home/Handle or signed-out Welcome routing."
+  ]
+}

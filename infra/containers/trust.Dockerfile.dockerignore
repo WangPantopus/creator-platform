@@ -1,0 +1,15 @@
+.git
+**/node_modules
+**/.env
+**/.env.*
+**/.aws
+**/.codex
+**/.agents
+artifacts
+**/dist
+**/build
+**/.build
+**/.next*
+**/.gradle
+**/*.xcresult
+**/local.properties
