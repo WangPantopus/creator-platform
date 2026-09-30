@@ -1,0 +1,287 @@
+import { Router, type Request } from "express";
+import { z } from "zod";
+import type { Actor } from "../identity/adapter.js";
+import { DomainError } from "../../core/errors.js";
+import type { CommerceService } from "./service.js";
+
+export function createCommerceRouter(input: {
+  service?: CommerceService;
+  actorFor: (request: Request) => Promise<Actor>;
+  extended?: import("./extended.js").ExtendedCommerce;
+}) {
+  const router = Router();
+  const service = () => {
+    if (!input.service)
+      throw new DomainError(
+        "commerce_unconfigured",
+        "Commerce is not connected yet. Nothing is charged.",
+        503,
+      );
+    return input.service;
+  };
+  const id = (value: unknown) => z.uuid().parse(value);
+  router.get("/capabilities", (_req, res) =>
+    res.json({
+      configured: Boolean(input.service),
+      paymentsAvailable: Boolean(input.service?.provider),
+      nativeReplyPurchase: false,
+      membershipAvailable: input.extended?.billing?.configured ?? false,
+      passEnabled: input.service?.policy.passEnabled ?? false,
+    }),
+  );
+  router.get("/overview", async (req, res) => {
+    const value = await service().overview(
+      await input.actorFor(req),
+      req.query.creatorId ? id(req.query.creatorId) : undefined,
+    );
+    res.json({
+      ...value,
+      policy: {
+        ...value.policy,
+        passEnabled: input.extended?.pass?.configured ?? false,
+      },
+      passChoices: (await input.extended?.pass?.choices(
+        await input.actorFor(req),
+      )) ?? { creators: [], replaceableSlotIds: [] },
+      capabilities: {
+        ...value.capabilities,
+        storePurchasesAvailable: input.extended?.storeConfigured ?? false,
+        membershipAvailable: input.extended?.billing?.configured ?? false,
+      },
+    });
+  });
+  router.post("/memberships/start", async (req, res) => {
+    if (!input.extended?.billing)
+      throw new DomainError(
+        "membership_unavailable",
+        "Membership billing is not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.billing.start(await input.actorFor(req), req.body),
+    );
+  });
+  router.post("/memberships/reconcile", async (req, res) => {
+    if (!input.extended?.billing)
+      throw new DomainError(
+        "membership_unavailable",
+        "Membership billing is not connected yet.",
+        503,
+      );
+    res.json(await input.extended.billing.reconcile(await input.actorFor(req)));
+  });
+  router.post("/memberships/:membershipId/cancel", async (req, res) => {
+    if (!input.extended?.billing)
+      throw new DomainError(
+        "membership_unavailable",
+        "Membership billing is not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.billing.cancel(
+        await input.actorFor(req),
+        id(req.params.membershipId),
+        req.body,
+      ),
+    );
+  });
+  router.post("/pass/draft", async (req, res) => {
+    if (!input.extended)
+      throw new DomainError(
+        "pass_unavailable",
+        "The pass is not available yet.",
+        503,
+      );
+    res.json(
+      await input.extended.draftPass(await input.actorFor(req), req.body),
+    );
+  });
+  router.post("/pass/initial", async (req, res) => {
+    if (!input.extended?.pass)
+      throw new DomainError(
+        "pass_unavailable",
+        "The pass is not available yet.",
+        503,
+      );
+    res.json(
+      await input.extended.pass.selectInitial(
+        await input.actorFor(req),
+        req.body,
+      ),
+    );
+  });
+  router.post("/pass/slots/:slotId/replace", async (req, res) => {
+    if (!input.extended?.pass)
+      throw new DomainError(
+        "pass_unavailable",
+        "The pass is not available yet.",
+        503,
+      );
+    res.json(
+      await input.extended.pass.replace(
+        await input.actorFor(req),
+        id(req.params.slotId),
+        req.body,
+      ),
+    );
+  });
+  router.post("/spend-limit", async (req, res) =>
+    res.json(await service().setLimit(await input.actorFor(req), req.body)),
+  );
+  router.post("/creators/:creatorId/modes", async (req, res) =>
+    res.json(
+      await service().saveMode(
+        await input.actorFor(req),
+        id(req.params.creatorId),
+        null,
+        req.body,
+      ),
+    ),
+  );
+  router.post("/creators/:creatorId/modes/:modeId", async (req, res) =>
+    res.json(
+      await service().saveMode(
+        await input.actorFor(req),
+        id(req.params.creatorId),
+        id(req.params.modeId),
+        req.body,
+      ),
+    ),
+  );
+  router.get("/creators/:creatorId/fans/:fanId/access", async (req, res) =>
+    res.json(
+      await service().accessFor(
+        await input.actorFor(req),
+        id(req.params.creatorId),
+        id(req.params.fanId),
+      ),
+    ),
+  );
+  router.get("/creators/:creatorId/fans/:fanId/disclosure", async (req, res) =>
+    res.json(
+      await service().packetDisclosure(
+        await input.actorFor(req),
+        id(req.params.creatorId),
+        id(req.params.fanId),
+      ),
+    ),
+  );
+  router.post("/creators/:creatorId/fans/:fanId/trial", async (req, res) =>
+    res.json(
+      await service().openTrial(
+        await input.actorFor(req),
+        id(req.params.creatorId),
+        id(req.params.fanId),
+      ),
+    ),
+  );
+  router.post("/packets", async (req, res) =>
+    res.json(await service().submit(await input.actorFor(req), req.body)),
+  );
+  router.get("/packets/:packetId", async (req, res) =>
+    res.json(
+      await service().packet(
+        await input.actorFor(req),
+        id(req.params.packetId),
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/withdraw", async (req, res) =>
+    res.json(
+      await service().withdraw(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/decide", async (req, res) =>
+    res.json(
+      await service().decide(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/info", async (req, res) =>
+    res.json(
+      await service().moreInfo(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/offer-choice", async (req, res) =>
+    res.json(
+      await service().offerChoice(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/reauthorize", async (req, res) =>
+    res.json(
+      await service().reauthorize(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/stores/verify", async (req, res) => {
+    if (!input.extended)
+      throw new DomainError(
+        "store_verification_unconfigured",
+        "Store verification is unavailable. No access was granted.",
+        503,
+      );
+    const body = z
+      .strictObject({
+        platform: z.enum(["apple", "google"]),
+        transaction: z.string().min(1).max(160000),
+      })
+      .parse(req.body);
+    res.json(
+      await input.extended.storePurchase(await input.actorFor(req), body),
+    );
+  });
+  router.post("/packets/:packetId/deliver", async (req, res) =>
+    res.json(
+      await service().deliver(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/share", async (req, res) =>
+    res.json(
+      await service().share(
+        await input.actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/reconcile", async (req, res) =>
+    res.json(
+      await service().reconcile(
+        await input.actorFor(req),
+        id(req.params.packetId),
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/authentication", async (req, res) =>
+    res.json(
+      await service().paymentAuthentication(
+        await input.actorFor(req),
+        id(req.params.packetId),
+      ),
+    ),
+  );
+  // The scheduler calls the service with an issued actor scope; no public global job command.
+  return router;
+}

@@ -1,0 +1,15 @@
+{
+  "environment": "isolated W8 development",
+  "runtimeRole": "creator_runtime",
+  "authority": "seeded fan, no grant",
+  "openThread": "succeeded",
+  "withThread": "thread_unavailable",
+  "sameAuthorityQueryResults": {
+    "plainRows": 1,
+    "forShareThreadRows": 1,
+    "forShareThreadCreatorFanRows": 0
+  },
+  "messageContentRead": false,
+  "source": "apps/backend/src/db/database.ts FOR SHARE OF t,c,f",
+  "status": "W1 repair required; profiles have owner-scoped UPDATE policies"
+}

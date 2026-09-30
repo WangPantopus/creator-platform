@@ -1,0 +1,220 @@
+{
+  "recordedAt": "2026-09-30T02:15:43.663035+00:00",
+  "head": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+  "uncommittedSharedWorkspace": true,
+  "ownedSourceSHA256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallConnectionService.kt": "b8e8c7b5120a09a6369c248d34f608121ff38b1642b1b84cf9adb689c7a44e9d",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt": "bd93ea69c63391d47870e18cb96cad3aaad82ab8cd53082c375a4df1d4989a1b",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "fbcdc102c001e9299f766023818fd8c3afaa103fce1d4c3484a1003a42a1a06c",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "c2e8b3af7666dc301ee07df0b54d746b88d79b5c44295b38e5e4cef672017cec",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt": "bfac4374239e6144269c7f096401af95f9f00e088e1d35442502dd801d9cfb82",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "91a67deef270515b0afbcf08ade591260b2b0d7a27889af9585f49bfa93be7cc",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/W6FanFeatures.kt": "959451df5c8d2e1a06bfe4a7230e0f511b5c7daeafecefd071734816f3036d70",
+    "apps/backend/src/modules/media/ai-audio.ts": "faa08aab81733d77082af35e66142c883b7ce594e17029b09ff537ea702e4ecc",
+    "apps/backend/src/modules/media/deadline.ts": "3df514dc6215f82cd857d8e9ffc7ecb12f0496ace7a01a6b3795a66d1c4468a8",
+    "apps/backend/src/modules/media/lifecycle.ts": "4f147f092f23983b8fbed9b9257c3cb609dbe51c0deb1307545038d9f9347e0c",
+    "apps/backend/src/modules/media/registration.ts": "764f2c198f17ce0d4957e99ab47c6929464a3f662a8a30e85defac4e5724f981",
+    "apps/backend/src/modules/media/router.ts": "9b85781cd8ecca10b9c37588ae1bd196768e51f794769caa079570b9de48b6ce",
+    "apps/backend/src/modules/media/runtime.ts": "4b8f158122df2c39ee1b39cdde5356c6ee2a91b5d51dc123fbe8c2f43697b1fb",
+    "apps/backend/src/modules/media/schema.sql": "0206427e525c5569c7f1753b92d39556bfe56ca0c1df61932213514da681a427",
+    "apps/backend/src/modules/media/service.ts": "a4600171f0d768682bc7a2dd708994f43c8148012fb22ba6ed85be87a791eb6e",
+    "apps/backend/src/modules/media/storage.ts": "f766401b795fa75d1a8da9fffcc98d3143c39c5a9d8960e59020836e618fc7b2",
+    "apps/backend/src/modules/media/worker.ts": "5d6888282aac2049dbdd1d8e519ffad0ac988f299ec6fed914b5e93b89a5f092",
+    "apps/backend/src/modules/session/availability.sql": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
+    "apps/backend/src/modules/session/availability.ts": "407c17863d71f453b78aac93b5041362bde722512d96d5030e582dca6e68c0aa",
+    "apps/backend/src/modules/session/clocks.ts": "2ddb2f0f8dad9dfcabdf7faa032b083a26803784dccad2b4b5d80d3cd1dbaa94",
+    "apps/backend/src/modules/session/commerce.ts": "5f0ca756c8092bab53032c4fd2e5482e12c455f5a3454d46f450b411d52dbe9c",
+    "apps/backend/src/modules/session/provider.ts": "cb552cb8f401f5d5a01feee9c713d8e1759cb943187f8cf81fdf85efe6a26320",
+    "apps/backend/src/modules/session/service.ts": "43b788ed81740dd190f58e5028c065365147e1f48871e2da9ff0fa504e71c427",
+    "apps/backend/src/modules/session/worker.ts": "6dd326388517428dba3418c788086d4499e3cc994a61709c3458c09ff7e26782",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift": "2592c204a6cd80bc430f087d1c348cd630d6b15a436c63b623c3e2a2daf75c58",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift": "bf14bb9047efab5b9c38a7bc5faba0cbe9d16d178058a61e7aa42044086a78df",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift": "9911fdc0eba42e56cca80094a8e8df79338d6667ac25ad2052154621b523023b",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "8bc6ff63364c366d1b141456cd051a06012f3aa1784df5791d8c0c61c475aeeb",
+    "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "7b338b25f917e760c911993ac433241b11a046550216e444423b4e13bc186a6e",
+    "apps/ios/Sources/QelvoraUI/Media/W6FanFeatures.swift": "8dc0997ad0c7ad2d71f29f077d57aaa31d40f17648b91a8518fa0273a4cf1092",
+    "apps/web/app/api/w6/[...path]/route.ts": "2ec1af3f8e4c07126c65454f665f5235472900146bbb7c28a500b7977534b839",
+    "apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx": "c41c9cff46167325d5d7bb2744170e8409e597012d0ed053572e2d96adca6323",
+    "apps/web/app/media/ai-voice/page.tsx": "3cba6fccb85e80963542ef55523118cf9681ac8abdd43cd562775007397e2fd1",
+    "apps/web/app/media/voice/page.tsx": "4d5fd5526dc7b17e6e6d7e050d45289f0b14484bb075815ccc8b6e1e995d99cc",
+    "apps/web/app/studio/calls/[creatorId]/[fanId]/[commitmentId]/page.tsx": "2058780774d6477805d6ca7aa21e2b9d1f3c9766abb191dc8be122f12def6e8f",
+    "apps/web/features/calls/AvailabilityEditor.tsx": "b5e25a48e954e045262d549add7af9d08700bbc792e89f2c9123178e93655336",
+    "apps/web/features/calls/CallView.tsx": "f42acaaae2c3ad0cdb4305f423c9182e58910b6e9e38a5c2c8067078c2f2e108",
+    "apps/web/features/calls/OfferTimes.tsx": "e602804d634529068b172f46d61cb8f5b451cee4d1772d05b2a035bafaa2a3b6",
+    "apps/web/features/calls/SelectTime.tsx": "4b0f0f7d3d4c1094c21913949166a26f096e626f5775ffb9519969e91bfce702",
+    "apps/web/features/calls/StudioCallOffer.tsx": "015c5ab1707a1d3b18b077d1031fd0e1a3048a0ba54c56212c8a72ad8800ee4b",
+    "apps/web/features/calls/transport.ts": "c539af7f63ec73cb29616cca9513d290487eaa8b510737e92066c93dc23a00f5",
+    "apps/web/features/media/SignRecording.tsx": "4da794f71e0db8cc33f6dae9be3d52e6b3a1433d5d89c6285a940a001971ef9e",
+    "apps/web/features/media/VoicePlayer.tsx": "5162868c2c6cfaa839d0a04324b2b8573f19a9fb0fdfac0f02ba231b82e3f069",
+    "apps/web/features/media/VoiceRecorder.tsx": "d4d64a3bffc2955d0f07cca019b06d36d28a3a54093474cf1c8c6f2909a6f657",
+    "apps/web/features/media/api.ts": "a4de23ae80b393782cdcd54ad7d37fda63662b4807f2439f7b64e97c00cc4bf1",
+    "apps/web/features/media/media.css": "ab50bd8db7255a26a888b5ac74da8c56948f087fcd25a9da681dbe5b250d2aa9",
+    "apps/web/features/media/recorder.ts": "e1001a977dce7cafe14d1c9c3e76144d236b89dbbaaaa55d8f60e69abec3c16f",
+    "packages/api/src/media.ts": "99bdac2dfd10d18051b559bd836248752815b6661687118293bb9555d73e2a40",
+    "packages/api/src/session.ts": "495e5e7c412b1ecd90bd347c96889de303a9f3bdc2896ef866ad0a76ee783a4f"
+  },
+  "copyChecks": {
+    "ios": {
+      "owned_source_matches_copy": true,
+      "files": {
+        "Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "7b338b25f917e760c911993ac433241b11a046550216e444423b4e13bc186a6e",
+        "Sources/QelvoraUI/Media/NativeCallOffers.swift": "bf14bb9047efab5b9c38a7bc5faba0cbe9d16d178058a61e7aa42044086a78df",
+        "Sources/QelvoraUI/Media/NativeMediaClient.swift": "8bc6ff63364c366d1b141456cd051a06012f3aa1784df5791d8c0c61c475aeeb",
+        "Sources/QelvoraUI/Media/W6FanFeatures.swift": "8dc0997ad0c7ad2d71f29f077d57aaa31d40f17648b91a8518fa0273a4cf1092",
+        "Sources/QelvoraUI/Media/NativeCallView.swift": "9911fdc0eba42e56cca80094a8e8df79338d6667ac25ad2052154621b523023b",
+        "Sources/QelvoraUI/Media/NativeCallCoordinator.swift": "2592c204a6cd80bc430f087d1c348cd630d6b15a436c63b623c3e2a2daf75c58"
+      }
+    },
+    "android": {
+      "owned_source_matches_copy": true,
+      "files": {
+        "app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt": "bd93ea69c63391d47870e18cb96cad3aaad82ab8cd53082c375a4df1d4989a1b",
+        "app/src/main/java/com/pantopus/qelvora/media/W6FanFeatures.kt": "959451df5c8d2e1a06bfe4a7230e0f511b5c7daeafecefd071734816f3036d70",
+        "app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "c2e8b3af7666dc301ee07df0b54d746b88d79b5c44295b38e5e4cef672017cec",
+        "app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "fbcdc102c001e9299f766023818fd8c3afaa103fce1d4c3484a1003a42a1a06c",
+        "app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "91a67deef270515b0afbcf08ade591260b2b0d7a27889af9585f49bfa93be7cc",
+        "app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt": "bfac4374239e6144269c7f096401af95f9f00e088e1d35442502dd801d9cfb82",
+        "app/src/main/java/com/pantopus/qelvora/media/NativeCallConnectionService.kt": "b8e8c7b5120a09a6369c248d34f608121ff38b1642b1b84cf9adb689c7a44e9d"
+      }
+    },
+    "web-media": {
+      "owned_source_matches_copy": true,
+      "files": {
+        "features/media/api.ts": "a4de23ae80b393782cdcd54ad7d37fda63662b4807f2439f7b64e97c00cc4bf1",
+        "features/media/VoiceRecorder.tsx": "d4d64a3bffc2955d0f07cca019b06d36d28a3a54093474cf1c8c6f2909a6f657",
+        "features/media/media.css": "ab50bd8db7255a26a888b5ac74da8c56948f087fcd25a9da681dbe5b250d2aa9",
+        "features/media/recorder.ts": "e1001a977dce7cafe14d1c9c3e76144d236b89dbbaaaa55d8f60e69abec3c16f",
+        "features/media/VoicePlayer.tsx": "5162868c2c6cfaa839d0a04324b2b8573f19a9fb0fdfac0f02ba231b82e3f069",
+        "features/media/SignRecording.tsx": "4da794f71e0db8cc33f6dae9be3d52e6b3a1433d5d89c6285a940a001971ef9e"
+      }
+    },
+    "web-calls": {
+      "owned_source_matches_copy": true,
+      "files": {
+        "features/calls/AvailabilityEditor.tsx": "b5e25a48e954e045262d549add7af9d08700bbc792e89f2c9123178e93655336",
+        "features/calls/CallView.tsx": "f42acaaae2c3ad0cdb4305f423c9182e58910b6e9e38a5c2c8067078c2f2e108",
+        "features/calls/SelectTime.tsx": "4b0f0f7d3d4c1094c21913949166a26f096e626f5775ffb9519969e91bfce702",
+        "features/calls/transport.ts": "c539af7f63ec73cb29616cca9513d290487eaa8b510737e92066c93dc23a00f5",
+        "features/calls/OfferTimes.tsx": "e602804d634529068b172f46d61cb8f5b451cee4d1772d05b2a035bafaa2a3b6",
+        "features/calls/StudioCallOffer.tsx": "015c5ab1707a1d3b18b077d1031fd0e1a3048a0ba54c56212c8a72ad8800ee4b"
+      }
+    }
+  },
+  "installedBuildFiles": {
+    "iosBundle": {
+      "path": "/private/tmp/creator-w6-ios/Build/Products/Debug-iphonesimulator/QelvoraApp.app",
+      "fileSHA256": {
+        "Info.plist": "79f5770e603193ee6dc3a3c6b97dfae27a16dcfaaedaae4f9dc0e345625a6fc9",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "QelvoraApp": "c87189b467707685c568e99e8a12c75321a19f0f375b403ff0ff50477463370d",
+        "QelvoraApp.debug.dylib": "0ee33b62d1f933f0c0559f319f9cc453b08ee78b07b2d31204825bd8e9bfdcd0",
+        "QelvoraNative_QelvoraUI.bundle/Geist-Italic.ttf": "a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62",
+        "QelvoraNative_QelvoraUI.bundle/Geist-OFL.txt": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f",
+        "QelvoraNative_QelvoraUI.bundle/Geist.ttf": "73894e0448cae90a92b6c2f8732b7bb9acb7b94c418bff559dad4a18e1de9659",
+        "QelvoraNative_QelvoraUI.bundle/GeistMono-Italic.ttf": "70c15be47d55f637197f7e38570dbca16b35777ea647dc3598f61bf3961d2b0d",
+        "QelvoraNative_QelvoraUI.bundle/GeistMono-OFL.txt": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f",
+        "QelvoraNative_QelvoraUI.bundle/GeistMono.ttf": "d00e590b8eb3a59acc329b2d044fd143ae935090b7da33199ebee27cc7de8196",
+        "QelvoraNative_QelvoraUI.bundle/Glyphs.json": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+        "QelvoraNative_QelvoraUI.bundle/Info.plist": "ec936bb314d45580d8918f605e70f1f4b8698f3ca34b80d67e5b397d1393d0ed",
+        "QelvoraNative_QelvoraUI.bundle/Newsreader-Italic.ttf": "796668611f80b64d5adf182fde3b6f29ed83b4e7cbec7b96937e84ac01364792",
+        "QelvoraNative_QelvoraUI.bundle/Newsreader-OFL.txt": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
+        "QelvoraNative_QelvoraUI.bundle/Newsreader.ttf": "8a08d13f8a6c0d51be379a60af84f945f65369a67e509ee3c3bdcc421254d7c1",
+        "QelvoraNative_QelvoraUI.bundle/_CodeSignature/CodeDirectory": "e39dc4c00c1d27c03ae50e72956dd08f511f790f449ed217b905e773f87bf986",
+        "QelvoraNative_QelvoraUI.bundle/_CodeSignature/CodeRequirements": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+        "QelvoraNative_QelvoraUI.bundle/_CodeSignature/CodeResources": "ae251ea5c0aa50d0947ad6c4a46f3bdf9b71cde348cba91f4203e04c784884c3",
+        "QelvoraNative_QelvoraUI.bundle/_CodeSignature/CodeSignature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "QelvoraNative_QelvoraUI.bundle/en.lproj/Localizable.strings": "0ba8b564c6e9a076f801d4ec166ed417fb0ee6ccc160049d006531ad29cc587f",
+        "_CodeSignature/CodeResources": "e62476186f4fc99e458a4423d0be6c66d4606d9b01d3dd97e6c5d4317c7d51db",
+        "__preview.dylib": "26c621626da92be8375621c07082d570aca7efb36bb8089d3d60e60e5ec83fc0"
+      },
+      "treeSHA256": "51b02c4ee44dd05338c7202d990e4b942f6c0a74fec7f5f14c8b01b36d45d61f"
+    },
+    "androidAPK": {
+      "path": "/private/tmp/creator-w6-android-current/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "4ee81f49136d5f3ec5e8ab5d808ea78d0ea28e6bcf5ff501858298bf72ca7261"
+    }
+  },
+  "runtime": {
+    "api": "http://127.0.0.1:4106",
+    "web": "http://127.0.0.1:3006",
+    "identity": "W1 development",
+    "mediaProvider": "unconfigured",
+    "callProvider": "unconfigured",
+    "capabilities": {
+      "mediaAvailable": false,
+      "callsAvailable": false,
+      "aiAudioAvailable": false,
+      "reason": "media_unconfigured"
+    }
+  },
+  "device": {
+    "ios": "50C7BB1D-FA6B-45CA-897E-B58E78072CDB",
+    "android": "emulator-5566"
+  },
+  "newTestCode": false,
+  "acceptance": "partial; provider/hardware/UI automation gates open",
+  "verification": {
+    "backendTypeScript": "passed",
+    "webTypeScript": "passed",
+    "targetedW6ESLint": "passed",
+    "formatCheck": "passed",
+    "nativeBuilds": "passed",
+    "nativeInstallLaunch": "passed; Android launcher ANR obstructs screen",
+    "browserUI": "missing mic; CDP focus timeouts",
+    "nativeUI": "Device Hub timeout",
+    "providerEndToEnd": "unconfigured/unverified",
+    "nativeRegisteredRootBuilds": "passed; Swift BUILD SUCCEEDED, Android BUILD SUCCESSFUL in 9m15s",
+    "nativeGeneratedModels": "passed31 OpenAPI operations",
+    "webCopiedWorkspaceTypeScript": "passed after dependency/peer contract copy repair",
+    "finalScreenshotsInspected": [
+      "ios-recorder-registered-current.png",
+      "ios-offer-auth-current.png",
+      "android-recorder-registered-current.png"
+    ],
+    "androidCurrentScreen": "Recorder behind persistent Pixel Launcher ANR; interaction blocked"
+  },
+  "priorRecorderBuildFiles": {
+    "ios-executable": {
+      "path": "/private/tmp/creator-w6-ios/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "sha256": "a64aaa9ab3b02dd1379e4cff405c125762d5180c3a9f69ff01f09419324ca306",
+      "bytes": 40144
+    },
+    "android-apk": {
+      "path": "/private/tmp/creator-w6-android-current/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "b036c02fffd322bfdd1e9f4d870e8a67ab723bd03006d7ce1e1f62cbc45121b6",
+      "bytes": 11978916
+    }
+  },
+  "sharedDependenciesConsumed": {
+    "iosRoot": {
+      "canonicalPath": "apps/ios/App/QelvoraApp.swift",
+      "copiedPath": "/private/tmp/creator-w6-ios-source/App/QelvoraApp.swift",
+      "copySHA256": "3497f8f3a80f5f76c9df51dc6772d039c23665cf64c1108939f0cbb6b052edc3",
+      "matchesCanonicalNow": true
+    },
+    "iosAPI": {
+      "canonicalPath": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "copiedPath": "/private/tmp/creator-w6-ios-source/Sources/Generated/QelvoraAPI.swift",
+      "copySHA256": "52c0bb1173dba0aaaa3314a59547157e03cfcaaed11c9e371aa9b10c55a25092",
+      "matchesCanonicalNow": true
+    },
+    "androidRoot": {
+      "canonicalPath": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "copiedPath": "/private/tmp/creator-w6-android-current/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "copySHA256": "58566d3692dcf7d684d667c574d4700f8056bd5f8e272a4f7c53b062a3b978b5",
+      "matchesCanonicalNow": true
+    },
+    "androidAPI": {
+      "canonicalPath": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "copiedPath": "/private/tmp/creator-w6-android-current/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "copySHA256": "4c8447c022665d015875e5398108176e9c60601f6525f91198923a7b2d928f95",
+      "matchesCanonicalNow": true
+    },
+    "webPrimitives": {
+      "canonicalPath": "packages/ui-web/src/components.ts",
+      "copiedPath": "/private/tmp/creator-w6-workspace/packages/ui-web/src/components.ts",
+      "copySHA256": "dbe53622da56caca90b55729b1d0b0dfe5d2e86310514645e45880022b8f9ece",
+      "matchesCanonicalNow": true
+    }
+  }
+}

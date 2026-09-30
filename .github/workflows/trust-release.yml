@@ -1,0 +1,38 @@
+name: Trust release compilation
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "apps/backend/src/modules/trust/**"
+      - "apps/backend/src/operations/**"
+      - "apps/backend/scripts/*trust*"
+      - "apps/backend/scripts/tombstone-journal.ts"
+      - "apps/backend/migrations/**"
+      - "apps/web/app/ops/**"
+      - "apps/web/app/support/**"
+      - "apps/web/app/trust/**"
+      - "apps/web/app/status/**"
+      - "infra/**"
+      - ".github/workflows/trust-release.yml"
+permissions:
+  contents: read
+concurrency:
+  group: trust-compilation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm generate:check
+      - run: pnpm --filter @qelvora/backend typecheck
+      - run: pnpm --filter @qelvora/web typecheck
+      - run: pnpm --filter @qelvora/backend build
+      - run: pnpm --filter @qelvora/web build
+      - name: Runtime evidence remains a release gate
+        run: echo 'Compilation does not establish G0-G5, provider, physical-device, privacy, store or reliability readiness. See docs/operations/W8-release.md.'

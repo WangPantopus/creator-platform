@@ -1,0 +1,6 @@
+{
+  "schemaComparison": "equal",
+  "migration": "0007_growth",
+  "checksum": "1ead3fb1b0c213c253bc2170e67467bf945821c9d6a9bb7d3b700b39d7d75c42",
+  "reason": "W8 executed migration before discovering producer SQL omitted registry INSERT"
+}

@@ -1,0 +1,28 @@
+name: creator-trust
+services:
+  trust:
+    image: ${TRUST_IMAGE_DIGEST:?Provide an immutable registry image digest}
+    read_only: true
+    init: true
+    user: "1000:1000"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    ports: ["127.0.0.1:${TRUST_PORT:-4108}:4108"]
+    environment:
+      DEPLOYMENT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT:?Choose review staging or production}
+      RELEASE_REVISION: ${RELEASE_REVISION:?Provide the immutable release digest}
+      TRUST_ADAPTER_MODULE: /opt/app/integrations/trust.mjs
+    volumes:
+      - ${TRUST_INTEGRATION_DIR:?Reviewed bundled integration directory}:/opt/app/integrations:ro
+    secrets: [trust_api_url, trust_worker_url, identity_session_key]
+    stop_grace_period: 65s
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
+        reservations: { cpus: "0.25", memory: 256M }
+secrets:
+  trust_api_url: { file: "${TRUST_API_SECRET_FILE:?API credential file}" }
+  trust_worker_url:
+    { file: "${TRUST_WORKER_SECRET_FILE:?Worker credential file}" }
+  identity_session_key: { file: "${IDENTITY_SECRET_FILE:?W1 session key file}" }

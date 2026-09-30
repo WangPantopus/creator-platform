@@ -1,0 +1,17 @@
+{
+  "correlationId": "6808b26c-9b3a-4f7d-a1a2-42a180bdf001",
+  "matches": [
+    {
+      "timestamp": "2026-09-30T00:38:20.800Z",
+      "level": "info",
+      "environment": "local-development",
+      "release": "uncommitted-w8",
+      "correlationId": "6808b26c-9b3a-4f7d-a1a2-42a180bdf001",
+      "method": "POST",
+      "route": "/v1/trust/cases/:id/decisions",
+      "status": 403,
+      "errorCode": "independent_reviewer_required",
+      "durationMs": 4797.2
+    }
+  ]
+}
