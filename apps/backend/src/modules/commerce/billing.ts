@@ -332,6 +332,41 @@ export class MembershipBilling {
             "billing_processing",
             "Wait for the current billing change to finish first.",
           );
+          if (body.refundNow && membership.grant_id) {
+            // Membership precedes grant. An unresolved generation cannot be
+            // priced as unused, then deliver while cancellation is in flight.
+            await client.query(
+              "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+              [membership.creator_id, membership.fan_id],
+            );
+            const grant = (
+              await client.query<{ reserved: number }>(
+                "SELECT reserved FROM creator.access_grant WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership' FOR UPDATE",
+                [membership.grant_id, membership.creator_id, membership.fan_id],
+              )
+            ).rows[0];
+            invariant(
+              grant && grant.reserved === 0,
+              "membership_usage_processing",
+              "Your AI usage is still processing. Try again when it finishes.",
+            );
+            await client.query(
+              "UPDATE creator.access_grant SET state='revoked' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership'",
+              [membership.grant_id, membership.creator_id, membership.fan_id],
+            );
+          }
+          if (body.refundNow) {
+            // Fence stale provider reads and later original-period restoration.
+            // Cash remains processing until the original effect is confirmed.
+            await client.query(
+              "UPDATE creator.commerce_membership SET state='revoked',version=version+1 WHERE id=$1",
+              [membership.id],
+            );
+            await client.query(
+              "UPDATE creator.commerce_billing_account SET version=version+1 WHERE fan_id=$1",
+              [membership.fan_id],
+            );
+          }
           return (
             await client.query<{ id: string }>(
               "INSERT INTO creator.commerce_billing_effect(fan_id,operation,provider_key,request) VALUES($1,'cancel',$2,$3) RETURNING id",
@@ -786,7 +821,26 @@ export class MembershipBilling {
           "billing_link_conflict",
           "The paid item changed its account or tier binding.",
         );
+        // A durable immediate-cancellation request ends local access to its
+        // exact original period. Old provider truth cannot restore it while
+        // cancellation/refund is unknown, or after confirmation.
+        const immediateCancellation = prior
+          ? Boolean(
+              (
+                await client.query(
+                  `SELECT id FROM creator.commerce_billing_effect
+                 WHERE fan_id=$1 AND operation='cancel'
+                   AND state IN('pending','processing','unknown','done')
+                   AND request->>'membershipId'=$2 AND request->>'atEnd'='false'
+                   AND (request->'receipt'->>'period_start')::timestamptz=$3
+                   AND (request->'receipt'->>'period_end')::timestamptz=$4 LIMIT 1`,
+                  [account.fan_id, prior.id, line.startsAt, line.endsAt],
+                )
+              ).rows[0],
+            )
+          : false;
         const active =
+          !immediateCancellation &&
           ["active", "grace", "cancelled"].includes(line.state) &&
           line.startsAt <= new Date() &&
           line.endsAt > new Date();
@@ -883,7 +937,12 @@ export class MembershipBilling {
               account.fan_id,
               line.tierId,
               reference,
-              line.state,
+              prior?.state === "refunded" &&
+              prior.period_start.getTime() === line.startsAt.getTime()
+                ? "refunded"
+                : immediateCancellation
+                  ? "revoked"
+                  : line.state,
               line.startsAt,
               line.endsAt,
               line.cancelAtEnd,

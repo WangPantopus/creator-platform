@@ -44,20 +44,21 @@ export async function createCommerceRuntime(input: {
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
 }) {
-  if (input.generationCostPolicy)
-    input.access.configureGenerationAllowance(
-      await CommerceGenerationAllowance.prepare(
+  const generationAllowance = input.generationCostPolicy
+    ? await CommerceGenerationAllowance.prepare(
         input.pool,
         input.generationCostPolicy,
-      ),
-    );
+      )
+    : undefined;
+  if (generationAllowance)
+    input.access.configureGenerationAllowance(generationAllowance);
   const service = new CommerceService(
     input.pool,
     input.database,
     input.access,
     {
       ...input.policy,
-      costAllowanceIntegrated: Boolean(input.generationCostPolicy),
+      costAllowanceIntegrated: Boolean(generationAllowance),
     },
     input.payments,
     input.assertActorAllowed,
@@ -84,6 +85,9 @@ export async function createCommerceRuntime(input: {
     tiers,
     money,
     settlement,
+    // W3 readiness consumes this after awaiting composition. It must not
+    // configure a second allowance/reservation path or infer it from keys.
+    generationAllowanceAvailable: Boolean(generationAllowance),
     audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),
   };
