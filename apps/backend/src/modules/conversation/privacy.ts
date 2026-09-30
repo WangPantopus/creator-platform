@@ -160,10 +160,21 @@ export function conversationPrivacyHook(input: {
                 pair,
               )
             ).rows;
+            const usageDays = (
+              await client.query(
+                "SELECT day,seconds,companion_seconds FROM creator.conversation_usage_day WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY day LIMIT 2001",
+                pair,
+              )
+            ).rows;
             invariant(
-              [messages, memories, audit, consents, memoryConsents].every(
-                (rows) => rows.length <= 2000,
-              ),
+              [
+                messages,
+                memories,
+                audit,
+                consents,
+                memoryConsents,
+                usageDays,
+              ].every((rows) => rows.length <= 2000),
               "bounded_subjob_required",
               "This export needs a paginated conversation subjob.",
             );
@@ -181,6 +192,7 @@ export function conversationPrivacyHook(input: {
               audit,
               consents,
               memoryConsents,
+              usageDays,
             });
             invariant(
               Buffer.byteLength(JSON.stringify(data), "utf8") <= 8_000_000,
@@ -227,6 +239,8 @@ export function conversationPrivacyHook(input: {
             "processor_consent",
             "event",
             "thread_audit",
+            "conversation_presence_client",
+            "conversation_usage_day",
           ] as const) {
             const count = await client.query<{ count: string }>(
               `SELECT count(*)::text AS count FROM (SELECT 1 FROM creator.${table} WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 2001) bounded`,
@@ -298,6 +312,15 @@ export function conversationPrivacyHook(input: {
             "DELETE FROM creator.conversation_relationship WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          for (const table of [
+            "conversation_presence_client",
+            "conversation_presence",
+            "conversation_usage_day",
+          ] as const)
+            await client.query(
+              `DELETE FROM creator.${table} WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
+              pair,
+            );
           await client.query(
             "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','takeover','handback','pause') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
             [family.threadId],

@@ -23,6 +23,7 @@ import type {
   ConversationPage,
 } from "../../../../packages/api/src/conversation/contracts";
 import { conversationRequest, ConversationError } from "./api";
+import { formatCopy } from "@qelvora/copy";
 import "./conversation.css";
 
 type Pending = {
@@ -41,7 +42,7 @@ function author(message: ConversationMessage, name: string) {
     case "team":
       return `${name}'s team · ${message.member ?? "Authorized team member"}`;
     case "approved_draft":
-      return `AI draft · approved by ${name}`;
+      return formatCopy("approvedAuthor", { name });
     case "human_broadcast":
       return `Note from ${name}`;
     case "human_reaction":
@@ -109,6 +110,7 @@ export function ConversationScreen({
         );
         if (
           result.accepted &&
+          latestPending.current?.key === item.key &&
           mounted.current &&
           lifecycle.current === revision
         ) {
@@ -146,6 +148,25 @@ export function ConversationScreen({
     setDraft("");
     setPending(null);
     setBefore(null);
+    let resumeCursor: number | undefined;
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(cursorKey) ?? "null");
+      if (
+        Number.isSafeInteger(stored?.cursor) &&
+        stored.cursor >= 0 &&
+        Number.isSafeInteger(stored?.epoch) &&
+        stored.epoch >= 0
+      )
+        resumeCursor = stored.cursor;
+      for (const key of Object.keys(sessionStorage))
+        if (
+          key.startsWith("qelvora:conversation:") &&
+          !key.startsWith(`qelvora:conversation:${accountId}:`)
+        )
+          sessionStorage.removeItem(key);
+    } catch {
+      sessionStorage.removeItem(cursorKey);
+    }
     let connecting = false;
     let disposed = false,
       socket: WebSocket | undefined,
@@ -206,9 +227,13 @@ export function ConversationScreen({
               kind: "subscribe",
               creatorId,
               fanId,
-              cursor: gate.current?.cursor ?? 0,
+              cursor: Math.min(
+                resumeCursor ?? gate.current?.cursor ?? 0,
+                gate.current?.cursor ?? 0,
+              ),
             }),
           );
+          resumeCursor = undefined;
         };
         socket.onmessage = (event) => {
           try {
@@ -272,7 +297,31 @@ export function ConversationScreen({
       current.current = null;
       gate.current = null;
     };
-  }, [accountId, creatorId, fanId, refresh]);
+  }, [accountId, creatorId, fanId, cursorKey, refresh]);
+  useEffect(() => {
+    const clientId = crypto.randomUUID();
+    const pulse = () => {
+      if (current.current)
+        void conversationRequest(`${root}/presence`, {
+          clientId,
+          active: navigator.onLine && document.visibilityState === "visible",
+        }).catch(() => undefined);
+    };
+    const timer = setInterval(pulse, 20000);
+    document.addEventListener("visibilitychange", pulse);
+    window.addEventListener("online", pulse);
+    pulse();
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", pulse);
+      window.removeEventListener("online", pulse);
+      if (navigator.onLine)
+        void conversationRequest(`${root}/presence`, {
+          clientId,
+          active: false,
+        }).catch(() => undefined);
+    };
+  }, [root, accountId, page?.threadId]);
 
   const send = async (retry?: Pending) => {
     const revision = lifecycle.current;
@@ -342,6 +391,27 @@ export function ConversationScreen({
           ? error.message
           : "Earlier messages are unavailable.",
       );
+    } finally {
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
+    }
+  };
+  const forget = async (message: ConversationMessage) => {
+    if (busy || !online || !page) return;
+    const revision = lifecycle.current;
+    setBusy(true);
+    try {
+      await conversationRequest(
+        `${root}/messages/${message.id}/dont-remember`,
+        { expectedRevision: page.revision },
+      );
+      if (mounted.current && lifecycle.current === revision) await refresh();
+    } catch (error) {
+      if (mounted.current && lifecycle.current === revision)
+        setFailure(
+          error instanceof Error
+            ? error.message
+            : "This memory change is unavailable.",
+        );
     } finally {
       if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
@@ -531,6 +601,18 @@ export function ConversationScreen({
                 )}
               </div>
             )}
+            {message.authorKind === "fan" &&
+              (message.offTheRecord ? (
+                <span className="qv-help">Not used for memory</span>
+              ) : (
+                <button
+                  className="qv-link-btn"
+                  disabled={busy || !online}
+                  onClick={() => void forget(message)}
+                >
+                  Don’t remember this
+                </button>
+              ))}
             {message.authorKind !== "fan" &&
               message.authorKind !== "system" && (
                 <div className="conversation-actions">

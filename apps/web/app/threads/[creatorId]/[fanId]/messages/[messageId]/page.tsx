@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { IdSchema } from "@qelvora/api";
 import { Notice, SignedMarker } from "@qelvora/ui-web";
+import { formatCopy } from "@qelvora/copy";
 import { currentSession, platformFetch } from "../../../../../../lib/session";
 import type {
   ConversationMessage,
@@ -53,7 +54,7 @@ export default async function OriginalMessage({
     ai: `${page.creatorName}’s AI`,
     team: `${page.creatorName}’s team · ${message.member ?? "Authorized team member"}`,
     human_creator: page.creatorName,
-    approved_draft: `AI draft · approved by ${page.creatorName}`,
+    approved_draft: formatCopy("approvedAuthor", { name: page.creatorName }),
     human_broadcast: `Note from ${page.creatorName}`,
     human_reaction: `${page.creatorName} reacted`,
     human_call: `Call with ${page.creatorName}`,

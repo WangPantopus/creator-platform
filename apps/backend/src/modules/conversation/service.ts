@@ -25,6 +25,7 @@ import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
+import type { ConversationWellbeing } from "./wellbeing.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -79,6 +80,7 @@ export class ConversationService {
     ) => Promise<void>;
     policyVersion?: string;
     citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
+    wellbeing?: ConversationWellbeing;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
     this.delivery = delivery;
@@ -270,6 +272,7 @@ export class ConversationService {
           const grantId =
             reservation?.grantId ??
             (await this.access.reserveAllowance(scope, client));
+          const generationId = randomUUID();
           const fan = await this.insertMessage(
             client,
             scope,
@@ -278,6 +281,37 @@ export class ConversationService {
             thread.control_epoch,
             "accepted",
           );
+          await appendFrame(client, scope, {
+            epoch: thread.control_epoch,
+            kind: "accepted",
+            messageId: fan.id,
+            authorKind: "fan",
+            text: fan.text,
+            generationId,
+            sequence: 0,
+          });
+          for (const line of (await this.delivery.wellbeing?.notices(
+            scope,
+            client,
+          )) ?? []) {
+            const notice = await this.insertMessage(
+              client,
+              scope,
+              "system",
+              line,
+              thread.control_epoch,
+              "delivered",
+            );
+            await appendFrame(client, scope, {
+              epoch: thread.control_epoch,
+              kind: "delivered",
+              messageId: notice.id,
+              authorKind: "system",
+              text: line,
+              generationId: null,
+              sequence: 0,
+            });
+          }
           const ai = await this.insertMessage(
             client,
             scope,
@@ -286,7 +320,6 @@ export class ConversationService {
             thread.control_epoch,
             "generating",
           );
-          const generationId = randomUUID();
           await client.query(
             "INSERT INTO creator.generation(id,thread_id,creator_id,fan_id,fan_message_id,ai_message_id,grant_id,epoch,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)",
             [
@@ -312,15 +345,6 @@ export class ConversationService {
                 scope.fanId,
               ],
             );
-          await appendFrame(client, scope, {
-            epoch: thread.control_epoch,
-            kind: "accepted",
-            messageId: fan.id,
-            authorKind: "fan",
-            text: fan.text,
-            generationId,
-            sequence: 0,
-          });
           return { message: fan, generationId };
         },
       ),

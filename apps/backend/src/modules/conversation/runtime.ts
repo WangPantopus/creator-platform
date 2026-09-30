@@ -12,6 +12,7 @@ import {
 import { conversationSocketTickets } from "./realtime-tickets.js";
 import type { ConversationAllowance } from "./allowance.js";
 import type { ProviderPolicy } from "../../../../../packages/api/src/conversation/contracts.js";
+import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -22,6 +23,7 @@ export function createConversationRuntime(input: {
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
   semantics?: SemanticExclusionPort;
+  mode?: ConversationMode;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -31,6 +33,7 @@ export function createConversationRuntime(input: {
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
   const memory = new MemoryService(input.database, input.semantics);
+  const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
   const processor = generator
     ? new ConversationGenerationProcessor(
@@ -41,6 +44,7 @@ export function createConversationRuntime(input: {
       )
     : undefined;
   input.conversation.configureDelivery({
+    wellbeing,
     ...(input.policy ? { policyVersion: input.policy.version } : {}),
     ...(input.allowance ? { allowance: input.allowance } : {}),
     ...(input.assertReady ? { assertReady: input.assertReady } : {}),
@@ -64,11 +68,13 @@ export function createConversationRuntime(input: {
     (scope) => processor?.schedule(scope),
     conversationSocketTickets,
     input.citation,
+    wellbeing,
   );
   return {
     feature,
     registration: conversationFeature(feature),
     memory,
+    wellbeing,
     processor,
   };
 }
