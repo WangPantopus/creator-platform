@@ -14,7 +14,7 @@
   "migrations": "canonical 0001–0031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
-  "builds": "isolated worktree .next and backend dist",
+  "builds": "Retained only active apps/web/.next-w2-review; inactive web/backend/native build outputs and task caches deleted after handoff",
   "nativeDevices": [],
   "provider": {
     "name": "OpenAI",
@@ -47,9 +47,10 @@
   "git": "PR #1 tracks pushed W2 checkpoints; metadata write still 403; no merge with failed checks. Production acceptance remains separately gated.",
   "nativeVerificationTools": {
     "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
-    "location": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930",
-    "state": "Released after verification; moved to Trash for recoverable cleanup",
-    "isolated": "Own SDK and Gradle home; no peer devices or caches used"
+    "location": null,
+    "state": "Permanently removed at founder request after handoff; reinstall scoped official tools for future local native acceptance",
+    "isolated": "Own SDK and Gradle home; no peer devices or caches used",
+    "formerLocation": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930"
   },
   "temporaryIngestionWorker": {
     "port": 4202,
@@ -89,5 +90,13 @@
       "CREATOR_NEXT_OUTPUT": ".next-w2-review"
     },
     "command": "node node_modules/next/dist/bin/next dev --webpack -H 127.0.0.1 -p 3002"
+  },
+  "cleanup": {
+    "receipt": "resource-cleanup.json",
+    "record": "resource-cleanup.md",
+    "allocatedKiBRemoved": 4744680,
+    "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
+    "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
+    "retained": "Review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret"
   }
 }
