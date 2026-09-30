@@ -71,12 +71,19 @@
       _ = NSApplication.shared
       QelvoraFonts.register()
       let host = NSHostingView(
-        rootView: view.transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
+        rootView: view.transaction { $0.disablesAnimations = true }
+          .environment(\.displayScale, 2).frame(
+            width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
       window.contentView = host
+      // Scale the hosted coordinate space before rasterization. Merely passing
+      // a 2x bitmap to cacheDisplay enlarges the 1x host raster on headless CI.
+      let hostScale = 2 / window.backingScaleFactor
+      window.setContentSize(CGSize(width: size.width * hostScale, height: size.height * hostScale))
+      host.frame = NSRect(origin: .zero, size: window.contentLayoutRect.size)
+      host.bounds = NSRect(origin: .zero, size: size)
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
@@ -93,7 +100,9 @@
       host.cacheDisplay(in: host.bounds, to: bitmap)
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
-      print("Snapshot \(name): \(bitmap.pixelsWide)x\(bitmap.pixelsHigh); screen scale \(window.backingScaleFactor)")
+      print(
+        "Snapshot \(name): \(bitmap.pixelsWide)x\(bitmap.pixelsHigh); screen scale \(window.backingScaleFactor); host transform \(hostScale); backing bounds \(host.convertToBacking(host.bounds).size)"
+      )
       assertSnapshot(
         of: image, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
