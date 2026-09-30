@@ -2,6 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import { IdSchema } from "@qelvora/api";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
+import { assertCurrentSession } from "./request-authority.js";
 import { DomainError, invariant } from "../../core/errors.js";
 
 const creatorScopeBrand: unique symbol = Symbol("CreatorScope");
@@ -70,6 +71,26 @@ export class CreatorIdentityAuthority {
       await this.authorize(client, scope, requirement);
       return work(client);
     });
+  }
+
+  /** Join an already-open domain transaction; the caller retains responsibility
+   * for commit/rollback. This must run before domain locks or effects, on the
+   * same configured non-owner client used for publication. */
+  async authorizeInTransaction(
+    scope: CreatorScope,
+    client: PoolClient,
+    requirement: CreatorRequirement = "owned",
+  ): Promise<void> {
+    invariant(
+      this.issued.has(scope),
+      "creator_scope_required",
+      "A current issued creator scope is required.",
+    );
+    await client.query("SELECT set_config('app.account_id',$1,true)", [
+      scope.accountId,
+    ]);
+    await assertCurrentSession(client, scope.accountId);
+    await this.authorize(client, scope, requirement);
   }
 
   private async authorize(
