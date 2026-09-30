@@ -1430,6 +1430,28 @@ data class APIConversationConsentInput(
 )
 
 @Serializable
+data class APIConversationConversationAccountPage(
+  val `fan`: APIConversationConversationAccountPageFan,
+  val `threads`: List<APIConversationConversationAccountPageThreadsItem>,
+  val `nextCursor`: String? = null
+)
+
+@Serializable
+data class APIConversationConversationAccountPageFan(
+  val `id`: String,
+  val `handle`: String,
+  val `intro`: String? = null
+)
+
+@Serializable
+data class APIConversationConversationAccountPageThreadsItem(
+  val `id`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `name`: String
+)
+
+@Serializable
 enum class APIConversationConversationAuthorship {
   @SerialName("fan") FAN,
   @SerialName("ai") AI,

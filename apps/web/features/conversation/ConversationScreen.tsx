@@ -69,7 +69,7 @@ export function ConversationScreen({
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = useState(false);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
@@ -98,6 +98,7 @@ export function ConversationScreen({
         fresh.generationSequences,
       );
       setPage(fresh);
+      setOnline(navigator.onLine);
       setFailure(null);
       setBefore((value) => value ?? fresh.before);
       sessionStorage.setItem(
@@ -121,6 +122,7 @@ export function ConversationScreen({
       }
     } catch (error) {
       if (!mounted.current || lifecycle.current !== revision) return;
+      setOnline(false);
       if (
         error instanceof ConversationError &&
         [401, 403, 404].includes(error.status)
@@ -201,12 +203,17 @@ export function ConversationScreen({
       if (disposed || connecting || !navigator.onLine) return;
       connecting = true;
       clearTimeout(reconnect);
+      reconnect = undefined;
       const previous = socket;
       socket = undefined;
       previous?.close();
       await orderedRefresh();
       if (disposed || !current.current) {
         connecting = false;
+        if (!disposed) {
+          reconnect = setTimeout(() => void connect(), delay);
+          delay = Math.min(delay * 2, 15000);
+        }
         return;
       }
       try {
@@ -222,7 +229,6 @@ export function ConversationScreen({
         socket = liveSocket;
         socket.onopen = () => {
           delay = 1000;
-          setOnline(true);
           socket?.send(
             JSON.stringify({
               kind: "subscribe",
@@ -253,7 +259,7 @@ export function ConversationScreen({
         };
         socket.onclose = () => {
           if (disposed || socket !== liveSocket) return;
-          setOnline(navigator.onLine);
+          setOnline(false);
           reconnect = setTimeout(() => void connect(), delay);
           delay = Math.min(delay * 2, 15000);
         };
@@ -272,19 +278,27 @@ export function ConversationScreen({
       socket?.close();
     };
     const resume = () => {
-      setOnline(true);
+      setOnline(false);
       clearTimeout(reconnect);
       socket?.close();
       void connect();
     };
     window.addEventListener("offline", offline);
     window.addEventListener("online", resume);
+    const visible = () => {
+      if (document.visibilityState === "visible" && navigator.onLine) {
+        if (!socket || socket.readyState === WebSocket.CLOSED) void connect();
+        else void orderedRefresh();
+      }
+    };
+    document.addEventListener("visibilitychange", visible);
+    window.addEventListener("focus", visible);
     // Polling recovers gaps and non-stream metadata. Only a freshly scoped snapshot is rendered.
     const poll = setInterval(() => {
       if (navigator.onLine && document.visibilityState === "visible")
         void orderedRefresh();
     }, 5000);
-    setOnline(navigator.onLine);
+    setOnline(false);
     void connect();
     return () => {
       disposed = true;
@@ -295,6 +309,8 @@ export function ConversationScreen({
       clearInterval(poll);
       window.removeEventListener("offline", offline);
       window.removeEventListener("online", resume);
+      document.removeEventListener("visibilitychange", visible);
+      window.removeEventListener("focus", visible);
       current.current = null;
       gate.current = null;
     };
@@ -326,7 +342,7 @@ export function ConversationScreen({
 
   const send = async (retry?: Pending) => {
     const revision = lifecycle.current;
-    if (!navigator.onLine || busy || !page) return;
+    if (!navigator.onLine || !online || busy || !page) return;
     const text = retry?.text ?? draft.trim();
     if (!text) return;
     const item: Pending = retry ?? {

@@ -1852,6 +1852,41 @@ public struct APIConversationConsentInput: Codable, Sendable {
   }
 }
 
+public struct APIConversationConversationAccountPage: Codable, Sendable {
+  public let `fan`: APIConversationConversationAccountPageFan
+  public let `threads`: [APIConversationConversationAccountPageThreadsItem]
+  public let `nextCursor`: String?
+  public init(fan: APIConversationConversationAccountPageFan, threads: [APIConversationConversationAccountPageThreadsItem], nextCursor: String? = nil) {
+    self.fan = fan
+    self.threads = threads
+    self.nextCursor = nextCursor
+  }
+}
+
+public struct APIConversationConversationAccountPageFan: Codable, Sendable {
+  public let `id`: String
+  public let `handle`: String
+  public let `intro`: String?
+  public init(id: String, handle: String, intro: String? = nil) {
+    self.id = id
+    self.handle = handle
+    self.intro = intro
+  }
+}
+
+public struct APIConversationConversationAccountPageThreadsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `name`: String
+  public init(id: String, creatorId: String, fanId: String, name: String) {
+    self.id = id
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.name = name
+  }
+}
+
 public enum APIConversationConversationAuthorship: String, Codable, Sendable {
   case `fan` = "fan"
   case `ai` = "ai"

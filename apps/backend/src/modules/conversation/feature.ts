@@ -15,6 +15,7 @@ import {
   ThreadPreferencesSchema,
   ProviderPolicySchema,
   ConversationMessageSchema,
+  ConversationAccountPageSchema,
   type ProviderPolicy,
   type ConversationPage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
@@ -22,6 +23,7 @@ import { IdSchema } from "@qelvora/api";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
+import type { CommerceService } from "../commerce/service.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -38,6 +40,7 @@ export class ConversationFeature {
     readonly tickets?: ConversationSocketTickets,
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
     readonly wellbeing?: ConversationWellbeing,
+    readonly firstConversation?: Pick<CommerceService, "openTrial">,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -47,6 +50,7 @@ export class ConversationFeature {
       consentAvailable: Boolean(this.policy?.verified),
       generationAvailable:
         this.generationAvailable && Boolean(this.policy?.verified),
+      firstConversationAvailable: Boolean(this.firstConversation),
       accessDisclosure,
     };
   }
@@ -147,6 +151,16 @@ export class ConversationFeature {
       fanId!,
       false,
     );
+    if (this.firstConversation) {
+      const access = await this.db.withThread(scope, (client) =>
+        capabilitySnapshot(client, scope),
+      );
+      // W4 decides the actual one-time trial and configured units. Current paid
+      // AI access needs no extra trial grant; exhausted access cannot be topped
+      // up by starting another conversation.
+      if (!access.capabilities.includes("ai_message"))
+        await this.firstConversation.openTrial(actor, body.creatorId, fanId!);
+    }
     return this.page(scope);
   }
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
@@ -301,7 +315,8 @@ export class ConversationFeature {
     );
     return this.page(scope);
   }
-  async account(actor: Actor) {
+  async account(actor: Actor, cursor?: string) {
+    const before = IdSchema.optional().parse(cursor);
     const client = await this.db.pool.connect();
     try {
       await client.query("BEGIN");
@@ -320,16 +335,36 @@ export class ConversationFeature {
         "fan_profile_required",
         "Choose your handle before opening You.",
       );
-      // Never widen RLS to list private messages. Scope each visible relationship using
-      // a bounded fan-owned thread directory function supplied by the migration.
+      // Only fan-owned relationship metadata is listed. Private messages remain
+      // behind the individual thread scope, including when a cursor is supplied.
+      if (before) {
+        const known = await client.query(
+          "SELECT thread_id FROM creator.conversation_relationship WHERE account_id=$1 AND fan_id=$2 AND thread_id=$3",
+          [actor.accountId, fan.id, before],
+        );
+        if (!known.rowCount)
+          throw new DomainError(
+            "account_cursor_unavailable",
+            "Refresh your conversations before paging.",
+            404,
+          );
+      }
       const threads = (
         await client.query(
-          'SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id WHERE r.account_id=$1 AND r.fan_id=$2 ORDER BY cp.display_name,r.thread_id LIMIT 100',
-          [actor.accountId, fan.id],
+          'SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id WHERE r.account_id=$1 AND r.fan_id=$2' +
+            (before ? " AND r.thread_id<$3" : "") +
+            " ORDER BY r.thread_id DESC LIMIT 51",
+          before
+            ? [actor.accountId, fan.id, before]
+            : [actor.accountId, fan.id],
         )
       ).rows;
       await client.query("COMMIT");
-      return { fan, threads };
+      return ConversationAccountPageSchema.parse({
+        fan,
+        threads: threads.slice(0, 50),
+        nextCursor: threads.length > 50 ? threads[49]!.id : null,
+      });
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;
@@ -380,7 +415,12 @@ export function conversationFeature(
           res.json(await feature.begin(await actorFor(req), req.body)),
       );
       router.get("/v1/conversations/account", async (req, res) =>
-        res.json(await feature.account(await actorFor(req))),
+        res.json(
+          await feature.account(
+            await actorFor(req),
+            IdSchema.optional().parse(req.query.cursor),
+          ),
+        ),
       );
       const scopeFor = async (req: import("express").Request) =>
         feature.access.openThread(

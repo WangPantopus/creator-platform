@@ -5,14 +5,12 @@ import type {
   ConversationPage,
   MemoryItem,
   ProviderPolicy,
+  ConversationAccountPage,
 } from "../../../../packages/api/src/conversation/contracts";
 import { useConversationRequest, ConversationError } from "./api";
 import { useIdentityRequest } from "../identity/session-boundary";
 import "./conversation.css";
-type Account = {
-  fan: { id: string; handle: string; intro: string };
-  threads: { id: string; creatorId: string; fanId: string; name: string }[];
-};
+type Account = ConversationAccountPage;
 type MemoryView = {
   revision: number;
   offTheRecord: boolean;
@@ -37,19 +35,35 @@ export function AccountScreen({
   const { session } = useIdentityRequest();
   const [account, setAccount] = useState<Account | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    if (creatorId && fanId) return;
     let active = true;
-    void request<Account>("account")
+    setLoading(true);
+    setError(null);
+    void request<Account>(cursor ? `account?cursor=${cursor}` : "account")
       .then((value) => {
         if (active) setAccount(value);
       })
       .catch((error) => {
-        if (active) setError(error.message);
+        if (active) {
+          if (
+            error instanceof ConversationError &&
+            [401, 403, 404].includes(error.status)
+          )
+            setAccount(null);
+          setError(error.message);
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
     return () => {
       active = false;
     };
-  }, [request]);
+  }, [request, cursor, attempt, creatorId, fanId]);
   if (creatorId && fanId)
     return (
       <ConversationPrivacy
@@ -73,6 +87,14 @@ export function AccountScreen({
           <Notice title="Your account is unavailable" tone="error">
             {error}
           </Notice>
+          <button
+            type="button"
+            className="qv-btn qv-btn--quiet"
+            disabled={loading}
+            onClick={() => setAttempt((value) => value + 1)}
+          >
+            Try again
+          </button>
         </section>
       )}
       <section>
@@ -151,6 +173,27 @@ export function AccountScreen({
             </a>
           </article>
         ))}
+        {loading && <p role="status">Loading your conversations…</p>}
+        {account?.nextCursor && (
+          <button
+            type="button"
+            className="qv-btn qv-btn--quiet"
+            disabled={loading || Boolean(error)}
+            onClick={() => setCursor(account.nextCursor)}
+          >
+            More conversations
+          </button>
+        )}
+        {cursor && (
+          <button
+            type="button"
+            className="qv-btn qv-btn--quiet"
+            disabled={loading}
+            onClick={() => setCursor(null)}
+          >
+            Back to first page
+          </button>
+        )}
         <Button href="/support/privacy" variant="secondary" block>
           Export or delete my data
         </Button>

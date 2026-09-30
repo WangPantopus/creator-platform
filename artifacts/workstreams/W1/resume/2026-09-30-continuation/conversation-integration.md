@@ -1,0 +1,11 @@
+# Published W3 account and recovery integration
+
+W1 personally reconciled seven producer source paths from W3 `bb2c7f84c6fcd5e184f6cbe819f72b6b687fc8d9` against prior W3 `f350fd313fedcc5ddcaa91504e94f7f07601ba95`, retaining current W1 identity boundaries, mismatch checks, session purge, route links, loading states and initial exclusive mutation locks. No SQL or migration registry changed. Three generated artifacts were regenerated through `pnpm generate`, never edited manually.
+
+The account contract now returns at most50 fan-owned relationship records and a canonical UUID cursor, validates that cursor against the current account/fan directory, and exposes loading/retry/paging on web/iOS/Android. Private thread messages still need their individual scope. Native privacy denial clears retained memory/audit/page/usage/editing/provenance. Web recovery starts unavailable until a successful current snapshot, retries first-snapshot failure and refreshes on foreground/focus.
+
+The optional W4 `firstConversation.openTrial` port is consumed only when injected by a genuinely configured host and current paid AI access is absent. W1's default host does not inject it: reviewed allowance/cost/provider configuration is unavailable. No numerical allowance or economic default was invented. The proposed account index remains unallocated and unapplied under W8 ownership.
+
+Validation: canonical generation check, backend build, API/backend/web type checks, targeted lint and formatting pass. Swift Package compiled all current consumers in17.41s with the existing pinned dependencies. Android local SDK/JDK/license files are absent; current Android compilation must be confirmed by exact-head hosted checks. Native UI operation remains unavailable.
+
+Actual browser on the restarted owned API4101 and web3001 loaded retained `@w1_resume_two` and its saved intro, then displayed “No conversations yet.” Light and Night were observed at390×844. Night DOM measurements show document scrollWidth390 and all visible account actions within the viewport with at least44px height. The account has no authorized private thread; paging of a populated directory, generation, multi-client stream recovery and provider acceptance are unverified. No approvals, fan grants or sample threads were fabricated. Screenshot: `account-night-mobile.png`.

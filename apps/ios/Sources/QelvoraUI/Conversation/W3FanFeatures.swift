@@ -204,7 +204,7 @@ private struct W3PrivacyScreen: View {
         }.padding(16) }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme)).task { await refresh() }.refreshable { await refresh() }
             .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Where this came from").qText("title"); Text(message.authorLabel(name:name)).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
     }
-    private func refresh() async { do { memory = try await client.request(root + "/memory"); audit = try await client.request(root + "/audit"); caps = try await client.request("capabilities", publicRead: true); page = try await client.request(root); usage = try await client.request(root + "/usage"); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to refresh privacy settings." } }
+    private func refresh() async { do { memory = try await client.request(root + "/memory"); audit = try await client.request(root + "/audit"); caps = try await client.request("capabilities", publicRead: true); page = try await client.request(root); usage = try await client.request(root + "/usage"); failure = "" } catch { if let denial = error as? W3Failure, [401,403,404].contains(denial.status) { memory = nil; audit = []; page = nil; usage = nil; editing = nil; text = ""; provenance = nil }; failure = (error as? W3Failure)?.message ?? "Reconnect to refresh privacy settings." } }
     private func decide(_ item: W3Memory, _ action: String) async { guard !busy, let memory else { return }; busy = true; defer { busy = false }; do { let _: W3MemoryView = try await client.request(root + "/memory/" + item.id, body: JSONEncoder().encode(W3Decision(expectedRevision: memory.revision, action: action, text: action == "edit" ? text : nil))); editing = nil; await refresh() } catch { failure = (error as? W3Failure)?.message ?? "This change could not be saved." } }
     private func preferences(offTheRecord: Bool, introShared: Bool) async { guard !busy, let memory else { return }; busy = true; defer { busy = false }; do { let _: W3Page = try await client.request(root + "/preferences", body: JSONEncoder().encode(W3Preferences(offTheRecord: offTheRecord, introShared: introShared, expectedRevision: memory.revision))); await refresh() } catch { failure = (error as? W3Failure)?.message ?? "This change could not be saved." } }
     private func consent(_ policy: W3Policy) async { guard !busy else { return }; busy = true; defer { busy = false }; do { let _: W3Page = try await client.request(root + "/consent", body: JSONEncoder().encode(W3Consent(version: policy.version, accepted: page?.consentCurrent != true))); await refresh() } catch { failure = (error as? W3Failure)?.message ?? "Consent could not be saved." } }
@@ -215,11 +215,13 @@ private struct W3Account: Decodable, Sendable {
     struct Fan: Decodable, Sendable { let id: String; let handle: String; let intro: String? }
     struct Conversation: Decodable, Identifiable, Sendable { let id: String; let creatorId: String; let fanId: String; let name: String }
     let fan: Fan; let threads: [Conversation]
+    let nextCursor: String?
 }
 private struct W3AccountScreen: View {
     let accountId: String
     let baseURL: URL; @ObservedObject var session: FanSession
     @State private var account: W3Account?; @State private var failure = ""
+    @State private var cursor: String?; @State private var loading = false
     @Environment(\.colorScheme) private var scheme
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
@@ -234,10 +236,18 @@ private struct W3AccountScreen: View {
             Text("Me and privacy").qText("display-md")
             Text("Memory and conversation access by creator").qText("body")
             ForEach(account?.threads ?? []) { thread in Button(thread.name, variant: .quiet, block: true) { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) } }
+            if loading { Text("Loading your conversations…").qText("caption") }
+            if let next = account?.nextCursor { Button("More conversations", variant: .quiet, disabled: loading || !failure.isEmpty) { Task { await refresh(before: next) } } }
+            if cursor != nil { Button("Back to first page", variant: .quiet, disabled: loading) { Task { await refresh() } } }
+            if !failure.isEmpty { Button("Try again", variant: .quiet, disabled: loading) { Task { await refresh(before: cursor) } } }
             Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
             Button("Help and safety", variant: .quiet) { session.open("/support") }
         }.padding(16) }.frame(maxWidth: 390).background(qColor("ground",scheme)).foregroundStyle(qColor("ink",scheme))
             .task(id: session.session?.accountId) { await refresh() }.refreshable { await refresh() }
     }
-    private func refresh() async { account = nil; do { account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account"); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." } }
+    private func refresh(before: String? = nil) async {
+        guard !loading else { return }; loading = true; cursor = before; defer { loading = false }
+        do { let fresh: W3Account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account" + (before.map { "?cursor=" + $0 } ?? "")); guard !Task.isCancelled else { return }; account = fresh; cursor = before; failure = "" }
+        catch { if !Task.isCancelled { if let denial = error as? W3Failure, [401,403,404].contains(denial.status) { account = nil }; failure = (error as? W3Failure)?.message ?? "Reconnect to open You." } }
+    }
 }

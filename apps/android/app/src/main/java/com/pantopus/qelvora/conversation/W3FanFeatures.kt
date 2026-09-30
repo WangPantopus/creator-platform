@@ -216,7 +216,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var provenance by remember(root) { mutableStateOf<ConversationMessage?>(null) }
     var editing by remember { mutableStateOf<String?>(null) }; var text by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    suspend fun refresh() { try { memory = client.json.decodeFromJsonElement(client.request("$root/memory")); audit = client.json.decodeFromJsonElement(client.request("$root/audit")); policy = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true)); page = client.page(root); usage = client.json.decodeFromJsonElement(client.request("$root/usage")); error = "" } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Reconnect to refresh your privacy settings." } }
+    suspend fun refresh() { try { memory = client.json.decodeFromJsonElement(client.request("$root/memory")); audit = client.json.decodeFromJsonElement(client.request("$root/audit")); policy = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true)); page = client.page(root); usage = client.json.decodeFromJsonElement(client.request("$root/usage")); error = "" } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { memory = null; audit = emptyList(); page = null; usage = null; editing = null; text = ""; provenance = null }; error = failure.message ?: "Reconnect to refresh your privacy settings." } }
     suspend fun decide(item: ConversationMemory, action: String) {
         val snapshot = memory ?: return; if (busy) return; busy = true
         try { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }); editing = null; refresh() }
@@ -323,7 +323,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
     val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
     var account by remember { mutableStateOf<JsonObject?>(null) };var error by remember { mutableStateOf("") }
-    LaunchedEffect(session.session?.accountId) { try { account=client.request("account").jsonObject } catch(failure:Throwable) { if(failure is CancellationException) throw failure;account=null;error=failure.message ?: "Reconnect to open You." } }
+    var cursor by remember { mutableStateOf<String?>(null) }; var loading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    suspend fun refresh(before: String? = null) {
+        if (loading) return; loading = true; cursor = before
+        try { account = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject; cursor = before; error = "" }
+        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(failure is ConversationFailure && failure.status in listOf(401,403,404)) account=null; error=failure.message ?: "Reconnect to open You." }
+        finally { loading = false }
+    }
+    LaunchedEffect(session.session?.accountId) { refresh() }
     val fan=account?.get("fan")?.jsonObject
     LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { BasicText("You",style=qText("title")); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
@@ -332,6 +340,12 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         item { BasicText("Me and privacy",style=qText("display-md"));BasicText("Memory and conversation access by creator",style=qText("body")) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item { Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") } }
+        }
+        item {
+            if (loading) BasicText("Loading your conversations…",style=qText("caption"))
+            account?.get("nextCursor")?.jsonPrimitive?.contentOrNull?.let { next -> Button("More conversations",variant=ButtonVariant.QUIET,disabled=loading || error.isNotEmpty()) { scope.launch { refresh(next) } } }
+            if (cursor != null) Button("Back to first page",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
+            if (error.isNotEmpty()) Button("Try again",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }
         }
         item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") };Button("Help and safety",variant=ButtonVariant.QUIET) { session.open("/support") } }
     }
