@@ -44,7 +44,7 @@ export class MemoryService {
     return this.db.withThread(scope, async (client) => {
       const thread = (
         await client.query(
-          "SELECT revision,control_epoch,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR UPDATE",
+          "SELECT revision,control_epoch,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR SHARE",
           pair(scope),
         )
       ).rows[0];

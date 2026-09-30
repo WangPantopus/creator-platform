@@ -142,10 +142,11 @@ export class ConversationService {
   private async lockThread(
     client: PoolClient,
     scope: ThreadScope,
+    readOnly = false,
   ): Promise<ThreadRow> {
     assertThreadScope(scope);
     const found = await client.query<ThreadRow>(
-      "SELECT control,control_epoch,revision,event_cursor,processor_consent_version FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR UPDATE",
+      `SELECT control,control_epoch,revision,event_cursor,processor_consent_version FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR ${readOnly ? "SHARE" : "UPDATE"}`,
       [scope.threadId, scope.creatorId, scope.fanId],
     );
     invariant(
@@ -191,7 +192,7 @@ export class ConversationService {
   }
   async read(scope: ThreadScope): Promise<ThreadTimeline> {
     return this.db.withThread(scope, async (client) => {
-      const thread = await this.lockThread(client, scope);
+      const thread = await this.lockThread(client, scope, true);
       const rows = await client.query<MessageRow>(
         "SELECT * FROM (SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence DESC LIMIT 100) recent ORDER BY sequence",
         [scope.threadId, scope.creatorId, scope.fanId],
@@ -674,6 +675,7 @@ export class ConversationService {
             "UPDATE creator.thread SET control=$1,control_epoch=$2 WHERE id=$3 AND creator_id=$4 AND fan_id=$5",
             [to, epoch, scope.threadId, scope.creatorId, scope.fanId],
           );
+          await this.delivery.wellbeing?.boundary(scope, client);
           const text = formatCopy(
             to === "human_active"
               ? "takeover"
@@ -769,7 +771,7 @@ export class ConversationService {
       "The replay page limit is invalid.",
     );
     return this.db.withThread(scope, async (client) => {
-      const thread = await this.lockThread(client, scope);
+      const thread = await this.lockThread(client, scope, true);
       invariant(
         cursor <= thread.event_cursor,
         "invalid_cursor",

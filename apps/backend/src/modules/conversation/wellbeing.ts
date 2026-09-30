@@ -98,13 +98,31 @@ export class ConversationWellbeing {
         `INSERT INTO creator.conversation_presence(thread_id,creator_id,fan_id,last_at,until_at,last_companion)
         VALUES($1,$2,$3,now(),coalesce($5::timestamptz,now()-interval '1 microsecond'),$4)
         ON CONFLICT(thread_id) DO UPDATE SET
-          continuous_seconds=CASE WHEN conversation_presence.until_at>=now() THEN conversation_presence.continuous_seconds+least(40,greatest(0,extract(epoch FROM now()-conversation_presence.last_at))) ELSE 0 END,
-          reminder_seconds=CASE WHEN conversation_presence.until_at>=now() THEN conversation_presence.reminder_seconds ELSE 0 END,
+          continuous_seconds=CASE WHEN $6::boolean AND conversation_presence.until_at>=now() THEN conversation_presence.continuous_seconds+least(40,greatest(0,extract(epoch FROM now()-conversation_presence.last_at))) ELSE 0 END,
+          reminder_seconds=CASE WHEN $6::boolean AND conversation_presence.until_at>=now() THEN conversation_presence.reminder_seconds ELSE 0 END,
           last_at=now(),until_at=excluded.until_at,last_companion=excluded.last_companion`,
-        [...pair, companion, thread.control === "ai_active" ? nextUntil : null],
+        [
+          ...pair,
+          companion,
+          thread.control === "ai_active" ? nextUntil : null,
+          thread.control === "ai_active" && nextUntil !== null,
+        ],
       );
     });
     return this.usage(scope);
+  }
+  /** The caller holds the thread lock. A speaker/consent boundary ends every
+   * foreground lease, while preserving daily totals and the once-a-day signal. */
+  async boundary(scope: ThreadScope, client: PoolClient): Promise<void> {
+    const values = [scope.threadId, scope.creatorId, scope.fanId];
+    await client.query(
+      "DELETE FROM creator.conversation_presence_client WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
+      values,
+    );
+    await client.query(
+      "UPDATE creator.conversation_presence SET continuous_seconds=0,reminder_seconds=0,last_at=clock_timestamp(),until_at=clock_timestamp()-interval '1 microsecond',last_companion=false WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
+      values,
+    );
   }
   async usage(scope: ThreadScope) {
     invariant(

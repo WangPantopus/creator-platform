@@ -153,7 +153,7 @@ export class ConversationFeature {
     return this.db.withThread(scope, async (client) => {
       const t = (
         await client.query(
-          "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR UPDATE OF t",
+          "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
           [scope.threadId, scope.creatorId, scope.fanId],
         )
       ).rows[0];
@@ -289,6 +289,7 @@ export class ConversationFeature {
           scope.fanId,
         ],
       );
+      await this.wellbeing?.boundary(scope, client);
     });
     return this.page(scope);
   }
