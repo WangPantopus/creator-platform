@@ -1119,6 +1119,7 @@ export class SessionService {
     const noShow =
       provider.complete &&
       Date.parse(now) >= graceAt &&
+      (!row.end_requested_at || row.end_requested_at.getTime() >= graceAt) &&
       (!creatorJoinedByGrace || !fanJoinedByGrace);
     const measuredUntil = Math.min(
       Date.parse(now),
@@ -1172,7 +1173,7 @@ export class SessionService {
             fanEndedByChoice: row.fan_ended_by_choice,
             creatorJoinedByGrace,
             fanJoinedByGrace,
-            graceElapsed: Date.now() >= graceAt,
+            graceElapsed: measuredUntil >= graceAt,
           })
         : null;
     return this.db.withThread(scope, async (client) => {
