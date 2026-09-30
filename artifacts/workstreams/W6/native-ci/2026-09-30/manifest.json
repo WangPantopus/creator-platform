@@ -842,5 +842,38 @@
     "comparisonPrecision": 1,
     "producerThresholdChangeConsumed": false,
     "localSwiftNonSnapshotCasesPassed": 15
+  },
+  "endingAndProviderUncertainty": {
+    "sourceSHA256": {
+      "apps/backend/src/modules/session/service.ts": "32700d1e88a447f8af8f9eb256d2ea3cd34bf13922efd7f0d8f367262aa41d87",
+      "apps/backend/src/modules/session/provider.ts": "37719c953a7f89084853065e64367e1a8435018a5ab8cbd1ccdd1184a02948cd",
+      "apps/backend/src/modules/session/worker.ts": "3adb076aae7a74955c28a60e657d0b078012e1e2979083b5b538f6b235cd99cd",
+      "apps/backend/src/modules/media/lifecycle.ts": "eb7ce8ea5de97952be4df906e393cff8a3dd973bd314b0676cbf1bbbe2428e7e"
+    },
+    "buildLintFormat": "passed",
+    "providerOutageClosureHistoryDeletionProof": "unverified; actual configured provider required"
+  },
+  "latestProducerAudit": {
+    "main": "2e337a1",
+    "W8": "bf44ada",
+    "publishedMigrationRegistryThrough": "0043",
+    "availabilityAllocated": false,
+    "W4": "c71d1c8",
+    "W2": "26c6c9b",
+    "W3": "a0a0025",
+    "W5Implementation": "7b167fb",
+    "W7": "15fd650",
+    "concreteMediaAndCallProviderRuntime": "absent"
+  },
+  "remoteAtConsentHead": {
+    "revision": "11d04bfac332f72cb1c15c5c236c5cf7d4e08839",
+    "run": 36764832033,
+    "webBackend": "success",
+    "androidRuntime": "success",
+    "androidFoundation": "success",
+    "webVisual": "queued",
+    "iosFoundation": "queued",
+    "trustRun": 36764832075,
+    "trustCompilation": "success"
   }
 }

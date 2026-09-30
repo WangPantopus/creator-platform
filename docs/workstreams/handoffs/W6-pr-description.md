@@ -14,6 +14,7 @@ Add W6's scoped media pipeline and web/Swift/Kotlin call workflows. Upload retri
 - Versioned availability and signed time offers, W4 scheduling/settlement and retained post-call authority, server interval clocks, independent consent, summary jobs and reconciliation.
 - Recovery fixes for completed uploads, chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms, actual recording occurrence during revocation and stale client transports.
 - Post-call recording/purpose revocation remains available to previously consenting actors on all three clients, and web summary output requires both current grants. Consume W1's exact bundled-italic token-size correction.
+- Explicit/deadline closure proceeds while provider history is unavailable; malformed provider truth cannot become absence/recording/deletion evidence, and ambiguous rejected effects remain pending for privacy drain.
 - Authorized foundation CI repairs for current identity contracts, migration setup and native compilation; corrected Android ended Composer with its required request action and reviewed four-image refresh; portable iOS color-profile normalization of existing references, preserving strict equality.
 
 Prerequisite commit `1a94db3` preserves shared app foundations/peer work and is not W6-authored completion. `2485828` contains original W6 implementation; `a96ecbb` incorporates main's newer W5 handoff. Later W6 recovery and CI repairs preserve those source boundaries.

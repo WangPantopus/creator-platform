@@ -3,6 +3,7 @@ import type { ThreadScope } from "../access/scope.js";
 import type { MediaService } from "./service.js";
 import type { SessionService } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
+import { validateProviderState } from "../session/provider.js";
 
 type PrivacyInput = Parameters<PrivacyHook["run"]>[0];
 export function createMediaPrivacyHook(input: {
@@ -125,14 +126,13 @@ export function createMediaPrivacyHook(input: {
             ),
             5000,
           );
-          if (
-            !(
-              await withDeadline(
-                input.sessions.provider.state(room.room_id),
-                5000,
-              )
-            ).closed
-          )
+          const truth = validateProviderState(
+            await withDeadline(
+              input.sessions.provider.state(room.room_id),
+              5000,
+            ),
+          );
+          if (!truth.closed || truth.recording)
             throw new Error("call_deletion_unconfirmed");
           roomsDeleted++;
         }

@@ -2,6 +2,7 @@ import type {
   CallRole,
   ConnectedInterval,
 } from "../../../../../packages/api/src/session.js";
+import { invariant } from "../../core/errors.js";
 
 /** Managed media transport. Participant history must be genuine, complete provider evidence. */
 export interface CallProvider {
@@ -38,6 +39,32 @@ export interface CallProvider {
     idempotencyKey: string,
   ): Promise<{ recording: boolean }>;
   deleteRecording(roomId: string, idempotencyKey: string): Promise<void>;
+}
+export function validateProviderState(
+  state: Awaited<ReturnType<CallProvider["state"]>>,
+) {
+  invariant(
+    state &&
+      typeof state.closed === "boolean" &&
+      typeof state.recording === "boolean" &&
+      Array.isArray(state.presentAccountIds) &&
+      state.presentAccountIds.every(
+        (accountId) => typeof accountId === "string" && accountId.length > 0,
+      ),
+    "call_provider_state_invalid",
+    "Call state is awaiting valid provider confirmation.",
+  );
+  return state;
+}
+export function validateRecordingState(
+  state: Awaited<ReturnType<CallProvider["setRecording"]>>,
+) {
+  invariant(
+    state && typeof state.recording === "boolean",
+    "call_provider_recording_invalid",
+    "Recording state is awaiting valid provider confirmation.",
+  );
+  return state;
 }
 export class UnavailableCallProvider implements CallProvider {
   readonly name = "unconfigured";

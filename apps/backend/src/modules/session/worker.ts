@@ -6,6 +6,7 @@ import type {
 import { SessionService } from "./service.js";
 import { withDeadline } from "../media/deadline.js";
 import { DomainError } from "../../core/errors.js";
+import { validateRecordingState } from "./provider.js";
 
 export interface CallEffects {
   summarize(input: {
@@ -94,6 +95,7 @@ export class SessionWorker {
       return next ? { ...next, lease } : null;
     });
     if (!effect) return;
+    let externalUnconfirmed = false;
     try {
       const cleanup = [
         "purge_consent_assets",
@@ -115,6 +117,7 @@ export class SessionWorker {
           row.revoked_at
         )
           throw new Error("room_creation_denied");
+        externalUnconfirmed = true;
         await withDeadline(
           this.sessions.provider.ensureRoom({
             roomId: row.room_id,
@@ -123,6 +126,7 @@ export class SessionWorker {
           }),
           5000,
         );
+        externalUnconfirmed = false;
         try {
           const current = await this.sessions.db.withThread(scope, (client) =>
             this.sessions.row(scope, client, effect.session_id),
@@ -151,14 +155,18 @@ export class SessionWorker {
           await this.sessions.db.withThread(scope, (client) =>
             this.sessions.row(scope, client, effect.session_id),
           );
-        const truth = await withDeadline(
-          this.sessions.provider.setRecording(
-            row.room_id,
-            enabled,
-            `${effect.key}:${enabled ? "on" : "off"}`,
+        externalUnconfirmed = true;
+        const truth = validateRecordingState(
+          await withDeadline(
+            this.sessions.provider.setRecording(
+              row.room_id,
+              enabled,
+              `${effect.key}:${enabled ? "on" : "off"}`,
+            ),
+            5000,
           ),
-          5000,
         );
+        externalUnconfirmed = false;
         const recordingResult = await this.sessions.db
           .withThread(scope, async (client) => {
             const current = await this.sessions.lifecycleRow(
@@ -222,13 +230,15 @@ export class SessionWorker {
             throw error;
           });
         if (recordingResult.denied) {
-          const stopped = await withDeadline(
-            this.sessions.provider.setRecording(
-              row.room_id,
-              false,
-              `${effect.key}:revoke`,
+          const stopped = validateRecordingState(
+            await withDeadline(
+              this.sessions.provider.setRecording(
+                row.room_id,
+                false,
+                `${effect.key}:revoke`,
+              ),
+              5000,
             ),
-            5000,
           );
           if (stopped.recording) throw new Error("recording_stop_unconfirmed");
           await this.sessions.db.withThread(scope, async (client) => {
@@ -287,6 +297,7 @@ export class SessionWorker {
           if (!this.effects.summarize)
             throw new Error("summary_provider_unconfigured");
           const revision = row.document.summaryRevision ?? 0;
+          externalUnconfirmed = true;
           const summary = await withDeadline(
             this.effects.summarize({
               packet: row.document.packet,
@@ -295,6 +306,7 @@ export class SessionWorker {
             }),
             30_000,
           );
+          externalUnconfirmed = false;
           if (!summary.trim() || summary.length > 16000)
             throw new Error("summary_output_invalid");
           await this.sessions.db.withThread(scope, async (client) => {
@@ -357,8 +369,11 @@ export class SessionWorker {
             scope.creatorId,
             scope.fanId,
             effect.lease,
-            error instanceof Error &&
-              error.message === "external_operation_unconfirmed",
+            externalUnconfirmed ||
+              (error instanceof Error &&
+                error.message === "external_operation_unconfirmed") ||
+              (error instanceof DomainError &&
+                error.code === "call_provider_recording_invalid"),
           ],
         );
       });

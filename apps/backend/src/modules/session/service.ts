@@ -18,7 +18,7 @@ import type { ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
-import type { CallProvider } from "./provider.js";
+import { validateProviderState, type CallProvider } from "./provider.js";
 import { calculateClocks, determineOutcome } from "./clocks.js";
 import type { AvailabilityService } from "./availability.js";
 import { withDeadline } from "../media/deadline.js";
@@ -74,6 +74,7 @@ type SessionRow = {
   revoked_at: Date | null;
   worker_lease_until: Date | null;
 };
+const providerTimestamp = z.iso.datetime({ offset: true });
 export function validateZone(zone: string) {
   try {
     return new Intl.DateTimeFormat("en", { timeZone: zone }).resolvedOptions()
@@ -1063,9 +1064,8 @@ export class SessionService {
         ),
         5000,
       );
-      const truth = await withDeadline(
-        this.provider.state(revoked.room_id),
-        5000,
+      const truth = validateProviderState(
+        await withDeadline(this.provider.state(revoked.room_id), 5000),
       );
       invariant(
         truth.closed && !truth.recording,
@@ -1092,11 +1092,68 @@ export class SessionService {
     }
     const doc = row.document;
     if (["ended", "cancelled"].includes(doc.state)) return doc;
+    const closureRequired = Boolean(
+      row.ended_by ||
+        doc.state === "ending" ||
+        Date.now() >= Date.parse(doc.hardEndAt),
+    );
+    // Persist the request phase before an external close/history outage; never report closure as confirmed.
+    if (
+      closureRequired &&
+      (doc.state !== "ending" ||
+        !["off", "stopping"].includes(doc.recordingState))
+    ) {
+      const ending = await this.db.withThread(scope, async (client) => {
+        const current = await this.row(scope, client, id, true);
+        if (
+          current.document.version !== doc.version ||
+          (lease && current.worker_lease_until?.toISOString() !== lease)
+        )
+          return current.document;
+        return this.persist(scope, client, {
+          ...current.document,
+          state: "ending",
+          recordingState:
+            current.document.recordingState === "off" ? "off" : "stopping",
+        });
+      });
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
+      return ending;
+    }
+    // Closing known ending/deadline paths does not depend on a healthy history API.
+    // Evidence and settlement still wait for confirmed closure and complete history below.
+    if (closureRequired)
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
     const provider = await withDeadline(
       this.provider.history(row.room_id),
       5000,
     );
-    const state = await withDeadline(this.provider.state(row.room_id), 5000);
+    invariant(
+      typeof provider.complete === "boolean" &&
+        typeof provider.closed === "boolean" &&
+        typeof provider.reference === "string" &&
+        (!provider.complete || provider.reference.trim().length > 0) &&
+        Array.isArray(provider.participants) &&
+        provider.participants.every(
+          (participant) =>
+            typeof participant.accountId === "string" &&
+            participant.accountId.length > 0 &&
+            Array.isArray(participant.intervals) &&
+            participant.intervals.every(
+              (interval) =>
+                providerTimestamp.safeParse(interval.start).success &&
+                providerTimestamp.safeParse(interval.end).success &&
+                Number.isFinite(Date.parse(interval.start)) &&
+                Number.isFinite(Date.parse(interval.end)) &&
+                Date.parse(interval.end) >= Date.parse(interval.start),
+            ),
+        ),
+      "call_history_invalid",
+      "Call history is awaiting valid provider evidence.",
+    );
+    const state = validateProviderState(
+      await withDeadline(this.provider.state(row.room_id), 5000),
+    );
     const now = new Date().toISOString();
     const creator = provider.participants
       .filter((p) => p.accountId === doc.creatorAccountId)
