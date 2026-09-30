@@ -560,4 +560,3 @@ Validate /tmp/creator-w7-resume-ios/DerivedData/Build/Products/Debug-iphonesimul
     builtin-validationUtility /tmp/creator-w7-resume-ios/DerivedData/Build/Products/Debug-iphonesimulator/QelvoraApp.app -shallow-bundle -infoplist-subpath Info.plist
 
 ** BUILD SUCCEEDED **
-

@@ -23,4 +23,3 @@ $ turbo run typecheck
  Tasks:    7 successful, 7 total
 Cached:    6 cached, 7 total
   Time:    10.148s
-
