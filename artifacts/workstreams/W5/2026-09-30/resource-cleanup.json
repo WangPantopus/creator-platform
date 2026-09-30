@@ -1,0 +1,160 @@
+{
+  "recordedAt": "2026-09-30T21:58:01.272349+00:00",
+  "removed": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform/apps/web/.next-w5",
+      "allocatedBytesBefore": 353730560,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform/apps/web/.next-w5-build",
+      "allocatedBytesBefore": 153669632,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform/apps/web/.next-w5-ci",
+      "allocatedBytesBefore": 135479296,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-swift-tests",
+      "allocatedBytesBefore": 692920320,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-swift-module-cache",
+      "allocatedBytesBefore": 73015296,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-ios-derived",
+      "allocatedBytesBefore": 650571776,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-android/app-build",
+      "allocatedBytesBefore": 121331712,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-android/project-cache",
+      "allocatedBytesBefore": 5812224,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-tools/sdk/build-tools/34.0.0",
+      "allocatedBytesBefore": 196579328,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-ci-renderer-diffs",
+      "allocatedBytesBefore": 57344,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-ci-host-transform-diffs",
+      "allocatedBytesBefore": 319488,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-ci-ios-36763954818",
+      "allocatedBytesBefore": 24088576,
+      "reason": "owned redundant cache, generated output or discarded/re-downloadable diagnostic"
+    },
+    {
+      "path": "/private/tmp/creator-w5-actor-1.cookies",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-actor-2.cookies",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-actor-3.cookies",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-actor-4.cookies",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-auth-headers",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-dev-cookiejar",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-api-wire.py",
+      "allocatedBytesBefore": 8192,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-native-generator.py",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-snapshot-metrics.mjs",
+      "allocatedBytesBefore": 4096,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-ci-platform.patch",
+      "allocatedBytesBefore": 8192,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    },
+    {
+      "path": "/private/tmp/creator-w5-development.html",
+      "allocatedBytesBefore": 16384,
+      "reason": "obsolete own temporary credential/helper; contents not read"
+    }
+  ],
+  "allocatedBytesRemoved": 2407641088,
+  "measurement": "sum of pre-deletion du allocated blocks; APFS sharing/concurrent peer activity prevents exact physical-free attribution",
+  "stopped": [
+    "creator-platform-w5-local",
+    "creator-platform-w5-ci",
+    "own ADB5045 daemon"
+  ],
+  "peerResourcesUntouched": true,
+  "retainedAfterThisCleanup": [
+    "W5 PostgreSQL volumes/data and stopped containers",
+    "current /private/tmp/creator-w5-swift scratch for immediate CI capture diagnosis",
+    "latest /private/tmp/creator-w5-ci-host-transform-full plus full log",
+    "/private/tmp/creator-w5-ios-packages and generated iOS project",
+    "Android35 SDK/emulator/system image/Gradle dependency cache and named AVD",
+    "shutdown named iOS simulator and installed fan app",
+    "private0600 W1 development key",
+    "tracked source/evidence/handoff and shared dependencies"
+  ],
+  "finalRecheck": {
+    "recordedAt": "2026-09-30T22:42:34Z",
+    "removedTargetsStillPresent": [],
+    "remainingW5TempPaths": [],
+    "unavailableFormerlyRetainedResources": [
+      "/private/tmp/creator-w5-swift",
+      "/private/tmp/creator-w5-ci-host-transform-full",
+      "/private/tmp/creator-w5-host-transform-full.log",
+      "/private/tmp/creator-w5-ios-packages",
+      "/private/tmp/creator-w5-ios-project",
+      "/private/tmp/creator-w5-tools",
+      "/private/tmp/creator-w5-android",
+      "/private/tmp/creator-w5-session-key",
+      "/private/tmp/creator-w1-resume-tools/jdk-x64/jdk-17.0.20.1+1/Contents/Home"
+    ],
+    "causeOfLaterAbsence": "unverified; not included in this cleanup deletion list or byte accounting",
+    "docker": "daemon unavailable; stopped containers/data cannot be inspected now",
+    "iosSimulator": "Creator Platform W5 9E7B3B43-955F-4473-8CE0-6BFEAE685D27 present and Shutdown",
+    "ownListeners": [],
+    "sourceEvidenceNodeDependencies": "present; preserved",
+    "successorInstructions": "Use the updated handoff; rebuild missing native tooling/scratch and authenticate afresh. Inspect Docker containers/volumes before starting, creating or migrating."
+  }
+}

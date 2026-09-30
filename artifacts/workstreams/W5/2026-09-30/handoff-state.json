@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-09-30T21:17:00Z",
+  "recordedAt": "2026-09-30T22:42:34Z",
   "workspace": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform",
   "branch": "codex/w5-studio-content",
   "applicationCheckpoint": "eedf35fc82544ab9216384896b84e376f2c323f4",
@@ -23,51 +23,53 @@
     "docker": [
       {
         "name": "creator-platform-w5-local",
-        "running": true,
+        "running": false,
         "port": 55435,
-        "databases": ["creator_w5", "creator_w5_upgrade"]
+        "databases": ["creator_w5", "creator_w5_upgrade"],
+        "lastVerifiedStatus": "exited after own docker stop",
+        "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       },
       {
         "name": "creator-platform-w5-ci",
-        "running": true,
+        "running": false,
         "port": 51360,
-        "databases": ["creator_foundation"]
+        "databases": ["creator_foundation"],
+        "lastVerifiedStatus": "exited after own docker stop",
+        "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       }
     ],
     "privateDevelopmentKey": {
       "path": "/private/tmp/creator-w5-session-key",
-      "mode": "0600",
-      "contentsNeverPrinted": true
+      "existsAtFinalRecheck": false,
+      "requiredMode": "0600",
+      "contentsNeverPrinted": true,
+      "restart": "Isolated development host creates a new private key if absent; sign in through development continuation again."
     },
-    "outputs": [
-      "apps/web/.next-w5",
-      "apps/web/.next-w5-build",
-      "/private/tmp/creator-w5-ios-*",
-      "/private/tmp/creator-w5-swift",
-      "/private/tmp/creator-w5-android",
-      "/private/tmp/creator-w5-tools"
-    ],
+    "outputs": [],
     "ios": {
       "name": "Creator Platform W5",
       "id": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
       "model": "iPhone17",
       "runtime": "iOS26.5",
-      "state": "Shutdown"
+      "state": "Shutdown; named simulator present on final recheck"
     },
     "android": {
       "avd": "CreatorPlatform_W5",
       "emulatorPort": 5590,
       "emulatorListening": false,
       "adbPort": 5045,
-      "adbPid": 60626,
-      "adb": "own idle daemon retained; verify transport/AVD before use",
-      "transport": "127.0.0.1:5591"
-    }
+      "adb": "own daemon stopped; no listener; former SDK/AVD/Gradle directories absent on final recheck",
+      "transport": "127.0.0.1:5591",
+      "previousAdbPid": 60626,
+      "avdExistsAtFinalRecheck": false
+    },
+    "sourceEvidenceDependenciesPresent": true
   },
   "browser": {
     "temporaryViewportReset": true,
     "cookieLossUnresolved": true,
-    "nativeInputAvailable": false
+    "nativeInputAvailable": false,
+    "openW5Tabs": 0
   },
   "PR": {
     "exists": false,
@@ -87,5 +89,22 @@
   ],
   "peers": {
     "sourceProcessesDatabasesDevicesOutputsPreserved": true
-  }
+  },
+  "resourceCleanup": {
+    "record": "resource-cleanup.json",
+    "allocatedBytesRemovedByThisCleanup": 2407641088,
+    "noListenersVerified": [3005, 3006, 3105, 4105, 5045, 55435, 51360, 5590],
+    "laterEnvironmentChange": "All W5 /private/tmp resources absent on final recheck; cause unverified. Docker daemon unavailable; do not assume containers or data are accessible."
+  },
+  "absentAtFinalRecheck": [
+    "/private/tmp/creator-w5-swift",
+    "/private/tmp/creator-w5-ci-host-transform-full",
+    "/private/tmp/creator-w5-host-transform-full.log",
+    "/private/tmp/creator-w5-ios-packages",
+    "/private/tmp/creator-w5-ios-project",
+    "/private/tmp/creator-w5-tools",
+    "/private/tmp/creator-w5-android",
+    "/private/tmp/creator-w5-session-key",
+    "/private/tmp/creator-w1-resume-tools/jdk-x64/jdk-17.0.20.1+1/Contents/Home"
+  ]
 }

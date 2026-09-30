@@ -18,7 +18,7 @@ Binding execution:
 - User resolved Q14: chronological library with scheduled live entries and separately audience-controlled replays, using W6 sessions. Do not ask again.
 - User already authorized commits/pushes/PR creation/ready merge and fixing legitimate CI failures. Keep small coherent pushed checkpoints. Never bypass PRs with direct main pushes.
 - OpenAI key is at `/Users/yingpengwang/.config/creator-platform/secrets/openai.env`. Load server-side only if necessary, never print/commit and avoid unnecessary paid calls. None was used by the previous owner.
-- Preserve peer worktrees/processes/DBs/build outputs/devices. W5 own caches/DBs survive; read handoff-state and check current listeners/ownership before launching. No destructive cleanup/reset/force push.
+- Preserve peer worktrees/processes/DBs/build outputs/devices. Read handoff-state and resource-cleanup.json before launching. Own services were stopped and about 2.24 GiB of expendable outputs removed. Final recheck found all W5 temporary SDK/AVD/native scratch/development key paths absent and Docker unavailable; do not assume those caches or accessible databases survive. Inspect existing Docker containers/volumes before reuse, rebuild missing native tooling only when needed and sign in afresh with the regenerated development key. The named iOS simulator/source/tracked evidence/Node dependencies remain. No destructive reset/force push or global pruning.
 
 Current implementation:
 
