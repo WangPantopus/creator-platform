@@ -14,12 +14,13 @@ export async function studioRequest<T>(
   domain: "studio" | "content",
   path: string,
   body?: unknown,
+  expectedAccountId?: string,
 ): Promise<T> {
   let response: Response;
   let fingerprint: string | undefined;
   if (body && typeof body === "object" && "idempotencyKey" in body) {
     const { idempotencyKey, ...command } = body as Record<string, unknown>;
-    fingerprint = JSON.stringify([domain, path, command]);
+    fingerprint = JSON.stringify([domain, path, expectedAccountId, command]);
     const original = pendingCommands.get(fingerprint) ?? String(idempotencyKey);
     pendingCommands.set(fingerprint, original);
     body = { ...command, idempotencyKey: original };
@@ -27,7 +28,12 @@ export async function studioRequest<T>(
   try {
     response = await fetch(`/api/${domain}/${path}`, {
       method: body === undefined ? "GET" : "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(expectedAccountId
+          ? { "x-qelvora-expected-account": expectedAccountId }
+          : {}),
+      },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       cache: "no-store",
     });

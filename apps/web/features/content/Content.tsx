@@ -39,13 +39,37 @@ export function FanContent({
   const [thanks, setThanks] = useState<Thanks | null>(null),
     [thanksText, setThanksText] = useState(""),
     [share, setShare] = useState(false),
-    [identity, setIdentity] = useState(false);
+    [identity, setIdentity] = useState(false),
+    [viewer, setViewer] = useState<string | null>(null);
   const dirtyThanks = useRef(false),
     loading = useRef(0),
     busyRef = useRef(false),
     depth = useRef(1);
+  const resetInputs = useCallback(() => {
+    setText("");
+    setThanksText("");
+    setShare(false);
+    setIdentity(false);
+    dirtyThanks.current = false;
+  }, []);
+  const observedViewer = useRef<string | null>(null);
   const load = useCallback(async () => {
     const generation = ++loading.current;
+    let before: { accountId: string; muted: boolean };
+    try {
+      before = await studioRequest("content", `${creatorId}/mute`);
+    } catch (failure) {
+      if (generation === loading.current) {
+        setContent(null);
+        setReplies([]);
+        setThanks(null);
+        setViewer(null);
+        resetInputs();
+        setError((failure as Error).message);
+      }
+      return;
+    }
+
     const results = await Promise.allSettled([
       studioRequest<ContentView>("content", `${creatorId}/${contentId}`),
       studioRequest<Thanks | null>(
@@ -67,8 +91,16 @@ export function FanContent({
         }
         return { ...page, items };
       })(),
-      studioRequest<{ muted: boolean }>("content", `${creatorId}/mute`),
+      Promise.resolve(before),
     ]);
+    try {
+      results[3] = {
+        status: "fulfilled",
+        value: await studioRequest("content", `${creatorId}/mute`),
+      };
+    } catch (reason) {
+      results[3] = { status: "rejected", reason };
+    }
     if (generation !== loading.current) return;
     if (
       results.some(
@@ -93,6 +125,24 @@ export function FanContent({
     }
 
     const [view, mine, page, pref] = results;
+    if (
+      pref.status !== "fulfilled" ||
+      before.accountId !== pref.value.accountId
+    ) {
+      setContent(null);
+      setReplies([]);
+      setThanks(null);
+      setViewer(null);
+      resetInputs();
+      setError("The signed-in account changed. Refresh before continuing.");
+      return;
+    }
+    if (observedViewer.current !== before.accountId) {
+      resetInputs();
+      depth.current = 1;
+      observedViewer.current = before.accountId;
+    }
+    setViewer(before.accountId);
     setContent(view.status === "fulfilled" ? view.value : null);
     if (mine.status === "fulfilled") {
       setThanks(mine.value);
@@ -112,7 +162,7 @@ export function FanContent({
     if (pref.status === "fulfilled") setMuted(pref.value.muted);
     const failure = results.find((r) => r.status === "rejected");
     setError(failure?.status === "rejected" ? failure.reason.message : "");
-  }, [creatorId, contentId]);
+  }, [creatorId, contentId, resetInputs]);
   useEffect(() => {
     void load();
     const refresh = () => {
@@ -142,13 +192,18 @@ export function FanContent({
       setBusy(false);
     }
   };
+  const contentMutation = <T,>(path: string, body: unknown) => {
+    if (!viewer)
+      throw new Error("Refresh your current account before sending.");
+    return studioRequest<T>("content", path, body, viewer);
+  };
   const consent = (
     reply: PrivateNoteReply,
     shareText: boolean,
     showHandle: boolean,
   ) =>
     act(() =>
-      studioRequest("content", `${creatorId}/replies/${reply.id}/consent`, {
+      contentMutation(`${creatorId}/replies/${reply.id}/consent`, {
         version: reply.consent.version,
         shareText,
         showHandle,
@@ -157,7 +212,7 @@ export function FanContent({
     );
   const saveThanks = (withdrawn = false) =>
     act(async () => {
-      await studioRequest("content", `${creatorId}/thanks`, {
+      await contentMutation(`${creatorId}/thanks`, {
         targetKind: "content",
         targetId: contentId,
         text: withdrawn ? "" : thanksText,
@@ -198,7 +253,6 @@ export function FanContent({
                   ? new Date(content.publishedAt).toLocaleString()
                   : ""
               }
-              audienceSize={content.audienceCount ?? undefined}
               signedActId={content.signedActId ?? undefined}
               reply={false}
             >
@@ -225,9 +279,14 @@ export function FanContent({
               <p>{content.audienceLabel}</p>
             </article>
           )}
+          {content.audienceCount != null && (
+            <p className="qv-help">Audience size · {content.audienceCount}</p>
+          )}
           {content.displayText !== content.document.text && (
             <details>
-              <summary>Signed original</summary>
+              <summary>
+                {content.signedActId ? "Signed original" : "Original text"}
+              </summary>
               <p className="w5-content-text">{content.document.text}</p>
             </details>
           )}
@@ -258,11 +317,10 @@ export function FanContent({
               onSubmit={(e) => {
                 e.preventDefault();
                 void act(async () => {
-                  await studioRequest(
-                    "content",
-                    `${creatorId}/${contentId}/replies`,
-                    { text, idempotencyKey: crypto.randomUUID() },
-                  );
+                  await contentMutation(`${creatorId}/${contentId}/replies`, {
+                    text,
+                    idempotencyKey: crypto.randomUUID(),
+                  });
                   setText("");
                 });
               }}
@@ -327,8 +385,7 @@ export function FanContent({
                 disabled={busy}
                 onClick={() =>
                   void act(() =>
-                    studioRequest(
-                      "content",
+                    contentMutation(
                       `${creatorId}/replies/${reply.id}/withdraw`,
                       {
                         version: reply.version,
@@ -360,7 +417,7 @@ export function FanContent({
         disabled={busy}
         onClick={() =>
           void act(() =>
-            studioRequest("content", `${creatorId}/mute`, { muted: !muted }),
+            contentMutation(`${creatorId}/mute`, { muted: !muted }),
           )
         }
       >

@@ -34,7 +34,14 @@ export class StudioService {
           [actor.accountId],
         )
       ).rows;
-      return { creators, invitations, serverTime: new Date().toISOString() };
+      return {
+        creators: creators.map((row) => ({
+          ...row,
+          viewerAccountId: actor.accountId,
+        })),
+        invitations,
+        serverTime: new Date().toISOString(),
+      };
     });
   }
   async acceptInvitation(actor: Actor, id: string) {
@@ -133,6 +140,9 @@ export class StudioService {
         )
       ).rows;
       return {
+        audienceCountsAvailable: Boolean(
+          this.content.dependencies.audienceCount,
+        ),
         tiers: tiers.map((t) => ({ id: t.id, name: t.name })),
         groups: tiers.flatMap((t) =>
           (t.catalog.contentGroups ?? []).map((id: string) => ({
