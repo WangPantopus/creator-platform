@@ -51,7 +51,9 @@
     "docs/workstreams/handoffs/W2-creator-ai-resume.md",
     "docs/workstreams/handoffs/W2-creator-ai.md",
     "docs/workstreams/status/W2.md",
-    "packages/api/src/agent/contracts.ts"
+    "packages/api/src/agent/contracts.ts",
+    "artifacts/workstreams/W2/handoff/20260929/resource-cleanup.md",
+    "artifacts/workstreams/W2/handoff/20260929/resource-cleanup.json"
   ],
   "referenceDocuments": [
     "AGENTS.md",

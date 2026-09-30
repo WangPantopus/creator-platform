@@ -77,9 +77,9 @@ The actual Sources screenshot uses the reference1280×900 dimensions, sidebar248
 
 Screens have pending/unconfigured synthetic content instead of fabricated populated reference facts. Development banner and missing-state forms alter heights; DG-W2-01–05 composition and exact populated-reference acceptance remain open. 200% text, screen readers, runtime reduced motion and offline/reconnect were not verified. Later Night Style inspection timed out in browser control and is not claimed. Temporary viewport was restored at the earlier checkpoint. A later desktop1280×900 override was used for Night Style inspection; final reset attempts timed out even after reconnecting browser control. Final viewport cleanup could not be confirmed, and browser control cannot currently establish more acceptance evidence.
 
-## How to resume the current isolated runtime
+## Historical launch commands — resources subsequently released
 
-The existing isolated DB/container and copied web app are preserved. Do not reset them or migrate peer databases. Start the container if stopped:
+The founder subsequently requested cleanup. W2 web was stopped and the isolated runtime/build copies, interrupted cache and temporary files were removed. Docker engine is unavailable and the targeted container deletion timed out; DB/container availability and image/storage cleanup are unverified. See [cleanup](../../handoff/20260929/resource-cleanup.md) and the updated handoff/resume instructions. Commands below describe the earlier checkpoint and require fresh reservations, supported Docker recovery and reviewed reprovisioning; they are not immediate resume commands. Historical container start:
 
     docker start creator-platform-w2-20260929
 
