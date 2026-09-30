@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Post-handoff resource release:** [PR #7](https://github.com/WangPantopus/creator-platform/pull/7) targets main. At the user's request, W8 servers/devices/builds/private caches/temp credentials are released; the former leases below are historical. Read the [resource-release record](../../../artifacts/workstreams/W8/handoff/20260929/resource-release.md) and receipt before recreating isolated resources. Docker cleanup remains blocked by Docker Desktop503; current DB state/volumes were not deleted. The complete resume prompt and all original remaining work still apply.
+
 Continuation authority: [full W8 handoff](../handoffs/W8.md) and [next-agent prompt](../handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
 
 Current checkpoint:2026-09-29 PDT / 2026-09-30 UTC. W8 personally implemented and verified its work; research help is read-only. This does not grant an edit lease over another owner's files.

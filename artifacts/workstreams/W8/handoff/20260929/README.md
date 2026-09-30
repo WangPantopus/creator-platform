@@ -1,5 +1,7 @@
 # W8 handoff checkpoint
 
+Latest state after the user requested cleanup: [resource release](resource-release.md), [verified receipt](resource-release.json), and [draft PR #7](https://github.com/WangPantopus/creator-platform/pull/7). W8 servers/devices/build/cache paths are released; Docker cleanup is blocked by global service503. The older current-state/source manifest below describe the original checkpoint and are retained unchanged.
+
 Prepared2026-09-29 America/Los_Angeles. [Full handoff](../../../../../docs/workstreams/handoffs/W8.md), [paste-ready resume prompt](../../../../../docs/workstreams/handoffs/W8-resume-prompt.md), [original brief](../../../../../docs/workstreams/W8-trust-release.md), [original execution prompt](../../../../../docs/workstreams/prompts/W8-trust-release.md).
 
 [current-state.json](current-state.json) records actual handoff liveness200/readiness503 with database unavailable, resource existence and late W1 source fixes requiring W8 personal acceptance. The earlier [trust run](../../trust/20260929-local/README.md) contains actual earlier browser/API/native/build/migration/recovery/load evidence with its own scope limits. No new test code or new authenticated client acceptance was performed during the handoff pass. Latest backend typecheck passed; owned document formatting/local-link checks and snapshot checks are recorded in [handoff-checks.json](handoff-checks.json).

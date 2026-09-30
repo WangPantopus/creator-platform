@@ -1,5 +1,7 @@
 # Trust operation and recovery
 
+After handoff the user authorized releasing W8 servers/devices/builds/private caches. The former simulator UUID and AVD below are deleted, copies/outputs removed, and port leases released. Read the [release receipt](../../artifacts/workstreams/W8/handoff/20260929/resource-release.md); reserve fresh isolated resources and update launch destinations before using these historical commands. Docker service503 blocks container/image cleanup.
+
 Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
 
 W8 personally owns this implementation. No commands below target Pantopus databases or devices. Full production integration remains gated; local synthetic actors are not identity/provider evidence.
