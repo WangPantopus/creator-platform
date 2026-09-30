@@ -89,6 +89,27 @@ export const ConversationPageSchema = z.strictObject({
   unavailableReason: z.string().nullable(),
 });
 export type ConversationPage = z.infer<typeof ConversationPageSchema>;
+export const ConversationAccountPageSchema = z.strictObject({
+  fan: z.strictObject({
+    id: IdSchema,
+    handle: z.string(),
+    intro: z.string().nullable(),
+  }),
+  threads: z
+    .array(
+      z.strictObject({
+        id: IdSchema,
+        creatorId: IdSchema,
+        fanId: IdSchema,
+        name: z.string(),
+      }),
+    )
+    .max(50),
+  nextCursor: IdSchema.nullable(),
+});
+export type ConversationAccountPage = z.infer<
+  typeof ConversationAccountPageSchema
+>;
 export const TeamReplySchema = z.strictObject({
   text: z.string().trim().min(1).max(10000),
   idempotencyKey: z.string().min(8).max(128),

@@ -13,6 +13,7 @@ import { conversationSocketTickets } from "./realtime-tickets.js";
 import type { ConversationAllowance } from "./allowance.js";
 import type { ProviderPolicy } from "../../../../../packages/api/src/conversation/contracts.js";
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
+import type { CommerceService } from "../commerce/service.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -22,6 +23,7 @@ export function createConversationRuntime(input: {
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
+  firstConversation?: Pick<CommerceService, "openTrial">;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
@@ -69,6 +71,7 @@ export function createConversationRuntime(input: {
     conversationSocketTickets,
     input.citation,
     wellbeing,
+    input.firstConversation,
   );
   return {
     feature,
