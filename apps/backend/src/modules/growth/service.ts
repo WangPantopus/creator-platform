@@ -104,7 +104,7 @@ export class GrowthService {
         q,
         `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
         cat,
-        Math.min(Math.max(offset, 0), 1000),
+        z.int().min(0).max(1000).parse(offset),
       ],
     );
     return {
@@ -340,7 +340,7 @@ export class GrowthService {
   async revokeDevice(actor: Actor, id: string) {
     await this.db.actor(actor, null, async (client) => {
       await client.query(
-        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND installation_id=$2",
+        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND (id=$2 OR installation_id=$2)",
         [actor.accountId, id],
       );
     });
@@ -444,6 +444,10 @@ export class GrowthService {
         );
     }
     return this.db.actor(actor, creatorId, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.invites:${actor.accountId}`],
+      );
       const count = await client.query(
         "SELECT count(*)::int AS count FROM growth.invite WHERE created_by=$1 AND expires_at>now() AND revoked_at IS NULL",
         [actor.accountId],
@@ -839,6 +843,8 @@ export class GrowthService {
         "share",
         "metric",
         "feedback",
+        "prompt_choice",
+        "entry_attribution",
       ]) {
         if (table === "notification")
           await client.query(
@@ -884,11 +890,24 @@ export class GrowthService {
         "metric",
         "invite",
         "follow",
+        "entry_attribution",
       ])
         await client.query(
           `DELETE FROM growth.${table} WHERE creator_id=ANY($1::uuid[])`,
           [ownedCreatorIds],
         );
+      await client.query(
+        "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+        [accountId],
+      );
+      await client.query(
+        "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
+        [ownedCreatorIds],
+      );
+      await client.query(
+        "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",
+        [ownedCreatorIds],
+      );
       await client.query(
         "DELETE FROM growth.delivery USING growth.notification n WHERE growth.delivery.notification_id=n.id AND n.creator_id=ANY($1::uuid[])",
         [ownedCreatorIds],

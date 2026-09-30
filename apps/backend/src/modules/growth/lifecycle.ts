@@ -80,6 +80,8 @@ export function growthPrivacyHook(
             "share",
             "metric",
             "feedback",
+            "prompt_choice",
+            "entry_attribution",
           ])
             result[table] = await collect(table, "account_id", input.accountId);
           result.invites = await collect(

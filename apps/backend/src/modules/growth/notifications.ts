@@ -212,6 +212,12 @@ export class Notifications {
         state: await this.owners.notificationState(event, recipient),
       })),
     );
+    if (states.some(({ state }) => state.retryable))
+      throw new DomainError(
+        "notification_owner_unconfigured",
+        "The current notification owner must be connected before consuming this event.",
+        503,
+      );
     return this.db.transaction(this.db.worker, async (client) => {
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
@@ -302,6 +308,7 @@ export class Notifications {
         );
         if (!recipient) throw new Error("recipient_missing");
         const state = await this.owners.notificationState(event, recipient);
+        if (state.retryable) throw new Error("notification_owner_unconfigured");
         const prefs = (notification.preference ??
           defaultPreferences) as NotificationPreferences;
         const channel = job.channel as "push" | "email";
@@ -431,6 +438,8 @@ export class Notifications {
           }
           const state = await this.owners.notificationState(event, recipient),
             prefs = Preferences.parse(row.preference ?? defaultPreferences);
+          if (state.retryable)
+            throw new Error("notification_owner_unconfigured");
           if (
             !state.available ||
             !state.authorized ||
@@ -534,6 +543,12 @@ export class Notifications {
       );
       if (!recipient) continue;
       const state = await this.owners.notificationState(event, recipient);
+      if (state.retryable)
+        throw new DomainError(
+          "notification_owner_unconfigured",
+          "The update owner is temporarily unavailable.",
+          503,
+        );
       if (!state.authorized) continue;
       const current = state.available ? present(event.type, state) : null;
       output.push({
