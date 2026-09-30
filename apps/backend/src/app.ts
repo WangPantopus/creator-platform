@@ -68,6 +68,7 @@ export function createApp(
     res.setHeader("Cache-Control", "no-store");
     next();
   });
+  app.use("/v1/agent", express.json({ limit: "1100kb" }));
   app.use(express.json({ limit: "64kb" }));
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {

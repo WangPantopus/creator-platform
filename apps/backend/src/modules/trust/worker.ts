@@ -154,6 +154,7 @@ export class TrustWorker {
           creatorId: task.creator_id,
           threadId: task.thread_id,
           idempotencyKey: `${task.job_id}:${task.domain}`,
+          leaseToken: task.lease_token,
         }),
         45_000,
       );
@@ -246,6 +247,7 @@ export class TrustWorker {
           actorAccountId: effect.actor_account_id,
           ...effect.input,
           idempotencyKey: effect.id,
+          leaseToken: effect.lease_token,
         }),
         45_000,
       );
