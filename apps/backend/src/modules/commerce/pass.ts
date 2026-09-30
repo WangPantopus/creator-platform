@@ -21,6 +21,7 @@ export interface PassPeriodVerifier {
   current(actor: Actor, reference: string): Promise<VerifiedPassPeriod>;
 }
 export type PassRoster = Readonly<{ creatorIds: readonly string[] }>;
+type SlotChoice = { id: string; creator_id: string; position: number };
 /** Roster gate controls release, while provider truth controls each paid cycle. */
 export class PassCommerce {
   get configured() {
@@ -90,6 +91,13 @@ export class PassCommerce {
         paid.endsAt.getUTCMinutes() === 0 &&
         paid.endsAt.getUTCSeconds() === 0 &&
         paid.endsAt.getUTCMilliseconds() === 0 &&
+        paid.endsAt.getTime() ===
+          Date.UTC(
+            paid.startsAt.getUTCFullYear(),
+            paid.startsAt.getUTCMonth() + 1,
+            1,
+          ) &&
+        paid.startsAt <= new Date() &&
         Number.isSafeInteger(paid.allowance) &&
         paid.allowance >= 0 &&
         Number.isSafeInteger(paid.slotCapacity) &&
@@ -111,7 +119,7 @@ export class PassCommerce {
       );
       const previous = (
         await client.query(
-          "SELECT * FROM creator.commerce_pass WHERE fan_id=$1 FOR UPDATE",
+          "SELECT *,cycle_start::text AS cycle_key,cycle_end::text AS cycle_end_key FROM creator.commerce_pass WHERE fan_id=$1 FOR UPDATE",
           [fan.id],
         )
       ).rows[0];
@@ -122,13 +130,31 @@ export class PassCommerce {
         "pass_truth_stale",
         "The pass changed while checking the purchase. Fetch its current period again.",
       );
+      const cycle = paid.startsAt.toISOString().slice(0, 7) + "-01";
+      const cycleEnd = paid.endsAt.toISOString().slice(0, 10);
+      const previousEnd = previous
+        ? new Date(`${previous.cycle_end_key}T00:00:00.000Z`)
+        : undefined;
+      invariant(
+        !previousEnd || paid.endsAt >= previousEnd,
+        "pass_truth_stale",
+        "An older pass period cannot replace the current one. Fetch its current period again.",
+      );
+      invariant(
+        !previous ||
+          cycleEnd !== previous.cycle_end_key ||
+          (cycle === previous.cycle_key &&
+            paid.allowance === previous.allowance &&
+            paid.slotCapacity === previous.slot_capacity),
+        "pass_period_conflict",
+        "The purchased pass terms changed within the same period. Reconcile the original purchase before changing access.",
+      );
       invariant(
         !previous?.provider_ref ||
           previous.provider_ref === reference ||
           (paid.replacesReference === previous.provider_ref &&
-            (previous.state === "refunded" ||
-              new Date(previous.cycle_end) <= new Date()) &&
-            paid.startsAt >= new Date(previous.cycle_end)),
+            (previous.state === "refunded" || previousEnd! <= new Date()) &&
+            paid.startsAt >= previousEnd!),
         "pass_link_conflict",
         "The pass is linked to another purchase.",
       );
@@ -137,7 +163,7 @@ export class PassCommerce {
           previous.state !== "refunded" ||
           previous.provider_ref !== reference ||
           paid.state === "refunded" ||
-          paid.startsAt >= new Date(previous.cycle_end),
+          paid.startsAt >= previousEnd!,
         "refunded_period_conflict",
         "A refunded pass period cannot restore access.",
       );
@@ -160,7 +186,6 @@ export class PassCommerce {
           );
         }
       }
-      const cycle = paid.startsAt.toISOString().slice(0, 7) + "-01";
       const active =
         ["active", "cancelled"].includes(paid.state) &&
         paid.startsAt <= new Date() &&
@@ -179,7 +204,7 @@ export class PassCommerce {
                 : "pending",
             paid.slotCapacity,
             cycle,
-            paid.endsAt.toISOString().slice(0, 10),
+            cycleEnd,
             paid.allowance,
             reference,
             paid.cancelAtEnd,
@@ -206,106 +231,87 @@ export class PassCommerce {
         "pass_link_conflict",
         "This pass purchase belongs to another account.",
       );
-      if (!active) {
-        await this.endSlots(client, pass.id, fan.id);
-        return { state: pass.state, cycleEnd: paid.endsAt };
+      const newPeriod = !previous || cycleEnd !== previous.cycle_end_key;
+      let selected: SlotChoice[];
+      let carryForward: boolean | undefined;
+      if (newPeriod) {
+        const current = (
+          await client.query<SlotChoice>(
+            "SELECT DISTINCT ON(position) id,creator_id,position FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('active','ended_readable','replaced') AND starts_at<=now() AND position<$3 ORDER BY position,starts_at DESC,id DESC",
+            [pass.id, previous?.cycle_key ?? cycle, paid.slotCapacity],
+          )
+        ).rows;
+        const draft = (
+          await client.query<SlotChoice>(
+            "SELECT id,creator_id,position FROM creator.commerce_pass_slot WHERE pass_id=$1 AND state='draft_next' AND cycle_start=$2 ORDER BY position FOR UPDATE",
+            [pass.id, cycle],
+          )
+        ).rows;
+        carryForward = draft.length !== paid.slotCapacity;
+        selected = carryForward ? current : draft;
+        await this.endSlots(client, pass.id, fan.id, true);
+        // Persist even failed/refunded renewal periods. Otherwise a later
+        // stale active result could revive that refund as a new paid cycle.
+        await client.query(
+          "UPDATE creator.commerce_pass SET cycle_start=$2,cycle_end=$3,allowance=$4,slot_capacity=$5,used=0,reserved=0 WHERE id=$1",
+          [pass.id, cycle, cycleEnd, paid.allowance, paid.slotCapacity],
+        );
+      } else {
+        selected = (
+          await client.query<SlotChoice>(
+            "SELECT DISTINCT ON(position) id,creator_id,position FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('draft_next','ended_readable','replaced') AND starts_at<=now() AND position<$3 ORDER BY position,CASE WHEN state='draft_next' THEN 0 ELSE 1 END,starts_at DESC,id DESC",
+            [pass.id, cycle, paid.slotCapacity],
+          )
+        ).rows;
       }
-      if (
-        !this.service.policy.passEnabled ||
-        !this.service.policy.costAllowanceIntegrated ||
-        !this.roster
-      ) {
+      const accessAvailable = active && this.configured;
+      if (!accessAvailable) {
         await this.endSlots(client, pass.id, fan.id);
+        if (newPeriod)
+          // Keep the chosen roster without issuing a grant or counting
+          // unfunded time. A same-period recovery consumes these choices.
+          for (const slot of selected)
+            await client.query(
+              "INSERT INTO creator.commerce_pass_slot(pass_id,fan_id,creator_id,cycle_start,position,state,starts_at,ends_at) VALUES($1,$2,$3,$4,$5,'draft_next',$6,$7)",
+              [
+                pass.id,
+                fan.id,
+                slot.creator_id,
+                cycle,
+                slot.position,
+                paid.startsAt,
+                paid.endsAt,
+              ],
+            );
         return {
           state: pass.state,
           cycleEnd: paid.endsAt,
           accessAvailable: false,
         };
       }
-      if (
-        previous &&
-        new Date(previous.cycle_end).getTime() ===
-          Date.parse(paid.endsAt.toISOString().slice(0, 10))
-      ) {
-        {
-          const ended = (
-            await client.query(
-              "SELECT DISTINCT ON(position) * FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('ended_readable','replaced') AND starts_at<now() ORDER BY position,starts_at DESC,id DESC",
-              [pass.id, cycle],
-            )
-          ).rows;
-          for (const slot of ended) {
-            const duplicate = await client.query(
-              "SELECT id FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND position=$3 AND state='active'",
-              [pass.id, cycle, slot.position],
-            );
-            if (duplicate.rowCount) continue;
-            if (await this.available(client, slot.creator_id, fan.id))
-              await this.activate(
-                client,
-                pass.id,
-                fan.id,
-                slot.creator_id,
-                slot.position,
-                cycle,
-                new Date(),
-                paid.endsAt,
-                previous.allowance,
-                slot.id,
-              );
-            else
-              await client.query(
-                "INSERT INTO creator.commerce_pass_slot(pass_id,fan_id,creator_id,cycle_start,position,state,starts_at,ends_at,replacement_of) VALUES($1,$2,$3,$4,$5,'active',now(),$6,$7)",
-                [
-                  pass.id,
-                  fan.id,
-                  slot.creator_id,
-                  cycle,
-                  slot.position,
-                  paid.endsAt,
-                  slot.id,
-                ],
-              );
-          }
-        }
-        return { state: pass.state, cycleEnd: paid.endsAt };
-      }
-      const current = (
-        await client.query(
-          "SELECT DISTINCT ON(position) * FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('active','ended_readable','replaced') AND starts_at<now() ORDER BY position,starts_at DESC,id DESC",
-          [pass.id, previous?.cycle_start ?? cycle],
-        )
-      ).rows;
-      const draft = (
-        await client.query(
-          "SELECT * FROM creator.commerce_pass_slot WHERE pass_id=$1 AND state='draft_next' AND cycle_start=$2 ORDER BY position FOR UPDATE",
-          [pass.id, cycle],
-        )
-      ).rows;
-      const selected = draft.length === paid.slotCapacity ? draft : current;
-      await this.endSlots(client, pass.id, fan.id, true);
       await client.query(
-        "UPDATE creator.commerce_pass SET cycle_start=$2,cycle_end=$3,allowance=$4,slot_capacity=$5,used=0,reserved=0 WHERE id=$1",
-        [
-          pass.id,
-          cycle,
-          paid.endsAt.toISOString().slice(0, 10),
-          paid.allowance,
-          paid.slotCapacity,
-        ],
+        "UPDATE creator.commerce_pass_slot SET state='ended_readable',ends_at=starts_at+interval '1 microsecond' WHERE pass_id=$1 AND cycle_start=$2 AND state='draft_next'",
+        [pass.id, cycle],
       );
+      const startsAt = newPeriod ? paid.startsAt : new Date();
       for (const slot of selected) {
+        const duplicate = await client.query(
+          "SELECT id FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND position=$3 AND state='active'",
+          [pass.id, cycle, slot.position],
+        );
+        if (duplicate.rowCount) continue;
         if (!(await this.available(client, slot.creator_id, fan.id))) {
           await client.query(
-            "INSERT INTO creator.commerce_pass_slot(pass_id,fan_id,creator_id,cycle_start,position,state,starts_at,ends_at) VALUES($1,$2,$3,$4,$5,'active',$6,$7)",
+            "INSERT INTO creator.commerce_pass_slot(pass_id,fan_id,creator_id,cycle_start,position,state,starts_at,ends_at,replacement_of) VALUES($1,$2,$3,$4,$5,'active',$6,$7,$8)",
             [
               pass.id,
               fan.id,
               slot.creator_id,
               cycle,
               slot.position,
-              paid.startsAt,
+              startsAt,
               paid.endsAt,
+              slot.id,
             ],
           );
           continue;
@@ -317,15 +323,16 @@ export class PassCommerce {
           slot.creator_id,
           slot.position,
           cycle,
-          paid.startsAt,
+          startsAt,
           paid.endsAt,
           paid.allowance,
+          slot.id,
         );
       }
       return {
         state: pass.state,
         cycleEnd: paid.endsAt,
-        carryForward: draft.length !== paid.slotCapacity,
+        ...(carryForward === undefined ? {} : { carryForward }),
       };
     });
   }
@@ -350,7 +357,7 @@ export class PassCommerce {
         async () => {
           const pass = (
             await client.query(
-              "SELECT * FROM creator.commerce_pass WHERE state IN('active','cancelled') AND cycle_end>now() FOR UPDATE",
+              "SELECT *,cycle_start::text AS cycle_start,cycle_end::text AS cycle_end FROM creator.commerce_pass WHERE state IN('active','cancelled') AND cycle_end>now() FOR UPDATE",
             )
           ).rows[0];
           invariant(
@@ -360,7 +367,7 @@ export class PassCommerce {
           );
           const existing = (
             await client.query(
-              "SELECT position,creator_id FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('active','replaced','ended_readable')",
+              "SELECT position,creator_id FROM creator.commerce_pass_slot WHERE pass_id=$1 AND cycle_start=$2 AND state IN('active','draft_next','replaced','ended_readable')",
               [pass.id, pass.cycle_start],
             )
           ).rows;
@@ -423,7 +430,7 @@ export class PassCommerce {
         async () => {
           const pass = (
             await client.query(
-              "SELECT * FROM creator.commerce_pass WHERE state IN('active','cancelled') AND cycle_end>now() FOR UPDATE",
+              "SELECT *,cycle_start::text AS cycle_start,cycle_end::text AS cycle_end FROM creator.commerce_pass WHERE state IN('active','cancelled') AND cycle_end>now() FOR UPDATE",
             )
           ).rows[0];
           invariant(
@@ -444,7 +451,7 @@ export class PassCommerce {
               "Choose an available creator whose AI is not already included.",
             );
           await client.query(
-            "UPDATE creator.commerce_pass_slot SET state='ended_readable' WHERE pass_id=$1 AND state='draft_next'",
+            "UPDATE creator.commerce_pass_slot SET state='ended_readable',ends_at=starts_at+interval '1 microsecond' WHERE pass_id=$1 AND state='draft_next'",
             [pass.id],
           );
           const start = new Date(pass.cycle_end);
@@ -491,7 +498,7 @@ export class PassCommerce {
         );
     }
     await client.query(
-      "UPDATE creator.commerce_pass_slot SET state='ended_readable',ends_at=greatest(starts_at+interval '1 microsecond',least(ends_at,now())) WHERE pass_id=$1 AND (state='active' OR ($2 AND state='draft_next'))",
+      "UPDATE creator.commerce_pass_slot SET ends_at=CASE WHEN state='draft_next' THEN starts_at+interval '1 microsecond' ELSE greatest(starts_at+interval '1 microsecond',least(ends_at,now())) END,state='ended_readable' WHERE pass_id=$1 AND (state='active' OR ($2 AND state='draft_next'))",
       [passId, includeDraft],
     );
   }
@@ -580,7 +587,7 @@ export class PassCommerce {
           );
           const slot = (
             await client.query(
-              "SELECT s.*,p.allowance,p.version AS pass_version,p.cycle_end,p.state AS pass_state FROM creator.commerce_pass_slot s JOIN creator.commerce_pass p ON p.id=s.pass_id WHERE s.id=$1 AND s.pass_id=$2 AND s.state='active' FOR UPDATE OF s",
+              "SELECT s.*,s.cycle_start::text AS cycle_start,p.allowance,p.version AS pass_version,p.cycle_end::text AS cycle_end,p.state AS pass_state FROM creator.commerce_pass_slot s JOIN creator.commerce_pass p ON p.id=s.pass_id WHERE s.id=$1 AND s.pass_id=$2 AND s.state='active' FOR UPDATE OF s",
               [slotId, owner.id],
             )
           ).rows[0];

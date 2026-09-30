@@ -262,11 +262,12 @@ struct CommerceFeature: View {
             Text("Your pass").qText("display-md")
             if !data.policy.passEnabled { EmptyState(title: "Pass is unavailable", body: "Memberships are the current way to deepen access. The pass is not open yet.") }
             if data.policy.passEnabled, let pass = data.pass.first {
+                let current = ["active", "cancelled"].contains(pass.state) && (instant(String(pass.cycle_end.prefix(10)) + "T00:00:00Z") ?? .distantPast) > accessNow
                 Text("\(pass.used + pass.reserved) of \(pass.allowance) shared AI cost units used or reserved.").qText("body")
                 ForEach(data.passChoices.creators) { candidate in Toggle(candidate.display_name, isOn: Binding(get: { selectedPassCreators.contains(candidate.id) }, set: { enabled in if enabled { selectedPassCreators.insert(candidate.id) } else { selectedPassCreators.remove(candidate.id) } })).qText("body") }
-                let occupied = Set(data.slots.filter { $0.cycle_start == pass.cycle_start && ["active","ended_readable","replaced"].contains($0.state) }.map(\.position)).count
-                if occupied < pass.slot_capacity { Button("Fill available slots", variant: .secondary, block: true, disabled: busy || selectedPassCreators.isEmpty || selectedPassCreators.count > pass.slot_capacity - occupied) { Task { await mutate("pass/initial", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your current choices are saved.") } } }
-                Button("Save next month’s choices", variant: .secondary, block: true, disabled: busy || selectedPassCreators.count > pass.slot_capacity) { Task { await mutate("pass/draft", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your next-month draft is saved.") } }
+                let occupied = Set(data.slots.filter { $0.cycle_start == pass.cycle_start && ["active","draft_next","ended_readable","replaced"].contains($0.state) }.map(\.position)).count
+                if occupied < pass.slot_capacity { Button("Fill available slots", variant: .secondary, block: true, disabled: busy || !current || selectedPassCreators.isEmpty || selectedPassCreators.count > pass.slot_capacity - occupied) { Task { await mutate("pass/initial", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your current choices are saved.") } } }
+                Button("Save next month’s choices", variant: .secondary, block: true, disabled: busy || !current || selectedPassCreators.count > pass.slot_capacity) { Task { await mutate("pass/draft", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your next-month draft is saved.") } }
                 Text("Complete all \(pass.slot_capacity) choices. An incomplete draft carries forward your current selection.").qText("caption")
             }
             ForEach(data.slots) { slot in panel {

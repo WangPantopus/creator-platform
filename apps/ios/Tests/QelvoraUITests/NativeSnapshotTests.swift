@@ -11,6 +11,17 @@
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
     }
+    private var captureColorSpace: NSColorSpace {
+      // All 110 original references have the same embedded profile. Use its
+      // encoding metadata, never its pixels, so strict comparisons do not
+      // inherit whichever display happens to be attached to the test host.
+      let reference = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png")
+      guard let data = try? Data(contentsOf: reference),
+        let representation = NSBitmapImageRep(data: data)
+      else { return .sRGB }
+      return representation.colorSpace
+    }
 
     func testWelcomeThemes() async {
       for (name, scheme) in [("light", ColorScheme.light), ("night", ColorScheme.dark)] {
@@ -76,17 +87,28 @@
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
-      // Device RGB inherits the attached display profile, which differs between
-      // developer machines and CI. Tokens are defined in sRGB.
-      window.colorSpace = .sRGB
+      let colorSpace = captureColorSpace
+      window.colorSpace = colorSpace
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // The references use 2x pixels. CI's headless screen is 1x; letting
+      // AppKit choose its bitmap size makes every reference incomparable.
+      let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
+        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
+        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+        bytesPerRow: 0, bitsPerPixel: 0
+      )!.retagging(with: colorSpace)!
+      bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let image = NSImage(size: size)
+      image.addRepresentation(bitmap)
       assertSnapshot(
-        of: host as NSView, as: .image(size: size), named: name, record: record, file: file,
+        of: image, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

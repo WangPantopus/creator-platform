@@ -353,7 +353,7 @@ export class CommerceService {
       const pass = fan
         ? (
             await client.query(
-              "SELECT * FROM creator.commerce_pass WHERE fan_id=$1",
+              "SELECT *,cycle_start::text AS cycle_start,cycle_end::text AS cycle_end FROM creator.commerce_pass WHERE fan_id=$1",
               [fan.id],
             )
           ).rows
@@ -361,7 +361,7 @@ export class CommerceService {
       const slots = fan
         ? (
             await client.query(
-              "SELECT s.*,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY cycle_start DESC,position LIMIT 100",
+              "SELECT s.*,s.cycle_start::text AS cycle_start,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY s.cycle_start DESC,position LIMIT 100",
               [fan.id],
             )
           ).rows

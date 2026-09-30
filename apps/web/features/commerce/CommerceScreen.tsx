@@ -1866,12 +1866,15 @@ function CommerceAccountScreen({
               )}
               {screen === "pass" && (
                 <>
-                  {!data.policy.passEnabled ? (
+                  {!data.policy.passEnabled && (
                     <Empty title="The pass is not available yet">
                       Your memberships and existing conversations remain
                       accessible.
                     </Empty>
-                  ) : (
+                  )}
+                  {(data.policy.passEnabled ||
+                    data.pass.length > 0 ||
+                    data.slots.length > 0) && (
                     <>
                       <h2>Your selected creators</h2>
                       {data.pass[0] && (
@@ -1880,9 +1883,23 @@ function CommerceAccountScreen({
                             {data.pass[0].used + data.pass[0].reserved} of{" "}
                             {data.pass[0].allowance} shared AI cost units used
                             or reserved this month. Ends{" "}
-                            {date(data.pass[0].cycle_end)}.
+                            {new Intl.DateTimeFormat(undefined, {
+                              dateStyle: "medium",
+                              timeZone: "UTC",
+                            }).format(
+                              new Date(
+                                `${data.pass[0].cycle_end.slice(0, 10)}T00:00:00.000Z`,
+                              ),
+                            )}
+                            .
                           </p>
-                          <PassChoices data={data} busy={busy} save={command} />
+                          {data.policy.passEnabled && (
+                            <PassChoices
+                              data={data}
+                              busy={busy}
+                              save={command}
+                            />
+                          )}
                         </>
                       )}
                       {data.slots.map((s) => (
@@ -1891,7 +1908,10 @@ function CommerceAccountScreen({
                           <p>
                             {s.state.replaceAll("_", " ")} · {date(s.ends_at)}
                           </p>
-                          {data.passChoices.replaceableSlotIds.includes(s.id) &&
+                          {data.policy.passEnabled &&
+                            data.passChoices.replaceableSlotIds.includes(
+                              s.id,
+                            ) &&
                             data.pass[0] && (
                               <PassReplacement
                                 slotId={s.id}
@@ -2616,12 +2636,17 @@ function PassChoices({
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const pass = data.pass[0]!;
+  const current =
+    ["active", "cancelled"].includes(pass.state) &&
+    Date.parse(`${pass.cycle_end.slice(0, 10)}T00:00:00.000Z`) > Date.now();
   const occupied = new Set(
     data.slots
       .filter(
         (s) =>
           s.cycle_start.slice(0, 10) === pass.cycle_start.slice(0, 10) &&
-          ["active", "ended_readable", "replaced"].includes(s.state),
+          ["active", "draft_next", "ended_readable", "replaced"].includes(
+            s.state,
+          ),
       )
       .map((s) => s.position),
   ).size;
@@ -2650,7 +2675,9 @@ function PassChoices({
       </fieldset>
       {remaining > 0 && (
         <Button
-          disabled={busy || !selected.length || selected.length > remaining}
+          disabled={
+            busy || !current || !selected.length || selected.length > remaining
+          }
           onClick={() =>
             void save("pass/initial", {
               version: pass.version,
@@ -2662,7 +2689,7 @@ function PassChoices({
         </Button>
       )}
       <Button
-        disabled={busy || selected.length > pass.slot_capacity}
+        disabled={busy || !current || selected.length > pass.slot_capacity}
         onClick={() =>
           void save("pass/draft", {
             version: pass.version,
