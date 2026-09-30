@@ -32,5 +32,13 @@
     "name": "Handle Night reference composition",
     "passed": true
   },
-  "remoteCI": "pending publication"
+  "remoteCI": "pending publication",
+  "producerIntegration": {
+    "branchHead": "ada430cf8ff5ddfc98a6b60bcecff2f69620ec24",
+    "producerCommit": "81d92355dadcb808e5332fd409398c3647824b3f",
+    "file": "apps/backend/src/modules/commerce/scheduling.ts",
+    "sha256": "11319a69740826a171b93ff40c97984036696b3b2beb230faccdc25a9d8a11f5",
+    "buildLintFormat": "passed",
+    "runtimeAcceptance": "unverified"
+  }
 }

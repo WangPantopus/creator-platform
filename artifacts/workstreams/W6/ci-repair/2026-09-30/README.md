@@ -28,3 +28,7 @@ Reserved only owned container `creator-platform-w6-ci-20260930`, disposable data
 PR #4 remains the integration vehicle. The GitHub connector authenticates as `wypgitt`; PR metadata writes return HTTP403. Reconnecting an authorized account/app or providing an authorized local GitHub CLI session is needed for PR metadata/merge actions. Git push works. Live PR title/body have not been replaced by the [prepared description](../../../../../docs/workstreams/handoffs/W6-pr-description.md).
 
 W6 remains incomplete: real storage/scanner/C2PA and audience authority, canonical runtime/availability allocation, approved policies, genuine call provider/client SDKs and media producers, physical hardware and full functional acceptance are still required. CI success alone will not close those gates.
+
+## W4 retained authority integration
+
+Fetched current W4 branch `ada430cf8ff5ddfc98a6b60bcecff2f69620ec24`. Its producer commit `81d92355dadcb808e5332fd409398c3647824b3f` adds `CommerceScheduling.retained`; W6 now consumes the exact current producer file without reimplementing its policy. The 49-line addition binds creator/fan/thread/account and a historical capture, permits the producer's retained states, and leaves `current()` as the sole scheduling/join authority. W6 invokes `retained` only for an ended/cancelled, non-revoked call. This supersedes the earlier missing-retained-adapter source gate; genuine post-settlement receipt/consented-summary acceptance remains unverified. Backend production build, source ESLint and formatting pass.
