@@ -131,6 +131,28 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           ),
         ),
       );
+      router.post("/:creatorId/replies/:id/review", async (req, res) => {
+        const p = ids(req);
+        res.json(
+          await service.retryReplyReview(
+            await actorFor(req),
+            p.creatorId,
+            p.id,
+            req.body,
+          ),
+        );
+      });
+      router.post("/:creatorId/replies/:id/read", async (req, res) => {
+        const p = ids(req);
+        res.json(
+          await service.markReplyRead(
+            await actorFor(req),
+            p.creatorId,
+            p.id,
+            req.body,
+          ),
+        );
+      });
       router.post("/:creatorId/replies/:id/consent", async (req, res) => {
         const p = ids(req);
         res.json(

@@ -1,0 +1,22 @@
+{
+  "scope": "Rollback-only manual RLS diagnostic, not publication, safety-provider or signed acceptance",
+  "migration": "0038_w5_reply_review",
+  "database": "creator_w5; own non-owner creator_runtime",
+  "ownFanPendingText": 1,
+  "otherFanPendingText": 0,
+  "creatorPendingText": 0,
+  "creatorReviewMetadata": 1,
+  "diagnosticRowsAfterRollback": 0,
+  "tables": {
+    "content_reply_review": {
+      "rls": true,
+      "force": true
+    },
+    "content_reply_read": {
+      "rls": true,
+      "force": true
+    }
+  },
+  "safetyProvider": "not configured; no paid call or fabricated moderation receipt",
+  "reviewAndReadAPIs": "compiled; actual reviewed/flagged happy path remains producer dependent"
+}

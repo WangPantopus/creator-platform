@@ -1158,6 +1158,9 @@ public struct APIContentReplyList: Codable, Sendable {
 }
 
 public struct APIContentReplyListItemsItem: Codable, Sendable {
+  public let `safetyState`: APIContentReplyListItemsItemSafetyState
+  public let `safetyReviewAvailable`: Bool
+  public let `read`: Bool
   public let `id`: String
   public let `contentId`: String
   public let `fanId`: String
@@ -1167,7 +1170,10 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
   public let `createdAt`: String
   public let `consent`: APIContentReplyListItemsItemConsent
   public let `reaction`: APIContentReplyListItemsItemReaction?
-  public init(id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
+  public init(safetyState: APIContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
+    self.safetyState = safetyState
+    self.safetyReviewAvailable = safetyReviewAvailable
+    self.read = read
     self.id = id
     self.contentId = contentId
     self.fanId = fanId
@@ -1178,6 +1184,12 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
     self.consent = consent
     self.reaction = reaction
   }
+}
+
+public enum APIContentReplyListItemsItemSafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
 }
 
 public struct APIContentReplyListItemsItemConsent: Codable, Sendable {
@@ -1198,6 +1210,62 @@ public struct APIContentReplyListItemsItemReaction: Codable, Sendable {
     self.kind = kind
     self.signedActId = signedActId
   }
+}
+
+public struct APIContentReplyPage: Codable, Sendable {
+  public let `cursor`: String?
+  public let `limit`: Int
+  public let `filter`: APIContentReplyPageFilter
+  public init(cursor: String? = nil, limit: Int, filter: APIContentReplyPageFilter) {
+    self.cursor = cursor
+    self.limit = limit
+    self.filter = filter
+  }
+}
+
+public enum APIContentReplyPageFilter: String, Codable, Sendable {
+  case `all` = "all"
+  case `unread` = "unread"
+  case `reacted` = "reacted"
+  case `flagged` = "flagged"
+}
+
+public struct APIContentReplyReadResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `read`: APIContentReplyReadResultRead
+  public init(id: String, version: Int, read: APIContentReplyReadResultRead) {
+    self.id = id
+    self.version = version
+    self.read = read
+  }
+}
+
+public struct APIContentReplyReadResultRead: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIContentReplyReviewResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `safetyState`: APIContentReplyReviewResultSafetyState
+  public init(id: String, version: Int, safetyState: APIContentReplyReviewResultSafetyState) {
+    self.id = id
+    self.version = version
+    self.safetyState = safetyState
+  }
+}
+
+public enum APIContentReplyReviewResultSafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
 }
 
 public struct APIContentResult: Codable, Sendable {
@@ -1453,6 +1521,9 @@ public struct APIContentWithdrawResultWithdrawn: Codable, Sendable {
 }
 
 public struct APIPrivateNoteReply: Codable, Sendable {
+  public let `safetyState`: APIPrivateNoteReplySafetyState
+  public let `safetyReviewAvailable`: Bool
+  public let `read`: Bool
   public let `id`: String
   public let `contentId`: String
   public let `fanId`: String
@@ -1462,7 +1533,10 @@ public struct APIPrivateNoteReply: Codable, Sendable {
   public let `createdAt`: String
   public let `consent`: APIPrivateNoteReplyConsent
   public let `reaction`: APIPrivateNoteReplyReaction?
-  public init(id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
+  public init(safetyState: APIPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
+    self.safetyState = safetyState
+    self.safetyReviewAvailable = safetyReviewAvailable
+    self.read = read
     self.id = id
     self.contentId = contentId
     self.fanId = fanId
@@ -1473,6 +1547,12 @@ public struct APIPrivateNoteReply: Codable, Sendable {
     self.consent = consent
     self.reaction = reaction
   }
+}
+
+public enum APIPrivateNoteReplySafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
 }
 
 public struct APIPrivateNoteReplyConsent: Codable, Sendable {
@@ -3237,8 +3317,14 @@ public actor CreatorAPIClient {
   public func archiveContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentResult {
     try await request("/v1/content/\(segment(creatorId))/\(segment(id))/archive", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
   }
-  public func replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = nil) async throws -> APIContentRevisionResult {
+  public func replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = nil) async throws -> APIContentReplyReviewResult {
     try await request("/v1/content/\(segment(creatorId))/\(segment(id))/replies", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentReplyReview(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentReplyReviewResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/review", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentReplyRead(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentReplyReadResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/read", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
   }
   public func studioThreadEntries(creatorId: String, query: [String: String] = [:]) async throws -> APIStudioThreadEntries {
     try await request("/v1/studio/\(segment(creatorId))/threads", method: "GET", query: query, authenticated: true)

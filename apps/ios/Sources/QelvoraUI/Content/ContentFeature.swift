@@ -5,7 +5,7 @@ private struct ContentDocumentView: Decodable, Sendable { let kind: String; let 
 private struct ContentViewValue: Decodable, Sendable { let id: String; let creatorName: String; let displayText: String; let teamMember: String?; let authorLabel: String; let audienceLabel: String; let audienceCount: Int?; let signedActId: String?; let publishedAt: String?; let document: ContentDocumentView; let quotedText: String?; let quotedHandle: String? }
 private struct ContentReaction: Decodable, Sendable { let kind: String; let signedActId: String }
 private struct ContentConsent: Decodable, Sendable { let shareText: Bool; let showHandle: Bool; let version: Int }
-private struct ContentReply: Decodable, Identifiable, Sendable { let id: String; let contentId: String; let version: Int; let text: String; let createdAt: String; let consent: ContentConsent; let reaction: ContentReaction? }
+private struct ContentReply: Decodable, Identifiable, Sendable { let safetyState:String?; let safetyReviewAvailable:Bool?; let id: String; let contentId: String; let version: Int; let text: String; let createdAt: String; let consent: ContentConsent; let reaction: ContentReaction? }
 private struct ContentReplyPage: Decodable, Sendable { let items: [ContentReply]; let nextCursor: String? }
 private struct ContentThanks: Decodable, Sendable { let version: Int; let text: String; let shareWithCreatorDigest: Bool; let showIdentity: Bool; let withdrawn: Bool }
 private struct ContentPreference: Decodable, Sendable {let accountId:String;let muted:Bool}
@@ -88,6 +88,8 @@ private struct ContentFanScreen: View {
                         ForEach(replies.filter { $0.contentId == contentId }) { reply in
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(reply.text).qText("body")
+                                if reply.safetyState != "allowed" { Text(reply.safetyState == "flagged" ? "This reply is withheld for safety review." : "Waiting for safety review. It has not reached the creator’s feed.").qText("caption") }
+                                if reply.safetyState == "pending",reply.safetyReviewAvailable == true { Button("Retry safety review",variant:.quiet,disabled:busy) { Task { if await mutate("replies/"+reply.id+"/review",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } } } }
                                 if let reaction = reply.reaction { Text(content.creatorName + " reacted · " + reaction.kind).qText("caption"); Button("Verify reaction", variant: .quiet) { signature = reaction.signedActId } }
                                 Button("Withdraw private reply", variant: .quiet, disabled: busy) { Task { await withdraw(reply) } }
                                 Toggle("Allow this reply to be quoted", isOn: Binding(get: { reply.consent.shareText }, set: { value in Task { await consent(reply, text: value, handle: value && reply.consent.showHandle) } })).disabled(busy)

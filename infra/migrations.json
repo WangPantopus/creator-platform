@@ -176,6 +176,11 @@
       "version": "0037_w5_content_fan_effects",
       "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
       "owner": "W5"
+    },
+    {
+      "version": "0038_w5_reply_review",
+      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "owner": "W5"
     }
   ],
   "reserved": [

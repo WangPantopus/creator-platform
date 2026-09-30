@@ -153,6 +153,8 @@ private fun ContentScreen(context: Context, baseURL: String?, model: FanSession)
                 replies.filter { it.text("contentId") == contentId }.forEach { reply ->
                     key(reply.text("id")) { Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         QText(reply.text("text"), "body")
+                        if(reply.text("safetyState")!="allowed") QText(if(reply.text("safetyState")=="flagged") "This reply is withheld for safety review." else "Waiting for safety review. It has not reached the creator’s feed.","caption")
+                        if(reply.text("safetyState")=="pending" && reply.flag("safetyReviewAvailable")) Button("Retry safety review",ButtonVariant.QUIET,disabled=busy) { scope.launch { mutate("replies/${reply.text("id")}/review",buildJsonObject { put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString()) }) } }
                         val reaction = reply["reaction"]?.takeUnless { it is JsonNull }?.jsonObject
                         if (reaction != null) { QText("$creator reacted · ${reaction.text("kind")}", "caption"); Button("Verify reaction", ButtonVariant.QUIET) { signature = reaction.text("signedActId") } }
                         Button("Withdraw private reply",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}

@@ -145,6 +145,22 @@ export const ContentPage = z.strictObject({
     .optional(),
   query: z.string().trim().max(180).optional(),
 });
+export const ContentReplyPage = ContentPage.pick({
+  cursor: true,
+  limit: true,
+}).extend({
+  filter: z.enum(["all", "unread", "reacted", "flagged"]).default("all"),
+});
+export const ContentReplyReviewResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+  safetyState: z.enum(["pending", "allowed", "flagged"]),
+});
+export const ContentReplyReadResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+  read: z.literal(true),
+});
 export type Audience = z.infer<typeof ContentAudience>;
 export type ContentBody = z.infer<typeof ContentDocument>;
 export const ContentView = z.strictObject({
@@ -174,6 +190,9 @@ export const ContentView = z.strictObject({
   quotedHandle: z.string().nullable(),
 });
 export const PrivateNoteReply = z.strictObject({
+  safetyState: z.enum(["pending", "allowed", "flagged"]),
+  safetyReviewAvailable: z.boolean(),
+  read: z.boolean(),
   id: z.uuid(),
   contentId: z.uuid(),
   fanId: z.uuid(),

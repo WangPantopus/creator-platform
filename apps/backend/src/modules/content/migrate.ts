@@ -27,6 +27,7 @@ try {
     ["0035_w5_content_consent", "schema-consent-history.sql"],
     ["0036_w5_content_thread_privacy", "schema-thread-privacy.sql"],
     ["0037_w5_content_fan_effects", "schema-fan-effects.sql"],
+    ["0038_w5_reply_review", "schema-reply-review.sql"],
   ] as const) {
     const sql = await readFile(new URL(`./${file}`, import.meta.url), "utf8"),
       checksum = createHash("sha256").update(sql).digest("hex");

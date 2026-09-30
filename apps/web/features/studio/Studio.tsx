@@ -454,6 +454,7 @@ function Notes({ creator }: { creator: Creator }) {
       items: [],
       nextCursor: null,
     }),
+    [replyFilter, setReplyFilter] = useState("all"),
     [reaction, setReaction] = useState<PrivateNoteReply | null>(null),
     action = useAction();
   const load = useCallback(async () => {
@@ -466,10 +467,10 @@ function Notes({ creator }: { creator: Creator }) {
       setReplies(
         await studioRequest<Page<PrivateNoteReply>>(
           "content",
-          `${creator.id}/studio/replies`,
+          `${creator.id}/studio/replies?filter=${replyFilter}`,
         ),
       );
-  }, [creator.id, creator.owned, creator.roles]);
+  }, [creator.id, creator.owned, creator.roles, replyFilter]);
   useEffect(() => {
     void action.run(load);
   }, [load]);
@@ -538,6 +539,18 @@ function Notes({ creator }: { creator: Creator }) {
             Only you and your triage team see these
           </span>
         </div>
+        <label className="w5-field">
+          Show replies
+          <select
+            value={replyFilter}
+            onChange={(e) => setReplyFilter(e.target.value)}
+          >
+            <option value="all">All reviewed replies</option>
+            <option value="unread">Unread</option>
+            <option value="reacted">Reacted</option>
+            <option value="flagged">Flagged</option>
+          </select>
+        </label>
         {replies.items.map((r) => (
           <article className="w5-reply" key={r.id}>
             <div className="w5-row">
@@ -545,7 +558,31 @@ function Notes({ creator }: { creator: Creator }) {
               <time className="qv-meta">{time(r.createdAt)}</time>
             </div>
             <p>{r.text}</p>
-            {r.reaction ? (
+            {!r.read && (
+              <button
+                className="qv-btn qv-btn--quiet"
+                disabled={action.busy}
+                onClick={() =>
+                  void action.run(async () => {
+                    await studioRequest(
+                      "content",
+                      `${creator.id}/replies/${r.id}/read`,
+                      { version: r.version, idempotencyKey: key() },
+                      creator.viewerAccountId,
+                    );
+                    await load();
+                  })
+                }
+              >
+                Mark read
+              </button>
+            )}
+            {r.safetyState === "flagged" ? (
+              <p className="qv-help">
+                Withheld from the feed · sent for safety review. Private text is
+                not shown here.
+              </p>
+            ) : r.reaction ? (
               <ReactionChip
                 name={creator.display_name}
                 signedActId={r.reaction.signedActId}
@@ -580,7 +617,7 @@ function Notes({ creator }: { creator: Creator }) {
               void action.run(async () => {
                 const page = await studioRequest<Page<PrivateNoteReply>>(
                   "content",
-                  `${creator.id}/studio/replies?cursor=${replies.nextCursor}`,
+                  `${creator.id}/studio/replies?cursor=${replies.nextCursor}&filter=${replyFilter}`,
                 );
                 setReplies({
                   items: [...replies.items, ...page.items],
@@ -594,7 +631,8 @@ function Notes({ creator }: { creator: Creator }) {
         )}
         {!replies.items.length && !action.busy && (
           <p className="qv-help">
-            Private replies appear here when fans reply to a published Note.
+            Reviewed private replies appear here when fans reply to a published
+            Note. Replies waiting for safety review stay out of the feed.
           </p>
         )}
       </div>
@@ -1849,13 +1887,28 @@ function Library({ creator }: { creator: Creator }) {
       </label>
       {page.items.map((item) => (
         <article key={item.id} className="w5-card">
-          <h2>{item.document.title || "Untitled Note"}</h2>
+          <h2>
+            {item.document.title ||
+              (item.document.kind === "note"
+                ? "Untitled Note"
+                : "Untitled post")}
+          </h2>
           <p className="qv-meta">
             {item.state} · REV {item.version} · {item.audienceLabel}
           </p>
           <p>{item.document.text}</p>
           <p className="qv-help">
-            {item.sourceState} · {time(item.document.scheduledAt)}
+            {
+              {
+                not_requested: "Separate from AI sources",
+                candidate_pending: "Waiting to add an AI source candidate",
+                candidate: "AI source candidate · approval happens in My AI",
+                revocation_pending: "AI source removal pending",
+                revoked: "Removed from AI sources",
+              }[item.sourceState]
+            }
+            {item.document.scheduledAt &&
+              ` · Scheduled ${time(item.document.scheduledAt)}`}
           </p>
           <div className="w5-actions">
             <button
@@ -1873,7 +1926,12 @@ function Library({ creator }: { creator: Creator }) {
               <button
                 key={operation}
                 className="qv-btn qv-btn--quiet"
-                disabled={action.busy}
+                disabled={
+                  action.busy ||
+                  item.state === "archived" ||
+                  (operation === "unpublish" &&
+                    !["published", "scheduled"].includes(item.state))
+                }
                 onClick={() =>
                   void action.run(async () => {
                     await studioRequest(

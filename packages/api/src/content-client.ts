@@ -129,20 +129,42 @@ export class ContentStudioClient {
   reply(creatorId: string, id: string, input: z.input<typeof C.ReplyToNote>) {
     return this.request(
       this.path(creatorId, `/${this.id(id)}/replies`),
-      C.ContentRevisionResult,
+      C.ContentReplyReviewResult,
       C.ReplyToNote.parse(input),
     );
   }
   replies(
     creatorId: string,
-    query: Pick<z.input<typeof C.ContentPage>, "cursor" | "limit"> = {},
+    query: z.input<typeof C.ContentReplyPage> = {},
     studio = false,
   ) {
     return this.request(
       this.path(creatorId, studio ? "/studio/replies" : "/replies"),
       C.ContentReplyList,
       undefined,
-      C.ContentPage.parse(query),
+      C.ContentReplyPage.parse(query),
+    );
+  }
+  reviewReply(
+    creatorId: string,
+    id: string,
+    input: z.input<typeof C.ContentVersionCommand>,
+  ) {
+    return this.request(
+      this.path(creatorId, `/replies/${this.id(id)}/review`),
+      C.ContentReplyReviewResult,
+      C.ContentVersionCommand.parse(input),
+    );
+  }
+  markReplyRead(
+    creatorId: string,
+    id: string,
+    input: z.input<typeof C.ContentVersionCommand>,
+  ) {
+    return this.request(
+      this.path(creatorId, `/replies/${this.id(id)}/read`),
+      C.ContentReplyReadResult,
+      C.ContentVersionCommand.parse(input),
     );
   }
   consent(
@@ -239,7 +261,7 @@ export class ContentStudioClient {
   }
   threadEntries(
     creatorId: string,
-    query: Pick<z.input<typeof C.ContentPage>, "cursor" | "limit"> = {},
+    query: z.input<typeof C.ContentReplyPage> = {},
   ) {
     return this.request(
       this.path(creatorId, "/threads", "studio"),

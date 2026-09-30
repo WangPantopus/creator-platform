@@ -111,6 +111,7 @@ for (const [suffix, id] of [
   ownedPath(content + suffix, "get", id!, "ContentReplyList", undefined, [
     "cursor",
     "limit",
+    "filter",
   ]);
 for (const [suffix, id, response, body] of [
   ["consent", "contentReplyConsent", "ContentConsentResult", "QuoteConsent"],
@@ -178,9 +179,20 @@ ownedPath(
   content + "/{id}/replies",
   "post",
   "replyToNote",
-  "ContentRevisionResult",
+  "ContentReplyReviewResult",
   "ReplyToNote",
 );
+for (const [action, result] of [
+  ["review", "ContentReplyReviewResult"],
+  ["read", "ContentReplyReadResult"],
+] as const)
+  ownedPath(
+    content + "/replies/{id}/" + action,
+    "post",
+    "contentReply" + action[0]!.toUpperCase() + action.slice(1),
+    result,
+    "ContentVersionCommand",
+  );
 const studio = "/v1/studio/{creatorId}";
 ownedPath(
   studio + "/threads",

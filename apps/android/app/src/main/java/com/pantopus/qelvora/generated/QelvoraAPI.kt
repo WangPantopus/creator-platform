@@ -866,6 +866,9 @@ data class APIContentReplyList(
 
 @Serializable
 data class APIContentReplyListItemsItem(
+  val `safetyState`: APIContentReplyListItemsItemSafetyState,
+  val `safetyReviewAvailable`: Boolean,
+  val `read`: Boolean,
   val `id`: String,
   val `contentId`: String,
   val `fanId`: String,
@@ -876,6 +879,13 @@ data class APIContentReplyListItemsItem(
   val `consent`: APIContentReplyListItemsItemConsent,
   val `reaction`: APIContentReplyListItemsItemReaction? = null
 )
+
+@Serializable
+enum class APIContentReplyListItemsItemSafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
 
 @Serializable
 data class APIContentReplyListItemsItemConsent(
@@ -889,6 +899,53 @@ data class APIContentReplyListItemsItemReaction(
   val `kind`: String,
   val `signedActId`: String
 )
+
+@Serializable
+data class APIContentReplyPage(
+  val `cursor`: String? = null,
+  val `limit`: Long,
+  val `filter`: APIContentReplyPageFilter
+)
+
+@Serializable
+enum class APIContentReplyPageFilter {
+  @SerialName("all") ALL,
+  @SerialName("unread") UNREAD,
+  @SerialName("reacted") REACTED,
+  @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentReplyReadResult(
+  val `id`: String,
+  val `version`: Long,
+  val `read`: APIContentReplyReadResultRead
+)
+
+@Serializable(with = APIContentReplyReadResultReadSerializer::class)
+object APIContentReplyReadResultRead { const val value: Boolean = true }
+object APIContentReplyReadResultReadSerializer : KSerializer<APIContentReplyReadResultRead> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentReplyReadResultRead", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentReplyReadResultRead {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIContentReplyReadResultRead
+  }
+  override fun serialize(encoder: Encoder, value: APIContentReplyReadResultRead) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIContentReplyReviewResult(
+  val `id`: String,
+  val `version`: Long,
+  val `safetyState`: APIContentReplyReviewResultSafetyState
+)
+
+@Serializable
+enum class APIContentReplyReviewResultSafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
 
 @Serializable
 data class APIContentResult(
@@ -1071,6 +1128,9 @@ object APIContentWithdrawResultWithdrawnSerializer : KSerializer<APIContentWithd
 
 @Serializable
 data class APIPrivateNoteReply(
+  val `safetyState`: APIPrivateNoteReplySafetyState,
+  val `safetyReviewAvailable`: Boolean,
+  val `read`: Boolean,
   val `id`: String,
   val `contentId`: String,
   val `fanId`: String,
@@ -1081,6 +1141,13 @@ data class APIPrivateNoteReply(
   val `consent`: APIPrivateNoteReplyConsent,
   val `reaction`: APIPrivateNoteReplyReaction? = null
 )
+
+@Serializable
+enum class APIPrivateNoteReplySafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
 
 @Serializable
 data class APIPrivateNoteReplyConsent(
@@ -2377,7 +2444,9 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun teamPublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/team-publish", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
   suspend fun unpublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/unpublish", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
   suspend fun archiveContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/archive", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = null): APIContentRevisionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/replies", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = null): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/replies", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun contentReplyReview(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/review", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun contentReplyRead(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentReplyReadResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/read", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
   suspend fun studioThreadEntries(creatorId: String, query: Map<String, String> = emptyMap()): APIStudioThreadEntries = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads", "GET", query = query, authenticated = true))
   suspend fun studioSession(): APIStudioSession = json.decodeFromString(request("/v1/studio/session", "GET", authenticated = true))
   suspend fun acceptStudioInvitation(id: String, expectedAccount: String? = null): APIDone = json.decodeFromString(request("/v1/studio/invitations/${segment(id)}/accept", "POST", expectedAccount = expectedAccount, authenticated = true))

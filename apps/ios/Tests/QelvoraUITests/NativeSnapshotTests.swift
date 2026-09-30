@@ -82,8 +82,20 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // Baselines use the documented 390x844 logical size at 2x. A hosted
+      // runner's display backing scale must not change the comparison size.
+      let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
+        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
+        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+        bytesPerRow: 0, bitsPerPixel: 0)!
+      bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let image = NSImage(size: size)
+      image.addRepresentation(bitmap)
+      print("Snapshot \(name): \(bitmap.pixelsWide)x\(bitmap.pixelsHigh); screen scale \(window.backingScaleFactor)")
       assertSnapshot(
-        of: host as NSView, as: .image(size: size), named: name, record: record, file: file,
+        of: image, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

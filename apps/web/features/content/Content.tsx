@@ -342,6 +342,33 @@ export function FanContent({
             <article key={reply.id} className="w5-paper">
               <p className="w5-content-text">{reply.text}</p>
               <small>{new Date(reply.createdAt).toLocaleString()}</small>
+              {reply.safetyState !== "allowed" && (
+                <p role="status">
+                  {reply.safetyState === "flagged"
+                    ? "This reply is withheld for safety review."
+                    : "Waiting for safety review. It has not reached the creator’s feed."}
+                </p>
+              )}
+              {reply.safetyState === "pending" &&
+                reply.safetyReviewAvailable && (
+                  <button
+                    disabled={busy}
+                    onClick={() =>
+                      void act(async () => {
+                        await contentMutation(
+                          `${creatorId}/replies/${reply.id}/review`,
+                          {
+                            version: reply.version,
+                            idempotencyKey: crypto.randomUUID(),
+                          },
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Retry safety review
+                  </button>
+                )}
               {reply.reaction && (
                 <ReactionChip
                   name={content?.creatorName ?? "The creator"}
