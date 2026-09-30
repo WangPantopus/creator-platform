@@ -150,74 +150,78 @@ export class ConversationFeature {
     return this.page(scope);
   }
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
-    return this.db.withThread(scope, async (client) => {
-      const t = (
-        await client.query(
-          "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR UPDATE OF t",
-          [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows[0];
-      invariant(t, "thread_unavailable", "This conversation is unavailable.");
-      const rows = (
-        await client.query(
-          `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
-          [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
-        )
-      ).rows;
-      const hasOlder = rows.length > 50;
-      const messages = rows.slice(0, 50).reverse();
-      const generations = (
-        await client.query<{ id: string; last_sequence: number }>(
-          "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
-          [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows;
-      const currentConsent = Boolean(
-        this.policy?.verified &&
-          t.processor_consent_version === this.policy.version,
-      );
-      const capabilities = await capabilitySnapshot(client, scope);
-      const hasAccess =
-        capabilities.capabilities.includes("ai_message") &&
-        capabilities.allowance.available > 0;
-      const canSend =
-        t.control === "human_active" ||
-        (currentConsent &&
-          this.generationAvailable &&
-          t.control === "ai_active" &&
-          hasAccess);
-      return {
-        threadId: scope.threadId,
-        creatorId: scope.creatorId,
-        fanId: scope.fanId,
-        creatorName: t.display_name,
-        fanHandle: t.handle,
-        control: t.control,
-        epoch: t.control_epoch,
-        cursor: t.event_cursor,
-        revision: t.revision,
-        generationSequences: Object.fromEntries(
-          generations.map((g) => [g.id, g.last_sequence]),
-        ),
-        messages,
-        before: hasOlder ? messages[0]!.sequence : null,
-        offTheRecord: t.off_the_record,
-        introShared: t.intro_shared,
-        consentCurrent: currentConsent,
-        canSend,
-        unavailableReason: canSend
-          ? null
-          : !currentConsent
-            ? "Review the AI providers before messaging."
-            : !this.generationAvailable
-              ? "AI messaging is not connected yet."
-              : t.control !== "ai_active"
-                ? "AI messaging is paused in this conversation."
-                : !hasAccess
-                  ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
-                  : null,
-      };
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const t = (
+          await client.query(
+            "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows[0];
+        invariant(t, "thread_unavailable", "This conversation is unavailable.");
+        const rows = (
+          await client.query(
+            `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
+            [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
+          )
+        ).rows;
+        const hasOlder = rows.length > 50;
+        const messages = rows.slice(0, 50).reverse();
+        const generations = (
+          await client.query<{ id: string; last_sequence: number }>(
+            "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows;
+        const currentConsent = Boolean(
+          this.policy?.verified &&
+            t.processor_consent_version === this.policy.version,
+        );
+        const capabilities = await capabilitySnapshot(client, scope);
+        const hasAccess =
+          capabilities.capabilities.includes("ai_message") &&
+          capabilities.allowance.available > 0;
+        const canSend =
+          t.control === "human_active" ||
+          (currentConsent &&
+            this.generationAvailable &&
+            t.control === "ai_active" &&
+            hasAccess);
+        return {
+          threadId: scope.threadId,
+          creatorId: scope.creatorId,
+          fanId: scope.fanId,
+          creatorName: t.display_name,
+          fanHandle: t.handle,
+          control: t.control,
+          epoch: t.control_epoch,
+          cursor: t.event_cursor,
+          revision: t.revision,
+          generationSequences: Object.fromEntries(
+            generations.map((g) => [g.id, g.last_sequence]),
+          ),
+          messages,
+          before: hasOlder ? messages[0]!.sequence : null,
+          offTheRecord: t.off_the_record,
+          introShared: t.intro_shared,
+          consentCurrent: currentConsent,
+          canSend,
+          unavailableReason: canSend
+            ? null
+            : !currentConsent
+              ? "Review the AI providers before messaging."
+              : !this.generationAvailable
+                ? "AI messaging is not connected yet."
+                : t.control !== "ai_active"
+                  ? "AI messaging is paused in this conversation."
+                  : !hasAccess
+                    ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                    : null,
+        };
+      },
+      "read",
+    );
   }
   async preferences(scope: ThreadScope, raw: unknown) {
     invariant(
@@ -226,24 +230,28 @@ export class ConversationFeature {
       "Only the fan can change their conversation preferences.",
     );
     const body = ThreadPreferencesSchema.parse(raw);
-    await this.db.withThread(scope, async (client) => {
-      const result = await client.query(
-        "UPDATE creator.thread SET off_the_record=$1,intro_shared=$2,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$3 AND creator_id=$4 AND fan_id=$5 AND revision=$6 RETURNING id",
-        [
-          body.offTheRecord,
-          body.introShared,
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-          body.expectedRevision,
-        ],
-      );
-      invariant(
-        result.rowCount === 1,
-        "conversation_changed",
-        "This conversation changed. Refresh before saving.",
-      );
-    });
+    await this.db.withThread(
+      scope,
+      async (client) => {
+        const result = await client.query(
+          "UPDATE creator.thread SET off_the_record=$1,intro_shared=$2,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$3 AND creator_id=$4 AND fan_id=$5 AND revision=$6 RETURNING id",
+          [
+            body.offTheRecord,
+            body.introShared,
+            scope.threadId,
+            scope.creatorId,
+            scope.fanId,
+            body.expectedRevision,
+          ],
+        );
+        invariant(
+          result.rowCount === 1,
+          "conversation_changed",
+          "This conversation changed. Refresh before saving.",
+        );
+      },
+      "write",
+    );
     return this.page(scope);
   }
   async consent(scope: ThreadScope, raw: unknown) {
@@ -259,37 +267,42 @@ export class ConversationFeature {
         "providers_changed",
         "Review the currently configured providers.",
       );
-    await this.db.withThread(scope, async (client) => {
-      await client.query(
-        "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      await client.query(
-        "UPDATE creator.processor_consent SET withdrawn_at=now() WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND withdrawn_at IS NULL",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      if (body.accepted)
+    await this.db.withThread(
+      scope,
+      async (client) => {
         await client.query(
-          "INSERT INTO creator.processor_consent(thread_id,creator_id,fan_id,account_id,version,providers) VALUES($1,$2,$3,$4,$5,$6)",
+          "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        await client.query(
+          "UPDATE creator.processor_consent SET withdrawn_at=now() WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND withdrawn_at IS NULL",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        if (body.accepted)
+          await client.query(
+            "INSERT INTO creator.processor_consent(thread_id,creator_id,fan_id,account_id,version,providers) VALUES($1,$2,$3,$4,$5,$6)",
+            [
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+              scope.actorAccountId,
+              body.version,
+              JSON.stringify(this.policy!.providers),
+            ],
+          );
+        await client.query(
+          "UPDATE creator.thread SET processor_consent_version=$1,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$2 AND creator_id=$3 AND fan_id=$4",
           [
+            body.accepted ? body.version : null,
             scope.threadId,
             scope.creatorId,
             scope.fanId,
-            scope.actorAccountId,
-            body.version,
-            JSON.stringify(this.policy!.providers),
           ],
         );
-      await client.query(
-        "UPDATE creator.thread SET processor_consent_version=$1,revision=revision+1,memory_revision=memory_revision+1 WHERE id=$2 AND creator_id=$3 AND fan_id=$4",
-        [
-          body.accepted ? body.version : null,
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-        ],
-      );
-    });
+        await this.wellbeing?.boundary(scope, client);
+      },
+      "write",
+    );
     return this.page(scope);
   }
   async account(actor: Actor) {
@@ -440,6 +453,7 @@ export function conversationFeature(
                 [scope.threadId, scope.creatorId, scope.fanId, id],
               )
             ).rows[0],
+          "read",
         );
         invariant(
           row,
@@ -466,6 +480,7 @@ export function conversationFeature(
                 [scope.threadId, scope.creatorId, scope.fanId, id],
               )
             ).rowCount,
+          "read",
         );
         invariant(
           visible,
@@ -504,6 +519,7 @@ export function conversationFeature(
                 ],
               )
             ).rows[0],
+          "read",
         );
         if (
           !prior &&
@@ -531,27 +547,31 @@ export function conversationFeature(
         );
         const key = IdSchema.parse(req.params.key);
         res.json(
-          await feature.db.withThread(scope, async (client) => {
-            const row = (
-              await client.query<{
-                response: {
-                  message?: { threadId?: string };
-                  threadId?: string;
-                };
-              }>(
-                "SELECT response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation IN('send','fan_reply') AND key=$2",
-                [scope.actorAccountId, key],
-              )
-            ).rows[0];
-            // The idempotency table is account-scoped; do not reveal a key from another pair.
-            return {
-              accepted: Boolean(
-                row &&
-                  (row.response.message?.threadId ?? row.response.threadId) ===
-                    scope.threadId,
-              ),
-            };
-          }),
+          await feature.db.withThread(
+            scope,
+            async (client) => {
+              const row = (
+                await client.query<{
+                  response: {
+                    message?: { threadId?: string };
+                    threadId?: string;
+                  };
+                }>(
+                  "SELECT response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation IN('send','fan_reply') AND key=$2",
+                  [scope.actorAccountId, key],
+                )
+              ).rows[0];
+              // The idempotency table is account-scoped; do not reveal a key from another pair.
+              return {
+                accepted: Boolean(
+                  row &&
+                    (row.response.message?.threadId ??
+                      row.response.threadId) === scope.threadId,
+                ),
+              };
+            },
+            "read",
+          ),
         );
       });
       router.post(root + "/takeover", async (req, res) =>
@@ -603,6 +623,7 @@ export function conversationFeature(
                   [scope.threadId, scope.creatorId, scope.fanId],
                 )
               ).rows,
+            "read",
           ),
         );
       });

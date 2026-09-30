@@ -7,6 +7,8 @@ import { DomainError } from "../core/errors.js";
 import { assertCurrentSession } from "../modules/identity/request-authority.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
 
+export type ThreadLockMode = "read" | "write";
+
 export class Database {
   constructor(
     readonly pool: Pool,
@@ -53,8 +55,20 @@ export class Database {
   async withThread<T>(
     scope: ThreadScope,
     work: (client: PoolClient) => Promise<T>,
+    lockMode: ThreadLockMode = "write",
   ): Promise<T> {
     assertThreadScope(scope);
+    if (lockMode !== "read" && lockMode !== "write")
+      throw new DomainError(
+        "thread_lock_invalid",
+        "The conversation operation is unavailable.",
+        400,
+      );
+    // Reviewed reads opt into SHARE. Unannotated producer operations take
+    // UPDATE during authorization, before domain/idempotency/allowance locks.
+    // Concurrent writers must not both take
+    // SHARE and deadlock when they subsequently upgrade to UPDATE.
+    const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
@@ -70,7 +84,7 @@ export class Database {
          WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND c.account_id=$6 AND t.deleted_at IS NULL AND (
          ($5='fan' AND f.account_id=$4) OR ($5='creator' AND c.account_id=$4 AND c.verification='verified') OR
          ($5='triage' AND c.verification='verified' AND EXISTS(SELECT 1 FROM creator.team_membership tm WHERE tm.creator_id=c.id AND tm.account_id=$4 AND tm.revoked_at IS NULL AND 'triage'=ANY(tm.roles))))
-         FOR SHARE OF t`,
+         FOR ${threadLock} OF t`,
         [
           scope.threadId,
           scope.creatorId,

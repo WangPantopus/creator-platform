@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sameRequestOrigin } from "../../../../lib/request-origin";
+import { sessionCookie } from "../../../../lib/session";
+import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download)?|operations\/(metrics|audits))$/i;
@@ -47,8 +49,8 @@ async function forward(
     );
   if (target === "dev/logout") {
     const response = NextResponse.json({ signedOut: true });
-    response.cookies.delete("w8_local_session");
-    response.cookies.delete("qelvora_session");
+    response.cookies.delete(trustLocalSessionCookie);
+    response.cookies.delete(sessionCookie);
     return response;
   }
   const configured = process.env.W8_API_URL;
@@ -89,8 +91,8 @@ async function forward(
   // the same server-held session as the conversation that supplied the report.
   const token =
     (development
-      ? request.cookies.get("w8_local_session")?.value
-      : undefined) || request.cookies.get("qelvora_session")?.value;
+      ? request.cookies.get(trustLocalSessionCookie)?.value
+      : undefined) || request.cookies.get(sessionCookie)?.value;
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   if (
     request.method === "POST" &&
@@ -138,14 +140,14 @@ async function forward(
     const data = await result.json();
     if (target === "dev/session" && result.ok) {
       const response = NextResponse.json({ localDevelopment: true });
-      response.cookies.set("w8_local_session", String(data.token), {
+      response.cookies.set(trustLocalSessionCookie, String(data.token), {
         httpOnly: true,
         sameSite: "strict",
         secure: false,
         path: "/",
         maxAge: 3600,
       });
-      response.cookies.delete("qelvora_session");
+      response.cookies.delete(sessionCookie);
       return response;
     }
     const response = NextResponse.json(data, {

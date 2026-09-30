@@ -1,4 +1,5 @@
 "use client";
+import { IdentityContinueSchema } from "@qelvora/api/schemas";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export class TrustError extends Error {
@@ -121,6 +122,13 @@ export function TrustSession() {
   const [actor, setActor] = useState("fan");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+  useEffect(() => {
+    const destination = IdentityContinueSchema.safeParse({
+      returnTo: window.location.pathname + window.location.search,
+    });
+    setReturnTo(destination.success ? destination.data.returnTo : "/home");
+  }, []);
   useEffect(() => {
     const refresh = () => void session.refresh();
     const visible = () => {
@@ -154,14 +162,19 @@ export function TrustSession() {
     const selected = accountActors[session.data.accountId];
     if (selected) setActor(selected);
   }, [data?.localDevelopment, session.data?.accountId]);
-  if (!data?.localDevelopment)
-    return (
-      <a className="qv-link-btn" href="/api/auth/continue?returnTo=/support">
+  const continuation =
+    returnTo && !session.loading && !session.data ? (
+      <a
+        className="qv-link-btn"
+        href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
+      >
         Continue with Pantopus
       </a>
-    );
+    ) : null;
+  if (!data?.localDevelopment) return continuation;
   return (
     <div className="trust-session">
+      {continuation}
       <p>Synthetic local accounts · no provider or production identity</p>
       <label htmlFor="local-actor">Switch to local actor</label>
       <select
