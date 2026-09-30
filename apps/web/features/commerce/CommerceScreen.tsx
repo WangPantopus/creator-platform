@@ -398,18 +398,20 @@ export function CommerceScreen(props: CommerceScreenProps) {
   }, [props.accountId]);
   if (ended || !props.accountId)
     return (
-      <main className="commerce commerce-phone commerce-content">
-        <Empty title="Continue with Pantopus">
-          Your session ended or the account changed. Continue to load this
-          account’s current commerce information.
-          <Link
-            className="commerce-link-button"
-            href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination(props))}`}
-          >
-            {copy.continueWithPantopus}
-          </Link>
-        </Empty>
-      </main>
+      <div className="commerce commerce-phone">
+        <main className="commerce-main commerce-content">
+          <Empty title="Continue with Pantopus">
+            Your session ended or the account changed. Continue to load this
+            account’s current commerce information.
+            <Link
+              className="commerce-link-button"
+              href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination(props))}`}
+            >
+              {copy.continueWithPantopus}
+            </Link>
+          </Empty>
+        </main>
+      </div>
     );
   return (
     <CommerceAccountScreen {...props} identityAvailable={identityAvailable} />

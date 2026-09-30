@@ -1,6 +1,6 @@
 # W4 commerce handoff — 2026-09-29
 
-**Current resumption — 2026-09-30:** the assigned primary continued on this branch, pushed three implementation increments (`81d9235`, `76112a6`, `d11b333`) and merged current main at `5392456`; further client/access/receipt/recovery fixes are recorded in [current status](../status/W4.md) and [resumed evidence](../verification/W4-2026-09-30.md). Those records supersede the dated missing-adapter and local-resource descriptions below. The original scope and acceptance requirements are preserved. PR #5 remains draft and unmerged because provider/business/peer inputs and failing acceptance/CI remain open.
+**Current resumption — 2026-09-30:** the assigned primary continued on this branch, pushed four implementation increments (`81d9235`, `76112a6`, `d11b333`, `b258a18`) and merged current main at `5392456`; further client/access/receipt/recovery fixes are recorded in [current status](../status/W4.md) and [resumed evidence](../verification/W4-2026-09-30.md). Those records supersede the dated missing-adapter and local-resource descriptions below. The original scope and acceptance requirements are preserved. PR #5 remains draft and unmerged because provider/business/peer inputs and failing acceptance/CI remain open.
 
 W4 is handed to the next primary implementation agent at a working implementation checkpoint. **The workstream is incomplete and is not release-ready.** Domain state machines, recovery boundaries, functional clients and native builds exist. Genuine paid provider workflows, several producer integrations, complete visual states and most acceptance scenarios remain open. Continue from this code; do not replace it with scaffolds or repeat the initial implementation.
 
@@ -219,3 +219,17 @@ For a fresh DB, read [the canonical migration runner](../../../apps/backend/scri
 6. Update status/coordination/state transitions/recovery docs and publish coherent W4 commits on the feature branch. Preserve shared history and do not force push. If a genuine external input prevents a dependent path after all independent work, identify the precise remaining item/owner/input and report it honestly. Do not ask whether to continue already assigned work or mark W4 complete from builds alone.
 
 The final report must enumerate all original work packages/artboards/contracts, implementation and integration changes, actual web/iOS/Android/provider journeys, evidence and measured results, remaining narrow external blockers, and the explanation of each demonstrated ledger outcome. Completion requires source-complete functionality and real acceptance; known money/authority defects always block release.
+
+## Current draft PR description — prepared for metadata access
+
+PR #5’s diff updates through branch pushes. Its connector metadata write returned `403 Resource not accessible by integration`, and the GitHub browser is signed out. The following title/body is prepared for a permitted metadata update; no duplicate PR or unauthorized credential workaround was created.
+
+Suggested title: **W4: integrate commerce providers, current access and billing recovery**
+
+The original W4 checkout lacked canonical runtime registration and genuine billing/store/current-money providers. This branch registers commerce and signing in the canonical host and implements configured Stripe SDK payments/Billing/Connect, Apple/Google server verification, shipping StoreKit/Play clients, weighted cost-reservation integration, current C03 access and complete paged financial exports. Paid adapters require explicit approved provider/catalog/economics and current scoped authority.
+
+Account-bound clients and server consistency checks prevent old forms from affecting another account. Original-key provider recovery preserves ambiguous holds, subscription changes, credit-note refunds and payouts without repeating aged money writes. Actual signed delivery/refund history and sharing revocation remain accessible after terminal settlement.
+
+Backend/Next production builds, both complete native builds, owned lint/format/generated checks pass. Personally operated local spending, reload, canonical session recovery and cross-account clearing; latest native apps were installed/launched. Existing tests/baselines and applied SQL are preserved. The branch includes a broad shared foundation checkpoint (854 files versus current main), requiring integration review beyond W4-owned files.
+
+Keep this PR draft: latest completed Foundation CI has five failing jobs; actual paid/provider/race/restart/native interaction/a11y/performance acceptance, DI-11/15 compositions and live W5/W8 producer integrations remain open. Required Q03/Q04/Q08/Q10/Q16 inputs are listed in current status/coordination. No OpenAI key was loaded or paid AI call made.
