@@ -2,7 +2,7 @@
 
 Code revision: `fbc52247168b4140f18b2a0068e60004a6cc8490`. Exclusive local development API4103/weblocalhost3003/DBcreator_w3:55443; W1 synthetic identity capability; provider policy/model generation unavailable. No private fan content or credentials in evidence.
 
-Backend/web TypeScript, scoped ESLint and optimized Next.js build pass. Swift iOS Simulator target compile passes5.97s (explicit iOS Simulator SDK, owned scratch directory); Kotlin compileDebugKotlin passes3s (owned SDK/cache/output). No new test files/code. Latest native code has not been operated; increment-2 host build/install/launch records precede these additions.
+Backend/web TypeScript, scoped ESLint and optimized Next.js build pass. Xcode26.5 (17F42) / Swift6.3.2. Swift iOS Simulator target compile passes5.97s (explicit iOS Simulator SDK, owned scratch directory); Kotlin compileDebugKotlin passes3s (owned SDK/cache/output). No new test files/code. Latest native code has not been operated; increment-2 host build/install/launch records precede these additions.
 
 Wellbeing migration proposal applied only to the owned database. Read-only catalog inspection under the runtime role confirms relrowsecurity=true, relforcerowsecurity=true, nonowner=true for conversation_presence, conversation_presence_client and conversation_usage_day. Canonical W8 allocation/registration pending; migration proposal is immutable after local application.
 
