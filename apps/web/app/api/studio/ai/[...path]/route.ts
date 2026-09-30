@@ -38,7 +38,9 @@ async function bridge(
     process.env.NODE_ENV === "development" &&
     process.env.W2_DEVELOPMENT_MODE === "true" &&
     isLocal;
-  if (!token && development) token = process.env.W2_DEVELOPMENT_SESSION;
+  // Loopback Studio has an explicitly selected synthetic server actor. Browser
+  // cookies are shared across localhost ports and may belong to a peer runtime.
+  if (development) token = process.env.W2_DEVELOPMENT_SESSION;
   if (!token)
     return Response.json(
       {

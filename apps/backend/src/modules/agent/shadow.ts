@@ -6,9 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import type { ThreadSnapshot } from "./pipeline.js";
 import type { VersionComparison } from "../../../../../packages/api/src/agent/contracts.js";
 export interface PrivacyParaphrasePort {
-  verifiedParaphrases(
-    scope: CreatorScope,
-  ): Promise<
+  verifiedParaphrases(scope: CreatorScope): Promise<
     readonly {
       sampleId: string;
       occurredAt: string;

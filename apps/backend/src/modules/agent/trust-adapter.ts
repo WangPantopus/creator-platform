@@ -214,6 +214,7 @@ export function agentPrivacyHook(
           let bytes = 0;
           try {
             await service.exportTo(scope, async (part) => {
+              await assertCurrent();
               hash.update(part);
               bytes += Buffer.byteLength(part);
               await sink.write(part);
@@ -300,6 +301,12 @@ export function agentNoticeHook(
         settlement.complete,
         "commerce_lifecycle_pending",
         "Generation is denied; commitment settlement remains pending.",
+      );
+      const current = await authority.verifiedNotice(input, type);
+      invariant(
+        contentHash(current) === contentHash(verified),
+        "notice_authority_changed",
+        "The case effect changed during settlement.",
       );
       return { receipt: { ...receipt, settlement: settlement.receipt } };
     },

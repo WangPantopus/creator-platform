@@ -132,6 +132,13 @@ export type EvaluationCase = {
   prompt: string;
   answer: string;
   reason: string;
+  withheld?: {
+    text: string;
+    category: string;
+    allowed?: boolean;
+    supported?: boolean;
+    requiresEvidence?: boolean;
+  };
   citations: string[];
   usage: Usage | null;
   pipelineUsage?: Usage[];
@@ -212,6 +219,7 @@ export type StudioState = {
   versions: Version[];
   liveVersion: Version | null;
   evaluation: Evaluation | null;
+  evaluationCurrent: boolean;
   license: License | null;
   sponsors: {
     id: string;
