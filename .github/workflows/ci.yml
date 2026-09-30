@@ -2,6 +2,9 @@ name: Foundation checks
 on:
   push:
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
   web-and-backend:
     runs-on: ubuntu-latest
@@ -50,6 +53,8 @@ jobs:
             test-results
   ios-foundation:
     runs-on: xcode-27
+    env:
+      SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/artifacts/ios/snapshots
     steps:
       - uses: actions/checkout@v4
       - run: swift test --package-path apps/ios
@@ -90,6 +95,8 @@ jobs:
           name: android-review
           path: |
             apps/android/app/build/reports
+            apps/android/app/build/test-results
+            apps/android/app/build/paparazzi/failures
             apps/android/app/build/outputs/apk/debug/*.apk
   android-runtime:
     runs-on: ubuntu-latest
