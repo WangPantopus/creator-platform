@@ -1,3 +1,4 @@
+import { conversationSocketTickets } from "../modules/conversation/realtime-tickets.js";
 import type { IncomingMessage, Server } from "node:http";
 import { WebSocketServer, WebSocket } from "ws";
 import { SubscribeSchema } from "@qelvora/api";
@@ -18,6 +19,7 @@ export function attachRealtime(
   allowedOrigin: string,
   authority: {
     assertActorAllowed?: (actor: Actor) => Promise<void>;
+    consumeTicket?: (ticket: string) => string;
     resolveSession?: (
       token: string,
     ) => Promise<{ actor: Actor; sessionId: string }>;
@@ -27,8 +29,13 @@ export function attachRealtime(
     noServer: true,
     maxPayload: 4096,
     handleProtocols: (protocols) =>
-      protocols.has("pantopus-session") ? "pantopus-session" : false,
+      protocols.has("pantopus-session")
+        ? "pantopus-session"
+        : protocols.has("qelvora-ticket")
+          ? "qelvora-ticket"
+          : false,
   });
+  const ticketTokens = new WeakMap<IncomingMessage, string>();
   server.on("upgrade", (request, socket, head) => {
     void authenticate(request)
       .then(() => {
@@ -40,10 +47,22 @@ export function attachRealtime(
             { scope: ThreadScope; cursor: number }
           >();
           let busy = false;
+          let subscriptionsPending = 0;
           connection.on("message", (data) => {
+            if (++subscriptionsPending > 64) {
+              connection.close(1008, "Subscription limit");
+              return;
+            }
             void (async () => {
               const input = SubscribeSchema.parse(JSON.parse(data.toString()));
-              if (subscriptions.size >= 64)
+              if (
+                subscriptions.size >= 64 &&
+                ![...subscriptions.values()].some(
+                  (s) =>
+                    s.scope.creatorId === input.creatorId &&
+                    s.scope.fanId === input.fanId,
+                )
+              )
                 throw new Error("Subscription limit");
               const current = await authenticate(request);
               await withAuthority(current, async () => {
@@ -57,7 +76,9 @@ export function attachRealtime(
                   cursor: input.cursor,
                 });
               });
-            })().catch(() => connection.close(1008, "Subscription refused"));
+            })()
+              .catch(() => connection.close(1008, "Subscription refused"))
+              .finally(() => subscriptionsPending--);
           });
           const timer = setInterval(() => {
             if (busy || connection.readyState !== WebSocket.OPEN) return;
@@ -111,7 +132,17 @@ export function attachRealtime(
       request.headers["sec-websocket-protocol"]
         ?.split(",")
         .map((value) => value.trim()) ?? [];
+    const ticket = protocols[0] === "qelvora-ticket" ? protocols[1] : undefined;
+    if (ticket && !ticketTokens.has(request))
+      ticketTokens.set(
+        request,
+        (
+          authority.consumeTicket ??
+          ((value: string) => conversationSocketTickets.consume(value))
+        )(ticket),
+      );
     const token =
+      ticketTokens.get(request) ??
       request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1] ??
       (protocols[0] === "pantopus-session" ? protocols[1] : undefined);
     if (!token) throw new Error("Session required");
