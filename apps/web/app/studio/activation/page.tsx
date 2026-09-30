@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
 export const dynamic = "force-dynamic";
@@ -22,34 +23,39 @@ export default async function ActivationPage() {
     return (
       <GrowthShell studio>
         <section className="growth-stack">
-          <h1>Your first 72 hours</h1>
+          <h1>{growthCopy.growthYourFirst72Hours}</h1>
           {!activation ? (
-            <NoData title="Publish your AI to start">
-              Your first digest appears after the 72-hour observation window
-              closes.
+            <NoData title={growthCopy.growthPublishYourAiToStart}>
+              {
+                growthCopy.growthYourFirstDigestAppearsAfterThe72HourObservationWindow
+              }
             </NoData>
           ) : activation.state !== "sent" || !activation.document ? (
             <NoData
               title={
                 activation.state === "blocked"
-                  ? "Your digest needs a connected source"
-                  : "Your digest is being prepared"
+                  ? growthCopy.growthYourDigestNeedsAConnectedSource
+                  : growthCopy.growthYourDigestIsBeingPrepared
               }
             >
-              The observation window closes{" "}
-              {new Date(activation.due_at).toLocaleDateString("en")}. Counts
-              will appear after current publication and source evidence are
-              checked.
+              {growthFormat(
+                "growthTheObservationWindowClosesCountsWillAppearAfterCurrentPublication",
+                {
+                  value1: new Date(activation.due_at).toLocaleDateString("en"),
+                },
+              )}
             </NoData>
           ) : (
             <>
               <p className="growth-meta">
-                PUBLISHED AI VERSION {activation.agent_version}
+                {growthFormat("growthPublishedAiVersion", {
+                  value1: activation.agent_version,
+                })}
               </p>
               <div className="growth-metrics">
                 <div>
                   <strong>{activation.document.sourceCount}</strong>
-                  <p>approved sources</p>
+                  <p>{growthCopy.growthApprovedSources}</p>
                 </div>
                 <div>
                   <strong>{activation.document.conversations}</strong>
@@ -57,25 +63,27 @@ export default async function ActivationPage() {
                 </div>
                 <div>
                   <strong>{activation.document.usefulAnswers}</strong>
-                  <p>useful answers</p>
+                  <p>{growthCopy.growthUsefulAnswers}</p>
                 </div>
               </div>
-              <h2>What to review next</h2>
+              <h2>{growthCopy.growthWhatToReviewNext}</h2>
               <p>
                 {activation.document.nextStep === "review_sources"
-                  ? "Review the sources your AI can use."
+                  ? growthCopy.growthReviewTheSourcesYourAiCanUse
                   : activation.document.nextStep === "review_boundaries"
-                    ? "Review your AI's boundaries and unresolved topics."
-                    : "Keep your sources current and return when you have something useful to share."}
+                    ? growthCopy.growthReviewYourAiSBoundariesAndUnresolvedTopics
+                    : growthCopy.growthKeepYourSourcesCurrentAndReturnWhenYouHaveSomething}
               </p>
               {activation.document.unresolvedTopics.map((topic) => (
                 <p key={topic.topicKey}>
-                  {topic.topicKey.replaceAll("-", " ")} · {topic.distinctFans}{" "}
-                  distinct fans
+                  {growthFormat("growthDistinctFans", {
+                    value1: topic.topicKey.replaceAll("-", " "),
+                    value2: topic.distinctFans,
+                  })}
                 </p>
               ))}
-              <a href="/studio/insights">Open Insights</a>
-              <a href="/studio/launch">Open your launch kit</a>
+              <a href="/studio/insights">{growthCopy.growthOpenInsights}</a>
+              <a href="/studio/launch">{growthCopy.growthOpenYourLaunchKit}</a>
             </>
           )}
         </section>

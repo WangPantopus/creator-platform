@@ -1,5 +1,23 @@
 import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
+import * as conversation from "./conversation/contracts.ts";
+import * as content from "./content.ts";
+
+// Aggregate owner contracts here after the core module initializes; conversation
+// itself imports core schemas and cannot be imported back into that module.
+const domainSchemas = Object.fromEntries(
+  [
+    ["Conversation", conversation],
+    ["Content", content],
+  ].flatMap(([prefix, values]) =>
+    Object.entries(values as Record<string, unknown>)
+      .filter(([, schema]) => schema instanceof z.ZodType)
+      .map(([name, schema]) => [
+        String(prefix) + name.replace(/Schema$/u, ""),
+        schema as z.ZodType,
+      ]),
+  ),
+);
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const json = (name: string) => ({ "application/json": { schema: ref(name) } });
@@ -220,10 +238,12 @@ export function createOpenApi() {
         },
       },
       schemas: Object.fromEntries(
-        Object.entries(publicSchemas).map(([name, schema]) => [
-          name,
-          z.toJSONSchema(schema, { target: "draft-2020-12" }),
-        ]),
+        Object.entries({ ...publicSchemas, ...domainSchemas }).map(
+          ([name, schema]) => [
+            name,
+            z.toJSONSchema(schema, { target: "draft-2020-12" }),
+          ],
+        ),
       ),
     },
   };

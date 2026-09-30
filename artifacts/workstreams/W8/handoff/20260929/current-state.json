@@ -1,0 +1,204 @@
+{
+  "preparedLocalDate": "2026-09-29",
+  "timezone": "America/Los_Angeles",
+  "capturedAt": "2026-09-30T04:15:06.318283+00:00",
+  "featureBranch": "codex/w8-trust-handoff",
+  "baseHead": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+  "liveSharedBranch": "main",
+  "implementationDelegation": false,
+  "newTestCodeWritten": false,
+  "scopeStatus": "partial integration, not release-ready; all original W8 packages remain assigned",
+  "actualProbes": {
+    "checkedAt": "2026-09-30T04:13:48.960643+00:00",
+    "probes": [
+      {
+        "endpoint": "live",
+        "httpStatus": 200,
+        "body": {
+          "alive": true
+        }
+      },
+      {
+        "endpoint": "ready",
+        "httpStatus": 503,
+        "body": {
+          "ready": false,
+          "environment": "local-development",
+          "release": "uncommitted-w8",
+          "capabilities": [
+            {
+              "name": "database",
+              "required": true,
+              "state": "unavailable",
+              "code": "probe_failed",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "identity",
+              "required": true,
+              "state": "development",
+              "code": "synthetic_local_accounts",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "model",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "payments",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "calls",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "voice",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "push",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            },
+            {
+              "name": "domain_privacy_hooks",
+              "required": true,
+              "state": "unavailable",
+              "code": "adapter_unconfigured",
+              "checkedAt": "2026-09-30T04:13:48.959Z"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "leasedProcesses": [
+    {
+      "pid": 36563,
+      "parentPid": 54771,
+      "elapsed": "01:11:06",
+      "lease": "W8 API"
+    },
+    {
+      "pid": 58193,
+      "parentPid": 54771,
+      "elapsed": "21:04",
+      "lease": "W8 stalled Docker read-only inspection"
+    },
+    {
+      "pid": 65818,
+      "parentPid": 65420,
+      "elapsed": "03:16:23",
+      "lease": "W8 Next"
+    }
+  ],
+  "processObservationLimits": "Specific lease identities inspected; read-only docker ps PID 58193 stopped after 21 minutes without output. No container/volume/app reset or peer process changes. Sandbox curl could not connect; elevated loopback probes returned actual 200/503 above.",
+  "databaseState": "Database unavailable/probe_failed; container existence/running state not confirmed at this capture. Earlier successful DB recovery is historical evidence. Preserve own data and diagnose before resuming acceptance.",
+  "lateSourceFixes": {
+    "W1ThreadAuthority": "Database.withThread now FOR SHARE OF t with retained own-profile/current eligibility checks; W8 rebuilt current runtime/client acceptance pending",
+    "C11": "Current navigation config registers crisis/access/feedback and bounded support UUID references; W8 acceptance pending"
+  },
+  "clientVerification": "Earlier full native builds/SDK installs/launches/public-help actual fetch and earlier browser case journey; current authenticated/native system/visual/accessibility acceptance unverified. Interactive browser/device control timeout.",
+  "resources": [
+    {
+      "path": "/private/tmp/creator-w8-web",
+      "exists": true,
+      "kind": "directory",
+      "privateNotCommitted": true
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios",
+      "exists": true,
+      "kind": "directory",
+      "privateNotCommitted": true
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app",
+      "exists": true,
+      "kind": "directory",
+      "privateNotCommitted": true
+    },
+    {
+      "path": "/private/tmp/creator-w8-android",
+      "exists": true,
+      "kind": "directory",
+      "privateNotCommitted": true
+    },
+    {
+      "path": "/private/tmp/creator-w8-android-build/outputs/apk/debug/app-debug.apk",
+      "exists": true,
+      "kind": "file",
+      "privateNotCommitted": true,
+      "bytes": 11963023,
+      "mode": "0o644"
+    },
+    {
+      "path": "/private/tmp/creator-platform-w8-foundation-20260929.tgz",
+      "exists": true,
+      "kind": "file",
+      "privateNotCommitted": true,
+      "bytes": 299761844,
+      "mode": "0o644"
+    },
+    {
+      "path": "/private/tmp/creator-w8-before-deletion.dump",
+      "exists": true,
+      "kind": "file",
+      "privateNotCommitted": true,
+      "bytes": 218584,
+      "mode": "0o644"
+    },
+    {
+      "path": "/private/tmp/w8-deletion-journal.json",
+      "exists": true,
+      "kind": "file",
+      "privateNotCommitted": true,
+      "bytes": 409,
+      "mode": "0o600"
+    }
+  ],
+  "leases": {
+    "webPort": 3008,
+    "apiPort": 4108,
+    "postgresPort": 55438,
+    "container": "creator-platform-w8-local",
+    "iosSimulator": "DBA500E9-A3E5-4424-83D6-ED4178991663",
+    "androidSerial": "emulator-5568",
+    "androidAVD": "CreatorPlatform_W8"
+  },
+  "migrationRegistry": {
+    "appliedIntegrationCount": 28,
+    "throughId": "0031",
+    "reservedIds": ["0005", "0009"],
+    "w8Ids": ["0008", "0010", "0012", "0023", "0027"],
+    "actualApplicationEvidence": "../../trust/20260929-local/migration-integration.txt",
+    "limits": "Not reapplied during handoff; full DB unavailable now. Old creator_w8 root subset is not full integration proof."
+  },
+  "firstNextActions": [
+    "Inspect branch tip, current ownership and leases; diagnose own database without data reset",
+    "Refresh isolated web/iOS/Android source; personally build/launch/operate latest W1 authority/C11",
+    "Finish R2\u2013R10 and every original W8 package/coverage/opportunity gate"
+  ],
+  "references": {
+    "handoff": "../../../../../docs/workstreams/handoffs/W8.md",
+    "resumePrompt": "../../../../../docs/workstreams/handoffs/W8-resume-prompt.md",
+    "originalBrief": "../../../../../docs/workstreams/W8-trust-release.md",
+    "originalPrompt": "../../../../../docs/workstreams/prompts/W8-trust-release.md",
+    "earlierActualEvidence": "../../trust/20260929-local/README.md"
+  }
+}

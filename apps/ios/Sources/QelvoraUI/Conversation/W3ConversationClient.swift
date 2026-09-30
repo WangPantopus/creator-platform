@@ -1,0 +1,177 @@
+import Foundation
+import SwiftUI
+
+struct W3Message: Decodable, Identifiable, Sendable {
+    let id: String; let threadId: String; let authorKind: APIMessageAuthorKind
+    let text: String; let deliveryState: APIMessageDeliveryState; let controlEpoch: Int
+    let sequence: Int; let signedActId: String?; let citations: [String]
+    let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
+    func authorLabel(name: String) -> String {
+        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
+        if authorKind == .fan { return "You" }
+        if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
+        return "Conversation update"
+    }
+}
+struct W3Page: Decodable, Sendable {
+    let threadId: String; let creatorId: String; let fanId: String; let creatorName: String; let fanHandle: String
+    let control: APIThreadControl; let epoch: Int; let cursor: Int; let revision: Int
+    let generationSequences: [String: Int]; let messages: [W3Message]; let before: Int?
+    let offTheRecord: Bool; let introShared: Bool; let consentCurrent: Bool; let canSend: Bool; let unavailableReason: String?
+}
+struct W3Provider: Decodable, Sendable { let name: String; let termsUrl: String; let noTraining: Bool; let noRetention: Bool }
+struct W3Policy: Decodable, Sendable { let version: String; let providers: [W3Provider]; let verified: Bool }
+struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String }
+struct W3Memory: Decodable, Identifiable, Sendable {
+    let id: String; let kind: String; let text: String; let provenanceMessageId: String
+    let sensitiveCategory: String?; let state: String; let editedByFan: Bool; let createdAt: String
+}
+struct W3MemoryView: Decodable, Sendable { let revision: Int; let offTheRecord: Bool; let introShared: Bool; let items: [W3Memory] }
+struct W3Audit: Decodable, Identifiable, Sendable { let id: String; let readerAccountId: String; let role: String; let readAt: String }
+struct W3Failure: Error, Sendable { let message: String; let status: Int }
+private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
+struct W3Status: Decodable, Sendable { let accepted: Bool }
+struct W3Preferences: Encodable { let offTheRecord: Bool; let introShared: Bool; let expectedRevision: Int }
+struct W3Decision: Encodable { let expectedRevision: Int; let action: String; let text: String? }
+struct W3Consent: Encodable { let version: String; let accepted: Bool }
+struct W3Begin: Encodable { let creatorId: String; let policyVersion: String; let accessNoticeAccepted: Bool; let idempotencyKey: String }
+struct W3Presence: Encodable { let clientId: String; let active: Bool }
+struct W3Usage: Decodable, Sendable {
+    struct Day: Decodable, Sendable { let day: String; let seconds: Double; let companionSeconds: Double }
+    let timezone: String; let days: [Day]; let modeAvailable: Bool; let measurement: String
+}
+
+/// W1's OS credential store supplies account authority; no model credential reaches a fan client.
+actor W3ConversationClient {
+    let baseURL: URL
+    private let credentials = SecureSessionStorage()
+    private let session: URLSession
+    init(baseURL: URL) {
+        self.baseURL = baseURL
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        session = URLSession(configuration: configuration)
+    }
+    func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, publicRead: Bool = false) async throws -> T {
+        guard let components = URLComponents(string: path) else { throw URLError(.badURL) }
+        var target = URLComponents(url: baseURL.appendingPathComponent("v1/conversations/" + components.path), resolvingAgainstBaseURL: false)!
+        target.queryItems = components.queryItems
+        var request = URLRequest(url: target.url!)
+        request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = 15
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let requestCredential = publicRead ? nil : try await credentials.read()
+        if !publicRead {
+            guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
+            request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        }
+        if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+        let (data, response) = try await session.data(for: request)
+        if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:"Your account changed. Open this conversation again.", status:401) } }
+        guard data.count <= 1_000_000 else { throw W3Failure(message:"This conversation response is too large. Refresh to try again.",status:503) }
+        guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        guard (200..<300).contains(response.statusCode) else { throw W3Failure(message: (try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error.message) ?? "Reconnect to refresh. Your input is kept.", status: response.statusCode) }
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+    func socket() async throws -> URLSessionWebSocketTask {
+        guard let token = try await credentials.read() else { throw W3Failure(message: "Continue with Pantopus again.", status: 401) }
+        var target = URLComponents(url: baseURL.appendingPathComponent("v1/realtime"), resolvingAgainstBaseURL: false)!
+        target.scheme = target.scheme == "https" ? "wss" : "ws"
+        var request = URLRequest(url: target.url!); request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        let socket = session.webSocketTask(with: request); socket.resume(); return socket
+    }
+}
+
+@MainActor
+final class W3ThreadModel: ObservableObject {
+    struct Pending { let key: String; let text: String; let clientSequence: Int; let destination: String; var uncertain = false; var rejected = false }
+    @Published var page: W3Page?; @Published var older: [W3Message] = []; @Published var before: Int?
+    @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = false
+    @Published var pending: Pending?
+    let client: W3ConversationClient; let creatorId: String; let fanId: String
+    private let accountId: String
+    private var resumeCursor: Int?
+    private var resumeActivated = false
+    private let presenceId = UUID().uuidString.lowercased()
+    private var storageScope: String { client.baseURL.absoluteString + "/" + root }
+    var root: String { creatorId + "/" + fanId }
+    private var gate: ThreadDeliveryGate?
+    init(baseURL: URL, creatorId: String, fanId: String, accountId: String) { client = W3ConversationClient(baseURL: baseURL); self.creatorId = creatorId; self.fanId = fanId; self.accountId = accountId }
+    func refresh() async {
+        do {
+            if !resumeActivated {
+                await W3ResumeStorage.shared.activate(accountId: accountId)
+                resumeCursor = await W3ResumeStorage.shared.cursor(accountId: accountId, scope: storageScope)?.cursor
+                resumeActivated = true
+            }
+            let fresh: W3Page = try await client.request(root)
+            guard !Task.isCancelled else { return }
+            guard page == nil || fresh.cursor >= page!.cursor else { return }
+            page = fresh; if before == nil && older.isEmpty { before = fresh.before }
+            gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
+            await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
+            offline = false; failure = ""
+            if let pending { let status: W3Status = try await client.request(root + "/messages/status/" + pending.key); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
+        } catch { failed(error) }
+    }
+    func connect() async {
+        while !Task.isCancelled {
+            await refresh()
+            if let page {
+                do {
+                    let socket = try await client.socket()
+                    // The authenticated snapshot establishes the current boundary.
+                    // Older persisted replay is deduplicated by that fresh gate.
+                    let subscription = APISubscribe(kind: .subscribe, creatorId: creatorId, fanId: fanId, cursor: min(resumeCursor ?? page.cursor, page.cursor))
+                    resumeCursor = nil
+                    try await socket.send(.data(JSONEncoder().encode(subscription)))
+                    await withTaskCancellationHandler {
+                        do {
+                            while !Task.isCancelled {
+                                let incoming = try await socket.receive()
+                                let data: Data
+                                switch incoming { case .data(let value): data = value; case .string(let value): data = Data(value.utf8); @unknown default: throw URLError(.badServerResponse) }
+                                let frame = try JSONDecoder().decode(APIFrame.self, from: data)
+                                if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
+                            }
+                        } catch { if !Task.isCancelled { failed(error) } }
+                    } onCancel: { socket.cancel(with: .goingAway, reason: nil) }
+                    socket.cancel(with: .goingAway, reason: nil)
+                } catch { failed(error) }
+            }
+            try? await Task.sleep(for: .seconds(3))
+        }
+    }
+    func send(retry: Bool = false) async {
+        guard !busy, !offline, let page else { return }
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard retry ? pending != nil : !text.isEmpty else { return }
+        let item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
+        pending = item; busy = true; defer { busy = false }
+        do {
+            let body = try JSONEncoder().encode(APISendMessage(text: item.text, idempotencyKey: item.key, clientSequence: item.clientSequence))
+            if item.destination == "fan-replies" { let _: APIMessage = try await client.request(root + "/fan-replies", body: body) }
+            else { let _: APIAcceptedMessage = try await client.request(root + "/messages", body: body) }
+            pending = nil; if !retry { draft = "" }; await refresh()
+        } catch { let status = (error as? W3Failure)?.status; pending?.uncertain = status == nil || status! >= 500 || status == 409; pending?.rejected = !(pending?.uncertain ?? true); failed(error) }
+    }
+    func earlier() async {
+        guard let before, !busy else { return }; busy = true; defer { busy = false }
+        do { let previous: W3Page = try await client.request(root + "?before=" + String(before)); let current = Set(older.map(\.id)); older = (previous.messages.filter { !current.contains($0.id) } + older).prefix(250).map { $0 }; self.before = previous.before }
+        catch { failed(error) }
+    }
+    func presence(active: Bool) async {
+        guard page != nil else { return }
+        let _: W3Usage? = try? await client.request(root + "/presence", body: JSONEncoder().encode(W3Presence(clientId: presenceId, active: active)))
+    }
+    func forget(_ message: W3Message) async {
+        guard !busy, !offline, let page else { return }; busy = true; defer { busy = false }
+        do { let body = try JSONSerialization.data(withJSONObject:["expectedRevision":page.revision]); let _: W3Page = try await client.request(root + "/messages/" + message.id + "/dont-remember",body:body); await refresh() }
+        catch { failed(error) }
+    }
+    private func failed(_ error: Error) {
+        if let failure = error as? W3Failure {
+            self.failure = failure.message
+            if [401,403,404].contains(failure.status) { page = nil; older = []; draft = ""; pending = nil; gate = nil; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
+        } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
+    }
+}

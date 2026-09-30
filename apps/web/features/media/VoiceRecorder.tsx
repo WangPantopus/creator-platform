@@ -44,6 +44,9 @@ export function VoiceRecording({
   const recorder = useRef<BrowserRecorder | null>(null);
   const controller = useRef<AbortController | null>(null);
   const ticket = useRef<UploadTicket | undefined>(undefined);
+  const uploadKey = useRef<string | undefined>(undefined);
+  const pendingUpload = useRef<Promise<void> | null>(null);
+  const [discarding, setDiscarding] = useState(false);
   useEffect(() => {
     const value = new BrowserRecorder(maxDurationMs, setRecording);
     recorder.current = value;
@@ -94,7 +97,9 @@ export function VoiceRecording({
     return () => clearInterval(timer);
   }, [asset, creatorId, fanId]);
   async function send() {
-    if (!recording.blob || !creatorId || !fanId) return;
+    if (!recording.blob || !creatorId || !fanId || pendingUpload.current)
+      return;
+    uploadKey.current ??= crypto.randomUUID();
     const abort = new AbortController();
     controller.current = abort;
     setUpload("uploading");
@@ -106,6 +111,7 @@ export function VoiceRecording({
         purpose,
         blob: recording.blob,
         durationMs: Math.round(recording.durationMs),
+        idempotencyKey: uploadKey.current,
         signal: abort.signal,
         progress: setProgress,
         resumed: ticket.current,
@@ -127,7 +133,10 @@ export function VoiceRecording({
     }
   }
   async function discard() {
+    if (discarding) return false;
+    setDiscarding(true);
     controller.current?.abort();
+    await pendingUpload.current;
     const current = ticket.current;
     if (current && creatorId && fanId) {
       try {
@@ -139,14 +148,25 @@ export function VoiceRecording({
         setError(
           "The uploaded file could not be removed. Try again before discarding.",
         );
-        return;
+        setDiscarding(false);
+        return false;
       }
     }
+    if (uploadKey.current && !current) {
+      setError(
+        "The upload is unconfirmed. Retry it to find and remove the saved file before discarding.",
+      );
+      setDiscarding(false);
+      return false;
+    }
     ticket.current = undefined;
+    uploadKey.current = undefined;
     recorder.current?.discard();
     setAsset(null);
     setUpload("idle");
     setError(null);
+    setDiscarding(false);
+    return true;
   }
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
@@ -175,9 +195,10 @@ export function VoiceRecording({
         {!active && recording.state !== "requesting" && (
           <button
             className="qv-btn qv-btn--maya"
+            disabled={upload === "uploading" || discarding}
             onClick={() => {
-              void discard().then(() => {
-                if (!ticket.current) void recorder.current?.start();
+              void discard().then((discarded) => {
+                if (discarded) void recorder.current?.start();
               });
             }}
           >
@@ -229,6 +250,7 @@ export function VoiceRecording({
           />
           <button
             className="qv-btn qv-btn--quiet"
+            disabled={discarding}
             onClick={() => {
               void discard();
             }}
@@ -262,9 +284,14 @@ export function VoiceRecording({
       {preview && upload !== "uploading" && !asset && (
         <button
           className="qv-btn qv-btn--maya"
-          disabled={!available || !creatorId || !fanId}
+          disabled={!available || !creatorId || !fanId || discarding}
           onClick={() => {
-            void send();
+            if (pendingUpload.current) return;
+            const work = send();
+            pendingUpload.current = work;
+            void work.finally(() => {
+              if (pendingUpload.current === work) pendingUpload.current = null;
+            });
           }}
         >
           {upload === "failed" ? "Retry upload" : "Upload recording"}

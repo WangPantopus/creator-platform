@@ -207,6 +207,7 @@ export type PrivacyHook = {
     creatorId: string | null;
     threadId: string | null;
     idempotencyKey: string;
+    leaseToken?: string;
   }): Promise<{
     receipt: Record<string, unknown>;
     data?: unknown;
@@ -224,5 +225,6 @@ export type EffectHook = {
     reason: string;
     amountMinor?: number;
     idempotencyKey: string;
+    leaseToken?: string;
   }): Promise<{ receipt: Record<string, unknown> }>;
 };

@@ -1,4 +1,6 @@
 "use client";
+import { notificationKindLabel } from "./copy";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useState } from "react";
 import { mutate } from "./actions";
 const kinds = [
@@ -65,11 +67,13 @@ export function PreferenceForm({
         try {
           await mutate("preferences", value, "PUT");
           setMessage(
-            "Preferences saved. Your in-app record remains available.",
+            growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );
         } catch (e) {
           setMessage(
-            e instanceof Error ? e.message : "Preferences were not saved.",
+            e instanceof Error
+              ? e.message
+              : growthCopy.growthPreferencesWereNotSaved,
           );
         } finally {
           setBusy(false);
@@ -77,9 +81,7 @@ export function PreferenceForm({
       }}
     >
       <p className="growth-help">
-        Your in-app notification record cannot be turned off. Push and email are
-        optional. Email delivery is grouped daily for creators and weekly for
-        fans.
+        {growthCopy.growthYourInAppNotificationRecordCannotBeTurnedOffPush}
       </p>
       <label>
         <input
@@ -87,7 +89,7 @@ export function PreferenceForm({
           checked={value.push}
           onChange={(e) => update({ push: e.target.checked })}
         />
-        Push notifications
+        {growthCopy.growthPushNotifications}
       </label>
       <label>
         <input
@@ -95,7 +97,7 @@ export function PreferenceForm({
           checked={value.email}
           onChange={(e) => update({ email: e.target.checked })}
         />
-        Email digest
+        {growthCopy.growthEmailDigest}
       </label>
       <label>
         <input
@@ -103,12 +105,12 @@ export function PreferenceForm({
           checked={value.hideSensitive}
           onChange={(e) => update({ hideSensitive: e.target.checked })}
         />
-        Hide sensitive previews
+        {growthCopy.growthHideSensitivePreviews}
       </label>
       <fieldset>
-        <legend>Quiet hours</legend>
+        <legend>{growthCopy.growthQuietHours}</legend>
         <label>
-          From
+          {growthCopy.growthFrom}
           <input
             type="time"
             value={time(value.quietStart)}
@@ -116,7 +118,7 @@ export function PreferenceForm({
           />
         </label>
         <label>
-          Until
+          {growthCopy.growthUntil}
           <input
             type="time"
             value={time(value.quietEnd)}
@@ -124,7 +126,7 @@ export function PreferenceForm({
           />
         </label>
         <label>
-          Time zone
+          {growthCopy.growthTimeZone}
           <input
             className="qv-input"
             value={value.timeZone}
@@ -133,12 +135,11 @@ export function PreferenceForm({
           />
         </label>
         <p className="growth-help">
-          Leave both times empty for no quiet hours. Matching times pause
-          optional delivery all day.
+          {growthCopy.growthLeaveBothTimesEmptyForNoQuietHoursMatchingTimes}
         </p>
       </fieldset>
       <fieldset>
-        <legend>Updates from creators</legend>
+        <legend>{growthCopy.growthUpdatesFromCreators}</legend>
         {creators.length ? (
           creators.map((creator) => (
             <label key={creator.id}>
@@ -153,20 +154,20 @@ export function PreferenceForm({
                   })
                 }
               />
-              {creator.name} · push and email
+              {growthFormat("growthPushAndEmail2", { name: creator.name })}
             </label>
           ))
         ) : (
           <p className="growth-help">
-            Creators you follow or receive updates from appear here.
+            {growthCopy.growthCreatorsYouFollowOrReceiveUpdatesFromAppearHere}
           </p>
         )}
       </fieldset>
       <fieldset>
-        <legend>Notification types</legend>
+        <legend>{growthCopy.growthNotificationTypes}</legend>
         {kinds.map((kind) => (
           <div key={kind}>
-            <strong>{kind.replaceAll("_", " ")}</strong>
+            <strong>{notificationKindLabel(kind)}</strong>
             {(["push", "email"] as const).map((channel) => {
               const key =
                 channel === "push" ? "disabledPushTypes" : "disabledEmailTypes";
@@ -183,7 +184,9 @@ export function PreferenceForm({
                       })
                     }
                   />
-                  {channel === "push" ? "Push" : "Email"}
+                  {channel === "push"
+                    ? growthCopy.growthPush
+                    : growthCopy.growthEmail}
                 </label>
               );
             })}
@@ -195,7 +198,7 @@ export function PreferenceForm({
         disabled={busy}
         type="submit"
       >
-        {busy ? "Saving…" : "Save preferences"}
+        {busy ? growthCopy.growthSaving : growthCopy.growthSavePreferences}
       </button>
       <p role="status" className="growth-help">
         {message}

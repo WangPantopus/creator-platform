@@ -52,6 +52,10 @@ export type ApplicationDependencies = {
   generationAvailable?: boolean;
   platformIdentity?: IdentityRuntime;
   features?: readonly FeatureRegistration[];
+  trustRouter?: Router;
+  /** Verified provider ingress must receive the original bytes before JSON/auth middleware. */
+  stripeNotifications?: Router;
+  storeNotifications?: Partial<Record<"apple" | "google", Router>>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -68,6 +72,17 @@ export function createApp(
     res.setHeader("Cache-Control", "no-store");
     next();
   });
+  if (dependencies.stripeNotifications)
+    app.use(
+      "/v1/commerce/provider-notifications/stripe",
+      dependencies.stripeNotifications,
+    );
+  for (const provider of ["apple", "google"] as const) {
+    const router = dependencies.storeNotifications?.[provider];
+    if (router)
+      app.use(`/v1/commerce/provider-notifications/${provider}`, router);
+  }
+  app.use("/v1/agent", express.json({ limit: "1100kb" }));
   app.use(express.json({ limit: "64kb" }));
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {
@@ -99,12 +114,16 @@ export function createApp(
         next();
         return;
       }
-      await dependencies.assertActorAllowed?.(resolved.actor);
+      // Trust retains authenticated support, appeals and privacy progress for
+      // closed accounts. Its router enforces operation-specific authority.
+      if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
+        await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
         { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },
         next,
       );
     });
+  if (dependencies.trustRouter) app.use(dependencies.trustRouter);
   app.get("/health", (_req, res) =>
     res.json({
       status: "ok",

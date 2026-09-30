@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { IdentityCompletionSchema, ReturnTargetSchema } from "@qelvora/api";
 import {
+  applicationOrigin,
+  sameRequestOrigin,
+} from "../../../../lib/request-origin";
+import {
   continuationCookie,
   continuationReturnCookie,
   sessionCookie,
@@ -12,7 +16,7 @@ function retry(request: NextRequest, error: string) {
   const saved = ReturnTargetSchema.safeParse(
     request.cookies.get(continuationReturnCookie)?.value,
   );
-  const target = new URL("/auth/continue", request.url);
+  const target = new URL("/auth/continue", applicationOrigin(request));
   target.searchParams.set("returnTo", saved.success ? saved.data : "/home");
   target.searchParams.set("error", error);
   const response = NextResponse.redirect(target, 303);
@@ -22,7 +26,7 @@ function retry(request: NextRequest, error: string) {
 }
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get("origin") !== request.nextUrl.origin)
+  if (!sameRequestOrigin(request))
     return Response.json(
       { error: { message: "Start sign-in from this app." } },
       { status: 403 },
@@ -86,7 +90,10 @@ async function complete(
     const target = result.session.fan
       ? result.returnTo
       : `/onboarding/handle?returnTo=${encodeURIComponent(result.returnTo)}`;
-    const redirect = NextResponse.redirect(new URL(target, request.url), 303);
+    const redirect = NextResponse.redirect(
+      new URL(target, applicationOrigin(request)),
+      303,
+    );
     redirect.cookies.set(sessionCookie, result.token, {
       ...cookieOptions,
       maxAge: 7 * 86400,

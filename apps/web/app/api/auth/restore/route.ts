@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { applicationOrigin } from "../../../../lib/request-origin";
 import {
   ReturnTargetSchema,
   SessionSchema,
@@ -12,6 +13,7 @@ import {
 
 /** Restore access within the existing refresh window; this is never fresh reauthentication. */
 export async function GET(request: NextRequest) {
+  const origin = applicationOrigin(request);
   const query = request.nextUrl.searchParams;
   const parsed = ReturnTargetSchema.safeParse(query.get("returnTo") ?? "/home");
   const valid =
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
       (key) => !["returnTo", "resumeHandle"].includes(key),
     );
   const returnTo = valid && parsed.success ? parsed.data : "/home";
-  const welcome = new URL("/auth/continue", request.url);
+  const welcome = new URL("/auth/continue", origin);
   welcome.searchParams.set("returnTo", returnTo);
   const finish = (target: URL) => {
     const response = NextResponse.redirect(target);
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
           !session.fan || query.get("resumeHandle") === "1"
             ? `/onboarding/handle?returnTo=${encodeURIComponent(returnTo)}`
             : returnTo,
-          request.url,
+          origin,
         )
       : welcome;
     const result = finish(target);

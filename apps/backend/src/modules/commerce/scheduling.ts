@@ -84,6 +84,55 @@ export class CommerceScheduling implements SchedulingAuthority {
       },
     };
   }
+  /** Receipt/summary access survives settlement. current() remains the sole booking/join authority. */
+  async retained(
+    scope: ThreadScope,
+    id: string,
+    client: PoolClient,
+  ): Promise<CallAuthorization | null> {
+    assertThreadScope(scope);
+    if (scope.authority !== "fan" && scope.authority !== "creator") return null;
+    const row = (
+      await client.query(
+        `SELECT c.id,c.mode,c.state,p.version,p.snapshot,p.disclosure,
+          cp.display_name,cp.account_id AS creator_account,fp.account_id AS fan_account
+         FROM creator.commerce_commitment c
+         JOIN creator.commerce_packet p ON p.id=c.packet_id
+         JOIN creator.creator_profile cp ON cp.id=c.creator_id
+         JOIN creator.fan_profile fp ON fp.id=c.fan_id
+         WHERE c.id=$1 AND c.creator_id=$2 AND c.fan_id=$3 AND p.thread_id=$4
+           AND c.state IN('delivered','resolution_required','refund_pending','refunded','resolved')
+           AND EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.packet_id=p.id AND l.kind='capture')`,
+        [id, scope.creatorId, scope.fanId, scope.threadId],
+      )
+    ).rows[0];
+    if (
+      !row ||
+      !["audio_call", "video_call"].includes(row.mode) ||
+      !Number.isSafeInteger(row.snapshot.durationSeconds) ||
+      row.snapshot.durationSeconds <= 0 ||
+      row.creator_account !== scope.creatorAccountId ||
+      scope.actorAccountId !==
+        (scope.authority === "fan" ? row.fan_account : row.creator_account)
+    )
+      return null;
+    return {
+      commitmentId: row.id,
+      creatorAccountId: row.creator_account,
+      fanAccountId: row.fan_account,
+      creatorName: row.display_name,
+      mediaMode: row.mode === "audio_call" ? "audio" : "video",
+      durationSeconds: row.snapshot.durationSeconds,
+      graceSeconds: this.graceSeconds,
+      authorizationVersion: row.version,
+      packet: {
+        summary: row.disclosure.summary ?? "",
+        attachmentIds: (row.disclosure.attachments ?? []).map(
+          (attachment: { id: string }) => attachment.id,
+        ),
+      },
+    };
+  }
   async acceptOffer(
     scope: ThreadScope,
     command: z.infer<typeof OfferTimesSchema>,

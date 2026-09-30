@@ -1,3 +1,4 @@
+import { copy as growthCopy } from "@qelvora/copy";
 import "server-only";
 import { cookies } from "next/headers";
 import { sessionCookie } from "../../lib/session";
@@ -15,23 +16,26 @@ export async function growthRequest<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
-  const origin = process.env.QELVORA_GROWTH_API_URL;
+  const origin =
+    process.env.QELVORA_GROWTH_API_URL ?? process.env.QELVORA_API_URL;
   if (!origin)
     throw new GrowthUnavailable(
       503,
       "growth_unconfigured",
-      "This feature is not connected yet.",
+      growthCopy.growthThisFeatureIsNotConnectedYet,
     );
-  const jar = await cookies(),
-    headers = new Headers(init?.headers);
+  const headers = new Headers(init?.headers);
   headers.set("Content-Type", "application/json");
-  const session = jar.get(sessionCookie)?.value;
+  const publicRead = path.startsWith("public/");
+  const jar = publicRead ? null : await cookies();
+  const session = jar?.get(sessionCookie)?.value;
+  if (publicRead) headers.delete("Authorization");
   if (session) headers.set("Authorization", `Bearer ${session}`);
   if (
     process.env.QELVORA_GROWTH_DEVELOPMENT === "true" &&
     process.env.NODE_ENV !== "production"
   ) {
-    const actor = jar.get("w7_development_actor")?.value;
+    const actor = jar?.get("w7_development_actor")?.value;
     if (actor === "fan" || actor === "creator")
       headers.set("x-w7-development-actor", actor);
   }
@@ -47,7 +51,7 @@ export async function growthRequest<T>(
     throw new GrowthUnavailable(
       503,
       "growth_offline",
-      "The service is unavailable. Please try again.",
+      growthCopy.growthTheServiceIsUnavailablePleaseTryAgain,
     );
   }
   const body = await response.json();
@@ -55,7 +59,7 @@ export async function growthRequest<T>(
     throw new GrowthUnavailable(
       response.status,
       body.error?.code ?? "growth_unavailable",
-      body.error?.message ?? "This feature is unavailable.",
+      body.error?.message ?? growthCopy.growthThisFeatureIsUnavailable,
     );
   return body as T;
 }

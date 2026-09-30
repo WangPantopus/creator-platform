@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import type { Metadata } from "next";
 import { Button, Mark } from "@qelvora/ui-web";
 import {
@@ -6,6 +7,10 @@ import {
 } from "../../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../../features/growth/shell";
 import type { Creator, Post } from "../../../../../features/growth/types";
+import {
+  VoluntaryInvite,
+  EntryConsent,
+} from "../../../../../features/growth/engagement";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -27,7 +32,7 @@ export async function generateMetadata({
     };
   } catch {
     return {
-      title: "Post unavailable",
+      title: growthCopy.growthPostUnavailable,
       robots: { index: false, follow: false },
     };
   }
@@ -49,7 +54,7 @@ export default async function PostPage({
       <GrowthShell active="Discover">
         <header className="growth-header">
           <a href={`/creators/${handle}`}>← {creator.name}</a>
-          <span className="growth-meta">PUBLIC POST</span>
+          <span className="growth-meta">{growthCopy.growthPublicPost}</span>
         </header>
         <article className="growth-stack">
           <span className="growth-note-label">{post.authorLabel}</span>
@@ -71,21 +76,30 @@ export default async function PostPage({
             >
               <span className="growth-mark">
                 <Mark kind="ai" />
-                {creator.name}'s AI
+                {growthFormat("aiAuthor", { name: creator.name })}
               </span>
               <p className="growth-help">
-                Ask about this post. The context stays with your conversation.
+                {
+                  growthCopy.growthAskAboutThisPostTheContextStaysWithYourConversation
+                }
               </p>
               <Button
                 href={`/creators/${handle}/chat?context=${id}`}
                 variant="ai"
                 block
               >
-                Ask {creator.name}'s AI about this
+                {growthFormat("growthAskSAiAboutThis", {
+                  value1: creator.name,
+                })}
               </Button>
             </section>
           ) : null}
         </article>
+        <details className="growth-stack">
+          <summary>{growthCopy.growthOptionalLinkChoices}</summary>
+          <VoluntaryInvite handle={handle} contextId={id} />
+          <EntryConsent handle={handle} source="post" objectId={id} />
+        </details>
       </GrowthShell>
     );
   } catch (error) {

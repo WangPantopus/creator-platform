@@ -34,7 +34,10 @@ export class TrustTelemetry {
       const start = performance.now();
       const incoming = req.header("x-correlation-id");
       const correlation =
-        incoming && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(incoming)
+        incoming &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          incoming,
+        )
           ? incoming
           : randomUUID();
       res.locals.correlationId = correlation;

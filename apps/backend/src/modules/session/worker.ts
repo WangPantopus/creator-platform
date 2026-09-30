@@ -5,6 +5,7 @@ import type {
 } from "../../../../../packages/api/src/session.js";
 import { SessionService } from "./service.js";
 import { withDeadline } from "../media/deadline.js";
+import { DomainError } from "../../core/errors.js";
 
 export interface CallEffects {
   summarize(input: {
@@ -96,6 +97,7 @@ export class SessionWorker {
     try {
       const cleanup = [
         "purge_consent_assets",
+        "sync_recording",
         "settle_evidence",
         "handback",
         "outcome_notice",
@@ -143,40 +145,70 @@ export class SessionWorker {
         );
         const enabled =
           both &&
+          !row.revoked_at &&
           !["ending", "ended", "cancelled"].includes(row.document.state);
+        if (enabled)
+          await this.sessions.db.withThread(scope, (client) =>
+            this.sessions.row(scope, client, effect.session_id),
+          );
         const truth = await withDeadline(
-          this.sessions.provider.setRecording(row.room_id, enabled, effect.key),
+          this.sessions.provider.setRecording(
+            row.room_id,
+            enabled,
+            `${effect.key}:${enabled ? "on" : "off"}`,
+          ),
           5000,
         );
-        await this.sessions.db
+        const recordingResult = await this.sessions.db
           .withThread(scope, async (client) => {
-            const current = await this.sessions.row(
+            const current = await this.sessions.lifecycleRow(
               scope,
               client,
               effect.session_id,
               true,
             );
+            if (!current) throw new Error("session_unavailable");
             const permitted = ["creator", "fan"].every((role) =>
               current.document.consents.some(
                 (c) =>
                   c.role === role && c.purpose === "recording" && c.granted,
               ),
             );
-            if (
+            let denied = Boolean(
               truth.recording &&
-              (!permitted ||
-                ["ending", "ended", "cancelled"].includes(
-                  current.document.state,
-                ))
-            )
-              throw new Error("consent_changed_during_recording");
-            await this.sessions.persist(scope, client, {
+                (!permitted ||
+                  current.revoked_at ||
+                  ["ending", "ended", "cancelled"].includes(
+                    current.document.state,
+                  )),
+            );
+            if (truth.recording && !denied) {
+              try {
+                await this.sessions.row(scope, client, effect.session_id);
+              } catch (error) {
+                if (
+                  !(error instanceof DomainError) ||
+                  !["call_unavailable", "call_authorization_revoked"].includes(
+                    error.code,
+                  )
+                )
+                  throw error;
+                denied = true;
+              }
+            }
+            // Commit observed recording before cleanup; a thrown denial would lose its occurrence.
+            const recorded = await this.sessions.persist(scope, client, {
               ...current.document,
-              recordingState: truth.recording ? "on" : "off",
+              recordingState: truth.recording
+                ? denied
+                  ? "stopping"
+                  : "on"
+                : "off",
               recordingOccurred: Boolean(
                 current.document.recordingOccurred || truth.recording,
               ),
             });
+            return { denied, version: recorded.version };
           })
           .catch(async (error) => {
             await withDeadline(
@@ -189,6 +221,32 @@ export class SessionWorker {
             );
             throw error;
           });
+        if (recordingResult.denied) {
+          const stopped = await withDeadline(
+            this.sessions.provider.setRecording(
+              row.room_id,
+              false,
+              `${effect.key}:revoke`,
+            ),
+            5000,
+          );
+          if (stopped.recording) throw new Error("recording_stop_unconfirmed");
+          await this.sessions.db.withThread(scope, async (client) => {
+            const current = await this.sessions.lifecycleRow(
+              scope,
+              client,
+              effect.session_id,
+              true,
+            );
+            if (!current) throw new Error("session_unavailable");
+            if (current.document.version !== recordingResult.version) return;
+            await this.sessions.persist(scope, client, {
+              ...current.document,
+              recordingState: "off",
+              recordingOccurred: true,
+            });
+          });
+        }
       } else if (effect.kind === "settle_evidence") {
         if (!this.effects.settleEvidence)
           throw new Error("settlement_adapter_unconfigured");

@@ -8,6 +8,7 @@ export type ScopeRestriction = (
   actor: Actor,
   creatorId: string,
   threadId: string,
+  participants: Readonly<{ fanAccountId: string; creatorAccountId: string }>,
 ) => Promise<void>;
 
 const threadScopeBrand: unique symbol = Symbol("ThreadScope");
@@ -17,6 +18,7 @@ export type ThreadScope = Readonly<{
   threadId: string;
   creatorId: string;
   fanId: string;
+  fanAccountId: string;
   actorAccountId: string;
   creatorAccountId: string;
   creatorName: string;
@@ -30,7 +32,32 @@ export function assertThreadScope(scope: ThreadScope): void {
   );
 }
 
+/** W4 implements weighted reservations; W3 supplies its durable generation identity. */
+export interface GenerationAllowance {
+  reserve(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+  ): Promise<string>;
+  settle(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+    grantId: string,
+    consumed: boolean,
+  ): Promise<void>;
+}
+
 export class AccessService {
+  private generationAllowance?: GenerationAllowance;
+  configureGenerationAllowance(allowance: GenerationAllowance) {
+    invariant(
+      !this.generationAllowance,
+      "allowance_already_configured",
+      "Generation allowance is already configured.",
+    );
+    this.generationAllowance = allowance;
+  }
   constructor(
     private readonly pool: Pool,
     private readonly identity: IdentityRead = new PostgresIdentityRead(),
@@ -94,7 +121,10 @@ export class AccessService {
           "This conversation is unavailable.",
           404,
         );
-      await this.assertAllowed?.(actor, creatorId, thread.id);
+      await this.assertAllowed?.(actor, creatorId, thread.id, {
+        fanAccountId: pair.fanAccountId,
+        creatorAccountId: pair.creatorAccountId,
+      });
       if (authority !== "fan" && auditOpen)
         await client.query(
           "INSERT INTO creator.thread_audit (thread_id, creator_id, fan_id, reader_account_id, role) VALUES ($1,$2,$3,$4,$5)",
@@ -106,6 +136,7 @@ export class AccessService {
         threadId: thread.id,
         creatorId,
         fanId,
+        fanAccountId: pair.fanAccountId,
         actorAccountId: actor.accountId,
         creatorAccountId: pair.creatorAccountId,
         creatorName: pair.creatorName,
@@ -125,8 +156,17 @@ export class AccessService {
   async reserveAllowance(
     scope: ThreadScope,
     client: PoolClient,
+    generationId?: string,
   ): Promise<string> {
     assertThreadScope(scope);
+    if (this.generationAllowance) {
+      invariant(
+        generationId,
+        "generation_required",
+        "A durable generation identity is required.",
+      );
+      return this.generationAllowance.reserve(scope, client, generationId);
+    }
     const eligible = await client.query<{ id: string }>(
       `SELECT id FROM creator.access_grant WHERE creator_id = $1 AND fan_id = $2
       AND 'ai_message' = ANY(capabilities) AND state = 'active' AND valid_from <= now() AND valid_until > now()
@@ -155,8 +195,23 @@ export class AccessService {
     client: PoolClient,
     grantId: string,
     consumed: boolean,
+    generationId?: string,
   ): Promise<void> {
     assertThreadScope(scope);
+    if (this.generationAllowance) {
+      invariant(
+        generationId,
+        "generation_required",
+        "A durable generation identity is required.",
+      );
+      return this.generationAllowance.settle(
+        scope,
+        client,
+        generationId,
+        grantId,
+        consumed,
+      );
+    }
     await client.query(
       "UPDATE creator.access_grant SET reserved=reserved-1, used=used+$4 WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND reserved > 0",
       [grantId, scope.creatorId, scope.fanId, consumed ? 1 : 0],

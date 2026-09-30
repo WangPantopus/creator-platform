@@ -1,3 +1,4 @@
+import { copy, formatCopy } from "@qelvora/copy";
 import { ImageResponse } from "next/og";
 import {
   growthRequest,
@@ -21,22 +22,19 @@ export async function GET(
       };
     }>(`public/shares/${id}`);
     if (data.state !== "valid" || !data.source)
-      return new Response("This card was withdrawn.", {
+      return new Response(copy.growthThisCardWasWithdrawn, {
         status: 410,
         headers: { "Cache-Control": "no-store" },
       });
     const s = data.source,
       origin = configuredOrigin();
     if (!origin)
-      return new Response(
-        "A public verification domain is required before exporting.",
-        { status: 503 },
-      );
+      return new Response(copy.growthImageNeedsOrigin, { status: 503 });
     if (s.text.length > 900)
-      return new Response(
-        "This reply is too long for one card. Share the complete verified link.",
-        { status: 422, headers: { "Cache-Control": "no-store" } },
-      );
+      return new Response(copy.growthImageTooLong, {
+        status: 422,
+        headers: { "Cache-Control": "no-store" },
+      });
     return new ImageResponse(
       (
         <div
@@ -53,8 +51,15 @@ export async function GET(
         >
           <div style={{ display: "flex", fontSize: 36 }}>
             {s.authorKind === "approved_draft"
-              ? `Prepared by AI · approved by ${s.creatorName}`
-              : `${s.creatorName}${s.handle ? ` replied to ${s.handle}` : " · personal reply"}`}
+              ? formatCopy("approvedAuthor", { name: s.creatorName })
+              : s.handle
+                ? formatCopy("growthSharedReplyTo", {
+                    name: s.creatorName,
+                    handle: s.handle,
+                  })
+                : formatCopy("growthSharedPersonalReply", {
+                    name: s.creatorName,
+                  })}
           </div>
           <div
             style={{ display: "flex", fontSize: 40, whiteSpace: "pre-wrap" }}
@@ -65,7 +70,10 @@ export async function GET(
             style={{ display: "flex", flexDirection: "column", fontSize: 22 }}
           >
             <span>
-              Signed by {s.creatorName} · version {s.version}
+              {formatCopy("growthSignedByVersion", {
+                name: s.creatorName,
+                version: s.version,
+              })}
             </span>
             <span>
               {origin}/share/{id}
@@ -83,7 +91,7 @@ export async function GET(
       },
     );
   } catch {
-    return new Response("This card is unavailable.", {
+    return new Response(copy.growthCardUnavailable, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
     });

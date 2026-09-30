@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-09-30T03:09:09.041709+00:00",
+  "newTestCodeWritten": false,
+  "existingTestsPreserved": true,
+  "backendTypecheck": {
+    "command": "pnpm --filter @qelvora/backend typecheck",
+    "exitCode": 0,
+    "observedLog": "$ tsc --noEmit"
+  },
+  "backendOwnedLint": {
+    "exitCode": 0,
+    "observedLog": ""
+  },
+  "webOwnedTypecheck": {
+    "exitCode": 0,
+    "scope": "isolated W8 routes; earlier completed source check"
+  },
+  "webOwnedLint": {
+    "exitCode": 0,
+    "scope": "owned W8 routes; earlier completed source check"
+  },
+  "generatedResources": {
+    "exitCode": 0,
+    "scope": "existing check;12 shared resources/31 API operations; no manual generated edits"
+  },
+  "iosFullBuild": {
+    "finalSigning": "normal local ad-hoc Simulator Debug",
+    "success": true,
+    "distributionSigningVerified": false
+  },
+  "androidFullBuild": {
+    "success": true,
+    "summary": "BUILD SUCCESSFUL in 44s;37 tasks,4 executed,33 up-to-date"
+  },
+  "deployBundle": {
+    "success": true,
+    "bytes": 72495,
+    "format": "ESM, external packages"
+  },
+  "composeValidation": {
+    "passedEarlier": true,
+    "actualContainerImageBuild": false
+  },
+  "remoteCiRun": false,
+  "immutableStagingDeployed": false
+}

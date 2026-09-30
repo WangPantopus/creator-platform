@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { currentSession, sessionCookie } from "../../../../../lib/session";
 export const runtime = "nodejs";
 const allowed =
-  /^(?:state|draft|interview|status|sources(?:\/[0-9a-f-]{36})?|sponsors|license|corrections|style-card|preview|comparisons|evaluations(?:\/cancel)?|publish|pause|versions\/[0-9a-f-]{36}\/rollback|export)$/u;
+  /^(?:state|draft|interview|status|sources(?:\/[0-9a-f-]{36})?|sponsors|license|corrections|style-card|preview|comparisons|evaluations(?:\/cancel)?|publish|pause|versions(?:\/[0-9a-f-]{36}\/rollback)?|export)$/u;
 async function bridge(
   request: Request,
   context: { params: Promise<{ path: string[] }> },
@@ -38,7 +38,9 @@ async function bridge(
     process.env.NODE_ENV === "development" &&
     process.env.W2_DEVELOPMENT_MODE === "true" &&
     isLocal;
-  if (!token && development) token = process.env.W2_DEVELOPMENT_SESSION;
+  // Loopback Studio has an explicitly selected synthetic server actor. Browser
+  // cookies are shared across localhost ports and may belong to a peer runtime.
+  if (development) token = process.env.W2_DEVELOPMENT_SESSION;
   if (!token)
     return Response.json(
       {
@@ -62,6 +64,24 @@ async function bridge(
         },
       },
       { status: 403 },
+    );
+  const accountId = development
+    ? token.replace(/^development:/u, "")
+    : session?.accountId;
+  const expectedActor = request.headers.get("X-Studio-Actor");
+  if (
+    (request.method !== "GET" || expectedActor) &&
+    expectedActor !== `${accountId}:${creatorId}`
+  )
+    return Response.json(
+      {
+        error: {
+          code: "studio_actor_changed",
+          message:
+            "Your creator session changed. Reload Studio before continuing.",
+        },
+      },
+      { status: 409 },
     );
   const base = process.env.W2_API_URL ?? process.env.QELVORA_API_URL;
   if (!base)
@@ -103,26 +123,55 @@ async function bridge(
         },
         { status: 413 },
       );
-    const response = await fetch(`${base}/v1/agent/${creatorId}/${path}`, {
-      method: request.method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        ...(request.headers.get("Idempotency-Key")
-          ? { "Idempotency-Key": request.headers.get("Idempotency-Key")! }
-          : {}),
+    const query = new URL(request.url).searchParams;
+    let suffix = "";
+    if (query.size) {
+      const before = query.get("before");
+      if (
+        path !== "versions" ||
+        query.size !== 1 ||
+        query.getAll("before").length !== 1 ||
+        !before ||
+        !/^[1-9][0-9]{0,8}$/u.test(before)
+      )
+        return Response.json(
+          {
+            error: {
+              code: "invalid_query",
+              message: "Choose a valid version history page.",
+            },
+          },
+          { status: 400 },
+        );
+      suffix = `?before=${before}`;
+    }
+    const response = await fetch(
+      `${base}/v1/agent/${creatorId}/${path}${suffix}`,
+      {
+        method: request.method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...(request.headers.get("Idempotency-Key")
+            ? { "Idempotency-Key": request.headers.get("Idempotency-Key")! }
+            : {}),
+        },
+        ...(body ? { body } : {}),
+        cache: "no-store",
+        signal: AbortSignal.any([
+          request.signal,
+          AbortSignal.timeout(
+            path === "export"
+              ? 300_000
+              : path === "preview" || path === "style-card"
+                ? 120_000
+                : 15_000,
+          ),
+        ]),
+        redirect: "error",
       },
-      ...(body ? { body } : {}),
-      cache: "no-store",
-      signal: AbortSignal.any([
-        request.signal,
-        AbortSignal.timeout(
-          path === "preview" || path === "style-card" ? 120_000 : 15_000,
-        ),
-      ]),
-      redirect: "error",
-    });
-    return new Response(await response.text(), {
+    );
+    return new Response(response.body, {
       status: response.status,
       headers: {
         "Content-Type": "application/json",

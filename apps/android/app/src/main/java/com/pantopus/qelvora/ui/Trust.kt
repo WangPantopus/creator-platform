@@ -35,6 +35,7 @@ class TrustClient(private val baseURL: String, private val token: () -> String?)
         val connection = URL(baseURL.trimEnd('/') + "/v1/trust/" + path).openConnection() as HttpURLConnection
         try {
             connection.requestMethod = if (input == null) "GET" else "POST"
+            connection.setRequestProperty("X-Correlation-Id", UUID.randomUUID().toString())
             connection.connectTimeout = 5000; connection.readTimeout = 15000; connection.useCaches = false
             connection.setRequestProperty("Content-Type", "application/json")
             // Public help must remain reachable when secure account storage is unavailable.
@@ -60,13 +61,20 @@ class TrustClient(private val baseURL: String, private val token: () -> String?)
 fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistration(
     matches = { it.startsWith("/support") || it.startsWith("/trust") },
     allowsSignedOut = { it.startsWith("/trust") },
-    screen = { model -> key(model.session?.accountId) { TrustFanFeature(context, baseURL, model.destination) } }
+    screen = { model ->
+        val account = model.session?.accountId
+        key(account) { TrustFanFeature(context, baseURL, model.destination) {
+            val credential = model.currentToken()
+            check(account != null && model.session?.accountId == account) { "Your account changed. Reopen this screen before continuing." }
+            credential
+        } }
+    }
 )
 
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
-fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support") {
-    val client = remember(baseURL) { baseURL?.let { TrustClient(it) { SecureSessionStorage(context).read() } } }
+fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context).read() }) {
+    val client = remember(baseURL) { baseURL?.let { TrustClient(it, token) } }
     val coroutine = rememberCoroutineScope()
     var route by remember { mutableStateOf(destination) }
     var cases by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
@@ -74,6 +82,8 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     var jobs by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var selectedJob by remember { mutableStateOf<JsonObject?>(null) }
     var local by remember { mutableStateOf(false) }
+    var verificationConfigured by remember { mutableStateOf(false) }
+    var verificationMethod by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var result by remember { mutableStateOf("") }
@@ -84,6 +94,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     var reason by remember { mutableStateOf("") }
     var creatorId by remember { mutableStateOf(reportedCreator.takeIf(::validTrustId).orEmpty()) }
     var messageId by remember { mutableStateOf(reportedMessage.takeIf(::validTrustId).orEmpty()) }
+    var requestId by remember { mutableStateOf(entry.getQueryParameter("requestId").orEmpty().takeIf(::validTrustId).orEmpty()) }
     var threadId by remember { mutableStateOf("") }
     var scope by remember { mutableStateOf("account") }
     var proof by remember { mutableStateOf("") }
@@ -116,7 +127,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         if (client == null) { error = "The trust service is not configured."; return }
         busy = true
         try {
-            local = client.request("capabilities")["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
+            val capability = client.request("capabilities")
+            local = capability["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
+            verificationConfigured = capability.text("actorVerification") == "configured"
+            verificationMethod = capability.text("verificationMethod")
             help = client.request("help")
             if (route.startsWith("/trust") || route.contains("feedback")) { }
             else if (route.contains("access")) history = client.request("access-history").items()
@@ -142,11 +156,11 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         catch (failure: Exception) { selectedJob = null; error = failure.message ?: "Reconnect and try again." }
     }
     suspend fun privacyCommand(action: String) {
-        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
+        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
         perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
     }
     LaunchedEffect(route) { load() }
-    LaunchedEffect(kind,reason,creatorId,messageId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
+    LaunchedEffect(kind,reason,creatorId,messageId,requestId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
         TrustText("Reports are available without paid access. Evidence is limited to what you report.")
@@ -181,8 +195,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             if (scope != "account") TrustField("Creator ID", creatorId) { creatorId = it }
             if (scope == "thread") TrustField("Conversation ID", threadId) { threadId = it }
             if (local) { TrustText("Synthetic local account: type LOCAL DEVELOPMENT to confirm.", "caption"); TrustField("Local confirmation", proof) { proof = it } }
+            else if (verificationMethod == "current_session") TrustText("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.", "caption")
+            else if (verificationConfigured) TrustField("Account verification receipt", proof) { proof = it }
             else TrustText("Fresh account verification must be connected before requesting data changes.", "caption")
-            val disabled = busy || !local || proof != "LOCAL DEVELOPMENT" || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
+            val disabled = busy || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { coroutine.launch { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
             jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state"), ButtonVariant.QUIET, block = true) { coroutine.launch { jobDetail(job.text("id")) } } }
@@ -211,14 +227,15 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             TrustText("Report type: " + kind.replace('_', ' '), "label")
             if (kind == "ai_report" || kind == "abuse" || kind == "block") TrustField("Creator ID", creatorId) { creatorId = it }
             if (kind == "ai_report") TrustField("AI message ID", messageId) { messageId = it }
+            if (kind == "support") TrustField("Request ID (optional)", requestId) { requestId = it }
             if (kind == "crisis") TrustCrisisHelp(context,help)
             TrustField("What happened?", reason, true) { reason = it }
-            Button(if(kind=="block") "Block creator" else "Send report", ButtonVariant.SECONDARY, block = true, disabled = busy || reason.trim().length < 12 || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { coroutine.launch {
+            Button(if(kind=="block") "Block creator" else "Send report", ButtonVariant.SECONDARY, block = true, disabled = busy || reason.trim().length < 12 || (kind=="support" && requestId.isNotEmpty() && !validTrustId(requestId)) || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { coroutine.launch {
                 if(kind=="block") {
                     if(perform("blocks",buildJsonObject { put("creatorId",creatorId.lowercase()); put("reason",reason); put("idempotencyKey",key) }) != null) { result="Your block is saved. Enforcement in connected domains follows their current denial checks."; reason=""; load() }
                     return@launch
                 }
-                val input = buildJsonObject { put("kind", kind); put("reason", reason); put("idempotencyKey", key); if (kind!="support" && creatorId.isNotEmpty()) put("creatorId", creatorId.lowercase()); if (kind == "ai_report") put("messageId", messageId.lowercase()) }
+                val input = buildJsonObject { put("kind", kind); put("reason", reason); put("idempotencyKey", key); if (kind!="support" && creatorId.isNotEmpty()) put("creatorId", creatorId.lowercase()); if (kind == "ai_report") put("messageId", messageId.lowercase()); if (kind == "support" && requestId.isNotEmpty()) put("requestId",requestId.lowercase()) }
                 perform("reports", input)?.let { result = "CASE-" + it.text("number") + " is saved. No provider action is implied."; reason = ""; load() }
             } }
             TrustText("Your cases", "title")

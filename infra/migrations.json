@@ -146,18 +146,78 @@
       "version": "0031_w4_purchase_history",
       "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
       "owner": "W4"
+    },
+    {
+      "version": "0032_growth_continuation",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0033_growth_prompt_claims",
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0034_growth_erasure_fence",
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0041_w3_conversations",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_conversations.sql",
+      "owner": "W3"
+    },
+    {
+      "version": "0042_w3_wellbeing",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_wellbeing.sql",
+      "owner": "W3"
+    },
+    {
+      "version": "0043_w8_relationship_backfill",
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "owner": "W8"
     }
   ],
   "reserved": [
     {
       "id": "0005",
       "owner": "W5",
-      "state": "producer_file_pending"
+      "state": "producer_allocated_at_0035"
     },
     {
       "id": "0009",
       "owner": "W3",
-      "state": "producer_file_pending"
+      "state": "producer_allocated_at_0041"
     }
   ]
 }

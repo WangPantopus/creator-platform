@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Pool } from "pg";
+import { z } from "zod";
 import type { PrivacyHook, EffectHook, PrivacyDomain } from "./contracts.js";
 import { TrustStore } from "./store.js";
 
@@ -154,9 +155,13 @@ export class TrustWorker {
           creatorId: task.creator_id,
           threadId: task.thread_id,
           idempotencyKey: `${task.job_id}:${task.domain}`,
+          leaseToken: task.lease_token,
         }),
         45_000,
       );
+      receipt(result.receipt);
+      if (task.kind === "export" && result.data === undefined)
+        throw new Error("export_artifact_missing");
       const size = Buffer.byteLength(JSON.stringify(result));
       if (size > 4 * 1024 * 1024) throw new Error("artifact_too_large");
       const client = await this.pool.connect();
@@ -201,7 +206,12 @@ export class TrustWorker {
     } catch (error) {
       const code =
         error instanceof Error &&
-        ["hook_timeout", "artifact_too_large"].includes(error.message)
+        [
+          "hook_timeout",
+          "artifact_too_large",
+          "receipt_invalid",
+          "export_artifact_missing",
+        ].includes(error.message)
           ? error.message
           : "domain_hook_error";
       await this.pool.query(
@@ -246,9 +256,11 @@ export class TrustWorker {
           actorAccountId: effect.actor_account_id,
           ...effect.input,
           idempotencyKey: effect.id,
+          leaseToken: effect.lease_token,
         }),
         45_000,
       );
+      receipt(result.receipt);
       const client = await this.pool.connect();
       try {
         await client.query("BEGIN");
@@ -290,14 +302,20 @@ export class TrustWorker {
       } finally {
         client.release();
       }
-    } catch {
+    } catch (error) {
+      const code =
+        error instanceof Error &&
+        ["hook_timeout", "receipt_invalid"].includes(error.message)
+          ? error.message
+          : "effect_hook_error";
       await this.pool.query(
-        "UPDATE creator_trust.effect SET state=$3,error_code='effect_hook_error',lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
+        "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
         [
           effect.id,
           effect.lease_token,
           effect.attempts >= 8 ? "dead_letter" : "retry",
           Math.min(3600, 2 ** effect.attempts * 5),
+          code,
         ],
       );
     }
@@ -314,6 +332,18 @@ export class TrustWorker {
       "UPDATE creator_trust.privacy_task t SET data=NULL FROM creator_trust.privacy_job j WHERE j.id=t.job_id AND j.kind='export' AND j.completed_at<now()-interval '7 days' AND t.data IS NOT NULL",
     );
   }
+}
+/** A missing, empty or explicitly incomplete owner acknowledgment cannot complete a task. */
+function receipt(value: unknown) {
+  const parsed = z.record(z.string(), z.unknown()).safeParse(value);
+  if (
+    !parsed.success ||
+    Object.keys(parsed.data).length === 0 ||
+    parsed.data.complete === false ||
+    parsed.data.done === false ||
+    Buffer.byteLength(JSON.stringify(parsed.data)) > 64 * 1024
+  )
+    throw new Error("receipt_invalid");
 }
 async function deadline<T>(promise: Promise<T>, ms: number) {
   let timer: ReturnType<typeof setTimeout> | undefined;

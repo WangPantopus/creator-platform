@@ -72,7 +72,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
       res.setHeader("Vary", "Origin");
       res.setHeader(
         "Access-Control-Allow-Headers",
-        "Authorization, Content-Type, X-Correlation-Id",
+        "Authorization, Content-Type, X-Correlation-Id, X-Expected-Account-Id",
       );
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
@@ -81,7 +81,26 @@ export function createTrustRouter(options: TrustRouterOptions) {
   });
   router.use(express.json({ limit: "64kb" }));
   const id = (req: Request) => z.uuid().parse(req.params.id);
-  const actor = (req: Request) => options.actor(req);
+  const actor = async (req: Request) => {
+    const current = await options.actor(req);
+    const expected = req.get("X-Expected-Account-Id");
+    if (expected && z.uuid().parse(expected) !== current.accountId)
+      throw new DomainError(
+        "session_account_changed",
+        "Your account changed. Reopen this page before taking this action.",
+        409,
+      );
+    // Preserve personal support/appeals/privacy progress after a denial while
+    // preventing a suspended operations account from reading or deciding cases.
+    if (
+      req.path.startsWith("/v1/trust/operations/") ||
+      req.path === "/v1/trust/cases" ||
+      (/^\/v1\/trust\/cases\/[^/]+(?:\/|$)/u.test(req.path) &&
+        !req.path.endsWith("/appeals"))
+    )
+      await options.service.assertAllowed(current);
+    return current;
+  };
   router.get("/health/live", (_req, res) => res.json({ alive: true }));
   router.get("/health/ready", async (_req, res) => {
     const state = await options.readiness.inspect();
@@ -96,6 +115,10 @@ export function createTrustRouter(options: TrustRouterOptions) {
       actorVerification: options.service.dependencies.verifyPrivacy
         ? "configured"
         : "unavailable",
+      verificationMethod: options.localDevelopment
+        ? "local_confirmation"
+        : (options.service.dependencies.privacyVerificationMethod ??
+          "external_receipt"),
       privacyDomains: [
         "identity",
         "conversation",

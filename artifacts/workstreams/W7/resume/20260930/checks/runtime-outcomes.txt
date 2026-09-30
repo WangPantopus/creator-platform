@@ -1,0 +1,11 @@
+Local synthetic diagnostics, not genuine owner/provider acceptance.
+Delayed notification after purge: created=0.
+Relay replay after purge: queued=false.
+Late email binding: growth_data_erased 410.
+Raw recipient notification/relay records: 0.
+Missing W8 job/account scope: growth_account_scope_required 503.
+Unsubscribe GET 200: subscribed=true.
+One-click POST 200: stopped=true.
+Actual browser development actor feedback: one notification/score4 row.
+No paid AI calls or transport sends.
+Final Android cold-start TotalTime=2347ms, WaitTime=2356ms; single diagnostic, not SLO.

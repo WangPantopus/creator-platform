@@ -1801,6 +1801,689 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
   case `interrupted` = "interrupted"
 }
 
+public struct APIConversationAuditEntry: Codable, Sendable {
+  public let `id`: String
+  public let `readerAccountId`: String
+  public let `role`: APIConversationAuditEntryRole
+  public let `readAt`: String
+  public init(id: String, readerAccountId: String, role: APIConversationAuditEntryRole, readAt: String) {
+    self.id = id
+    self.readerAccountId = readerAccountId
+    self.role = role
+    self.readAt = readAt
+  }
+}
+
+public enum APIConversationAuditEntryRole: String, Codable, Sendable {
+  case `creator` = "creator"
+  case `triage` = "triage"
+  case `ops` = "ops"
+}
+
+public struct APIConversationBeginConversation: Codable, Sendable {
+  public let `creatorId`: String
+  public let `policyVersion`: String
+  public let `accessNoticeAccepted`: APIConversationBeginConversationAccessNoticeAccepted
+  public let `idempotencyKey`: String
+  public init(creatorId: String, policyVersion: String, accessNoticeAccepted: APIConversationBeginConversationAccessNoticeAccepted, idempotencyKey: String) {
+    self.creatorId = creatorId
+    self.policyVersion = policyVersion
+    self.accessNoticeAccepted = accessNoticeAccepted
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIConversationBeginConversationAccessNoticeAccepted: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIConversationConsentInput: Codable, Sendable {
+  public let `version`: String
+  public let `accepted`: Bool
+  public init(version: String, accepted: Bool) {
+    self.version = version
+    self.accepted = accepted
+  }
+}
+
+public enum APIConversationConversationAuthorship: String, Codable, Sendable {
+  case `fan` = "fan"
+  case `ai` = "ai"
+  case `approved_draft` = "approved_draft"
+  case `human_creator` = "human_creator"
+  case `human_call` = "human_call"
+  case `human_broadcast` = "human_broadcast"
+  case `human_reaction` = "human_reaction"
+  case `team` = "team"
+  case `system` = "system"
+}
+
+public struct APIConversationConversationMessage: Codable, Sendable {
+  public let `id`: String
+  public let `threadId`: String
+  public let `authorKind`: APIConversationConversationMessageAuthorKind
+  public let `text`: String
+  public let `deliveryState`: APIConversationConversationMessageDeliveryState
+  public let `controlEpoch`: Int
+  public let `sequence`: Int
+  public let `signedActId`: String?
+  public let `citations`: [String]
+  public let `createdAt`: String
+  public let `member`: String?
+  public let `offTheRecord`: Bool
+  public let `version`: Int
+  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, citations: [String], createdAt: String, member: String? = nil, offTheRecord: Bool, version: Int) {
+    self.id = id
+    self.threadId = threadId
+    self.authorKind = authorKind
+    self.text = text
+    self.deliveryState = deliveryState
+    self.controlEpoch = controlEpoch
+    self.sequence = sequence
+    self.signedActId = signedActId
+    self.citations = citations
+    self.createdAt = createdAt
+    self.member = member
+    self.offTheRecord = offTheRecord
+    self.version = version
+  }
+}
+
+public enum APIConversationConversationMessageAuthorKind: String, Codable, Sendable {
+  case `fan` = "fan"
+  case `ai` = "ai"
+  case `approved_draft` = "approved_draft"
+  case `human_creator` = "human_creator"
+  case `human_call` = "human_call"
+  case `human_broadcast` = "human_broadcast"
+  case `human_reaction` = "human_reaction"
+  case `team` = "team"
+  case `system` = "system"
+}
+
+public enum APIConversationConversationMessageDeliveryState: String, Codable, Sendable {
+  case `accepted` = "accepted"
+  case `generating` = "generating"
+  case `delivered` = "delivered"
+  case `failed` = "failed"
+  case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationPage: Codable, Sendable {
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `creatorName`: String
+  public let `fanHandle`: String
+  public let `control`: APIConversationConversationPageControl
+  public let `epoch`: Int
+  public let `cursor`: Int
+  public let `revision`: Int
+  public let `generationSequences`: [String: Int]
+  public let `messages`: [APIConversationConversationPageMessagesItem]
+  public let `before`: Int?
+  public let `offTheRecord`: Bool
+  public let `introShared`: Bool
+  public let `consentCurrent`: Bool
+  public let `canSend`: Bool
+  public let `unavailableReason`: String?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil) {
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.creatorName = creatorName
+    self.fanHandle = fanHandle
+    self.control = control
+    self.epoch = epoch
+    self.cursor = cursor
+    self.revision = revision
+    self.generationSequences = generationSequences
+    self.messages = messages
+    self.before = before
+    self.offTheRecord = offTheRecord
+    self.introShared = introShared
+    self.consentCurrent = consentCurrent
+    self.canSend = canSend
+    self.unavailableReason = unavailableReason
+  }
+}
+
+public enum APIConversationConversationPageControl: String, Codable, Sendable {
+  case `ai_active` = "ai_active"
+  case `human_active` = "human_active"
+  case `ai_paused` = "ai_paused"
+  case `closed` = "closed"
+  case `blocked` = "blocked"
+}
+
+public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
+  public let `id`: String
+  public let `threadId`: String
+  public let `authorKind`: APIConversationConversationPageMessagesItemAuthorKind
+  public let `text`: String
+  public let `deliveryState`: APIConversationConversationPageMessagesItemDeliveryState
+  public let `controlEpoch`: Int
+  public let `sequence`: Int
+  public let `signedActId`: String?
+  public let `citations`: [String]
+  public let `createdAt`: String
+  public let `member`: String?
+  public let `offTheRecord`: Bool
+  public let `version`: Int
+  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, citations: [String], createdAt: String, member: String? = nil, offTheRecord: Bool, version: Int) {
+    self.id = id
+    self.threadId = threadId
+    self.authorKind = authorKind
+    self.text = text
+    self.deliveryState = deliveryState
+    self.controlEpoch = controlEpoch
+    self.sequence = sequence
+    self.signedActId = signedActId
+    self.citations = citations
+    self.createdAt = createdAt
+    self.member = member
+    self.offTheRecord = offTheRecord
+    self.version = version
+  }
+}
+
+public enum APIConversationConversationPageMessagesItemAuthorKind: String, Codable, Sendable {
+  case `fan` = "fan"
+  case `ai` = "ai"
+  case `approved_draft` = "approved_draft"
+  case `human_creator` = "human_creator"
+  case `human_call` = "human_call"
+  case `human_broadcast` = "human_broadcast"
+  case `human_reaction` = "human_reaction"
+  case `team` = "team"
+  case `system` = "system"
+}
+
+public enum APIConversationConversationPageMessagesItemDeliveryState: String, Codable, Sendable {
+  case `accepted` = "accepted"
+  case `generating` = "generating"
+  case `delivered` = "delivered"
+  case `failed` = "failed"
+  case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationUsage: Codable, Sendable {
+  public let `timezone`: APIConversationConversationUsageTimezone
+  public let `days`: [APIConversationConversationUsageDaysItem]
+  public let `modeAvailable`: Bool
+  public let `measurement`: String
+  public init(timezone: APIConversationConversationUsageTimezone, days: [APIConversationConversationUsageDaysItem], modeAvailable: Bool, measurement: String) {
+    self.timezone = timezone
+    self.days = days
+    self.modeAvailable = modeAvailable
+    self.measurement = measurement
+  }
+}
+
+public enum APIConversationConversationUsageTimezone: String, Codable, Sendable {
+  case `UTC` = "UTC"
+}
+
+public struct APIConversationConversationUsageDaysItem: Codable, Sendable {
+  public let `day`: String
+  public let `seconds`: Double
+  public let `companionSeconds`: Double
+  public init(day: String, seconds: Double, companionSeconds: Double) {
+    self.day = day
+    self.seconds = seconds
+    self.companionSeconds = companionSeconds
+  }
+}
+
+public struct APIConversationMemoryDecision: Codable, Sendable {
+  public let `expectedRevision`: Int
+  public let `action`: APIConversationMemoryDecisionAction
+  public let `text`: String?
+  public init(expectedRevision: Int, action: APIConversationMemoryDecisionAction, text: String? = nil) {
+    self.expectedRevision = expectedRevision
+    self.action = action
+    self.text = text
+  }
+}
+
+public enum APIConversationMemoryDecisionAction: String, Codable, Sendable {
+  case `accept` = "accept"
+  case `delete` = "delete"
+  case `edit` = "edit"
+  case `resolve` = "resolve"
+}
+
+public struct APIConversationMemoryItem: Codable, Sendable {
+  public let `id`: String
+  public let `kind`: APIConversationMemoryItemKind
+  public let `text`: String
+  public let `provenanceMessageId`: String
+  public let `sensitiveCategory`: String?
+  public let `state`: APIConversationMemoryItemState
+  public let `editedByFan`: Bool
+  public let `createdAt`: String
+  public init(id: String, kind: APIConversationMemoryItemKind, text: String, provenanceMessageId: String, sensitiveCategory: String? = nil, state: APIConversationMemoryItemState, editedByFan: Bool, createdAt: String) {
+    self.id = id
+    self.kind = kind
+    self.text = text
+    self.provenanceMessageId = provenanceMessageId
+    self.sensitiveCategory = sensitiveCategory
+    self.state = state
+    self.editedByFan = editedByFan
+    self.createdAt = createdAt
+  }
+}
+
+public enum APIConversationMemoryItemKind: String, Codable, Sendable {
+  case `fact` = "fact"
+  case `summary` = "summary"
+  case `open_loop` = "open_loop"
+}
+
+public enum APIConversationMemoryItemState: String, Codable, Sendable {
+  case `proposed` = "proposed"
+  case `remembered` = "remembered"
+  case `resolved` = "resolved"
+}
+
+public struct APIConversationMemoryProposal: Codable, Sendable {
+  public let `kind`: APIConversationMemoryProposalKind
+  public let `text`: String
+  public let `semanticKey`: String
+  public let `provenanceMessageId`: String
+  public let `expectedRevision`: Int
+  public let `sensitiveCategory`: String?
+  public init(kind: APIConversationMemoryProposalKind, text: String, semanticKey: String, provenanceMessageId: String, expectedRevision: Int, sensitiveCategory: String? = nil) {
+    self.kind = kind
+    self.text = text
+    self.semanticKey = semanticKey
+    self.provenanceMessageId = provenanceMessageId
+    self.expectedRevision = expectedRevision
+    self.sensitiveCategory = sensitiveCategory
+  }
+}
+
+public enum APIConversationMemoryProposalKind: String, Codable, Sendable {
+  case `fact` = "fact"
+  case `summary` = "summary"
+  case `open_loop` = "open_loop"
+}
+
+public struct APIConversationProviderPolicy: Codable, Sendable {
+  public let `version`: String
+  public let `providers`: [APIConversationProviderPolicyProvidersItem]
+  public let `verified`: Bool
+  public init(version: String, providers: [APIConversationProviderPolicyProvidersItem], verified: Bool) {
+    self.version = version
+    self.providers = providers
+    self.verified = verified
+  }
+}
+
+public struct APIConversationProviderPolicyProvidersItem: Codable, Sendable {
+  public let `name`: String
+  public let `termsUrl`: String
+  public let `noTraining`: Bool
+  public let `noRetention`: Bool
+  public init(name: String, termsUrl: String, noTraining: Bool, noRetention: Bool) {
+    self.name = name
+    self.termsUrl = termsUrl
+    self.noTraining = noTraining
+    self.noRetention = noRetention
+  }
+}
+
+public struct APIConversationTeamReply: Codable, Sendable {
+  public let `text`: String
+  public let `idempotencyKey`: String
+  public init(text: String, idempotencyKey: String) {
+    self.text = text
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIConversationThreadPreferences: Codable, Sendable {
+  public let `offTheRecord`: Bool
+  public let `introShared`: Bool
+  public let `expectedRevision`: Int
+  public init(offTheRecord: Bool, introShared: Bool, expectedRevision: Int) {
+    self.offTheRecord = offTheRecord
+    self.introShared = introShared
+    self.expectedRevision = expectedRevision
+  }
+}
+
+public struct APIConversationTranslation: Codable, Sendable {
+  public let `messageId`: String
+  public let `originalVersion`: Int
+  public let `language`: String
+  public let `text`: String
+  public let `provider`: String
+  public let `label`: APIConversationTranslationLabel
+  public init(messageId: String, originalVersion: Int, language: String, text: String, provider: String, label: APIConversationTranslationLabel) {
+    self.messageId = messageId
+    self.originalVersion = originalVersion
+    self.language = language
+    self.text = text
+    self.provider = provider
+    self.label = label
+  }
+}
+
+public enum APIConversationTranslationLabel: String, Codable, Sendable {
+  case `Translated___original_available` = "Translated · original available"
+}
+
+public struct APIContentContentDocument: Codable, Sendable {
+  public let `kind`: APIContentContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentContentDocumentLive?
+  public init(kind: APIContentContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public struct APIContentContentMedia: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentContentMediaKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentContentMediaKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentContentMediaKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentContentPage: Codable, Sendable {
+  public let `cursor`: String?
+  public let `limit`: Int
+  public let `state`: APIContentContentPageState?
+  public let `query`: String?
+  public init(cursor: String? = nil, limit: Int, state: APIContentContentPageState? = nil, query: String? = nil) {
+    self.cursor = cursor
+    self.limit = limit
+    self.state = state
+    self.query = query
+  }
+}
+
+public enum APIContentContentPageState: String, Codable, Sendable {
+  case `draft` = "draft"
+  case `scheduled` = "scheduled"
+  case `published` = "published"
+  case `unpublished` = "unpublished"
+  case `archived` = "archived"
+}
+
+public struct APIContentContentVersionCommand: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public init(version: Int, idempotencyKey: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentPublishContent: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentQuoteConsent: Codable, Sendable {
+  public let `version`: Int
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `idempotencyKey`: String
+  public init(version: Int, shareText: Bool, showHandle: Bool, idempotencyKey: String) {
+    self.version = version
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentReactToReply: Codable, Sendable {
+  public let `version`: Int
+  public let `kind`: APIContentReactToReplyKind
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(version: Int, kind: APIContentReactToReplyKind, signedActId: String, idempotencyKey: String) {
+    self.version = version
+    self.kind = kind
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIContentReactToReplyKind: String, Codable, Sendable {
+  case `heart` = "heart"
+  case `thanks` = "thanks"
+  case `helpful` = "helpful"
+}
+
+public struct APIContentReplyToNote: Codable, Sendable {
+  public let `text`: String
+  public let `idempotencyKey`: String
+  public init(text: String, idempotencyKey: String) {
+    self.text = text
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentSaveContent: Codable, Sendable {
+  public let `id`: String
+  public let `expectedVersion`: Int
+  public let `document`: APIContentSaveContentDocument
+  public let `idempotencyKey`: String
+  public init(id: String, expectedVersion: Int, document: APIContentSaveContentDocument, idempotencyKey: String) {
+    self.id = id
+    self.expectedVersion = expectedVersion
+    self.document = document
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentSaveContentDocument: Codable, Sendable {
+  public let `kind`: APIContentSaveContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentSaveContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentSaveContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentSaveContentDocumentLive?
+  public init(kind: APIContentSaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentSaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentSaveContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentSaveContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentSaveContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentSaveContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentSaveContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentSaveContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentSaveContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentSaveContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentSaveContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public struct APIContentThanksCommand: Codable, Sendable {
+  public let `targetKind`: APIContentThanksCommandTargetKind
+  public let `targetId`: String
+  public let `text`: String
+  public let `shareWithCreatorDigest`: Bool
+  public let `showIdentity`: Bool
+  public let `withdrawn`: Bool
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(targetKind: APIContentThanksCommandTargetKind, targetId: String, text: String, shareWithCreatorDigest: Bool, showIdentity: Bool, withdrawn: Bool, expectedVersion: Int, idempotencyKey: String) {
+    self.targetKind = targetKind
+    self.targetId = targetId
+    self.text = text
+    self.shareWithCreatorDigest = shareWithCreatorDigest
+    self.showIdentity = showIdentity
+    self.withdrawn = withdrawn
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIContentThanksCommandTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
 public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
 
 public actor CreatorAPIClient {
@@ -1921,9 +2604,9 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:setup|notes|requests|threads|ai|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|requests|threads|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$)", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$)", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$"]
     let literalValues = ["offer": "1"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }

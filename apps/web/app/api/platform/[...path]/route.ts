@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SessionTokenSchema } from "@qelvora/api";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 import {
   cookieOptions,
   platformFetch,
@@ -51,10 +52,7 @@ async function proxy(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (
-    request.method !== "GET" &&
-    request.headers.get("origin") !== request.nextUrl.origin
-  )
+  if (request.method !== "GET" && !sameRequestOrigin(request))
     return Response.json(
       { error: { message: "Use this app to perform the action." } },
       { status: 403 },

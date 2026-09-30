@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { CommerceScreen } from "../../../features/commerce/CommerceScreen";
+import { currentSession } from "../../../lib/session";
 const screens = [
   "requests",
   "spending",
@@ -23,8 +24,11 @@ export default async function Page({
   const { screen } = await params;
   if (!screens.some((s) => s === screen)) notFound();
   const query = await searchParams;
+  const session = await currentSession();
   return (
     <CommerceScreen
+      key={session?.accountId ?? "signed-out"}
+      accountId={session?.accountId ?? null}
       screen={screen}
       creatorId={query.creatorId}
       packetId={query.packetId}

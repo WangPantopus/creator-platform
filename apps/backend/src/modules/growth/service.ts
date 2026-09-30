@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import {
   createHash,
   createHmac,
@@ -25,9 +26,11 @@ import {
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
+import { GrowthErasure } from "./erasure.js";
 
 export class GrowthService {
   readonly notifications: Notifications;
+  readonly erasure: GrowthErasure;
   constructor(
     readonly db: GrowthDatabase,
     readonly owners: GrowthOwners,
@@ -36,7 +39,22 @@ export class GrowthService {
   ) {
     if (secret.length !== 32)
       throw new Error("Growth requires a 32-byte encryption/aggregation key");
-    this.notifications = new Notifications(db, owners, provider);
+    this.erasure = new GrowthErasure(secret);
+    db.actorFence = async (client, accountId, creatorId) => {
+      if (
+        !(await this.erasure.subjects(
+          client,
+          [accountId],
+          creatorId ? [creatorId] : [],
+        ))
+      )
+        throw new DomainError(
+          "growth_data_erased",
+          copy.growthErrorGrowthDataErased2,
+          410,
+        );
+    };
+    this.notifications = new Notifications(db, owners, this.erasure, provider);
   }
   private pseudonym(creatorId: string, accountId: string, window: string) {
     return createHmac("sha256", this.secret)
@@ -67,31 +85,37 @@ export class GrowthService {
   }
   async projectCreator(input: unknown) {
     const item = CreatorProjection.parse(input);
-    await this.db.worker.query(
-      `INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6)
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.id))) return;
+      await client.query(
+        `INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6)
       ON CONFLICT(id) DO UPDATE SET version=excluded.version,handle=excluded.handle,state=excluded.state,document=excluded.document,updated_at=excluded.updated_at WHERE growth.creator_public.version<excluded.version`,
-      [item.id, item.version, item.handle, item.state, item, item.updatedAt],
-    );
+        [item.id, item.version, item.handle, item.state, item, item.updatedAt],
+      );
+    });
   }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
-        "Public named content requires signed evidence.",
+        copy.growthErrorSignedContentRequired,
       );
-    await this.db.worker.query(
-      `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.creatorId))) return;
+      await client.query(
+        `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
       ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document WHERE growth.content_public.version<excluded.version`,
-      [
-        item.id,
-        item.creatorId,
-        item.version,
-        item.state,
-        item,
-        item.publishedAt,
-      ],
-    );
+        [
+          item.id,
+          item.creatorId,
+          item.version,
+          item.state,
+          item,
+          item.publishedAt,
+        ],
+      );
+    });
   }
   async discover(query: string, category: string, offset = 0) {
     const q = z.string().max(120).parse(query),
@@ -104,7 +128,7 @@ export class GrowthService {
         q,
         `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
         cat,
-        Math.min(Math.max(offset, 0), 1000),
+        z.int().min(0).max(1000).parse(offset),
       ],
     );
     return {
@@ -187,7 +211,7 @@ export class GrowthService {
     if (!result.rowCount)
       throw new DomainError(
         "creator_unavailable",
-        "This creator is unavailable.",
+        copy.growthThisCreatorIsUnavailable,
         404,
       );
     await this.db.actor(actor, null, async (client) => {
@@ -305,7 +329,7 @@ export class GrowthService {
       if (!result.rowCount)
         throw new DomainError(
           "notification_unavailable",
-          "This update is unavailable.",
+          copy.growthErrorNotificationUnavailable,
           404,
         );
       return { read: true };
@@ -340,7 +364,7 @@ export class GrowthService {
   async revokeDevice(actor: Actor, id: string) {
     await this.db.actor(actor, null, async (client) => {
       await client.query(
-        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND installation_id=$2",
+        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND (id=$2 OR installation_id=$2)",
         [actor.accountId, id],
       );
     });
@@ -350,14 +374,22 @@ export class GrowthService {
   async bindVerifiedEmail(accountId: string, address: string) {
     const email = z.email().parse(address),
       token = randomBytes(32).toString("base64url");
-    await this.db.worker.query(
-      "INSERT INTO growth.email(account_id,encrypted_address,verified_at,unsubscribe_hash) VALUES($1,$2,now(),$3) ON CONFLICT(account_id) DO UPDATE SET encrypted_address=excluded.encrypted_address,verified_at=now(),bounced_at=NULL,unsubscribed_at=NULL,unsubscribe_hash=excluded.unsubscribe_hash",
-      [
-        accountId,
-        this.seal(email),
-        createHash("sha256").update(token).digest("hex"),
-      ],
-    );
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.subjects(client, [accountId])))
+        throw new DomainError(
+          "growth_data_erased",
+          copy.growthErrorGrowthDataErased3,
+          410,
+        );
+      await client.query(
+        "INSERT INTO growth.email(account_id,encrypted_address,verified_at,unsubscribe_hash) VALUES($1,$2,now(),$3) ON CONFLICT(account_id) DO UPDATE SET encrypted_address=excluded.encrypted_address,verified_at=now(),bounced_at=NULL,unsubscribed_at=NULL,unsubscribe_hash=excluded.unsubscribe_hash",
+        [
+          accountId,
+          this.seal(email),
+          createHash("sha256").update(token).digest("hex"),
+        ],
+      );
+    });
     return { unsubscribeToken: token };
   }
   async unsubscribe(token: string) {
@@ -379,13 +411,13 @@ export class GrowthService {
     if (!source)
       throw new DomainError(
         "sharing_unavailable",
-        "Sharing is not permitted for this reply.",
+        copy.growthErrorSharingUnavailable,
       );
     const current = await this.owners.shareStatus(grantId, source);
     if (!current.valid)
       throw new DomainError(
         "sharing_unavailable",
-        "Sharing is not permitted for this reply.",
+        copy.growthErrorSharingUnavailable,
       );
     // Canonical W1/W4/W5 adapter attests exact delivered version, creator permission and fan choice.
     return this.db.actor(actor, null, async (client) => {
@@ -404,7 +436,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "share_version_conflict",
-          "The shared version has changed.",
+          copy.growthErrorShareVersionConflict,
           409,
         );
       return { id: prior.rows[0].id };
@@ -439,11 +471,15 @@ export class GrowthService {
       if (!posts.some((p) => p.id === value.contextId))
         throw new DomainError(
           "context_unavailable",
-          "This post is unavailable.",
+          copy.growthThisPostIsUnavailable,
           404,
         );
     }
     return this.db.actor(actor, creatorId, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.invites:${actor.accountId}`],
+      );
       const count = await client.query(
         "SELECT count(*)::int AS count FROM growth.invite WHERE created_by=$1 AND expires_at>now() AND revoked_at IS NULL",
         [actor.accountId],
@@ -451,7 +487,7 @@ export class GrowthService {
       if (count.rows[0].count >= 20)
         throw new DomainError(
           "invite_limit",
-          "You already have 20 active invitation links.",
+          copy.growthErrorInviteLimit2,
           429,
         );
       const result = await client.query(
@@ -480,7 +516,7 @@ export class GrowthService {
     if (!id)
       throw new DomainError(
         "creator_required",
-        "This view is available to the creator only.",
+        copy.growthErrorCreatorRequired,
       );
     return id;
   }
@@ -495,7 +531,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "invalid_window",
-        "Insights use Monday-starting weekly windows.",
+        copy.growthErrorInvalidWindow,
         400,
       );
     const fanKey = this.pseudonym(
@@ -504,6 +540,14 @@ export class GrowthService {
       value.window,
     );
     await this.db.transaction(this.db.worker, async (client) => {
+      if (
+        !(await this.erasure.subjects(
+          client,
+          [value.fanAccountId],
+          [value.creatorId],
+        ))
+      )
+        return;
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [value.creatorId + ":" + value.window],
@@ -518,7 +562,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "window_closed",
-          "This weekly evidence window is already closed.",
+          copy.growthErrorWindowClosed,
           409,
         );
       const saved = await client.query(
@@ -547,7 +591,7 @@ export class GrowthService {
         )
           throw new DomainError(
             "signal_version_conflict",
-            "A signal version cannot change its meaning.",
+            copy.growthErrorSignalVersionConflict,
             409,
           );
       }
@@ -563,16 +607,13 @@ export class GrowthService {
     )
       throw new DomainError(
         "invalid_window",
-        "Insights use Monday-starting weekly windows.",
+        copy.growthErrorInvalidWindow,
         400,
       );
     if (date.valueOf() + 7 * 86400000 > Date.now())
-      throw new DomainError(
-        "window_open",
-        "Insights publish after the weekly evidence window closes.",
-        409,
-      );
+      throw new DomainError("window_open", copy.growthErrorWindowOpen, 409);
     await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, creatorId))) return;
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [creatorId + ":" + window],
@@ -625,7 +666,7 @@ export class GrowthService {
       if (!snapshot.rowCount)
         throw new DomainError(
           "insight_unavailable",
-          "This insight is unavailable.",
+          copy.growthErrorInsightUnavailable,
           404,
         );
       await client.query(
@@ -659,7 +700,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "insight_unavailable",
-        "This insight is unavailable.",
+        copy.growthErrorInsightUnavailable,
       );
     return this.owners.publishRecommendation(actor, value);
   }
@@ -671,7 +712,7 @@ export class GrowthService {
     )
       throw new DomainError(
         "creator_required",
-        "This outcome is outside your creator scope.",
+        copy.growthErrorCreatorRequired2,
       );
     await this.db.actor(actor, null, async (client) => {
       const inserted = await client.query(
@@ -695,7 +736,7 @@ export class GrowthService {
         if (!prior || contentHash(prior.document) !== contentHash(value))
           throw new DomainError(
             "metric_id_conflict",
-            "This outcome ID already refers to another event.",
+            copy.growthErrorMetricIdConflict,
             409,
           );
       }
@@ -753,12 +794,17 @@ export class GrowthService {
   }
   async experiments(actor: Actor) {
     const creatorId = await this.requireCreator(actor);
-    return (
-      await this.db.worker.query(
-        "SELECT id,hypothesis,success_criterion,stop_criterion,state,approved_at FROM growth.experiment WHERE creator_id=$1 ORDER BY id LIMIT 20",
-        [creatorId],
-      )
-    ).rows;
+    return this.db.workerActor(
+      actor,
+      creatorId,
+      async (client) =>
+        (
+          await client.query(
+            "SELECT id,hypothesis,success_criterion,stop_criterion,state,approved_at FROM growth.experiment WHERE creator_id=$1 ORDER BY id LIMIT 20",
+            [creatorId],
+          )
+        ).rows,
+    );
   }
   async proposeExperiment(actor: Actor, input: unknown) {
     const creatorId = await this.requireCreator(actor),
@@ -769,7 +815,7 @@ export class GrowthService {
           stopCriterion: z.string().trim().min(12).max(800),
         })
         .parse(input);
-    return this.db.transaction(this.db.worker, async (client) => {
+    return this.db.workerActor(actor, creatorId, async (client) => {
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [creatorId],
@@ -786,7 +832,7 @@ export class GrowthService {
       )
         throw new DomainError(
           "experiment_limit",
-          "Review your existing draft proposals first.",
+          copy.growthErrorExperimentLimit,
           429,
         );
       const result = await client.query(
@@ -826,6 +872,7 @@ export class GrowthService {
     ownedCreatorIds: readonly string[] = [],
   ) {
     await this.db.transaction(this.db.worker, async (client) => {
+      await this.erasure.mark(client, accountId, ownedCreatorIds);
       await client.query(
         "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
         [accountId],
@@ -839,6 +886,8 @@ export class GrowthService {
         "share",
         "metric",
         "feedback",
+        "prompt_choice",
+        "entry_attribution",
       ]) {
         if (table === "notification")
           await client.query(
@@ -884,11 +933,24 @@ export class GrowthService {
         "metric",
         "invite",
         "follow",
+        "entry_attribution",
       ])
         await client.query(
           `DELETE FROM growth.${table} WHERE creator_id=ANY($1::uuid[])`,
           [ownedCreatorIds],
         );
+      await client.query(
+        "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+        [accountId],
+      );
+      await client.query(
+        "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
+        [ownedCreatorIds],
+      );
+      await client.query(
+        "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",
+        [ownedCreatorIds],
+      );
       await client.query(
         "DELETE FROM growth.delivery USING growth.notification n WHERE growth.delivery.notification_id=n.id AND n.creator_id=ANY($1::uuid[])",
         [ownedCreatorIds],

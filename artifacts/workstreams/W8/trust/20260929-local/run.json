@@ -1,0 +1,64 @@
+{
+  "capturedAt": "2026-09-30T03:06:25.800433+00:00",
+  "owner": "W8 primary",
+  "environment": "isolated local synthetic development",
+  "revision": "ba2ee4f plus preserved shared uncommitted changes",
+  "providerMode": {
+    "identity": "synthetic local",
+    "model": "unconfigured",
+    "payments": "unconfigured",
+    "calls": "unconfigured",
+    "voice": "unconfigured",
+    "push": "unconfigured"
+  },
+  "roles": [
+    "fan",
+    "other_fan",
+    "creator",
+    "supervisor safety",
+    "independent reviewer",
+    "verification-only ops"
+  ],
+  "runtimeDatabaseRoles": [
+    "creator_runtime",
+    "creator_trust_runtime",
+    "creator_trust_worker"
+  ],
+  "leases": {
+    "web": 3008,
+    "api": 4108,
+    "postgres": 55438,
+    "ios": "DBA500E9-A3E5-4424-83D6-ED4178991663",
+    "android": "emulator-5568"
+  },
+  "actualClientProof": {
+    "browser": "earlier report/lease/close/notice/appeal; current control timeout",
+    "ios": "full signed app build/install/launch; public help fetched; authenticated interaction unverified",
+    "android": "full app build/install/launch; public help fetched; system ANR recovered; authenticated interaction unverified"
+  },
+  "actualApiProof": [
+    "independent appeal and role denial",
+    "version/idempotency conflict",
+    "pause intent and recovery replay",
+    "block replay after denial",
+    "immediate deletion tombstone",
+    "ownership snapshot/restart replay/input denial",
+    "liveness200/readiness503"
+  ],
+  "migrationEntries": 28,
+  "latestIntegrationMigration": "0031_w4_purchase_history",
+  "releaseReady": false,
+  "restoredTrafficReady": false,
+  "newTestCode": false,
+  "externalPublication": false,
+  "finalNativePixelViewports": {
+    "ios": [1206, 2622],
+    "android": [1080, 2400]
+  },
+  "finalPrivacyMetadata": {
+    "jobs": 4,
+    "ownershipSnapshots": 3,
+    "blockedTasks": 28,
+    "completeTrustTasks": 4
+  }
+}

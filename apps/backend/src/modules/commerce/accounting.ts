@@ -278,6 +278,12 @@ export class PoolSettlement {
   }
 }
 
+export type VerifiedTransfer = {
+  id: string;
+  state: "pending" | "succeeded" | "failed";
+  reversed: boolean;
+  reversalReceipts?: readonly { reference: string; amount: number }[];
+};
 export interface PayoutProvider {
   account(reference: string): Promise<{
     reference: string;
@@ -290,6 +296,7 @@ export interface PayoutProvider {
     currency: string;
     sourcePayment: string;
     reconciledAt: Date;
+    disputeOpen?: boolean;
   }>;
   transfer(input: {
     destination: string;
@@ -297,16 +304,13 @@ export interface PayoutProvider {
     currency: string;
     sourcePayment: string;
     key: string;
-  }): Promise<{
-    id: string;
-    state: "pending" | "succeeded" | "failed";
-    reversed: boolean;
-  }>;
-  current(reference: string): Promise<{
-    id: string;
-    state: "pending" | "succeeded" | "failed";
-    reversed: boolean;
-  }>;
+  }): Promise<VerifiedTransfer>;
+  /** Read-only lookup of the exact original effect, including after provider
+   * idempotency expiry. Absence never authorizes a new aged transfer. */
+  recoverTransfer?(
+    input: Parameters<PayoutProvider["transfer"]>[0],
+  ): Promise<Awaited<ReturnType<PayoutProvider["transfer"]>> | undefined>;
+  current(reference: string): Promise<VerifiedTransfer>;
   reverse(
     reference: string,
     key: string,
@@ -325,6 +329,9 @@ type PayoutEffect = {
 };
 /** Q03/topology and market approval are mandatory injected configuration, never inferred from a build. */
 export class CreatorSettlement {
+  get configured() {
+    return Boolean(this.provider && this.countries.length);
+  }
   constructor(
     private readonly service: CommerceService,
     private readonly countries: readonly string[],
@@ -405,6 +412,7 @@ export class CreatorSettlement {
           balance === BigInt(verifiedBalance.netMinor) &&
           verifiedBalance.currency === c.snapshot.currency &&
           verifiedBalance.sourcePayment === c.intent_ref &&
+          verifiedBalance.disputeOpen !== true &&
           Math.abs(Date.now() - verifiedBalance.reconciledAt.getTime()) < 60000,
         "ledger_reconciliation_required",
         "Provider fees, reserves and available funds must match the ledger before payout.",
@@ -452,21 +460,55 @@ export class CreatorSettlement {
           )
         ).rows[0],
     );
-    if (!effect)
-      return this.service.account(actor, async (client) => {
+    if (!effect) {
+      const prior = await this.service.account(actor, async (client) => {
         const prior = (
           await client.query(
-            "SELECT state,error_code FROM creator.commerce_payout_effect WHERE id=$1",
+            "SELECT e.*,EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.kind='payout' AND l.cause=e.provider_key) AS posted FROM creator.commerce_payout_effect e WHERE e.id=$1",
             [id],
           )
         ).rows[0];
         invariant(prior, "payout_unavailable", "The payout is unavailable.");
-        return {
-          processing: !["done", "failed"].includes(prior.state),
-          state: prior.state,
-          ...(prior.error_code ? { reason: prior.error_code } : {}),
-        };
+        return prior;
       });
+      if (
+        ["done", "failed"].includes(prior.state) &&
+        prior.posted &&
+        prior.provider_ref
+      ) {
+        const transfer = await this.provider.current(prior.provider_ref);
+        invariant(
+          transfer.state === "succeeded",
+          "payout_truth_changed",
+          "The completed transfer needs current provider reconciliation.",
+        );
+        if (transfer.reversed || transfer.reversalReceipts?.length)
+          await this.service.account(actor, async (client) => {
+            const own = await client.query(
+              "SELECT e.*,c.packet_id FROM creator.commerce_payout_effect e JOIN creator.commerce_commitment c ON c.id=e.commitment_id WHERE e.id=$1 AND e.state IN('done','failed') AND e.provider_ref=$2 FOR UPDATE OF e",
+              [id, prior.provider_ref],
+            );
+            if (!own.rows[0]) return;
+            await this.recordReversals(client, own.rows[0], transfer);
+            await client.query(
+              "UPDATE creator.commerce_payout_effect SET state='failed',error_code='provider_transfer_reversed' WHERE id=$1",
+              [id],
+            );
+          });
+        return {
+          processing: false,
+          state:
+            transfer.reversed || transfer.reversalReceipts?.length
+              ? "failed"
+              : "done",
+        };
+      }
+      return {
+        processing: !["done", "failed"].includes(prior.state),
+        state: prior.state,
+        ...(prior.error_code ? { reason: prior.error_code } : {}),
+      };
+    }
     try {
       const current = await this.service.account(
         actor,
@@ -483,6 +525,29 @@ export class CreatorSettlement {
         "payout_scope_unavailable",
         "Current payout scope is unavailable; provider reconciliation is required.",
       );
+      if (!effect.provider_ref && this.provider.recoverTransfer) {
+        const recovered = await this.provider.recoverTransfer({
+          destination: current.provider_ref,
+          amount: Number(effect.amount),
+          currency: effect.currency,
+          sourcePayment: current.intent_ref,
+          key: effect.provider_key,
+        });
+        if (recovered) {
+          await this.service.account(actor, async (client) => {
+            const own = await client.query(
+              "UPDATE creator.commerce_payout_effect SET provider_ref=$3 WHERE id=$1 AND attempt=$2 AND state='processing' AND provider_ref IS NULL RETURNING id",
+              [effect.id, effect.attempt, recovered.id],
+            );
+            invariant(
+              own.rowCount === 1,
+              "effect_lease_lost",
+              "A newer payout worker owns this recovery.",
+            );
+          });
+          effect.provider_ref = recovered.id;
+        }
+      }
       invariant(
         effect.provider_ref ||
           (current.state === "delivered" &&
@@ -514,6 +579,7 @@ export class CreatorSettlement {
           balance.netMinor === Number(effect.amount) &&
             balance.currency === effect.currency &&
             balance.sourcePayment === current.intent_ref &&
+            balance.disputeOpen !== true &&
             Math.abs(Date.now() - balance.reconciledAt.getTime()) < 60000,
           "payout_amount_changed",
           "Current available funds no longer match the original payout.",
@@ -550,6 +616,34 @@ export class CreatorSettlement {
             sourcePayment: current.intent_ref,
             key: effect.provider_key,
           });
+      await this.service.account(actor, async (client) => {
+        const own = await client.query(
+          "UPDATE creator.commerce_payout_effect SET provider_ref=$3 WHERE id=$1 AND attempt=$2 AND state='processing' RETURNING id",
+          [id, effect.attempt, transfer.id],
+        );
+        invariant(
+          own.rowCount === 1,
+          "effect_lease_lost",
+          "A newer payout worker owns this recovery.",
+        );
+      });
+      // Store the reference before another provider read. A changed KYC/market
+      // gate after transfer requires durable compensation, not a done receipt.
+      const afterAccount = await this.provider.account(current.provider_ref);
+      const afterBalance = await this.provider.reconciledBalance(
+        effect.commitment_id,
+      );
+      const accountHeld =
+        afterAccount.reference !== current.provider_ref ||
+        !afterAccount.enabled ||
+        afterAccount.detailsDue ||
+        !this.countries.includes(afterAccount.country);
+      const fundsHeld =
+        afterBalance.disputeOpen === true ||
+        afterBalance.netMinor !== Number(effect.amount) ||
+        afterBalance.currency !== effect.currency ||
+        afterBalance.sourcePayment !== current.intent_ref ||
+        Math.abs(Date.now() - afterBalance.reconciledAt.getTime()) >= 60000;
       // Persist the reference before post-provider eligibility checks; crash retries fetch current truth.
       const held = await this.service.account(actor, async (client) => {
         const own = await client.query(
@@ -578,6 +672,8 @@ export class CreatorSettlement {
           )
         ).rows[0]!;
         const held =
+          accountHeld ||
+          fundsHeld ||
           !c ||
           c.state !== "delivered" ||
           c.dispute_open ||
@@ -598,6 +694,11 @@ export class CreatorSettlement {
                 transfer.id,
               ],
             );
+          await this.recordReversals(
+            client,
+            { ...effect, packet_id: current.packet_id },
+            transfer,
+          );
         }
         await client.query(
           "UPDATE creator.commerce_payout_effect SET state=$2,lease_until=$3,error_code=$4 WHERE id=$1",
@@ -605,7 +706,9 @@ export class CreatorSettlement {
             id,
             held
               ? "unknown"
-              : transfer.reversed || transfer.state === "failed"
+              : transfer.reversed ||
+                  transfer.reversalReceipts?.length ||
+                  transfer.state === "failed"
                 ? "failed"
                 : transfer.state === "succeeded"
                   ? "done"
@@ -648,6 +751,46 @@ export class CreatorSettlement {
       );
       return { processing: true };
     }
+  }
+  private async recordReversals(
+    client: PoolClient,
+    effect: PayoutEffect & { packet_id: string },
+    transfer: VerifiedTransfer,
+  ) {
+    const receipts = transfer.reversalReceipts ?? [];
+    invariant(
+      !transfer.reversed || receipts.length > 0,
+      "payout_reversal_receipts_required",
+      "Confirmed reversal receipts are required before correcting a posted payout.",
+    );
+    invariant(
+      new Set(receipts.map((r) => r.reference)).size === receipts.length &&
+        receipts.every(
+          (r) =>
+            r.reference.length > 0 &&
+            r.reference.length <= 200 &&
+            Number.isSafeInteger(r.amount) &&
+            r.amount > 0,
+        ) &&
+        receipts.reduce((n, r) => n + BigInt(r.amount), 0n) <=
+          BigInt(effect.amount),
+      "payout_reversal_invalid",
+      "Current reversal receipts do not match the original payout.",
+    );
+    for (const receipt of receipts)
+      await client.query(
+        "INSERT INTO creator.commerce_ledger(creator_id,packet_id,commitment_id,kind,amount,currency,cause,provider_ref,refs) VALUES($1,$2,$3,'adjustment',$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING",
+        [
+          effect.creator_id,
+          effect.packet_id,
+          effect.commitment_id,
+          receipt.amount,
+          effect.currency,
+          `payout_reversal:${receipt.reference}`,
+          receipt.reference,
+          JSON.stringify({ direction: "credit", sourceTransfer: transfer.id }),
+        ],
+      );
   }
 }
 
