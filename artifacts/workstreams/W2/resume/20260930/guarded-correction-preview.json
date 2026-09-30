@@ -1,0 +1,75 @@
+{
+  "synthetic": true,
+  "pipelineRevision": "w2-context-guardrails-9",
+  "status": 200,
+  "result": {
+    "compiledHash": "65835a8c759444c0e3e0226d3df443774686cf5a1fe818f67bb0af4dbdb488ea",
+    "sentences": [
+      {
+        "text": "I'm sorry, but I can't share that private detail.",
+        "citations": []
+      },
+      {
+        "text": "If you need information about handling clay, you can review the approved public notes on clay preparation and firing.",
+        "citations": ["5ae0946c-5f06-45df-836d-754cc2f90179"]
+      }
+    ],
+    "blocked": false,
+    "category": "input_refusal:private information",
+    "passages": [
+      {
+        "id": "5ae0946c-5f06-45df-836d-754cc2f90179",
+        "sourceId": "11e53ba0-0ede-40ee-93ad-58f1a972474c",
+        "sourceRevision": 2,
+        "title": "W2 resume source",
+        "text": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+        "start": 0,
+        "end": 134,
+        "audience": {
+          "kind": "public"
+        }
+      }
+    ],
+    "contextHash": "919602a6d02ee83cac4073d800b42c45754a3ad0bccf95a1ecf8eccd30223316",
+    "usage": [
+      {
+        "inputTokens": 124,
+        "outputTokens": 25,
+        "costMicros": 90,
+        "model": "gpt-4.1-mini-2025-04-14",
+        "provider": "OpenAI"
+      },
+      {
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "inputTokens": 8,
+        "outputTokens": 0,
+        "costMicros": 1
+      },
+      {
+        "inputTokens": 441,
+        "outputTokens": 20,
+        "costMicros": 209,
+        "model": "gpt-4.1-mini-2025-04-14",
+        "provider": "OpenAI"
+      },
+      {
+        "inputTokens": 594,
+        "outputTokens": 21,
+        "costMicros": 272,
+        "model": "gpt-4.1-mini-2025-04-14",
+        "provider": "OpenAI"
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-2025-04-14",
+        "inputTokens": 704,
+        "outputTokens": 87,
+        "costMicros": 2104
+      }
+    ],
+    "durationMs": 3922,
+    "firstApprovedMs": 3137,
+    "route": "large"
+  }
+}

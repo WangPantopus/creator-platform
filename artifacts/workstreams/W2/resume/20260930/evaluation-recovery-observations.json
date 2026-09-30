@@ -1,0 +1,158 @@
+{
+  "synthetic": true,
+  "pipelineRevision": "w2-context-guardrails-8",
+  "beforeFix": {
+    "synthetic": true,
+    "pipelineRevision": "w2-context-guardrails-8",
+    "started": {
+      "status": 202,
+      "receipt": {
+        "id": "a11ea884-4e60-4399-bf9b-380b36bd2080",
+        "revision": 11
+      }
+    },
+    "replayed": {
+      "status": 409,
+      "receipt": {
+        "error": {
+          "code": "evaluation_running",
+          "message": "An evaluation is already running."
+        }
+      }
+    },
+    "concurrent": {
+      "status": 409,
+      "receipt": {
+        "error": {
+          "code": "evaluation_running",
+          "message": "An evaluation is already running."
+        }
+      }
+    },
+    "draftChanged": {
+      "status": 200,
+      "receipt": {
+        "revision": 12
+      }
+    },
+    "staleResult": {
+      "revision": 12,
+      "evaluationCurrent": false,
+      "evaluation": {
+        "id": "a11ea884-4e60-4399-bf9b-380b36bd2080",
+        "revision": 11,
+        "fingerprint": "926a71d5a30da79ffda951e195aa47f3f1ee1a8e2861d11871303ca61c15b990",
+        "state": "failed",
+        "cases": [
+          {
+            "name": "Pipeline unavailable",
+            "state": "fail",
+            "usage": null,
+            "answer": "",
+            "prompt": "",
+            "reason": "Generation was interrupted.",
+            "citations": [],
+            "durationMs": 0
+          }
+        ],
+        "createdAt": "2026-09-30T09:20:51.055Z",
+        "completedAt": "2026-09-30T09:20:52.141Z"
+      }
+    }
+  },
+  "afterFix": {
+    "started": {
+      "status": 202,
+      "receipt": {
+        "id": "49ae29cc-0ec2-45e4-a7e9-7ccdccb01a2e",
+        "revision": 12
+      }
+    },
+    "replayed": {
+      "status": 202,
+      "receipt": {
+        "id": "49ae29cc-0ec2-45e4-a7e9-7ccdccb01a2e",
+        "revision": 12
+      }
+    },
+    "concurrent": {
+      "status": 403,
+      "receipt": {
+        "error": {
+          "code": "evaluation_running",
+          "message": "An evaluation is already running. Cancel it before starting another."
+        }
+      }
+    },
+    "draftChanged": {
+      "status": 200,
+      "receipt": {
+        "revision": 13
+      }
+    },
+    "staleResult": {
+      "revision": 13,
+      "evaluationCurrent": false,
+      "evaluation": {
+        "id": "49ae29cc-0ec2-45e4-a7e9-7ccdccb01a2e",
+        "revision": 12,
+        "fingerprint": "dac4ba96c73350b6a3f91f9bc1d302e3f2f9339ac27a90740e3e54ad3e4d8728",
+        "state": "failed",
+        "cases": [
+          {
+            "name": "Pipeline unavailable",
+            "state": "fail",
+            "usage": null,
+            "answer": "",
+            "prompt": "",
+            "reason": "Generation was interrupted.",
+            "citations": [],
+            "durationMs": 0
+          }
+        ],
+        "createdAt": "2026-09-30T09:32:13.785Z",
+        "completedAt": "2026-09-30T09:32:14.993Z"
+      }
+    }
+  },
+  "finalRetry": {
+    "started": {
+      "status": 202,
+      "receipt": {
+        "id": "ffc6f2bd-7ff6-4d82-bca2-56b82ea9dad5",
+        "revision": 13
+      }
+    },
+    "replayed": {
+      "status": 202,
+      "receipt": {
+        "id": "ffc6f2bd-7ff6-4d82-bca2-56b82ea9dad5",
+        "revision": 13
+      }
+    },
+    "concurrent": {
+      "status": 409,
+      "receipt": {
+        "error": {
+          "code": "evaluation_running",
+          "message": "An evaluation is already running. Cancel it before starting another."
+        }
+      }
+    }
+  },
+  "durableJobRows": [
+    {
+      "id": "ffc6f2bd-7ff6-4d82-bca2-56b82ea9dad5",
+      "revision": 13,
+      "state": "passed",
+      "completed_at": "2026-09-30T09:33:46.899Z"
+    },
+    {
+      "id": "49ae29cc-0ec2-45e4-a7e9-7ccdccb01a2e",
+      "revision": 12,
+      "state": "failed",
+      "completed_at": "2026-09-30T09:32:14.993Z"
+    }
+  ],
+  "staleJobRecheckedAfterCurrentPassingEvaluation": "failed"
+}

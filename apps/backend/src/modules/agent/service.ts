@@ -554,12 +554,7 @@ export class AgentService {
         "Connect an approved model provider before running evaluations.",
         503,
       );
-    if (this.evaluations.has(scope.creatorId))
-      throw new DomainError(
-        "evaluation_running",
-        "An evaluation is already running.",
-        409,
-      );
+    let created = false;
     const started = await this.repository.command(
       scope,
       key,
@@ -576,11 +571,12 @@ export class AgentService {
           "SELECT 1 FROM creator.ai_evaluation WHERE creator_id=$1 AND state='running'",
           [scope.creatorId],
         );
-        invariant(
-          !active.rowCount,
-          "evaluation_running",
-          "An evaluation is already running. Cancel it before starting another.",
-        );
+        if (active.rowCount)
+          throw new DomainError(
+            "evaluation_running",
+            "An evaluation is already running. Cancel it before starting another.",
+            409,
+          );
         const snapshot = await this.snapshot(
           client,
           scope,
@@ -598,16 +594,21 @@ export class AgentService {
             snapshot,
           ],
         );
+        created = true;
         return { id, revision: workspace.revision };
       },
     );
+    if (!created) return started;
     const controller = new AbortController();
     this.evaluations.set(scope.creatorId, controller);
     void this.performEvaluation(
       scope,
       started.id,
       AbortSignal.any([controller.signal, AbortSignal.timeout(480_000)]),
-    ).finally(() => this.evaluations.delete(scope.creatorId));
+    ).finally(() => {
+      if (this.evaluations.get(scope.creatorId) === controller)
+        this.evaluations.delete(scope.creatorId);
+    });
     return started;
   }
   private async performEvaluation(
