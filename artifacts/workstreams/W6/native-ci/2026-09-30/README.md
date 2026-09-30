@@ -38,6 +38,12 @@ An early join can create a waiting room before cancellation commits, while cance
 
 After the current font-source correction, reran the three existing local Swift snapshot cases:110 image differences remain in101.268s on macOS26/Xcode26. Personally viewed the old/current Mark composition; matching macOS27 artifacts remain required before changing additional baselines. The exact pixel assertion remains unchanged.
 
+## Headless runner pixel density
+
+The current macOS27/Xcode27 job `110078617487` in [run36771329713](https://github.com/WangPantopus/creator-platform/actions/runs/36771329713) passes15 non-snapshot cases and uploads110 fresh failure images. **Every CI image is390×844; every reference is780×1688.** The default NSView capture inherits attached-display backing scale, so the headless runner fails the dimension guard before any strict pixel comparison. This is observed runner output, not an inferred font tolerance problem.
+
+The existing capture now sets SwiftUI displayScale2 and draws into an explicit780×1688 sRGB bitmap with390×844 point size using AppKit cacheDisplay. It compares the resulting NSImage with the same strict precision1. No new cases/suites/harnesses or rendered references were added. Local compilation and15 non-snapshot cases pass; output dimensions are780×1688, and Mark exactly matches its prior local sRGB capture. The older host still reports110 reference pixel differences in85.038s. A fresh matching-runner pass must assess pixels after the size defect is fixed.
+
 ## Owned resources and acceptance limits
 
 Official Temurin21.0.12.1 and Android command-line archives were checksum-verified and extracted under `/tmp/qelvora-w6-android-toolchain-20260930`. SDK35, required build tools, Gradle cache/output and Swift capture/scratch paths are isolated from peers. No emulator or physical phone was operated in this checkpoint. The owned PostgreSQL container remains stopped/preserved; the supplied OpenAI env file was not accessed.

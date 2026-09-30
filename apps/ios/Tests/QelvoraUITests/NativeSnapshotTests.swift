@@ -71,7 +71,8 @@
       _ = NSApplication.shared
       QelvoraFonts.register()
       let host = NSHostingView(
-        rootView: view.transaction { $0.disablesAnimations = true }.frame(
+        rootView: view.environment(\.displayScale, 2)
+          .transaction { $0.disablesAnimations = true }.frame(
           width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
@@ -83,8 +84,23 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // Match the existing 2x references independently of a runner's attached display.
+      guard let context = CGContext(
+        data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
+        bitsPerComponent: 8, bytesPerRow: 0,
+        space: CGColorSpace(name: CGColorSpace.sRGB)!,
+        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+      ), let pixels = context.makeImage() else {
+        XCTFail("Snapshot bitmap could not be allocated.", file: file, line: line)
+        return
+      }
+      let bitmap = NSBitmapImageRep(cgImage: pixels)
+      bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let snapshot = NSImage(size: size)
+      snapshot.addRepresentation(bitmap)
       assertSnapshot(
-        of: host as NSView, as: .image(size: size), named: name, record: record, file: file,
+        of: snapshot, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

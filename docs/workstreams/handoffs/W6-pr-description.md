@@ -25,7 +25,7 @@ Remote web/backend checks pass all18 genuine PostgreSQL/contracts plus generatio
 
 The additional consent controls pass web TypeScript/lint/format, Android APK compilation and the complete QelvoraUI iOS Simulator target. Genuine post-call revocation/retained-asset deletion remains an integration acceptance gate.
 
-iOS compiles and its15 non-snapshot checks pass. All110 original image assertions failed even on Xcode27, exposing display-profile differences. The existing capture now uses sRGB and existing references were ColorSync-converted with dimensions/alpha preserved; no new iOS render is accepted as a baseline. Matching-runner strict verification remains pending. Actual browser recorder permission cancellation/retry was operated at390×844; successful real microphone capture and complete native W6 journeys remain unverified.
+iOS compiles and its15 non-snapshot checks pass. All110 original image assertions failed even on Xcode27, exposing display-profile differences. The existing capture now uses sRGB and existing references were ColorSync-converted with dimensions/alpha preserved; no new iOS render is accepted as a baseline. The current headless macOS27 runner produced390×844 images against780×1688 references. Existing capture now explicitly supplies2× pixel density and sRGB bitmap allocation; strict matching-runner pixel verification remains pending. Actual browser recorder permission cancellation/retry was operated at390×844; successful real microphone capture and complete native W6 journeys remain unverified.
 
 ## Integration gates — draft
 

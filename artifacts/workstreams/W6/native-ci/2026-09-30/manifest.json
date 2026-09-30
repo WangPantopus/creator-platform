@@ -900,5 +900,25 @@
     "artifactPath": "/tmp/qelvora-w6-swift-current-snapshots-20260930",
     "logPath": "/tmp/qelvora-w6-swift-current-snapshots-20260930.log",
     "interpretation": "After consuming italic font correction, uniform sRGB backgrounds align and Mark composition appears unchanged. Matching macOS27 runner artifacts are still required to explain remaining pixel differences; no reference refresh or tolerance relaxation performed."
+  },
+  "headlessSnapshotDensity": {
+    "run": "https://github.com/WangPantopus/creator-platform/actions/runs/36771329713",
+    "jobId": 110078617487,
+    "runner": "macOS27.0 26A428 / xcode-27-arm64 20260928.0222.1",
+    "capturedImages": 110,
+    "actualPixels": [390, 844],
+    "referencePixels": [780, 1688],
+    "nonSnapshotCasesPassed": 15,
+    "failure": "Every reference comparison fails the size guard before pixel comparison.",
+    "fix": "Existing capture supplies SwiftUI displayScale2 and an explicit 780x1688 sRGB bitmap with390x844 point size; strict NSImage equality remains1. No new cases/harnesses or fresh baselines.",
+    "sourceSHA256": "a9f1daea921169457931b9e8b9261328e7728569ec3122d765f972ac20f5b44c",
+    "local": {
+      "nonSnapshotCasesPassed": 15,
+      "imageDifferences": 110,
+      "snapshotSeconds": 85.038,
+      "outputPixels": [780, 1688],
+      "MarkMatchesPriorLocalCapture": true
+    },
+    "remoteRerun": "pending"
   }
 }
