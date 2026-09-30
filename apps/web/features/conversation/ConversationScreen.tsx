@@ -28,6 +28,8 @@ import "./conversation.css";
 type Pending = {
   key: string;
   text: string;
+  clientSequence: number;
+  destination: "messages" | "fan-replies";
   state: "pending" | "uncertain" | "rejected";
 };
 function author(message: ConversationMessage, name: string) {
@@ -77,9 +79,13 @@ export function ConversationScreen({
   latestPending.current = pending;
   const scrollEnd = useRef<HTMLDivElement>(null);
   const cursorKey = `qelvora:conversation:${accountId}:${creatorId}:${fanId}`;
+  const lifecycle = useRef(0);
+  const mounted = useRef(true);
   const refresh = useCallback(async () => {
+    const revision = lifecycle.current;
     try {
       const fresh = await conversationRequest<ConversationPage>(root);
+      if (!mounted.current || lifecycle.current !== revision) return;
       // A delayed HTTP response cannot put an earlier author boundary back on screen.
       if (current.current && fresh.cursor < current.current.cursor) return;
       current.current = fresh;
@@ -101,9 +107,17 @@ export function ConversationScreen({
         const result = await conversationRequest<{ accepted: boolean }>(
           `${root}/messages/status/${item.key}`,
         );
-        if (result.accepted) setPending(null);
+        if (
+          result.accepted &&
+          mounted.current &&
+          lifecycle.current === revision
+        ) {
+          setPending(null);
+          setDraft((value) => (value.trim() === item.text ? "" : value));
+        }
       }
     } catch (error) {
+      if (!mounted.current || lifecycle.current !== revision) return;
       if (
         error instanceof ConversationError &&
         [401, 403, 404].includes(error.status)
@@ -125,6 +139,14 @@ export function ConversationScreen({
   }, [root, cursorKey]);
 
   useEffect(() => {
+    mounted.current = true;
+    lifecycle.current++;
+    setPage(null);
+    setOlder([]);
+    setDraft("");
+    setPending(null);
+    setBefore(null);
+    let connecting = false;
     let disposed = false,
       socket: WebSocket | undefined,
       reconnect: ReturnType<typeof setTimeout> | undefined;
@@ -154,16 +176,28 @@ export function ConversationScreen({
       }
     };
     const connect = async () => {
-      if (disposed || !navigator.onLine) return;
+      if (disposed || connecting || !navigator.onLine) return;
+      connecting = true;
+      clearTimeout(reconnect);
+      const previous = socket;
+      socket = undefined;
+      previous?.close();
       await orderedRefresh();
-      if (disposed || !current.current) return;
+      if (disposed || !current.current) {
+        connecting = false;
+        return;
+      }
       try {
         const ticket = await conversationRequest<{
           ticket: string;
           url: string;
         }>("realtime-ticket", {});
         if (disposed) return;
-        socket = new WebSocket(ticket.url, ["qelvora-ticket", ticket.ticket]);
+        const liveSocket = new WebSocket(ticket.url, [
+          "qelvora-ticket",
+          ticket.ticket,
+        ]);
+        socket = liveSocket;
         socket.onopen = () => {
           delay = 1000;
           setOnline(true);
@@ -192,7 +226,7 @@ export function ConversationScreen({
           }
         };
         socket.onclose = () => {
-          if (disposed) return;
+          if (disposed || socket !== liveSocket) return;
           setOnline(navigator.onLine);
           reconnect = setTimeout(() => void connect(), delay);
           delay = Math.min(delay * 2, 15000);
@@ -203,6 +237,8 @@ export function ConversationScreen({
             () => void connect(),
             (delay = Math.min(delay * 2, 15000)),
           );
+      } finally {
+        connecting = false;
       }
     };
     const offline = () => {
@@ -226,6 +262,8 @@ export function ConversationScreen({
     void connect();
     return () => {
       disposed = true;
+      mounted.current = false;
+      lifecycle.current++;
       socket?.close();
       clearTimeout(reconnect);
       clearInterval(poll);
@@ -237,12 +275,15 @@ export function ConversationScreen({
   }, [accountId, creatorId, fanId, refresh]);
 
   const send = async (retry?: Pending) => {
+    const revision = lifecycle.current;
     if (!navigator.onLine || busy || !page) return;
     const text = retry?.text ?? draft.trim();
     if (!text) return;
     const item: Pending = retry ?? {
       key: crypto.randomUUID(),
       text,
+      clientSequence: (page.messages.at(-1)?.sequence ?? 0) + 1,
+      destination: page.control === "human_active" ? "fan-replies" : "messages",
       state: "pending",
     };
     setPending({ ...item, state: "pending" });
@@ -250,16 +291,20 @@ export function ConversationScreen({
     setFailure(null);
     try {
       await conversationRequest<AcceptedMessage>(
-        `${root}/${page.control === "human_active" ? "fan-replies" : "messages"}`,
-        { text, idempotencyKey: item.key },
+        `${root}/${item.destination}`,
+        { text, idempotencyKey: item.key, clientSequence: item.clientSequence },
       );
+      if (!mounted.current || lifecycle.current !== revision) return;
       setPending(null);
       if (!retry) setDraft("");
       await refresh();
       scrollEnd.current?.scrollIntoView({ block: "end", behavior: "instant" });
     } catch (error) {
+      if (!mounted.current || lifecycle.current !== revision) return;
       const uncertain =
-        !(error instanceof ConversationError) || error.status >= 500;
+        !(error instanceof ConversationError) ||
+        error.status >= 500 ||
+        error.status === 409;
       setPending({ ...item, state: uncertain ? "uncertain" : "rejected" });
       setFailure(
         error instanceof Error
@@ -267,10 +312,11 @@ export function ConversationScreen({
           : "Reconnect to check whether this message was accepted.",
       );
     } finally {
-      setBusy(false);
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
   };
   const loadOlder = async () => {
+    const revision = lifecycle.current;
     if (!before || busy) return;
     const height = document.documentElement.scrollHeight;
     setBusy(true);
@@ -278,23 +324,26 @@ export function ConversationScreen({
       const previous = await conversationRequest<ConversationPage>(
         `${root}?before=${before}`,
       );
+      if (!mounted.current || lifecycle.current !== revision) return;
       setOlder((items) =>
         [...previous.messages, ...items]
           .filter((m, i, all) => all.findIndex((x) => x.id === m.id) === i)
           .slice(0, 250),
       );
       setBefore(previous.before);
-      requestAnimationFrame(() =>
-        window.scrollBy(0, document.documentElement.scrollHeight - height),
-      );
+      requestAnimationFrame(() => {
+        if (mounted.current && lifecycle.current === revision)
+          window.scrollBy(0, document.documentElement.scrollHeight - height);
+      });
     } catch (error) {
+      if (!mounted.current || lifecycle.current !== revision) return;
       setFailure(
         error instanceof Error
           ? error.message
           : "Earlier messages are unavailable.",
       );
     } finally {
-      setBusy(false);
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
   };
   if (!page)
@@ -460,7 +509,13 @@ export function ConversationScreen({
             ) : (
               <div className="qv qv-msg">
                 <AuthorLabel
-                  kind={message.authorKind === "human_broadcast" ? "human_broadcast" : message.authorKind === "human_reaction" ? "human_reaction" : "human_creator"}
+                  kind={
+                    message.authorKind === "human_broadcast"
+                      ? "human_broadcast"
+                      : message.authorKind === "human_reaction"
+                        ? "human_reaction"
+                        : "human_creator"
+                  }
                   name={page.creatorName}
                   member={message.member ?? "Authorized team member"}
                   audience="Audience details unavailable"
@@ -518,16 +573,18 @@ export function ConversationScreen({
                 >
                   Retry
                 </button>
-                <button
-                  className="qv-link-btn"
-                  disabled={busy}
-                  onClick={() => {
-                    setDraft(pending.text);
-                    setPending(null);
-                  }}
-                >
-                  Keep editing
-                </button>
+                {pending.state === "rejected" && (
+                  <button
+                    className="qv-link-btn"
+                    disabled={busy}
+                    onClick={() => {
+                      setDraft(pending.text);
+                      setPending(null);
+                    }}
+                  >
+                    Keep editing
+                  </button>
+                )}
               </div>
             )}
           </div>

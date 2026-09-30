@@ -18,7 +18,12 @@ type MemoryView = {
   introShared: boolean;
   items: MemoryItem[];
 };
-type Audit = { id: string; role: string; readAt: string };
+type Audit = {
+  id: string;
+  readerAccountId: string;
+  role: string;
+  readAt: string;
+};
 
 export function AccountScreen({
   creatorId,
@@ -287,7 +292,7 @@ function ConversationPrivacy({
               </p>
             )}
             <a
-              href={`/threads/${creatorId}/${fanId}#message-${item.provenanceMessageId}`}
+              href={`/threads/${creatorId}/${fanId}/messages/${item.provenanceMessageId}`}
             >
               View where this came from
             </a>
@@ -351,6 +356,10 @@ function ConversationPrivacy({
                       : "Authorized safety account"}
                   <br />
                   <span className="qv-help">Opened this conversation</span>
+                  <br />
+                  <span className="qv-help">
+                    Account {entry.readerAccountId}
+                  </span>
                 </span>
                 <time className="qv-meta" dateTime={entry.readAt}>
                   {new Date(entry.readAt).toLocaleString()}

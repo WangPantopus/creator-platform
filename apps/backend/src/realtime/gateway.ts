@@ -48,35 +48,39 @@ export function attachRealtime(
           >();
           let busy = false;
           let subscriptionsPending = 0;
+          let mutations: Promise<void> = Promise.resolve();
           connection.on("message", (data) => {
             if (++subscriptionsPending > 64) {
               connection.close(1008, "Subscription limit");
               return;
             }
-            void (async () => {
-              const input = SubscribeSchema.parse(JSON.parse(data.toString()));
-              if (
-                subscriptions.size >= 64 &&
-                ![...subscriptions.values()].some(
-                  (s) =>
-                    s.scope.creatorId === input.creatorId &&
-                    s.scope.fanId === input.fanId,
-                )
-              )
-                throw new Error("Subscription limit");
-              const current = await authenticate(request);
-              await withAuthority(current, async () => {
-                const scope = await access.openThread(
-                  current.actor,
-                  input.creatorId,
-                  input.fanId,
+            mutations = mutations
+              .then(async () => {
+                const input = SubscribeSchema.parse(
+                  JSON.parse(data.toString()),
                 );
-                subscriptions.set(scope.threadId, {
-                  scope,
-                  cursor: input.cursor,
+                if (
+                  subscriptions.size >= 64 &&
+                  ![...subscriptions.values()].some(
+                    (s) =>
+                      s.scope.creatorId === input.creatorId &&
+                      s.scope.fanId === input.fanId,
+                  )
+                )
+                  throw new Error("Subscription limit");
+                const current = await authenticate(request);
+                await withAuthority(current, async () => {
+                  const scope = await access.openThread(
+                    current.actor,
+                    input.creatorId,
+                    input.fanId,
+                  );
+                  subscriptions.set(scope.threadId, {
+                    scope,
+                    cursor: input.cursor,
+                  });
                 });
-              });
-            })()
+              })
               .catch(() => connection.close(1008, "Subscription refused"))
               .finally(() => subscriptionsPending--);
           });

@@ -14,6 +14,7 @@ import {
   ConsentInputSchema,
   ThreadPreferencesSchema,
   ProviderPolicySchema,
+  ConversationMessageSchema,
   type ProviderPolicy,
   type ConversationPage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
@@ -348,8 +349,10 @@ export function conversationFeature(
         );
         res.json(feature.tickets.issue(actor, token));
       });
-      router.post("/v1/conversations", async (req, res) =>
-        res.json(await feature.begin(await actorFor(req), req.body)),
+      router.post(
+        ["/v1/conversations", "/v1/conversations/begin"],
+        async (req, res) =>
+          res.json(await feature.begin(await actorFor(req), req.body)),
       );
       router.get("/v1/conversations/account", async (req, res) =>
         res.json(await feature.account(await actorFor(req))),
@@ -383,18 +386,55 @@ export function conversationFeature(
           ),
         ),
       );
-    router.get(root + "/memory", async (req, res) =>
+      router.get(root + "/memory", async (req, res) =>
         res.json(await feature.memory.list(await scopeFor(req))),
-    );
-    router.get(root + "/citations/:id", async (req, res) => {
-      const scope = await scopeFor(req);
-      invariant(feature.citation, "citation_unavailable", "No longer accessible to you");
-      const id = IdSchema.parse(req.params.id);
-      // A passage link must come from this scoped timeline; IDs are not a source browser.
-      const visible = await feature.db.withThread(scope, async client => (await client.query("SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND $4=ANY(citations) LIMIT 1", [scope.threadId,scope.creatorId,scope.fanId,id])).rowCount);
-      invariant(visible, "citation_unavailable", "No longer accessible to you");
-      res.json(await feature.citation(scope,id));
-    });
+      );
+      router.get(root + "/messages/:id", async (req, res) => {
+        const scope = await scopeFor(req);
+        const id = IdSchema.parse(req.params.id);
+        const row = await feature.db.withThread(
+          scope,
+          async (client) =>
+            (
+              await client.query(
+                `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
+                [scope.threadId, scope.creatorId, scope.fanId, id],
+              )
+            ).rows[0],
+        );
+        invariant(
+          row,
+          "message_unavailable",
+          "This source message is unavailable.",
+        );
+        res.json(ConversationMessageSchema.parse(row));
+      });
+      router.get(root + "/citations/:id", async (req, res) => {
+        const scope = await scopeFor(req);
+        invariant(
+          feature.citation,
+          "citation_unavailable",
+          "No longer accessible to you",
+        );
+        const id = IdSchema.parse(req.params.id);
+        // A passage link must come from this scoped timeline; IDs are not a source browser.
+        const visible = await feature.db.withThread(
+          scope,
+          async (client) =>
+            (
+              await client.query(
+                "SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND $4=ANY(citations) LIMIT 1",
+                [scope.threadId, scope.creatorId, scope.fanId, id],
+              )
+            ).rowCount,
+        );
+        invariant(
+          visible,
+          "citation_unavailable",
+          "No longer accessible to you",
+        );
+        res.json(await feature.citation(scope, id));
+      });
       router.post(root + "/memory/:id", async (req, res) =>
         res.json(
           await feature.memory.decide(
@@ -520,7 +560,7 @@ export function conversationFeature(
             async (client) =>
               (
                 await client.query(
-                  'SELECT id,role,read_at::text AS "readAt" FROM creator.thread_audit WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY read_at DESC,id LIMIT 100',
+                  'SELECT id,reader_account_id AS "readerAccountId",role,read_at::text AS "readAt" FROM creator.thread_audit WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY read_at DESC,id LIMIT 100',
                   [scope.threadId, scope.creatorId, scope.fanId],
                 )
               ).rows,
