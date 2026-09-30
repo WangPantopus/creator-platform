@@ -1,3 +1,5 @@
+import type { ConversationAllowance } from "./allowance.js";
+import type { ApprovedSentence } from "../agent/runtime.js";
 import { randomUUID } from "node:crypto";
 import { formatCopy } from "@qelvora/copy";
 import type { PoolClient } from "pg";
@@ -48,6 +50,8 @@ type GenerationRow = {
   epoch: number;
   last_sequence: number;
   state: string;
+  reservation_id: string | null;
+  worker_token: string | null;
 };
 function message(row: MessageRow): Message {
   return {
@@ -63,6 +67,64 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private delivery: {
+    allowance?: ConversationAllowance;
+    assertReady?: (scope: ThreadScope) => Promise<void>;
+    policyVersion?: string;
+    citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
+  } = {};
+  configureDelivery(delivery: typeof this.delivery) {
+    this.delivery = delivery;
+  }
+  private async settle(
+    client: PoolClient,
+    scope: ThreadScope,
+    generation: GenerationRow,
+    consumed: boolean,
+  ) {
+    if (generation.reservation_id) {
+      invariant(
+        this.delivery.allowance,
+        "allowance_unconfigured",
+        "Allowance reconciliation is unavailable.",
+      );
+      await this.delivery.allowance.settle(
+        scope,
+        client,
+        generation.reservation_id,
+        consumed,
+      );
+    } else
+      await this.access.settleAllowance(
+        scope,
+        client,
+        generation.grant_id,
+        consumed,
+      );
+  }
+  async releaseApprovedSentence(
+    scope: ThreadScope,
+    generationId: string,
+    approved: ApprovedSentence,
+    sequence: number,
+    workerToken?: string,
+  ) {
+    invariant(
+      this.delivery.citation,
+      "generation_unconfigured",
+      "The approved generation adapter is unavailable.",
+    );
+    for (const id of approved.citations)
+      await this.delivery.citation(scope, id);
+    return this.releaseSentence(
+      scope,
+      generationId,
+      { text: approved.text, citations: approved.citations },
+      sequence,
+      true,
+      workerToken,
+    );
+  }
   constructor(
     private readonly db: Database,
     private readonly access: AccessService,
@@ -98,7 +160,7 @@ export class ConversationService {
       [scope.threadId, scope.creatorId, scope.fanId],
     );
     const result = await client.query<MessageRow>(
-      "INSERT INTO creator.message(id,thread_id,creator_id,fan_id,author_kind,author_account_id,text,delivery_state,control_epoch,sequence,signed_act_id,signed_content_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *",
+      "INSERT INTO creator.message(id,thread_id,creator_id,fan_id,author_kind,author_account_id,text,delivery_state,control_epoch,sequence,signed_act_id,signed_content_hash,off_the_record) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,(SELECT off_the_record FROM creator.thread WHERE id=$2 AND creator_id=$3 AND fan_id=$4)) RETURNING *",
       [
         randomUUID(),
         scope.threadId,
@@ -122,7 +184,7 @@ export class ConversationService {
     return this.db.withThread(scope, async (client) => {
       const thread = await this.lockThread(client, scope);
       const rows = await client.query<MessageRow>(
-        "SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence",
+        "SELECT * FROM (SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence DESC LIMIT 100) recent ORDER BY sequence",
         [scope.threadId, scope.creatorId, scope.fanId],
       );
       const generations = await client.query<{
@@ -166,7 +228,30 @@ export class ConversationService {
           "processor_consent_required",
           "Consent to the configured AI providers is required before messaging.",
         );
-        const grantId = await this.access.reserveAllowance(scope, client);
+        if (this.delivery.policyVersion)
+          invariant(
+            thread.processor_consent_version === this.delivery.policyVersion,
+            "processor_consent_required",
+            "Review the current AI providers before messaging.",
+          );
+        await this.delivery.assertReady?.(scope);
+        const active = await client.query(
+          "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        invariant(
+          !active.rowCount,
+          "reply_in_progress",
+          "Wait for this reply before sending another message.",
+        );
+        const reservation = await this.delivery.allowance?.reserve(
+          scope,
+          client,
+          body.idempotencyKey,
+        );
+        const grantId =
+          reservation?.grantId ??
+          (await this.access.reserveAllowance(scope, client));
         const fan = await this.insertMessage(
           client,
           scope,
@@ -198,6 +283,17 @@ export class ConversationService {
             "queued",
           ],
         );
+        if (reservation)
+          await client.query(
+            "UPDATE creator.generation SET reservation_id=$1,context_revision=(SELECT revision FROM creator.thread WHERE id=$3 AND creator_id=$4 AND fan_id=$5) WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
+            [
+              reservation.reservationId,
+              generationId,
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+            ],
+          );
         await appendFrame(client, scope, {
           epoch: thread.control_epoch,
           kind: "accepted",
@@ -211,11 +307,56 @@ export class ConversationService {
       }),
     );
   }
+  async fanReply(scope: ThreadScope, raw: unknown): Promise<Message> {
+    const body = SendMessageSchema.parse(raw);
+    invariant(
+      scope.authority === "fan",
+      "fan_required",
+      "Only this fan can send their message.",
+    );
+    return this.db.withThread(scope, (client) =>
+      idempotent(
+        client,
+        scope,
+        "fan_reply",
+        body.idempotencyKey,
+        body,
+        async () => {
+          const thread = await this.lockThread(client, scope);
+          invariant(
+            thread.control === "human_active",
+            "human_unavailable",
+            "The creator is no longer in this conversation. Refresh before sending.",
+          );
+          const output = await this.insertMessage(
+            client,
+            scope,
+            "fan",
+            body.text,
+            thread.control_epoch,
+            "accepted",
+          );
+          await appendFrame(client, scope, {
+            epoch: thread.control_epoch,
+            kind: "accepted",
+            messageId: output.id,
+            authorKind: "fan",
+            text: output.text,
+            generationId: null,
+            sequence: 0,
+          });
+          return output;
+        },
+      ),
+    );
+  }
   async releaseSentence(
     scope: ThreadScope,
     generationId: string,
     rawProposal: unknown,
     sequence: number,
+    approved = false,
+    workerToken?: string,
   ): Promise<Frame | null> {
     invariant(
       Number.isSafeInteger(sequence) && sequence > 0,
@@ -223,11 +364,13 @@ export class ConversationService {
       "A generation frame sequence is required.",
     );
     const proposal = ModelProposalSchema.parse(rawProposal);
-    const checked = await this.guardrails.checkSentence({
-      scope,
-      text: proposal.text,
-      citations: proposal.citations,
-    });
+    const checked = approved
+      ? { allowed: true }
+      : await this.guardrails.checkSentence({
+          scope,
+          text: proposal.text,
+          citations: proposal.citations,
+        });
     invariant(
       checked.allowed,
       "sentence_withheld",
@@ -245,15 +388,18 @@ export class ConversationService {
         "generation_unavailable",
         "The generation is unavailable.",
       );
+      if (workerToken && generation.worker_token !== workerToken) return null;
       if (
         thread.control !== "ai_active" ||
+        (this.delivery.policyVersion !== undefined &&
+          thread.processor_consent_version !== this.delivery.policyVersion) ||
         generation.epoch !== thread.control_epoch ||
         !["queued", "generating"].includes(generation.state)
       )
         return null;
       // Citation retrieval/grounding is not enabled until the scoped source module exists.
       invariant(
-        proposal.citations.length === 0,
+        proposal.citations.length === 0 || (approved && this.delivery.citation),
         "citations_unavailable",
         "Source citations require the scoped retrieval module.",
       );
@@ -292,14 +438,19 @@ export class ConversationService {
         ],
       );
       await client.query(
-        "UPDATE creator.message SET text=text || $1 WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
+        "UPDATE creator.message SET text=text || $1,citations=ARRAY(SELECT DISTINCT unnest(citations || $6::uuid[])) WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
         [
           proposal.text,
           generation.ai_message_id,
           scope.threadId,
           scope.creatorId,
           scope.fanId,
+          proposal.citations,
         ],
+      );
+      await client.query(
+        "UPDATE creator.generation SET first_visible_at=coalesce(first_visible_at,now()) WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
+        [generationId, scope.threadId, scope.creatorId, scope.fanId],
       );
       await client.query(
         "UPDATE creator.thread SET revision=revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
@@ -320,6 +471,7 @@ export class ConversationService {
     scope: ThreadScope,
     generationId: string,
     failed = false,
+    workerToken?: string,
   ): Promise<Frame | null> {
     return this.db.withThread(scope, async (client) => {
       const thread = await this.lockThread(client, scope);
@@ -334,6 +486,7 @@ export class ConversationService {
         "The generation is unavailable.",
       );
       if (!["queued", "generating"].includes(generation.state)) return null;
+      if (workerToken && generation.worker_token !== workerToken) return null;
       if (
         thread.control !== "ai_active" ||
         thread.control_epoch !== generation.epoch
@@ -354,11 +507,10 @@ export class ConversationService {
           scope.fanId,
         ],
       );
-      await this.access.settleAllowance(
-        scope,
-        client,
-        generation.grant_id,
-        !failed,
+      await this.settle(client, scope, generation, !failed);
+      await client.query(
+        "UPDATE creator.generation SET completed_at=now(),worker_token=NULL,lease_until=NULL WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
+        [generationId, scope.threadId, scope.creatorId, scope.fanId],
       );
       return appendFrame(client, scope, {
         epoch: generation.epoch,
@@ -432,10 +584,10 @@ export class ConversationService {
                 scope.fanId,
               ],
             );
-            await this.access.settleAllowance(
-              scope,
+            await this.settle(
               client,
-              generation.grant_id,
+              scope,
+              generation,
               generation.last_sequence > 0,
             );
             await appendFrame(client, scope, {
@@ -542,7 +694,18 @@ export class ConversationService {
       "invalid_cursor",
       "The replay cursor is invalid.",
     );
+    invariant(
+      Number.isSafeInteger(limit) && limit > 0 && limit <= 256,
+      "invalid_limit",
+      "The replay page limit is invalid.",
+    );
     return this.db.withThread(scope, async (client) => {
+      const thread = await this.lockThread(client, scope);
+      invariant(
+        cursor <= thread.event_cursor,
+        "invalid_cursor",
+        "Refresh the conversation before resuming.",
+      );
       const rows = await client.query<{ payload: Frame }>(
         "SELECT payload FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND cursor>$4 ORDER BY cursor LIMIT $5",
         [scope.threadId, scope.creatorId, scope.fanId, cursor, limit],
