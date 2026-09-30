@@ -261,7 +261,7 @@ export class ContentStudioClient {
   }
   threadEntries(
     creatorId: string,
-    query: z.input<typeof C.ContentReplyPage> = {},
+    query: Pick<z.input<typeof C.ContentPage>, "cursor" | "limit"> = {},
   ) {
     return this.request(
       this.path(creatorId, "/threads", "studio"),

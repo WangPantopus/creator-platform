@@ -329,7 +329,7 @@ export function Studio({
   return (
     <div
       key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
-      className="qv w5-studio"
+      className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
     >
       <aside className="w5-sidebar">
         {navigationTree(
@@ -343,7 +343,7 @@ export function Studio({
           href,
         )}
       </aside>
-      <div className="w5-main">
+      <main className="w5-main">
         <div className="w5-account">
           <Link href="/studio/workspace">{brand.studioName}</Link>
           <span>
@@ -387,7 +387,7 @@ export function Studio({
         ) : (
           <More creator={creator} />
         )}
-      </div>
+      </main>
       <div className="w5-tabs">
         {navigationTree(
           StudioTabBar({
@@ -529,113 +529,119 @@ function Notes({ creator }: { creator: Creator }) {
             />
           )}
       </div>
-      <div className="w5-replies">
-        <div className="w5-replies-title">
-          <span className="qv-meta">
-            REPLIES · {replies.items.length}
-            {replies.nextCursor ? "+" : ""}
-          </span>
-          <span className="qv-help">
-            Only you and your triage team see these
-          </span>
-        </div>
-        <label className="w5-field">
-          Show replies
-          <select
-            value={replyFilter}
-            onChange={(e) => setReplyFilter(e.target.value)}
-          >
-            <option value="all">All reviewed replies</option>
-            <option value="unread">Unread</option>
-            <option value="reacted">Reacted</option>
-            <option value="flagged">Flagged</option>
-          </select>
-        </label>
-        {replies.items.map((r) => (
-          <article className="w5-reply" key={r.id}>
-            <div className="w5-row">
-              <strong>@{r.handle}</strong>
-              <time className="qv-meta">{time(r.createdAt)}</time>
-            </div>
-            <p>{r.text}</p>
-            {!r.read && (
-              <button
-                className="qv-btn qv-btn--quiet"
-                disabled={action.busy}
-                onClick={() =>
-                  void action.run(async () => {
-                    await studioRequest(
-                      "content",
-                      `${creator.id}/replies/${r.id}/read`,
-                      { version: r.version, idempotencyKey: key() },
-                      creator.viewerAccountId,
-                    );
-                    await load();
-                  })
-                }
-              >
-                Mark read
-              </button>
-            )}
-            {r.safetyState === "flagged" ? (
-              <p className="qv-help">
-                Withheld from the feed · sent for safety review. Private text is
-                not shown here.
-              </p>
-            ) : r.reaction ? (
-              <ReactionChip
-                name={creator.display_name}
-                signedActId={r.reaction.signedActId}
-              />
-            ) : (
-              <div className="w5-actions">
-                <button
-                  className="qv-btn qv-btn--secondary"
-                  disabled={!creator.owned || action.busy}
-                  onClick={() => setReaction(r)}
-                >
-                  React
-                </button>
-                <Link
-                  aria-disabled={!r.consent.shareText}
-                  className="qv-btn qv-btn--quiet"
-                  href={`/studio/${creator.id}/compose?quote=${r.id}`}
-                >
-                  {r.consent.shareText
-                    ? "Quote in a Note"
-                    : "Sharing consent required"}
-                </Link>
+      {(creator.owned || creator.roles.includes("triage")) && (
+        <div className="w5-replies">
+          <div className="w5-replies-title">
+            <span className="qv-meta">
+              REPLIES · {replies.items.length}
+              {replies.nextCursor ? "+" : ""}
+            </span>
+            <span className="qv-help">
+              Only you and your triage team see these
+            </span>
+          </div>
+          <label className="w5-field">
+            Show replies
+            <select
+              value={replyFilter}
+              onChange={(e) => setReplyFilter(e.target.value)}
+            >
+              <option value="all">All reviewed replies</option>
+              <option value="unread">Unread</option>
+              <option value="reacted">Reacted</option>
+              <option value="flagged">Flagged</option>
+            </select>
+          </label>
+          {replies.items.map((r) => (
+            <article className="w5-reply" key={r.id}>
+              <div className="w5-row">
+                <strong>@{r.handle}</strong>
+                <time className="qv-meta">{time(r.createdAt)}</time>
               </div>
-            )}
-          </article>
-        ))}
-        {replies.nextCursor && (
-          <button
-            className="qv-btn qv-btn--secondary"
-            disabled={action.busy}
-            onClick={() =>
-              void action.run(async () => {
-                const page = await studioRequest<Page<PrivateNoteReply>>(
-                  "content",
-                  `${creator.id}/studio/replies?cursor=${replies.nextCursor}&filter=${replyFilter}`,
-                );
-                setReplies({
-                  items: [...replies.items, ...page.items],
-                  nextCursor: page.nextCursor,
-                });
-              })
-            }
-          >
-            More replies
-          </button>
-        )}
-        {!replies.items.length && !action.busy && (
-          <p className="qv-help">
-            Reviewed private replies appear here when fans reply to a published
-            Note. Replies waiting for safety review stay out of the feed.
-          </p>
-        )}
-      </div>
+              <p>{r.text}</p>
+              {!r.read && (
+                <button
+                  className="qv-btn qv-btn--quiet"
+                  disabled={action.busy}
+                  onClick={() =>
+                    void action.run(async () => {
+                      await studioRequest(
+                        "content",
+                        `${creator.id}/replies/${r.id}/read`,
+                        { version: r.version, idempotencyKey: key() },
+                        creator.viewerAccountId,
+                      );
+                      await load();
+                    })
+                  }
+                >
+                  Mark read
+                </button>
+              )}
+              {r.safetyState === "flagged" ? (
+                <p className="qv-help">
+                  Withheld from the feed · sent for safety review. Private text
+                  is not shown here.
+                </p>
+              ) : r.reaction ? (
+                <ReactionChip
+                  name={creator.display_name}
+                  signedActId={r.reaction.signedActId}
+                />
+              ) : (
+                <div className="w5-actions">
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={!creator.owned || action.busy}
+                    onClick={() => setReaction(r)}
+                  >
+                    React
+                  </button>
+                  {r.consent.shareText ? (
+                    <Link
+                      className="qv-btn qv-btn--quiet"
+                      href={`/studio/${creator.id}/compose?quote=${r.id}`}
+                    >
+                      Quote in a Note
+                    </Link>
+                  ) : (
+                    <button className="qv-btn qv-btn--quiet" disabled>
+                      Sharing consent required
+                    </button>
+                  )}
+                </div>
+              )}
+            </article>
+          ))}
+          {replies.nextCursor && (
+            <button
+              className="qv-btn qv-btn--secondary"
+              disabled={action.busy}
+              onClick={() =>
+                void action.run(async () => {
+                  const page = await studioRequest<Page<PrivateNoteReply>>(
+                    "content",
+                    `${creator.id}/studio/replies?cursor=${replies.nextCursor}&filter=${replyFilter}`,
+                  );
+                  setReplies({
+                    items: [...replies.items, ...page.items],
+                    nextCursor: page.nextCursor,
+                  });
+                })
+              }
+            >
+              More replies
+            </button>
+          )}
+          {!replies.items.length && !action.busy && (
+            <p className="qv-help">
+              Reviewed private replies appear here when fans reply to a
+              published Note. Replies waiting for safety review stay out of the
+              feed.
+            </p>
+          )}
+        </div>
+      )}
       {reaction && (
         <Modal
           title="React to this private reply"
@@ -735,6 +741,10 @@ function Compose({
   onDone: () => void;
   post?: boolean;
 }) {
+  const canDraft =
+    creator.owned ||
+    creator.roles.includes("drafter") ||
+    creator.roles.includes("publisher");
   const [document, setDocument] = useState<ContentBody>(
       emptyBody(post ? "post" : "note"),
     ),
@@ -891,14 +901,15 @@ function Compose({
       <Feedback action={action} />
       <div className="w5-gutter">
         <span className="qv-meta">TO</span>
-        <div className="qv-segmented" role="group" aria-label="Audience">
+        <div className="qv-seg w5-audience" role="group" aria-label="Audience">
           {(post
             ? ["public", "followers", "members", "tiers", "groups"]
             : ["followers", "members", "tiers"]
           ).map((kind) => (
             <button
               key={kind}
-              className={`qv-seg ${document.audience.kind === kind ? "is-active" : ""}`}
+              type="button"
+              aria-pressed={document.audience.kind === kind}
               onClick={() =>
                 edit({
                   audience:
@@ -959,11 +970,19 @@ function Compose({
           </fieldset>
         )}
         <p className="qv-help">
-          It's labeled “{creator.display_name} · to{" "}
-          {document.audience.kind === "members"
-            ? "all members"
-            : document.audience.kind}
-          ” everywhere.
+          {creator.owned ? (
+            <>
+              It's labeled “{creator.display_name} · to{" "}
+              {document.audience.kind === "members"
+                ? "all members"
+                : document.audience.kind}
+              ” everywhere.
+            </>
+          ) : document.kind === "post" ? (
+            `A team publication stays labeled “${creator.display_name}'s team · ${creator.memberHandle}”.`
+          ) : (
+            `Your team can prepare this draft. ${creator.display_name} must review and personally sign it.`
+          )}
         </p>
       </div>
       {post && !document.quote && !document.packetId && (
@@ -1062,15 +1081,23 @@ function Compose({
           placeholder="Write in your own words"
         />
         <div className="w5-actions">
-          <Link className="qv-btn qv-btn--quiet" href="/media/voice">
-            Voice · up to 60 s
-          </Link>
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
             onClick={() =>
               action.setNotice(
-                "A processed creator-owned media revision is required. The media producer currently needs a thread scope; content-scoped photo uploads are awaiting its adapter.",
+                "Voice recordings for this content are unavailable. You can still save your text draft.",
+              )
+            }
+          >
+            Voice · up to 60 s
+          </button>
+          <button
+            className="qv-btn qv-btn--quiet"
+            type="button"
+            onClick={() =>
+              action.setNotice(
+                "Photo uploads for this content are unavailable. You can still save your text draft.",
               )
             }
           >
@@ -1145,6 +1172,7 @@ function Compose({
           <button
             className="qv-btn qv-btn--secondary"
             disabled={
+              !canDraft ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1164,6 +1192,10 @@ function Compose({
           <button
             className={`qv-btn ${creator.owned ? "qv-btn--maya" : "qv-btn--secondary"}`}
             disabled={
+              (!creator.owned &&
+                (!creator.roles.includes("publisher") ||
+                  document.kind !== "post")) ||
+              !canDraft ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1191,7 +1223,13 @@ function Compose({
               })
             }
           >
-            {creator.owned ? "Review and sign" : "Publish as team"}
+            {creator.owned
+              ? "Review and sign"
+              : document.kind !== "post"
+                ? "Creator signature required"
+                : !creator.roles.includes("publisher")
+                  ? "Publishing role required"
+                  : "Publish as team"}
           </button>
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
@@ -1312,25 +1350,106 @@ function Compose({
 function Requests({ creator }: { creator: Creator }) {
   const [queue, setQueue] = useState<Queue | null>(null),
     [filter, setFilter] = useState("all"),
+    [ready, setReady] = useState(false),
+    [reload, setReload] = useState(0),
     action = useAction(),
     router = useRouter();
+  const positionKey = `w5.queue:${creator.viewerAccountId}:${creator.id}`;
+  const pages = useRef(1),
+    restore = useRef<{ pages: number; scroll: number } | null>(null),
+    requestGeneration = useRef(0);
   useEffect(() => {
-    void action.run(async () =>
-      setQueue(
-        await studioRequest("studio", `${creator.id}/queue?filter=${filter}`),
-      ),
-    );
-  }, [creator.id, filter]);
+    // Persist only navigation metadata. Every return reloads current authorized
+    // producer pages; private packet/disclosure text never enters storage.
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(positionKey) ?? "null");
+      if (
+        stored &&
+        ["all", "due", "decide", "more_info"].includes(stored.filter) &&
+        Number.isInteger(stored.pages) &&
+        stored.pages >= 1 &&
+        stored.pages <= 50 &&
+        Number.isFinite(stored.scroll) &&
+        stored.scroll >= 0
+      ) {
+        setFilter(stored.filter);
+        restore.current = { pages: stored.pages, scroll: stored.scroll };
+      }
+    } catch {
+      // Invalid or unavailable storage starts a fresh current queue.
+    }
+    setReady(true);
+  }, [positionKey]);
   useEffect(() => {
-    const saved = sessionStorage.getItem(`w5.queue.${creator.id}`);
-    if (saved) window.scrollTo(0, Number(saved));
-    return () =>
-      sessionStorage.setItem(`w5.queue.${creator.id}`, String(window.scrollY));
-  }, [creator.id]);
+    if (!ready) return;
+    const current = ++requestGeneration.current;
+    let frame: number | undefined;
+    const position = restore.current;
+    restore.current = null;
+    void action.run(async () => {
+      let result = await studioRequest<Queue>(
+        "studio",
+        `${creator.id}/queue?filter=${filter}`,
+      );
+      if (current !== requestGeneration.current) return;
+      setQueue(result);
+      let loadedPages = 1;
+      while (
+        current === requestGeneration.current &&
+        result.nextCursor &&
+        loadedPages < (position?.pages ?? 1)
+      ) {
+        const next = await studioRequest<Queue>(
+          "studio",
+          `${creator.id}/queue?filter=${filter}&cursor=${result.nextCursor}`,
+        );
+        result = { ...next, items: [...result.items, ...next.items] };
+        loadedPages++;
+        if (current === requestGeneration.current) setQueue(result);
+      }
+      if (current !== requestGeneration.current) return;
+      pages.current = loadedPages;
+      setQueue(result);
+      if (position)
+        frame = requestAnimationFrame(() =>
+          window.scrollTo(0, position.scroll),
+        );
+    });
+    return () => {
+      requestGeneration.current++;
+      if (frame !== undefined) cancelAnimationFrame(frame);
+    };
+  }, [creator.id, filter, ready, reload]);
+  const rememberPosition = () => {
+    try {
+      sessionStorage.setItem(
+        positionKey,
+        JSON.stringify({
+          filter,
+          pages: Math.min(pages.current, 50),
+          scroll: window.scrollY,
+        }),
+      );
+    } catch {
+      // Storage availability never blocks opening a current request.
+    }
+  };
   return (
     <section className="w5-requests">
       <header className="w5-heading">
         <h1>Requests</h1>
+        <button
+          className="qv-link-btn"
+          disabled={action.busy || !ready}
+          onClick={() => {
+            restore.current = null;
+            pages.current = 1;
+            setQueue(null);
+            setReload((value) => value + 1);
+          }}
+        >
+          Refresh requests
+        </button>
         <span className="qv-meta">
           {queue?.items.length ?? "—"}
           {queue?.nextCursor ? "+" : ""}
@@ -1352,7 +1471,28 @@ function Requests({ creator }: { creator: Creator }) {
       <div className="w5-gutter">
         <label className="w5-field">
           Filter
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select
+            value={filter}
+            disabled={action.busy || !ready}
+            onChange={(e) => {
+              restore.current = null;
+              pages.current = 1;
+              setQueue(null);
+              setFilter(e.target.value);
+              try {
+                sessionStorage.setItem(
+                  positionKey,
+                  JSON.stringify({
+                    filter: e.target.value,
+                    pages: 1,
+                    scroll: 0,
+                  }),
+                );
+              } catch {
+                // The filter still works without browser storage.
+              }
+            }}
+          >
             <option value="all">All</option>
             <option value="due">Due</option>
             <option value="decide">To decide</option>
@@ -1360,25 +1500,36 @@ function Requests({ creator }: { creator: Creator }) {
           </select>
         </label>
       </div>
-      {["Due", "To decide"].map((section, index) => (
-        <div className="w5-queue-section" key={section}>
-          <h2>{section}</h2>
-          {queue?.items
-            .filter((p) =>
-              index === 0
-                ? Boolean(
-                    p.commitment_id &&
-                      ["due", "in_progress"].includes(p.commitment_state ?? ""),
-                  )
-                : !p.commitment_id,
-            )
-            .map((p) => (
+      {[
+        "Due",
+        "To decide",
+        "Waiting for more information",
+        "Waiting for fan decision",
+      ].map((section, index) => {
+        const items =
+          queue?.items.filter((p) => {
+            const due = Boolean(
+              p.commitment_id &&
+                ["due", "in_progress"].includes(p.commitment_state ?? ""),
+            );
+            return index === 0
+              ? due
+              : !due &&
+                  p.state ===
+                    ["", "submitted", "more_info", "offer_pending"][index];
+          }) ?? [];
+        if (index > 1 && !items.length) return null;
+        return (
+          <div className="w5-queue-section" key={section}>
+            <h2>{section}</h2>
+            {items.map((p) => (
               <button
                 key={p.id}
                 className="w5-queue-open"
-                onClick={() =>
-                  router.push(`/studio/${creator.id}/packets/${p.id}`)
-                }
+                onClick={() => {
+                  rememberPosition();
+                  router.push(`/studio/${creator.id}/packets/${p.id}`);
+                }}
               >
                 <QueueCard
                   kind={index === 0 ? "commitment" : "packet"}
@@ -1392,8 +1543,9 @@ function Requests({ creator }: { creator: Creator }) {
                 />
               </button>
             ))}
-        </div>
-      ))}
+          </div>
+        );
+      })}
       {queue?.items.length === 0 && (
         <div className="w5-gutter">
           <EmptyState
@@ -1412,6 +1564,7 @@ function Requests({ creator }: { creator: Creator }) {
                 "studio",
                 `${creator.id}/queue?filter=${filter}&cursor=${queue.nextCursor}`,
               );
+              pages.current++;
               setQueue({ ...next, items: [...queue.items, ...next.items] });
             })
           }
@@ -1643,7 +1796,16 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                 Save written draft
               </button>
               {detail.packet.snapshot.mode === "voice_note" && (
-                <Link href="/media/voice">Record human voice</Link>
+                <button
+                  className="qv-link-btn"
+                  onClick={() =>
+                    action.setNotice(
+                      "Voice replies are unavailable for this request. You can still save your written draft.",
+                    )
+                  }
+                >
+                  Record human voice
+                </button>
               )}
               {detail.commitment &&
                 detail.packet.snapshot.mode.includes("call") && (
@@ -1904,7 +2066,7 @@ function Library({ creator }: { creator: Creator }) {
                 candidate_pending: "Waiting to add an AI source candidate",
                 candidate: "AI source candidate · approval happens in My AI",
                 revocation_pending: "AI source removal pending",
-                revoked: "Removed from AI sources",
+                revoked: "AI use is off",
               }[item.sourceState]
             }
             {item.document.scheduledAt &&

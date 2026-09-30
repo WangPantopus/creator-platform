@@ -31,11 +31,91 @@
       "width": 1280,
       "theme": "night",
       "proof": "functional desktop layout with248sidebar"
+    },
+    {
+      "file": "team-invitation-session-expired-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "capture encountered expired session after observed invitation action; not invitation-result proof"
+    },
+    {
+      "file": "team-recipient-accepted-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "genuine recipient acceptance; drafter role only"
+    },
+    {
+      "file": "team-drafter-compose-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "unsaved team preview and disabled creator signing; captured before segmented-style repair"
+    },
+    {
+      "file": "team-remove-session-expired-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "capture encountered expired session after observed removal; canonical role state recorded separately"
+    },
+    {
+      "file": "team-revoked-session-missing-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "capture lost cookie after specific no-role DOM observation; not revoked-role proof"
+    },
+    {
+      "file": "notes-flagged-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "actual empty flagged filter; no fabricated safety case"
+    },
+    {
+      "file": "queue-filter-return-desktop-light.png",
+      "width": 1280,
+      "theme": "light",
+      "proof": "selected filter restored after Notes navigation; current queue empty"
+    },
+    {
+      "file": "note-compose-session-missing-phone-light.png",
+      "width": 390,
+      "theme": "light",
+      "proof": "latest capture lost session; not editor or layout acceptance"
     }
   ],
   "limitations": [
     "Synthetic identity is not Pantopus production or creator passkey verification",
     "No signed Note, payment, media, distribution, privacy completion or cross-client happy path claimed",
-    "Earlier note-signing-result-phone-light.png is preview only; its filename does not establish signing success"
-  ]
+    "Earlier note-signing-result-phone-light.png is preview only; its filename does not establish signing success",
+    "Screenshot capture can differ from preceding DOM observations when browser session is lost; failure files are explicitly named and captioned, and do not prove successful actions."
+  ],
+  "team": {
+    "creator": "W5 development creator",
+    "recipient": "W5 development fan two",
+    "acceptedRoles": ["drafter"],
+    "observed": [
+      "creator creates public-handle invitation with Drafting only",
+      "recipient accepts through genuine W1 development continuation",
+      "drafter composer can prepare text; creator signing and AI-use grant controls remain unavailable",
+      "creator removes recipient access",
+      "fresh recipient sign-in receives current-account-no-role denial at compose route"
+    ],
+    "temporaryRecipientRoleRestored": "removed",
+    "triagePublisherActorPreserved": true,
+    "concurrentRevocationWhileOpen": "not demonstrated; sequential sessions only",
+    "draftPreviewSaved": false,
+    "canonicalStateEvidence": "team-canonical-state.json"
+  },
+  "queue": {
+    "observed": "selected waiting-for-more-information; left for Notes; returned and selected filter restored with a current empty producer queue",
+    "populatedPageReplay": "implemented but not operated; no payment/packet records fabricated",
+    "scrollRestoration": "implemented but unverified with populated queue",
+    "storage": "account-scoped filter/page-count/scroll metadata only; current pages reloaded; no packet text stored",
+    "HTTP": "http-queue-recovery.json: current empty filter200; stale cursor409 queue_changed"
+  },
+  "composer": {
+    "audienceSelector": "neutral shared segmented track; accessible pressed state;44px controls",
+    "phone": "focused layout implemented; segmented control personally observed, but final focused-editor capture lost session and is not visual acceptance",
+    "night": "correct generated warm creator plate/focus tokens implemented; final phone Night operated capture remains unavailable",
+    "unavailableMedia": "keeps draft and explains availability; no wrong-purpose recorder navigation",
+    "cookieRecovery": "older browser tabs intermittently lost cookies; fresh tab after isolated server restart retained session through queue/Notes/composer navigation; underlying browser behavior is not conclusively diagnosed"
+  }
 }

@@ -21,6 +21,7 @@ export function contentSignedSubjects(
         .object({ kind: z.enum(["content_publication", "content_reaction"]) })
         .safeParse(requested.content);
       if (!content.success) return null;
+      await service.assertCurrentAllowed(client, actor, creatorId);
       await service.role(client, actor, creatorId);
       if (content.data.kind === "content_reaction") {
         const input = z
@@ -31,7 +32,7 @@ export function contentSignedSubjects(
           .parse(requested.content);
         const reply = (
           await client.query(
-            "SELECT id,version,content_id FROM creator.content_reply WHERE id=$1 AND creator_id=$2 AND withdrawn_at IS NULL",
+            "SELECT r.id,r.version,r.content_id FROM creator.content_reply r JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
             [requested.subjectId, creatorId],
           )
         ).rows[0];

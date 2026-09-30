@@ -1,0 +1,37 @@
+{
+  "head": "aa50642f944292386679194cd1f4066c82c4c64f",
+  "runId": 36759698720,
+  "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36759698720",
+  "webAndBackend": "success",
+  "androidRuntime": "success",
+  "iosFoundation": {
+    "result": "failure",
+    "compilation": "pass",
+    "existingNonSnapshotTests": 15,
+    "snapshotFailures": 110,
+    "runner": "macOS27.0/Xcode27 ARM64",
+    "nextAction": "inspect retained diffs under explicit2x capture; strict goldens unchanged"
+  },
+  "webVisual": "queued at record",
+  "androidFoundation": "queued at record",
+  "pullRequest": {
+    "created": false,
+    "reason": "GitHub connector403 Resource not accessible by integration; browser signed out",
+    "connectorLogin": "wypgitt",
+    "installationAccounts": ["wypgitt", "Pantopus"],
+    "repositoryOwner": "WangPantopus",
+    "lastAttempt": "403 creating draft PR after latest access claim; no PR or merge exists"
+  },
+  "nextHead": "7b167fb",
+  "nextRunId": 36763954818,
+  "nextRunURL": "https://github.com/WangPantopus/creator-platform/actions/runs/36763954818",
+  "nextHeadWebAndBackend": "success",
+  "nextHeadWebVisual": "success",
+  "nextHeadAndroidRuntime": "success",
+  "nextHeadNativeFoundation": {
+    "ios": "failure: 110 existing snapshot comparisons",
+    "android": "queued at 2026-09-30T20:44Z",
+    "iosArtifactId": 11124533610,
+    "observedCapture": "780x1688 bitmap from1x hosted display is blurred relative to2x baseline; actual snapshots available; no tolerance or golden change"
+  }
+}

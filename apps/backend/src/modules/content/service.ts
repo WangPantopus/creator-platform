@@ -203,30 +203,37 @@ export class ContentService {
       [actor.accountId, creatorId, subjectId, subjectKind, version, type],
     );
   }
-  async transaction<T>(
+  async assertCurrentAllowed(
+    client: PoolClient,
     actor: Actor,
     creatorId: string,
-    work: (client: PoolClient) => Promise<T>,
-  ): Promise<T> {
+  ) {
     invariant(
       actor.adultEligible,
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
     await this.dependencies.assertAllowed?.(actor, creatorId);
+    const denied = await client.query(
+      "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
+      [actor.accountId],
+    );
+    invariant(
+      !denied.rowCount,
+      "content_deleted",
+      "This account's content has been removed.",
+    );
+  }
+  async transaction<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ): Promise<T> {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
-      const denied = await client.query(
-        "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
-        [actor.accountId],
-      );
-      invariant(
-        !denied.rowCount,
-        "content_deleted",
-        "This account's content has been removed.",
-      );
       await client.query("SELECT set_config('app.creator_id',$1,true)", [
         creatorId,
       ]);
+      await this.assertCurrentAllowed(client, actor, creatorId);
       return work(client);
     });
   }
@@ -686,7 +693,7 @@ export class ContentService {
       );
       const reply = (
         await client.query(
-          "SELECT r.text,p.share_text,p.show_handle,p.version,f.handle FROM creator.content_reply r JOIN creator.content_quote_permission p ON p.reply_id=r.id JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
+          "SELECT r.text,p.share_text,p.show_handle,p.version,f.handle FROM creator.content_reply r JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL JOIN creator.content_quote_permission p ON p.reply_id=r.id JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
           [document.quote.replyId, row.creator_id],
         )
       ).rows[0];
@@ -1400,7 +1407,7 @@ export class ContentService {
         async () => {
           const reply = (
             await client.query(
-              "SELECT * FROM creator.content_reply WHERE id=$1 AND creator_id=$2 AND withdrawn_at IS NULL",
+              "SELECT r.* FROM creator.content_reply r JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
               [replyId, creatorId],
             )
           ).rows[0];

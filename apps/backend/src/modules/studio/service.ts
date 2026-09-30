@@ -180,6 +180,12 @@ export class StudioService {
           [creatorId, input.filter, input.cursor ?? null, input.limit + 1],
         )
       ).rows;
+      if (input.cursor && !rows.length)
+        throw new DomainError(
+          "queue_changed",
+          "The request queue changed. Refresh requests to continue from current state.",
+          409,
+        );
       const capacity = (
         await client.query(
           "SELECT m.id,m.title,m.kind,m.weekly_limit,coalesce(c.used,0) AS used,coalesce(c.reserved,0) AS reserved,m.version FROM creator.commerce_mode m LEFT JOIN creator.commerce_capacity c ON c.mode_id=m.id AND c.window_start=date_trunc('week',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' WHERE m.creator_id=$1 AND m.state='offered' ORDER BY m.title LIMIT 100",

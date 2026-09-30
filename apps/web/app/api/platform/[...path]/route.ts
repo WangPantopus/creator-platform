@@ -49,8 +49,10 @@ async function proxy(
         ...cookieOptions,
         maxAge: 7 * 86400,
       });
+    // A request can finish after another tab has completed fresh sign-in.
+    // A late 401 must not erase that newer cookie; the server still rejects
+    // expired authorization, and explicit logout/revocation clears the cookie.
     if (
-      upstream.status === 401 ||
       ["identity/logout", "identity/revoke-sessions"].includes(path.join("/"))
     )
       response.cookies.delete(sessionCookie);
