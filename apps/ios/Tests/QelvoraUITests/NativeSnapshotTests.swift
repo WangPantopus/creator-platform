@@ -76,6 +76,7 @@
       host.frame = NSRect(origin: .zero, size: size)
       let window = NSWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      window.colorSpace = .sRGB
       window.contentView = host
       host.layoutSubtreeIfNeeded()
       if delay {

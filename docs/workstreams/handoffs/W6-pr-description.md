@@ -1,34 +1,30 @@
-# Prepared PR #4 description
+# Current PR #4 description
 
-Suggested title: **W6: resumable media and server-backed call lifecycle**
+Title: **W6: resumable media and server-backed call lifecycle**
 
-The connector denied metadata writes (HTTP403) and the browser was signed out. The following text is ready to apply when an authorized GitHub write session is available. It has not replaced the live PR description.
+GitHub CLI write access is verified as `WangPantopus`; the live PR title/body have been updated. Current text follows.
 
 ---
 
-Add W6's scoped media pipeline and web/Swift/Kotlin call workflows. Upload retries preserve the original upload after a lost response, and call consent, provider history and authorization changes drive durable cleanup rather than leaving capture or recording active.
+Add W6's scoped media pipeline and web/Swift/Kotlin call workflows. Upload retries preserve the original upload after a lost response; consent, complete provider history and authorization changes drive durable capture/recording cleanup.
 
 ## Implementation
 
 - Resumable quarantined media, bounded processing/provenance/privacy contracts, exact-media signing, browser/native recording and secure playback.
-- Versioned availability and signed time offers; W4 scheduling/settlement composition; authoritative interval clocks, separate consent, summary jobs and provider reconciliation.
-- Recovery fixes for completed uploads, exact chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms, recording-occurrence preservation during revocation and stale client transports.
-- Source-mapped status, ownership requests, continuation instructions and current verification evidence.
+- Versioned availability and signed time offers, W4 scheduling/settlement and retained post-call authority, server interval clocks, independent consent, summary jobs and reconciliation.
+- Recovery fixes for completed uploads, chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms, actual recording occurrence during revocation and stale client transports.
+- Authorized foundation CI repairs for current identity contracts, migration setup and native compilation; corrected Android ended Composer with its required request action and reviewed four-image refresh; portable iOS color-profile normalization of existing references, preserving strict equality.
 
-The prerequisite commit `1a94db3` preserves existing shared app foundations and peer work; it is not W6-authored completion. `2485828` contains the original W6 implementation, `a96ecbb` incorporates main's newer W5 handoff, and `fa6af82`/`796d4e8` contain the current W6 recovery/consent/history and early-end fixes/evidence. Review those scopes separately.
+Prerequisite commit `1a94db3` preserves shared app foundations/peer work and is not W6-authored completion. `2485828` contains original W6 implementation; `a96ecbb` incorporates main's newer W5 handoff. Later W6 recovery and CI repairs preserve those source boundaries.
 
 ## Validation
 
-Current backend/web TypeScript and production builds, targeted W6 ESLint/format and generated consistency (12 resources, 31 operations) pass. Current Swift QelvoraUI builds for the iOS Simulator. The actual browser recorder was operated at 390×844 through permission-request cancellation and retry; the AI-audio unavailable gate was inspected. No new test files/cases/suites, provider fixtures or paid AI requests were used. The founder subsequently authorized correcting existing checks and shared CI failures.
+Remote web/backend checks pass all18 genuine PostgreSQL/contracts plus generation, TypeScript, lint, format and production build. Web visual, Android emulator and trust compilation checks pass. Local isolated Android APK build and all19 existing unit/snapshot checks pass after the Composer correction. No new cases/suites/harnesses, weakened limits or paid AI requests.
 
-Current Android sources compiled and packaged in GitHub's runtime job; three existing foundation checks passed, with arrival-context removal failing. Local Android compilation and personally operated current native app journeys remain unverified: the local JDK/Android SDK/XcodeGen and native UI control are unavailable. Historical native launch evidence is dated separately. Browser microphone input remains unavailable for real recording.
-
-All five foundation CI jobs failed on `796d4e8`: shared formatting, Swift macOS modifiers, Android SDK setup, and separate web/Android arrival/design failures. Trust release compilation passed. The founder subsequently authorized applying the nine-file shared proposal and correcting existing auth/reference-composition/PostgreSQL setup checks. Current local results and remaining runner-dependent failures are recorded in the authorized CI repair evidence. Precise results and the unapplied proposal are recorded in the [CI triage](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/ci-triage.md).
+iOS compiles and its15 non-snapshot checks pass. All110 original image assertions failed even on Xcode27, exposing display-profile differences. The existing capture now uses sRGB and existing references were ColorSync-converted with dimensions/alpha preserved; no new iOS render is accepted as a baseline. Matching-runner strict verification remains pending. Actual browser recorder permission cancellation/retry was operated at390×844; successful real microphone capture and complete native W6 journeys remain unverified.
 
 ## Integration gates — draft
 
-All media/call/AI-audio capabilities remain false. Genuine storage/scanner/C2PA and media authority, availability migration/bootstrap wiring, supported call provider/single-use admission/history and client SDKs, producer handback/reminder/licensed-audio adapters, approved grace/reschedule/both-absent/retention policies, and runtime verification of W4 retained receipt/summary authority remain open. The exact current W4 retained-authority producer is now integrated. Full media/sign/delivery/play and two-party outcome/receipt/consent journeys, physical phones, accessibility and latency/revocation evidence must pass before full W6 acceptance or merge readiness. No fulfillment, refund, provider or hardware success is inferred from a build.
+All media/call/AI-audio capabilities remain false. Genuine storage/scanner/C2PA and current media authority, availability allocation/bootstrap wiring, supported provider/single-use admission/history/SDKs, W3/W7/W2 effects, approved grace/reschedule/both-absent/retention policies and physical-phone/full functional acceptance remain open. W4's exact retained-authority producer is integrated but its post-settlement receipt/summary journey remains unverified. CI success alone does not close W6 acceptance or merge readiness.
 
-[Current resume evidence](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/README.md) · [Current status](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/status/W6.md) · [Complete handoff](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/handoffs/W6.md) · [Resume prompt](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/prompts/W6-resume.md)
-
-Docker responds and the prior W6 container is absent. W6's local web/API processes were released after verification; peer resources were preserved.
+[Current native CI evidence](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/native-ci/2026-09-30/README.md) · [Current status](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/status/W6.md) · [Complete handoff](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/handoffs/W6.md) · [Resume prompt](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/prompts/W6-resume.md)
