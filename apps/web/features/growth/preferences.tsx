@@ -1,8 +1,8 @@
 "use client";
 import { notificationKindLabel } from "./copy";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
-import { useState } from "react";
-import { mutate } from "./actions";
+import { useId, useRef, useState } from "react";
+import { GrowthActionError, mutate } from "./actions";
 const kinds = [
   "ai_reply",
   "approved_draft",
@@ -54,16 +54,49 @@ export function PreferenceForm({
 }) {
   const [value, setValue] = useState(initial),
     [message, setMessage] = useState(""),
-    [busy, setBusy] = useState(false);
-  const update = (patch: Partial<PreferencesValue>) =>
-    setValue({ ...value, ...patch });
+    [busy, setBusy] = useState(false),
+    [invalid, setInvalid] = useState({ quietHours: false, timeZone: false });
+  const fromInput = useRef<HTMLInputElement>(null),
+    untilInput = useRef<HTMLInputElement>(null),
+    zoneInput = useRef<HTMLInputElement>(null),
+    errorId = useId();
+  const update = (patch: Partial<PreferencesValue>) => {
+    setValue((current) => ({ ...current, ...patch }));
+    setMessage("");
+    setInvalid((current) => ({
+      quietHours:
+        "quietStart" in patch || "quietEnd" in patch
+          ? false
+          : current.quietHours,
+      timeZone: "timeZone" in patch ? false : current.timeZone,
+    }));
+  };
   return (
     <form
       className="growth-stack"
       onSubmit={async (event) => {
         event.preventDefault();
-        setBusy(true);
+        if (busy) return;
         setMessage("");
+        const quietHours =
+          (value.quietStart === null) !== (value.quietEnd === null);
+        let timeZone = false;
+        try {
+          new Intl.DateTimeFormat("en", { timeZone: value.timeZone });
+        } catch {
+          timeZone = true;
+        }
+        setInvalid({ quietHours, timeZone });
+        if (quietHours || timeZone) {
+          const input = quietHours
+            ? value.quietStart === null
+              ? fromInput
+              : untilInput
+            : zoneInput;
+          input.current?.focus();
+          return;
+        }
+        setBusy(true);
         try {
           await mutate("preferences", value, "PUT");
           setMessage(
@@ -71,9 +104,11 @@ export function PreferenceForm({
           );
         } catch (e) {
           setMessage(
-            e instanceof Error
-              ? e.message
-              : growthCopy.growthPreferencesWereNotSaved,
+            e instanceof GrowthActionError && e.status === 400
+              ? growthCopy.growthPreferencesWereNotSaved
+              : e instanceof Error
+                ? e.message
+                : growthCopy.growthPreferencesWereNotSaved,
           );
         } finally {
           setBusy(false);
@@ -112,7 +147,12 @@ export function PreferenceForm({
         <label>
           {growthCopy.growthFrom}
           <input
+            ref={fromInput}
             type="time"
+            aria-invalid={invalid.quietHours || undefined}
+            aria-describedby={
+              invalid.quietHours ? `${errorId}-quiet` : undefined
+            }
             value={time(value.quietStart)}
             onChange={(e) => update({ quietStart: minutes(e.target.value) })}
           />
@@ -120,20 +160,38 @@ export function PreferenceForm({
         <label>
           {growthCopy.growthUntil}
           <input
+            ref={untilInput}
             type="time"
+            aria-invalid={invalid.quietHours || undefined}
+            aria-describedby={
+              invalid.quietHours ? `${errorId}-quiet` : undefined
+            }
             value={time(value.quietEnd)}
             onChange={(e) => update({ quietEnd: minutes(e.target.value) })}
           />
         </label>
+        {invalid.quietHours && (
+          <p id={`${errorId}-quiet`} role="alert" className="growth-error">
+            {growthCopy.growthErrorQuietHoursPair}
+          </p>
+        )}
         <label>
           {growthCopy.growthTimeZone}
           <input
+            ref={zoneInput}
             className="qv-input"
+            aria-invalid={invalid.timeZone || undefined}
+            aria-describedby={invalid.timeZone ? `${errorId}-zone` : undefined}
             value={value.timeZone}
             maxLength={80}
             onChange={(e) => update({ timeZone: e.target.value })}
           />
         </label>
+        {invalid.timeZone && (
+          <p id={`${errorId}-zone`} role="alert" className="growth-error">
+            {growthCopy.growthErrorTimeZone}
+          </p>
+        )}
         <p className="growth-help">
           {growthCopy.growthLeaveBothTimesEmptyForNoQuietHoursMatchingTimes}
         </p>

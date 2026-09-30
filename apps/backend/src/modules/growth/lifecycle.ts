@@ -40,20 +40,17 @@ export function growthPrivacyHook(
             {
               category: "pseudonymous_erasure_fence",
               until: null,
-              reason:
-                "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.",
+              reason: copy.growthRetainedErasureFence,
             },
             {
               category: "anonymous_event_dedupe",
               until: null,
-              reason:
-                "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.",
+              reason: copy.growthRetainedEventDedupe,
             },
             {
               category: "anonymous_closed_fan_aggregates",
               until: null,
-              reason:
-                "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
+              reason: copy.growthRetainedFanAggregates,
             },
           ],
         };

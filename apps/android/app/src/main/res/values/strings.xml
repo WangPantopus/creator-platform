@@ -595,4 +595,15 @@
   <string name="growth_email_service_unavailable" formatted="false">Email service unavailable</string>
   <string name="growth_error_content_effect_unconfigured" formatted="false">This content effect requires its owner adapter.</string>
   <string name="growth_error_content_version_unavailable" formatted="false">The current content version is unavailable.</string>
+  <string name="growth_signed_conversation_update" formatted="false">A signed reply is available in your conversation.</string>
+  <string name="growth_ai_conversation_update" formatted="false">An AI reply is available in your conversation.</string>
+  <string name="growth_current_call_update" formatted="false">Your call status has changed.</string>
+  <string name="growth_measurement_denominator" formatted="false">Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.</string>
+  <string name="growth_measurement_retention" formatted="false">D1/D7/D30 use each actor\'s first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.</string>
+  <string name="growth_retained_closed_snapshots" formatted="false">Irreversibly aggregated closed snapshots contain no identity or text.</string>
+  <string name="growth_retained_erasure_fence" formatted="false">Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.</string>
+  <string name="growth_retained_event_dedupe" formatted="false">Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.</string>
+  <string name="growth_retained_fan_aggregates" formatted="false">Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.</string>
+  <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
+  <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
 </resources>

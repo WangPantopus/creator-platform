@@ -178,8 +178,8 @@ export function conversationNotificationState(
         creatorName: scope.creatorName,
         authorKind: message.author_kind,
         safePreview: human
-          ? "A signed reply is available in your conversation."
-          : "An AI reply is available in your conversation.",
+          ? copy.growthSignedConversationUpdate
+          : copy.growthAiConversationUpdate,
         inAppPreview: message.text.slice(0, 240),
         destination: `/creators/${handle}/chat`,
       };
@@ -283,7 +283,7 @@ export function callNotificationState(
       version: call.version,
       creatorName: scope.creatorName,
       authorKind: "system",
-      safePreview: "Your call status has changed.",
+      safePreview: copy.growthCurrentCallUpdate,
       destination: `/calls/${call.id}`,
       status:
         call.state === "scheduled"

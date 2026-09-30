@@ -6468,6 +6468,127 @@
           }
         }
       }
+    },
+    "A signed reply is available in your conversation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A signed reply is available in your conversation."
+          }
+        }
+      }
+    },
+    "An AI reply is available in your conversation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An AI reply is available in your conversation."
+          }
+        }
+      }
+    },
+    "Your call status has changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call status has changed."
+          }
+        }
+      }
+    },
+    "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed."
+          }
+        }
+      }
+    },
+    "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed."
+          }
+        }
+      }
+    },
+    "Irreversibly aggregated closed snapshots contain no identity or text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Irreversibly aggregated closed snapshots contain no identity or text."
+          }
+        }
+      }
+    },
+    "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored."
+          }
+        }
+      }
+    },
+    "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased."
+          }
+        }
+      }
+    },
+    "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted."
+          }
+        }
+      }
+    },
+    "Both quiet-hour boundaries are required": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both quiet-hour boundaries are required"
+          }
+        }
+      }
+    },
+    "Choose a valid time zone, such as America/Los_Angeles.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a valid time zone, such as America/Los_Angeles."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

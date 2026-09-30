@@ -855,10 +855,8 @@ export class GrowthService {
       returns,
       timeToUsefulAnswerSeconds:
         Number(useful.observations) >= 5 ? Number(useful.median_seconds) : null,
-      denominator:
-        "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.",
-      retention:
-        "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.",
+      denominator: copy.growthMeasurementDenominator,
+      retention: copy.growthMeasurementRetention,
     };
   }
   async experiments(actor: Actor) {
@@ -1025,8 +1023,8 @@ export class GrowthService {
         [ownedCreatorIds],
       );
       await client.query(
-        "UPDATE growth.notification SET sender='System',preview='This update is no longer available.',destination='/notifications' WHERE creator_id=ANY($1::uuid[])",
-        [ownedCreatorIds],
+        "UPDATE growth.notification SET sender=$2,preview=$3,destination='/notifications' WHERE creator_id=ANY($1::uuid[])",
+        [ownedCreatorIds, copy.growthSystem, copy.growthUpdateUnavailable],
       );
       await client.query(
         "DELETE FROM growth.share WHERE source->>'creatorId'=ANY($1::text[])",
@@ -1039,8 +1037,7 @@ export class GrowthService {
     });
     return {
       acknowledged: true,
-      retained:
-        "Irreversibly aggregated closed snapshots contain no identity or text.",
+      retained: copy.growthRetainedClosedSnapshots,
     };
   }
 }

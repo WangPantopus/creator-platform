@@ -217,6 +217,9 @@
   font-size: 14px;
   line-height: 20px;
 }
+.growth input[aria-invalid="true"] {
+  border-color: var(--alert);
+}
 .growth a:focus-visible,
 .growth button:focus-visible,
 .growth input:focus-visible,

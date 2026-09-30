@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 
@@ -116,7 +117,7 @@ export const Preferences = z
   })
   .refine(
     (value) => (value.quietStart === null) === (value.quietEnd === null),
-    "Both quiet-hour boundaries are required",
+    copy.growthErrorQuietHoursPair,
   );
 export type NotificationPreferences = z.infer<typeof Preferences>;
 export const defaultPreferences: NotificationPreferences = {
