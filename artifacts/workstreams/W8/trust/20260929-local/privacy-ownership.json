@@ -1,0 +1,129 @@
+{
+  "requests": [
+    {
+      "actor": "creator",
+      "correlationId": "6808b26c-9b3a-4f7d-a1a2-42a180bdf031",
+      "status": 202,
+      "id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+      "kind": "export",
+      "state": "queued",
+      "immediateDeny": false,
+      "domainIntegration": "pending"
+    },
+    {
+      "actor": "fan",
+      "correlationId": "6808b26c-9b3a-4f7d-a1a2-42a180bdf032",
+      "status": 202,
+      "id": "95632ec2-890f-485d-a611-61df26d39db5",
+      "kind": "export",
+      "state": "queued",
+      "immediateDeny": false,
+      "domainIntegration": "pending"
+    }
+  ],
+  "observed": {
+    "creatorIds": ["20000000-0000-4000-8000-000000000001"],
+    "fanIds": [],
+    "wrongAccount": null,
+    "legacyJob": null,
+    "snapshotMutation": "42501",
+    "tasks": [
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "agent",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "identity",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "media",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "95632ec2-890f-485d-a611-61df26d39db5",
+        "domain": "trust",
+        "state": "complete",
+        "error_code": null
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "agent",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "identity",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "media",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable"
+      },
+      {
+        "job_id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+        "domain": "trust",
+        "state": "complete",
+        "error_code": null
+      }
+    ]
+  }
+}
