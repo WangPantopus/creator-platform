@@ -109,6 +109,7 @@ export class ConversationService {
         client,
         generation.grant_id,
         consumed,
+        generation.id,
       );
   }
   async releaseApprovedSentence(
@@ -259,14 +260,15 @@ export class ConversationService {
                 "Review the current AI providers before messaging.",
               );
             await this.delivery.assertReady?.(scope, client);
+            const generationId = randomUUID();
             const reservation = await this.delivery.allowance?.reserve(
               scope,
               client,
-              body.idempotencyKey,
+              `generation:${generationId}`,
             );
             const grantId =
               reservation?.grantId ??
-              (await this.access.reserveAllowance(scope, client));
+              (await this.access.reserveAllowance(scope, client, generationId));
             const active = await client.query(
               "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
               [scope.threadId, scope.creatorId, scope.fanId],
@@ -279,7 +281,6 @@ export class ConversationService {
               "reply_in_progress",
               "Wait for this reply before sending another message.",
             );
-            const generationId = randomUUID();
             const fan = await this.insertMessage(
               client,
               scope,
@@ -580,7 +581,15 @@ export class ConversationService {
           thread.control_epoch !== generation.epoch
         )
           return null;
-        const state = failed ? "failed" : "delivered";
+        // A visible approved prefix is already delivered work. Keep it and
+        // settle it consistently with takeover; only an empty failure releases
+        // the reservation without consumption.
+        const visible = generation.last_sequence > 0;
+        const state = failed
+          ? visible
+            ? "interrupted"
+            : "failed"
+          : "delivered";
         await client.query(
           "UPDATE creator.generation SET state=$1 WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
           [state, generationId, scope.threadId, scope.creatorId, scope.fanId],
@@ -595,7 +604,7 @@ export class ConversationService {
             scope.fanId,
           ],
         );
-        await this.settle(client, scope, generation, !failed);
+        await this.settle(client, scope, generation, !failed || visible);
         await client.query(
           "UPDATE creator.generation SET completed_at=now(),worker_token=NULL,lease_until=NULL WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
           [generationId, scope.threadId, scope.creatorId, scope.fanId],

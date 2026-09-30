@@ -84,7 +84,20 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      var imageStrategy = Snapshotting<NSView, NSImage>.image(size: size)
+      // W4's published capture correction: references contain 2x pixels,
+      // whereas a headless CI display is 1x. Render into a fixed-resolution
+      // bitmap instead of resizing a lower-resolution capture afterward.
+      let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
+        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
+        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+        bytesPerRow: 0, bitsPerPixel: 0
+      )!.retagging(with: .sRGB)!
+      bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let rendered = NSImage(size: size)
+      rendered.addRepresentation(bitmap)
+      var imageStrategy = Snapshotting<NSImage, NSImage>.image
       let compare = imageStrategy.diffing.diffV2
       imageStrategy.diffing.diffV2 = { reference, rendered in
         // References contain the original monitor's ICC profile. Compare both
@@ -133,7 +146,7 @@
         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
       }
       assertSnapshot(
-        of: host as NSView, as: imageStrategy, named: name, record: record, file: file,
+        of: rendered, as: imageStrategy, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

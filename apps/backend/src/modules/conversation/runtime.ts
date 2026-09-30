@@ -76,5 +76,6 @@ export function createConversationRuntime(input: {
     memory,
     wellbeing,
     processor,
+    close: () => processor?.close(),
   };
 }

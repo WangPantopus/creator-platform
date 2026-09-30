@@ -19,8 +19,8 @@ private struct W3ConversationDestination: View {
         if let baseURL, path.count == 3, path[0] == "threads", UUID(uuidString: path[1]) != nil, UUID(uuidString: path[2]) != nil {
             W3ThreadScreen(baseURL: baseURL, creatorId: path[1], fanId: path[2], session: session)
         } else if let baseURL, path.count == 3, path[0] == "creators", path[2] == "chat" {
-            W3FirstConversation(baseURL: baseURL, handle: path[1], session: session)
-        } else if let baseURL, path == ["you"] { W3AccountScreen(baseURL: baseURL, session: session) }
+            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", session: session)
+        } else if let baseURL, path == ["you"] { W3AccountScreen(accountId: session.session?.accountId ?? "signed-out", baseURL: baseURL, session: session) }
         else { Notice(title: "Conversation unavailable", children: "Reconnect to open this conversation from your account.") }
     }
 }
@@ -115,7 +115,7 @@ private struct W3ThreadScreen: View {
 private struct W3Passage: Decodable, Identifiable, Sendable { let id: String; let title: String; let text: String }
 
 private struct W3FirstConversation: View {
-    let baseURL: URL; let handle: String; @ObservedObject var session: FanSession
+    let baseURL: URL; let handle: String; let accountId: String; @ObservedObject var session: FanSession
     @State private var creator: GrowthCreator?; @State private var caps: W3Capabilities?; @State private var failure = ""; @State private var busy = false
     @State private var key = UUID().uuidString.lowercased()
     @Environment(\.colorScheme) private var scheme
@@ -150,7 +150,7 @@ private struct W3FirstConversation: View {
     }
     private func begin() async {
         guard let creator, let policy = caps?.providers else { return }; busy = true; defer { busy = false }
-        do { let page: W3Page = try await W3ConversationClient(baseURL: baseURL).request("begin", body: JSONEncoder().encode(W3Begin(creatorId: creator.id, policyVersion: policy.version, accessNoticeAccepted: true, idempotencyKey: key))); session.open("/threads/" + page.creatorId + "/" + page.fanId) }
+        do { let page: W3Page = try await W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId).request("begin", body: JSONEncoder().encode(W3Begin(creatorId: creator.id, policyVersion: policy.version, accessNoticeAccepted: true, idempotencyKey: key))); session.open("/threads/" + page.creatorId + "/" + page.fanId) }
         catch { failure = (error as? W3Failure)?.message ?? "Reconnect to try again. No message was sent." }
     }
 }
@@ -214,6 +214,7 @@ private struct W3Account: Decodable, Sendable {
     let fan: Fan; let threads: [Conversation]
 }
 private struct W3AccountScreen: View {
+    let accountId: String
     let baseURL: URL; @ObservedObject var session: FanSession
     @State private var account: W3Account?; @State private var failure = ""
     @Environment(\.colorScheme) private var scheme
@@ -223,9 +224,9 @@ private struct W3AccountScreen: View {
             if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
             Text(account?.fan.handle ?? "Your account").qText("display-md")
             Text(account?.fan.intro ?? "Your intro is private until you choose to share it.").qText("body")
-            Button("Handle and intro", variant: .quiet) { session.open("/settings/profile") }
-            Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce") }
-            Button("Spend and time", variant: .quiet, block: true) { session.open("/commerce/limits") }
+            Button("Handle and intro", variant: .quiet) { session.open("/identity/account") }
+            Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce/requests") }
+            Button("Spend and time", variant: .quiet, block: true) { session.open("/commerce/spending") }
             Button("Notifications", variant: .quiet, block: true) { session.open("/notifications/settings") }
             Text("Me and privacy").qText("display-md")
             Text("Memory and conversation access by creator").qText("body")
@@ -235,5 +236,5 @@ private struct W3AccountScreen: View {
         }.padding(16) }.frame(maxWidth: 390).background(qColor("ground",scheme)).foregroundStyle(qColor("ink",scheme))
             .task(id: session.session?.accountId) { await refresh() }.refreshable { await refresh() }
     }
-    private func refresh() async { account = nil; do { account = try await W3ConversationClient(baseURL:baseURL).request("account"); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." } }
+    private func refresh() async { account = nil; do { account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account"); failure = "" } catch { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." } }
 }

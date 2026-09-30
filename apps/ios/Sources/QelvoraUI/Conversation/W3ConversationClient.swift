@@ -29,7 +29,7 @@ struct W3Memory: Decodable, Identifiable, Sendable {
 struct W3MemoryView: Decodable, Sendable { let revision: Int; let offTheRecord: Bool; let introShared: Bool; let items: [W3Memory] }
 struct W3Audit: Decodable, Identifiable, Sendable { let id: String; let readerAccountId: String; let role: String; let readAt: String }
 struct W3Failure: Error, Sendable { let message: String; let status: Int }
-private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
+private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
 struct W3Status: Decodable, Sendable { let accepted: Bool }
 struct W3Preferences: Encodable { let offTheRecord: Bool; let introShared: Bool; let expectedRevision: Int }
 struct W3Decision: Encodable { let expectedRevision: Int; let action: String; let text: String? }
@@ -46,8 +46,10 @@ actor W3ConversationClient {
     let baseURL: URL
     private let credentials = SecureSessionStorage()
     private let session: URLSession
-    init(baseURL: URL) {
+    private let expectedAccountId: String?
+    init(baseURL: URL, expectedAccountId: String? = nil) {
         self.baseURL = baseURL
+        self.expectedAccountId = expectedAccountId
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         session = URLSession(configuration: configuration)
@@ -61,22 +63,29 @@ actor W3ConversationClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         let requestCredential = publicRead ? nil : try await credentials.read()
         if !publicRead {
+            guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
             guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
             request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+            request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
         }
         if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
         let (data, response) = try await session.data(for: request)
         if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:"Your account changed. Open this conversation again.", status:401) } }
         guard data.count <= 1_000_000 else { throw W3Failure(message:"This conversation response is too large. Refresh to try again.",status:503) }
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        guard (200..<300).contains(response.statusCode) else { throw W3Failure(message: (try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error.message) ?? "Reconnect to refresh. Your input is kept.", status: response.statusCode) }
+        guard (200..<300).contains(response.statusCode) else {
+            let error = try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error
+            throw W3Failure(message: error?.message ?? "Reconnect to refresh. Your input is kept.", status: error?.code == "session_account_changed" ? 401 : response.statusCode)
+        }
         return try JSONDecoder().decode(T.self, from: data)
     }
     func socket() async throws -> URLSessionWebSocketTask {
+        guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
         guard let token = try await credentials.read() else { throw W3Failure(message: "Continue with Pantopus again.", status: 401) }
         var target = URLComponents(url: baseURL.appendingPathComponent("v1/realtime"), resolvingAgainstBaseURL: false)!
         target.scheme = target.scheme == "https" ? "wss" : "ws"
         var request = URLRequest(url: target.url!); request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
         let socket = session.webSocketTask(with: request); socket.resume(); return socket
     }
 }
@@ -95,7 +104,7 @@ final class W3ThreadModel: ObservableObject {
     private var storageScope: String { client.baseURL.absoluteString + "/" + root }
     var root: String { creatorId + "/" + fanId }
     private var gate: ThreadDeliveryGate?
-    init(baseURL: URL, creatorId: String, fanId: String, accountId: String) { client = W3ConversationClient(baseURL: baseURL); self.creatorId = creatorId; self.fanId = fanId; self.accountId = accountId }
+    init(baseURL: URL, creatorId: String, fanId: String, accountId: String) { client = W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId); self.creatorId = creatorId; self.fanId = fanId; self.accountId = accountId }
     func refresh() async {
         do {
             if !resumeActivated {

@@ -50,7 +50,7 @@ private data class PendingMessage(val key: String, val text: String, val sequenc
 
 @Composable
 private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String, session: FanSession) {
-    val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken) }
+    val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken, session.session?.accountId) }
     val root = "$creatorId/$fanId"
     val accountId = session.session?.accountId ?: "signed-out"
     val context = LocalContext.current
@@ -275,7 +275,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 
 
 @Composable private fun FirstConversation(baseURL: String, handle: String, session: FanSession) {
-    val client = remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken) }
+    val client = remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
     val growth = remember(baseURL) { GrowthClient(baseURL) }
     var creator by remember(handle) { mutableStateOf<org.json.JSONObject?>(null) }
     var capabilities by remember(handle) { mutableStateOf<ConversationCapabilities?>(null) }
@@ -321,14 +321,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 }
 
 @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
-    val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken) }
+    val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
     var account by remember { mutableStateOf<JsonObject?>(null) };var error by remember { mutableStateOf("") }
     LaunchedEffect(session.session?.accountId) { try { account=client.request("account").jsonObject } catch(failure:Throwable) { if(failure is CancellationException) throw failure;account=null;error=failure.message ?: "Reconnect to open You." } }
     val fan=account?.get("fan")?.jsonObject
     LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { BasicText("You",style=qText("title")); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
-        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content.orEmpty(),style=qText("display-md"));BasicText(fan?.get("intro")?.jsonPrimitive?.contentOrNull ?: "Your intro is private until you choose to share it.",style=qText("body"));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/settings/profile") } }
-        item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/limits") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
+        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content.orEmpty(),style=qText("display-md"));BasicText(fan?.get("intro")?.jsonPrimitive?.contentOrNull ?: "Your intro is private until you choose to share it.",style=qText("body"));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
+        item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce/requests") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/spending") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
         item { BasicText("Me and privacy",style=qText("display-md"));BasicText("Memory and conversation access by creator",style=qText("body")) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item { Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") } }

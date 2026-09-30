@@ -579,18 +579,21 @@ export function ConversationScreen({
               </Message>
             ) : (
               <div className="qv qv-msg">
-                <AuthorLabel
-                  kind={
-                    message.authorKind === "human_broadcast"
-                      ? "human_broadcast"
-                      : message.authorKind === "human_reaction"
-                        ? "human_reaction"
-                        : "human_creator"
-                  }
-                  name={page.creatorName}
-                  member={message.member ?? "Authorized team member"}
-                  audience="Audience details unavailable"
-                />
+                {message.authorKind === "human_call" ? (
+                  <span className="qv-author">
+                    {formatCopy("callAuthor", { name: page.creatorName })}
+                  </span>
+                ) : (
+                  <AuthorLabel
+                    kind={
+                      message.authorKind === "human_broadcast"
+                        ? "human_broadcast"
+                        : "human_reaction"
+                    }
+                    name={page.creatorName}
+                    audience="Audience details unavailable"
+                  />
+                )}
                 <p className="qv-voice" style={{ whiteSpace: "pre-wrap" }}>
                   {message.text}
                 </p>

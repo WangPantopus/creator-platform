@@ -43,9 +43,10 @@ fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
 class ConversationFailure(val status: Int, override val message: String) : Exception(message)
 
 /** Uses W1's encrypted credential supplier and disables HTTP response caching. */
-class ConversationClient(private val baseURL: String, private val token: () -> String?) {
+class ConversationClient(private val baseURL: String, private val token: () -> String?, private val expectedAccountId: String?) {
     val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false): JsonElement = withContext(Dispatchers.IO) {
+        if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, "Reopen this page with your current account.")
         val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
         val connection = URL(baseURL.trimEnd('/') + "/v1/conversations/" + path).openConnection() as HttpURLConnection
         try {
@@ -53,6 +54,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
             connection.requestMethod = if (body == null) "GET" else "POST"
             connection.setRequestProperty("Accept", "application/json")
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
+            if (!publicRead) connection.setRequestProperty("X-Expected-Account-Id", expectedAccountId)
             if (body != null) {
                 connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json")
                 connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
@@ -65,7 +67,10 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
             }.orEmpty()
             if (!publicRead && token() != credential) throw ConversationFailure(401,"Your account changed. Open this conversation again.")
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
-            if (status !in 200..299) throw ConversationFailure(status, value?.jsonObject?.get("error")?.jsonObject?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
+            if (status !in 200..299) {
+                val error = value?.jsonObject?.get("error")?.jsonObject
+                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
+            }
             value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
         } finally { connection.disconnect() }
     }
