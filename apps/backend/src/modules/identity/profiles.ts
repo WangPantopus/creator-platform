@@ -1,0 +1,318 @@
+import { randomBytes } from "node:crypto";
+import type { Pool, PoolClient } from "pg";
+import {
+  CreatorProfileInputSchema,
+  FanProfileInputSchema,
+  ProofInputSchema,
+  ProofSubmitSchema,
+  TeamInviteSchema,
+} from "@qelvora/api";
+import type { Actor } from "./adapter.js";
+import { identityTransaction } from "./transaction.js";
+import { DomainError, invariant } from "../../core/errors.js";
+
+const handle = (value: string) => value.replace(/^@/u, "").toLowerCase();
+export interface VerificationDecision {
+  proofId: string;
+  accountId: string;
+  reviewerAccountId: string;
+  caseId: string;
+  decision: "approved" | "rejected" | "revoked";
+  reason: string;
+}
+export class IdentityProfiles {
+  constructor(private readonly pool: Pool) {}
+  async view(actor: Actor) {
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      const fan = await client.query(
+        "SELECT id,handle,intro,version FROM creator.fan_profile WHERE account_id=$1",
+        [actor.accountId],
+      );
+      const creator = await client.query(
+        'SELECT id,handle,display_name AS "displayName",verification,version FROM creator.creator_profile WHERE account_id=$1',
+        [actor.accountId],
+      );
+      const teams = await client.query(
+        'SELECT creator_id AS "creatorId",roles FROM creator.team_membership WHERE account_id=$1 AND revoked_at IS NULL ORDER BY creator_id LIMIT 100',
+        [actor.accountId],
+      );
+      return {
+        fan: fan.rows[0] ?? null,
+        creator: creator.rows[0] ?? null,
+        teams: teams.rows,
+      };
+    });
+  }
+  private async unique<T>(work: () => Promise<T>): Promise<T> {
+    try {
+      return await work();
+    } catch (error) {
+      if ((error as { code?: string }).code === "23505")
+        throw new DomainError(
+          "handle_taken",
+          "That handle is already in use. Choose another.",
+          409,
+        );
+      throw error;
+    }
+  }
+  async saveFan(actor: Actor, input: unknown) {
+    const body = FanProfileInputSchema.parse(input);
+    return this.unique(() =>
+      identityTransaction(this.pool, actor.accountId, async (client) => {
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+          [actor.accountId],
+        );
+        const result = await client.query(
+          "INSERT INTO creator.fan_profile(account_id,handle,intro) VALUES($1,$2,$3) ON CONFLICT(account_id) DO UPDATE SET handle=excluded.handle,intro=excluded.intro,version=creator.fan_profile.version+1 RETURNING id,handle,intro,version",
+          [actor.accountId, handle(body.handle), body.intro],
+        );
+        return result.rows[0];
+      }),
+    );
+  }
+  async saveCreator(actor: Actor, input: unknown) {
+    const body = CreatorProfileInputSchema.parse(input);
+    return this.unique(() =>
+      identityTransaction(this.pool, actor.accountId, async (client) => {
+        const result = await client.query(
+          "INSERT INTO creator.creator_profile(account_id,handle,display_name,verification) VALUES($1,$2,$3,'pending') ON CONFLICT(account_id) DO UPDATE SET handle=excluded.handle,display_name=excluded.display_name,version=creator.creator_profile.version+1 RETURNING id,handle,display_name AS \"displayName\",verification,version",
+          [actor.accountId, handle(body.handle), body.displayName],
+        );
+        return result.rows[0];
+      }),
+    );
+  }
+  async requireCreator(client: PoolClient, actor: Actor, creatorId: string) {
+    const result = await client.query(
+      "SELECT id,verification,recovery_required FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR UPDATE",
+      [creatorId, actor.accountId],
+    );
+    invariant(
+      result.rows[0],
+      "creator_required",
+      "Only this creator can perform this action.",
+    );
+    return result.rows[0];
+  }
+  async beginProof(actor: Actor, creatorId: string, input: unknown) {
+    const body = ProofInputSchema.parse(input);
+    const url = new URL(body.accountUrl);
+    const permitted =
+      body.platform === "instagram"
+        ? ["instagram.com", "www.instagram.com"]
+        : ["youtube.com", "www.youtube.com"];
+    invariant(
+      url.protocol === "https:" &&
+        permitted.includes(url.hostname) &&
+        !url.username &&
+        !url.password &&
+        !url.search &&
+        !url.hash,
+      "proof_account_invalid",
+      "Use the public HTTPS account URL for the selected platform.",
+    );
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await this.requireCreator(client, actor, creatorId);
+      const code = randomBytes(6).toString("hex").toUpperCase();
+      const result = await client.query(
+        'INSERT INTO creator.creator_proof(account_id,creator_id,code,platform,account_url,expires_at) VALUES($1,$2,$3,$4,$5,now()+interval \'24 hours\') RETURNING id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason',
+        [actor.accountId, creatorId, code, body.platform, url.href],
+      );
+      return result.rows[0];
+    });
+  }
+  async submitProof(actor: Actor, proofId: string, input: unknown) {
+    const body = ProofSubmitSchema.parse(input);
+    const url = new URL(body.postUrl);
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      const proof = await client.query(
+        "SELECT * FROM creator.creator_proof WHERE id=$1 AND account_id=$2 AND expires_at>now() FOR UPDATE",
+        [proofId, actor.accountId],
+      );
+      const row = proof.rows[0];
+      invariant(
+        row,
+        "proof_expired",
+        "This proof challenge expired. Create a new one.",
+      );
+      const expected =
+        row.platform === "instagram"
+          ? ["instagram.com", "www.instagram.com"]
+          : ["youtube.com", "www.youtube.com", "youtu.be"];
+      invariant(
+        url.protocol === "https:" &&
+          expected.includes(url.hostname) &&
+          !url.username &&
+          !url.password &&
+          !url.hash,
+        "proof_post_invalid",
+        "Use a public post URL on the selected platform.",
+      );
+      invariant(
+        ["challenge", "pending"].includes(row.state),
+        "proof_reviewed",
+        "This proof has already been reviewed.",
+      );
+      invariant(
+        row.state !== "pending" || row.post_url === url.href,
+        "proof_submission_changed",
+        "This proof is already awaiting review. Create a new challenge to submit a different post.",
+      );
+      const result = await client.query(
+        'UPDATE creator.creator_proof SET post_url=$1,state=\'pending\',submitted_at=coalesce(submitted_at,now()) WHERE id=$2 RETURNING id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason',
+        [url.href, proofId],
+      );
+      return result.rows[0];
+    });
+  }
+  async proof(actor: Actor, creatorId: string) {
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await this.requireCreator(client, actor, creatorId);
+      const result = await client.query(
+        'SELECT id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason FROM creator.creator_proof WHERE creator_id=$1 AND account_id=$2 ORDER BY expires_at DESC LIMIT 1',
+        [creatorId, actor.accountId],
+      );
+      if (!result.rows[0])
+        throw new DomainError(
+          "proof_not_found",
+          "Create an external proof challenge first.",
+          404,
+        );
+      return result.rows[0];
+    });
+  }
+  /** W8 supplies a purpose-scoped review authorizer; no public client can approve itself. */
+  async reviewProof(
+    input: VerificationDecision,
+    authorize: (input: VerificationDecision) => Promise<boolean>,
+  ) {
+    invariant(
+      await authorize(input),
+      "review_authority_required",
+      "A scoped verification review is required.",
+    );
+    return identityTransaction(this.pool, input.accountId, async (client) => {
+      const proof = await client.query(
+        "SELECT * FROM creator.creator_proof WHERE id=$1 AND account_id=$2 FOR UPDATE",
+        [input.proofId, input.accountId],
+      );
+      const row = proof.rows[0];
+      invariant(row, "proof_not_found", "This proof is unavailable.");
+      if (row.review_case_id === input.caseId && row.state === input.decision)
+        return { done: true as const };
+      invariant(
+        input.decision === "revoked" || row.state === "pending",
+        "proof_state_changed",
+        "This proof is no longer pending.",
+      );
+      if (input.decision === "approved")
+        invariant(
+          new Date(row.expires_at).getTime() > Date.now(),
+          "proof_expired",
+          "Create fresh external proof before approval.",
+        );
+      await client.query(
+        "UPDATE creator.creator_proof SET state=$1,code='',reviewed_at=now(),reviewer_account_id=$2,review_case_id=$3,reason=$4 WHERE id=$5",
+        [
+          input.decision,
+          input.reviewerAccountId,
+          input.caseId,
+          input.reason,
+          input.proofId,
+        ],
+      );
+      const status =
+        input.decision === "approved" ? "verified" : input.decision;
+      const changed = await client.query(
+        "UPDATE creator.creator_profile SET verification=$1,version=version+1 WHERE id=$2 AND account_id=$3 RETURNING version",
+        [status, row.creator_id, input.accountId],
+      );
+      await client.query(
+        "UPDATE creator.signed_verification SET creator_revoked=$1 WHERE creator_id=$2",
+        [status !== "verified", row.creator_id],
+      );
+      await client.query(
+        "INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version) VALUES($1,'creator_verification_changed',$2,$3)",
+        [input.accountId, row.creator_id, changed.rows[0].version],
+      );
+      return { done: true as const };
+    });
+  }
+  async invite(actor: Actor, creatorId: string, input: unknown) {
+    const body = TeamInviteSchema.parse(input);
+    invariant(
+      body.accountId !== actor.accountId,
+      "team_creator_identity",
+      "The creator does not need a team invitation.",
+    );
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await this.requireCreator(client, actor, creatorId);
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`team:${creatorId}:${body.accountId}`],
+      );
+      const result = await client.query(
+        'INSERT INTO creator.team_invitation(creator_id,account_id,roles,expires_at) VALUES($1,$2,$3,now()+interval \'7 days\') RETURNING id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted',
+        [creatorId, body.accountId, [...new Set(body.roles)]],
+      );
+      return result.rows[0];
+    });
+  }
+  async acceptInvite(actor: Actor, invitationId: string) {
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      const target = await client.query(
+        "SELECT creator_id FROM creator.team_invitation WHERE id=$1 AND account_id=$2",
+        [invitationId, actor.accountId],
+      );
+      invariant(
+        target.rows[0],
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`team:${target.rows[0].creator_id}:${actor.accountId}`],
+      );
+      const invitation = await client.query(
+        "SELECT * FROM creator.team_invitation WHERE id=$1 AND account_id=$2 AND expires_at>now() AND revoked_at IS NULL FOR UPDATE",
+        [invitationId, actor.accountId],
+      );
+      const row = invitation.rows[0];
+      invariant(
+        row,
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      if (row.accepted_at) return { done: true as const };
+      await client.query(
+        "INSERT INTO creator.team_membership(creator_id,account_id,roles) VALUES($1,$2,$3) ON CONFLICT(creator_id,account_id) DO UPDATE SET roles=excluded.roles,revoked_at=NULL",
+        [row.creator_id, actor.accountId, row.roles],
+      );
+      await client.query(
+        "UPDATE creator.team_invitation SET accepted_at=now() WHERE id=$1",
+        [invitationId],
+      );
+      return { done: true as const };
+    });
+  }
+  async removeMember(actor: Actor, creatorId: string, accountId: string) {
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await this.requireCreator(client, actor, creatorId);
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`team:${creatorId}:${accountId}`],
+      );
+      await client.query(
+        "UPDATE creator.team_membership SET revoked_at=now() WHERE creator_id=$1 AND account_id=$2",
+        [creatorId, accountId],
+      );
+      await client.query(
+        "UPDATE creator.team_invitation SET revoked_at=now() WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
+        [creatorId, accountId],
+      );
+      return { done: true as const };
+    });
+  }
+}

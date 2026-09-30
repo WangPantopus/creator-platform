@@ -1,0 +1,138 @@
+{
+  "workstream": "W1",
+  "recordedAt": "2026-09-30T04:19:20.835204+00:00",
+  "branch": "codex/w1-handoff-2026-09-29",
+  "implementationCheckpoint": "5e104cd20f33b96c366f11f74b793c56071d0457",
+  "purpose": "Sanitized handoff observations and source provenance; not end-to-end or release acceptance.",
+  "sourceInventory": {
+    "changedOrAddedFiles": 841,
+    "gitBlobEntriesMatchCheckpoint": true
+  },
+  "recordedBuildDigestChecks": [
+    {
+      "path": "config/navigation.json",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "packages/api/src/identity.ts",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "scripts/generate-native-api.mjs",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/backend/src/modules/identity/sessions.ts",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/ios/App/QelvoraApp.swift",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "artifacts/workstreams/W1/build/ios/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "artifacts/workstreams/W1/build/ios/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "artifacts/workstreams/W1/build/android/outputs/apk/debug/app-debug.apk",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/web/.next-w1-build/BUILD_ID",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/backend/src/db/database.ts",
+      "sha256MatchesRecordedBuild": true
+    },
+    {
+      "path": "apps/web/app/page.tsx",
+      "sha256MatchesRecordedBuild": true
+    }
+  ],
+  "consistencyChecks": {
+    "backendTypecheck": "Passed during handoff preparation",
+    "apiTypecheck": "Passed during handoff preparation",
+    "generatedResourcesAndNativeClients": "Passed during handoff preparation: 12 resources, 31 operations",
+    "freshFullWebOrNativeBuildDuringHandoff": false
+  },
+  "latestHostRuntimeRead": {
+    "observedLocalDateTime": "2026-09-29 21:17 America/Los_Angeles",
+    "api4101": {
+      "status": "ok",
+      "ready": false,
+      "foundationReady": true,
+      "identity": "configured",
+      "identityMode": "development",
+      "generation": "unconfigured",
+      "registeredFeatures": [],
+      "database": "configured",
+      "featureEnabled": true
+    },
+    "web3001": {
+      "httpStatus": 200,
+      "finalUrl": "http://localhost:3001/auth/continue?returnTo=%2Fhome",
+      "individualRequestElapsedSeconds": 0.126171,
+      "interactiveBrowserAcceptance": false
+    },
+    "ios": {
+      "udid": "B622C222-8292-46EF-A2B2-A9DA67763DE6",
+      "name": "Creator Platform W1",
+      "runtime": "iOS 27.0",
+      "state": "Booted",
+      "freshInteractiveAcceptance": false
+    },
+    "android": {
+      "serial": "emulator-5560",
+      "adbServerPort": 5041,
+      "sdk": 34,
+      "freshInteractiveAcceptance": false
+    },
+    "sandboxNote": "Restricted localhost/CoreSimulator/ADB calls failed; approved host reads above succeeded. Sandbox connection errors are not proof that the leased runtimes stopped."
+  },
+  "migrationLedgerRead": {
+    "result": "Stalled read-only W1 Docker/psql client; terminated only that identified client, exit 143. No DB/container/peer process stopped.",
+    "lastSuccessfulRecordedInspection": "Only core 0001/0002 applied, legacy checksums null",
+    "freshFullRegistryMigrationProof": false
+  },
+  "sharedCheckout": {
+    "branch": "main",
+    "head": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+    "normalIndexSha256BeforeHandoffCommit": "8258bf3059d2fb2edeef988caa30574774b227bdfff051c3f73c93a74523097f",
+    "preservationMethod": "Temporary Git index, explicit staged paths, feature ref; no checkout/reset/stash/clean"
+  },
+  "subagents": "Both research-only children completed; no implementation delegated or running.",
+  "releaseReady": false
+}
