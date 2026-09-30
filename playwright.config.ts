@@ -1,4 +1,7 @@
 import { defineConfig } from "@playwright/test";
+const webOrigin = process.env.VISUAL_WEB_ORIGIN ?? "http://localhost:3000";
+const referenceOrigin =
+  process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
 export default defineConfig({
   testDir: "./tests/visual",
   fullyParallel: false,
@@ -13,12 +16,12 @@ export default defineConfig({
   webServer: [
     {
       command: "node scripts/visual-reference.mjs",
-      url: "http://127.0.0.1:3101/phase4a-fan-core/Welcome.dc.html",
+      url: `${referenceOrigin}/phase4a-fan-core/Welcome.dc.html`,
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: "pnpm --filter @qelvora/web dev",
-      url: "http://localhost:3000/auth/continue",
+      command: `pnpm --filter @qelvora/web exec next dev -p ${new URL(webOrigin).port || 3000} --hostname localhost`,
+      url: `${webOrigin}/auth/continue`,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },

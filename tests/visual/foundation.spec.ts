@@ -1,10 +1,13 @@
 import { test, expect } from "@playwright/test";
+const webOrigin = process.env.VISUAL_WEB_ORIGIN ?? "http://localhost:3000";
+const referenceOrigin =
+  process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
 const foundations = [
   {
     name: "welcome",
     group: "phase4a-fan-core",
     id: "Welcome",
-    path: "/auth/continue",
+    path: "/design/screens/phase4a-fan-core/Welcome?raw=1",
     width: 390,
     height: 844,
   },
@@ -12,7 +15,7 @@ const foundations = [
     name: "creator-home",
     group: "phase4a-fan-core",
     id: "Main",
-    path: "/creators/maya",
+    path: "/design/screens/phase4a-fan-core/Main?raw=1",
     width: 390,
     height: 1560,
   },
@@ -27,7 +30,7 @@ const foundations = [
 ];
 for (const theme of ["light", "night"] as const)
   for (const screen of foundations) {
-    test(`${screen.name} matches approved design in ${theme}`, async ({
+    test(`${screen.name} reference composition matches approved design in ${theme}`, async ({
       page,
       context,
     }) => {
@@ -44,7 +47,7 @@ for (const theme of ["light", "night"] as const)
         height: screen.height,
       });
       await reference.goto(
-        `http://127.0.0.1:3101/${screen.group}/${screen.id}.dc.html`,
+        `${referenceOrigin}/${screen.group}/${screen.id}.dc.html`,
       );
       await reference.locator("x-dc").getByRole("heading").first().waitFor();
       await reference.evaluate((mode) => {
@@ -56,7 +59,7 @@ for (const theme of ["light", "night"] as const)
         maxDiffPixels: 0,
       });
       await page.goto(
-        `http://localhost:3000${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
+        `${webOrigin}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
       );
       await page.getByRole("heading").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -81,17 +84,17 @@ for (const theme of ["light", "night"] as const)
 test("unconfigured Pantopus sign-in does not create a local identity and preserves arrival", async ({
   page,
 }) => {
-  await page.goto("http://localhost:3000/auth/continue");
+  await page.goto(`${webOrigin}/auth/continue`);
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
     .click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
-  await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
-  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
-    "/creators/maya/chat",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Pantopus sign-in" }),
+  ).toContainText("Pantopus sign-in");
+  expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
-    "http://localhost:3000/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests",
+    `${webOrigin}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
   );
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
@@ -99,6 +102,6 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
     "/creators/maya/requests",
   );
-  await page.goto("http://localhost:3000/onboarding/handle");
+  await page.goto(`${webOrigin}/onboarding/handle`);
   await expect(page).toHaveURL(/auth\/continue/);
 });

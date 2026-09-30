@@ -1,12 +1,18 @@
-import { TeamRoleSchema } from "@qelvora/api";
+import {
+  StudioInvite,
+  StudioQueueQuery,
+  StudioSaveReplyDraft,
+  StudioSendReplyDraft,
+  StudioCorrection,
+} from "../../../../../packages/api/src/studio.js";
 import type { IdentityProfiles } from "../identity/profiles.js";
-import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import type { ContentService } from "../content/service.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationService } from "../conversation/service.js";
 import type { AccessService } from "../access/scope.js";
 import type { AgentService } from "../agent/service.js";
+import { ContentPage } from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
 
 export class StudioService {
@@ -54,16 +60,10 @@ export class StudioService {
     return this.owners.profiles.acceptInvite(actor, id);
   }
   async inviteByHandle(actor: Actor, creatorId: string, raw: unknown) {
-    const input = z
-      .strictObject({
-        handle: z
-          .string()
-          .trim()
-          .transform((s) => s.replace(/^@/, "").toLowerCase())
-          .pipe(z.string().regex(/^[a-z0-9_]{3,30}$/)),
-        roles: z.array(TeamRoleSchema).min(1).max(4),
-      })
-      .parse(raw);
+    const input = {
+      ...StudioInvite.parse(raw),
+      handle: StudioInvite.parse(raw).handle.replace(/^@/, "").toLowerCase(),
+    };
     if (!this.owners.profiles)
       throw new DomainError(
         "identity_team_unconfigured",
@@ -154,13 +154,7 @@ export class StudioService {
     });
   }
   async queue(actor: Actor, creatorId: string, raw: unknown) {
-    const input = z
-      .strictObject({
-        cursor: z.uuid().optional(),
-        filter: z.enum(["all", "due", "decide", "more_info"]).default("all"),
-        limit: z.coerce.number().int().min(1).max(50).default(20),
-      })
-      .parse(raw);
+    const input = StudioQueueQuery.parse(raw);
     return this.content.transaction(actor, creatorId, async (client) => {
       const role = await this.content.role(client, actor, creatorId, [
         "triage",
@@ -285,13 +279,7 @@ export class StudioService {
       fanId,
       false,
     );
-    const input = z
-      .strictObject({
-        text: z.string().max(20000),
-        expectedVersion: z.int().nonnegative(),
-        idempotencyKey: z.string().min(8).max(128),
-      })
-      .parse(raw);
+    const input = StudioSaveReplyDraft.parse(raw);
     return this.content.transaction(actor, creatorId, (client) =>
       this.content.command(
         client,
@@ -338,13 +326,7 @@ export class StudioService {
     fanId: string,
     raw: unknown,
   ) {
-    const input = z
-      .strictObject({
-        version: z.int().positive(),
-        signedActId: z.uuid(),
-        idempotencyKey: z.string().min(8).max(128),
-      })
-      .parse(raw);
+    const input = StudioSendReplyDraft.parse(raw);
     const scope = await this.owners.access.openThread(
       actor,
       creatorId,
@@ -428,6 +410,68 @@ export class StudioService {
       fanId,
     };
   }
+  async threadEntries(actor: Actor, creatorId: string, raw: unknown) {
+    const page = ContentPage.pick({ cursor: true, limit: true }).parse(raw);
+    const rows = await this.content.transaction(
+      actor,
+      creatorId,
+      async (client) => {
+        await this.content.role(client, actor, creatorId, ["triage"]);
+        // Read current references under each producer's RLS. Team queue authority
+        // is never escalated, and no private conversation text is assembled here.
+        return (
+          await client.query<{
+            fan_id: string;
+            handle: string;
+            sources: string[];
+            updated_at: Date;
+          }>(
+            `
+        WITH links AS (
+          SELECT fan_id,'note_reply' AS source,max(created_at) AS updated_at FROM creator.content_reply
+          WHERE creator_id=$1 AND withdrawn_at IS NULL GROUP BY fan_id
+          UNION ALL
+          SELECT fan_id,'request' AS source,max(submitted_at) AS updated_at FROM creator.commerce_packet
+          WHERE creator_id=$1 AND submitted_at IS NOT NULL GROUP BY fan_id
+        ), entries AS (
+          SELECT f.id AS fan_id,f.handle,array_agg(DISTINCT l.source) AS sources,max(l.updated_at) AS updated_at
+          FROM links l JOIN creator.fan_profile f ON f.id=l.fan_id GROUP BY f.id,f.handle
+        ) SELECT * FROM entries WHERE $2::uuid IS NULL OR (updated_at,fan_id)<(SELECT updated_at,fan_id FROM entries WHERE fan_id=$2)
+        ORDER BY updated_at DESC,fan_id DESC LIMIT $3`,
+            [creatorId, page.cursor ?? null, page.limit + 1],
+          )
+        ).rows;
+      },
+    );
+    const items = [];
+    for (const row of rows.slice(0, page.limit)) {
+      try {
+        await this.owners.access.openThread(
+          actor,
+          creatorId,
+          row.fan_id,
+          false,
+        );
+        items.push({
+          fanId: row.fan_id,
+          handle: row.handle,
+          sources: row.sources,
+          updatedAt: row.updated_at.toISOString(),
+        });
+      } catch (error) {
+        if (
+          !(error instanceof DomainError && error.code === "thread_unavailable")
+        )
+          throw error;
+      }
+    }
+    return {
+      items,
+      nextCursor:
+        rows.length > page.limit ? rows[page.limit - 1]!.fan_id : null,
+      coverage: "notes_and_requests" as const,
+    };
+  }
   async control(
     actor: Actor,
     creatorId: string,
@@ -475,15 +519,7 @@ export class StudioService {
         "The AI rule and regression producer is not connected yet.",
         503,
       );
-    const input = z
-      .strictObject({
-        idempotencyKey: z.string().min(8).max(128),
-        expectedRevision: z.int().nonnegative(),
-        paraphrasedPrompt: z.string().min(5).max(1000),
-        rule: z.string().min(5).max(500),
-        unacceptableAnswer: z.string().max(3000),
-      })
-      .parse(body);
+    const input = StudioCorrection.parse(body);
     return this.owners.agent.correction(
       { creatorId, accountId: actor.accountId, development: false },
       input.idempotencyKey,

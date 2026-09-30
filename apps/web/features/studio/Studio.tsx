@@ -27,6 +27,7 @@ import {
   StudioTabBar,
 } from "@qelvora/ui-web";
 import type { SignedActCommand } from "@qelvora/api";
+import { validReturnTarget } from "@qelvora/api";
 import type {
   ContentBody,
   ContentView,
@@ -153,6 +154,16 @@ export function Studio({
   creatorId?: string;
   screen?: string[];
 }) {
+  const requestedPath = creatorId
+    ? `/studio/${creatorId}/${screen.join("/")}`
+    : "/studio/workspace";
+  const [returnTo, setReturnTo] = useState(
+    validReturnTarget(requestedPath) ? requestedPath : "/studio/workspace",
+  );
+  useEffect(() => {
+    const current = location.pathname + location.search;
+    setReturnTo(validReturnTarget(current) ? current : "/studio/workspace");
+  }, [requestedPath]);
   const [creators, setCreators] = useState<Creator[]>([]),
     [creator, setCreator] = useState<Creator | null>(null),
     [invitations, setInvitations] = useState<
@@ -291,7 +302,7 @@ export function Studio({
             </button>
           </article>
         ))}
-        <Link href="/auth/continue?returnTo=%2Fhome">
+        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
           Continue with Pantopus
         </Link>
         <Link href="/studio/setup">Creator setup</Link>
@@ -310,7 +321,7 @@ export function Studio({
           {error || "Your current account has no role in this Studio."}
         </Notice>
         <Link href="/studio/workspace">Choose your Studio</Link>
-        <Link href="/auth/continue?returnTo=%2Fhome">
+        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
           Continue with Pantopus
         </Link>
       </main>
@@ -420,7 +431,7 @@ function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
   return (
     <>
       {action.error && (
-        <div role="alert">
+        <div>
           <Notice tone="error" title="Action status">
             {action.error}
           </Notice>
@@ -481,16 +492,23 @@ function Notes({ creator }: { creator: Creator }) {
           .filter((n) => n.document.kind === "note")
           .map((n) => (
             <div key={n.id}>
-              <Note
-                name={creator.display_name}
-                audience={n.audienceLabel}
-                time={time(n.publishedAt)}
-                signedActId={n.signedActId ?? undefined}
-                audienceSize={n.audienceCount ?? undefined}
-                reply={false}
-              >
-                {n.document.text}
-              </Note>
+              {n.state === "draft" ? (
+                <article className="w5-card">
+                  <p className="qv-meta">Draft · not signed or sent</p>
+                  <p>{n.document.text}</p>
+                </article>
+              ) : (
+                <Note
+                  name={creator.display_name}
+                  audience={n.audienceLabel}
+                  time={time(n.publishedAt)}
+                  signedActId={n.signedActId ?? undefined}
+                  audienceSize={n.audienceCount ?? undefined}
+                  reply={false}
+                >
+                  {n.document.text}
+                </Note>
+              )}
               <p className="qv-help">
                 {n.state === "published" ? "Broadcast" : n.state} ·{" "}
                 {n.sourceState === "not_requested"
@@ -662,7 +680,7 @@ const emptyBody = (kind: ContentBody["kind"] = "note"): ContentBody => ({
   audience: { kind: "members" },
   media: [],
   nameToken: false,
-  showAudienceCount: true,
+  showAudienceCount: false,
   aiUseIntent: false,
   scheduledAt: null,
   quote: null,
@@ -1155,6 +1173,11 @@ function Compose({
             Audience: {review.view.audienceLabel}. AI use remains subject to a
             separate source approval.
           </p>
+          {!pendingPublication && (
+            <p className="qv-meta">
+              Signature preview · this draft has not been signed or posted.
+            </p>
+          )}
           {pendingPublication ? (
             <div role="status">
               <p>
@@ -2085,7 +2108,16 @@ function Team({ creator }: { creator: Creator }) {
   );
 }
 function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
-  const [fan, setFan] = useState(fanId ?? ""),
+  const [entries, setEntries] = useState<{
+      items: {
+        fanId: string;
+        handle: string;
+        sources: string[];
+        updatedAt: string;
+      }[];
+      nextCursor: string | null;
+    } | null>(null),
+    [filter, setFilter] = useState("all"),
     [data, setData] = useState<{
       timeline: {
         threadId: string;
@@ -2123,7 +2155,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         setDraftVersion(draft.version);
         setText(draft.text);
       }
-    }
+    } else setEntries(await studioRequest("studio", `${creator.id}/threads`));
   }, [creator.id, fanId]);
   useEffect(() => {
     void action.run(load);
@@ -2142,16 +2174,75 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
               Conversation access is separate from request routing. Every
               full-thread open is recorded for the fan.
             </p>
+            <p className="qv-help">
+              Conversations linked to your Notes and requests appear here.
+            </p>
             <label className="w5-field">
-              Fan profile ID
-              <input value={fan} onChange={(e) => setFan(e.target.value)} />
+              Show conversations
+              <select
+                value={filter}
+                onChange={(event) => setFilter(event.target.value)}
+              >
+                <option value="all">All linked conversations</option>
+                <option value="note_reply">Note replies</option>
+                <option value="request">Requests</option>
+              </select>
             </label>
-            <Link
-              className="qv-btn qv-btn--secondary"
-              href={`/studio/${creator.id}/threads/${fan}`}
-            >
-              Open audited conversation
-            </Link>
+            {entries?.items
+              .filter(
+                (entry) => filter === "all" || entry.sources.includes(filter),
+              )
+              .map((entry) => (
+                <article className="w5-card" key={entry.fanId}>
+                  <h2>@{entry.handle}</h2>
+                  <p className="qv-meta">
+                    {entry.sources
+                      .map((source) =>
+                        source === "note_reply" ? "Note reply" : "Request",
+                      )
+                      .join(" · ")}
+                  </p>
+                  <Link
+                    className="qv-btn qv-btn--secondary"
+                    href={`/studio/${creator.id}/threads/${entry.fanId}`}
+                  >
+                    Open audited conversation
+                  </Link>
+                </article>
+              ))}
+            {entries?.items.length === 0 && (
+              <EmptyState
+                title="No linked conversations"
+                body="Current conversations will appear when fans reply to Notes or send requests."
+              />
+            )}
+            {entries?.nextCursor && (
+              <button
+                className="qv-btn qv-btn--secondary"
+                disabled={action.busy}
+                onClick={() =>
+                  void action.run(async () => {
+                    const next = await studioRequest<
+                      NonNullable<typeof entries>
+                    >(
+                      "studio",
+                      `${creator.id}/threads?cursor=${entries.nextCursor}`,
+                    );
+                    setEntries((current) => ({
+                      items: [...(current?.items ?? []), ...next.items].filter(
+                        (entry, index, all) =>
+                          all.findIndex(
+                            (other) => other.fanId === entry.fanId,
+                          ) === index,
+                      ),
+                      nextCursor: next.nextCursor,
+                    }));
+                  })
+                }
+              >
+                Load more conversations
+              </button>
+            )}
           </>
         ) : (
           data && (

@@ -31,6 +31,269 @@ const pair = [
     schema: { type: "string", format: "uuid" },
   },
 ];
+const scoped = (names: string[], query: string[] = []) => [
+  ...names.map((name) => ({
+    in: "path",
+    name,
+    required: true,
+    schema: { type: "string", format: "uuid" },
+  })),
+  ...query.map((name) => ({
+    in: "query",
+    name,
+    required: false,
+    schema: { type: name === "limit" ? "integer" : "string" },
+  })),
+];
+const contentPaths: Record<string, unknown> = {};
+function ownedPath(
+  path: string,
+  method: string,
+  id: string,
+  response: string,
+  body?: string,
+  query: string[] = [],
+) {
+  const parameters = scoped(
+    Array.from(path.matchAll(/\{([^}]+)\}/gu), (match) => match[1]!),
+    query,
+  );
+  contentPaths[path] = {
+    ...((contentPaths[path] as object) ?? {}),
+    parameters,
+    [method]: {
+      ...operation(id, response, body),
+      ...(method === "get"
+        ? {}
+        : {
+            parameters: [
+              {
+                in: "header",
+                name: "x-qelvora-expected-account",
+                required: false,
+                schema: { type: "string", format: "uuid" },
+                description:
+                  "Rejects a stale UI account; never grants authority.",
+              },
+            ],
+          }),
+    },
+  };
+}
+const content = "/v1/content/{creatorId}";
+const page = ["cursor", "limit", "state", "query"];
+ownedPath(content, "get", "contentList", "ContentList", undefined, page);
+ownedPath(
+  content + "/studio",
+  "get",
+  "studioContentList",
+  "ContentList",
+  undefined,
+  page,
+);
+ownedPath(
+  content + "/studio/live",
+  "get",
+  "studioLiveCatalog",
+  "ContentLiveCatalog",
+);
+ownedPath(
+  content + "/drafts",
+  "post",
+  "saveContent",
+  "ContentResult",
+  "SaveContent",
+);
+for (const [suffix, id] of [
+  ["/replies", "contentReplies"],
+  ["/studio/replies", "studioContentReplies"],
+])
+  ownedPath(content + suffix, "get", id!, "ContentReplyList", undefined, [
+    "cursor",
+    "limit",
+  ]);
+for (const [suffix, id, response, body] of [
+  ["consent", "contentReplyConsent", "ContentConsentResult", "QuoteConsent"],
+  ["reaction", "contentReplyReaction", "ContentReactionResult", "ReactToReply"],
+  [
+    "withdraw",
+    "withdrawContentReply",
+    "ContentWithdrawResult",
+    "ContentVersionCommand",
+  ],
+])
+  ownedPath(content + "/replies/{id}/" + suffix, "post", id!, response!, body);
+ownedPath(content + "/mute", "get", "contentPreference", "ContentPreference");
+ownedPath(
+  content + "/mute",
+  "post",
+  "muteContent",
+  "ContentMuteCommand",
+  "ContentMuteCommand",
+);
+ownedPath(
+  content + "/thanks",
+  "get",
+  "myContentThanks",
+  "ContentThanksView",
+  undefined,
+  ["targetKind", "targetId"],
+);
+ownedPath(
+  content + "/thanks",
+  "post",
+  "saveContentThanks",
+  "ContentRevisionResult",
+  "ThanksCommand",
+);
+ownedPath(
+  content + "/studio/thanks",
+  "get",
+  "studioThanksFeed",
+  "ContentThanksFeed",
+);
+ownedPath(
+  content + "/studio/scheduled/run",
+  "post",
+  "runScheduledContent",
+  "ContentScheduledResult",
+);
+ownedPath(
+  content + "/studio/effects/run",
+  "post",
+  "runContentEffects",
+  "ContentEffectsResult",
+);
+ownedPath(content + "/{id}", "get", "contentView", "ContentView");
+ownedPath(content + "/{id}/studio", "get", "studioContentView", "ContentView");
+ownedPath(content + "/{id}/review", "get", "reviewContent", "ContentReview");
+for (const [suffix, id, body] of [
+  ["publish", "publishContent", "PublishContent"],
+  ["team-publish", "teamPublishContent", "ContentVersionCommand"],
+  ["unpublish", "unpublishContent", "ContentVersionCommand"],
+  ["archive", "archiveContent", "ContentVersionCommand"],
+])
+  ownedPath(content + "/{id}/" + suffix, "post", id!, "ContentResult", body);
+ownedPath(
+  content + "/{id}/replies",
+  "post",
+  "replyToNote",
+  "ContentRevisionResult",
+  "ReplyToNote",
+);
+const studio = "/v1/studio/{creatorId}";
+ownedPath(
+  studio + "/threads",
+  "get",
+  "studioThreadEntries",
+  "StudioThreadEntries",
+  undefined,
+  ["cursor", "limit"],
+);
+ownedPath("/v1/studio/session", "get", "studioSession", "StudioSession");
+ownedPath(
+  "/v1/studio/invitations/{id}/accept",
+  "post",
+  "acceptStudioInvitation",
+  "Done",
+);
+ownedPath(
+  studio + "/team/invite",
+  "post",
+  "inviteStudioMember",
+  "StudioInvitation",
+  "StudioInvite",
+);
+ownedPath(studio + "/team", "get", "studioTeam", "StudioTeam");
+ownedPath(studio + "/audiences", "get", "studioAudiences", "StudioAudiences");
+ownedPath(
+  studio + "/corrections",
+  "get",
+  "studioCorrectionRevision",
+  "StudioRevision",
+);
+ownedPath(
+  studio + "/corrections",
+  "post",
+  "submitStudioCorrection",
+  "StudioCommerceProjection",
+  "StudioCorrection",
+);
+ownedPath(
+  studio + "/queue",
+  "get",
+  "studioQueue",
+  "StudioCommerceProjection",
+  undefined,
+  ["cursor", "filter", "limit"],
+);
+ownedPath(
+  studio + "/packets/{packetId}",
+  "get",
+  "studioPacket",
+  "StudioCommerceProjection",
+);
+ownedPath(
+  studio + "/packets/{packetId}/decide",
+  "post",
+  "studioDecidePacket",
+  "StudioCommerceProjection",
+  "CommerceDecidePacket",
+);
+ownedPath(
+  studio + "/packets/{packetId}/deliveries",
+  "get",
+  "studioPacketDeliveries",
+  "StudioCommerceProjection",
+);
+ownedPath(
+  studio + "/packets/{packetId}/deliver",
+  "post",
+  "studioDeliverPacket",
+  "StudioCommerceProjection",
+  "CommerceFulfillmentCommand",
+);
+ownedPath(
+  studio + "/threads/{fanId}",
+  "get",
+  "studioThread",
+  "StudioCommerceProjection",
+);
+for (const action of ["takeover", "handback", "pause"])
+  ownedPath(
+    studio + "/threads/{fanId}/" + action,
+    "post",
+    "studio" + action[0]!.toUpperCase() + action.slice(1),
+    "Frame",
+    "StudioControlCommand",
+  );
+ownedPath(
+  studio + "/threads/{fanId}/reply",
+  "post",
+  "studioHumanReply",
+  "Message",
+  "HumanReply",
+);
+ownedPath(
+  studio + "/threads/{fanId}/draft",
+  "get",
+  "studioReplyDraft",
+  "StudioReplyDraft",
+);
+ownedPath(
+  studio + "/threads/{fanId}/draft",
+  "post",
+  "saveStudioReplyDraft",
+  "StudioDraftVersion",
+  "StudioSaveReplyDraft",
+);
+ownedPath(
+  studio + "/threads/{fanId}/send-draft",
+  "post",
+  "sendStudioReplyDraft",
+  "Message",
+  "StudioSendReplyDraft",
+);
 export function createOpenApi() {
   return {
     openapi: "3.1.0",
@@ -41,6 +304,7 @@ export function createOpenApi() {
         "Foundation contract. Private operations fail closed until the Pantopus identity adapter and runtime database are configured.",
     },
     paths: {
+      ...contentPaths,
       "/health": { get: { ...operation("health", "Health"), security: [] } },
       "/v1/identity/capabilities": {
         get: {

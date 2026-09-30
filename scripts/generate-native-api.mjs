@@ -36,8 +36,13 @@ const primitiveType = (schema) =>
     ? schema.type.find((value) => value !== "null")
     : schema.type;
 function register(name, schema) {
-  schema = concrete(schema);
   if (models.has(name)) return;
+  const value = concrete(schema);
+  if (value !== schema) {
+    models.set(name, { kind: "alias", schema });
+    register(`${name}Value`, value);
+    return;
+  }
   if (schema.type === "object" && schema.properties) {
     models.set(name, { kind: "object", schema });
     for (const [key, value] of Object.entries(schema.properties))
@@ -54,6 +59,10 @@ function register(name, schema) {
     schema.enum.every((value) => typeof value === "string")
   )
     models.set(name, { kind: "enum", schema });
+  else {
+    models.set(name, { kind: "alias", schema });
+    fieldType(schema, `${name}Value`);
+  }
 }
 function fieldType(schema, name, language = "swift") {
   schema = concrete(schema);
@@ -102,7 +111,17 @@ let kotlin =
   "// Generated from packages/api/generated/openapi.json. Do not edit.\npackage com.pantopus.qelvora.generated\n\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.SerialName\nimport kotlinx.serialization.KSerializer\nimport kotlinx.serialization.SerializationException\nimport kotlinx.serialization.descriptors.PrimitiveKind\nimport kotlinx.serialization.descriptors.PrimitiveSerialDescriptor\nimport kotlinx.serialization.encoding.Decoder\nimport kotlinx.serialization.encoding.Encoder\nimport kotlinx.serialization.encodeToString\nimport kotlinx.serialization.decodeFromString\nimport kotlinx.serialization.json.Json\nimport kotlinx.serialization.json.JsonElement\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\nimport java.net.HttpURLConnection\nimport java.net.URL\nimport java.net.URLEncoder\n\n";
 swift += `public enum APIJSONValue: Codable, Sendable {\n  case string(String), number(Double), boolean(Bool), array([APIJSONValue]), object([String: APIJSONValue]), null\n  public init(from decoder: Decoder) throws {\n    let container = try decoder.singleValueContainer()\n    if container.decodeNil() { self = .null }\n    else if let value = try? container.decode(Bool.self) { self = .boolean(value) }\n    else if let value = try? container.decode(Double.self) { self = .number(value) }\n    else if let value = try? container.decode(String.self) { self = .string(value) }\n    else if let value = try? container.decode([APIJSONValue].self) { self = .array(value) }\n    else { self = .object(try container.decode([String: APIJSONValue].self)) }\n  }\n  public func encode(to encoder: Encoder) throws {\n    var container = encoder.singleValueContainer()\n    switch self {\n      case .string(let value): try container.encode(value)\n      case .number(let value): try container.encode(value)\n      case .boolean(let value): try container.encode(value)\n      case .array(let value): try container.encode(value)\n      case .object(let value): try container.encode(value)\n      case .null: try container.encodeNil()\n    }\n  }\n}\n\n`;
 for (const [name, { kind, schema }] of models) {
-  if (kind === "enum") {
+  if (kind === "alias") {
+    const value = concrete(schema);
+    const swiftType =
+      value !== schema ? `${name}Value?` : fieldType(value, `${name}Value`);
+    const kotlinType =
+      value !== schema
+        ? `${name}Value?`
+        : fieldType(value, `${name}Value`, "kotlin");
+    swift += `public typealias ${name} = ${swiftType}\n\n`;
+    kotlin += `typealias ${name} = ${kotlinType}\n\n`;
+  } else if (kind === "enum") {
     swift += `public enum ${name}: String, Codable, Sendable {\n${schema.enum.map((value) => `  case \`${value.replace(/[^A-Za-z0-9_]/g, "_")}\` = ${JSON.stringify(value)}`).join("\n")}\n}\n\n`;
     kotlin += `@Serializable\nenum class ${name} {\n${schema.enum.map((value) => `  @SerialName(${JSON.stringify(value)}) ${value.replace(/[^A-Za-z0-9_]/g, "_").toUpperCase()}`).join(",\n")}\n}\n\n`;
   } else if (kind === "booleanLiteral") {
@@ -133,8 +152,8 @@ const operations = Object.entries(spec.paths).flatMap(([route, item]) =>
       ],
     })),
 );
-swift += `public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }\n\npublic actor CreatorAPIClient {\n  private let baseURL: URL\n  private let session: URLSession\n  private let token: @Sendable () async throws -> String?\n  public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }\n  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool) async throws -> Response {\n    guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }\n    url.percentEncodedPath = path\n    var request = URLRequest(url: url.url!)\n    request.httpMethod = method; request.httpBody = body\n    request.setValue("application/json", forHTTPHeaderField: "Accept")\n    if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }\n    if authenticated, let value = try await token() { request.setValue("Bearer \\(value)", forHTTPHeaderField: "Authorization") }\n    let (data, response) = try await session.data(for: request)\n    guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }\n    guard (200..<300).contains(response.statusCode) else { throw CreatorAPIError(status: response.statusCode, body: data) }\n    return try JSONDecoder().decode(Response.self, from: data)\n  }\n  private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }\n`;
-kotlin += `class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")\n\nclass CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {\n  private val json = Json { ignoreUnknownKeys = false }\n  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean): String = withContext(Dispatchers.IO) {\n    val connection = URL(baseURL.trimEnd('/') + path).openConnection() as HttpURLConnection\n    try {\n      connection.requestMethod = method\n      connection.connectTimeout = 15000; connection.readTimeout = 30000\n      connection.setRequestProperty("Accept", "application/json")\n      if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }\n      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.bufferedWriter().use { it.write(body) } }\n      val status = connection.responseCode\n      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""\n      if (status !in 200..299) throw CreatorAPIError(status, payload)\n      payload\n    } finally { connection.disconnect() }\n  }\n  private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")\n`;
+swift += `public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }\n\npublic actor CreatorAPIClient {\n  private let baseURL: URL\n  private let session: URLSession\n  private let token: @Sendable () async throws -> String?\n  public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }\n  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, query: [String: String] = [:], expectedAccount: String? = nil, authenticated: Bool) async throws -> Response {\n    guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }\n    url.percentEncodedPath = path\n    url.queryItems = query.isEmpty ? nil : query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }\n    var request = URLRequest(url: url.url!)\n    request.httpMethod = method; request.httpBody = body\n    if let expectedAccount { request.setValue(expectedAccount, forHTTPHeaderField: "x-qelvora-expected-account") }\n    request.setValue("application/json", forHTTPHeaderField: "Accept")\n    if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }\n    if authenticated, let value = try await token() { request.setValue("Bearer \\(value)", forHTTPHeaderField: "Authorization") }\n    let (data, response) = try await session.data(for: request)\n    guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }\n    guard (200..<300).contains(response.statusCode) else { throw CreatorAPIError(status: response.statusCode, body: data) }\n    return try JSONDecoder().decode(Response.self, from: data)\n  }\n  private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }\n`;
+kotlin += `class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")\n\nclass CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {\n  private val json = Json { ignoreUnknownKeys = false }\n  private suspend fun request(path: String, method: String, body: String? = null, query: Map<String, String> = emptyMap(), expectedAccount: String? = null, authenticated: Boolean): String = withContext(Dispatchers.IO) {\n    val connection = URL(baseURL.trimEnd('/') + path + if (query.isEmpty()) "" else query.toSortedMap().entries.joinToString(prefix = "?", separator = "&") { segment(it.key) + "=" + segment(it.value) }).openConnection() as HttpURLConnection\n    try {\n      connection.requestMethod = method\n      connection.connectTimeout = 15000; connection.readTimeout = 30000\n      connection.setRequestProperty("Accept", "application/json")\n      expectedAccount?.let { connection.setRequestProperty("x-qelvora-expected-account", it) }\n      if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }\n      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.bufferedWriter().use { it.write(body) } }\n      val status = connection.responseCode\n      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""\n      if (status !in 200..299) throw CreatorAPIError(status, payload)\n      payload\n    } finally { connection.disconnect() }\n  }\n  private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")\n`;
 for (const { route, method, operation, parameters } of operations) {
   const response = operation.responses["200"]?.content?.[
     "application/json"
@@ -162,8 +181,14 @@ for (const { route, method, operation, parameters } of operations) {
     /\{([^}]+)\}/g,
     (_, key) => `\x24{segment(${key})}`,
   );
-  swift += `  public func ${operation.operationId}(${[...params.map((key) => `${key}: String`), ...(body ? [`body: ${modelName(body)}`] : [])].join(", ")}) async throws -> ${modelName(response)} {\n    try await request("${swiftPath}", method: "${method.toUpperCase()}"${body ? ", body: JSONEncoder().encode(body)" : ""}, authenticated: ${requiredAuth})\n  }\n`;
-  kotlin += `  suspend fun ${operation.operationId}(${[...params.map((key) => `${key}: String`), ...(body ? [`body: ${modelName(body)}`] : [])].join(", ")}): ${modelName(response)} = json.decodeFromString(request("${kotlinPath}", "${method.toUpperCase()}"${body ? ", body = json.encodeToString(body)" : ""}, authenticated = ${requiredAuth}))\n`;
+  const hasQuery = parameters.some((parameter) => parameter.in === "query");
+  const hasAccount = parameters.some(
+    (parameter) =>
+      parameter.in === "header" &&
+      parameter.name === "x-qelvora-expected-account",
+  );
+  swift += `  public func ${operation.operationId}(${[...params.map((key) => `${key}: String`), ...(body ? [`body: ${modelName(body)}`] : []), ...(hasQuery ? ["query: [String: String] = [:]"] : []), ...(hasAccount ? ["expectedAccount: String? = nil"] : [])].join(", ")}) async throws -> ${modelName(response)} {\n    try await request("${swiftPath}", method: "${method.toUpperCase()}"${body ? ", body: JSONEncoder().encode(body)" : ""}${hasQuery ? ", query: query" : ""}${hasAccount ? ", expectedAccount: expectedAccount" : ""}, authenticated: ${requiredAuth})\n  }\n`;
+  kotlin += `  suspend fun ${operation.operationId}(${[...params.map((key) => `${key}: String`), ...(body ? [`body: ${modelName(body)}`] : []), ...(hasQuery ? ["query: Map<String, String> = emptyMap()"] : []), ...(hasAccount ? ["expectedAccount: String? = null"] : [])].join(", ")}): ${modelName(response)} = json.decodeFromString(request("${kotlinPath}", "${method.toUpperCase()}"${body ? ", body = json.encodeToString(body)" : ""}${hasQuery ? ", query = query" : ""}${hasAccount ? ", expectedAccount = expectedAccount" : ""}, authenticated = ${requiredAuth}))\n`;
 }
 swift += "}\n";
 kotlin += "}\n";

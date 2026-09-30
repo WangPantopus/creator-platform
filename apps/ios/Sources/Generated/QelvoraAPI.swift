@@ -25,6 +25,8 @@ public enum APIJSONValue: Codable, Sendable {
   }
 }
 
+public typealias APIAgentAgentAudience = APIJSONValue
+
 public struct APIAgentCorrectionRequest: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `paraphrasedPrompt`: String
@@ -233,6 +235,8 @@ public struct APIAgentPublishRequest: Codable, Sendable {
   }
 }
 
+public typealias APIAgentRevision = Int
+
 public struct APIAgentSourceAction: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `action`: APIAgentSourceActionAction
@@ -311,6 +315,8 @@ public enum APICommerceCommitmentState: String, Codable, Sendable {
   case `resolved` = "resolved"
 }
 
+public typealias APICommerceCurrency = String
+
 public struct APICommerceDecidePacket: Codable, Sendable {
   public let `action`: APICommerceDecidePacketAction
   public let `version`: Int
@@ -384,6 +390,10 @@ public struct APICommerceFulfillmentCommand: Codable, Sendable {
     self.messageId = messageId
   }
 }
+
+public typealias APICommerceIdempotencyKey = String
+
+public typealias APICommerceMinorUnits = Int
 
 public enum APICommerceModeKind: String, Codable, Sendable {
   case `written_reply` = "written_reply"
@@ -793,6 +803,1340 @@ public enum APICallSessionState: String, Codable, Sendable {
   case `ending` = "ending"
   case `ended` = "ended"
   case `cancelled` = "cancelled"
+}
+
+public typealias APIContentAudience = APIJSONValue
+
+public struct APIContentConsentResult: Codable, Sendable {
+  public let `version`: Int
+  public let `share_text`: Bool
+  public let `show_handle`: Bool
+  public init(version: Int, share_text: Bool, show_handle: Bool) {
+    self.version = version
+    self.share_text = share_text
+    self.show_handle = show_handle
+  }
+}
+
+public struct APIContentDocument: Codable, Sendable {
+  public let `kind`: APIContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentDocumentLive?
+  public init(kind: APIContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public struct APIContentEffectsResult: Codable, Sendable {
+  public let `processed`: Int
+  public init(processed: Int) {
+    self.processed = processed
+  }
+}
+
+public typealias APIContentKey = String
+
+public struct APIContentList: Codable, Sendable {
+  public let `items`: [APIContentListItemsItem]
+  public let `nextCursor`: String?
+  public let `serverTime`: String
+  public init(items: [APIContentListItemsItem], nextCursor: String? = nil, serverTime: String) {
+    self.items = items
+    self.nextCursor = nextCursor
+    self.serverTime = serverTime
+  }
+}
+
+public struct APIContentListItemsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentListItemsItemAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentListItemsItemDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentListItemsItemSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentListItemsItemAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentListItemsItemDocument, audienceCount: Int? = nil, sourceState: APIContentListItemsItemSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+}
+
+public enum APIContentListItemsItemAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentListItemsItemDocument: Codable, Sendable {
+  public let `kind`: APIContentListItemsItemDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentListItemsItemDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentListItemsItemDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentListItemsItemDocumentLive?
+  public init(kind: APIContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, live: APIContentListItemsItemDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentListItemsItemDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentListItemsItemDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentListItemsItemDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentListItemsItemDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentListItemsItemDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentListItemsItemDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentListItemsItemDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public enum APIContentListItemsItemSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
+}
+
+public struct APIContentLiveCatalog: Codable, Sendable {
+  public let `available`: Bool
+  public let `items`: [APIContentLiveCatalogItemsItem]
+  public init(available: Bool, items: [APIContentLiveCatalogItemsItem]) {
+    self.available = available
+    self.items = items
+  }
+}
+
+public struct APIContentLiveCatalogItemsItem: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public let `replayReady`: Bool
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil, replayReady: Bool) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+    self.replayReady = replayReady
+  }
+}
+
+public struct APIContentMedia: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentMediaKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentMediaKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentMediaKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentMuteCommand: Codable, Sendable {
+  public let `muted`: Bool
+  public init(muted: Bool) {
+    self.muted = muted
+  }
+}
+
+public struct APIContentPage: Codable, Sendable {
+  public let `cursor`: String?
+  public let `limit`: Int
+  public let `state`: APIContentPageState?
+  public let `query`: String?
+  public init(cursor: String? = nil, limit: Int, state: APIContentPageState? = nil, query: String? = nil) {
+    self.cursor = cursor
+    self.limit = limit
+    self.state = state
+    self.query = query
+  }
+}
+
+public enum APIContentPageState: String, Codable, Sendable {
+  case `draft` = "draft"
+  case `scheduled` = "scheduled"
+  case `published` = "published"
+  case `unpublished` = "unpublished"
+  case `archived` = "archived"
+}
+
+public struct APIContentPreference: Codable, Sendable {
+  public let `accountId`: String
+  public let `muted`: Bool
+  public init(accountId: String, muted: Bool) {
+    self.accountId = accountId
+    self.muted = muted
+  }
+}
+
+public struct APIContentReactionResult: Codable, Sendable {
+  public let `replyId`: String
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(replyId: String, kind: String, signedActId: String) {
+    self.replyId = replyId
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentReplyList: Codable, Sendable {
+  public let `items`: [APIContentReplyListItemsItem]
+  public let `nextCursor`: String?
+  public init(items: [APIContentReplyListItemsItem], nextCursor: String? = nil) {
+    self.items = items
+    self.nextCursor = nextCursor
+  }
+}
+
+public struct APIContentReplyListItemsItem: Codable, Sendable {
+  public let `id`: String
+  public let `contentId`: String
+  public let `fanId`: String
+  public let `handle`: String
+  public let `text`: String
+  public let `version`: Int
+  public let `createdAt`: String
+  public let `consent`: APIContentReplyListItemsItemConsent
+  public let `reaction`: APIContentReplyListItemsItemReaction?
+  public init(id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
+    self.id = id
+    self.contentId = contentId
+    self.fanId = fanId
+    self.handle = handle
+    self.text = text
+    self.version = version
+    self.createdAt = createdAt
+    self.consent = consent
+    self.reaction = reaction
+  }
+}
+
+public struct APIContentReplyListItemsItemConsent: Codable, Sendable {
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `version`: Int
+  public init(shareText: Bool, showHandle: Bool, version: Int) {
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.version = version
+  }
+}
+
+public struct APIContentReplyListItemsItemReaction: Codable, Sendable {
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(kind: String, signedActId: String) {
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `signedActId`: String?
+  public init(id: String, version: Int, state: String, signedActId: String? = nil) {
+    self.id = id
+    self.version = version
+    self.state = state
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentRevisionResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public init(id: String, version: Int) {
+    self.id = id
+    self.version = version
+  }
+}
+
+public struct APIContentScheduledResult: Codable, Sendable {
+  public let `published`: Int
+  public init(published: Int) {
+    self.published = published
+  }
+}
+
+public typealias APIContentThanksFeed = [APIContentThanksFeedValueItem]
+
+public struct APIContentThanksFeedValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `target_kind`: APIContentThanksFeedValueItemTargetKind
+  public let `target_id`: String
+  public let `text`: String
+  public let `handle`: String?
+  public let `created_at`: String
+  public init(id: String, version: Int, target_kind: APIContentThanksFeedValueItemTargetKind, target_id: String, text: String, handle: String? = nil, created_at: String) {
+    self.id = id
+    self.version = version
+    self.target_kind = target_kind
+    self.target_id = target_id
+    self.text = text
+    self.handle = handle
+    self.created_at = created_at
+  }
+}
+
+public enum APIContentThanksFeedValueItemTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public struct APIContentThanksQuery: Codable, Sendable {
+  public let `targetKind`: APIContentThanksQueryTargetKind
+  public let `targetId`: String
+  public init(targetKind: APIContentThanksQueryTargetKind, targetId: String) {
+    self.targetKind = targetKind
+    self.targetId = targetId
+  }
+}
+
+public enum APIContentThanksQueryTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public typealias APIContentThanksView = APIContentThanksViewValue?
+
+public struct APIContentThanksViewValue: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `text`: String
+  public let `shareWithCreatorDigest`: Bool
+  public let `showIdentity`: Bool
+  public let `withdrawn`: Bool
+  public init(id: String, version: Int, text: String, shareWithCreatorDigest: Bool, showIdentity: Bool, withdrawn: Bool) {
+    self.id = id
+    self.version = version
+    self.text = text
+    self.shareWithCreatorDigest = shareWithCreatorDigest
+    self.showIdentity = showIdentity
+    self.withdrawn = withdrawn
+  }
+}
+
+public struct APIContentVersionCommand: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public init(version: Int, idempotencyKey: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentView: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentViewAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentViewDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentViewSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentViewAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentViewDocument, audienceCount: Int? = nil, sourceState: APIContentViewSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+}
+
+public enum APIContentViewAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentViewDocument: Codable, Sendable {
+  public let `kind`: APIContentViewDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentViewDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentViewDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentViewDocumentLive?
+  public init(kind: APIContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentViewDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentViewDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentViewDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentViewDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentViewDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentViewDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentViewDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentViewDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public enum APIContentViewSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
+}
+
+public struct APIContentWithdrawResult: Codable, Sendable {
+  public let `id`: String
+  public let `withdrawn`: APIContentWithdrawResultWithdrawn
+  public init(id: String, withdrawn: APIContentWithdrawResultWithdrawn) {
+    self.id = id
+    self.withdrawn = withdrawn
+  }
+}
+
+public struct APIContentWithdrawResultWithdrawn: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIPrivateNoteReply: Codable, Sendable {
+  public let `id`: String
+  public let `contentId`: String
+  public let `fanId`: String
+  public let `handle`: String
+  public let `text`: String
+  public let `version`: Int
+  public let `createdAt`: String
+  public let `consent`: APIPrivateNoteReplyConsent
+  public let `reaction`: APIPrivateNoteReplyReaction?
+  public init(id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
+    self.id = id
+    self.contentId = contentId
+    self.fanId = fanId
+    self.handle = handle
+    self.text = text
+    self.version = version
+    self.createdAt = createdAt
+    self.consent = consent
+    self.reaction = reaction
+  }
+}
+
+public struct APIPrivateNoteReplyConsent: Codable, Sendable {
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `version`: Int
+  public init(shareText: Bool, showHandle: Bool, version: Int) {
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.version = version
+  }
+}
+
+public struct APIPrivateNoteReplyReaction: Codable, Sendable {
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(kind: String, signedActId: String) {
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIPublishContent: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIQuoteConsent: Codable, Sendable {
+  public let `version`: Int
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `idempotencyKey`: String
+  public init(version: Int, shareText: Bool, showHandle: Bool, idempotencyKey: String) {
+    self.version = version
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIReactToReply: Codable, Sendable {
+  public let `version`: Int
+  public let `kind`: APIReactToReplyKind
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(version: Int, kind: APIReactToReplyKind, signedActId: String, idempotencyKey: String) {
+    self.version = version
+    self.kind = kind
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIReactToReplyKind: String, Codable, Sendable {
+  case `heart` = "heart"
+  case `thanks` = "thanks"
+  case `helpful` = "helpful"
+}
+
+public struct APIReplyToNote: Codable, Sendable {
+  public let `text`: String
+  public let `idempotencyKey`: String
+  public init(text: String, idempotencyKey: String) {
+    self.text = text
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APISaveContent: Codable, Sendable {
+  public let `id`: String
+  public let `expectedVersion`: Int
+  public let `document`: APISaveContentDocument
+  public let `idempotencyKey`: String
+  public init(id: String, expectedVersion: Int, document: APISaveContentDocument, idempotencyKey: String) {
+    self.id = id
+    self.expectedVersion = expectedVersion
+    self.document = document
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APISaveContentDocument: Codable, Sendable {
+  public let `kind`: APISaveContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APISaveContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APISaveContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APISaveContentDocumentLive?
+  public init(kind: APISaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APISaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APISaveContentDocumentQuote? = nil, packetId: String? = nil, live: APISaveContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APISaveContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APISaveContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APISaveContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APISaveContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APISaveContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APISaveContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APISaveContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public struct APIThanksCommand: Codable, Sendable {
+  public let `targetKind`: APIThanksCommandTargetKind
+  public let `targetId`: String
+  public let `text`: String
+  public let `shareWithCreatorDigest`: Bool
+  public let `showIdentity`: Bool
+  public let `withdrawn`: Bool
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(targetKind: APIThanksCommandTargetKind, targetId: String, text: String, shareWithCreatorDigest: Bool, showIdentity: Bool, withdrawn: Bool, expectedVersion: Int, idempotencyKey: String) {
+    self.targetKind = targetKind
+    self.targetId = targetId
+    self.text = text
+    self.shareWithCreatorDigest = shareWithCreatorDigest
+    self.showIdentity = showIdentity
+    self.withdrawn = withdrawn
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIThanksCommandTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public struct APIStudioInvite: Codable, Sendable {
+  public let `handle`: String
+  public let `roles`: [APIStudioInviteRolesItem]
+  public init(handle: String, roles: [APIStudioInviteRolesItem]) {
+    self.handle = handle
+    self.roles = roles
+  }
+}
+
+public enum APIStudioInviteRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioQueueQuery: Codable, Sendable {
+  public let `cursor`: String?
+  public let `filter`: APIStudioQueueQueryFilter
+  public let `limit`: Int
+  public init(cursor: String? = nil, filter: APIStudioQueueQueryFilter, limit: Int) {
+    self.cursor = cursor
+    self.filter = filter
+    self.limit = limit
+  }
+}
+
+public enum APIStudioQueueQueryFilter: String, Codable, Sendable {
+  case `all` = "all"
+  case `due` = "due"
+  case `decide` = "decide"
+  case `more_info` = "more_info"
+}
+
+public struct APIStudioSaveReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(text: String, expectedVersion: Int, idempotencyKey: String) {
+    self.text = text
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioSendReplyDraft: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIStudioCorrection: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public let `expectedRevision`: Int
+  public let `paraphrasedPrompt`: String
+  public let `rule`: String
+  public let `unacceptableAnswer`: String
+  public init(idempotencyKey: String, expectedRevision: Int, paraphrasedPrompt: String, rule: String, unacceptableAnswer: String) {
+    self.idempotencyKey = idempotencyKey
+    self.expectedRevision = expectedRevision
+    self.paraphrasedPrompt = paraphrasedPrompt
+    self.rule = rule
+    self.unacceptableAnswer = unacceptableAnswer
+  }
+}
+
+public struct APIStudioRevision: Codable, Sendable {
+  public let `revision`: Int
+  public init(revision: Int) {
+    self.revision = revision
+  }
+}
+
+public struct APIStudioDraftVersion: Codable, Sendable {
+  public let `version`: Int
+  public init(version: Int) {
+    self.version = version
+  }
+}
+
+public struct APIStudioReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `version`: Int
+  public let `sentMessageId`: String?
+  public init(text: String, version: Int, sentMessageId: String? = nil) {
+    self.text = text
+    self.version = version
+    self.sentMessageId = sentMessageId
+  }
+}
+
+public struct APIStudioSession: Codable, Sendable {
+  public let `creators`: [APIStudioSessionCreatorsItem]
+  public let `invitations`: [APIStudioSessionInvitationsItem]
+  public let `serverTime`: String
+  public init(creators: [APIStudioSessionCreatorsItem], invitations: [APIStudioSessionInvitationsItem], serverTime: String) {
+    self.creators = creators
+    self.invitations = invitations
+    self.serverTime = serverTime
+  }
+}
+
+public struct APIStudioSessionCreatorsItem: Codable, Sendable {
+  public let `id`: String
+  public let `display_name`: String
+  public let `handle`: String
+  public let `verification`: String
+  public let `owned`: Bool
+  public let `roles`: [APIStudioSessionCreatorsItemRolesItem]
+  public let `memberHandle`: String?
+  public let `viewerAccountId`: String
+  public init(id: String, display_name: String, handle: String, verification: String, owned: Bool, roles: [APIStudioSessionCreatorsItemRolesItem], memberHandle: String? = nil, viewerAccountId: String) {
+    self.id = id
+    self.display_name = display_name
+    self.handle = handle
+    self.verification = verification
+    self.owned = owned
+    self.roles = roles
+    self.memberHandle = memberHandle
+    self.viewerAccountId = viewerAccountId
+  }
+}
+
+public enum APIStudioSessionCreatorsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioSessionInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `roles`: [APIStudioSessionInvitationsItemRolesItem]
+  public let `expiresAt`: String
+  public init(id: String, creatorId: String, creatorName: String, roles: [APIStudioSessionInvitationsItemRolesItem], expiresAt: String) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.roles = roles
+    self.expiresAt = expiresAt
+  }
+}
+
+public enum APIStudioSessionInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioAudiences: Codable, Sendable {
+  public let `audienceCountsAvailable`: Bool
+  public let `tiers`: [APIStudioAudiencesTiersItem]
+  public let `groups`: [APIStudioAudiencesGroupsItem]
+  public init(audienceCountsAvailable: Bool, tiers: [APIStudioAudiencesTiersItem], groups: [APIStudioAudiencesGroupsItem]) {
+    self.audienceCountsAvailable = audienceCountsAvailable
+    self.tiers = tiers
+    self.groups = groups
+  }
+}
+
+public struct APIStudioAudiencesTiersItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioAudiencesGroupsItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioInvitation: Codable, Sendable {
+  public let `id`: String
+  public let `roles`: [APIStudioInvitationRolesItem]
+  public let `creatorId`: String?
+  public let `accountId`: String?
+  public let `expiresAt`: String?
+  public let `accepted`: Bool?
+  public init(id: String, roles: [APIStudioInvitationRolesItem], creatorId: String? = nil, accountId: String? = nil, expiresAt: String? = nil, accepted: Bool? = nil) {
+    self.id = id
+    self.roles = roles
+    self.creatorId = creatorId
+    self.accountId = accountId
+    self.expiresAt = expiresAt
+    self.accepted = accepted
+  }
+}
+
+public enum APIStudioInvitationRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public typealias APIStudioCommerceProjection = APIJSONValue
+
+public struct APIStudioTeam: Codable, Sendable {
+  public let `members`: [APIStudioTeamMembersItem]
+  public let `invitations`: [APIStudioTeamInvitationsItem]
+  public init(members: [APIStudioTeamMembersItem], invitations: [APIStudioTeamInvitationsItem]) {
+    self.members = members
+    self.invitations = invitations
+  }
+}
+
+public struct APIStudioTeamMembersItem: Codable, Sendable {
+  public let `account_id`: String
+  public let `roles`: [APIStudioTeamMembersItemRolesItem]
+  public let `revoked_at`: String?
+  public let `handle`: String?
+  public init(account_id: String, roles: [APIStudioTeamMembersItemRolesItem], revoked_at: String? = nil, handle: String? = nil) {
+    self.account_id = account_id
+    self.roles = roles
+    self.revoked_at = revoked_at
+    self.handle = handle
+  }
+}
+
+public enum APIStudioTeamMembersItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioTeamInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `account_id`: String
+  public let `handle`: String?
+  public let `roles`: [APIStudioTeamInvitationsItemRolesItem]
+  public let `expires_at`: String
+  public let `accepted_at`: String?
+  public let `revoked_at`: String?
+  public init(id: String, account_id: String, handle: String? = nil, roles: [APIStudioTeamInvitationsItemRolesItem], expires_at: String, accepted_at: String? = nil, revoked_at: String? = nil) {
+    self.id = id
+    self.account_id = account_id
+    self.handle = handle
+    self.roles = roles
+    self.expires_at = expires_at
+    self.accepted_at = accepted_at
+    self.revoked_at = revoked_at
+  }
+}
+
+public enum APIStudioTeamInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioControlCommand: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public init(idempotencyKey: String) {
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioThreadEntries: Codable, Sendable {
+  public let `items`: [APIStudioThreadEntriesItemsItem]
+  public let `nextCursor`: String?
+  public let `coverage`: APIStudioThreadEntriesCoverage
+  public init(items: [APIStudioThreadEntriesItemsItem], nextCursor: String? = nil, coverage: APIStudioThreadEntriesCoverage) {
+    self.items = items
+    self.nextCursor = nextCursor
+    self.coverage = coverage
+  }
+}
+
+public struct APIStudioThreadEntriesItemsItem: Codable, Sendable {
+  public let `fanId`: String
+  public let `handle`: String
+  public let `sources`: [APIStudioThreadEntriesItemsItemSourcesItem]
+  public let `updatedAt`: String
+  public init(fanId: String, handle: String, sources: [APIStudioThreadEntriesItemsItemSourcesItem], updatedAt: String) {
+    self.fanId = fanId
+    self.handle = handle
+    self.sources = sources
+    self.updatedAt = updatedAt
+  }
+}
+
+public enum APIStudioThreadEntriesItemsItemSourcesItem: String, Codable, Sendable {
+  case `note_reply` = "note_reply"
+  case `request` = "request"
+}
+
+public enum APIStudioThreadEntriesCoverage: String, Codable, Sendable {
+  case `notes_and_requests` = "notes_and_requests"
+}
+
+public struct APIContentReview: Codable, Sendable {
+  public let `command`: APIContentReviewCommand
+  public let `view`: APIContentReviewView
+  public init(command: APIContentReviewCommand, view: APIContentReviewView) {
+    self.command = command
+    self.view = view
+  }
+}
+
+public struct APIContentReviewCommand: Codable, Sendable {
+  public let `actType`: APIContentReviewCommandActType
+  public let `subjectId`: String
+  public let `content`: APIJSONValue
+  public init(actType: APIContentReviewCommandActType, subjectId: String, content: APIJSONValue) {
+    self.actType = actType
+    self.subjectId = subjectId
+    self.content = content
+  }
+}
+
+public enum APIContentReviewCommandActType: String, Codable, Sendable {
+  case `reply` = "reply"
+  case `approved_draft` = "approved_draft"
+  case `broadcast` = "broadcast"
+  case `reaction` = "reaction"
+  case `accept` = "accept"
+  case `correction` = "correction"
+}
+
+public struct APIContentReviewView: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentReviewViewAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentReviewViewDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentReviewViewSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentReviewViewAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentReviewViewDocument, audienceCount: Int? = nil, sourceState: APIContentReviewViewSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+}
+
+public enum APIContentReviewViewAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentReviewViewDocument: Codable, Sendable {
+  public let `kind`: APIContentReviewViewDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentReviewViewDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentReviewViewDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentReviewViewDocumentLive?
+  public init(kind: APIContentReviewViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentReviewViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentReviewViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentReviewViewDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+}
+
+public enum APIContentReviewViewDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentReviewViewDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentReviewViewDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentReviewViewDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentReviewViewDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentReviewViewDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentReviewViewDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+}
+
+public enum APIContentReviewViewSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
 }
 
 public struct APIConsentEnvelope: Codable, Sendable {
@@ -1808,11 +3152,13 @@ public actor CreatorAPIClient {
   private let session: URLSession
   private let token: @Sendable () async throws -> String?
   public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }
-  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool) async throws -> Response {
+  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, query: [String: String] = [:], expectedAccount: String? = nil, authenticated: Bool) async throws -> Response {
     guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }
     url.percentEncodedPath = path
+    url.queryItems = query.isEmpty ? nil : query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
     var request = URLRequest(url: url.url!)
     request.httpMethod = method; request.httpBody = body
+    if let expectedAccount { request.setValue(expectedAccount, forHTTPHeaderField: "x-qelvora-expected-account") }
     request.setValue("application/json", forHTTPHeaderField: "Accept")
     if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
@@ -1822,6 +3168,141 @@ public actor CreatorAPIClient {
     return try JSONDecoder().decode(Response.self, from: data)
   }
   private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }
+  public func contentList(creatorId: String, query: [String: String] = [:]) async throws -> APIContentList {
+    try await request("/v1/content/\(segment(creatorId))", method: "GET", query: query, authenticated: true)
+  }
+  public func studioContentList(creatorId: String, query: [String: String] = [:]) async throws -> APIContentList {
+    try await request("/v1/content/\(segment(creatorId))/studio", method: "GET", query: query, authenticated: true)
+  }
+  public func studioLiveCatalog(creatorId: String) async throws -> APIContentLiveCatalog {
+    try await request("/v1/content/\(segment(creatorId))/studio/live", method: "GET", authenticated: true)
+  }
+  public func saveContent(creatorId: String, body: APISaveContent, expectedAccount: String? = nil) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/drafts", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentReplies(creatorId: String, query: [String: String] = [:]) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", query: query, authenticated: true)
+  }
+  public func studioContentReplies(creatorId: String, query: [String: String] = [:]) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", query: query, authenticated: true)
+  }
+  public func contentReplyConsent(creatorId: String, id: String, body: APIQuoteConsent, expectedAccount: String? = nil) async throws -> APIContentConsentResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/consent", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentReplyReaction(creatorId: String, id: String, body: APIReactToReply, expectedAccount: String? = nil) async throws -> APIContentReactionResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/reaction", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func withdrawContentReply(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentWithdrawResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/withdraw", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentPreference(creatorId: String) async throws -> APIContentPreference {
+    try await request("/v1/content/\(segment(creatorId))/mute", method: "GET", authenticated: true)
+  }
+  public func muteContent(creatorId: String, body: APIContentMuteCommand, expectedAccount: String? = nil) async throws -> APIContentMuteCommand {
+    try await request("/v1/content/\(segment(creatorId))/mute", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func myContentThanks(creatorId: String) async throws -> APIContentThanksView {
+    try await request("/v1/content/\(segment(creatorId))/thanks", method: "GET", authenticated: true)
+  }
+  public func saveContentThanks(creatorId: String, body: APIThanksCommand, expectedAccount: String? = nil) async throws -> APIContentRevisionResult {
+    try await request("/v1/content/\(segment(creatorId))/thanks", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioThanksFeed(creatorId: String) async throws -> APIContentThanksFeed {
+    try await request("/v1/content/\(segment(creatorId))/studio/thanks", method: "GET", authenticated: true)
+  }
+  public func runScheduledContent(creatorId: String, expectedAccount: String? = nil) async throws -> APIContentScheduledResult {
+    try await request("/v1/content/\(segment(creatorId))/studio/scheduled/run", method: "POST", expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func runContentEffects(creatorId: String, expectedAccount: String? = nil) async throws -> APIContentEffectsResult {
+    try await request("/v1/content/\(segment(creatorId))/studio/effects/run", method: "POST", expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func contentView(creatorId: String, id: String) async throws -> APIContentView {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))", method: "GET", authenticated: true)
+  }
+  public func studioContentView(creatorId: String, id: String) async throws -> APIContentView {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/studio", method: "GET", authenticated: true)
+  }
+  public func reviewContent(creatorId: String, id: String) async throws -> APIContentReview {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/review", method: "GET", authenticated: true)
+  }
+  public func publishContent(creatorId: String, id: String, body: APIPublishContent, expectedAccount: String? = nil) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/publish", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func teamPublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/team-publish", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func unpublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/unpublish", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func archiveContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = nil) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/archive", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = nil) async throws -> APIContentRevisionResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/replies", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioThreadEntries(creatorId: String, query: [String: String] = [:]) async throws -> APIStudioThreadEntries {
+    try await request("/v1/studio/\(segment(creatorId))/threads", method: "GET", query: query, authenticated: true)
+  }
+  public func studioSession() async throws -> APIStudioSession {
+    try await request("/v1/studio/session", method: "GET", authenticated: true)
+  }
+  public func acceptStudioInvitation(id: String, expectedAccount: String? = nil) async throws -> APIDone {
+    try await request("/v1/studio/invitations/\(segment(id))/accept", method: "POST", expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func inviteStudioMember(creatorId: String, body: APIStudioInvite, expectedAccount: String? = nil) async throws -> APIStudioInvitation {
+    try await request("/v1/studio/\(segment(creatorId))/team/invite", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioTeam(creatorId: String) async throws -> APIStudioTeam {
+    try await request("/v1/studio/\(segment(creatorId))/team", method: "GET", authenticated: true)
+  }
+  public func studioAudiences(creatorId: String) async throws -> APIStudioAudiences {
+    try await request("/v1/studio/\(segment(creatorId))/audiences", method: "GET", authenticated: true)
+  }
+  public func studioCorrectionRevision(creatorId: String) async throws -> APIStudioRevision {
+    try await request("/v1/studio/\(segment(creatorId))/corrections", method: "GET", authenticated: true)
+  }
+  public func submitStudioCorrection(creatorId: String, body: APIStudioCorrection, expectedAccount: String? = nil) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/corrections", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioQueue(creatorId: String, query: [String: String] = [:]) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/queue", method: "GET", query: query, authenticated: true)
+  }
+  public func studioPacket(creatorId: String, packetId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))", method: "GET", authenticated: true)
+  }
+  public func studioDecidePacket(creatorId: String, packetId: String, body: APICommerceDecidePacket, expectedAccount: String? = nil) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/decide", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioPacketDeliveries(creatorId: String, packetId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/deliveries", method: "GET", authenticated: true)
+  }
+  public func studioDeliverPacket(creatorId: String, packetId: String, body: APICommerceFulfillmentCommand, expectedAccount: String? = nil) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/deliver", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioThread(creatorId: String, fanId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))", method: "GET", authenticated: true)
+  }
+  public func studioTakeover(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = nil) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/takeover", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioHandback(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = nil) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/handback", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioPause(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = nil) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/pause", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioHumanReply(creatorId: String, fanId: String, body: APIHumanReply, expectedAccount: String? = nil) async throws -> APIMessage {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/reply", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func studioReplyDraft(creatorId: String, fanId: String) async throws -> APIStudioReplyDraft {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/draft", method: "GET", authenticated: true)
+  }
+  public func saveStudioReplyDraft(creatorId: String, fanId: String, body: APIStudioSaveReplyDraft, expectedAccount: String? = nil) async throws -> APIStudioDraftVersion {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/draft", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
+  public func sendStudioReplyDraft(creatorId: String, fanId: String, body: APIStudioSendReplyDraft, expectedAccount: String? = nil) async throws -> APIMessage {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/send-draft", method: "POST", body: JSONEncoder().encode(body), expectedAccount: expectedAccount, authenticated: true)
+  }
   public func health() async throws -> APIHealth {
     try await request("/health", method: "GET", authenticated: false)
   }
@@ -1921,9 +3402,9 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:setup|notes|requests|threads|ai|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|requests|threads|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$)", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$)", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$"]
     let literalValues = ["offer": "1"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }

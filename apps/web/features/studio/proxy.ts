@@ -8,7 +8,7 @@ const allow = {
     "u",
   ),
   studio: new RegExp(
-    `^(?:session|invitations/${uuid}/accept|${uuid}/(?:queue|audiences|team(?:/invite)?|corrections|packets/${uuid}(?:/(?:decide|deliveries|deliver))?|threads/${uuid}(?:/(?:takeover|handback|pause|reply|draft|send-draft))?))$`,
+    `^(?:session|invitations/${uuid}/accept|${uuid}/(?:queue|audiences|team(?:/invite)?|corrections|packets/${uuid}(?:/(?:decide|deliveries|deliver))?|threads(?:/${uuid}(?:/(?:takeover|handback|pause|reply|draft|send-draft))?)?))$`,
     "u",
   ),
 };

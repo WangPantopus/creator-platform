@@ -146,6 +146,36 @@
       "version": "0031_w4_purchase_history",
       "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
       "owner": "W4"
+    },
+    {
+      "version": "0032_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0033_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0034_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0035_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0036_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0037_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "owner": "W5"
     }
   ],
   "reserved": [

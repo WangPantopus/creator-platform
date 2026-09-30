@@ -21,6 +21,9 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
+        // Explicit reference composition; shipping sign-in only shows producer-resolved arrival context.
+        compose.activity.runOnUiThread { compose.activity.setContent { QelvoraTheme(false) { Welcome(showContext = true, contextSource = "You came from Maya's page", contextTitle = "Maya · Ceramics · Kiln Club") } } }
+        compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertIsDisplayed()
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()
     }

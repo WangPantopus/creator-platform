@@ -1,0 +1,41 @@
+{
+  "surface": "functional Studio web; genuine W1 development continuation; synthetic prerequisite creator",
+  "backend": "loopback W5 with non-owner creator_runtime role",
+  "notes": {
+    "id": "a9181632-d598-49f5-9be8-49a66184081c",
+    "savedRevision": 3,
+    "state": "draft",
+    "observed": "reopened persisted text; exact-version review; registered-passkey-required denial",
+    "signatureCreated": false,
+    "published": false
+  },
+  "threads": {
+    "coverage": "notes_and_requests",
+    "observed": "current permission-checked empty directory with filters; no fabricated conversation"
+  },
+  "captures": [
+    {
+      "file": "note-passkey-required-phone-light.png",
+      "width": 390,
+      "theme": "light",
+      "proof": "actual registered-passkey-required denial; saved draft remains unsigned"
+    },
+    {
+      "file": "threads-phone-light.png",
+      "width": 390,
+      "theme": "light",
+      "proof": "functional bounded directory empty state"
+    },
+    {
+      "file": "threads-desktop-night.png",
+      "width": 1280,
+      "theme": "night",
+      "proof": "functional desktop layout with248sidebar"
+    }
+  ],
+  "limitations": [
+    "Synthetic identity is not Pantopus production or creator passkey verification",
+    "No signed Note, payment, media, distribution, privacy completion or cross-client happy path claimed",
+    "Earlier note-signing-result-phone-light.png is preview only; its filename does not establish signing success"
+  ]
+}
