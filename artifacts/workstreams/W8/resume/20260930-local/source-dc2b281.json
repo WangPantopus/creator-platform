@@ -1,0 +1,254 @@
+{
+  "observedAt": "2026-09-30T09:42:38.600314+00:00",
+  "sourceRevision": "dc2b281586640202bff37aa36e20e74f1fe04b32",
+  "startingRemoteRevision": "82509a9ecda6d9337f67a7b2ad089307bec37a02",
+  "mergedMainRevision": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "postMainMergeBaseline": "771817834f73fb34aa5eeac0e247c29bf1162f96",
+  "sourceScope": "These are the 47 personally resumed W8 paths after merging main, not certification or authorship of the captured W1\u2013W7 dependency checkpoint.",
+  "paths": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "6bd8cb8da318f7098acc6c2e1adb746ca9b5eadb6e6a8d6ca9897c465f93da70",
+      "bytes": 4734
+    },
+    {
+      "path": ".github/workflows/trust-release.yml",
+      "sha256": "6b083357e4ff7d992f64b1a1587952212910f662f13f722011a637aaebaf8f21",
+      "bytes": 1459
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+      "sha256": "0a7571e60b343682ea685ecb06b561cdf3430d819611b82f055e53c224af1ab8",
+      "bytes": 23902
+    },
+    {
+      "path": "apps/backend/scripts/tombstone-journal.ts",
+      "sha256": "dceae8e46035d10cd032ca05ce96438b1373ebdef657ec53b0781229a9bb4b17",
+      "bytes": 9149
+    },
+    {
+      "path": "apps/backend/src/app.ts",
+      "sha256": "f3a9902d978e229f18fbf5e376033dad6b7db648b44c5598dbf5574f6e41a3f8",
+      "bytes": 11607
+    },
+    {
+      "path": "apps/backend/src/db/database.ts",
+      "sha256": "ad01eb794d480aa6dea300cbed6461cb53cc69e48ea9e0e649217e3d20e4654c",
+      "bytes": 6701
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "e714c9649f8c022fc433cf7f7fa7d3b07372aafea1993072ecd22e7ce69e059f",
+      "bytes": 7022
+    },
+    {
+      "path": "apps/backend/src/modules/access/scope.ts",
+      "sha256": "c2daa707863bc09f293492b76857ddd4a399f9aa0eb32f21a4679b6f0c044e46",
+      "bytes": 5550
+    },
+    {
+      "path": "apps/backend/src/modules/trust/identity-authority.ts",
+      "sha256": "b18b42aef236b06064c3fb013429d910756b1297e8ba129c6e5a430172a89d79",
+      "bytes": 6113
+    },
+    {
+      "path": "apps/backend/src/modules/trust/own-privacy-hook.ts",
+      "sha256": "1c6aed6cfd56e132b477917a00a9dfb09cfaa888bb0a16058d694755c50a980c",
+      "bytes": 9013
+    },
+    {
+      "path": "apps/backend/src/modules/trust/router.ts",
+      "sha256": "87bc43958238026e57931f5043312740fc1abadee8309635e82b1a19fdc401f5",
+      "bytes": 11592
+    },
+    {
+      "path": "apps/backend/src/modules/trust/scope-restriction.ts",
+      "sha256": "16cc84ba6caafe53fd4686d2a47cf819827dbce8594e02e444328592d9d20da4",
+      "bytes": 1575
+    },
+    {
+      "path": "apps/backend/src/modules/trust/service.ts",
+      "sha256": "9a1516f750f502b4b0ec14bf3ca5da1288b9bdc36d4b97bdd0c878b0cc2f7882",
+      "bytes": 37071
+    },
+    {
+      "path": "apps/backend/src/modules/trust/worker.ts",
+      "sha256": "cd92acb4ec29db868773057027812f512730639553f4cd18d797bfd10c70e450",
+      "bytes": 14508
+    },
+    {
+      "path": "apps/backend/src/operations/local-server.ts",
+      "sha256": "767f6ae246304f28b8f1856c6844d9316f921c526b73ed4ec7c6dffed8af2ee1",
+      "bytes": 14301
+    },
+    {
+      "path": "apps/backend/src/operations/readiness.ts",
+      "sha256": "7097bcecd21f1f69729570f166c787f39e2e51e2d946f15dbd1b26bb8f8101eb",
+      "bytes": 1775
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "sha256": "ebb2154b7c43bb1a5a5e42f4ced561f7e508e79c4bf900034ba0e65a458c4f5b",
+      "bytes": 7672
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "sha256": "df37eb394079b584400f3f824de458625c6e94178c106d6b16b4edffdca124fe",
+      "bytes": 3512
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+      "sha256": "f73749ec16093c03bad97645a2f636a59761ef8db9261fb311d8ca96c9c9e99e",
+      "bytes": 21724
+    },
+    {
+      "path": "apps/web/app/api/trust/[...path]/route.ts",
+      "sha256": "c4e24ed5d31398b0bef914b202d659ccb7b04f82da5e3bb8da95ed55e139753a",
+      "bytes": 4681
+    },
+    {
+      "path": "apps/web/app/ops/cases/[id]/page.tsx",
+      "sha256": "68cf6aa1edca704d7ff032e1aae17dea55417a83fce378aa436cbcc6b1731aa8",
+      "bytes": 17567
+    },
+    {
+      "path": "apps/web/app/ops/trust-client.tsx",
+      "sha256": "c6874e2b5aad0062b979d37c0382e21010a4b19faf1c4d78e0b394dd9aa78e8a",
+      "bytes": 6848
+    },
+    {
+      "path": "apps/web/app/support/feedback/page.tsx",
+      "sha256": "dfcdb372b1ff89df3d19ad9cbb6647a243ce30863f4195a0a813834e2f5e164b",
+      "bytes": 3348
+    },
+    {
+      "path": "apps/web/app/support/page.tsx",
+      "sha256": "0d17ff163733ed595729d48bea758c7ec08dd247b652d1eb786618bab436bb59",
+      "bytes": 11140
+    },
+    {
+      "path": "apps/web/app/support/privacy/page.tsx",
+      "sha256": "2b04c3ac541a2a676fb1eff05647257fe610f73d79323b602ce824ce27884cf3",
+      "bytes": 11564
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/README.md",
+      "sha256": "4fa16aa20349cd3c42e628b4c3df20344c83d4cdb3fe1ac0de9817adc3077df4",
+      "bytes": 13923
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/canonical-privacy-authority.json",
+      "sha256": "77be6d482550e7764cbb171ef415903566fb134798c9cd72f26fbeebc5c53cb5",
+      "bytes": 638
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/ci-9f5afcb.json",
+      "sha256": "dd7d9bc3e89907978222c2d3d5f2bafa31836a2ca25f3f00b68a0fba9c399de9",
+      "bytes": 2818
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/feedback-account-switch-night-390.jpg",
+      "sha256": "9c2f0cdb136f72f980821c543957c5ff4715493dc0ac1b66361bb42cded112d4",
+      "bytes": 49508
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/image-9f5afcb.json",
+      "sha256": "1428550cce300048555d1fb2e723d2b44375ce23d02073cd09e649f47f404a60",
+      "bytes": 789
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/independent-appeal.jpg",
+      "sha256": "0dd10dc6c5020d93c5c914579e888fdb29a4df270989c1b143c3e79f27f611dc",
+      "bytes": 116879
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/ops-queue-9f5afcb-light-1280.jpg",
+      "sha256": "156f857108c1c4e645eb2a1fa98805601256343cd8a70580a8c7183d4dbf07d2",
+      "bytes": 38559
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/ops-queue-light-1280.jpg",
+      "sha256": "fb930a98cde1cc0902614bf423dc1d4298d15e62a97286943e43ff0ce980078e",
+      "bytes": 49607
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/participant-denial.json",
+      "sha256": "31cb29bb7014280bda41c6ad883c28adfa520843ef0f7fe93ada615fe84efe2e",
+      "bytes": 2187
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/privacy-9f5afcb-night.jpg",
+      "sha256": "52313ceeeb725b0bfd20cc8ffc1134137a5ba920f172bc67b4d7246ffc5bd0dd",
+      "bytes": 107534
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/privacy-blocked.jpg",
+      "sha256": "8f07e9c1be0d493d805826965045cdcecf9eb7f3e80ed400b0cfa13906cdd291",
+      "bytes": 107373
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/reasoned-case.jpg",
+      "sha256": "efb3c02a54425a173bf1eb587198859596e5dd390e7f1f6e03b40022a72d7d4e",
+      "bytes": 103276
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/recovery-current.json",
+      "sha256": "06340ec27890e9efe62a36b70e186fa6bee940e80f3f17a971ca113a904d622e",
+      "bytes": 298
+    },
+    {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/recovery-replay.json",
+      "sha256": "80a308ca8eb97f1d12e3ec792c68c80ad723a8dea65f950564a072ba3a23c8b5",
+      "bytes": 903
+    },
+    {
+      "path": "docs/operations/W8-release.md",
+      "sha256": "11292913d4443583e1cd40c4103a0cc29726f7f2ecde8c9631badbfe1e13a61b",
+      "bytes": 9811
+    },
+    {
+      "path": "docs/operations/W8-runbook.md",
+      "sha256": "4087e4aa950c626bbb6a3e7dd67af5003f2ca8d501ad8e62800d8d60a65038b7",
+      "bytes": 18693
+    },
+    {
+      "path": "docs/operations/W8-security.md",
+      "sha256": "8a1b3817a61021d26d1d5da06fbcb53e2078d78f46e969a4c1228a62f34a05e8",
+      "bytes": 9010
+    },
+    {
+      "path": "docs/workstreams/coordination/W8-contracts.md",
+      "sha256": "1c42b043e742916e1f517085f0651370d27f3724b4cdf879f6fd23eda6a2fbdc",
+      "bytes": 18296
+    },
+    {
+      "path": "docs/workstreams/handoffs/W8-resume-prompt.md",
+      "sha256": "167e99d8b79967ad6e8900bc327a0d4f4383e974a66fd681ea7c650752fe47e7",
+      "bytes": 23220
+    },
+    {
+      "path": "docs/workstreams/handoffs/W8.md",
+      "sha256": "8ffe467475270630025f5603ba3b30f1e2200ffd8b696fbbf4536c7d4750326e",
+      "bytes": 43719
+    },
+    {
+      "path": "docs/workstreams/status/W8.md",
+      "sha256": "3610065acd956f3b84831d5eb9fc894402e48dfb865a92fa13c96b2a9db4e679",
+      "bytes": 15914
+    },
+    {
+      "path": "infra/containers/trust.Dockerfile",
+      "sha256": "b2a7bee79e3ef751f9650acf75392d52e0c1db3749a68bf9c11b015235d92f61",
+      "bytes": 1537
+    }
+  ],
+  "backendImageRevision": "9f5afcbec6527a66846d86758e3af9958262a995",
+  "backendOrInfraChangesSinceImage": [],
+  "gitCleanBeforeReceipt": true,
+  "paidModelCalls": 0,
+  "openaiSecretRead": false,
+  "sharedFourFileLease": "returned",
+  "sharedFiveFileFormattingLease": "requested; pending; patch not applied",
+  "releaseReady": false,
+  "mergeReady": false
+}
