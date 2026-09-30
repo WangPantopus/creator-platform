@@ -1,18 +1,16 @@
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import type { AgentModel } from "./model.js";
 import type { AgentRepository, CreatorScope } from "./repository.js";
+import type { StreamProposal } from "./streaming.js";
 
-/** Records completed usage even when the later draft write fails. A provider
- * request without final usage remains uncertain rather than becoming free. */
-export async function withProviderUsage<T extends { usage: Usage }>(
+async function openProviderUsage(
   repository: AgentRepository,
   scope: CreatorScope,
   model: AgentModel,
   versionHash: string,
   category: string,
   signal: AbortSignal,
-  call: () => Promise<T>,
-): Promise<T> {
+) {
   signal.throwIfAborted();
   const started = performance.now();
   const id = await repository.transaction(scope, async (client) => {
@@ -22,18 +20,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
     );
     return row.rows[0]!.id;
   });
-  let usage: Usage = {
-    provider: "configured",
-    model: model.fingerprint,
-    inputTokens: 0,
-    outputTokens: 0,
-    costMicros: null,
-  };
-  try {
-    const result = await call();
-    usage = result.usage;
-    return result;
-  } finally {
+  return async (usage: Usage) => {
     await repository.transaction(scope, async (client) => {
       await client.query(
         "UPDATE creator.ai_usage SET provider=$3,model=$4,input_tokens=$5,output_tokens=$6,cost_micros=$7,duration_ms=$8 WHERE creator_id=$1 AND id=$2",
@@ -49,5 +36,74 @@ export async function withProviderUsage<T extends { usage: Usage }>(
         ],
       );
     });
+  };
+}
+
+function unknownUsage(model: AgentModel): Usage {
+  return {
+    provider: "configured",
+    model: model.fingerprint,
+    inputTokens: 0,
+    outputTokens: 0,
+    costMicros: null,
+  };
+}
+
+/** Records completed usage even when the later draft write fails. A provider
+ * request without final usage remains uncertain rather than becoming free. */
+export async function withProviderUsage<T extends { usage: Usage }>(
+  repository: AgentRepository,
+  scope: CreatorScope,
+  model: AgentModel,
+  versionHash: string,
+  category: string,
+  signal: AbortSignal,
+  call: () => Promise<T>,
+): Promise<T> {
+  const finish = await openProviderUsage(
+    repository,
+    scope,
+    model,
+    versionHash,
+    category,
+    signal,
+  );
+  let usage = unknownUsage(model);
+  try {
+    const result = await call();
+    usage = result.usage;
+    return result;
+  } finally {
+    await finish(usage);
+  }
+}
+
+/** The durable unknown row precedes opening the remote stream. A cancelled,
+ * interrupted or guardrail-stopped stream without final usage remains unknown. */
+export async function* withProviderStreamUsage(
+  repository: AgentRepository,
+  scope: CreatorScope,
+  model: AgentModel,
+  versionHash: string,
+  category: string,
+  signal: AbortSignal,
+  call: () => AsyncIterable<StreamProposal>,
+): AsyncIterable<StreamProposal> {
+  const finish = await openProviderUsage(
+    repository,
+    scope,
+    model,
+    versionHash,
+    category,
+    signal,
+  );
+  let usage = unknownUsage(model);
+  try {
+    for await (const proposal of call()) {
+      if ("usage" in proposal) usage = proposal.usage;
+      yield proposal;
+    }
+  } finally {
+    await finish(usage);
   }
 }

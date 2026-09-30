@@ -3,6 +3,7 @@ import type { CapabilitySnapshot } from "../../../../../packages/api/src/commerc
 import { assertThreadScope, type ThreadScope } from "./scope.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import { commerceAudience } from "../commerce/audience.js";
 
 /** W2 source audiences use real tier IDs, independently of spend counters.
  * Group grants require their canonical producer; absence confers no group access. */
@@ -10,35 +11,7 @@ export async function sourceAudienceSnapshot(
   client: PoolClient,
   scope: ThreadScope,
 ) {
-  assertThreadScope(scope);
-  const memberships = await client.query<{
-    tier_id: string;
-    version: number;
-    valid_until: Date;
-  }>(
-    `SELECT m.tier_id,m.version,least(g.valid_until,CASE WHEN m.state='grace' THEN m.grace_end ELSE m.period_end END) AS valid_until
-     FROM creator.commerce_membership m JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id
-     WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN ('active','grace','cancelled')
-     AND g.state='active' AND g.source='membership' AND g.valid_from<=now() AND g.valid_until>now()
-     AND CASE WHEN m.state='grace' THEN m.grace_end>now() ELSE m.period_end>now() END
-     ORDER BY m.tier_id,m.id`,
-    [scope.creatorId, scope.fanId],
-  );
-  return {
-    revision: contentHash({
-      creatorId: scope.creatorId,
-      fanId: scope.fanId,
-      memberships: memberships.rows,
-    }),
-    tierIds: [...new Set(memberships.rows.map((m) => m.tier_id))],
-    groupIds: [] as string[],
-    validUntil: new Date(
-      Math.min(
-        Date.now() + 60_000,
-        ...memberships.rows.map((m) => m.valid_until.getTime()),
-      ),
-    ).toISOString(),
-  };
+  return commerceAudience(client, scope);
 }
 
 /** Select one authoritative AI grant; overlapping equivalent allowances never sum. */
@@ -167,7 +140,7 @@ export async function reserveCostAllowance(
     grant.source === "pass_slot"
       ? (
           await client.query<{ id: string; cycle_start: string }>(
-            "SELECT p.id,p.cycle_start FROM creator.commerce_pass p JOIN creator.commerce_pass_slot s ON s.pass_id=p.id WHERE s.grant_id=$1 AND s.state='active' AND p.state IN('active','cancelled') AND p.cycle_end>now() FOR UPDATE OF p",
+            "SELECT p.id,p.cycle_start::text AS cycle_start FROM creator.commerce_pass p JOIN creator.commerce_pass_slot s ON s.pass_id=p.id WHERE s.grant_id=$1 AND s.state='active' AND p.state IN('active','cancelled') AND p.cycle_end>now() FOR UPDATE OF p",
             [grant.id],
           )
         ).rows[0]
@@ -223,7 +196,7 @@ export async function settleCostAllowance(
       pass_id: string | null;
       pass_cycle: string | null;
     }>(
-      "SELECT grant_id,units,state,pass_id,pass_cycle FROM creator.commerce_allowance_reservation WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+      "SELECT grant_id,units,state,pass_id,pass_cycle::text AS pass_cycle FROM creator.commerce_allowance_reservation WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
       [id, scope.creatorId, scope.fanId],
     )
   ).rows[0];
@@ -244,7 +217,7 @@ export async function settleCostAllowance(
   if (row.pass_id) {
     const pass = (
       await client.query<{ cycle_start: string }>(
-        "SELECT cycle_start FROM creator.commerce_pass WHERE id=$1 FOR UPDATE",
+        "SELECT cycle_start::text AS cycle_start FROM creator.commerce_pass WHERE id=$1 FOR UPDATE",
         [row.pass_id],
       )
     ).rows[0];
@@ -253,7 +226,8 @@ export async function settleCostAllowance(
       "allowance_inconsistent",
       "Pass allowance reconciliation is required.",
     );
-    // A prior-period generation cannot decrement the new paid cycle's reservation counter.
+    // Compare canonical SQL date strings, rather than distinct pg Date objects.
+    // A prior-period generation cannot decrement the new cycle's counter.
     if (pass.cycle_start === row.pass_cycle) {
       const updated = await client.query(
         "UPDATE creator.commerce_pass SET reserved=reserved-$2,used=used+$3,version=version+1 WHERE id=$1 AND reserved >= $2 RETURNING id",

@@ -45,7 +45,7 @@
   "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
   "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
-  "git": "PR #1 only; authenticated local GitHub CLI available for metadata. Merge requires complete exact-head checks; production acceptance remains separately gated.",
+  "git": "Existing draft PR1 metadata successfully updated through authenticated local GitHub CLI; source pushed without force. Complete exact-head checks govern merge.",
   "nativeVerificationTools": {
     "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
     "location": null,
@@ -64,10 +64,10 @@
       "executionSession": 53429
     },
     "api": {
-      "pid": 16529,
-      "executionSession": 61320
+      "pid": 24758,
+      "executionSession": 81605
     },
-    "observedAt": "2026-09-30T23:37:39.457036+00:00",
+    "observedAt": "2026-09-30T23:48:59.204038+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -103,16 +103,16 @@
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-09-30T23:37:39.457036+00:00",
+    "observedAt": "2026-09-30T23:48:59.204038+00:00",
     "webPort3002": "loopback listener, PID11183",
-    "apiPort4102": "loopback listener, PID16529",
+    "apiPort4102": "loopback listener, PID24758",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
     "savedData": "123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
     "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
     "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-    "nextAction": "Publish coherent delivery/safety/cache increment; consume fresh allocated W8 usage schema and canonical W1/W3/W4 producer contracts when published"
+    "nextAction": "Fresh exact-head CI after journal/audience increment; W8 allocation for cache columns and generation receipts remains pending"
   },
   "availabilityHistory": [
     {

@@ -41,9 +41,8 @@ Durable delivery additionally requires canonical
 `LicenseVerifier.isCurrentInTransaction(scope, license, client)` and
 `AudiencePort.currentInTransaction(scope, client)`. A separate preflight cannot
 substitute for those locks; absent methods fail closed. `createAgentDomain`
-reports `readiness.atomicDelivery`. W1/W3/W4 have the proposed contract. The W4
-owner reports an unpublished same-client audience implementation; authentic
-W1 license authority is still absent. This is implemented integration source,
+reports `readiness.atomicDelivery`. W1/W3/W4 have the proposed contract. The published W4 same-client audience producer has subsequently been
+consumed; authentic W1 license authority is still absent. This is implemented integration source,
 not licensed fan-delivery acceptance or distributed timing proof.
 
 The grant-free safety classifier now uses the same durable pre-call uncertain
@@ -135,3 +134,5 @@ Phone console at390×844 has no horizontal overflow; transcript controls expose
 44px minimum heights and keyboard Tab advances to the next case. This is bounded
 browser observation, not 200% text, reduced-motion, VoiceOver/TalkBack or populated
 artboard acceptance. The owned browser viewport override is reset after captures.
+
+The subsequent [per-call journal and canonical audience continuation](journal-and-audience-followup.md) supersedes the earlier per-pipeline final-write journal and unpublished-W4 descriptions. It records actual matched provider cost, cancellation uncertainty, the canonical audience/pass-cycle producer import and successful PR1 metadata update.
