@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Current handoff authority, 2026-09-30:** [preserved checkpoint/resources](../../../artifacts/workstreams/W8/handoff/20260930/README.md) and [comprehensive continuation assignment](../handoffs/W8-resume-prompt.md) supersede dated runtime/missing-source dispositions below. Existing isolated seam/producer authority is preserved. Current container/ports/private env/database/build outputs remain leased and retained; no cleanup or peer change is authorized by handoff. W1–W7 published integration and40-entry registry are present. Existing CI fixture exception remains pending; no test/golden/security authority is widened. Source checkpointbf92a8b; next commit is documentation/receipts only.
+
 ## Continued isolated integration scope — 2026-09-30
 
 **Phone acceptance follow-up:** W8's own `apps/web/app/ops/trust.css` now gives phone case metadata a16px column gap and wraps long labels/values. Actual390 Light/Night preserves scoped CASE-003 atresolved, its original evidence/decision, zero horizontal overflow and recipient-only local notice. Current evidence/inputs and the narrow existing-fixture/setup proposal are prepared; no test edit or grant widening occurred. The exact source/build/API/image revisions remain separately recorded.

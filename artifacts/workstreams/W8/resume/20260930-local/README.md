@@ -1,5 +1,7 @@
 # W8 resumed local acceptance — 2026-09-30 PDT
 
+**Current handoff:** the [Sep30 preserved checkpoint](../../handoff/20260930/README.md) pins current live resources, database metadata, new private recovery file hashes, PR/CI and source trees. Use the [rewritten full continuation prompt](../../../../../docs/workstreams/handoffs/W8-resume-prompt.md); older dated observations remain evidence, not current missing-source/runtime claims.
+
 Current code checkpoint: `da03bb764cd05d0f6ac7e19fcd012611226465c5`, pushed. Current evidence is summarized at the end of this index; earlier sections retain their observed revision/date and are not current missing-source/toolchain claims. Existing draft PR #7 remains the review surface and unmerged.
 
 Starting remote W8 revision: `82509a9ecda6d9337f67a7b2ad089307bec37a02`. Main `2e337a1afdf6d8bba3974427588e0b34b6d42d36` was merged as `7718178`, preserving main's newer W5 documentation. PR #7 remains the existing review surface. This increment does not certify the captured W1–W7 dependency checkpoint.
