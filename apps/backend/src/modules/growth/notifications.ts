@@ -12,6 +12,7 @@ import {
   type NotificationState,
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
+import type { GrowthErasure } from "./erasure.js";
 
 const authorKinds: Record<
   NotificationKind,
@@ -198,6 +199,7 @@ export class Notifications {
   constructor(
     private readonly db: GrowthDatabase,
     private readonly owners: GrowthOwners,
+    private readonly erasure: GrowthErasure,
     private readonly provider?: DeliveryProvider,
   ) {}
   async consume(input: unknown) {
@@ -219,6 +221,8 @@ export class Notifications {
         503,
       );
     return this.db.transaction(this.db.worker, async (client) => {
+      const retained = await this.erasure.event(client, event);
+      if (!retained) return { duplicate: false, created: 0 };
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [event.id],
@@ -238,11 +242,15 @@ export class Notifications {
       }
       await client.query(
         "INSERT INTO growth.event_inbox(id,envelope,envelope_hash) VALUES($1,$2,$3)",
-        [event.id, event, envelopeHash],
+        [event.id, retained, envelopeHash],
       );
       let created = 0;
       for (const { recipient, state } of states) {
         if (
+          !retained.recipients.some(
+            (r) =>
+              r.accountId === recipient.accountId && r.role === recipient.role,
+          ) ||
           !state.available ||
           !state.authorized ||
           state.version < event.aggregateVersion ||
@@ -340,22 +348,36 @@ export class Notifications {
           continue;
         }
         if (!this.provider) throw new Error("provider_unconfigured");
-        const delivered = await this.provider.send({
-          channel,
-          accountId: job.account_id,
-          notificationId: notification.id,
-          idempotencyKey: job.id,
-          sender: view.sender,
-          preview: prefs.hideSensitive
-            ? "You have an update. Open the app to view it."
-            : view.preview,
-          destination: view.destination,
-          authorship: view.authorship,
+        await this.db.transaction(this.db.worker, async (client) => {
+          const retained = await this.erasure.event(client, event);
+          if (!retained?.recipients.some((r) => r.accountId === job.account_id))
+            return;
+          if (
+            !(
+              await client.query(
+                "SELECT 1 FROM growth.delivery WHERE id=$1 AND lease_id=$2 AND state='leased'",
+                [job.id, leaseId],
+              )
+            ).rowCount
+          )
+            return;
+          const delivered = await this.provider!.send({
+            channel,
+            accountId: job.account_id,
+            notificationId: notification.id,
+            idempotencyKey: job.id,
+            sender: view.sender,
+            preview: prefs.hideSensitive
+              ? "You have an update. Open the app to view it."
+              : view.preview,
+            destination: view.destination,
+            authorship: view.authorship,
+          });
+          await client.query(
+            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2",
+            [job.id, leaseId, delivered.providerRef],
+          );
         });
-        await this.db.worker.query(
-          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2",
-          [job.id, leaseId, delivered.providerRef],
-        );
       } catch (error) {
         await this.db.worker.query(
           "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2",
@@ -417,6 +439,7 @@ export class Notifications {
       if (!jobs.length) break;
       claimed += jobs.length;
       const eligible: typeof jobs = [];
+      const eligibleEvents: ReturnType<typeof EventEnvelope.parse>[] = [];
       const entries: NonNullable<
         Parameters<DeliveryProvider["send"]>[0]["entries"]
       > = [];
@@ -458,6 +481,7 @@ export class Notifications {
           }
           if (quietNow(prefs, new Date())) throw new QuietDelivery();
           eligible.push(job);
+          eligibleEvents.push(event);
           entries.push({
             ...view,
             preview: prefs.hideSensitive
@@ -468,21 +492,30 @@ export class Notifications {
         if (!entries.length) continue;
         if (!this.provider) throw new DeliveryFailure(60);
         const first = entries[0]!;
-        const result = await this.provider.send({
-          channel: "email",
-          accountId: jobs[0]!.account_id,
-          notificationId: eligible[0]!.notification_id,
-          idempotencyKey: jobs[0]!.digest_id,
-          sender: "Your updates",
-          preview: first.preview,
-          destination: "/notifications",
-          authorship: "system",
-          entries,
+        await this.db.transaction(this.db.worker, async (client) => {
+          await this.erasure.lockEvents(client, eligibleEvents);
+          const current = await client.query(
+            "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
+            [eligible.map((job) => job.id), leaseId],
+          );
+          // Purge may have completed while owners were being read. Rebuild on the next lease.
+          if (current.rowCount !== eligible.length) return;
+          const result = await this.provider!.send({
+            channel: "email",
+            accountId: jobs[0]!.account_id,
+            notificationId: eligible[0]!.notification_id,
+            idempotencyKey: jobs[0]!.digest_id,
+            sender: "Your updates",
+            preview: first.preview,
+            destination: "/notifications",
+            authorship: "system",
+            entries,
+          });
+          await client.query(
+            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
+            [eligible.map((job) => job.id), leaseId, result.providerRef],
+          );
         });
-        await this.db.worker.query(
-          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
-          [eligible.map((job) => job.id), leaseId, result.providerRef],
-        );
       } catch (error) {
         if (error instanceof QuietDelivery) {
           await this.db.worker.query(

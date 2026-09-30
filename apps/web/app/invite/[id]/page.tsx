@@ -3,6 +3,7 @@ import { brand } from "@qelvora/brand";
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
 import type { Creator } from "../../../features/growth/types";
+import { EntryConsent } from "../../../features/growth/engagement";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function Invite({
@@ -11,8 +12,9 @@ export default async function Invite({
   params: Promise<{ id: string }>;
 }) {
   try {
+    const { id } = await params;
     const data = await growthRequest<{ creator: Creator; destination: string }>(
-      `public/invites/${encodeURIComponent((await params).id)}`,
+      `public/invites/${encodeURIComponent(id)}`,
     );
     return (
       <GrowthShell>
@@ -32,6 +34,13 @@ export default async function Invite({
             card needed.
           </p>
         </section>
+        <div className="growth-stack">
+          <EntryConsent
+            handle={data.creator.handle}
+            source="invite"
+            objectId={id}
+          />
+        </div>
       </GrowthShell>
     );
   } catch (error) {

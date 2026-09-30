@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mutate } from "./actions";
 export function FeedbackForm() {
   const [category, setCategory] = useState("notification"),
@@ -119,4 +119,66 @@ export function ExperimentForm() {
       <p role="status">{message}</p>
     </form>
   );
+}
+
+export function ExperimentChoices() {
+  const [items, setItems] = useState<
+      { id: string; hypothesis: string; state: string }[]
+    >([]),
+    [message, setMessage] = useState(""),
+    [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/growth/experiments")
+      .then(async (response) => {
+        if (response.ok && active)
+          setItems((await response.json()).experiments);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+  return items.length ? (
+    <section className="growth-stack">
+      <h2>Your experiment proposals</h2>
+      {items.map((item) => (
+        <article className="growth-card growth-card-body" key={item.id}>
+          <p>{item.hypothesis}</p>
+          <p>State: {item.state}</p>
+          {["draft", "active"].includes(item.state) && (
+            <button
+              className="qv-btn qv-btn--quiet"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setMessage("");
+                try {
+                  await mutate(`experiments/${item.id}/stop`, {}, "PUT");
+                  setItems((current) =>
+                    current.map((value) =>
+                      value.id === item.id
+                        ? { ...value, state: "stopped" }
+                        : value,
+                    ),
+                  );
+                } catch (error) {
+                  setMessage(
+                    error instanceof Error
+                      ? error.message
+                      : "Could not stop this proposal.",
+                  );
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Stop this proposal
+            </button>
+          )}
+        </article>
+      ))}
+      <p role="status">{message}</p>
+    </section>
+  ) : null;
 }

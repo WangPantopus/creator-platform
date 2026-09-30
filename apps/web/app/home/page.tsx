@@ -2,6 +2,7 @@ import { brand } from "@qelvora/brand";
 import { growthRequest } from "../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
 import type { Creator, Post } from "../../features/growth/types";
+import { BrowserPostValuePrompt } from "../../features/growth/engagement";
 export const dynamic = "force-dynamic";
 export default async function Home() {
   let data: {
@@ -38,6 +39,7 @@ export default async function Home() {
       </header>
       <div className="growth-stack">
         <h1>Your people</h1>
+        <BrowserPostValuePrompt />
         {data.entries.length ? (
           data.entries.map((e) => (
             <a

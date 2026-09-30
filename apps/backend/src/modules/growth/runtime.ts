@@ -38,7 +38,7 @@ export async function createGrowthRuntime(input: {
   const db = new GrowthDatabase(input.runtimePool, input.workerPool);
   await db.ready();
   const schema = await input.workerPool.query(
-    "SELECT to_regclass('growth.producer_relay') IS NOT NULL AND to_regclass('growth.prompt_choice') IS NOT NULL AND to_regclass('growth.entry_attribution') IS NOT NULL AS current",
+    "SELECT to_regclass('growth.producer_relay') IS NOT NULL AND to_regclass('growth.erasure_fence') IS NOT NULL AND to_regclass('growth.prompt_choice') IS NOT NULL AND to_regclass('growth.entry_attribution') IS NOT NULL AND EXISTS(SELECT FROM information_schema.columns WHERE table_schema='growth' AND table_name='prompt_choice' AND column_name='last_claim_id') AS current",
   );
   if (!schema.rows[0]?.current)
     throw new Error("Growth continuation migration is required.");

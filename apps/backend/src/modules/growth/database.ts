@@ -4,6 +4,11 @@ import { DomainError } from "../../core/errors.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
 
 export class GrowthDatabase {
+  actorFence?: (
+    client: PoolClient,
+    accountId: string,
+    creatorId: string | null,
+  ) => Promise<void>;
   constructor(
     readonly runtime: Pool,
     readonly worker: Pool,
@@ -76,16 +81,22 @@ export class GrowthDatabase {
         "adult_eligibility_required",
         "Adult eligibility is required.",
       );
-    return this.transaction(this.runtime, async (client) => {
-      await client.query("SELECT set_config('app.account_id',$1,true)", [
-        actor.accountId,
-      ]);
-      await assertCurrentSession(client, actor.accountId);
-      await client.query(
-        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true)",
-        [actor.accountId, creatorId ?? ""],
-      );
-      return work(client);
+    const perform = () =>
+      this.transaction(this.runtime, async (client) => {
+        await client.query("SELECT set_config('app.account_id',$1,true)", [
+          actor.accountId,
+        ]);
+        await assertCurrentSession(client, actor.accountId);
+        await client.query(
+          "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true)",
+          [actor.accountId, creatorId ?? ""],
+        );
+        return work(client);
+      });
+    if (!this.actorFence) return perform();
+    return this.transaction(this.worker, async (client) => {
+      await this.actorFence!(client, actor.accountId, creatorId);
+      return perform();
     });
   }
   async transaction<T>(
@@ -107,5 +118,28 @@ export class GrowthDatabase {
     } finally {
       client.release();
     }
+  }
+  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
+  async workerActor<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    if (!actor.adultEligible || !this.actorFence)
+      throw new DomainError(
+        "growth_authority_required",
+        "Current account authority is required.",
+        503,
+      );
+    return this.transaction(this.worker, async (worker) => {
+      await this.actorFence!(worker, actor.accountId, creatorId);
+      return this.transaction(this.runtime, async (runtime) => {
+        await runtime.query("SELECT set_config('app.account_id',$1,true)", [
+          actor.accountId,
+        ]);
+        await assertCurrentSession(runtime, actor.accountId);
+        return work(worker);
+      });
+    });
   }
 }

@@ -204,9 +204,12 @@ public struct GrowthFanFeature: View {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
             Text("Discover").qText("display-lg")
-            TextField("Search creators, crafts or questions", text: $query).textFieldStyle(
-              .roundedBorder
-            ).submitLabel(.search).onSubmit { Task { await load() } }
+            TextField("Search creators", text: $query,
+              prompt: Text("Search creators, crafts or questions").foregroundStyle(qColor("ink-muted", scheme)))
+              .foregroundStyle(qColor("ink", scheme)).padding(12)
+              .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
+              .overlay { RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1) }
+              .submitLabel(.search).onSubmit { Task { await load() } }
             Segmented(items: ["For you", "Crafts", "Music", "Food"], active: category) { value in
               category = value
               Task { await load() }
@@ -243,6 +246,7 @@ public struct GrowthFanFeature: View {
               Spacer()
               Button("Notifications", variant: .quiet) { route = "/notifications" }
             }
+            GrowthPostValuePrompt(client: client) { route = $0 }
             ForEach(home.entries) { entry in
               SwiftUI.Button {
                 route = entry.destination
@@ -554,5 +558,50 @@ public struct GrowthFanFeature: View {
         "notifications/" + item.id + "/read", method: "PUT", body: Data("{}".utf8))
       route = item.destination
     } catch { if !Task.isCancelled { record(error) } }
+  }
+}
+
+/// Optional post-value prompt; the owner-recorded outcome and durable server cap determine visibility.
+private struct GrowthPostValuePrompt: View {
+  private struct Claim: Decodable { let eligible: Bool; let target: String? }
+  private struct Choice: Decodable { let saved: Bool }
+  let client: GrowthClient?
+  let open: (String) -> Void
+  @State private var claimID = UUID().uuidString.lowercased()
+  @State private var target: String?
+  @State private var busy = false
+  @State private var error = ""
+  var body: some View {
+    Group {
+      if let target {
+        VStack(alignment: .leading, spacing: 16) {
+          Text("Keep useful updates within reach").qText("title")
+          Text("Choose push or email in settings when you want updates. You can change them any time.").qText("body")
+          Button("Choose updates", variant: .secondary) { choose("accepted", target: target) }.disabled(busy)
+          Button("Later", variant: .quiet) { choose("later", target: target) }.disabled(busy)
+          Button("Don't ask again", variant: .quiet) { choose("declined", target: target) }.disabled(busy)
+          if !error.isEmpty { Text(error).qText("caption").accessibilityAddTraits(.updatesFrequently) }
+        }
+      }
+    }.task {
+      guard let client else { return }
+      let body = try? JSONSerialization.data(withJSONObject: ["platform":"ios", "id":claimID])
+      if let claim: Claim = try? await client.request("engagement/return/claim", method:"POST", body:body), !Task.isCancelled {
+        target = claim.eligible ? claim.target : nil
+      }
+    }
+  }
+  private func choose(_ choice: String, target destination: String) {
+    busy = true; error = ""
+    Task {
+      defer { busy = false }
+      do {
+        guard let client else { throw URLError(.notConnectedToInternet) }
+        let body = try JSONSerialization.data(withJSONObject:["id":claimID, "choice":choice])
+        let _: Choice = try await client.request("engagement/return/choice", method:"PUT", body:body)
+        target = nil
+        if choice == "accepted" { open(destination) }
+      } catch { self.error = "This choice could not be saved. Try again." }
+    }
   }
 }

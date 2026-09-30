@@ -1,6 +1,9 @@
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
-import { ExperimentForm } from "../../../features/growth/feedback";
+import {
+  ExperimentForm,
+  ExperimentChoices,
+} from "../../../features/growth/feedback";
 export const dynamic = "force-dynamic";
 export default async function Measurement() {
   try {
@@ -77,6 +80,7 @@ export default async function Measurement() {
             criteria. No uplift is claimed.
           </p>
           <ExperimentForm />
+          <ExperimentChoices />
         </section>
       </GrowthShell>
     );

@@ -107,22 +107,32 @@ export function createGrowthRouter(
       await engagement.claimPrompt(
         await actorFor(req),
         req.params.kind,
-        z.strictObject({ platform: z.enum(["ios", "android"]) }).parse(req.body)
-          .platform,
+        z
+          .strictObject({
+            platform: z.enum(["web", "ios", "android"]),
+            id: z.uuid(),
+          })
+          .parse(req.body).platform,
+        z.uuid().parse(req.body.id),
       ),
     ),
   );
-  router.put("/engagement/:kind/choice", async (req, res) =>
+  router.put("/engagement/:kind/choice", async (req, res) => {
+    const value = z
+      .strictObject({
+        id: z.uuid(),
+        choice: z.enum(["later", "declined", "accepted"]),
+      })
+      .parse(req.body);
     res.json(
       await engagement.choosePrompt(
         await actorFor(req),
         req.params.kind,
-        z
-          .strictObject({ choice: z.enum(["later", "declined", "accepted"]) })
-          .parse(req.body).choice,
+        value.choice,
+        value.id,
       ),
-    ),
-  );
+    );
+  });
   router.get("/engagement", async (req, res) =>
     res.json({ choices: await engagement.choices(await actorFor(req)) }),
   );

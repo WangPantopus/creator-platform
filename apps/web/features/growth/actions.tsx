@@ -16,7 +16,7 @@ export async function mutate(path: string, body: unknown, method = "POST") {
   const response = await fetch(`/api/growth/${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    ...(method !== "DELETE" ? { body: JSON.stringify(body) } : {}),
   });
   const result = await response.json();
   if (!response.ok)
