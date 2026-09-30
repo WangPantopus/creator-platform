@@ -27,7 +27,10 @@ struct GrowthNotificationSettings: View {
                 Toggle(QelvoraCopy.text("growthHideSensitivePreviews"), isOn: field(\.hideSensitive))
                 TextField(QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from).textFieldStyle(.roundedBorder)
                 TextField(QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until).textFieldStyle(.roundedBorder)
-                TextField(QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone)).textFieldStyle(.roundedBorder).textInputAutocapitalization(.never)
+                TextField(QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone)).textFieldStyle(.roundedBorder)
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
+                    #endif
                 Text(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours")).qText("caption")
                 ForEach(creators) {creator in Toggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), isOn: allowed(\.mutedCreators, creator.id))}
                 ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())).qText("label");Toggle(QelvoraCopy.text("growthPush"), isOn: allowed(\.disabledPushTypes, kind));Toggle(QelvoraCopy.text("growthEmail"), isOn: allowed(\.disabledEmailTypes, kind))}}

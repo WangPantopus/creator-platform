@@ -56,7 +56,7 @@ export function IdentityWelcome({
           />
         )}
         {error && (
-          <div role="alert">
+          <div>
             <Notice tone="error" title={copy.pantopusUnavailableTitle}>
               {error === "invalid_return"
                 ? "This arrival link is unavailable. You can continue to Home."

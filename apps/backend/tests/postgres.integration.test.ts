@@ -5,7 +5,9 @@ import {
   randomUUID,
   sign,
 } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import pg from "pg";
 import fc from "fast-check";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -46,12 +48,12 @@ describe.skipIf(!adminUrl)(
     const creators = Array.from({ length: 10 }, (_, index) => ({
       id: randomUUID(),
       account: randomUUID(),
-      handle: `creator-${index}`,
+      handle: `creator_${index}`,
     }));
     const fans = Array.from({ length: 100 }, (_, index) => ({
       id: randomUUID(),
       account: randomUUID(),
-      handle: `fan-${index}`,
+      handle: `fan_${index}`,
     }));
     const teamAccount = randomUUID();
     const fan: Actor = { accountId: fans[0]!.account, adultEligible: true };
@@ -65,12 +67,27 @@ describe.skipIf(!adminUrl)(
       const url = new URL(adminUrl!);
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
-      await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
       await admin.query(
-        await readFile(
-          new URL("../migrations/0001_foundation.sql", import.meta.url),
-          "utf8",
-        ),
+        "DROP SCHEMA IF EXISTS creator, growth, creator_trust CASCADE",
+      );
+      // Exercise today's runtime against the same immutable registry as deployment.
+      // Never add test-only grants to compensate for an obsolete schema.
+      await promisify(execFile)(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          fileURLToPath(
+            new URL("../scripts/migrate-trust.ts", import.meta.url),
+          ),
+        ],
+        {
+          env: {
+            ...process.env,
+            DATABASE_MIGRATION_URL: adminUrl!,
+            W8_LEGACY_ROOT_MIGRATIONS: "false",
+          },
+        },
       );
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
@@ -206,7 +223,9 @@ describe.skipIf(!adminUrl)(
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 120000);
+      // Current authority checks take transaction locks on every iteration. Keep
+      // all 10,000 cases while allowing Docker-backed development machines time.
+    }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",

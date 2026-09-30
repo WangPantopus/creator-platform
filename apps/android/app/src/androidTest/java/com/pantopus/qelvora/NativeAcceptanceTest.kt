@@ -21,6 +21,9 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
+        // This component check supplies its arrival explicitly; the app host
+        // correctly has no creator context without a configured owner source.
+        compose.activity.runOnUiThread { compose.activity.setContent { QelvoraTheme(false) { Welcome() } } }
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()
     }

@@ -121,5 +121,5 @@ const server = http.createServer((req, res) => {
   res.end(data);
 });
 server.listen(Number(process.env.REFERENCE_PORT ?? 3101), "127.0.0.1", () =>
-  console.log("Design reference server on 3101"),
+  console.log(`Design reference server on ${server.address().port}`),
 );
