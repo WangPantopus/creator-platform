@@ -475,6 +475,8 @@ export class MembershipBilling {
           currency: string;
           creator_id: string;
           membership_id: string;
+          period_start: string;
+          period_end: string;
         };
         const refundInput = {
           invoiceReference: receipt.invoice_ref,
@@ -525,10 +527,30 @@ export class MembershipBilling {
                 }),
               ],
             );
-            await client.query(
-              "UPDATE creator.commerce_membership SET state='refunded',version=version+1 WHERE id=$1",
-              [receipt.membership_id],
-            );
+            // A delayed original refund can finish after renewal. Retain that
+            // receipt/ledger result without revoking a different paid period.
+            const refunded = (
+              await client.query<{ grant_id: string | null }>(
+                "UPDATE creator.commerce_membership SET state='refunded',version=version+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND period_start=$4 AND period_end=$5 RETURNING grant_id",
+                [
+                  receipt.membership_id,
+                  receipt.creator_id,
+                  effect.fan_id,
+                  receipt.period_start,
+                  receipt.period_end,
+                ],
+              )
+            ).rows[0];
+            if (refunded?.grant_id) {
+              await client.query(
+                "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+                [receipt.creator_id, effect.fan_id],
+              );
+              await client.query(
+                "UPDATE creator.access_grant SET state='revoked' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership'",
+                [refunded.grant_id, receipt.creator_id, effect.fan_id],
+              );
+            }
           }
           await client.query(
             "UPDATE creator.commerce_billing_effect SET state=$2,provider_ref=$3,lease_until=NULL,next_at=now()+interval '30 seconds' WHERE id=$1",

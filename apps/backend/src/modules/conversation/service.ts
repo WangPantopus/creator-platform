@@ -329,6 +329,12 @@ export class ConversationService {
         "UPDATE creator.thread SET revision=revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
         [scope.threadId, scope.creatorId, scope.fanId],
       );
+      await this.access.recordAllowanceOutput(
+        scope,
+        client,
+        generation.id,
+        generation.grant_id,
+      );
       return appendFrame(client, scope, {
         epoch: generation.epoch,
         kind: "sentence",
@@ -382,7 +388,7 @@ export class ConversationService {
         scope,
         client,
         generation.grant_id,
-        !failed || generation.last_sequence > 0,
+        generation.last_sequence > 0,
         generation.id,
       );
       return appendFrame(client, scope, {

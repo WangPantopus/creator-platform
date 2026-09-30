@@ -32,8 +32,14 @@ const configured =
           const commerce = readCommerceEnvironment(pool);
           return commerce
             ? [
-                createCommerceRuntime({ pool, database, access, ...commerce })
-                  .feature,
+                (
+                  await createCommerceRuntime({
+                    pool,
+                    database,
+                    access,
+                    ...commerce,
+                  })
+                ).feature,
               ]
             : [];
         },

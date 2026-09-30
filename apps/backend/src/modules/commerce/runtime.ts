@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import type { AccessService } from "../access/scope.js";
 import type { PaymentProvider } from "../payments/provider.js";
 import { CommerceService, type CommercePolicy } from "./service.js";
 import {
@@ -9,7 +9,10 @@ import {
 } from "./billing.js";
 import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
 import { commerceFeature } from "./registration.js";
-import { CommerceGenerationAllowance } from "./generation-allowance.js";
+import {
+  CommerceGenerationAllowance,
+  type GenerationCostPolicy,
+} from "./generation-allowance.js";
 import { CommerceTiers, type TierCatalog } from "./tiers.js";
 import {
   MoneyReconciliation,
@@ -23,12 +26,12 @@ import {
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
-export function createCommerceRuntime(input: {
+export async function createCommerceRuntime(input: {
   pool: Pool;
   database: Database;
   access: AccessService;
   policy: Omit<CommercePolicy, "costAllowanceIntegrated">;
-  generationCostUnits?: (scope: ThreadScope) => number;
+  generationCostPolicy?: GenerationCostPolicy;
   groupAudience?: GroupAudienceReader;
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
@@ -41,9 +44,12 @@ export function createCommerceRuntime(input: {
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
 }) {
-  if (input.generationCostUnits)
+  if (input.generationCostPolicy)
     input.access.configureGenerationAllowance(
-      new CommerceGenerationAllowance(input.generationCostUnits),
+      await CommerceGenerationAllowance.prepare(
+        input.pool,
+        input.generationCostPolicy,
+      ),
     );
   const service = new CommerceService(
     input.pool,
@@ -51,7 +57,7 @@ export function createCommerceRuntime(input: {
     input.access,
     {
       ...input.policy,
-      costAllowanceIntegrated: Boolean(input.generationCostUnits),
+      costAllowanceIntegrated: Boolean(input.generationCostPolicy),
     },
     input.payments,
     input.assertActorAllowed,
