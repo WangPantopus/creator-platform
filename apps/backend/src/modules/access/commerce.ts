@@ -44,7 +44,7 @@ export async function capabilitySnapshot(
     creatorId: scope.creatorId,
     fanId: scope.fanId,
     version: contentHash({
-      pass,
+      pass: pass ?? null,
       grants: grants.rows.map((g) => ({
         id: g.id,
         source: g.source,
