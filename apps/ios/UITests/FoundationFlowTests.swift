@@ -13,7 +13,8 @@ final class FoundationFlowTests: XCTestCase {
             XCTAssertTrue(button.isHittable)
             capture(app, name: "Welcome-\(theme)")
             button.tap()
-            XCTAssertTrue(app.staticTexts["pantopus-unavailable"].waitForExistence(timeout: 5))
+            // The shipping shell presents provider errors in its shared Notice.
+            XCTAssertTrue(app.staticTexts["Pantopus sign-in is not connected in this local build."].waitForExistence(timeout: 5))
             XCTAssertTrue(button.isEnabled)
             XCTAssertFalse(app.textFields["handle"].exists)
             capture(app, name: "SignIn-unconfigured-\(theme)")

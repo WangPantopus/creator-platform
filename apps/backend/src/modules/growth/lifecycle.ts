@@ -185,7 +185,9 @@ export function growthPrivacyHook(
           return result;
         },
       );
-      // W8 writes authorized data to its encrypted export artifact; never logs/telemetry.
+      // Return only to W8's authorized privacy worker; never logs/telemetry.
+      // The current worker persists bounded JSONB, so this is not encrypted
+      // export-storage or streaming acceptance.
       return {
         receipt: { domain: "growth", exported: true },
         data,
