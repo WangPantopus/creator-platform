@@ -128,6 +128,13 @@ struct CommerceFeature: View {
             Notice(title: "AI time", children: "Your time summary is unavailable until conversation activity is connected.")
         }
     }
+    @ViewBuilder private func monthlyAmountField(_ currency: String) -> some View {
+        #if os(iOS)
+        TextField("Amount in \(currency)", text: $amount).keyboardType(.decimalPad)
+        #else
+        TextField("Amount in \(currency)", text: $amount)
+        #endif
+    }
     private func access(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Access").qText("display-md")

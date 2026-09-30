@@ -46,6 +46,8 @@ export class ExtendedCommerce {
     readonly pass?: import("./pass.js").PassCommerce,
     readonly billing?: import("./billing.js").MembershipBilling,
     readonly tiers?: import("./tiers.js").CommerceTiers,
+    readonly money?: import("./reconciliation.js").MoneyReconciliation,
+    readonly settlement?: import("./accounting.js").CreatorSettlement,
   ) {}
   async storePurchase(
     actor: Actor,

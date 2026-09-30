@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash } from "node:crypto";
 import Stripe from "stripe";
 import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
@@ -46,6 +46,11 @@ export interface PaymentProvider {
   fetchRefund(
     id: string,
   ): Promise<{ id: string; state: "pending" | "succeeded" | "failed" }>;
+  recoverRefund?(input: {
+    intentId: string;
+    amount: number;
+    key: string;
+  }): Promise<Awaited<ReturnType<PaymentProvider["fetchRefund"]>> | undefined>;
 }
 
 export class StripePaymentProvider implements PaymentProvider {
@@ -175,14 +180,59 @@ export class StripePaymentProvider implements PaymentProvider {
     };
   }
   async refund(id: string, amount: number, key: string) {
-    return stripeOperation(async () =>
-      this.refundResult(
+    return stripeOperation(async () => {
+      const prior = await this.recoverRefund({ intentId: id, amount, key });
+      if (prior) return prior;
+      return this.refundResult(
         await this.client.refunds.create(
-          { payment_intent: id, amount },
+          {
+            payment_intent: id,
+            amount,
+            metadata: {
+              commerce_key: createHash("sha256").update(key).digest("hex"),
+            },
+          },
           { ...this.options, idempotencyKey: key },
         ),
-      ),
-    );
+      );
+    });
+  }
+  async recoverRefund(input: {
+    intentId: string;
+    amount: number;
+    key: string;
+  }) {
+    return stripeOperation(async () => {
+      const key = createHash("sha256").update(input.key).digest("hex");
+      const matches: Stripe.Refund[] = [];
+      let count = 0;
+      for await (const refund of this.client.refunds.list(
+        { payment_intent: input.intentId, limit: 100 },
+        this.options,
+      )) {
+        invariant(
+          ++count <= 1000,
+          "provider_statement_too_large",
+          "The refund history requires reviewed bulk reconciliation.",
+        );
+        if (refund.metadata?.commerce_key === key) matches.push(refund);
+      }
+      invariant(
+        matches.length <= 1,
+        "refund_reference_conflict",
+        "More than one refund matches this immutable effect.",
+      );
+      if (!matches[0]) return undefined;
+      invariant(
+        matches[0].amount === input.amount &&
+          (typeof matches[0].payment_intent === "string"
+            ? matches[0].payment_intent
+            : matches[0].payment_intent?.id) === input.intentId,
+        "refund_reference_conflict",
+        "The original refund has different immutable terms.",
+      );
+      return this.refundResult(matches[0]);
+    });
   }
   async fetchRefund(id: string) {
     return stripeOperation(async () =>
@@ -211,35 +261,42 @@ export function verifyStripeWebhook(
       "The notification signature is unavailable.",
       400,
     );
-  const expected = createHmac("sha256", secret)
-    .update(`${timestamp}.`)
-    .update(raw)
-    .digest();
-  if (
-    !fields.some(([name, value]) => {
-      const candidate = Buffer.from(value ?? "", "hex");
-      return (
-        name === "v1" &&
-        candidate.length === expected.length &&
-        timingSafeEqual(expected, candidate)
-      );
-    })
-  )
+  let event: Stripe.Event;
+  try {
+    event = Stripe.webhooks.constructEvent(
+      raw,
+      signature,
+      secret,
+      300,
+      undefined,
+      nowSeconds * 1000,
+    );
+  } catch {
     throw new DomainError(
       "webhook_signature_invalid",
       "The notification signature is unavailable.",
       400,
     );
-  const event = JSON.parse(raw.toString("utf8")) as {
-    id?: string;
-    type?: string;
-    data?: { object?: { id?: string } };
-  };
-  if (!event.id || !event.type || !event.data?.object?.id)
+  }
+  const objectReference = z
+    .object({ id: z.string().min(1).max(200).optional() })
+    .safeParse(event.data?.object);
+  const ref = objectReference.success
+    ? (objectReference.data.id ??
+      (event.type === "balance.available"
+        ? (event.account ?? "platform")
+        : undefined))
+    : undefined;
+  if (event.livemode !== false || !event.id || !event.type || !ref)
     throw new DomainError(
       "webhook_invalid",
       "This notification is incomplete.",
       400,
     );
-  return { id: event.id, type: event.type, reference: event.data.object.id };
+  return {
+    id: event.id,
+    type: event.type,
+    reference: ref,
+    account: event.account ?? "platform",
+  };
 }
