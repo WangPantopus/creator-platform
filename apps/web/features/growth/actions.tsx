@@ -1,4 +1,6 @@
 "use client";
+import { growthLabel } from "./copy";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
@@ -22,7 +24,7 @@ export async function mutate(path: string, body: unknown, method = "POST") {
   if (!response.ok)
     throw new GrowthActionError(
       response.status,
-      result.error?.message ?? "This action could not be completed.",
+      result.error?.message ?? growthCopy.growthThisActionCouldNotBeCompleted,
     );
   return result;
 }
@@ -68,14 +70,20 @@ export function Follow({
           } catch (e) {
             setSignIn(e instanceof GrowthActionError && e.status === 401);
             setError(
-              e instanceof Error ? e.message : "Could not update follow.",
+              e instanceof Error
+                ? e.message
+                : growthCopy.growthCouldNotUpdateFollow,
             );
           } finally {
             setBusy(false);
           }
         }}
       >
-        {busy ? "Saving…" : value ? "Following · unfollow" : "Follow"}
+        {busy
+          ? growthCopy.growthSaving
+          : value
+            ? growthCopy.growthFollowingUnfollow
+            : growthCopy.growthFollow}
       </button>
       {error ? (
         <p className="growth-error" role="alert">
@@ -86,7 +94,7 @@ export function Follow({
         <a
           href={`/auth/continue?returnTo=${encodeURIComponent(`/creators/${handle}`)}`}
         >
-          Continue with Pantopus
+          {growthCopy.continueWithPantopus}
         </a>
       ) : null}
     </div>
@@ -137,7 +145,15 @@ export function Inbox({
       ) : null}
       {Object.entries(groups).map(([group, entries]) => (
         <section key={group}>
-          <p className="growth-meta">{group}</p>
+          <p className="growth-meta">
+            {
+              {
+                TODAY: growthCopy.growthToday,
+                "THIS WEEK": growthCopy.growthThisWeek,
+                EARLIER: growthCopy.growthEarlier,
+              }[group]
+            }
+          </p>
           {entries.map((item) => (
             <a
               className={`qv qv-notif growth-notification ${item.readAt ? "" : "is-unread"}`}
@@ -150,14 +166,25 @@ export function Inbox({
                   window.location.assign(item.destination);
                 } catch (e) {
                   setError(
-                    e instanceof Error ? e.message : "Could not open update.",
+                    e instanceof Error
+                      ? e.message
+                      : growthCopy.growthCouldNotOpenUpdate,
                   );
                 }
               }}
             >
               <span
                 aria-hidden="true"
-                className={`qv-notif__icon qv-notif__icon--${item.authorKind === "ai" ? "ai" : item.authorKind === "team" ? "team" : item.authorKind.startsWith("human") || item.authorKind === "approved_draft" ? "maya" : "system"}`}
+                className={`qv-notif__icon qv-notif__icon--${
+                  item.authorKind === "ai"
+                    ? "ai"
+                    : item.authorKind === "team"
+                      ? "team"
+                      : item.authorKind.startsWith("human") ||
+                          item.authorKind === "approved_draft"
+                        ? "maya"
+                        : "system"
+                }`}
               >
                 {item.authorKind === "ai" ? (
                   glyphs.ring(16)
@@ -216,14 +243,14 @@ export function ShareLink({ url, title }: { url: string; title: string }) {
             if (navigator.share) await navigator.share({ title, url });
             else {
               await navigator.clipboard.writeText(url);
-              setMessage("Link copied.");
+              setMessage(growthCopy.growthLinkCopied);
             }
           } catch {
-            setMessage("The link was not shared.");
+            setMessage(growthCopy.growthTheLinkWasNotShared);
           }
         }}
       >
-        Share link
+        {growthCopy.growthShareLink}
       </button>
       <span role="status">{message}</span>
     </div>
@@ -243,13 +270,16 @@ export function Connection() {
   }, []);
   return offline ? (
     <div className="growth-offline" role="status">
-      Offline · this page may be out of date. Actions need a connection.
+      {growthCopy.growthOfflineThisPageMayBeOutOfDateActionsNeed}
     </div>
   ) : null;
 }
 export function Producer({ cluster }: { cluster: Cluster }) {
   const [outline, setOutline] = useState(
-      cluster.outline ?? `Answer ${cluster.topicKey.replaceAll("-", " ")}`,
+      cluster.outline ??
+        growthFormat("growthAnswer", {
+          value1: cluster.topicKey.replaceAll("-", " "),
+        }),
     ),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
@@ -266,21 +296,25 @@ export function Producer({ cluster }: { cluster: Cluster }) {
       setMessage(`Saved: ${decision}.`);
       router.refresh();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Could not save.");
+      setMessage(
+        e instanceof Error ? e.message : growthCopy.growthCouldNotSave,
+      );
     } finally {
       setBusy(false);
     }
   }
   return (
     <aside className="growth-card growth-card-body">
-      <span className="growth-meta">RECOMMENDED NEXT</span>
-      <h3>Answer once for everyone</h3>
+      <span className="growth-meta">{growthCopy.growthRecommendedNext}</span>
+      <h3>{growthCopy.growthAnswerOnceForEveryone}</h3>
       <p className="growth-help">
-        Evidence: {cluster.fanCount} distinct fans · seven-day window beginning{" "}
-        {window}. Effort and audience must be chosen by you.
+        {growthFormat(
+          "growthEvidenceDistinctFansSevenDayWindowBeginningEffortAndAudience",
+          { value1: cluster.fanCount, value2: window },
+        )}
       </p>
       <label>
-        Outline
+        {growthCopy.growthOutline}
         <textarea
           value={outline}
           onChange={(e) => setOutline(e.target.value)}
@@ -294,7 +328,9 @@ export function Producer({ cluster }: { cluster: Cluster }) {
             className="qv-btn qv-btn--secondary"
             disabled={busy}
             onClick={() => void decide(decision)}
-          >{`${decision[0]?.toUpperCase()}${decision.slice(1)}`}</button>
+          >
+            {growthLabel(decision)}
+          </button>
         ))}
       </div>
       <button
@@ -311,14 +347,16 @@ export function Producer({ cluster }: { cluster: Cluster }) {
             router.push(result.destination);
           } catch (e) {
             setMessage(
-              e instanceof Error ? e.message : "Publishing is unavailable.",
+              e instanceof Error
+                ? e.message
+                : growthCopy.growthPublishingIsUnavailable,
             );
           } finally {
             setBusy(false);
           }
         }}
       >
-        Open group-answer composer
+        {growthCopy.growthOpenGroupAnswerComposer}
       </button>
       <p role="status" className="growth-help">
         {message}

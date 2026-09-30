@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
@@ -23,7 +24,7 @@ export class GrowthDatabase {
     if (roles[0] === roles[1])
       throw new DomainError(
         "separate_growth_roles_required",
-        "Growth requires distinct runtime and worker roles.",
+        copy.growthErrorSeparateGrowthRolesRequired,
         503,
       );
     const runtimeAccess = (
@@ -43,7 +44,7 @@ export class GrowthDatabase {
     )
       throw new DomainError(
         "unsafe_growth_membership",
-        "Actor persistence must not inherit ETL authority.",
+        copy.growthErrorUnsafeGrowthMembership,
         503,
       );
     for (const pool of [this.runtime, this.worker]) {
@@ -54,7 +55,7 @@ export class GrowthDatabase {
       if (!row || row.rolsuper || row.rolbypassrls || row.owns)
         throw new DomainError(
           "unsafe_growth_role",
-          "Growth requires a non-owner database role.",
+          copy.growthErrorUnsafeGrowthRole,
           503,
         );
     }
@@ -67,7 +68,7 @@ export class GrowthDatabase {
     if (!schema.rows[0]?.current)
       throw new DomainError(
         "growth_migration_required",
-        "Growth's registered migrations must be applied before startup.",
+        copy.growthErrorGrowthMigrationRequired,
         503,
       );
   }
@@ -79,7 +80,7 @@ export class GrowthDatabase {
     if (!actor.adultEligible)
       throw new DomainError(
         "adult_eligibility_required",
-        "Adult eligibility is required.",
+        copy.growthErrorAdultEligibilityRequired,
       );
     const perform = () =>
       this.transaction(this.runtime, async (client) => {
@@ -128,7 +129,7 @@ export class GrowthDatabase {
     if (!actor.adultEligible || !this.actorFence)
       throw new DomainError(
         "growth_authority_required",
-        "Current account authority is required.",
+        copy.growthErrorGrowthAuthorityRequired,
         503,
       );
     return this.transaction(this.worker, async (worker) => {

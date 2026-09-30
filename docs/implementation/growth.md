@@ -1,5 +1,7 @@
 # W7 growth module
 
+**Catalog/CI follow-up, 2026-09-30:** W7 fixed web/native copy, all19 kind labels and optional email controls consume387 additions to the shared generated English catalog (zero changed existing entries). Current full builds and saved/reloaded preferences pass. [Exact copy/CI evidence](../../artifacts/workstreams/W7/resume/20260930/copy-and-ci.md) records legacy backend suite failures, Android input/setup failures and queued runner checks; O20 extraction facts below are historical. Shared catalog/locale review and full owner/provider/design acceptance remain open. No new test code or paid AI call.
+
 Primary personally implements and verifies this workstream. No new tests or test scripts are added. The new module is a real PostgreSQL-backed implementation; its development runner has explicitly synthetic upstream projections and does not satisfy integrated creator/AI/content/signature/provider acceptance.
 
 ## Production registration

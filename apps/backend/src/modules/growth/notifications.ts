@@ -1,3 +1,4 @@
+import { copy, formatCopy } from "@qelvora/copy";
 import { createHash, randomUUID } from "node:crypto";
 import { DomainError } from "../../core/errors.js";
 import { canonical } from "../../core/canonical.js";
@@ -63,22 +64,22 @@ export function present(type: NotificationKind, state: NotificationState) {
   if (!authorKinds[type].includes(state.authorKind))
     throw new DomainError(
       "notification_author_mismatch",
-      "The event author does not match its notification type.",
+      copy.growthErrorNotificationAuthorMismatch,
       409,
     );
   if (type === "content_match" && !state.contentMatchConsent)
     throw new DomainError(
       "content_match_consent_required",
-      "Content matching requires consent.",
+      copy.growthErrorContentMatchConsentRequired,
     );
   const name = state.creatorName;
-  let sender = "System";
+  let sender: string = copy.growthSystem;
   switch (type) {
     case "ai_reply":
-      sender = `${name}'s AI`;
+      sender = formatCopy("aiAuthor", { name });
       break;
     case "approved_draft":
-      sender = `Approved by ${name}`;
+      sender = formatCopy("approvedNotification", { name });
       break;
     case "personal_reply":
     case "creator_offer":
@@ -87,20 +88,28 @@ export function present(type: NotificationKind, state: NotificationState) {
     case "announcement":
       sender =
         state.authorKind === "team"
-          ? `${name}'s team${state.teamName ? ` · ${state.teamName}` : ""}`
-          : `${name} · to ${state.audienceLabel ?? "followers"}`;
+          ? state.teamName
+            ? formatCopy("teamAuthor", { name, member: state.teamName })
+            : formatCopy("growthCreatorTeam", { name })
+          : formatCopy("noteAudience", {
+              name,
+              audience: state.audienceLabel ?? copy.growthFollowers,
+            });
       break;
     case "note":
       if (!state.audienceLabel)
         throw new DomainError(
           "audience_label_required",
-          "A Note must name its audience.",
+          copy.growthErrorAudienceLabelRequired,
           409,
         );
-      sender = `${name} · to ${state.audienceLabel}`;
+      sender = formatCopy("noteAudience", {
+        name,
+        audience: state.audienceLabel,
+      });
       break;
     case "reaction":
-      sender = `${name} reacted to your reply`;
+      sender = formatCopy("reaction", { name });
       break;
   }
   // These types never accept a preview carrying financial or private source material.
@@ -118,7 +127,7 @@ export function present(type: NotificationKind, state: NotificationState) {
   if (restrictedPreviewTypes.includes(type))
     preview = preview.replace(
       /(?:[$€£¥]\s*[\d,.]+|\b[\d,.]+\s*(?:USD|EUR|GBP)\b)/giu,
-      "[amount hidden]",
+      copy.growthAmountHidden,
     );
   if (
     type === "call_reminder" &&
@@ -126,9 +135,7 @@ export function present(type: NotificationKind, state: NotificationState) {
   )
     return null;
   // Provider queues cannot prevent a late lock-screen delivery; keep call copy safe.
-  if (type === "call_reminder")
-    preview =
-      "Your scheduled call has an update. Open the app to check its current status.";
+  if (type === "call_reminder") preview = copy.growthCallUpdate;
   return {
     sender,
     preview,
@@ -217,7 +224,7 @@ export class Notifications {
     if (states.some(({ state }) => state.retryable))
       throw new DomainError(
         "notification_owner_unconfigured",
-        "The current notification owner must be connected before consuming this event.",
+        copy.growthErrorNotificationOwnerUnconfigured,
         503,
       );
     return this.db.transaction(this.db.worker, async (client) => {
@@ -235,7 +242,7 @@ export class Notifications {
         if (prior.rows[0].envelope_hash !== envelopeHash)
           throw new DomainError(
             "event_id_conflict",
-            "This event ID already has different content.",
+            copy.growthErrorEventIdConflict,
             409,
           );
         return { duplicate: true, created: 0 };
@@ -368,7 +375,7 @@ export class Notifications {
             idempotencyKey: job.id,
             sender: view.sender,
             preview: prefs.hideSensitive
-              ? "You have an update. Open the app to view it."
+              ? copy.growthHiddenUpdate
               : view.preview,
             destination: view.destination,
             authorship: view.authorship,
@@ -485,7 +492,7 @@ export class Notifications {
           entries.push({
             ...view,
             preview: prefs.hideSensitive
-              ? "You have an update. Open the app to view it."
+              ? copy.growthHiddenUpdate
               : view.preview,
           });
         }
@@ -505,7 +512,7 @@ export class Notifications {
             accountId: jobs[0]!.account_id,
             notificationId: eligible[0]!.notification_id,
             idempotencyKey: jobs[0]!.digest_id,
-            sender: "Your updates",
+            sender: copy.growthYourUpdates,
             preview: first.preview,
             destination: "/notifications",
             authorship: "system",
@@ -579,7 +586,7 @@ export class Notifications {
       if (state.retryable)
         throw new DomainError(
           "notification_owner_unconfigured",
-          "The update owner is temporarily unavailable.",
+          copy.growthErrorNotificationOwnerUnconfigured2,
           503,
         );
       if (!state.authorized) continue;
@@ -590,7 +597,7 @@ export class Notifications {
         sender: current?.sender ?? row.sender,
         authorKind: state.available ? state.authorKind : "system",
         creatorName: state.creatorName,
-        preview: current?.preview ?? "This update is no longer available.",
+        preview: current?.preview ?? copy.growthUpdateUnavailable,
         destination: current?.destination ?? "/notifications",
         readAt: row.read_at,
         createdAt: row.created_at,

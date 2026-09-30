@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import type { Metadata } from "next";
 import { brand } from "@qelvora/brand";
 import { Button, Seal } from "@qelvora/ui-web";
@@ -41,7 +42,7 @@ export async function generateMetadata({
     };
   } catch {
     return {
-      title: "Creator unavailable",
+      title: growthCopy.growthCreatorUnavailable,
       robots: { index: false, follow: false },
     };
   }
@@ -77,7 +78,7 @@ export default async function CreatorHome({
           className="growth-actions"
           style={{ justifyContent: "space-between", alignItems: "center" }}
         >
-          <a href="/discover" aria-label="Back to Discover">
+          <a href="/discover" aria-label={growthCopy.growthBackToDiscover}>
             ←
           </a>
           <span className="growth-wordmark">{brand.name}</span>
@@ -85,7 +86,7 @@ export default async function CreatorHome({
             url={
               origin ? `${origin}/creators/${handle}` : `/creators/${handle}`
             }
-            title={`${c.name}'s page`}
+            title={growthFormat("growthSPage", { value1: c.name })}
           />
         </nav>
         <div className="growth-portrait">{c.photoCaption}</div>
@@ -99,7 +100,9 @@ export default async function CreatorHome({
         <div className="growth-mark growth-rule">
           <Seal size={22} initial={c.name[0]} />
           <span className="growth-help">
-            Official AI · {c.mode.replaceAll("_", " ")}
+            {growthFormat("growthOfficialAi", {
+              value1: c.mode.replaceAll("_", " "),
+            })}
           </span>
         </div>
       </div>
@@ -111,17 +114,26 @@ export default async function CreatorHome({
             block
             href={`/creators/${handle}/chat`}
           >
-            Message {c.name}'s AI
+            {growthFormat("growthMessageSAi", { value1: c.name })}
           </Button>
         ) : (
-          <p>{c.name}'s AI is paused · public profile remains readable.</p>
+          <p>
+            {growthFormat("growthSAiIsPausedPublicProfileRemainsReadable", {
+              value1: c.name,
+            })}
+          </p>
         )}
         <p className="growth-help" style={{ textAlign: "center" }}>
-          Official means {c.name} authorized this AI. It does not mean {c.name}{" "}
-          read your message.
+          {growthFormat(
+            "growthOfficialMeansAuthorizedThisAiItDoesNotMeanRead",
+            { value1: c.name, value2: c.name },
+          )}
         </p>
         <Follow creatorId={c.id} handle={c.handle} />
-        <nav className="growth-seg" aria-label="Creator sections">
+        <nav
+          className="growth-seg"
+          aria-label={growthCopy.growthCreatorSections}
+        >
           {["Chat", "Posts", "Requests", "Access"].map((s) => (
             <a
               key={s}
@@ -136,37 +148,42 @@ export default async function CreatorHome({
       <section className="growth-stack">
         {section === "Posts" ? (
           <>
-            <h2>From {c.name}</h2>
+            <h2>{growthFormat("growthFrom2", { value1: c.name })}</h2>
             {data.posts.length ? (
               data.posts.map((p) => (
                 <article className="growth-card growth-card-body" key={p.id}>
                   <span className="growth-note-label">{p.authorLabel}</span>
                   <h3>{p.title}</h3>
                   <p className="growth-voice">{p.body}</p>
-                  <a href={`/creators/${handle}/posts/${p.id}`}>Open post</a>
+                  <a href={`/creators/${handle}/posts/${p.id}`}>
+                    {growthCopy.growthOpenPost}
+                  </a>
                 </article>
               ))
             ) : (
-              <NoData title="No public posts yet">
-                Come back when {c.name} publishes something.
+              <NoData title={growthCopy.growthNoPublicPostsYet}>
+                {growthFormat("growthComeBackWhenPublishesSomething", {
+                  value1: c.name,
+                })}
               </NoData>
             )}
           </>
         ) : section === "Chat" ? (
           <>
-            <h2>What {c.name}'s AI knows</h2>
+            <h2>{growthFormat("growthWhatSAiKnows", { value1: c.name })}</h2>
             <p>{c.sourceSummary}</p>
             <p>{c.topics.join(", ")}</p>
             <p className="growth-help">{c.presence}</p>
           </>
         ) : section === "Requests" ? (
           <>
-            <h2>{c.name}'s time, by request</h2>
+            <h2>{growthFormat("growthSTimeByRequest", { value1: c.name })}</h2>
             <p>{c.capacity}</p>
             <p className="growth-help">{c.reliability}</p>
             <p className="growth-help">
-              Requests and prices come from the creator's current offer. No
-              offer is connected here yet.
+              {
+                growthCopy.growthRequestsAndPricesComeFromTheCreatorSCurrentOffer
+              }
             </p>
           </>
         ) : (
@@ -180,7 +197,7 @@ export default async function CreatorHome({
       </section>
       <ApprovedVariant handle={c.handle} />
       <details className="growth-stack">
-        <summary>Optional link choices</summary>
+        <summary>{growthCopy.growthOptionalLinkChoices}</summary>
         <VoluntaryInvite handle={c.handle} />
         <EntryConsent handle={c.handle} source="creator_link" />
       </details>

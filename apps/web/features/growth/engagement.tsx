@@ -1,4 +1,5 @@
 "use client";
+import { copy as growthCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { mutate, GrowthActionError } from "./actions";
 import { growthText as text } from "./copy";
@@ -172,7 +173,7 @@ export function VoluntaryInvite({
         <a
           href={`/auth/continue?returnTo=${encodeURIComponent(contextId ? `/creators/${handle}/posts/${contextId}` : `/creators/${handle}`)}`}
         >
-          Continue with Pantopus
+          {growthCopy.continueWithPantopus}
         </a>
       )}
     </div>
@@ -239,7 +240,7 @@ export function EntryConsent({
       <p role="status">{message}</p>
       {signIn && (
         <a href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
-          Continue with Pantopus
+          {growthCopy.continueWithPantopus}
         </a>
       )}
     </div>

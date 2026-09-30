@@ -1,3 +1,4 @@
+import { copy as growthCopy } from "@qelvora/copy";
 import "server-only";
 import { cookies } from "next/headers";
 import { sessionCookie } from "../../lib/session";
@@ -21,7 +22,7 @@ export async function growthRequest<T>(
     throw new GrowthUnavailable(
       503,
       "growth_unconfigured",
-      "This feature is not connected yet.",
+      growthCopy.growthThisFeatureIsNotConnectedYet,
     );
   const headers = new Headers(init?.headers);
   headers.set("Content-Type", "application/json");
@@ -50,7 +51,7 @@ export async function growthRequest<T>(
     throw new GrowthUnavailable(
       503,
       "growth_offline",
-      "The service is unavailable. Please try again.",
+      growthCopy.growthTheServiceIsUnavailablePleaseTryAgain,
     );
   }
   const body = await response.json();
@@ -58,7 +59,7 @@ export async function growthRequest<T>(
     throw new GrowthUnavailable(
       response.status,
       body.error?.code ?? "growth_unavailable",
-      body.error?.message ?? "This feature is unavailable.",
+      body.error?.message ?? growthCopy.growthThisFeatureIsUnavailable,
     );
   return body as T;
 }

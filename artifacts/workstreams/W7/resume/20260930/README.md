@@ -58,3 +58,7 @@ Additional source/build manifests and captures follow as continuation proceeds. 
 ### CI follow-up
 
 At checkpoint `6b34a20`, Trust release compilation passed. Foundation web/backend generation, typecheck and lint passed, then stopped at inherited formatting in `apps/backend/src/config.ts` and `apps/web/app/globals.css`. The follow-up applies Prettier only; full local `pnpm format:check` passes. Android runtime compiled/installed and reported `Failed to inject touch input` in the existing arrival-context test; it is a failed runtime check, not accepted device proof. Native/visual jobs were still queued when inspected. Further checks will be recorded against their actual commit.
+
+### Catalog completion follow-up
+
+[Copy and CI continuation](copy-and-ci.md) records387 shared English additions, generated Swift/Kotlin resources, final builds, actual saved/reloaded browser settings and native Night captures. Existing catalog values are unchanged. Full locale/copy review and integrated acceptance remain gates. The current source is recorded separately in `source-copy.sha256`; earlier manifests/logs are historical.

@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { createHmac } from "node:crypto";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
@@ -43,7 +44,7 @@ export class GrowthExperiments {
     if (!this.enabled)
       throw new DomainError(
         "experiments_disabled",
-        "Experiments await review.",
+        copy.growthErrorExperimentsDisabled,
         503,
       );
     const value = ExperimentApproval.parse(input);
@@ -59,7 +60,7 @@ export class GrowthExperiments {
         if (!draft)
           throw new DomainError(
             "experiment_unavailable",
-            "This proposal is unavailable.",
+            copy.growthErrorExperimentUnavailable,
             404,
           );
         if (
@@ -69,7 +70,7 @@ export class GrowthExperiments {
         )
           throw new DomainError(
             "experiment_review_changed",
-            "Review the current hypothesis and criteria.",
+            copy.growthErrorExperimentReviewChanged,
             409,
           );
         if (
@@ -80,7 +81,7 @@ export class GrowthExperiments {
         if (draft.state !== "draft")
           throw new DomainError(
             "experiment_review_changed",
-            "A stopped or changed experiment needs a new proposal.",
+            copy.growthErrorExperimentReviewChanged2,
             409,
           );
         await client.query(
@@ -135,7 +136,7 @@ export class GrowthExperiments {
     if (!result.rowCount)
       throw new DomainError(
         "experiment_unavailable",
-        "This proposal is unavailable.",
+        copy.growthErrorExperimentUnavailable,
         404,
       );
     return { stopped: true };

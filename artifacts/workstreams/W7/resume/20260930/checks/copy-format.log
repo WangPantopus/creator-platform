@@ -1,0 +1,3 @@
+$ prettier --check apps packages config scripts tests '*.json' '*.yaml' '.github/**/*.yml'
+Checking formatting...
+All matched files use Prettier code style!

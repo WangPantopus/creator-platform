@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
 import {
@@ -22,14 +23,14 @@ export default async function Measurement() {
     return (
       <GrowthShell studio>
         <section className="growth-stack">
-          <h1>Arrival and return</h1>
+          <h1>{growthCopy.growthArrivalAndReturn}</h1>
           <p>{data.denominator}</p>
           <table>
-            <caption>Last 30 days · five-actor minimum</caption>
+            <caption>{growthCopy.growthLast30DaysFiveActorMinimum}</caption>
             <thead>
               <tr>
                 <th scope="col">Event</th>
-                <th scope="col">Distinct actors</th>
+                <th scope="col">{growthCopy.growthDistinctActors}</th>
                 <th scope="col">Events</th>
               </tr>
             </thead>
@@ -44,11 +45,11 @@ export default async function Measurement() {
             </tbody>
           </table>
           <table>
-            <caption>Closed arrival cohorts</caption>
+            <caption>{growthCopy.growthClosedArrivalCohorts}</caption>
             <thead>
               <tr>
-                <th scope="col">Return day</th>
-                <th scope="col">Eligible actors</th>
+                <th scope="col">{growthCopy.growthReturnDay}</th>
+                <th scope="col">{growthCopy.growthEligibleActors}</th>
                 <th scope="col">Returned</th>
                 <th scope="col">Rate</th>
               </tr>
@@ -61,7 +62,7 @@ export default async function Measurement() {
                   <td>{row.returned ?? "Suppressed"}</td>
                   <td>
                     {row.rate === null
-                      ? "Unavailable"
+                      ? growthCopy.growthUnavailable
                       : `${(row.rate * 100).toFixed(1)}%`}
                   </td>
                 </tr>
@@ -69,15 +70,18 @@ export default async function Measurement() {
             </tbody>
           </table>
           <p>
-            Median time to first useful answer:{" "}
+            {growthCopy.growthMedianTimeToFirstUsefulAnswer}{" "}
             {data.timeToUsefulAnswerSeconds === null
               ? "unavailable"
-              : `${data.timeToUsefulAnswerSeconds.toFixed(1)} seconds`}
+              : growthFormat("growthSeconds", {
+                  value1: data.timeToUsefulAnswerSeconds.toFixed(1),
+                })}
           </p>
           <p className="growth-help">{data.retention}</p>
           <p className="growth-help">
-            Pilot targets and growth experiments require agreed success and stop
-            criteria. No uplift is claimed.
+            {
+              growthCopy.growthPilotTargetsAndGrowthExperimentsRequireAgreedSuccessAndStop
+            }
           </p>
           <ExperimentForm />
           <ExperimentChoices />

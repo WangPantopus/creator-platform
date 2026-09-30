@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
 import { growthRequest } from "../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
@@ -32,13 +33,15 @@ export default async function Home() {
         <span className="growth-wordmark">{brand.name}</span>
         <a
           href="/notifications"
-          aria-label={`${data.unread} unread notifications`}
+          aria-label={growthFormat("growthUnreadNotifications", {
+            value1: data.unread,
+          })}
         >
-          Notifications · {data.unread}
+          {growthFormat("growthNotifications2", { value1: data.unread })}
         </a>
       </header>
       <div className="growth-stack">
-        <h1>Your people</h1>
+        <h1>{growthCopy.growthYourPeople}</h1>
         <BrowserPostValuePrompt />
         {data.entries.length ? (
           data.entries.map((e) => (
@@ -54,21 +57,21 @@ export default async function Home() {
             </a>
           ))
         ) : data.posts.length === 0 ? (
-          <NoData title="Pick a creator to start">
-            <a href="/discover">Discover creators</a>
+          <NoData title={growthCopy.growthPickACreatorToStart}>
+            <a href="/discover">{growthCopy.growthDiscoverCreators}</a>
           </NoData>
         ) : null}
         {data.posts.length ? (
           <>
-            <h2>New from people you follow</h2>
-            <p className="growth-help">Latest first.</p>
+            <h2>{growthCopy.growthNewFromPeopleYouFollow}</h2>
+            <p className="growth-help">{growthCopy.growthLatestFirst}</p>
             {data.posts.map(({ post, creator }) => (
               <article className="growth-card growth-card-body" key={post.id}>
                 <span className="growth-note-label">{post.authorLabel}</span>
                 <h3>{post.title}</h3>
                 <p className="growth-voice">{post.body}</p>
                 <a href={`/creators/${creator.handle}/posts/${post.id}`}>
-                  Open post
+                  {growthCopy.growthOpenPost}
                 </a>
               </article>
             ))}

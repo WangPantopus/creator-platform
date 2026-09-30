@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { cookies } from "next/headers";
 import { Button, Notice } from "@qelvora/ui-web";
 import { growthRequest } from "../../../../features/growth/server";
@@ -22,14 +23,16 @@ export default async function ContextualChat({
     let post: Post | undefined;
     if (context) {
       if (!/^[a-f0-9-]{36}$/u.test(context))
-        throw new Error("This post is unavailable.");
+        throw new Error(growthCopy.growthThisPostIsUnavailable);
       post = (
         await growthRequest<{ post: Post }>(
           `public/creators/${handle}/posts/${context}`,
         )
       ).post;
       if (!post.aiContextEligible)
-        throw new Error("This post cannot be used as conversation context.");
+        throw new Error(
+          growthCopy.growthThisPostCannotBeUsedAsConversationContext,
+        );
     }
     const jar = await cookies();
     const signedIn = Boolean(jar.get("qelvora_session"));
@@ -40,21 +43,23 @@ export default async function ContextualChat({
           <a href={`/creators/${handle}`}>{creator.name}</a>
         </header>
         <div className="growth-stack">
-          <h1>{creator.name}'s AI</h1>
+          <h1>{growthFormat("growthSAi", { value1: creator.name })}</h1>
           <p>
-            You're talking to {creator.name}'s AI · {creator.name} steps in on
-            request.
+            {growthFormat("growthYouReTalkingToSAiStepsInOnRequest", {
+              value1: creator.name,
+              value2: creator.name,
+            })}
           </p>
           {post ? (
             <>
               <div className="qv qv-context">
                 <div className="qv-context__text">
-                  <span className="qv-meta">From a post</span>
+                  <span className="qv-meta">{growthCopy.growthFromAPost}</span>
                   <span>{post.title}</span>
                 </div>
                 <a
                   className="qv-icon-btn"
-                  aria-label="Remove this post from your first message"
+                  aria-label={growthCopy.removeContext}
                   href={`/creators/${handle}/chat`}
                 >
                   ×
@@ -65,13 +70,13 @@ export default async function ContextualChat({
           <Notice
             title={
               creator.state !== "published"
-                ? "AI paused"
-                : "Conversation service not connected"
+                ? growthCopy.growthAiPaused
+                : growthCopy.growthConversationServiceNotConnected
             }
           >
             {creator.state !== "published"
-              ? `${creator.name}'s AI is paused.`
-              : "Your entry context is valid. Messaging and processor consent require the conversation service."}
+              ? growthFormat("growthSAiIsPaused", { value1: creator.name })
+              : growthCopy.growthYourEntryContextIsValidMessagingAndProcessorConsentRequire}
           </Notice>
           {!signedIn ? (
             <Button
@@ -79,12 +84,13 @@ export default async function ContextualChat({
               variant="ai"
               block
             >
-              Continue with Pantopus
+              {growthCopy.continueWithPantopus}
             </Button>
           ) : null}
           <p className="growth-help">
-            A first conversation lasts about 24 hours once available. No message
-            has been sent.
+            {
+              growthCopy.growthAFirstConversationLastsAbout24HoursOnceAvailableNo
+            }
           </p>
         </div>
       </GrowthShell>

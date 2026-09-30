@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
@@ -56,7 +57,7 @@ export class GrowthRelay {
           if (prior.producer !== owner || prior.creator_id !== creatorId)
             throw new DomainError(
               "producer_event_conflict",
-              "This producer event ID belongs to another scope.",
+              copy.growthErrorProducerEventConflict,
               409,
             );
           return { queued: false };
@@ -65,7 +66,7 @@ export class GrowthRelay {
         if (event.id !== id || event.creatorId !== creatorId)
           throw new DomainError(
             "producer_event_conflict",
-            "The owner event does not match its retry key.",
+            copy.growthErrorProducerEventConflict2,
             409,
           );
         const retained = await this.service.erasure.event(client, event);
@@ -107,7 +108,7 @@ export class GrowthRelay {
         if (prior?.envelope_hash !== hash)
           throw new DomainError(
             "producer_event_conflict",
-            "This producer event ID has different contents.",
+            copy.growthErrorProducerEventConflict3,
             409,
           );
         return { queued: true };

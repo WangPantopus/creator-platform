@@ -19,28 +19,28 @@ struct GrowthNotificationSettings: View {
     @State private var busy = false
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Notification settings").qText("display-md")
-            Text("Your in-app record cannot be turned off. Push and email are optional.").qText("body")
+            Text(QelvoraCopy.text("growthNotificationSettings")).qText("display-md")
+            Text(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd")).qText("body")
             if value != nil {
-                Toggle("Push notifications", isOn: field(\.push))
-                Toggle("Email digest", isOn: field(\.email))
-                Toggle("Hide sensitive previews", isOn: field(\.hideSensitive))
-                TextField("Quiet hours from · HH:mm", text: $from).textFieldStyle(.roundedBorder)
-                TextField("Quiet hours until · HH:mm", text: $until).textFieldStyle(.roundedBorder)
-                TextField("Time zone", text: field(\.timeZone)).textFieldStyle(.roundedBorder).textInputAutocapitalization(.never)
-                Text("Leave both times empty for no quiet hours.").qText("caption")
-                ForEach(creators) {creator in Toggle(creator.name + " · push and email", isOn: allowed(\.mutedCreators, creator.id))}
-                ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(kind.replacingOccurrences(of: "_", with: " ")).qText("label");Toggle("Push", isOn: allowed(\.disabledPushTypes, kind));Toggle("Email", isOn: allowed(\.disabledEmailTypes, kind))}}
-                Button(busy ? "Saving…" : "Save preferences", variant: .secondary, block: true, disabled: busy) {Task {await save()}}
+                Toggle(QelvoraCopy.text("growthPushNotifications"), isOn: field(\.push))
+                Toggle(QelvoraCopy.text("growthEmailDigest"), isOn: field(\.email))
+                Toggle(QelvoraCopy.text("growthHideSensitivePreviews"), isOn: field(\.hideSensitive))
+                TextField(QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from).textFieldStyle(.roundedBorder)
+                TextField(QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until).textFieldStyle(.roundedBorder)
+                TextField(QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone)).textFieldStyle(.roundedBorder).textInputAutocapitalization(.never)
+                Text(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours")).qText("caption")
+                ForEach(creators) {creator in Toggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), isOn: allowed(\.mutedCreators, creator.id))}
+                ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())).qText("label");Toggle(QelvoraCopy.text("growthPush"), isOn: allowed(\.disabledPushTypes, kind));Toggle(QelvoraCopy.text("growthEmail"), isOn: allowed(\.disabledEmailTypes, kind))}}
+                Button(busy ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
             } else if message.isEmpty {ProgressView()}
             if !message.isEmpty {Text(message).qText("body").accessibilityAddTraits(.updatesFrequently)}
-            Button("Reload settings", variant: .quiet, disabled: busy) {Task {await load()}}
+            Button(QelvoraCopy.text("growthReloadSettings"), variant: .quiet, disabled: busy) {Task {await load()}}
         }.task {await load()}
     }
     private func field<T>(_ key: WritableKeyPath<GrowthPreferences, T>) -> Binding<T> {Binding(get: {value![keyPath: key]}, set: {value![keyPath: key] = $0})}
     private func allowed(_ key: WritableKeyPath<GrowthPreferences, [String]>, _ id: String) -> Binding<Bool> {Binding(get: {!value![keyPath: key].contains(id)}, set: {enabled in value![keyPath: key].removeAll {$0 == id};if !enabled {value![keyPath: key].append(id)}})}
     private func time(_ minute: Int?) -> String {guard let minute else {return ""};return String(format: "%02d:%02d", minute / 60, minute % 60)}
     private func minute(_ text: String) throws -> Int? {if text.isEmpty {return nil};let parts = text.split(separator: ":");guard parts.count == 2, let hour = Int(parts[0]), let minute = Int(parts[1]), (0...23).contains(hour), (0...59).contains(minute) else {throw URLError(.cannotParseResponse)};return hour * 60 + minute}
-    private func load() async {guard let client else {message = "The growth service is not configured.";return};busy = true;defer {busy = false};do {value = try await client.request("preferences");let directory: PreferenceCreators = try await client.request("preferences/creators");creators = directory.creators;from = time(value?.quietStart);until = time(value?.quietEnd);message = ""} catch {message = "Settings need a current signed-in account and network connection."}}
-    private func save() async {guard let client, var current = value else {return};busy = true;defer {busy = false};do {current.quietStart = try minute(from);current.quietEnd = try minute(until);guard (current.quietStart == nil) == (current.quietEnd == nil) else {throw URLError(.cannotParseResponse)};let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current));value = updated;message = "Preferences saved. Your in-app record remains available."} catch {message = "Preferences were not saved. Check both quiet-hour times and reconnect."}}
+    private func load() async {guard let client else {message = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured");return};busy = true;defer {busy = false};do {value = try await client.request("preferences");let directory: PreferenceCreators = try await client.request("preferences/creators");creators = directory.creators;from = time(value?.quietStart);until = time(value?.quietEnd);message = ""} catch {message = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")}}
+    private func save() async {guard let client, var current = value else {return};busy = true;defer {busy = false};do {current.quietStart = try minute(from);current.quietEnd = try minute(until);guard (current.quietStart == nil) == (current.quietEnd == nil) else {throw URLError(.cannotParseResponse)};let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current));value = updated;message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")} catch {message = QelvoraCopy.text("growthPreferencesWereNotSavedCheckBothQuietHourTimesAnd")}}
 }

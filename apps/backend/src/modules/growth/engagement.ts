@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
@@ -85,7 +86,7 @@ export class Engagement {
         if (previous.last_claim_platform !== device)
           throw new DomainError(
             "prompt_claim_conflict",
-            "This choice request changed platforms.",
+            copy.growthErrorPromptClaimConflict,
             409,
           );
         return previous.choice === "eligible" &&
@@ -127,7 +128,7 @@ export class Engagement {
       if (!result.rowCount)
         throw new DomainError(
           "prompt_unavailable",
-          "This choice is unavailable.",
+          copy.growthErrorPromptUnavailable,
           404,
         );
       return { saved: true };
@@ -154,7 +155,7 @@ export class Engagement {
     if (!creator || creator.state !== "published")
       throw new DomainError(
         "entry_unavailable",
-        "This entry is unavailable.",
+        copy.growthErrorEntryUnavailable,
         404,
       );
     if (
@@ -163,7 +164,7 @@ export class Engagement {
     )
       throw new DomainError(
         "entry_context_required",
-        "Choose a valid entry source.",
+        copy.growthErrorEntryContextRequired,
         400,
       );
     if (
@@ -172,7 +173,7 @@ export class Engagement {
     )
       throw new DomainError(
         "entry_unavailable",
-        "This post is unavailable.",
+        copy.growthThisPostIsUnavailable,
         404,
       );
     if (
@@ -181,7 +182,7 @@ export class Engagement {
     )
       throw new DomainError(
         "entry_unavailable",
-        "This invitation is unavailable.",
+        copy.growthErrorEntryUnavailable2,
         404,
       );
     if (entry.source === "share") {
@@ -189,7 +190,7 @@ export class Engagement {
       if (share?.state !== "valid" || share.source.creatorId !== creator.id)
         throw new DomainError(
           "entry_unavailable",
-          "This shared reply is unavailable.",
+          copy.growthErrorEntryUnavailable3,
           404,
         );
     }
@@ -224,7 +225,7 @@ export class Engagement {
         )
           throw new DomainError(
             "entry_id_conflict",
-            "This entry ID has different contents.",
+            copy.growthErrorEntryIdConflict,
             409,
           );
       }
@@ -248,7 +249,7 @@ export class Engagement {
     )
       throw new DomainError(
         "entry_unavailable",
-        "This creator or post is unavailable.",
+        copy.growthErrorEntryUnavailable4,
         404,
       );
     return this.service.db.actor(actor, creator.id, async (client) => {
@@ -263,11 +264,7 @@ export class Engagement {
         )
       ).rows[0]?.count;
       if (count >= 20)
-        throw new DomainError(
-          "invite_limit",
-          "Review your active invitation links first.",
-          429,
-        );
+        throw new DomainError("invite_limit", copy.growthErrorInviteLimit, 429);
       return (
         await client.query(
           "INSERT INTO growth.invite(creator_id,created_by,context_id,expires_at,campaign) VALUES($1,$2,$3,now()+interval '30 days','voluntary_invite') RETURNING id,expires_at",
@@ -287,7 +284,7 @@ export class Engagement {
       if (!prior)
         throw new DomainError(
           "invite_unavailable",
-          "This invitation is unavailable.",
+          copy.growthErrorEntryUnavailable2,
           404,
         );
       await client.query("SELECT set_config('app.creator_id',$1,true)", [
@@ -300,7 +297,7 @@ export class Engagement {
       if (!result.rowCount)
         throw new DomainError(
           "invite_unavailable",
-          "This invitation is unavailable.",
+          copy.growthErrorEntryUnavailable2,
           404,
         );
       return { revoked: true };
