@@ -12,18 +12,18 @@ Add W6's scoped media pipeline and web/Swift/Kotlin call workflows. Upload retri
 
 - Resumable quarantined media, bounded processing/provenance/privacy contracts, exact-media signing, browser/native recording and secure playback.
 - Versioned availability and signed time offers; W4 scheduling/settlement composition; authoritative interval clocks, separate consent, summary jobs and provider reconciliation.
-- Recovery fixes for completed uploads, exact chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms and stale client transports.
+- Recovery fixes for completed uploads, exact chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms, recording-occurrence preservation during revocation and stale client transports.
 - Source-mapped status, ownership requests, continuation instructions and current verification evidence.
 
-The prerequisite commit `1a94db3` preserves existing shared app foundations and peer work; it is not W6-authored completion. `2485828` contains the original W6 implementation, `a96ecbb` incorporates main's newer W5 handoff, and `fa6af82` contains the current W6 fixes/evidence. Review those scopes separately.
+The prerequisite commit `1a94db3` preserves existing shared app foundations and peer work; it is not W6-authored completion. `2485828` contains the original W6 implementation, `a96ecbb` incorporates main's newer W5 handoff, and `fa6af82`/`796d4e8` contain the current W6 recovery/consent/history and early-end fixes/evidence. Review those scopes separately.
 
 ## Validation
 
 Current backend/web TypeScript and production builds, targeted W6 ESLint/format and generated consistency (12 resources, 31 operations) pass. Current Swift QelvoraUI builds for the iOS Simulator. The actual browser recorder was operated at 390×844 through permission-request cancellation and retry; the AI-audio unavailable gate was inspected. No new test code, provider fixtures or paid AI requests were used.
 
-Current Android compilation and native app install/interaction are unverified: the local JDK/Android SDK/XcodeGen and native UI control are unavailable. Historical native launch evidence is dated separately. Browser microphone input remains unavailable for real recording.
+Current Android sources compiled and packaged in GitHub's runtime job; three existing foundation checks passed, with arrival-context removal failing. Local Android compilation and personally operated current native app journeys remain unverified: the local JDK/Android SDK/XcodeGen and native UI control are unavailable. Historical native launch evidence is dated separately. Browser microphone input remains unavailable for real recording.
 
-Foundation CI exposed formatting, Swift macOS modifier and Android SDK setup failures outside W6. Trust release compilation passed. The precise run results and prepared, isolated-build-checked repair are recorded in the [CI triage](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/ci-triage.md).
+All five foundation CI jobs failed on `796d4e8`: shared formatting, Swift macOS modifiers, Android SDK setup, and separate web/Android arrival/design failures. Trust release compilation passed. The nine-file shared proposal passes isolated macOS/iOS Simulator library builds and awaits its edit lease; it does not repair the separate arrival/design failures. Precise results and the unapplied proposal are recorded in the [CI triage](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/resume/2026-09-30/ci-triage.md).
 
 ## Integration gates — draft
 
