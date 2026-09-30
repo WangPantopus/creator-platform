@@ -503,7 +503,10 @@ export class ContentService {
   async save(actor: Actor, creatorId: string, raw: unknown) {
     const input = SaveContent.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
-      await this.role(client, actor, creatorId, ["drafter", "publisher"]);
+      const role = await this.role(client, actor, creatorId, [
+        "drafter",
+        "publisher",
+      ]);
       return this.command(
         client,
         actor,
@@ -527,6 +530,17 @@ export class ContentService {
             "This draft changed. Refresh before saving; your text is kept.",
           );
           const document = input.document;
+          invariant(
+            !document.aiUseIntent || role.creator,
+            "creator_source_intent_required",
+            "The creator must explicitly confirm AI reuse for this revision. Team edits can remove that intent.",
+          );
+          invariant(
+            !document.aiUseIntent ||
+              (this.dependencies.effect && this.dependencies.revokeSource),
+            "source_integration_unavailable",
+            "AI reuse requires both the source candidate and current revocation adapters.",
+          );
           if (document.scheduledAt)
             invariant(
               new Date(document.scheduledAt).getTime() > Date.now(),
@@ -624,6 +638,18 @@ export class ContentService {
     row: Index,
     document: ContentBody,
   ) {
+    if (document.showAudienceCount) {
+      const count = await this.dependencies.audienceCount?.(
+        client,
+        row.creator_id,
+        document.audience,
+      );
+      invariant(
+        count != null && Number.isSafeInteger(count) && count >= 0,
+        "audience_count_unavailable",
+        "Current audience size is unavailable. Turn off its display before publishing.",
+      );
+    }
     if (document.kind === "live" || document.kind === "replay")
       invariant(
         document.live &&
@@ -1244,6 +1270,7 @@ export class ContentService {
   }
   async preference(actor: Actor, creatorId: string) {
     return this.transaction(actor, creatorId, async (client) => ({
+      accountId: actor.accountId,
       muted:
         (
           await client.query(

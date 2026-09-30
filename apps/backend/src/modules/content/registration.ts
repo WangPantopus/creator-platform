@@ -1,3 +1,4 @@
+import { contentActorGuard } from "./actor-guard.js";
 import { Router, type Request } from "express";
 import { z } from "zod";
 import type { FeatureRegistration } from "../../app.js";
@@ -74,6 +75,7 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           creatorId: z.uuid().parse(req.params.creatorId),
           id: z.uuid().parse(req.params.id),
         });
+      router.use(contentActorGuard(actorFor));
       router.get("/:creatorId", async (req, res) =>
         res.json(
           await service.list(

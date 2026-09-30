@@ -44,6 +44,7 @@ type Creator = {
   owned: boolean;
   roles: string[];
   memberHandle: string | null;
+  viewerAccountId: string;
 };
 type Page<T> = { items: T[]; nextCursor: string | null };
 type QueueItem = {
@@ -315,7 +316,10 @@ export function Studio({
       </main>
     );
   return (
-    <div className="qv w5-studio">
+    <div
+      key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
+      className="qv w5-studio"
+    >
       <aside className="w5-sidebar">
         {navigationTree(
           Sidebar({
@@ -610,6 +614,7 @@ function Notes({ creator }: { creator: Creator }) {
                   signedActId,
                   idempotencyKey: key(),
                 },
+                creator.viewerAccountId,
               );
               setReaction(null);
               await load();
@@ -687,6 +692,7 @@ function Compose({
       items: (NonNullable<ContentBody["live"]> & { replayReady: boolean })[];
     } | null>(null),
     [catalog, setCatalog] = useState<{
+      audienceCountsAvailable: boolean;
       tiers: { id: string; name: string }[];
       groups: { id: string; name: string }[];
     } | null>(null),
@@ -700,7 +706,7 @@ function Compose({
     action = useAction(),
     draftId = useRef<string | null>(null),
     operation = useRef<{ body: string; key: string } | null>(null);
-  const pendingStorage = `w5.pendingPublication:${creator.id}`;
+  const pendingStorage = `w5.pendingPublication:${creator.viewerAccountId}:${creator.id}`;
   const clearPending = () => {
     sessionStorage.removeItem(pendingStorage);
     setPendingPublication(null);
@@ -813,6 +819,7 @@ function Compose({
       "content",
       `${creator.id}/drafts`,
       { ...body, idempotencyKey: operation.current.key },
+      creator.viewerAccountId,
     );
     setSaved(result);
     operation.current = null;
@@ -1019,13 +1026,15 @@ function Compose({
         <input
           type="checkbox"
           checked={document.aiUseIntent}
+          disabled={!creator.owned && !document.aiUseIntent}
           onChange={(e) => edit({ aiUseIntent: e.target.checked })}
         />
         <span>
           <strong>Let my AI use this</strong>
           <span className="qv-help">
-            Adds a source candidate for this same audience. Approve it
-            separately in My AI.
+            {creator.owned
+              ? "Adds a source candidate for this same audience. Approve it separately in My AI."
+              : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
           </span>
         </span>
       </label>
@@ -1034,9 +1043,15 @@ function Compose({
         <input
           type="checkbox"
           checked={document.showAudienceCount}
+          disabled={
+            !catalog?.audienceCountsAvailable && !document.showAudienceCount
+          }
           onChange={(e) => edit({ showAudienceCount: e.target.checked })}
         />
       </label>
+      {!catalog?.audienceCountsAvailable && (
+        <p className="qv-help">Current audience size is unavailable.</p>
+      )}
       {!post && (
         <label className="w5-toggle">
           Use the fan's name token
@@ -1113,6 +1128,7 @@ function Compose({
                     "content",
                     `${creator.id}/${result.id}/team-publish`,
                     { version: result.version, idempotencyKey: key() },
+                    creator.viewerAccountId,
                   );
                   onDone();
                 }
@@ -1178,6 +1194,7 @@ function Compose({
                       "content",
                       `${creator.id}/${id}/publish`,
                       command,
+                      creator.viewerAccountId,
                     );
                     clearPending();
                     onDone();
@@ -1219,6 +1236,7 @@ function Compose({
                     signedActId: command.signedActId,
                     idempotencyKey: command.idempotencyKey,
                   },
+                  creator.viewerAccountId,
                 );
                 clearPending();
                 onDone();
@@ -1381,20 +1399,26 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
       "studio",
       `${creator.id}/threads/${detail.packet.fan_id}/draft`,
       { text, expectedVersion: draftVersion, idempotencyKey: key() },
+      creator.viewerAccountId,
     );
     setDraftVersion(saved.version);
     edited.current = false;
   };
   const decide = async (name: string, signedActId?: string) => {
     if (!detail) return;
-    await studioRequest("studio", `${creator.id}/packets/${id}/decide`, {
-      action: name,
-      version: detail.packet.version,
-      idempotencyKey: key(),
-      ...(signedActId ? { signedActId } : {}),
-      ...(text ? { text } : {}),
-      ...(proposedMode ? { proposedModeId: proposedMode } : {}),
-    });
+    await studioRequest(
+      "studio",
+      `${creator.id}/packets/${id}/decide`,
+      {
+        action: name,
+        version: detail.packet.version,
+        idempotencyKey: key(),
+        ...(signedActId ? { signedActId } : {}),
+        ...(text ? { text } : {}),
+        ...(proposedMode ? { proposedModeId: proposedMode } : {}),
+      },
+      creator.viewerAccountId,
+    );
     setCommand(null);
     setDecision(null);
     await load();
@@ -1670,6 +1694,7 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                                   version: detail.commitment!.version,
                                   idempotencyKey: key(),
                                 },
+                                creator.viewerAccountId,
                               );
                               await load();
                               setDeliveries(null);
@@ -1832,6 +1857,7 @@ function Library({ creator }: { creator: Creator }) {
                       "content",
                       `${creator.id}/${item.id}/${operation}`,
                       { version: item.version, idempotencyKey: key() },
+                      creator.viewerAccountId,
                     );
                     await load();
                   })
@@ -2024,10 +2050,15 @@ function Team({ creator }: { creator: Creator }) {
             disabled={action.busy || !account || !roles.length}
             onClick={() =>
               void action.run(async () => {
-                await studioRequest("studio", `${creator.id}/team/invite`, {
-                  handle: account,
-                  roles,
-                });
+                await studioRequest(
+                  "studio",
+                  `${creator.id}/team/invite`,
+                  {
+                    handle: account,
+                    roles,
+                  },
+                  creator.viewerAccountId,
+                );
                 action.setNotice(
                   "Invitation created. The invited account must accept it; no role is granted yet.",
                 );
@@ -2169,6 +2200,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                           {
                             idempotencyKey: key(),
                           },
+                          creator.viewerAccountId,
                         );
                         await load();
                       })
@@ -2204,6 +2236,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                         expectedVersion: draftVersion,
                         idempotencyKey: key(),
                       },
+                      creator.viewerAccountId,
                     );
                     setDraftVersion(saved.version);
                     setDraftDirty(false);
@@ -2244,6 +2277,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                           expectedVersion: draftVersion,
                           idempotencyKey: key(),
                         },
+                        creator.viewerAccountId,
                       );
                       setDraftVersion(saved.version);
                       setDraftDirty(false);
@@ -2287,6 +2321,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                           signedActId,
                           idempotencyKey: key(),
                         },
+                        creator.viewerAccountId,
                       );
                       setText("");
                       draftEdited.current = false;
@@ -2355,6 +2390,7 @@ function CorrectionForm({
                 unacceptableAnswer: excerpt,
                 idempotencyKey: key(),
               },
+              creator.viewerAccountId,
             );
             setSaved(result.id);
           });

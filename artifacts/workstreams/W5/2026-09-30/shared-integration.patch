@@ -12,7 +12,7 @@
 --- a/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt
 +++ b/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt
 @@ -2,6 +2,7 @@
- 
+
  import android.content.Context
  import androidx.compose.runtime.rememberCoroutineScope
 +import com.pantopus.qelvora.content.ContentFanFeature
@@ -20,7 +20,7 @@
  import com.pantopus.qelvora.media.W6FanFeatures
  import com.pantopus.qelvora.ui.GrowthFanFeature
 @@ -10,6 +11,7 @@
- 
+
  /** Authority remains in the owning API. Order gives Access to Commerce. */
  fun fanFeatures(context: Context, baseURL: String?): List<FanFeatureRegistration> = listOf(
 +    ContentFanFeature.registration(context, baseURL),

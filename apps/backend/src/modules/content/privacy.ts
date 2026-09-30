@@ -88,12 +88,19 @@ export function contentPrivacyHook(
             [scope[0], scope[1], scope[3]],
           )
         ).rows;
+        const preferences = (
+          await client.query(
+            "SELECT creator_id,muted FROM creator.content_preference WHERE account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND $3::uuid IS NULL ORDER BY creator_id LIMIT 1001",
+            [scope[0], scope[1], scope[3]],
+          )
+        ).rows;
         invariant(
           replies.length <= 1000 &&
             thanks.length <= 1000 &&
             revisions.length <= 1000 &&
             drafts.length <= 1000 &&
-            consents.length <= 1000,
+            consents.length <= 1000 &&
+            preferences.length <= 1000,
           "privacy_scope_large",
           "This job exceeds the bounded content operation. Split the scope; no truncated acknowledgement was issued.",
         );
@@ -108,7 +115,7 @@ export function contentPrivacyHook(
               revisions: revisions.length,
               complete: true,
             },
-            data: { replies, thanks, revisions, drafts, consents },
+            data: { replies, thanks, revisions, drafts, consents, preferences },
           };
         }
         const prior = (

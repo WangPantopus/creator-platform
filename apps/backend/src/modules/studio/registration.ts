@@ -1,3 +1,4 @@
+import { contentActorGuard } from "../content/actor-guard.js";
 import { Router } from "express";
 import { z } from "zod";
 import type { FeatureRegistration } from "../../app.js";
@@ -10,6 +11,7 @@ export function studioFeature(service: StudioService): FeatureRegistration {
     router: ({ actorFor }) => {
       const router = Router(),
         id = (value: unknown) => z.uuid().parse(value);
+      router.use(contentActorGuard(actorFor));
       router.get("/session", async (req, res) =>
         res.json(await service.session(await actorFor(req))),
       );

@@ -40,7 +40,16 @@ export function studioProxy(domain: "studio" | "content") {
           ...(request.method === "GET"
             ? {}
             : {
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(request.headers.get("x-qelvora-expected-account")
+                    ? {
+                        "x-qelvora-expected-account": request.headers.get(
+                          "x-qelvora-expected-account",
+                        )!,
+                      }
+                    : {}),
+                },
                 body: await request.text(),
               }),
         },
