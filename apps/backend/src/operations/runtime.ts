@@ -94,6 +94,23 @@ export async function createTrustRuntime(options: {
           }),
         };
   });
+  const privacyProbeNames = PrivacyDomains.map((domain) => `privacy_${domain}`);
+  const privacyProbes: Probe[] = PrivacyDomains.map((domain) => {
+    const name = `privacy_${domain}`;
+    const supplied = options.probes.find((probe) => probe.name === name);
+    if (options.privacyHooks.some((hook) => hook.domain === domain) && supplied)
+      return { ...supplied, required: true };
+    return {
+      name,
+      required: true,
+      run: async () => ({
+        state: "unavailable",
+        code: supplied
+          ? "domain_hook_unavailable"
+          : "owner_readiness_unconfigured",
+      }),
+    };
+  });
   const store = new TrustStore(options.apiPool);
   await store.assertRole();
   await new TrustStore(options.workerPool).assertRole(true);
@@ -164,13 +181,18 @@ export async function createTrustRuntime(options: {
         }),
       },
       ...providerProbes,
-      ...options.probes.filter((probe) => !providerNames.includes(probe.name)),
+      ...privacyProbes,
+      ...options.probes.filter(
+        (probe) =>
+          !providerNames.includes(probe.name) &&
+          !privacyProbeNames.includes(probe.name),
+      ),
     ],
     options.environment,
     options.release,
   );
-  // Registered hooks establish availability only; probes must check the actual
-  // owner/provider readiness. A registration alone never proves completion.
+  // Each required domain probe checks actual role/authority/provider/policy
+  // configuration without running an export or purge. Registration is separate.
   const worker = new TrustWorker(
     options.workerPool,
     options.privacyHooks,

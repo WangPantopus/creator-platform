@@ -48,6 +48,7 @@ async function forward(
   if (target === "dev/logout") {
     const response = NextResponse.json({ signedOut: true });
     response.cookies.delete("w8_local_session");
+    response.cookies.delete("qelvora_session");
     return response;
   }
   const configured = process.env.W8_API_URL;
@@ -84,9 +85,12 @@ async function forward(
     const value = request.nextUrl.searchParams.get(key);
     if (value) url.searchParams.set(key, value);
   }
-  const token = request.cookies.get(
-    development ? "w8_local_session" : "qelvora_session",
-  )?.value;
+  // The explicit local selector is a development-only override. Otherwise use
+  // the same server-held session as the conversation that supplied the report.
+  const token =
+    (development
+      ? request.cookies.get("w8_local_session")?.value
+      : undefined) || request.cookies.get("qelvora_session")?.value;
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   if (
     request.method === "POST" &&
@@ -141,6 +145,7 @@ async function forward(
         path: "/",
         maxAge: 3600,
       });
+      response.cookies.delete("qelvora_session");
       return response;
     }
     const response = NextResponse.json(data, {

@@ -1,5 +1,7 @@
 # W1 identity and authority integration
 
+Current September30 launch/resource and final integration facts: [W1 current handoff](../workstreams/handoffs/W1-resume-2026-09-30.md). Older leased commands below remain historical templates; use the new worktree/private env/device/ports after ownership checks.
+
 This is implementation/configuration documentation, not release sign-off. W1 personally authored the code, built and launched the clients. No new test code was added. See [current status](../workstreams/status/W1.md), [producer record](../workstreams/coordination/W1.md) and [verification rules](../workstreams/VERIFICATION.md).
 
 ## Identity boundary

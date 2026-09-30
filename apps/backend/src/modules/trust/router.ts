@@ -18,7 +18,10 @@ import {
 } from "./contracts.js";
 import type { TrustService } from "./service.js";
 import type { Readiness } from "../../operations/readiness.js";
-import type { TrustTelemetry } from "../../operations/telemetry.js";
+import {
+  failureClass,
+  type TrustTelemetry,
+} from "../../operations/telemetry.js";
 
 export type TrustRouterOptions = {
   service: TrustService;
@@ -325,23 +328,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
   router.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
       void _next;
-      const databaseCodes: Record<string, string> = {
-        "57014": "database_timeout",
-        "55P03": "database_lock_timeout",
-        "40P01": "database_deadlock",
-        "53300": "database_capacity",
-        "57P01": "database_interruption",
-        "42501": "database_authority",
-      };
-      const code =
-        error && typeof error === "object" && "code" in error
-          ? String(error.code)
-          : "";
-      res.locals.failureClass =
-        databaseCodes[code] ??
-        (error instanceof DomainError || error instanceof ZodError
-          ? null
-          : "unexpected_failure");
+      res.locals.failureClass = failureClass(error);
       const value =
         error instanceof DomainError
           ? error

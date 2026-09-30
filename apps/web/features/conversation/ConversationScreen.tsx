@@ -22,7 +22,7 @@ import type {
   ConversationMessage,
   ConversationPage,
 } from "../../../../packages/api/src/conversation/contracts";
-import { conversationRequest, ConversationError } from "./api";
+import { useConversationRequest, ConversationError } from "./api";
 import { formatCopy } from "@qelvora/copy";
 import "./conversation.css";
 
@@ -65,6 +65,7 @@ export function ConversationScreen({
   fanId: string;
   accountId: string;
 }) {
+  const request = useConversationRequest();
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -85,7 +86,7 @@ export function ConversationScreen({
   const refresh = useCallback(async () => {
     const revision = lifecycle.current;
     try {
-      const fresh = await conversationRequest<ConversationPage>(root);
+      const fresh = await request<ConversationPage>(root);
       if (!mounted.current || lifecycle.current !== revision) return;
       // A delayed HTTP response cannot put an earlier author boundary back on screen.
       if (current.current && fresh.cursor < current.current.cursor) return;
@@ -105,7 +106,7 @@ export function ConversationScreen({
       );
       const item = latestPending.current;
       if (item) {
-        const result = await conversationRequest<{ accepted: boolean }>(
+        const result = await request<{ accepted: boolean }>(
           `${root}/messages/status/${item.key}`,
         );
         if (
@@ -138,7 +139,7 @@ export function ConversationScreen({
           : "This conversation is unavailable.",
       );
     }
-  }, [root, cursorKey]);
+  }, [root, cursorKey, request]);
 
   useEffect(() => {
     mounted.current = true;
@@ -209,7 +210,7 @@ export function ConversationScreen({
         return;
       }
       try {
-        const ticket = await conversationRequest<{
+        const ticket = await request<{
           ticket: string;
           url: string;
         }>("realtime-ticket", {});
@@ -297,12 +298,12 @@ export function ConversationScreen({
       current.current = null;
       gate.current = null;
     };
-  }, [accountId, creatorId, fanId, cursorKey, refresh]);
+  }, [accountId, creatorId, fanId, cursorKey, refresh, request]);
   useEffect(() => {
     const clientId = crypto.randomUUID();
     const pulse = () => {
       if (current.current)
-        void conversationRequest(`${root}/presence`, {
+        void request(`${root}/presence`, {
           clientId,
           active: navigator.onLine && document.visibilityState === "visible",
         }).catch(() => undefined);
@@ -316,12 +317,12 @@ export function ConversationScreen({
       document.removeEventListener("visibilitychange", pulse);
       window.removeEventListener("online", pulse);
       if (navigator.onLine)
-        void conversationRequest(`${root}/presence`, {
+        void request(`${root}/presence`, {
           clientId,
           active: false,
         }).catch(() => undefined);
     };
-  }, [root, accountId, page?.threadId]);
+  }, [root, accountId, page?.threadId, request]);
 
   const send = async (retry?: Pending) => {
     const revision = lifecycle.current;
@@ -339,10 +340,11 @@ export function ConversationScreen({
     setBusy(true);
     setFailure(null);
     try {
-      await conversationRequest<AcceptedMessage>(
-        `${root}/${item.destination}`,
-        { text, idempotencyKey: item.key, clientSequence: item.clientSequence },
-      );
+      await request<AcceptedMessage>(`${root}/${item.destination}`, {
+        text,
+        idempotencyKey: item.key,
+        clientSequence: item.clientSequence,
+      });
       if (!mounted.current || lifecycle.current !== revision) return;
       setPending(null);
       if (!retry) setDraft("");
@@ -370,7 +372,7 @@ export function ConversationScreen({
     const height = document.documentElement.scrollHeight;
     setBusy(true);
     try {
-      const previous = await conversationRequest<ConversationPage>(
+      const previous = await request<ConversationPage>(
         `${root}?before=${before}`,
       );
       if (!mounted.current || lifecycle.current !== revision) return;
@@ -400,10 +402,9 @@ export function ConversationScreen({
     const revision = lifecycle.current;
     setBusy(true);
     try {
-      await conversationRequest(
-        `${root}/messages/${message.id}/dont-remember`,
-        { expectedRevision: page.revision },
-      );
+      await request(`${root}/messages/${message.id}/dont-remember`, {
+        expectedRevision: page.revision,
+      });
       if (mounted.current && lifecycle.current === revision) await refresh();
     } catch (error) {
       if (mounted.current && lifecycle.current === revision)
@@ -466,7 +467,7 @@ export function ConversationScreen({
           </div>
           <a
             className="qv-icon-btn"
-            href={`/you?creator=${creatorId}&fan=${fanId}`}
+            href={`/you?creatorId=${creatorId}&fanId=${fanId}`}
             aria-label="Conversation privacy"
           >
             ⋯
@@ -578,18 +579,21 @@ export function ConversationScreen({
               </Message>
             ) : (
               <div className="qv qv-msg">
-                <AuthorLabel
-                  kind={
-                    message.authorKind === "human_broadcast"
-                      ? "human_broadcast"
-                      : message.authorKind === "human_reaction"
-                        ? "human_reaction"
-                        : "human_creator"
-                  }
-                  name={page.creatorName}
-                  member={message.member ?? "Authorized team member"}
-                  audience="Audience details unavailable"
-                />
+                {message.authorKind === "human_call" ? (
+                  <span className="qv-author">
+                    {formatCopy("callAuthor", { name: page.creatorName })}
+                  </span>
+                ) : (
+                  <AuthorLabel
+                    kind={
+                      message.authorKind === "human_broadcast"
+                        ? "human_broadcast"
+                        : "human_reaction"
+                    }
+                    name={page.creatorName}
+                    audience="Audience details unavailable"
+                  />
+                )}
                 <p className="qv-voice" style={{ whiteSpace: "pre-wrap" }}>
                   {message.text}
                 </p>
@@ -618,13 +622,13 @@ export function ConversationScreen({
                 <div className="conversation-actions">
                   <a
                     className="qv-link-btn"
-                    href={`/support?messageId=${message.id}`}
+                    href={`/support?creatorId=${creatorId}${message.authorKind === "ai" ? `&messageId=${message.id}` : ""}`}
                   >
                     Report
                   </a>
                   <a
                     className="qv-link-btn"
-                    href={`/you?creator=${creatorId}&fan=${fanId}#memory`}
+                    href={`/you?creatorId=${creatorId}&fanId=${fanId}#memory`}
                   >
                     What it remembers
                   </a>
@@ -741,7 +745,9 @@ export function ConversationScreen({
           Ask {page.creatorName} to step in
         </Button>
         <div className="conversation-actions">
-          <a href={`/you?creator=${creatorId}&fan=${fanId}`}>Me and privacy</a>
+          <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>
+            Me and privacy
+          </a>
           <a href="/trust/crisis">Get support</a>
         </div>
       </footer>

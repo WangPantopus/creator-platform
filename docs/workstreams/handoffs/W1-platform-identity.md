@@ -1,5 +1,7 @@
 # W1 handoff — platform, identity, and app foundations
 
+September30 final continuation: start with [the current handoff](../handoffs/W1-resume-2026-09-30.md) and [current comprehensive resume prompt](../prompts/W1-resume-2026-09-30.md). They supersede the historical leases/control/producer-absence facts below while preserving the full original scope.
+
 ## Active continuation
 
 September 30: work resumed on the retained W1 branch in an isolated worktree. Read [W1-resume status and evidence](../status/W1-resume.md) first for current leases, browser repairs/observations, builds, CI gate and producer requests. The H01–H20 obligations below remain; historical control failures, released resources and absent W3/W5 producers are not current facts.

@@ -1,5 +1,7 @@
 # Resume prompt — W1 — finish platform, identity, and app foundations
 
+September30 final continuation: start with [the current handoff](../handoffs/W1-resume-2026-09-30.md) and [current comprehensive resume prompt](../prompts/W1-resume-2026-09-30.md). They supersede the historical leases/control/producer-absence facts below while preserving the full original scope.
+
 You are the next directly assigned **primary W1 implementation agent**. Continue the current workstream through **all** remaining original scope and acceptance. This is an instruction to implement, debug, integrate, launch and personally verify the product, not to plan/review the handoff or rebuild a scaffold.
 
 ## Start from the exact delivered state

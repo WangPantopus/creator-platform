@@ -3,7 +3,8 @@
   "contextParameter": "context",
   "queryParameters": {
     "context": "^/creators/",
-    "creatorId": "^(?:/commerce/|/support$)",
+    "creatorId": "^(?:/commerce/|/support$|/you$)",
+    "fanId": "^/you$",
     "packetId": "^/commerce/",
     "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$",
     "messageId": "^/support$",

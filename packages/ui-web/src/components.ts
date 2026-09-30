@@ -1963,7 +1963,10 @@ export function Button(p: ButtonProps) {
   );
 }
 export function TabBar(p: TabBarProps) {
-  const tabs: [string, (s?: number) => React.ReactElement][] = [
+  const tabs: [
+    NonNullable<TabBarProps["active"]>,
+    (s?: number) => React.ReactElement,
+  ][] = [
     ["Home", G.home],
     ["Discover", G.compass],
     ["Requests", G.inbox],
@@ -1978,7 +1981,7 @@ export function TabBar(p: TabBarProps) {
         "a",
         {
           key: t[0],
-          href: "#",
+          href: p.hrefs?.[t[0]] ?? "#",
           className: cx("qv-tab", active === t[0] && "is-active"),
           "aria-current": active === t[0] ? "page" : undefined,
         },

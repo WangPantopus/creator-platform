@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
+import { IdSchema, SessionSchema } from "@qelvora/api";
 import { platformFetch } from "../../../../lib/session";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const permitted = new RegExp(
@@ -17,7 +19,7 @@ async function proxy(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (req.method !== "GET" && req.headers.get("origin") !== req.nextUrl.origin)
+  if (req.method !== "GET" && !sameRequestOrigin(req))
     return Response.json(
       { error: { message: "Use this app to perform this action." } },
       { status: 403 },
@@ -32,14 +34,63 @@ async function proxy(
       { status: 400 },
     );
   try {
+    if (joined !== "capabilities") {
+      const expectedAccount = IdSchema.safeParse(
+        req.headers.get("X-Expected-Account-Id"),
+      );
+      if (!expectedAccount.success)
+        return Response.json(
+          {
+            error: {
+              code: "session_account_required",
+              message: "Reopen this page with your current account.",
+            },
+          },
+          { status: 400, headers: { "Cache-Control": "no-store" } },
+        );
+      // Both fetches read the same request's immutable HttpOnly cookie. The
+      // header never selects an actor or expands the upstream thread scope.
+      const current = await platformFetch("/v1/identity/session");
+      if (!current.ok)
+        return Response.json(await current.json(), {
+          status: current.status,
+          headers: { "Cache-Control": "no-store" },
+        });
+      if (
+        SessionSchema.parse(await current.json()).accountId !==
+        expectedAccount.data
+      )
+        return Response.json(
+          {
+            error: {
+              code: "session_account_changed",
+              message: "Your account changed. Reopen this page to continue.",
+            },
+          },
+          { status: 409, headers: { "Cache-Control": "no-store" } },
+        );
+    }
     const upstream = await platformFetch(
       `/v1/conversations${joined === "begin" ? "" : "/" + joined}${req.nextUrl.search}`,
       {
         method: req.method,
+        headers: {
+          "X-Correlation-Id":
+            req.headers.get("x-correlation-id") ?? crypto.randomUUID(),
+          ...(joined !== "capabilities"
+            ? {
+                "X-Expected-Account-Id": req.headers.get(
+                  "X-Expected-Account-Id",
+                )!,
+              }
+            : {}),
+          ...(req.method === "GET"
+            ? {}
+            : { "Content-Type": "application/json" }),
+        },
         ...(req.method === "GET"
           ? {}
           : {
-              headers: { "Content-Type": "application/json" },
               body: await req.text(),
             }),
       },
@@ -64,7 +115,12 @@ async function proxy(
     }
     return Response.json(data, {
       status: upstream.status,
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Cache-Control": "no-store",
+        ...(upstream.headers.get("x-correlation-id")
+          ? { "X-Correlation-Id": upstream.headers.get("x-correlation-id")! }
+          : {}),
+      },
     });
   } catch {
     return Response.json(

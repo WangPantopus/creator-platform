@@ -28,12 +28,11 @@ export default async function ThreadPage({
     );
   return (
     <IdentitySessionBoundary
-      key={session.accountId}
+      key={`${session.accountId}:${creatorId}:${fanId}`}
       initial={session}
-      returnTo={returnTo}
+      returnTo={`/threads/${creatorId}/${fanId}`}
     >
       <ConversationScreen
-        key={`${session.accountId}:${creatorId}:${fanId}`}
         creatorId={creatorId}
         fanId={fanId}
         accountId={session.accountId}

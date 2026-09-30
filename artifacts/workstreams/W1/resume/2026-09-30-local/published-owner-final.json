@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-30",
+  "parentRevision": "e129fede3e96a3e809a077bfe8136934184b6d32",
+  "integration": {
+    "W8": "da03bb764cd05d0f6ac7e19fcd012611226465c5; full clean Git merge after bf44ada",
+    "W3": "f350fd313fedcc5ddcaa91504e94f7f07601ba95; 30 owner/seam paths reconciled against virtual base 27b982998fc6995e700c43b3b9dba32cf85d9c91; older W1 foundation copies not imported",
+    "resolutions": "Seven conflict paths reconciled personally, preserving initial exclusive thread mutation locks, current identity boundaries, correlation and expected-account headers, native font/capture/CI repairs. W3 source ownership retained.",
+    "migrations": "No SQL or registry changes in this late integration; existing own-DB 40-entry checksum proof remains historical current schema evidence."
+  },
+  "checks": {
+    "backend": "Full existing run:16 passed,2 failed stale contract expectations,350.95s. Two existing expectations maintained (ai_access_unavailable; sensitive_memory_disabled), affected rerun2 passed/7 skipped,4.33s. All18 covered across runs; not a single final18/18 run. All10000pairs/50000scoped queries retained.",
+    "swift": "18/18 existing cases,110 image comparisons,124.054s; generated C11 refresh then Identity5/5.",
+    "android": "19 existing cases plus assembleDebug and verifyPaparazziDebug pass,2m57s; generated C11 refresh then assemble passes1m7s.",
+    "ios": "Normally signed generic iOS Simulator build succeeds after final generated C11 refresh. Existing UI2/2 previously passed on cf851 source; not repeated after owner-only conversation integration.",
+    "web": "Final production build/lint/format/generation/shared existing checks; prior13 visual/auth cases covered across initial and affected reruns. Late owner Account/navigation changes are personally observed and compiled; remote final-head CI is a separate gate.",
+    "rename": "Final FolioPreview backend, web, normally signed iOS and Android builds pass after owner integration; final optional TabBar routes only affect web and are rebuilt in both copies."
+  },
+  "browser": {
+    "identityMode": "Explicit synthetic development adapter only",
+    "root": "/you loads @w1_resume_two and persisted intro; correct synthetic label, true empty conversations after actual account projection, four shipping tab destinations. Click Home visibly navigates /home and reports endpoint unavailable because growth is not configured.",
+    "thread": "Canonical creatorId/fanId UUID query survives reload; nonexistent/unapproved thread displays unavailable opening history and disabled private controls, never a successful authorized-thread claim.",
+    "screenshots": [
+      "integrated-you-final.png",
+      "integrated-thread-unavailable-final.png"
+    ],
+    "limitations": "One browser jar,1280x720 actual screenshot; no operated native/real identity/passkey/provider/participant or complete matched-design acceptance."
+  },
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "d8b90daba2b60199a95e6e205c1c56fe4e01ba61658313f51b7bafed45b435b9",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "1d99c841be76fd2d41583971cd6dcee83f9f1f7dab6b73291176bafe1b52ca42",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "ca76a8227d6641941ae17235b2a423f5a723ac36bdcb5d88746bac64c3d34aae",
+    "apps/backend/src/app.ts": "ee0a5150551f95a07c3c1809e75279d60db3e7072ee2f515867192a4b57a9d64",
+    "apps/backend/src/integration.ts": "8ddeebaa22dba6e2e67bf5e756b2cecfc1e9fd866e809427d57fa21f52282da5",
+    "apps/backend/src/modules/access/commerce.ts": "92c36e3488c3838aa135969f476bb3e8fb8c2ec8adc31241eddad57f9edd32a9",
+    "apps/backend/src/modules/conversation/development-server.ts": "d9a0df5ce01a28ab04ca40593927d7ef0959ba480cff753cc7c686f619e5ea41",
+    "apps/backend/src/modules/conversation/feature.ts": "787ee920dad6d3676cf9291a46b7e50110a41f594cacb274449ba963ebd9aa2d",
+    "apps/backend/src/modules/conversation/generation.ts": "4aba676b65563af9f1725c6d8726d42f4109da3f2f5f5f326ad9622dbb9ecd90",
+    "apps/backend/src/modules/conversation/memory.ts": "45cbac18fba8224e89eb8ad7b19bf49bb421de3c7b2e3403af29ea01ced95ccf",
+    "apps/backend/src/modules/conversation/runtime.ts": "bd50c8bbe465c3f4e481e47aecba0279244ebeb7de531de2a53a4d841e2d09c2",
+    "apps/backend/src/modules/conversation/service.ts": "be4305faf2196889e31cc8d620bcb492288d25c607865da2c81694887b46df1b",
+    "apps/backend/src/modules/trust/router.ts": "594a2ab09b626d52d40bbef6a0d26f4022802b318ffd7e7f0cbcba5d7a3cb2e9",
+    "apps/backend/src/operations/local-server.ts": "e782b79a66b5a8e8d6413f2b562fe2806d4e35bf4afb057b821a64029dfb6e25",
+    "apps/backend/src/operations/runtime.ts": "dcf51831db5f876a747794620ce0d08cce7e99b022ae547a5b9a289ac15328e2",
+    "apps/backend/src/operations/telemetry.ts": "2bb8d64317fb4ebaf653c0bfd00b0ef01e4c0dbe7b6f45016bbace55e2d594e3",
+    "apps/backend/src/realtime/gateway.ts": "7ed0e295b74b727dc68b62737bfe4f81b51f90b597dcc31cbed4219bcd1bafce",
+    "apps/backend/tests/postgres.integration.test.ts": "8a4d703673881d14f5883bdafdd7ec72f9a3f0e0e7b2f3f5f385045bcd4ac88a",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "9d9fea88876dfb189dc133a20bfabb298f4463d4d5b868289cf20fce4ec1e3fd",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift": "75ac57e4b88d979dc2c24667119d5d79bb905c7053ba0d7456278d24de4b1fee",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "e2cfcff4254b51a392ac759a9f3cbb4b3f39973ca290d1867ef898d43bc0796f",
+    "apps/web/app/api/auth/complete/route.ts": "fb25758a38de04c5db640537b90f317476bdd5d6017f21b71e4ed311bb98d28a",
+    "apps/web/app/api/conversations/[...path]/route.ts": "feb8df834f1ee294ae3440e7771ed25eba81939d1914127c08af70383fb965a4",
+    "apps/web/app/api/trust/[...path]/route.ts": "6c306be6b93047d1ab5c15215f6dfdfe4dd0085236f044ecbb1cf987b2e43bbf",
+    "apps/web/app/chat/[handle]/page.tsx": "60c33a5998a6a0eb765a6729b050f2adb177ebbfed4e9e6613b4aee562e611fb",
+    "apps/web/app/creators/[handle]/chat/page.tsx": "55f47f058db7bdeed359ed4617f73a8ffb810c664cf03d46c8733adca08750e7",
+    "apps/web/app/ops/audits/page.tsx": "8842deea16c65e702a9dbf05cbc3d1a33b9d7d95b4804c024da2640809d6e5f7",
+    "apps/web/app/ops/cases/[id]/page.tsx": "a9f7f06ee06080b7465441845d3f0b32f0e313b82d32c184b5a1a1bdaa5eef4c",
+    "apps/web/app/ops/metrics/page.tsx": "3e97133d25835f2d3d9f8f7e83733fab7567bc15ac600f97ede0906c99ef3a78",
+    "apps/web/app/ops/page.tsx": "994e3da0dcb292f539f34c6fca85b8b422dee625b427b2533196b5652d16c92c",
+    "apps/web/app/ops/trust-client.tsx": "486843852907fbbdc8e54a9dc403202e00a8eff56c7dc731b0d17e0b6a0f5fef",
+    "apps/web/app/support/page.tsx": "024aab3a28d1bea305f52802e3c46b6a6e5f267e8a7c874949aae0733adad261",
+    "apps/web/app/threads/[creatorId]/[fanId]/page.tsx": "a12f251c4825a1ceb9b8dc05d8be40d6cc3ae1c270a0ac20afcec61baa7ecf90",
+    "apps/web/app/you/page.tsx": "bf2f61fec09f8b3f47a1bfecfdbe436293a4569ceae8895c5881da1911ac324a",
+    "apps/web/features/conversation/AccountScreen.tsx": "c616d80eea7d1a629c393599d785632bbf513e8caba473acbd4a35d0d66994b2",
+    "apps/web/features/conversation/ConsentScreen.tsx": "d2f03255bc301b4c0fc9c30584abb7c29313421cbf8d0db62432b8de204a5a2b",
+    "apps/web/features/conversation/ConversationScreen.tsx": "ca837c61b470e9dbd4e507c1fc7def3499142d350f8f71d070b0047941fa8e5f",
+    "apps/web/features/conversation/api.ts": "8caa040de3bd4940cfba8c4ea17af895d778fbe77ccabc20762cc61142727f6c",
+    "config/navigation.json": "05702fe5512e59b2b631b008312eaf536d1934c56430c21dd2284af7f2724128",
+    "packages/ui-web/src/components.ts": "d5ae46577d52ad052494603e12d0ddfd655a80cabfe13a6933567316a1fc6208",
+    "packages/ui-web/src/contracts.ts": "219dac301b0357ee7023f5f661184512859f960d03ce68b29cc829a357400ee7"
+  },
+  "logs": {
+    "creator-w1-late-owner-backend-tests.log": {
+      "path": "/private/tmp/creator-w1-late-owner-backend-tests.log",
+      "sha256": "7505c7e736e49c1388823af75b137b4de9bfa9e403a9d6281ed816b5a5bcd128"
+    },
+    "creator-w1-late-owner-backend-rerun-final.log": {
+      "path": "/private/tmp/creator-w1-late-owner-backend-rerun-final.log",
+      "sha256": "303a051957a498b1d7e5df5290b599ed7ce4914256b4c306b43a63d77204fcdc"
+    },
+    "creator-w1-late-owner-backend-shipping-final.log": {
+      "path": "/private/tmp/creator-w1-late-owner-backend-shipping-final.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "creator-w1-late-owner-swift.log": {
+      "path": "/private/tmp/creator-w1-late-owner-swift.log",
+      "sha256": "270d71d874c46e3696cc70c982b52cd61132d301f6f2030d847dd15c4e9a5d0b"
+    },
+    "creator-w1-late-owner-swift-navigation.log": {
+      "path": "/private/tmp/creator-w1-late-owner-swift-navigation.log",
+      "sha256": "948a25adc7c9f557abd0e104fa8c919b86cb5372eb513d747be10ed3798b38db"
+    },
+    "creator-w1-late-owner-android.log": {
+      "path": "/private/tmp/creator-w1-late-owner-android.log",
+      "sha256": "9f0ca94f4a67c75c736ec2fb7b899b70564e608899aa62395f39c8b24f1c6719"
+    },
+    "creator-w1-late-owner-android-navigation.log": {
+      "path": "/private/tmp/creator-w1-late-owner-android-navigation.log",
+      "sha256": "c7299f3b17c781134829a460c118e880c1ded480db9e6022cd8debea5ae1bb86"
+    },
+    "creator-w1-late-owner-ios-navigation.log": {
+      "path": "/private/tmp/creator-w1-late-owner-ios-navigation.log",
+      "sha256": "5455a18050afeb5efc3b6bc84c9a3c9ab2ebca9fb73b14fc54e4126ad3e56451"
+    },
+    "creator-w1-late-owner-rename-generation.log": {
+      "path": "/private/tmp/creator-w1-late-owner-rename-generation.log",
+      "sha256": "7b40e7a7b6f47b61d358077835cd6a63d7a7c7b9d4b9c511f4b947a8e315bafd"
+    },
+    "creator-w1-late-owner-rename-backend.log": {
+      "path": "/private/tmp/creator-w1-late-owner-rename-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "creator-w1-late-owner-rename-ios.log": {
+      "path": "/private/tmp/creator-w1-late-owner-rename-ios.log",
+      "sha256": "9361c2951a107d686ffb5606ede377f2c67cc34094361bf5445e52a1d0251e30"
+    },
+    "creator-w1-late-owner-rename-android.log": {
+      "path": "/private/tmp/creator-w1-late-owner-rename-android.log",
+      "sha256": "e8e54ce4e507932551073838b8bd201fdd03e071715b5f957dbf2071ddb5e457"
+    },
+    "creator-w1-handoff-web.log": {
+      "path": "/private/tmp/creator-w1-handoff-web.log",
+      "sha256": "15eabe77a59349f4b8cb13b6803dc63a77679c3fdce7fbbcacdc6203b1d138b0"
+    },
+    "creator-w1-handoff-lint.log": {
+      "path": "/private/tmp/creator-w1-handoff-lint.log",
+      "sha256": "c6c4b725b7860cec20bca1c59d73a2bc21483bcdd227bf52f856967ca122f448"
+    },
+    "creator-w1-handoff-format.log": {
+      "path": "/private/tmp/creator-w1-handoff-format.log",
+      "sha256": "8488f5b2421bda28ce47eddc32b8fee98def934f4f8d9133c2fcf83cdb53727d"
+    },
+    "creator-w1-handoff-generation.log": {
+      "path": "/private/tmp/creator-w1-handoff-generation.log",
+      "sha256": "90de7138975851ef4c9b6bf1a563a3e03a7c28f6c3ceb0195935a2d4dfb3f399"
+    },
+    "creator-w1-handoff-shared.log": {
+      "path": "/private/tmp/creator-w1-handoff-shared.log",
+      "sha256": "d98f616216d9d75d3c50b5ccfcd0b304a1c6db4f1b18e9b99f3df7d524f26b05"
+    },
+    "creator-w1-handoff-rename-web.log": {
+      "path": "/private/tmp/creator-w1-handoff-rename-web.log",
+      "sha256": "09be0662700d72e347634e93b3f0c29c0ffb673ba4da8fc579813a5cf67aa8fa"
+    }
+  },
+  "releaseReady": false,
+  "finalRevision": "Use the final delivery SHA and current branch/PR metadata. This record describes source before its containing commit; source hashes disambiguate it.",
+  "localBuildSha256": {
+    "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/backend/dist/server.mjs": "ee81b8c67bba9718d5581040e6b30a8a077c00dce2b28ccbfaaf3cc0b902b9f4",
+    "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/artifacts/workstreams/W1/build/ios-signed/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp": "f2ae839ef9250bc1334ab3f26201776e81f67da82f333da8d640892a5b7268b2",
+    "/private/tmp/creator-w1-resume-android/app-build/outputs/apk/debug/app-debug.apk": "1e55c6a4651dfbe8eb70b1f0a352973e8d5fd9e4fe8b1a229c4f551d9dab8bdb"
+  },
+  "screenshots": {
+    "integrated-you-final.png": {
+      "sha256": "311f26b3447c953ddf77780438ea196f16319e01f130eaa1acb094af9c7b7729",
+      "actualViewport": "1280x720"
+    },
+    "integrated-thread-unavailable-final.png": {
+      "sha256": "c7f0a6845d350309ffeedc5816583c207c32ac8cdeb8ccdc804b2a8a79f22dd4",
+      "actualViewport": "1280x720"
+    }
+  }
+}

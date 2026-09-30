@@ -346,6 +346,20 @@ export function conversationFeature(
     path: "/",
     router: ({ actorFor }) => {
       const router = Router();
+      router.use("/v1/conversations", async (req, _res, next) => {
+        const expected = req.header("X-Expected-Account-Id");
+        if (expected) {
+          const accountId = IdSchema.parse(expected);
+          const actor = await actorFor(req);
+          if (actor.accountId !== accountId)
+            throw new DomainError(
+              "session_account_changed",
+              "Your account changed. Reopen this page to continue.",
+              409,
+            );
+        }
+        next();
+      });
       router.get("/v1/conversations/capabilities", (_req, res) =>
         res.json(feature.capabilities()),
       );

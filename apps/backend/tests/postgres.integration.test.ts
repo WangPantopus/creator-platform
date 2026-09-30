@@ -365,7 +365,7 @@ describe.skipIf(!adminUrl)(
           idempotencyKey: "other-message-key",
         }),
         // A reserved last unit remains occupied while the accepted reply is active.
-      ).rejects.toMatchObject({ code: "reply_in_progress" });
+      ).rejects.toMatchObject({ code: "ai_access_unavailable" });
       const counters = await admin.query(
         "SELECT used,reserved FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2",
         [scope.creatorId, scope.fanId],
@@ -394,7 +394,7 @@ describe.skipIf(!adminUrl)(
           ...proposal,
           sensitiveCategory: "health",
         }),
-      ).resolves.toBe(false);
+      ).rejects.toMatchObject({ code: "sensitive_memory_disabled" });
     });
     it("T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once", async () => {
       const signing = new SignedActService(
