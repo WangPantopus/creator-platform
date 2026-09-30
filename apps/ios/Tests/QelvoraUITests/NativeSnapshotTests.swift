@@ -5,9 +5,23 @@
   import XCTest
   @testable import QelvoraUI
 
+  private final class CaptureWindow: NSWindow {
+    override var backingScaleFactor: CGFloat { 2 }
+  }
+
   @MainActor
   final class NativeSnapshotTests: XCTestCase {
     private let size = CGSize(width: 390, height: 844)
+    private var captureColorSpace: NSColorSpace {
+      // Every existing reference has this same ICC profile. Reuse its color
+      // metadata, never its pixels, when rasterizing the current view.
+      let reference = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png")
+      guard let data = try? Data(contentsOf: reference),
+        let bitmap = NSBitmapImageRep(data: data)
+      else { return .sRGB }
+      return bitmap.colorSpace
+    }
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
     }
@@ -75,15 +89,14 @@
           .environment(\.displayScale, 2).frame(
             width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
+      let colorSpace = captureColorSpace
+      let window = CaptureWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      window.colorSpace = colorSpace
       window.contentView = host
-      // Scale the hosted coordinate space before rasterization. Merely passing
-      // a 2x bitmap to cacheDisplay enlarges the 1x host raster on headless CI.
-      let hostScale = 2 / window.backingScaleFactor
-      window.setContentSize(CGSize(width: size.width * hostScale, height: size.height * hostScale))
-      host.frame = NSRect(origin: .zero, size: window.contentLayoutRect.size)
-      host.bounds = NSRect(origin: .zero, size: size)
+      // Notify AppKit before layout so hosted layers rasterize at 2x; scaling
+      // only the view coordinates enlarges a previously cached 1x raster.
+      host.viewDidChangeBackingProperties()
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
@@ -95,13 +108,13 @@
         bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
         pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
         hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
-        bytesPerRow: 0, bitsPerPixel: 0)!
+        bytesPerRow: 0, bitsPerPixel: 0)!.retagging(with: colorSpace)!
       bitmap.size = size
       host.cacheDisplay(in: host.bounds, to: bitmap)
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
       print(
-        "Snapshot \(name): \(bitmap.pixelsWide)x\(bitmap.pixelsHigh); screen scale \(window.backingScaleFactor); host transform \(hostScale); backing bounds \(host.convertToBacking(host.bounds).size)"
+        "Snapshot \(name): \(bitmap.pixelsWide)x\(bitmap.pixelsHigh); screen scale \(window.backingScaleFactor); backing bounds \(host.convertToBacking(host.bounds).size); color space \(colorSpace.localizedName ?? "unknown")"
       )
       assertSnapshot(
         of: image, as: .image, named: name, record: record, file: file,
