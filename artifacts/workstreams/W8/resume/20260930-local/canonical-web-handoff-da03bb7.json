@@ -1,0 +1,37 @@
+{
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "scope": "Direct operator HTTP observation; separate from browser/native acceptance",
+  "steps": [
+    {
+      "step": "complete_web",
+      "status": 200,
+      "path": "/support"
+    },
+    {
+      "endpoint": "/api/trust/session",
+      "status": 200,
+      "accountId": "10000000-0000-4000-8000-000000000002",
+      "messageCount": null,
+      "canSend": null,
+      "cidSent": "893021c6-768a-4165-af72-432222f26e97",
+      "cidReturned": "893021c6-768a-4165-af72-432222f26e97"
+    },
+    {
+      "endpoint": "/api/conversations/20000000-0000-4000-8000-000000000001/30000000-0000-4000-8000-000000000002",
+      "status": 200,
+      "accountId": null,
+      "messageCount": 1,
+      "canSend": false,
+      "cidSent": "7cba43e1-61ab-4a4d-bb14-6ce7a9b0ec8e",
+      "cidReturned": "7cba43e1-61ab-4a4d-bb14-6ce7a9b0ec8e"
+    },
+    {
+      "endpoint": "/api/conversations/20000000-0000-4000-8000-000000000001/30000000-0000-4000-8000-000000000001",
+      "status": 403,
+      "error": "thread_unavailable",
+      "cidSent": "68aa2e06-5a2b-4403-9464-663aa0cbb3c7",
+      "cidReturned": "68aa2e06-5a2b-4403-9464-663aa0cbb3c7"
+    }
+  ],
+  "paidAICalls": 0
+}
