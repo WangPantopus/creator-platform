@@ -31,6 +31,7 @@ type CreatorAIIdentity = Readonly<{
   end: () => void;
 }>;
 type Preview = {
+  revision: number;
   sentences: { text: string; citations: string[] }[];
   passages: {
     id: string;
@@ -71,12 +72,14 @@ function storeDraft(key: string, value: unknown) {
   }
 }
 function Button({
+  id,
   children,
   onClick,
   disabled = false,
   variant = "secondary",
   type = "button",
 }: {
+  id?: string;
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
@@ -85,6 +88,7 @@ function Button({
 }) {
   return (
     <button
+      id={id}
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -501,6 +505,10 @@ export function CreatorAI({
     };
   }, [fetchState]);
   useEffect(() => {
+    if (preview && (dirty || preview.revision !== state?.revision))
+      setPreview(null);
+  }, [dirty, preview, state?.revision]);
+  useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
@@ -563,6 +571,9 @@ export function CreatorAI({
       setError("");
       setMessage("");
       dialog.current?.showModal();
+      dialog.current
+        ?.querySelector<HTMLButtonElement>("#w2-confirm-cancel")
+        ?.focus();
     } else if (!confirmation && dialog.current?.open) dialog.current.close();
   }, [confirmation]);
   useEffect(() => {
@@ -1926,11 +1937,18 @@ export function CreatorAI({
                           onSubmit={(e) => {
                             e.preventDefault();
                             void action(async () => {
+                              const revision = state.revision;
                               const result = await api("preview", {
-                                expectedRevision: state.revision,
+                                expectedRevision: revision,
                                 message: prompt,
                               });
-                              setPreview(result as unknown as Preview);
+                              setPreview({
+                                ...(result as unknown as Omit<
+                                  Preview,
+                                  "revision"
+                                >),
+                                revision,
+                              });
                             }, "Draft preview complete.");
                           }}
                         >
@@ -1950,30 +1968,41 @@ export function CreatorAI({
                             Send to draft AI
                           </Button>
                         </form>
-                        {preview && (
-                          <>
-                            <AuthorLabel kind="ai" name={state.creator.name} />
-                            {preview.sentences.map((sentence, index) => (
-                              <div key={index}>
-                                <p>{sentence.text}</p>
-                                {sentence.citations.map((id) => (
-                                  <details key={id}>
-                                    <summary>Open authorized passage</summary>
-                                    {preview.passages.find((p) => p.id === id)
-                                      ?.text ?? "No longer accessible to you"}
-                                  </details>
-                                ))}
-                              </div>
-                            ))}
-                            <p className="qv-help">
-                              Pipeline {preview.durationMs} ms · first approved{" "}
-                              {preview.firstApprovedMs ?? "withheld"} ms · cost{" "}
-                              {preview.usage.some((u) => u.costMicros === null)
-                                ? "awaiting provider usage or rate reconciliation"
-                                : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
-                            </p>
-                          </>
-                        )}
+                        {preview &&
+                          preview.revision === state.revision &&
+                          !dirty && (
+                            <>
+                              <p className="qv-meta">
+                                Draft preview · revision {preview.revision}
+                              </p>
+                              <AuthorLabel
+                                kind="ai"
+                                name={state.creator.name}
+                              />
+                              {preview.sentences.map((sentence, index) => (
+                                <div key={index}>
+                                  <p>{sentence.text}</p>
+                                  {sentence.citations.map((id) => (
+                                    <details key={id}>
+                                      <summary>Open authorized passage</summary>
+                                      {preview.passages.find((p) => p.id === id)
+                                        ?.text ?? "No longer accessible to you"}
+                                    </details>
+                                  ))}
+                                </div>
+                              ))}
+                              <p className="qv-help">
+                                Pipeline {preview.durationMs} ms · first
+                                approved {preview.firstApprovedMs ?? "withheld"}{" "}
+                                ms · cost{" "}
+                                {preview.usage.some(
+                                  (u) => u.costMicros === null,
+                                )
+                                  ? "awaiting provider usage or rate reconciliation"
+                                  : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
+                              </p>
+                            </>
+                          )}
                       </Panel>
                       <Panel title="I’D NEVER SAY THAT">
                         <p className="qv-help">
@@ -2448,6 +2477,22 @@ export function CreatorAI({
         className="w2-dialog"
         aria-labelledby="w2-confirm-title"
         aria-describedby="w2-confirm-body"
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const buttons =
+            event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "button:not(:disabled)",
+            );
+          const first = buttons[0];
+          const last = buttons[buttons.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
         onCancel={() => setConfirmation(null)}
         onClose={() => setConfirmation(null)}
       >
@@ -2467,7 +2512,11 @@ export function CreatorAI({
           >
             {confirmation?.confirm}
           </Button>
-          <Button variant="quiet" onClick={() => setConfirmation(null)}>
+          <Button
+            id="w2-confirm-cancel"
+            variant="quiet"
+            onClick={() => setConfirmation(null)}
+          >
             Cancel
           </Button>
         </div>

@@ -1,0 +1,80 @@
+{
+  "profile": "Intel macOS, local canonical Studio 3002/API4102/PG17; same primary companion18; OpenAI pipeline9; two admitted and third rejected; named single observed window",
+  "usageRows": [
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:02.483619+00:00",
+      "costMicros": 93
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:02.736407+00:00",
+      "costMicros": 93
+    },
+    {
+      "model": "text-embedding-3-small",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:05.248687+00:00",
+      "costMicros": 1
+    },
+    {
+      "model": "text-embedding-3-small",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:05.345309+00:00",
+      "costMicros": 1
+    },
+    {
+      "model": "gpt-4.1-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:06.222966+00:00",
+      "costMicros": 2202
+    },
+    {
+      "model": "gpt-4.1-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:06.861978+00:00",
+      "costMicros": 2106
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:07.183331+00:00",
+      "costMicros": 266
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:07.83284+00:00",
+      "costMicros": 264
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:09.031523+00:00",
+      "costMicros": 273
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "provider": "OpenAI",
+      "createdAt": "2026-10-01T11:47:09.63939+00:00",
+      "costMicros": 268
+    }
+  ],
+  "limitations": "Both full replies exceed 8000ms; both first-approved timings exceed warm2500ms; one two-concurrency observation is not p95. One companion cited an unstated cracking benefit, subsequently fixed in pipeline10.",
+  "windowStart": "2026-10-01T11:47:02.332Z",
+  "measurements": [
+    {
+      "costMicros": 2732,
+      "durationMs": 9039,
+      "firstApprovedMs": 7143
+    },
+    {
+      "costMicros": 2835,
+      "durationMs": 8263,
+      "firstApprovedMs": 6281
+    }
+  ],
+  "thirdRequest": "UI generation_busy refusal before provider work; prompt retained"
+}
