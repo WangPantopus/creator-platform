@@ -1,0 +1,5 @@
+# Native inline parameter enum generation
+
+W1 personally reviewed the complete current generator and consumed only the published one-file repair from W6 `1ada9369fa85fa72fccc7a98182559929bea2ab9`. Inline string parameter enums are registered before model declarations are emitted. Swift parameters use rawValue and Kotlin parameters serialize their exact SerialName wire value, including optional values and path/query/header use. Unsupported empty/non-string parameter enum definitions are rejected. Existing restricted header, signature, binary, status, authentication and navigation checks remain.
+
+Canonical generation and consistency, the existing two shared checks, affected lint and formatting pass. Current44-operation OpenAPI, all generated web/Swift/Kotlin files and navigation are byte-identical to the parent. Existing qualified actual consumer builds therefore still cover those unchanged files. W6 reported successful48-operation enum compilation in its own source; W1 does not claim those operations integrated or personally runtime-verified. No new suites, schemas or manual generated edits. Source/output/log digests: native-parameter-enum-source.json.
