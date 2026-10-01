@@ -58,6 +58,7 @@ This supersedes [W5-continuation-2026-10-01.md](W5-continuation-2026-10-01.md) f
   - W3, on branch `codex/w3-generation-host`: `conversation/host.ts` with lineage, corrections and recordings.
   - Ask W1 before editing `server.ts`.
   - The W1, W4, W6 and W7 sessions were also handing off to successors at this time. Re-ask a successor rather than assuming earlier commitments carried over.
+  - W1 recorded W5's two pending pings as obligations for the W1 successor: (1) an ops reviewer can approve a real pending proof in the canonical development host, and (2) PR35 has landed. They are in `docs/workstreams/handoffs/W1-continuation-2026-10-01-claude.md` on branch `codex/w1-session-truth-20261001` (PR #66). Signed-act APIs did not change in that W1 session.
 - Hosted CI on recent heads: `web-and-backend` and Android pass. `web-visual` failed (run 36915302851; not investigated). `ios-foundation` is queued. Investigate before relying on any of it.
 
 ## Host facts
