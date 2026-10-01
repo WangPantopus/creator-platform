@@ -1968,6 +1968,88 @@ data class APIConversationConversationPageFeedbackPolicy(
 )
 
 @Serializable
+data class APIConversationConversationTimeline(
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `control`: APIConversationConversationTimelineControl,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `generationSequences`: Map<String, Long>,
+  val `messages`: List<APIConversationConversationTimelineMessagesItem>
+)
+
+@Serializable
+enum class APIConversationConversationTimelineControl {
+  @SerialName("ai_active") AI_ACTIVE,
+  @SerialName("human_active") HUMAN_ACTIVE,
+  @SerialName("ai_paused") AI_PAUSED,
+  @SerialName("closed") CLOSED,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItem(
+  val `id`: String,
+  val `threadId`: String,
+  val `authorKind`: APIConversationConversationTimelineMessagesItemAuthorKind,
+  val `text`: String,
+  val `deliveryState`: APIConversationConversationTimelineMessagesItemDeliveryState,
+  val `controlEpoch`: Long,
+  val `sequence`: Long,
+  val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
+  val `citations`: List<String>,
+  val `createdAt`: String,
+  val `offTheRecord`: Boolean,
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationTimelineMessagesItemAgentVersion? = null,
+  val `feedback`: APIConversationConversationTimelineMessagesItemFeedback? = null,
+  val `correction`: APIConversationConversationTimelineMessagesItemCorrection? = null
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemAuthorKind {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemDeliveryState {
+  @SerialName("accepted") ACCEPTED,
+  @SerialName("generating") GENERATING,
+  @SerialName("delivered") DELIVERED,
+  @SerialName("failed") FAILED,
+  @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
 data class APIConversationConversationUsage(
   val `timezone`: APIConversationConversationUsageTimezone,
   val `days`: List<APIConversationConversationUsageDaysItem>,
@@ -2632,7 +2714,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun publicSignature(signedActId: String): APIPublicSignature = json.decodeFromString(request("/v1/identity/signed-acts/${segment(signedActId)}", "GET", authenticated = false))
   suspend fun beginSignedAct(creatorId: String, body: APIBeginSignedAct): APISignedChallenge = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/signed-acts/begin", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun verifySignedAct(body: APIVerifySignedAct): APISignedActResult = json.decodeFromString(request("/v1/identity/signed-acts/verify", "POST", body = json.encodeToString(body), authenticated = true))
-  suspend fun readThread(creatorId: String, fanId: String): APIThreadTimeline = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}", "GET", authenticated = true))
+  suspend fun readThread(creatorId: String, fanId: String): APIConversationConversationTimeline = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}", "GET", authenticated = true))
   suspend fun sendMessage(creatorId: String, fanId: String, body: APISendMessage): APIAcceptedMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/messages", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))

@@ -212,7 +212,7 @@ export function createOpenApi() {
       },
       "/v1/threads/{creatorId}/{fanId}": {
         parameters: pair,
-        get: operation("readThread", "ThreadTimeline"),
+        get: operation("readThread", "ConversationConversationTimeline"),
       },
       "/v1/threads/{creatorId}/{fanId}/messages": {
         parameters: pair,

@@ -45,7 +45,13 @@ export function ConsentScreen({
     };
   }, [request]);
   const begin = async () => {
-    if (!capabilities?.providers?.verified || busy) return;
+    if (
+      !capabilities?.providers?.verified ||
+      !capabilities.consentAvailable ||
+      !capabilities.generationAvailable ||
+      busy
+    )
+      return;
     setBusy(true);
     setError(null);
     try {

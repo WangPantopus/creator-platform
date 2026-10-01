@@ -4,6 +4,7 @@ import {
   IdSchema,
   MessageSchema,
   ThreadControlSchema,
+  ThreadTimelineSchema,
 } from "../schemas.ts";
 
 export const ProviderPolicySchema = z.strictObject({
@@ -126,6 +127,12 @@ export const ConversationMessageSchema = MessageSchema.extend({
     .optional(),
 });
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
+/** Audited Studio reads share the actual bounded W3 message projection.
+ * Lineage is optional until its registered migration has been prepared. */
+export const ConversationTimelineSchema = ThreadTimelineSchema.extend({
+  messages: z.array(ConversationMessageSchema).max(100),
+});
+export type ConversationTimeline = z.infer<typeof ConversationTimelineSchema>;
 export const ConversationPageSchema = z.strictObject({
   threadId: IdSchema,
   creatorId: IdSchema,

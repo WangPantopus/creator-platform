@@ -790,6 +790,14 @@ function Compose({
     draftId = useRef<string | null>(null),
     operation = useRef<{ body: string; key: string } | null>(null);
   const pendingStorage = `w5.pendingPublication:${creator.viewerAccountId}:${creator.id}`;
+  const verificationReady = creator.verification === "verified";
+  const canDraft =
+    verificationReady &&
+    (creator.owned ||
+      creator.roles.includes("drafter") ||
+      creator.roles.includes("publisher"));
+  const canPublish =
+    verificationReady && (creator.owned || creator.roles.includes("publisher"));
   const clearPending = () => {
     sessionStorage.removeItem(pendingStorage);
     setPendingPublication(null);
@@ -885,6 +893,12 @@ function Compose({
     setReview(null);
   };
   const save = async () => {
+    if (!canDraft)
+      throw new Error(
+        verificationReady
+          ? "Your current role does not allow saving this draft."
+          : "Creator verification must be approved before saving or signing. You can keep writing here.",
+      );
     if (pendingPublication)
       throw new Error(
         "Check the pending publication before saving another revision.",
@@ -916,6 +930,15 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {!verificationReady && (
+        <Notice title="Creator verification">
+          {creator.verification === "pending"
+            ? "Your creator verification is pending."
+            : "Your creator verification is not current."}{" "}
+          You can keep writing here. Saving and signing are unavailable until
+          verification is approved.
+        </Notice>
+      )}
       <div className="w5-gutter">
         <span className="qv-meta">TO</span>
         <div className="qv-segmented" role="group" aria-label="Audience">
@@ -1172,6 +1195,7 @@ function Compose({
           <button
             className="qv-btn qv-btn--secondary"
             disabled={
+              !canDraft ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1191,6 +1215,7 @@ function Compose({
           <button
             className={`qv-btn ${creator.owned ? "qv-btn--maya" : "qv-btn--secondary"}`}
             disabled={
+              !canPublish ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1198,6 +1223,10 @@ function Compose({
             }
             onClick={() =>
               void action.run(async () => {
+                if (!canPublish)
+                  throw new Error(
+                    "Current creator verification and a publishing role are required.",
+                  );
                 const result = await save();
                 if (creator.owned)
                   setReview(
@@ -1223,7 +1252,7 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
-      {review && (
+      {review && canPublish && (
         <Modal
           title={
             document.scheduledAt

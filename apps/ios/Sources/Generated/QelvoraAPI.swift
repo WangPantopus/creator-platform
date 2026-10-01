@@ -2594,6 +2594,117 @@ public struct APIConversationConversationPageFeedbackPolicy: Codable, Sendable {
   }
 }
 
+public struct APIConversationConversationTimeline: Codable, Sendable {
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `control`: APIConversationConversationTimelineControl
+  public let `epoch`: Int
+  public let `cursor`: Int
+  public let `generationSequences`: [String: Int]
+  public let `messages`: [APIConversationConversationTimelineMessagesItem]
+  public init(threadId: String, creatorId: String, fanId: String, control: APIConversationConversationTimelineControl, epoch: Int, cursor: Int, generationSequences: [String: Int], messages: [APIConversationConversationTimelineMessagesItem]) {
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.control = control
+    self.epoch = epoch
+    self.cursor = cursor
+    self.generationSequences = generationSequences
+    self.messages = messages
+  }
+}
+
+public enum APIConversationConversationTimelineControl: String, Codable, Sendable {
+  case `ai_active` = "ai_active"
+  case `human_active` = "human_active"
+  case `ai_paused` = "ai_paused"
+  case `closed` = "closed"
+  case `blocked` = "blocked"
+}
+
+public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable {
+  public let `id`: String
+  public let `threadId`: String
+  public let `authorKind`: APIConversationConversationTimelineMessagesItemAuthorKind
+  public let `text`: String
+  public let `deliveryState`: APIConversationConversationTimelineMessagesItemDeliveryState
+  public let `controlEpoch`: Int
+  public let `sequence`: Int
+  public let `signedActId`: String?
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public let `citations`: [String]
+  public let `createdAt`: String
+  public let `offTheRecord`: Bool
+  public let `version`: Int
+  public let `agentVersion`: APIConversationConversationTimelineMessagesItemAgentVersion?
+  public let `feedback`: APIConversationConversationTimelineMessagesItemFeedback?
+  public let `correction`: APIConversationConversationTimelineMessagesItemCorrection?
+  public init(id: String, threadId: String, authorKind: APIConversationConversationTimelineMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationTimelineMessagesItemAgentVersion? = nil, feedback: APIConversationConversationTimelineMessagesItemFeedback? = nil, correction: APIConversationConversationTimelineMessagesItemCorrection? = nil) {
+    self.id = id
+    self.threadId = threadId
+    self.authorKind = authorKind
+    self.text = text
+    self.deliveryState = deliveryState
+    self.controlEpoch = controlEpoch
+    self.sequence = sequence
+    self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
+    self.citations = citations
+    self.createdAt = createdAt
+    self.offTheRecord = offTheRecord
+    self.version = version
+    self.agentVersion = agentVersion
+    self.feedback = feedback
+    self.correction = correction
+  }
+}
+
+public enum APIConversationConversationTimelineMessagesItemAuthorKind: String, Codable, Sendable {
+  case `fan` = "fan"
+  case `ai` = "ai"
+  case `approved_draft` = "approved_draft"
+  case `human_creator` = "human_creator"
+  case `human_call` = "human_call"
+  case `human_broadcast` = "human_broadcast"
+  case `human_reaction` = "human_reaction"
+  case `team` = "team"
+  case `system` = "system"
+}
+
+public enum APIConversationConversationTimelineMessagesItemDeliveryState: String, Codable, Sendable {
+  case `accepted` = "accepted"
+  case `generating` = "generating"
+  case `delivered` = "delivered"
+  case `failed` = "failed"
+  case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationTimelineMessagesItemAgentVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
+public enum APIConversationConversationTimelineMessagesItemFeedback: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationConversationTimelineMessagesItemCorrection: Codable, Sendable {
+  public let `originalMessageId`: String
+  public let `originalVersion`: Int
+  public init(originalMessageId: String, originalVersion: Int) {
+    self.originalMessageId = originalMessageId
+    self.originalVersion = originalVersion
+  }
+}
+
 public struct APIConversationConversationUsage: Codable, Sendable {
   public let `timezone`: APIConversationConversationUsageTimezone
   public let `days`: [APIConversationConversationUsageDaysItem]
@@ -3556,7 +3667,7 @@ public actor CreatorAPIClient {
   public func verifySignedAct(body: APIVerifySignedAct) async throws -> APISignedActResult {
     try await request("/v1/identity/signed-acts/verify", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
-  public func readThread(creatorId: String, fanId: String) async throws -> APIThreadTimeline {
+  public func readThread(creatorId: String, fanId: String) async throws -> APIConversationConversationTimeline {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))", method: "GET", authenticated: true)
   }
   public func sendMessage(creatorId: String, fanId: String, body: APISendMessage) async throws -> APIAcceptedMessage {

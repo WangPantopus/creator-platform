@@ -5,7 +5,6 @@ import {
   HumanReplySchema,
   MessageSchema,
   SendMessageSchema,
-  ThreadTimelineSchema,
   IdentityCapabilitiesSchema,
   IdentityContinueSchema,
   IdentityRedirectSchema,
@@ -17,7 +16,6 @@ import {
   type Frame,
   type Health,
   type Message,
-  type ThreadTimeline,
 } from "./schemas.ts";
 import type { z } from "zod";
 import {
@@ -36,6 +34,10 @@ import {
   PasskeyRevocationSchema,
   PublicSignatureSchema,
 } from "./identity.ts";
+import {
+  ConversationTimelineSchema,
+  type ConversationTimeline,
+} from "./conversation/contracts.ts";
 
 export class CreatorApiClient {
   constructor(
@@ -170,8 +172,11 @@ export class CreatorApiClient {
       false,
     );
   }
-  readThread(creatorId: string, fanId: string): Promise<ThreadTimeline> {
-    return this.request(this.thread(creatorId, fanId), ThreadTimelineSchema);
+  readThread(creatorId: string, fanId: string): Promise<ConversationTimeline> {
+    return this.request(
+      this.thread(creatorId, fanId),
+      ConversationTimelineSchema,
+    );
   }
   sendMessage(
     creatorId: string,
