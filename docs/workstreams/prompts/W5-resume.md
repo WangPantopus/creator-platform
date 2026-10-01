@@ -1,3 +1,5 @@
+> **Newest:** use the paste-ready prompt in [W5 continuation handoff (b)](../handoffs/W5-continuation-2026-10-01-b.md#paste-ready-prompt-for-the-next-w5-agent). The prompt below is historical.
+
 > **2026-10-01 update:** Read [the current W5 continuation handoff](../handoffs/W5-continuation-2026-10-01.md) before using this historical resume prompt. PR #9 and later repairs have merged; the branch, runtime and permission statements below are dated.
 
 # Resume W5 from the pushed implementation checkpoint
