@@ -69,6 +69,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   const [proofRetry, setProofRetry] = useState(0);
   const proofFocus = useRef<HTMLButtonElement | null>(null);
   const proofRetryFocus = useRef<HTMLButtonElement | null>(null);
+  const proofAccountFocus = useRef<HTMLInputElement | null>(null);
   const restoreProofFocus = useRef(false);
   const proofReady =
     !!creator &&
@@ -80,6 +81,11 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     proofRead.status === "unavailable";
   const proofExpired =
     !!proof && new Date(proof.expiresAt).getTime() <= Date.now();
+  const proofAccountBound =
+    proofReady &&
+    !!proof &&
+    !proofExpired &&
+    ["challenge", "pending"].includes(proof.state);
   useEffect(() => {
     if (
       !restoreProofFocus.current ||
@@ -286,15 +292,29 @@ export function CreatorSetup({ initial }: { initial: Session }) {
               </label>
               <input
                 id="proof-account"
+                ref={proofAccountFocus}
                 className="qv-input"
+                disabled={busy || !proofReady}
+                readOnly={proofAccountBound}
+                aria-describedby={
+                  proofAccountBound ? "proof-account-hint" : undefined
+                }
                 placeholder={
                   platform === "instagram"
                     ? "https://instagram.com/your_handle"
                     : "https://youtube.com/@your_handle"
                 }
-                value={account}
+                value={
+                  proofAccountBound ? (proof?.accountUrl ?? account) : account
+                }
                 onChange={(event) => setAccount(event.target.value)}
               />
+              {proofAccountBound && (
+                <p id="proof-account-hint" className="qv-field__hint">
+                  This code applies to the saved account. Start a new proof
+                  request to use a different account.
+                </p>
+              )}
             </div>
             <Notice title="Proof is reviewed before signing">
               The proof code is saved with your verification request. Signing
@@ -343,6 +363,23 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                   onChange={(event) => setPost(event.target.value)}
                 />
               </div>
+            )}
+            {proofAccountBound && (
+              <button
+                type="button"
+                className="qv-btn qv-btn--quiet"
+                disabled={busy}
+                onClick={() => {
+                  setProof(null);
+                  setAccount("");
+                  setPost("");
+                  setError("");
+                  setNotice("Enter the account for a new proof code.");
+                  proofAccountFocus.current?.focus();
+                }}
+              >
+                Use a different account
+              </button>
             )}
             <div className="proof-actions">
               <button

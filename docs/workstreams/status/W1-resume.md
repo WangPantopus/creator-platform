@@ -31,6 +31,8 @@ Current API4111/web3011/Postgres55451 are exclusively W1, with a labelled512MiB/
 | H19        | O06 proof/auth recovery progresses. O01/03/04/05/08/10/11/16/20 remain source-mapped contributions; actual configured owner effects and policy inputs remain required.                                                                                              |
 | H20        | Full scope remains active. This source/browser increment is implemented/runnable/integrated/personally verified only within its recorded development scope. Full acceptance and release-ready remain no.                                                            |
 
+[PR16](https://github.com/WangPantopus/creator-platform/pull/16) contains this setup recovery increment. Its final follow-up also keeps an active proof code bound to the saved account and provides an explicit keyboard-accessible new-account draft. Code Review CI discovery currently requires a connected GitHub account; merge is blocked and no hosted pass is claimed.
+
 Continue personally through remaining feasible work and coherent PR delivery. No new test code, reference regeneration, immutable migration change, weaker authority, secret publication or invented provider/review result. Current-head CI must be read with Code Review only; queued/running/unavailable is not pass and PR2's specific exception does not transfer.
 
 PR6 is merged as `6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac`, with final application source `299c953ca42ec735f5fe84b9ee68d5c6581bfeb5`. Its local affected browser, normally signed iOS2/2 and Android4/4 plus clean shipping Light/Night evidence passed; hosted jobs were queued at merge and were not counted as passes. Main tree equality and clean owned checkout were verified.

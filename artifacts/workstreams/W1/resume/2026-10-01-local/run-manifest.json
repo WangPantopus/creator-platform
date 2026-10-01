@@ -54,7 +54,7 @@
     "changedSourceESLint": "pass",
     "changedSourcePrettier": "pass",
     "finalWebProductionBuild": "pass",
-    "hostedCI": "Not yet requested; no queued checks counted as pass.",
+    "hostedCI": "PR16 Code Review discovery requires a connected GitHub account. No hosted pass claimed; merge blocked.",
     "newTestCode": false
   },
   "limits": [
