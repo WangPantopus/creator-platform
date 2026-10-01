@@ -46,6 +46,9 @@ export function createGrowthRouter(
           .min(0)
           .max(1000)
           .parse(req.query.offset ?? 0),
+        req.query.cursor === undefined
+          ? undefined
+          : z.string().min(1).max(2048).parse(req.query.cursor),
       ),
     ),
   );
@@ -105,7 +108,19 @@ export function createGrowthRouter(
     ),
   );
   router.get("/discovery-access", async (req, res) =>
-    res.json(await service.passDiscovery(await actorFor(req))),
+    res.json(
+      await service.passDiscovery(
+        await actorFor(req),
+        req.query.creators === undefined
+          ? undefined
+          : z
+              .string()
+              .max(3699)
+              .parse(req.query.creators)
+              .split(",")
+              .filter(Boolean),
+      ),
+    ),
   );
   router.post("/engagement/:kind/claim", async (req, res) =>
     res.json(

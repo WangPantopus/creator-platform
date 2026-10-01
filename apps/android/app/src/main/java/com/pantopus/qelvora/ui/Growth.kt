@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,12 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     var section by remember { mutableStateOf("Chat") }
     var refresh by remember { mutableIntStateOf(0) }
     var creators by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
+    var discoverCursor by remember { mutableStateOf<String?>(null) }
+    var discoverNextCursor by remember { mutableStateOf<String?>(null) }
+    var discoverQuery by remember { mutableStateOf("") }
+    var discoverCategory by remember { mutableStateOf("") }
+    var discoverRequestRevision by remember { mutableIntStateOf(0) }
+    var pagingDiscover by remember { mutableStateOf(false) }
     var pass by remember { mutableStateOf<JSONObject?>(null) }
     var creator by remember { mutableStateOf<JSONObject?>(null) }
     var posts by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
@@ -89,6 +96,32 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     val client = remember(baseUrl) { baseUrl?.let { GrowthClient(it, token) } }
     val ink = qColor("ink")
     fun record(failure: Exception) {requiresSignIn = (failure as? GrowthRequestFailure)?.status == 401;error = if(failure is GrowthRequestFailure) failure.message!! else QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")}
+    suspend fun loadDirectory(cursor: String?, search: String, filter: String, revision: Int) {
+        if(client == null || route != "/discover") return
+        val currentSession = token()
+        val parameters = listOf("q=" + URLEncoder.encode(search, "UTF-8"), "category=" + URLEncoder.encode(filter, "UTF-8"), cursor?.let {"cursor=" + URLEncoder.encode(it, "UTF-8")}).filterNotNull().joinToString("&")
+        val page = client.request("public/creators?$parameters")
+        val values = page.objects("creators")
+        val access = if(currentSession != null && values.isNotEmpty()) try {
+            client.request("discovery-access?creators=" + URLEncoder.encode(values.joinToString(",") {it.getString("id")}, "UTF-8"), expectedSession = currentSession)
+        } catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled} catch(_: Exception) {null} else null
+        if(route != "/discover" || discoverRequestRevision != revision) return
+        creators = values;pass = if(token() == currentSession) access else null
+        discoverCursor = cursor;discoverNextCursor = if(page.isNull("nextCursor")) null else page.getString("nextCursor")
+        discoverQuery = search;discoverCategory = filter;error = ""
+        scrollState.scrollTo(0)
+    }
+    fun pageDiscover(cursor: String?) {
+        if(route != "/discover" || pagingDiscover || loading || client == null) return
+        val revision = ++discoverRequestRevision
+        pagingDiscover = true;pass = null
+        scope.launch {
+            try {loadDirectory(cursor, discoverQuery, discoverCategory, revision)}
+            catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled}
+            catch(failure: Exception) {if(route == "/discover" && discoverRequestRevision == revision) {pass = null;record(failure)}}
+            finally {if(discoverRequestRevision == revision) pagingDiscover = false}
+        }
+    }
     fun exportSharedReply() {
         val target = route
         if(client == null || !target.startsWith("/share/") || sharingReply) return
@@ -128,12 +161,14 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
         }
     }
     LaunchedEffect(route, refresh, category) {
+        val revision = ++discoverRequestRevision
+        pagingDiscover = false
         error = ""; requiresSignIn = false; loading = true
         try {
             creator = null; posts = emptyList(); home = null; invitation = null; shared = null
             if (client == null) throw IllegalStateException(QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured"))
             when {
-                route == "/discover" -> { val result = client.request("public/creators?q=${URLEncoder.encode(query, "UTF-8")}&category=${if (category == "For you") "" else category}"); creators = result.objects("creators");pass = null;pass = try {client.request("discovery-access")}catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled} catch(_: Exception) {null} }
+                route == "/discover" -> {pass = null;loadDirectory(null, query, if(category == "For you") "" else category, revision)}
                 route == "/home" -> {homePostsCursor = null;homeThreadsCursor = null;home = client.request("home")}
                 route.startsWith("/invite/") -> invitation = client.request("public/invites/${route.removePrefix("/invite/")}")
                 route.startsWith("/share/") -> shared = client.request("public/shares/${route.removePrefix("/share/")}")
@@ -157,10 +192,13 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
             when {
                 route == "/notifications/settings" -> GrowthNotificationSettings(client)
                 route == "/discover" -> {
-                    BasicText(QelvoraCopy.text("navDiscover"), style = qText("display-lg").copy(color = ink))
+                    BasicText(QelvoraCopy.text("navDiscover"), style = qText("display-lg").copy(color = ink), modifier = Modifier.semantics {heading()})
                     BasicTextField(query, onValueChange = { query = it.take(120) }, textStyle = qText("body").copy(color = ink), singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = {refresh++}), decorationBox = {inner -> Box {if(query.isEmpty()) BasicText(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions"), style = qText("body").copy(color = qColor("ink-muted")));inner()}}, modifier = Modifier.fillMaxWidth().background(qColor("surface"), RoundedCornerShape(12.dp)).padding(14.dp).semantics {contentDescription = QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")})
                     Segmented(growthCategories.map(::growthLabel), growthLabel(category)) { label -> category = growthCategories.firstOrNull { growthLabel(it) == label } ?: category }
                     creators.forEach { item -> GrowthCreatorCard(item, if(pass?.optBoolean("enabled")==true) pass?.objects("markers")?.firstOrNull {it.getString("creatorId")==item.getString("id")}?.getString("state") else null) { navigate("/creators/${item.getString("handle")}") } }
+                    discoverNextCursor?.let {cursor -> Button(QelvoraCopy.text("growthMoreCreators"), ButtonVariant.SECONDARY, disabled = loading || pagingDiscover) {pageDiscover(cursor)}}
+                    if(discoverCursor != null) Button(QelvoraCopy.text("growthFirstPage"), ButtonVariant.QUIET, disabled = loading || pagingDiscover) {pageDiscover(null)}
+                    if(pagingDiscover) BasicText(QelvoraCopy.text("growthLoading"), style = qText("caption").copy(color = ink))
                     if (creators.isEmpty() && !loading && error.isEmpty()) EmptyState(QelvoraCopy.text("growthNoCreatorsFound"), QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
                 }
                 route == "/notifications" -> {

@@ -355,6 +355,8 @@ object QelvoraCopy {
     "growthDiscoverCreators" to "Discover creators",
     "growthNewFromPeopleYouFollow" to "New from people you follow",
     "growthLatestFirst" to "Latest first.",
+    "growthMoreCreators" to "More creators",
+    "growthFirstPage" to "First page",
     "growthAnInvitationFrom" to "AN INVITATION FROM {value1}",
     "growthSAiCanHelpYouKeepGoing" to "{value1}'s AI can help you keep going.",
     "growthAcceptInvitation" to "Accept invitation",

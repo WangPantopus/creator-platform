@@ -355,6 +355,8 @@
   <string name="growth_discover_creators" formatted="false">Discover creators</string>
   <string name="growth_new_from_people_you_follow" formatted="false">New from people you follow</string>
   <string name="growth_latest_first" formatted="false">Latest first.</string>
+  <string name="growth_more_creators" formatted="false">More creators</string>
+  <string name="growth_first_page" formatted="false">First page</string>
   <string name="growth_an_invitation_from" formatted="false">AN INVITATION FROM {value1}</string>
   <string name="growth_s_ai_can_help_you_keep_going" formatted="false">{value1}\'s AI can help you keep going.</string>
   <string name="growth_accept_invitation" formatted="false">Accept invitation</string>

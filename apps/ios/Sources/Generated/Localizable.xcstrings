@@ -3884,6 +3884,28 @@
         }
       }
     },
+    "More creators": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More creators"
+          }
+        }
+      }
+    },
+    "First page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First page"
+          }
+        }
+      }
+    },
     "AN INVITATION FROM {value1}": {
       "extractionState": "manual",
       "localizations": {

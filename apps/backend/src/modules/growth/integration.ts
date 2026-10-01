@@ -32,56 +32,9 @@ export function canonicalCreatorOwner(
   };
 }
 
-/** Bounded account-scoped W4 read; no spending/ledger data enters the projection. */
+/** W4 reads the displayed page under current account/session authority. */
 export function canonicalPassAccess(
   commerce: import("../commerce/service.js").CommerceService,
-  publicCreatorIds: () => Promise<string[]>,
 ): GrowthOwners["discoveryAccess"] {
-  return async (actor) => {
-    const overview = await commerce.overview(actor);
-    if (
-      !overview.policy.passEnabled ||
-      !overview.pass.some(
-        (pass) =>
-          pass.state === "active" &&
-          new Date(pass.cycle_end).valueOf() > Date.now(),
-      )
-    )
-      return { enabled: false, markers: [] };
-    const creatorIds = await publicCreatorIds(),
-      now = Date.now();
-    return {
-      enabled: true,
-      markers: creatorIds.slice(0, 100).map((creatorId) => {
-        const slots = overview.slots.filter(
-          (slot) =>
-            slot.creator_id === creatorId &&
-            new Date(slot.ends_at).valueOf() > now,
-        );
-        const active = slots.find(
-          (slot) =>
-            slot.state === "active" &&
-            new Date(slot.starts_at).valueOf() <= now,
-        );
-        const scheduled = slots
-          .filter(
-            (slot) =>
-              slot.state === "draft_next" &&
-              new Date(slot.starts_at).valueOf() > now,
-          )
-          .sort(
-            (a, b) =>
-              new Date(a.starts_at).valueOf() - new Date(b.starts_at).valueOf(),
-          )[0];
-        return {
-          creatorId,
-          state: active ? "active" : scheduled ? "draft_next" : "none",
-          startsAt:
-            scheduled && !active
-              ? new Date(scheduled.starts_at).toISOString()
-              : null,
-        };
-      }),
-    };
-  };
+  return (actor, creatorIds) => commerce.passDiscovery(actor, creatorIds);
 }

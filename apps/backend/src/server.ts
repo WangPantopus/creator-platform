@@ -15,6 +15,7 @@ import { createAgentDomain } from "./modules/agent/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { contentPublicProjection } from "./modules/growth/content.js";
 import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { DomainError } from "./core/errors.js";
 import { copy } from "@qelvora/copy";
 
@@ -115,13 +116,16 @@ const configured =
                     async (creatorId) => {
                       const row = (
                         await runtime.pool.query(
-                          "SELECT document->>'handle' AS handle FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
+                          "SELECT handle FROM creator.creator_profile WHERE id=$1",
                           [creatorId],
                         )
                       ).rows[0];
                       return row?.handle ?? null;
                     },
                   ),
+                  ...(commerce
+                    ? { discoveryAccess: canonicalPassAccess(commerce.service) }
+                    : {}),
                 }
               : undefined,
           });

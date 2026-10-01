@@ -30,7 +30,10 @@ public struct GrowthPost: Codable, Identifiable, Sendable {
   public let authorLabel: String
   public let aiContextEligible: Bool
 }
-private struct Directory: Decodable { let creators: [GrowthCreator] }
+private struct Directory: Decodable {
+  let creators: [GrowthCreator]
+  let nextCursor: String?
+}
 private struct GrowthPassAccess: Decodable {
   struct Marker: Decodable {
     let creatorId: String
@@ -193,6 +196,14 @@ public struct GrowthFanFeature: View {
   @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
+  @State private var discoverCursor: String?
+  @State private var discoverNextCursor: String?
+  @State private var discoverQuery = ""
+  @State private var discoverCategory = ""
+  @State private var discoverRequestID = UUID()
+  @State private var discoverPageRevision = 0
+  @State private var pagingDiscover = false
+  @AccessibilityFocusState private var discoverHeadingFocused: Bool
   @State private var pass: GrowthPassAccess?
   @State private var creator: GrowthCreator?
   @State private var posts: [GrowthPost] = []
@@ -244,7 +255,7 @@ public struct GrowthFanFeature: View {
           if route == "/notifications/settings" {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
-            Text(QelvoraCopy.text("navDiscover")).qText("display-lg")
+            Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
               .foregroundStyle(qColor("ink", scheme)).padding(12)
@@ -262,6 +273,17 @@ public struct GrowthFanFeature: View {
                 creatorCard(value)
               }.buttonStyle(.plain)
             }
+            if let cursor = discoverNextCursor {
+              Button(QelvoraCopy.text("growthMoreCreators"), variant: .secondary, block: true) {
+                Task { await pageDiscover(cursor) }
+              }.disabled(loading || pagingDiscover)
+            }
+            if discoverCursor != nil {
+              Button(QelvoraCopy.text("growthFirstPage"), variant: .quiet, block: true) {
+                Task { await pageDiscover(nil) }
+              }.disabled(loading || pagingDiscover)
+            }
+            if pagingDiscover { ProgressView().accessibilityLabel(QelvoraCopy.text("growthLoading")) }
             if creators.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoCreatorsFound"), body: QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
             }
@@ -480,6 +502,9 @@ public struct GrowthFanFeature: View {
       }.onChange(of: homePageRevision) { _, _ in
         reader.scrollTo("growth-home-top", anchor: .top)
         homeHeadingFocused = true
+      }.onChange(of: discoverPageRevision) { _, _ in
+        reader.scrollTo("growth-home-top", anchor: .top)
+        discoverHeadingFocused = true
       }
       }
       if !hasSession {
@@ -530,8 +555,11 @@ public struct GrowthFanFeature: View {
     }.background(qColor("surface", scheme)).clipShape(RoundedRectangle(cornerRadius: 16))
   }
   private func load() async {
+    let loadID = UUID()
+    let loadedRoute = route
     replyExport = nil
     homeRequestID = UUID()
+    discoverRequestID = loadID
     guard let client else {
       error = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured")
       return
@@ -540,7 +568,7 @@ public struct GrowthFanFeature: View {
     error = ""
     requiresSignIn = false
     hasSession = (try? await client.token()) != nil
-    defer { loading = false }
+    defer { if discoverRequestID == loadID { loading = false } }
     do {
       creator = nil
       posts = []
@@ -548,18 +576,7 @@ public struct GrowthFanFeature: View {
       invitation = nil
       shared = nil
       if route == "/discover" {
-        var parameters = URLComponents()
-        parameters.queryItems = [
-          URLQueryItem(name: "q", value: query),
-          URLQueryItem(name: "category", value: category == "For you" ? "" : category),
-        ]
-        let data: Directory = try await client.request(
-          "public/creators?" + (parameters.percentEncodedQuery ?? ""))
-        creators = data.creators
-        pass = nil
-        if hasSession {
-          pass = try? await client.request("discovery-access")
-        }
+        try await loadDirectory(nil, reset: true, requestID: loadID)
       } else if route == "/home" {
         homePostsCursor = nil
         homeThreadsCursor = nil
@@ -602,11 +619,51 @@ public struct GrowthFanFeature: View {
           ((try? await client.request("follow/" + creator.id)) as FollowState?)?.following ?? false
       }
     } catch {
-      if Task.isCancelled { return }
+      if Task.isCancelled || route != loadedRoute || discoverRequestID != loadID { return }
       creator = nil
       posts = []
       creators = []
       notifications = []
+      record(error)
+    }
+  }
+  private func loadDirectory(_ cursor: String?, reset: Bool = false, requestID: UUID) async throws {
+    guard let client, route == "/discover" else { return }
+    discoverRequestID = requestID
+    let search = reset ? query : discoverQuery
+    let filter = reset ? (category == "For you" ? "" : category) : discoverCategory
+    pagingDiscover = true
+    pass = nil
+    defer { if discoverRequestID == requestID { pagingDiscover = false } }
+    var parameters = URLComponents()
+    parameters.queryItems = [URLQueryItem(name: "q", value: search), URLQueryItem(name: "category", value: filter)]
+    if let cursor { parameters.queryItems?.append(URLQueryItem(name: "cursor", value: cursor)) }
+    let currentSession = try? await client.token()
+    let data: Directory = try await client.request("public/creators?" + (parameters.percentEncodedQuery ?? ""))
+    var access: GrowthPassAccess?
+    if let currentSession, !data.creators.isEmpty {
+      var accessParameters = URLComponents()
+      accessParameters.queryItems = [URLQueryItem(name: "creators", value: data.creators.map(\.id).joined(separator: ","))]
+      access = try? await client.request("discovery-access?" + (accessParameters.percentEncodedQuery ?? ""), expectedSession: currentSession)
+    }
+    guard !Task.isCancelled, route == "/discover", discoverRequestID == requestID else { return }
+    if (try? await client.token()) != currentSession { access = nil }
+    creators = data.creators
+    pass = access
+    discoverCursor = cursor
+    discoverNextCursor = data.nextCursor
+    discoverQuery = search
+    discoverCategory = filter
+    discoverPageRevision += 1
+    error = ""
+  }
+  private func pageDiscover(_ cursor: String?) async {
+    guard route == "/discover", !pagingDiscover, !loading else { return }
+    let requestID = UUID()
+    do { try await loadDirectory(cursor, requestID: requestID) }
+    catch {
+      guard !Task.isCancelled, route == "/discover", discoverRequestID == requestID else { return }
+      pass = nil
       record(error)
     }
   }

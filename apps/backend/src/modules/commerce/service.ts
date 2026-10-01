@@ -436,6 +436,66 @@ export class CommerceService {
       };
     });
   }
+  /** Current pass labels for the displayed public page. No overview truncation,
+   * financial history, private request or provider reference is projected. */
+  async passDiscovery(actor: Actor, creatorIds: readonly string[]) {
+    const ids = [...new Set(z.array(z.uuid()).max(100).parse(creatorIds))];
+    return this.account(
+      actor,
+      async (client) => {
+        if (!this.policy.passEnabled) return { enabled: false, markers: [] };
+        const fan = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.fan_profile WHERE account_id=$1",
+            [actor.accountId],
+          )
+        ).rows[0];
+        if (!fan) return { enabled: false, markers: [] };
+        const pass = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.commerce_pass WHERE fan_id=$1 AND state='active' AND (cycle_start::timestamp AT TIME ZONE 'UTC')<=clock_timestamp() AND (cycle_end::timestamp AT TIME ZONE 'UTC')>clock_timestamp()",
+            [fan.id],
+          )
+        ).rows[0];
+        if (!pass) return { enabled: false, markers: [] };
+        const creators = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.creator_profile WHERE id=ANY($1::uuid[]) AND verification='verified' AND NOT recovery_required",
+            [ids],
+          )
+        ).rows;
+        const slots = (
+          await client.query<{
+            creator_id: string;
+            state: "active" | "draft_next";
+            starts_at: Date;
+          }>(
+            `SELECT DISTINCT ON(s.creator_id) s.creator_id,s.state,s.starts_at
+         FROM creator.commerce_pass_slot s
+         WHERE s.fan_id=$1 AND s.creator_id=ANY($2::uuid[]) AND s.pass_id=$3 AND s.ends_at>clock_timestamp()
+           AND ((s.state='active' AND s.starts_at<=clock_timestamp()) OR (s.state='draft_next' AND s.starts_at>clock_timestamp()))
+         ORDER BY s.creator_id,(s.state='active') DESC,s.starts_at,s.id`,
+            [fan.id, creators.map((creator) => creator.id), pass.id],
+          )
+        ).rows;
+        return {
+          enabled: true,
+          markers: creators.map((creator) => {
+            const slot = slots.find((value) => value.creator_id === creator.id);
+            return {
+              creatorId: creator.id,
+              state: slot?.state ?? ("none" as const),
+              startsAt:
+                slot?.state === "draft_next"
+                  ? slot.starts_at.toISOString()
+                  : null,
+            };
+          }),
+        };
+      },
+      { isolation: "repeatable read" },
+    );
+  }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
     const totals = (
       await client.query<{ captured: string; held: string }>(

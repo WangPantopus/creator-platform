@@ -206,7 +206,10 @@ export interface GrowthOwners {
     nextCursor: string | null;
     order?: "activity" | "directory";
   }>;
-  discoveryAccess(actor: Actor): Promise<PassDiscoveryView>;
+  discoveryAccess(
+    actor: Actor,
+    creatorIds: readonly string[],
+  ): Promise<PassDiscoveryView>;
   creatorFor(actor: Actor): Promise<string | null>;
   shareSource(actor: Actor, grantId: string): Promise<ShareSource | null>;
   shareStatus(

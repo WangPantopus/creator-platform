@@ -222,31 +222,79 @@ export class GrowthService {
       );
     });
   }
-  async discover(query: string, category: string, offset = 0) {
+  async discover(query: string, category: string, offset = 0, cursor?: string) {
     const q = z.string().max(120).parse(query),
       cat = z.string().max(60).parse(category);
+    const pageOffset = z.int().min(0).max(1000).parse(offset);
+    let after: string | null = null;
+    if (cursor) {
+      try {
+        const page = z
+          .strictObject({
+            kind: z.literal("discover-page"),
+            query: z.literal(q),
+            category: z.literal(cat),
+            after: z.string().regex(/^[a-z0-9_]{3,30}$/u),
+          })
+          .parse(
+            JSON.parse(this.open(z.string().min(1).max(2048).parse(cursor))),
+          );
+        if (pageOffset !== 0)
+          throw new Error("discover_cursor_offset_conflict");
+        after = page.after;
+      } catch {
+        throw new DomainError(
+          "discover_cursor_invalid",
+          copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+          400,
+        );
+      }
+    }
     const result = await this.db.runtime.query(
-      `SELECT document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
+      `SELECT handle,document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
       AND ($1='' OR (document->>'name') ILIKE $2 OR (document->>'biography') ILIKE $2 OR (document->>'topics') ILIKE $2)
-      AND ($3='' OR document->>'category'=$3) ORDER BY handle LIMIT 31 OFFSET $4`,
-      [
-        q,
-        `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
-        cat,
-        z.int().min(0).max(1000).parse(offset),
-      ],
+      AND ($3='' OR document->>'category'=$3) AND ($5::text IS NULL OR handle>$5)
+      ORDER BY handle LIMIT 31 OFFSET $4`,
+      [q, `%${q.replace(/[\\%_]/gu, "\\$&")}%`, cat, pageOffset, after],
     );
     return {
       creators: result.rows
         .slice(0, 30)
         .map((r) => r.document as PublicCreator),
       hasMore: result.rows.length > 30,
+      nextCursor:
+        result.rows.length > 30
+          ? this.seal(
+              JSON.stringify({
+                kind: "discover-page",
+                query: q,
+                category: cat,
+                after: result.rows[29]!.handle,
+              }),
+            )
+          : null,
     };
   }
-  async passDiscovery(actor: Actor) {
-    const view = PassDiscovery.parse(await this.owners.discoveryAccess(actor));
-    if (!view.enabled) return { enabled: false, markers: [] };
+  async passDiscovery(actor: Actor, requestedIds?: readonly string[]) {
+    const ids =
+      requestedIds === undefined
+        ? (
+            await this.db.runtime.query(
+              "SELECT id FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true' ORDER BY handle LIMIT 30",
+            )
+          ).rows.map((row) => row.id as string)
+        : [...new Set(z.array(z.uuid()).max(100).parse(requestedIds))];
     const publicIds = (
+      await this.db.runtime.query(
+        "SELECT id FROM growth.creator_public WHERE id=ANY($1::uuid[]) AND state IN ('published','paused') AND document->>'verified'='true'",
+        [ids],
+      )
+    ).rows.map((row) => row.id as string);
+    const view = PassDiscovery.parse(
+      await this.owners.discoveryAccess(actor, publicIds),
+    );
+    if (!view.enabled) return { enabled: false, markers: [] };
+    const currentPublicIds = (
       await this.db.runtime.query(
         "SELECT id FROM growth.creator_public WHERE id=ANY($1::uuid[]) AND state IN ('published','paused') AND document->>'verified'='true'",
         [view.markers.map((marker) => marker.creatorId)],
@@ -254,8 +302,10 @@ export class GrowthService {
     ).rows.map((row) => row.id);
     return {
       ...view,
-      markers: view.markers.filter((marker) =>
-        publicIds.includes(marker.creatorId),
+      markers: view.markers.filter(
+        (marker) =>
+          publicIds.includes(marker.creatorId) &&
+          currentPublicIds.includes(marker.creatorId),
       ),
     };
   }
