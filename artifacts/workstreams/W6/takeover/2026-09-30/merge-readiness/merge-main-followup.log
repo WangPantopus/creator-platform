@@ -1,0 +1,60 @@
+Merge made by the 'ort' strategy.
+ apps/web/features/identity/account.tsx             |  42 ++++---
+ apps/web/features/studio/Studio.tsx                |  67 ++++++++---
+ apps/web/features/studio/api.ts                    |   7 +-
+ .../all-devices-signed-out.png                     | Bin 0 -> 29746 bytes
+ .../refresh-current-main-night.png                 | Bin 0 -> 37298 bytes
+ .../refresh-night-phone.png                        | Bin 0 -> 37298 bytes
+ .../2026-09-30-account-keyboard/refresh-outage.png | Bin 0 -> 42804 bytes
+ .../refresh-recovered.png                          | Bin 0 -> 40354 bytes
+ .../refresh-success.png                            | Bin 0 -> 37057 bytes
+ .../resume/2026-09-30-account-keyboard/review.md   |   9 ++
+ .../session-signed-out.png                         | Bin 0 -> 29746 bytes
+ .../resume/2026-09-30-account-keyboard/source.json |  87 +++++++++++++++
+ .../W5/2026-10-01/role-recovery/README.md          |   5 +
+ .../before-fix-reconnect-focus-body-390-light.jpg  | Bin 0 -> 19789 bytes
+ ...before-periodic-focus-fix-outage-1280-light.jpg | Bin 0 -> 33015 bytes
+ ...before-periodic-focus-fix-outage-1280-night.jpg | Bin 0 -> 31597 bytes
+ .../before-periodic-focus-fix-outage-390-light.jpg | Bin 0 -> 20076 bytes
+ .../before-periodic-focus-fix-outage-390-night.jpg | Bin 0 -> 18510 bytes
+ ...fore-periodic-focus-fix-restored-1280-night.jpg | Bin 0 -> 52823 bytes
+ ...efore-periodic-focus-fix-restored-390-light.jpg | Bin 0 -> 38496 bytes
+ .../final-busy-reconnect-390-night.jpg             | Bin 0 -> 19533 bytes
+ .../role-recovery/final-composer-1280-night.jpg    | Bin 0 -> 52767 bytes
+ .../role-recovery/final-outage-1280-light.jpg      | Bin 0 -> 33015 bytes
+ .../role-recovery/final-outage-390-light.jpg       | Bin 0 -> 20076 bytes
+ .../role-recovery/final-outage-390-night.jpg       | Bin 0 -> 19533 bytes
+ .../role-recovery/final-recovery-states.json       |  56 ++++++++++
+ .../role-recovery/final-restored-1280-light.jpg    | Bin 0 -> 54475 bytes
+ .../role-recovery/final-restored-390-light.jpg     | Bin 0 -> 37590 bytes
+ .../role-recovery/final-restored-390-night.jpg     | Bin 0 -> 36416 bytes
+ .../W5/2026-10-01/role-recovery/observations.json  | 123 +++++++++++++++++++++
+ docs/workstreams/status/W1-resume.md               |   6 +-
+ 31 files changed, 373 insertions(+), 29 deletions(-)
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/all-devices-signed-out.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/refresh-current-main-night.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/refresh-night-phone.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/refresh-outage.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/refresh-recovered.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/refresh-success.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/review.md
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/session-signed-out.png
+ create mode 100644 artifacts/workstreams/W1/resume/2026-09-30-account-keyboard/source.json
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/README.md
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-fix-reconnect-focus-body-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-1280-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-1280-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-restored-1280-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-restored-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-busy-reconnect-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-composer-1280-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-1280-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-recovery-states.json
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-1280-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/role-recovery/observations.json

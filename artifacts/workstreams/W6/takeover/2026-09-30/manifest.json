@@ -248,16 +248,7 @@
     "producerLeases": "All narrow W1 leases released including playback generation; no runtime enablement",
     "webMicrophone": "Actual keyboard request denied; enabledRecord/0:00 withexplicitreason; userpermissionpending",
     "mergeReadinessRecheck": {
-      "prs": [
-        1,
-        2,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
+      "prs": [1, 2, 4, 5, 6, 7, 8, 9],
       "ready": [],
       "basis": "Owner actualjourney gates/currentheadCI open; none eligible",
       "pr4DescriptionUpdated": true,
@@ -289,5 +280,14 @@
   "processingNotice": "processing-notice.json",
   "sourceCiIosReview": "source-ci-ios-review/review.json",
   "latestRuntimeSource": "c57a5e840748bb015c09742f61bffac3e494a123",
-  "nativeCaptureRepair": "source-ci-ios-review/layer-repair.json"
+  "nativeCaptureRepair": "source-ci-ios-review/layer-repair.json",
+  "mergeContinuation": {
+    "sourceRevision": "86fc07468629bdaacd4765eded7c4506e984d59f",
+    "receipt": "merge-readiness/receipt.json",
+    "phase": "guarded-shipping-entry-verified",
+    "allCapabilitiesFalse": true,
+    "newTests": 0,
+    "thresholdChanges": 0,
+    "freshGoldens": 0
+  }
 }
