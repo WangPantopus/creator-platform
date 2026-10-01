@@ -69,6 +69,9 @@ export class LiveAgentRuntime {
       hold: string;
       versionHash: string;
       model: string;
+      authority: CapturedAgentAuthority;
+      context: ConversationContextPort;
+      snapshot: { epoch: number; revision: number };
       completed: boolean;
       sealed: boolean;
     }
@@ -87,6 +90,19 @@ export class LiveAgentRuntime {
   async sealExecution(scope: ThreadScope, execution: ProviderExecution) {
     assertThreadScope(scope);
     const held = this.executionHolds.get(execution);
+    if (!held && this.service.repository.usageJournal) {
+      // Authority can fail before this runtime reserves a creator hold. W3's
+      // actual terminal fence may still close its accepted journal. Missing
+      // history remains unknown; only proven zero admissions become no_request.
+      await execution.sealAdmission((client) =>
+        this.service.repository.usageJournal!.seal(
+          scope,
+          client,
+          execution.generationId,
+        ),
+      );
+      return;
+    }
     invariant(
       held &&
         held.creatorId === scope.creatorId &&
@@ -152,6 +168,64 @@ export class LiveAgentRuntime {
       sentence,
     );
   }
+  /** Memory stays on the same completed main attempt until W3 commits its
+   * single batch and seals it. No new thread, lease or version is inferred. */
+  memoryJournal(
+    scope: ThreadScope,
+    snapshot: ThreadSnapshot,
+    execution: ProviderExecution,
+    signal: AbortSignal,
+  ) {
+    assertThreadScope(scope);
+    const held = this.executionHolds.get(execution);
+    invariant(
+      held &&
+        held.creatorId === scope.creatorId &&
+        held.threadId === scope.threadId &&
+        held.fanId === scope.fanId &&
+        held.actorAccountId === scope.actorAccountId &&
+        held.generationId === execution.generationId &&
+        held.attemptId === execution.attemptId &&
+        held.completed &&
+        !held.sealed,
+      "memory_execution_required",
+      "Memory requires this runtime's completed, unsealed generation attempt.",
+    );
+    return {
+      repository: this.service.repository,
+      versionHash: held.versionHash,
+      execution,
+      assertCurrent: async () => {
+        signal.throwIfAborted();
+        invariant(
+          !held.sealed,
+          "generation_admission_closed",
+          "Memory admission is closed.",
+        );
+        await held.context.assertDeliveryCurrent(scope, held.snapshot);
+        await held.context.assertProcessorConsent!(scope);
+        const current = await held.context.current(scope);
+        invariant(
+          current.epoch === snapshot.epoch &&
+            current.revision === snapshot.revision &&
+            !current.offTheRecord &&
+            !snapshot.offTheRecord,
+          "memory_changed",
+          "The memory extraction snapshot changed.",
+        );
+        signal.throwIfAborted();
+      },
+      assertAdmission: async (client: PoolClient) => {
+        signal.throwIfAborted();
+        invariant(
+          !held.sealed,
+          "generation_admission_closed",
+          "Memory admission is closed.",
+        );
+        await this.assertReady(scope, client, held.authority);
+      },
+    };
+  }
   /** W3 calls before a paid generation reservation. Safety needs current thread authority, never a license or grant. */
   async routeSafety(
     scope: ThreadScope,
@@ -163,6 +237,7 @@ export class LiveAgentRuntime {
       authorKind: "ai";
       safety: true;
     }) => Promise<void>,
+    context: ConversationContextPort = this.conversations,
   ) {
     assertThreadScope(scope);
     invariant(
@@ -171,15 +246,15 @@ export class LiveAgentRuntime {
       "A bounded fan message is required.",
     );
     signal.throwIfAborted();
-    const snapshot = await this.conversations.current(scope);
+    const snapshot = await context.current(scope);
     let crisis = needsImmediateSafety(message);
     if (!crisis && this.service.pipeline.model) {
       invariant(
-        this.conversations.assertProcessorConsent,
+        context.assertProcessorConsent,
         "processor_consent_unavailable",
         "Current processor consent is required before safety classification.",
       );
-      await this.conversations.assertProcessorConsent(scope);
+      await context.assertProcessorConsent(scope);
       crisis = await this.service.pipeline.classifySafety(
         this.creatorScope(scope),
         message,
@@ -187,7 +262,7 @@ export class LiveAgentRuntime {
       );
     }
     if (!crisis) return false;
-    await this.conversations.assertDeliveryCurrent(scope, {
+    await context.assertDeliveryCurrent(scope, {
       epoch: snapshot.epoch,
       revision: snapshot.revision,
     });
@@ -278,6 +353,7 @@ export class LiveAgentRuntime {
     signal: AbortSignal,
     deliver: (sentence: ApprovedSentence) => Promise<void>,
     execution?: ProviderExecution,
+    context: ConversationContextPort = this.conversations,
   ) {
     assertThreadScope(scope);
     invariant(
@@ -293,12 +369,12 @@ export class LiveAgentRuntime {
     );
     const current = await this.current(creatorScope);
     invariant(
-      this.conversations.assertProcessorConsent,
+      context.assertProcessorConsent,
       "processor_consent_unavailable",
       "Current processor consent is required before generation.",
     );
-    await this.conversations.assertProcessorConsent(scope);
-    const snapshot = await this.conversations.current(scope);
+    await context.assertProcessorConsent(scope);
+    const snapshot = await context.current(scope);
     const grants = await this.audiences.current(scope);
     const hold = await reserveCreatorCost(
       this.service.repository,
@@ -322,6 +398,13 @@ export class LiveAgentRuntime {
           hold,
           versionHash: current.version.compiledHash,
           model: this.service.pipeline.model?.fingerprint ?? "unconfigured",
+          authority: {
+            versionId: current.version.id,
+            versionHash: current.version.compiledHash,
+            audienceRevision: grants.revision,
+          },
+          context,
+          snapshot: { epoch: snapshot.epoch, revision: snapshot.revision },
           completed: false,
           sealed: false,
         }
@@ -351,11 +434,11 @@ export class LiveAgentRuntime {
     const assertCurrent = async () => {
       signal.throwIfAborted();
       controller.signal.throwIfAborted();
-      await this.conversations.assertDeliveryCurrent(scope, {
+      await context.assertDeliveryCurrent(scope, {
         epoch: snapshot.epoch,
         revision: snapshot.revision,
       });
-      await this.conversations.assertProcessorConsent!(scope);
+      await context.assertProcessorConsent!(scope);
       const fresh = await this.current(creatorScope);
       if (fresh.version.id !== current.version.id)
         throw new DomainError(
@@ -464,30 +547,25 @@ export class LiveAgentRuntime {
       }
     }
   }
-  async passage(scope: ThreadScope, passageId: string): Promise<Passage> {
-    const creatorScope = this.creatorScope(scope);
-    const grants = await this.audiences.current(scope);
-    if (!(Date.parse(grants.validUntil) > Date.now()))
+  /** W3 supplies its actual current scoped read transaction; audience/source
+   * authority cannot be checked on one connection and read on another. */
+  async passage(
+    scope: ThreadScope,
+    passageId: string,
+    client: PoolClient,
+  ): Promise<Passage> {
+    await this.assertReady(scope, client);
+    const grants = await this.audiences.currentInTransaction!(scope, client);
+    const rows = await client.query(
+      `SELECT c.id,s.id AS "sourceId",c.source_revision AS "sourceRevision",s.title,c.passage AS text,c.start_offset AS start,c.end_offset AS "end",s.audience FROM creator.ai_chunk c JOIN creator.ai_source s ON s.id=c.source_id AND s.creator_id=c.creator_id WHERE c.id=$1 AND c.creator_id=$2 AND s.creator_id=$2 AND c.source_revision=s.revision AND s.state='approved' AND (s.expires_at IS NULL OR s.expires_at>clock_timestamp()) AND (s.audience->>'kind'='public' OR (s.audience->>'kind'='tier' AND s.audience->'ids' ?| $3::text[]) OR (s.audience->>'kind'='group' AND s.audience->'ids' ?| $4::text[])) FOR SHARE OF c,s`,
+      [passageId, scope.creatorId, grants.tierIds, grants.groupIds],
+    );
+    if (!rows.rows[0] || !(Date.parse(grants.validUntil) > Date.now()))
       throw new DomainError(
         "citation_unavailable",
         "No longer accessible to you",
         403,
       );
-    return this.service.repository.transaction(
-      creatorScope,
-      async (client: PoolClient) => {
-        const rows = await client.query(
-          `SELECT c.id,s.id AS "sourceId",c.source_revision AS "sourceRevision",s.title,c.passage AS text,c.start_offset AS start,c.end_offset AS "end",s.audience FROM creator.ai_chunk c JOIN creator.ai_source s ON s.id=c.source_id AND s.creator_id=c.creator_id WHERE c.id=$1 AND c.creator_id=$2 AND s.creator_id=$2 AND c.source_revision=s.revision AND s.state='approved' AND (s.expires_at IS NULL OR s.expires_at>now()) AND (s.audience->>'kind'='public' OR (s.audience->>'kind'='tier' AND s.audience->'ids' ?| $3::text[]) OR (s.audience->>'kind'='group' AND s.audience->'ids' ?| $4::text[]))`,
-          [passageId, scope.creatorId, grants.tierIds, grants.groupIds],
-        );
-        if (!rows.rows[0])
-          throw new DomainError(
-            "citation_unavailable",
-            "No longer accessible to you",
-            403,
-          );
-        return rows.rows[0] as Passage;
-      },
-    );
+    return rows.rows[0] as Passage;
   }
 }

@@ -15,7 +15,20 @@
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
   "builds": "Active apps/web/.next-w2-review retained; own backend dist recreated by source verification; peer outputs/devices unchanged",
-  "nativeDevices": [],
+  "nativeDevices": [
+    {
+      "workstream": "W2",
+      "simulator": "09FA41B1-C300-4970-9F09-26F7CB884425",
+      "state": "Completed UI proof; own simulator shut down, app/data retained"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "state": "Fourth scoped recovery in progress;4existing UI interactions verified, clean launch still unverified"
+    }
+  ],
   "provider": {
     "name": "OpenAI",
     "secretReference": "/Users/yingpengwang/.config/creator-platform/secrets/openai.env",
@@ -44,14 +57,24 @@
   },
   "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
-  "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
-  "git": "Existing draft PR1 metadata successfully updated through authenticated local GitHub CLI; source pushed without force. Complete exact-head checks govern merge.",
+  "preservedPeerPorts": [
+    3001,
+    4101,
+    55431,
+    55435,
+    55438,
+    55443,
+    55444,
+    55447
+  ],
+  "git": "Existing PR1 is ready for review; authenticated local GitHub CLI metadata works. Complete exact-head checks and actual app verification govern merge; no duplicate or forced push.",
   "nativeVerificationTools": {
     "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
-    "location": null,
-    "state": "Permanently removed at founder request after handoff; reinstall scoped official tools for future local native acceptance",
+    "location": "tmp/w2-native-20260930",
+    "state": "Fresh scoped official XcodeGen2.46.0, Temurin21.0.12.1, AndroidCLI15859902 and emulator37.1.11 installed; owned SDK/AVD/Gradle/DerivedData only",
     "isolated": "Own SDK and Gradle home; no peer devices or caches used",
-    "formerLocation": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930"
+    "formerLocation": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930",
+    "historicalCleanupState": "Permanently removed at founder request after handoff; reinstall scoped official tools for future local native acceptance"
   },
   "temporaryIngestionWorker": {
     "port": 4202,
@@ -64,10 +87,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 71623,
-      "executionSession": 28587
+      "pid": 97035,
+      "executionSession": 74107
     },
-    "observedAt": "2026-10-01T01:21:16.678073+00:00",
+    "observedAt": "2026-10-01T02:43:39.166900+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -100,20 +123,24 @@
     "record": "resource-cleanup.md",
     "allocatedKiBRemoved": 4744680,
     "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
-    "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
+    "privateRuntimeFiles": [
+      "runtime.env",
+      "provider.env",
+      "postgres.env"
+    ],
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-10-01T01:21:16.678073+00:00",
+    "observedAt": "2026-10-01T02:12:23.278087+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener,PID71623/session28587; restarted current source-hashed owner export follow-up",
+    "apiPort4102": "loopback listener,PID97035/session74107; current createAgentDomain plus agentFeature registration mounted; saved companion18/current evaluation retained",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
     "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
     "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
     "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-    "nextAction": "Publish prepared family ports to W3/W4/W8; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full new-head CI/native/visual acceptance pending"
+    "nextAction": "Personally complete launched-app/native acceptance; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full final-head CI pending"
   },
   "availabilityHistory": [
     {
@@ -131,21 +158,50 @@
       "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
     },
     {
-      "observedAt": "2026-10-01T01:21:16.678073+00:00",
+      "observedAt": "2026-10-01T00:23:25.011767+00:00",
       "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-      "apiPort4102": "loopback listener,PID71623/session28587; restarted current source-hashed owner export follow-up",
+      "apiPort4102": "loopback listener,PID42986; restarted741d8dd provider admission/hold source",
       "postgresPort55442": "loopback Docker listener",
       "docker": "Shared engine already available when rechecked; no engine restart/prune",
       "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
-      "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
+      "savedData": "123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
       "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
       "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-      "nextAction": "Publish prepared family ports to W3/W4/W8; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full new-head CI/native/visual acceptance pending"
+      "nextAction": "W8 exact0048 source custody/registration and canonical rollout; W3 acceptance fence, original W4 weighting and current C10 fan-accounting registration; complete final-head CI/native/visual acceptance remain pending"
     }
   ],
   "temporaryVisualVerification": {
-    "ports": [3012, 3112],
+    "ports": [
+      3012,
+      3112
+    ],
     "state": "Stopped after existing suite/followup; reference PNGs/assertions/tolerances unchanged; next-env drift restored",
     "receipt": "visual-origin-followup.json"
+  },
+  "nativeVerification": {
+    "state": "iOS2 and Android4 existing UI interactions verified; clean Android launch recovery ongoing; canonical licensed fan journeys unavailable",
+    "simulator": {
+      "name": "Creator Platform W2 Resume 20260930",
+      "id": "09FA41B1-C300-4970-9F09-26F7CB884425",
+      "runtime": "iOS26.5",
+      "state": "Signed app installed/visibly launched, existing2 UI cases PASS0fail44.250s including sign-in Light/Night; owned device now shut down, app/data retained",
+      "peerDevices": "All preserved",
+      "evidence": [
+        "ios-welcome-launched.png",
+        "ios-signin-night-operated.png"
+      ]
+    },
+    "android": {
+      "emulatorPort": 5562,
+      "adbServerPort": 5042,
+      "state": "Existing4 UI casesPASS144.28s. Post-run relaunch and fourth hostGPU recovery still showSystemUIANR; fourth boot89.206s/launchstatusok11.363s is not clean. Own same5562/5042/data; targeted existing sign-in case rerun in progress, no new suites.",
+      "evidence": [
+        "android-systemui-failure.png",
+        "android-systemui-after-ui.png"
+      ],
+      "executionSession": 21120
+    },
+    "ownedDirectory": "tmp/w2-native-20260930",
+    "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse"
   }
 }
