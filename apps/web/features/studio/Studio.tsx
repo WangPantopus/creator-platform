@@ -639,7 +639,8 @@ function Notes({ creator }: { creator: Creator }) {
             </div>
           ))}
         {!notes.items.some((n) => n.document.kind === "note") &&
-          !action.busy && (
+          !action.busy &&
+          !action.error && (
             <EmptyState
               title="Your first Note"
               body="Write one Note for your audience. Each fan's reply stays private."
@@ -650,8 +651,12 @@ function Notes({ creator }: { creator: Creator }) {
         <div className="w5-replies">
           <div className="w5-replies-title">
             <span className="qv-meta">
-              REPLIES · {replies.items.length}
-              {replies.nextCursor ? "+" : ""}
+              REPLIES ·{" "}
+              {action.busy
+                ? "loading"
+                : action.error
+                  ? "unavailable"
+                  : `${replies.items.length}${replies.nextCursor ? "+" : ""}`}
             </span>
             <span className="qv-help">
               Only you and your triage team see these
@@ -750,7 +755,7 @@ function Notes({ creator }: { creator: Creator }) {
               More replies
             </button>
           )}
-          {!replies.items.length && !action.busy && (
+          {!replies.items.length && !action.busy && !action.error && (
             <p className="qv-help">
               Reviewed private replies appear here when fans reply to a
               published Note. Replies waiting for safety review stay out of the
