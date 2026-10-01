@@ -83,6 +83,35 @@ export function assetView(row: AssetRow): MediaAsset {
     provenance: row.provenance,
   });
 }
+/** Credentials bind the original recording occurrence and every processed field. */
+function verifiedRecordingProvenance(row: AssetRow) {
+  const proof = row.provenance;
+  return Boolean(
+    row.signed_act_id &&
+      row.mime_type === "audio/mp4" &&
+      row.duration_ms !== null &&
+      Number.isSafeInteger(row.duration_ms) &&
+      row.duration_ms > 0 &&
+      proof?.schemaVersion === 1 &&
+      proof.kind === "human_recording" &&
+      proof.c2paVerified === true &&
+      proof.accountId === row.owner_account_id &&
+      proof.creatorId === row.creator_id &&
+      proof.fanId === row.fan_id &&
+      proof.threadId === row.thread_id &&
+      proof.purpose === row.purpose &&
+      proof.assetId === row.id &&
+      proof.assetVersion === row.version &&
+      proof.signedActId === row.signed_act_id &&
+      proof.processedMediaSha256 === row.output_sha256 &&
+      proof.processedMediaBytes === Number(row.bytes) &&
+      proof.processedMediaMimeType === row.mime_type &&
+      proof.processedMediaDurationMs === row.duration_ms &&
+      proof.transform === "aac_m4a" &&
+      typeof proof.fileSha256 === "string" &&
+      /^[a-f0-9]{64}$/u.test(proof.fileSha256),
+  );
+}
 export class MediaService {
   readonly chunkBytes = 1024 * 1024;
   constructor(
@@ -422,6 +451,10 @@ export class MediaService {
       scope.authority === "creator" &&
         row.owner_account_id === scope.actorAccountId &&
         row.state === "ready" &&
+        row.mime_type === "audio/mp4" &&
+        row.duration_ms !== null &&
+        Number.isSafeInteger(row.duration_ms) &&
+        row.duration_ms > 0 &&
         ["human_note", "human_reply"].includes(row.purpose),
       "media_not_signable",
       "This recording cannot be signed by this account.",
@@ -472,9 +505,7 @@ export class MediaService {
         row.mime_type === proof.mimeType &&
         row.duration_ms === proof.durationMs &&
         row.signed_act_id &&
-        row.provenance?.c2paVerified === true &&
-        row.provenance.processedMediaSha256 === proof.sha256 &&
-        row.provenance.signedActId === row.signed_act_id,
+        verifiedRecordingProvenance(row),
       "media_publication_unavailable",
       "This exact signed recording is not ready for delivery.",
     );
@@ -511,7 +542,7 @@ export class MediaService {
         ["human_note", "human_reply"].includes(row.purpose)
       )
         invariant(
-          row.signed_act_id && row.provenance?.c2paVerified === true,
+          verifiedRecordingProvenance(row),
           "media_provenance_pending",
           "This recording is awaiting its signature and content credentials.",
         );

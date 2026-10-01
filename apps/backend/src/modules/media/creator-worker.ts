@@ -109,6 +109,7 @@ export class CreatorMediaWorker {
         if (
           !claimed.signed_act_id ||
           !claimed.output_sha256 ||
+          processed.length !== Number(claimed.bytes) ||
           MediaService.digest(processed) !== claimed.output_sha256
         )
           throw new Error("processed_media_integrity_invalid");

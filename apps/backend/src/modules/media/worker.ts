@@ -48,6 +48,10 @@ export class MediaWorker {
         manifest_pending: boolean;
         delete_pending: boolean;
         owner_account_id: string;
+        creator_id: string;
+        fan_id: string;
+        thread_id: string;
+        duration_ms: number | null;
       }>(
         `SELECT * FROM creator.media_asset WHERE creator_id=$1 AND fan_id=$2 AND job_available_at<=now() AND (job_lease_until IS NULL OR job_lease_until<now()) AND (state IN ('quarantined','processing','revoked') OR manifest_pending OR delete_pending) ORDER BY job_available_at,id LIMIT 1 FOR UPDATE SKIP LOCKED`,
         [scope.creatorId, scope.fanId],
@@ -120,7 +124,14 @@ export class MediaWorker {
           "processed",
         );
         if (
+          !claimed.signed_act_id ||
           !claimed.output_sha256 ||
+          claimed.mime_type !== "audio/mp4" ||
+          claimed.duration_ms === null ||
+          !Number.isSafeInteger(claimed.duration_ms) ||
+          claimed.duration_ms <= 0 ||
+          !["human_note", "human_reply"].includes(claimed.purpose) ||
+          processed.length !== Number(claimed.bytes) ||
           MediaService.digest(processed) !== claimed.output_sha256
         )
           throw new Error("processed_media_integrity_invalid");
@@ -128,9 +139,17 @@ export class MediaWorker {
           schemaVersion: 1,
           kind: "human_recording",
           accountId: claimed.owner_account_id,
+          creatorId: claimed.creator_id,
+          fanId: claimed.fan_id,
+          threadId: claimed.thread_id,
+          purpose: claimed.purpose,
           signedActId: claimed.signed_act_id,
           assetId: claimed.id,
+          assetVersion: claimed.version,
           processedMediaSha256: claimed.output_sha256,
+          processedMediaBytes: Number(claimed.bytes),
+          processedMediaMimeType: claimed.mime_type,
+          processedMediaDurationMs: claimed.duration_ms,
           transform: "aac_m4a",
           c2paVerified: true,
         };
