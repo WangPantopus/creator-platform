@@ -1,0 +1,1727 @@
+[
+  {
+    "path": ".github/workflows/ci.yml",
+    "baseBlob": "cc0303b6ea02897b335a5189ee291c93ca47163c",
+    "oursBlob": "cda12122cabff5c6ddb5e6509db818bc67e49419",
+    "mainBlob": "bb8274a80dd2cbd4a066863a0a3ac074da19cd20",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": ".github/workflows/trust-release.yml",
+    "baseBlob": "9199320890ede9bdaaedc839619ddff98706ce94",
+    "oursBlob": "9199320890ede9bdaaedc839619ddff98706ce94",
+    "mainBlob": "8f3707b1786f1a031edf6cf5ac9d755667c5344c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": ".prettierignore",
+    "baseBlob": "a7d9f19bc70fc05f707b72e0859369852b5484c4",
+    "oursBlob": "4f8de828e3120404ab967e5cd6a5b275d78b63fc",
+    "mainBlob": "a7d9f19bc70fc05f707b72e0859369852b5484c4",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/build.gradle.kts",
+    "baseBlob": "5a67047b77f5ff8893f272501781b34cb462ca7d",
+    "oursBlob": "5a67047b77f5ff8893f272501781b34cb462ca7d",
+    "mainBlob": "6fc675e7e5116d3fa6ccf510f662efd333a8a244",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/androidTest/java/com/pantopus/qelvora/NativeAcceptanceTest.kt",
+    "baseBlob": "a74cddc63e1a5284814e0cf95fd605348150fb75",
+    "oursBlob": "8fcba2d5bcc3da4750785442b43378632852f99b",
+    "mainBlob": "1f4649a171ff0c7215269e74995e97af22bb24df",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt",
+    "baseBlob": "c5150d35d272885ec060ca205747c77d7da0bdf3",
+    "oursBlob": "c5150d35d272885ec060ca205747c77d7da0bdf3",
+    "mainBlob": "5e72bce2a8b13d0f38d977faba29da175d7b05fb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt",
+    "baseBlob": "898d665751029e9e80f273d972bbb84935e2bec6",
+    "oursBlob": "e83a29dd43f2c0a04ab232c50e97dc6129a1e371",
+    "mainBlob": "898d665751029e9e80f273d972bbb84935e2bec6",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt",
+    "baseBlob": "7d2ce30ef39cf5fabb44ad073e5e4d85790c6599",
+    "oursBlob": "b5799d98d939a86b943081f894b60355cd17effd",
+    "mainBlob": "7d2ce30ef39cf5fabb44ad073e5e4d85790c6599",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+    "baseBlob": "f0b008352962c829c899a84a822bdb45ddefa546",
+    "oursBlob": "fe1cfd537bb749049a9f2a3a38101ce385119b5d",
+    "mainBlob": "c3fd1400ac27630b361303a13a28e178f73645a2",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+    "baseBlob": "4a059b3acbebe42de8f18be54a84e41b36213822",
+    "oursBlob": "4a059b3acbebe42de8f18be54a84e41b36213822",
+    "mainBlob": "2e342ce264037b32530bb161dfcf85be2ec5b926",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+    "baseBlob": "163d4fce70764539074ba50d2a9e8b9abbb9d447",
+    "oursBlob": "163d4fce70764539074ba50d2a9e8b9abbb9d447",
+    "mainBlob": "f58735caeef6b3692bd98b554852346437f18b14",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+    "baseBlob": "9137f86f687e41d55e6f8efc84ab2c15bf29a00e",
+    "oursBlob": "9137f86f687e41d55e6f8efc84ab2c15bf29a00e",
+    "mainBlob": "7954f72a8462ecfb7b80b5b0d945e9fdf4878940",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt",
+    "baseBlob": "a08aead11a42d055ce6166fe68ae56f5ea6f3e1b",
+    "oursBlob": "a08aead11a42d055ce6166fe68ae56f5ea6f3e1b",
+    "mainBlob": "a1ca0e6c66b059eba0d4d0f4e9da007a5597f318",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt",
+    "baseBlob": "4996744913333b654526f74c45cd26eecc7b6e87",
+    "oursBlob": "4996744913333b654526f74c45cd26eecc7b6e87",
+    "mainBlob": "ffae6ebcf9ac226b39b7c2e196d498f7e06b27f1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt",
+    "baseBlob": "43f6ea94b75968f7a28fb87222283fd22f042c14",
+    "oursBlob": "43f6ea94b75968f7a28fb87222283fd22f042c14",
+    "mainBlob": "e6e65eb2762e95afec680ba166cb28ff18f0fd90",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt",
+    "baseBlob": "3bd53810c11da1db586d712eb1bdd8605f3b60ea",
+    "oursBlob": "3bd53810c11da1db586d712eb1bdd8605f3b60ea",
+    "mainBlob": "d2948b807f9b7815f7e3727e51b98357e6f29adc",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Conversation.kt",
+    "baseBlob": "9324115a335527f416c628c2a59726b0ae73b8f0",
+    "oursBlob": "9324115a335527f416c628c2a59726b0ae73b8f0",
+    "mainBlob": "15506f8ff5a94a4c5fdf3d697ae13b46c41b3ed8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt",
+    "baseBlob": "5f3f00efdd3d241ef76e62f730f72e294363dea9",
+    "oursBlob": "5f3f00efdd3d241ef76e62f730f72e294363dea9",
+    "mainBlob": "42629f8562a835c541f835f0d2c4654f029bd4de",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt",
+    "baseBlob": "5e7cb7150710b914bf15ede6786cf7d2be68b410",
+    "oursBlob": "5e7cb7150710b914bf15ede6786cf7d2be68b410",
+    "mainBlob": "e3d0450a749d13df74268aa8f8c341ce783d87ac",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+    "baseBlob": "3f6e61536b389716a52af7a5dbe3b67a7fe2ccb3",
+    "oursBlob": "3f6e61536b389716a52af7a5dbe3b67a7fe2ccb3",
+    "mainBlob": "de463f360444dd3ccaee0992f3f988944bc6a723",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt",
+    "baseBlob": "1829c78e158db2a7fd536c7e2a9936f6b8535ea8",
+    "oursBlob": "0e61e4c0f2cff5dfc5a6d35d3e2fd1cf8cf31062",
+    "mainBlob": "1829c78e158db2a7fd536c7e2a9936f6b8535ea8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/android/app/src/main/res/values/strings.xml",
+    "baseBlob": "eff482fdada7a1a6e9241c65aaff72898442fcd1",
+    "oursBlob": "eff482fdada7a1a6e9241c65aaff72898442fcd1",
+    "mainBlob": "08ff986f996a113f7505bd5ea6d2fe2800509a12",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/scripts/build.mjs",
+    "baseBlob": "0971a76a7999a7fae221a85c0ec0e16998b4effa",
+    "oursBlob": "57045777f7a2d30cd2c092a89982503bc5b76076",
+    "mainBlob": "92f4ba8c55630728dd21f2f435c942e41038ff8f",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/scripts/tombstone-journal.ts",
+    "baseBlob": "096962c20ac94d327cbc20b3ec42361bc63ad302",
+    "oursBlob": "096962c20ac94d327cbc20b3ec42361bc63ad302",
+    "mainBlob": "0c6b27c76f47b7302d25b9cf98e794b0235a632d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/app.ts",
+    "baseBlob": "50aecac957aa7ae60e87d749de894221b3221831",
+    "oursBlob": "c22a2e4ba0c2e891608940b6dab4411ef9d368f9",
+    "mainBlob": "0bdb354091d435064226e86df95b3d6c8e6a8b84",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/core/idempotency.ts",
+    "baseBlob": "244a0cabba6e0764a2b9f1dddf038e0bd9989e0e",
+    "oursBlob": "244a0cabba6e0764a2b9f1dddf038e0bd9989e0e",
+    "mainBlob": "4eb6b329163c629130b5fa408913feb56ed9354f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/db/database.ts",
+    "baseBlob": "9116fc84dba67b409f23c3430f7074b53190f9fe",
+    "oursBlob": "9e5c8496d1af497db1cb6253067659ee5ce89bac",
+    "mainBlob": "dbeaf232d271ef540ab8a98ff1ac4aa971fd63c7",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/features.ts",
+    "baseBlob": "cb127bca62bacb787cf193d91c67d265ef428fb3",
+    "oursBlob": "cb127bca62bacb787cf193d91c67d265ef428fb3",
+    "mainBlob": "db73e03ea5c747efbfbe774b0d23c04a0c33cabe",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/integration.ts",
+    "baseBlob": "e5a66a00ebc5176e1864b7bb62772d06ce44231e",
+    "oursBlob": "0f789f2ead6e4cb0282d7e9cb9f4f1bceae79387",
+    "mainBlob": "3669b5a9ce4903786cc227025122116452d142d6",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/modules/access/commerce.ts",
+    "baseBlob": "ae2bed10efaa16f117e4ac878644bd13cba2c824",
+    "oursBlob": "e7835f35e3c1aa38d0d4bf20ed5043b923aae158",
+    "mainBlob": "a828b8d661d5318b043f43527aedaa354b7bdcb9",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/access/scope.ts",
+    "baseBlob": "bd2e43af86b82e8457f7d5ffd882a70d2594c1ce",
+    "oursBlob": "8d359a4d20e66b4a309b82e0603984171c8a2e7f",
+    "mainBlob": "cf09e44f115ee677c6309883bf73ca4a9ac9be2c",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/budget.ts",
+    "baseBlob": "6e6f27b2e135e35695bd450782b0c692c433a587",
+    "oursBlob": "6e6f27b2e135e35695bd450782b0c692c433a587",
+    "mainBlob": "c0c60de7e871cc578e881221739e961d4d93093d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/lifecycle.ts",
+    "baseBlob": "989ee4fc0729a7d9672c24f05ce46668741def47",
+    "oursBlob": "989ee4fc0729a7d9672c24f05ce46668741def47",
+    "mainBlob": "7dcd8c311f47a7626a2588b4ad7ed3a28112bf5d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/memory-proposals.ts",
+    "baseBlob": "bc42ed4ea5f6c7e3650d7528b5551241537d5bda",
+    "oursBlob": "bc42ed4ea5f6c7e3650d7528b5551241537d5bda",
+    "mainBlob": "7767fbe77d4fefaf32b28617882542ea5576c763",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/model.ts",
+    "baseBlob": "b54233e4ef30bbe32ff8822f21250e7c9d648614",
+    "oursBlob": "b54233e4ef30bbe32ff8822f21250e7c9d648614",
+    "mainBlob": "eb3511650142a2fe153fb5debb5b7d833618f471",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/pipeline.ts",
+    "baseBlob": "8d53241e10d4a8bbad24f0c136083d9bbabbb577",
+    "oursBlob": "8d53241e10d4a8bbad24f0c136083d9bbabbb577",
+    "mainBlob": "cb22ce1186654ac46a1126cf7b9c5b48aef7dab0",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/repository.ts",
+    "baseBlob": "ea4b0fb7ddbc770b8207fe6c5e1ed2fbd3da5dea",
+    "oursBlob": "ea4b0fb7ddbc770b8207fe6c5e1ed2fbd3da5dea",
+    "mainBlob": "68db273edb8b655970b206c39f06a2d3d0d8d0aa",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/router.ts",
+    "baseBlob": "4c30da5e05aeb9c18de5c8f28f9e3c2be3a63766",
+    "oursBlob": "4c30da5e05aeb9c18de5c8f28f9e3c2be3a63766",
+    "mainBlob": "87340b18c1e56b5291922b34df2945c887290f4a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/runtime.ts",
+    "baseBlob": "cd28bef726d11e9ad39641d5a125a63c5bc86074",
+    "oursBlob": "cd28bef726d11e9ad39641d5a125a63c5bc86074",
+    "mainBlob": "b056840b70017dd594a7198088ed7fd311eee12d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/service.ts",
+    "baseBlob": "f326b05021faaae3bd72aa1c7756139b0a3dd532",
+    "oursBlob": "f326b05021faaae3bd72aa1c7756139b0a3dd532",
+    "mainBlob": "fb6ee90356521b36b379382396bd0b08515ca056",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/shadow.ts",
+    "baseBlob": "5addecb72aca484dcf9e049f95eb5eea13260510",
+    "oursBlob": "5addecb72aca484dcf9e049f95eb5eea13260510",
+    "mainBlob": "6a32faca647d2fca2e3ccbfbd22b6d56276e13d3",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/streaming.ts",
+    "baseBlob": "d27a9ee00ac36fd8079f2763820be7cbcbe31b35",
+    "oursBlob": "d27a9ee00ac36fd8079f2763820be7cbcbe31b35",
+    "mainBlob": "c2f18c5cbaa62a86bbbce63eba2e368b5054ae7b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/style-index.ts",
+    "baseBlob": "75d10a33170cb395457bf47e159c027074e91cd9",
+    "oursBlob": "75d10a33170cb395457bf47e159c027074e91cd9",
+    "mainBlob": "0dcd44fc9dd2af85ce9cc7fe54444a8b4af1d08b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/agent/trust-adapter.ts",
+    "baseBlob": "3a63c7982a2dd57bcd1f2e60e62103f834469cc9",
+    "oursBlob": "3a63c7982a2dd57bcd1f2e60e62103f834469cc9",
+    "mainBlob": "0b0ec296ffe30d7451ccabb257a8edeeca447de2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/accounting.ts",
+    "baseBlob": "d99b948109884bde5418f605b27b20ab7bfa80a0",
+    "oursBlob": "ed58079ffa167a731b3081b3ff55032fc2d2d993",
+    "mainBlob": "d99b948109884bde5418f605b27b20ab7bfa80a0",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/audience.ts",
+    "baseBlob": "553b54ba9a56276dd42c26749e3433297e452602",
+    "oursBlob": "f42ac4f4c341124a8c16c6650bb23b323e192fd8",
+    "mainBlob": "553b54ba9a56276dd42c26749e3433297e452602",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/billing.ts",
+    "baseBlob": "7359b3972f511074905c9f1cd6666d9c7ee27463",
+    "oursBlob": "9e96e26e606108e1441f1679c593ea464f3ae7d2",
+    "mainBlob": "7359b3972f511074905c9f1cd6666d9c7ee27463",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/extended.ts",
+    "baseBlob": "6aa813c4d72811d7d834a3f2f22aa14d8d0ed5e1",
+    "oursBlob": "bbb05fe1c0f18a5f68d83a84b3f5b60669db3261",
+    "mainBlob": "6aa813c4d72811d7d834a3f2f22aa14d8d0ed5e1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/financial-export.ts",
+    "baseBlob": "f53a8dffbfe0ad7d6c56354cf640d063c2584a7c",
+    "oursBlob": "b4641ff938a08d622bbbf61dd7e0d639f1937a77",
+    "mainBlob": "f53a8dffbfe0ad7d6c56354cf640d063c2584a7c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/generation-allowance.ts",
+    "baseBlob": "2f3084835fdc4f2ab5d793061f2439a84b3e06f6",
+    "oursBlob": "14b12af35316641402563111a0c6e460b5614fe8",
+    "mainBlob": "2f3084835fdc4f2ab5d793061f2439a84b3e06f6",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/operations.ts",
+    "baseBlob": "ceef974d3e581197230b5ffe87e6c3148e82f448",
+    "oursBlob": "758ee7cf0ba1e568cc7bf6ccf084a9139696177a",
+    "mainBlob": "ceef974d3e581197230b5ffe87e6c3148e82f448",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/pass.ts",
+    "baseBlob": "8cb498d4738b8a38bde0199ed03445e83d554621",
+    "oursBlob": "6a817bff1e528ef80b8dc13e6734e56e039a1143",
+    "mainBlob": "8cb498d4738b8a38bde0199ed03445e83d554621",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/router.ts",
+    "baseBlob": "39255dc147c2c8c2fa2092dd97e05b03a2400cc1",
+    "oursBlob": "e5efd2244a682c387bebd1839e28dbb3ea22f354",
+    "mainBlob": "39255dc147c2c8c2fa2092dd97e05b03a2400cc1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/runtime.ts",
+    "baseBlob": "b3839c8c9faa6b9ffccd84fe99794da5a56a00ce",
+    "oursBlob": "c21fd35165c167fcb598bec107dd3143bc531f84",
+    "mainBlob": "b3839c8c9faa6b9ffccd84fe99794da5a56a00ce",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/service.ts",
+    "baseBlob": "a972eb8ec460536a8a247a6794dd53ba78587c3a",
+    "oursBlob": "4abc34a6380c964db2bd38a436ebd57010c9fa20",
+    "mainBlob": "60e71114e8112abdf7391ff14eca66780bee7056",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/stripe-billing.ts",
+    "baseBlob": "e1e13c092c580a599bbc890e04c74ac5c3ce4c65",
+    "oursBlob": "7038fe96d2f3106b8a1b4b2c7e8a1851c21627b8",
+    "mainBlob": "e1e13c092c580a599bbc890e04c74ac5c3ce4c65",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/commerce/stripe-connect.ts",
+    "baseBlob": "36150b5de9c5589b1d2e95ee362502b1b5afe321",
+    "oursBlob": "8207751aee23f041f2d1b77de587860c817baafa",
+    "mainBlob": "36150b5de9c5589b1d2e95ee362502b1b5afe321",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/content/privacy.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/content/registration.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/content/service.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/conversation/memory.ts",
+    "baseBlob": "a2073014c3474d53a17953cd7aac335f02894d3d",
+    "oursBlob": "a2073014c3474d53a17953cd7aac335f02894d3d",
+    "mainBlob": "eb408ae512ef519c628c3563aece8fc365408851",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/conversation/service.ts",
+    "baseBlob": "6f2dddbdc5c8d0648800f485db1397682360a51e",
+    "oursBlob": "47418a89c73948575a1f67cd64aee8f05b45a221",
+    "mainBlob": "0b4789a3dff92f3049411147a552a761036c9f71",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/contracts.ts",
+    "baseBlob": "000265da2e13ae6c3252d993bed41db81f4fff06",
+    "oursBlob": "000265da2e13ae6c3252d993bed41db81f4fff06",
+    "mainBlob": "69d083d8b6988891c2c6268b46661c7fe12bdce8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/database.ts",
+    "baseBlob": "60526bf3aa03f03f9d4a5f78ba84a167098884ae",
+    "oursBlob": "60526bf3aa03f03f9d4a5f78ba84a167098884ae",
+    "mainBlob": "69f07e688fbc91ac3aecc898a08697646058413c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/development.ts",
+    "baseBlob": "91f94c745c36ca8dc698205b233a0f83474798c5",
+    "oursBlob": "91f94c745c36ca8dc698205b233a0f83474798c5",
+    "mainBlob": "ccb816fbc0654303938f6468cd2b93bd140417fb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/email.ts",
+    "baseBlob": "3d9c76625cabef01ff68edc2cb64964c2216f5c5",
+    "oursBlob": "3d9c76625cabef01ff68edc2cb64964c2216f5c5",
+    "mainBlob": "f7a4b04ce4bf67122f8b5a44dd402d9de193b391",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/lifecycle.ts",
+    "baseBlob": "2e0d1f18597a06488cb8318847ae3cfedae108b1",
+    "oursBlob": "2e0d1f18597a06488cb8318847ae3cfedae108b1",
+    "mainBlob": "e3e99d73059e0fb016ef78784d7c9e6a843b6e97",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/notifications.ts",
+    "baseBlob": "98c1fb5d89633cc0a34d5182f0a2c5c338c5fba2",
+    "oursBlob": "98c1fb5d89633cc0a34d5182f0a2c5c338c5fba2",
+    "mainBlob": "f36361e00bd8bcec660e81d24cc7bb67bae08e13",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/retention.ts",
+    "baseBlob": "b94908521b66d1b92976f8b6fbf3eb34c262e44f",
+    "oursBlob": "b94908521b66d1b92976f8b6fbf3eb34c262e44f",
+    "mainBlob": "db8546046939007dcb8ebe1da41712fc9999cc26",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/router.ts",
+    "baseBlob": "ef034bc86ce6c429e85e25ed355c194bce17f946",
+    "oursBlob": "ef034bc86ce6c429e85e25ed355c194bce17f946",
+    "mainBlob": "8959d8bc59fe09349a4a5e5d5cbc2e71ebe68226",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/growth/service.ts",
+    "baseBlob": "da3bdad379caa35ead30a3bdb52aaac342cc7a65",
+    "oursBlob": "da3bdad379caa35ead30a3bdb52aaac342cc7a65",
+    "mainBlob": "1d05b2f9435c6137911d644baa1019833b8063c9",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/sessions.ts",
+    "baseBlob": "32e0b1d2ed15f965ad73e66860c14973beb0d629",
+    "oursBlob": "32e0b1d2ed15f965ad73e66860c14973beb0d629",
+    "mainBlob": "7343836bd168c3094a2bad68020933fc6b6510ff",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/signed-acts.ts",
+    "baseBlob": "21c011f58c2333e6e4038f1193246038e77f0713",
+    "oursBlob": "21c011f58c2333e6e4038f1193246038e77f0713",
+    "mainBlob": "d4be4ce35ba1514dd871580588ad022979de45a0",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/subjects.ts",
+    "baseBlob": "144dc7a09424d6bea655aab05c2017a8bbf2edf2",
+    "oursBlob": "144dc7a09424d6bea655aab05c2017a8bbf2edf2",
+    "mainBlob": "f074f05f8bfb26beaa11ea1971ad3d50aa9e204b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/ingestion/worker.ts",
+    "baseBlob": "a81abea7f21249ec882384db8ae224f3d217415b",
+    "oursBlob": "a81abea7f21249ec882384db8ae224f3d217415b",
+    "mainBlob": "e3b1b272d9ab494d3465f3b39c42b1f381039835",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/ai-audio.ts",
+    "baseBlob": "234ea1d1037426ec484a2ddf1c9e2c6d42fb75f7",
+    "oursBlob": "234ea1d1037426ec484a2ddf1c9e2c6d42fb75f7",
+    "mainBlob": "7e125f16d276b5a55fcaf726c5da1872c3adf9df",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/lifecycle.ts",
+    "baseBlob": "e481ff88754f0989ca20151ccbea2d39cb8a3326",
+    "oursBlob": "e481ff88754f0989ca20151ccbea2d39cb8a3326",
+    "mainBlob": "071e7965bbf96b6fc9feba925440ac05f7c7da01",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/registration.ts",
+    "baseBlob": "4188ccbe36ae4aeb2ec26b6fd2eaf5a0cfc3ed2d",
+    "oursBlob": "4188ccbe36ae4aeb2ec26b6fd2eaf5a0cfc3ed2d",
+    "mainBlob": "2360b0d2eebec7536a3d447fefc8e8cc43eefd1d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/router.ts",
+    "baseBlob": "7b8bb6d1e04cdd879f6512ea5498e12df277a6d1",
+    "oursBlob": "7b8bb6d1e04cdd879f6512ea5498e12df277a6d1",
+    "mainBlob": "3237e2928ddc771e7f318b3df52acbaf5694bc5b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/service.ts",
+    "baseBlob": "c5462ad52058b30430b6a08e4cf6b05a375325ee",
+    "oursBlob": "c5462ad52058b30430b6a08e4cf6b05a375325ee",
+    "mainBlob": "dd824a77e820d346353d87c48dfc9ace6a60317a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/storage.ts",
+    "baseBlob": "39ec66288395ee3834691fb0d2c2fd144c095517",
+    "oursBlob": "39ec66288395ee3834691fb0d2c2fd144c095517",
+    "mainBlob": "c8aae80a2806bb97f9d5a4a995e86ebc20437fa1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/media/worker.ts",
+    "baseBlob": "8ce089450b685160a7beaa9a8d21f1ce03e39d6b",
+    "oursBlob": "8ce089450b685160a7beaa9a8d21f1ce03e39d6b",
+    "mainBlob": "9baf8c5fff5127c61e020fead401476c356fdadf",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/availability.ts",
+    "baseBlob": "72d48a92d93cd086d571fddf76c873bb09078b01",
+    "oursBlob": "72d48a92d93cd086d571fddf76c873bb09078b01",
+    "mainBlob": "a1ae44ff523de37892be131ec4a8954d377f0d4b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/clocks.ts",
+    "baseBlob": "a24cfb28647a8729d4b3da2bed70474a09375262",
+    "oursBlob": "a24cfb28647a8729d4b3da2bed70474a09375262",
+    "mainBlob": "b803b6be7937e09d57562e17aa82ad174e121244",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/commerce.ts",
+    "baseBlob": "f829561e6c463ef0deed0ee95fbbe414c629b8cf",
+    "oursBlob": "f829561e6c463ef0deed0ee95fbbe414c629b8cf",
+    "mainBlob": "8b252b44a9556d60897e4f586740c47bd0470a75",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/provider.ts",
+    "baseBlob": "2a8efc8a7ca135cebe192e51ad28d96ace5d514f",
+    "oursBlob": "2a8efc8a7ca135cebe192e51ad28d96ace5d514f",
+    "mainBlob": "23bf824ae392c9ff459717397b2d103cf639cb8e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/service.ts",
+    "baseBlob": "54a9ddab70a5d988ce2aa029b3848b882c1f6e16",
+    "oursBlob": "54a9ddab70a5d988ce2aa029b3848b882c1f6e16",
+    "mainBlob": "29972d6d15279edd536ff3c40f61062e687c6dc4",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/session/worker.ts",
+    "baseBlob": "4b4ae16396f345968eb1efb391d86768c99ae848",
+    "oursBlob": "4b4ae16396f345968eb1efb391d86768c99ae848",
+    "mainBlob": "e3589a91de8580c1d4f67a7bb87f25fb0b585053",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/studio/service.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/trust/contracts.ts",
+    "baseBlob": "ea86bfeffea256bd30d170732b78bce2a3caab01",
+    "oursBlob": "ea86bfeffea256bd30d170732b78bce2a3caab01",
+    "mainBlob": "424584980313ba2bd50e9104e877e65063ec4ce2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/trust/own-privacy-hook.ts",
+    "baseBlob": "27b6204d251e8ef4f1fb58de6a5fba65cac19c92",
+    "oursBlob": "27b6204d251e8ef4f1fb58de6a5fba65cac19c92",
+    "mainBlob": "339b8be3971b8fcb955601e0db5aef45bff988fa",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/trust/router.ts",
+    "baseBlob": "48d0d7f4864408731dba511396eee000c4399b58",
+    "oursBlob": "48d0d7f4864408731dba511396eee000c4399b58",
+    "mainBlob": "87e3c56fd2c0f68306f60f103bdeab913d3d6191",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/trust/service.ts",
+    "baseBlob": "03d9b89c5421bceefd5bd921844a3c099ab66826",
+    "oursBlob": "03d9b89c5421bceefd5bd921844a3c099ab66826",
+    "mainBlob": "981317cc73af5ec5beb116f3c54d596d54255fb4",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/modules/trust/worker.ts",
+    "baseBlob": "244f6385a6591d518c6a8de9ae7d009a7bf1c72f",
+    "oursBlob": "244f6385a6591d518c6a8de9ae7d009a7bf1c72f",
+    "mainBlob": "ec92df1424965fa51f0cff66a80a9f1316e97857",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/operations/local-server.ts",
+    "baseBlob": "01878b42f3b4327e9e1e969a6f6fc3235275aff1",
+    "oursBlob": "01878b42f3b4327e9e1e969a6f6fc3235275aff1",
+    "mainBlob": "9410543406ddd7b691bb34ed9cdd20f090d3ad5a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/operations/readiness.ts",
+    "baseBlob": "dfb649b5f0257fdce67891a07d5cdf173e96a46d",
+    "oursBlob": "dfb649b5f0257fdce67891a07d5cdf173e96a46d",
+    "mainBlob": "f6e35a81ed70188c2058c09273d3f5b9766218ae",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/operations/runtime.ts",
+    "baseBlob": "83ea49c4e90ab5a0f81a2e1606388465175c8302",
+    "oursBlob": "83ea49c4e90ab5a0f81a2e1606388465175c8302",
+    "mainBlob": "75a0fd03de84f5ebda82a5cc0dccc9ec401acb28",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/operations/telemetry.ts",
+    "baseBlob": "f2b59dff73dcc4dbee66a4d8eb957acfb804e1fb",
+    "oursBlob": "f2b59dff73dcc4dbee66a4d8eb957acfb804e1fb",
+    "mainBlob": "0a0986a73b2e78b4b5637e542395f12fff7305d0",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/realtime/gateway.ts",
+    "baseBlob": "174e9e58ef1cfdc2b6caf3baf7de3e4a75291eb8",
+    "oursBlob": "174e9e58ef1cfdc2b6caf3baf7de3e4a75291eb8",
+    "mainBlob": "baec16cac0c7f3918102c989aea948b7d92c5b90",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/backend/src/server.ts",
+    "baseBlob": "e150f7f70910b32fd4b8960a2062cdad21d1d205",
+    "oursBlob": "be85df59c35322be36cdab01900669d182e87007",
+    "mainBlob": "7fd7347fed7447baad343f7dc9035371c503a96f",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/tests/contracts.test.ts",
+    "baseBlob": "4e832c05975cc0cc6e8fb594ae205c1da870e20e",
+    "oursBlob": "54f2ef54dd2a7c46ceeb6ed87713c0fde3ba3bc9",
+    "mainBlob": "1f71d03484971ab5460657eec6699abdbe430116",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/backend/tests/postgres.integration.test.ts",
+    "baseBlob": "f489e59a4207a6328a74314f51bb4eb94067ae22",
+    "oursBlob": "ed228dc4f3e692cb198caaced9e2833292dc396f",
+    "mainBlob": "4a39f2ab44488fd8082fdb915587b0f31db6559d",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/App/QelvoraApp.swift",
+    "baseBlob": "ac9b1b2250c6dcc09aed5305bd0332ba417a132e",
+    "oursBlob": "ac9b1b2250c6dcc09aed5305bd0332ba417a132e",
+    "mainBlob": "0fc4ec7cdcb8c3c410bd3911121a70f497b2858b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+    "baseBlob": "37f079de5939458a7c5b6ba7e0ff98cb9684a37a",
+    "oursBlob": "37f079de5939458a7c5b6ba7e0ff98cb9684a37a",
+    "mainBlob": "a096451dec59f5b4b92905035fb961faaee2e42b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+    "baseBlob": "525dd336a2c86e981d9f63d47fdbec5c7f133db6",
+    "oursBlob": "e1bfe1e8cdff594a058224ac671944f1a436256b",
+    "mainBlob": "378bbbc0b61829e53356beaebad06e2fe3fc3592",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+    "baseBlob": "c33165809df686a62a09a9656b12bca04c209b56",
+    "oursBlob": "c33165809df686a62a09a9656b12bca04c209b56",
+    "mainBlob": "a6a90c1a0b78ebc5782eb014287720b5a950af8f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift",
+    "baseBlob": "968536d6af1d5d966017843f1d0f840e4d52366f",
+    "oursBlob": "7e2bb4e23c476dbca59259fe466fb94659dc7917",
+    "mainBlob": "968536d6af1d5d966017843f1d0f840e4d52366f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift",
+    "baseBlob": "94b6862ae24b5e628ee80c69a37654f3e3fbd680",
+    "oursBlob": "f7cb2985e99f2494677edf94e7828624134d23c3",
+    "mainBlob": "62ab096b099961222ca05f60ab1c2cbf77d9d3f1",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Conversation.swift",
+    "baseBlob": "1a69ece37c368094954ac3d1d64937c87932677b",
+    "oursBlob": "1a69ece37c368094954ac3d1d64937c87932677b",
+    "mainBlob": "8f16fe241bfa22f3b1cc76c6a1feb8f811d07a8e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+    "baseBlob": "ca56731d0dd263682de84bb1cd88e095dd81a714",
+    "oursBlob": "15f9f5ca68020b9a7ce0ea08d70c784e7a344a66",
+    "mainBlob": "f44b227ad015346bcdacb46af02cceac8603b66b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Growth.swift",
+    "baseBlob": "924587cb382aa871ef04eae9c530320e3b7ff066",
+    "oursBlob": "924587cb382aa871ef04eae9c530320e3b7ff066",
+    "mainBlob": "5578f35058bef5b684d3bbbfed4b6b7d9e835327",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift",
+    "baseBlob": "ff1a975d2a1c0668b45eb5f1bffadb40e7c5921a",
+    "oursBlob": "60de41cd390673c80cafe33750448cb603b11ace",
+    "mainBlob": "1a6bd1570b9b8e3c2420426c255d137961cdd1cd",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift",
+    "baseBlob": "348d3e2c8102398e384a2238669665251ddf203e",
+    "oursBlob": "348d3e2c8102398e384a2238669665251ddf203e",
+    "mainBlob": "ced2141f6b6681bb12b2230cd9048a69d442a0d2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift",
+    "baseBlob": "e8ef84d42ac9ee039059412136c3a9121ef62473",
+    "oursBlob": "e8ef84d42ac9ee039059412136c3a9121ef62473",
+    "mainBlob": "97a21437ce5d33a0e8424b8e6598819a33bacf37",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift",
+    "baseBlob": "b920ead38dfa664bc92cce57c17ea11ee48611c6",
+    "oursBlob": "b920ead38dfa664bc92cce57c17ea11ee48611c6",
+    "mainBlob": "2685e373cc10d38f90d41c334ccdc64ef4dc7e2e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Navigation.swift",
+    "baseBlob": "d058774f8274058315c53db2b717cc5d5cda9394",
+    "oursBlob": "d058774f8274058315c53db2b717cc5d5cda9394",
+    "mainBlob": "65d0586df259a0a24be256648ffa50df6c613167",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/StudioComponents.swift",
+    "baseBlob": "832b568d6910442681c8b7f076eed89678818154",
+    "oursBlob": "832b568d6910442681c8b7f076eed89678818154",
+    "mainBlob": "888b3c15dceb9c25eeb2079750604ec23359dd32",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Theme.swift",
+    "baseBlob": "79642597caa019f154f34fa44a9d21aad2eb89d4",
+    "oursBlob": "79642597caa019f154f34fa44a9d21aad2eb89d4",
+    "mainBlob": "bf374a5c60486b010ad3c835ddf40fc172082fd4",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+    "baseBlob": "e70b07d4ea5fae2df45bc4e7cfbb1f83e02a31e0",
+    "oursBlob": "f894830389e55b04d98c1eeb80f90de819fbe77a",
+    "mainBlob": "73816c38535299ba39439ceab821d1167f9855d6",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift",
+    "baseBlob": "53c7b19987f6593a4c2e1f94ea7f58bc7ee10dba",
+    "oursBlob": "69691663afd5616d5be430e11e1fdb354aca82bf",
+    "mainBlob": "159af45d0f40adde89ea203e576382538a9b310b",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/ios/Tools/NativeSnapshots/main.swift",
+    "baseBlob": "3f5ca2d2f9e1abe2d05869e45fc0fa03419c4a25",
+    "oursBlob": "3f5ca2d2f9e1abe2d05869e45fc0fa03419c4a25",
+    "mainBlob": "f04737d628b82826bbbf251df4478c9f8c6bce1a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/ios/UITests/FoundationFlowTests.swift",
+    "baseBlob": "8bcb98cc76d9228f7dc08fc23bba3bdc3d725189",
+    "oursBlob": "8bcb98cc76d9228f7dc08fc23bba3bdc3d725189",
+    "mainBlob": "e498b9c3b4fd5d895ab09a7fec9e56f20c7ed707",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/auth/complete/route.ts",
+    "baseBlob": "ce5e21b6f45d619965bb17685583545839c617b2",
+    "oursBlob": "ce5e21b6f45d619965bb17685583545839c617b2",
+    "mainBlob": "ecbf38f06c9972fe5eec29e22bc626541bffb117",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/auth/continue/route.ts",
+    "baseBlob": "727727e9c88b351fe824f7a7887a68d062d7198e",
+    "oursBlob": "727727e9c88b351fe824f7a7887a68d062d7198e",
+    "mainBlob": "095cb5cb1a147487b7361dce55f1efc16025f5a6",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/commerce/[...path]/route.ts",
+    "baseBlob": "08eea1399d79d4c788694fc4e942f758f7ea628d",
+    "oursBlob": "08b44d5319fa6cde461dbd9c6bb9eb2a0606fc5d",
+    "mainBlob": "08eea1399d79d4c788694fc4e942f758f7ea628d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/growth/[...path]/route.ts",
+    "baseBlob": "285b8621172c89bac910d14a567922cd97b64d95",
+    "oursBlob": "285b8621172c89bac910d14a567922cd97b64d95",
+    "mainBlob": "8e8396905e629d1aa45b0d5a13321f125613bb97",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/platform/[...path]/route.ts",
+    "baseBlob": "54bdbdb1ac1f3a351c4aa1204eb9e56fc676c554",
+    "oursBlob": "be9aca04c69cc4c7d35d0c6d4e14b0d30f306fc7",
+    "mainBlob": "17ffb5bf15c4df914d8c2329ad18732602efc152",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/web/app/api/studio/ai/[...path]/route.ts",
+    "baseBlob": "8ea970d2fe912211447aa563f4db24997dc11854",
+    "oursBlob": "8ea970d2fe912211447aa563f4db24997dc11854",
+    "mainBlob": "2544bbb6000002518e0e33b749a2838ace01f703",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/trust/[...path]/route.ts",
+    "baseBlob": "9a0b10414a74ae4ae9d7ae2657242e6dadc1e34f",
+    "oursBlob": "9a0b10414a74ae4ae9d7ae2657242e6dadc1e34f",
+    "mainBlob": "2404c091f7c42406610fcb2cd243aedd8cd5dc8f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/api/w6/[...path]/route.ts",
+    "baseBlob": "67da2101de613a7bea4a83ad4168c0f1fd5ea3fd",
+    "oursBlob": "67da2101de613a7bea4a83ad4168c0f1fd5ea3fd",
+    "mainBlob": "84243b00991b9927ed7221aea8a4f3e02bc35f8a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/content/[creatorId]/[contentId]/page.tsx",
+    "baseBlob": "745d9fc26148db4e727b7dcdcd4f2ef23276499f",
+    "oursBlob": "745d9fc26148db4e727b7dcdcd4f2ef23276499f",
+    "mainBlob": "5d1f5b99ef7a684a30edbf369ebcc861230b4d2f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/creators/[handle]/chat/page.tsx",
+    "baseBlob": "7a7d4c19e3bb76b8d995385c7e09ab512278e182",
+    "oursBlob": "7a7d4c19e3bb76b8d995385c7e09ab512278e182",
+    "mainBlob": "03c69378e20f4596c11a5ac79df685e257dec6fd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/creators/[handle]/page.tsx",
+    "baseBlob": "e7db23ff8bbe1e8092685a9b33ce4ecb9fdd0e61",
+    "oursBlob": "e7db23ff8bbe1e8092685a9b33ce4ecb9fdd0e61",
+    "mainBlob": "42dfe0cffd058ea4f8ee1c2b5e235cce81c28cd7",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/creators/[handle]/posts/[id]/page.tsx",
+    "baseBlob": "98856d42684ce84fa75da2c72159767e7b0dfd29",
+    "oursBlob": "98856d42684ce84fa75da2c72159767e7b0dfd29",
+    "mainBlob": "a7c78c7ce2828e83b49e3e5a14acf54fc18391ff",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/discover/page.tsx",
+    "baseBlob": "fbdb140dac7b6f2275ec143de261a164aff19242",
+    "oursBlob": "fbdb140dac7b6f2275ec143de261a164aff19242",
+    "mainBlob": "467a0dce9f775f55beb80f4b993e1e6f2e2f289a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/globals.css",
+    "baseBlob": "dd5b54e3869f849066ff04bcbf222604b60943b3",
+    "oursBlob": "dd5b54e3869f849066ff04bcbf222604b60943b3",
+    "mainBlob": "89531b61c3fa75a8d2f74d2d738c63df7bdb1224",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/home/page.tsx",
+    "baseBlob": "b21a613d902cb4ed7136c627b938c6498acc52db",
+    "oursBlob": "b21a613d902cb4ed7136c627b938c6498acc52db",
+    "mainBlob": "f97cf8ec5aa205ef1f5023c5c40d6a5d00d6222c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/identity/account/page.tsx",
+    "baseBlob": "4a8263746c1b1937ef3b99312895138fbffbd768",
+    "oursBlob": "4a8263746c1b1937ef3b99312895138fbffbd768",
+    "mainBlob": "c605fe65c939151afdf04b2d716fae8b02efd76f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/invite/[id]/page.tsx",
+    "baseBlob": "4e8db3afa24478f53d27bcbd3ea08254ff7fd06e",
+    "oursBlob": "4e8db3afa24478f53d27bcbd3ea08254ff7fd06e",
+    "mainBlob": "26f0e6e1b729a00da5babd157bfe7dbc80eaa10e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/media/voice/page.tsx",
+    "baseBlob": "d2c4c5596ad4ae3b7fd9d55466f7fbf2498bb17c",
+    "oursBlob": "d2c4c5596ad4ae3b7fd9d55466f7fbf2498bb17c",
+    "mainBlob": "3336f1e9f8a57a10147704aaf27e5dc92a738886",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/notifications/page.tsx",
+    "baseBlob": "a72c3473d96298e60e440c467fc0deccf8955744",
+    "oursBlob": "a72c3473d96298e60e440c467fc0deccf8955744",
+    "mainBlob": "844d501f598ff885fa5b36d8d754d147f4cbf2cb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/notifications/settings/page.tsx",
+    "baseBlob": "87ce194fc2ec8e0180ddefb22a4d8031c625e908",
+    "oursBlob": "87ce194fc2ec8e0180ddefb22a4d8031c625e908",
+    "mainBlob": "4af7679cff76b84cf40437f261add8a0e5121100",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/onboarding/handle/page.tsx",
+    "baseBlob": "d1e2a2bf9e0bdb9a0c99d19a6f8a3752df8f0d49",
+    "oursBlob": "d1e2a2bf9e0bdb9a0c99d19a6f8a3752df8f0d49",
+    "mainBlob": "b01c5a28e2f3b2f05d12082a537548164c6415fe",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/audits/page.tsx",
+    "baseBlob": "24165c2efd698dede00afa207c973724ad55495f",
+    "oursBlob": "24165c2efd698dede00afa207c973724ad55495f",
+    "mainBlob": "5acbc72b8b9089471c11268530841f3f430b96fd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/cases/[id]/page.tsx",
+    "baseBlob": "8d9395b717d37dfc48acbdb8281512dc645a12c2",
+    "oursBlob": "8d9395b717d37dfc48acbdb8281512dc645a12c2",
+    "mainBlob": "4e7dbe5a389ba6d582796f4a3169787aa0e148f7",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/metrics/page.tsx",
+    "baseBlob": "cb6d78389e722e4ccda293a94871f05ca6d60559",
+    "oursBlob": "cb6d78389e722e4ccda293a94871f05ca6d60559",
+    "mainBlob": "f5b1bdb067fa5ef61da78aa04d897df92addd760",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/page.tsx",
+    "baseBlob": "8760563f2e0b9d1f1c7faf4cdac50ca0a4282aaa",
+    "oursBlob": "8760563f2e0b9d1f1c7faf4cdac50ca0a4282aaa",
+    "mainBlob": "390f3dc0d9679ed23a86a4ec115683b6c92f479d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/trust-client.tsx",
+    "baseBlob": "8289a0f3a894e54bdc4457114267b1cb412a4402",
+    "oursBlob": "8289a0f3a894e54bdc4457114267b1cb412a4402",
+    "mainBlob": "d079a6eea5309b3ce3ba1f5a8ed21db3b74174cd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/ops/trust.css",
+    "baseBlob": "b4bd31a239be9848ab2e52a8c94e32347e7f1d4b",
+    "oursBlob": "b4bd31a239be9848ab2e52a8c94e32347e7f1d4b",
+    "mainBlob": "22d5f718f7b3e2227b178def7097a2ce39e4e8b2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/page.tsx",
+    "baseBlob": "11c85101292e70b7634b55d159ede250c6ea3090",
+    "oursBlob": "11c85101292e70b7634b55d159ede250c6ea3090",
+    "mainBlob": "c3f4c4a9ac3ae6b3f253942c73fba765bb02dee8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/share/[id]/image/route.tsx",
+    "baseBlob": "f7534df555d4c4f3058fa948ac5be54c634d6ee4",
+    "oursBlob": "f7534df555d4c4f3058fa948ac5be54c634d6ee4",
+    "mainBlob": "5bfe555e37474e94b5399dd1bbb1d1e87231f024",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/share/[id]/page.tsx",
+    "baseBlob": "1f6981bd76472aad499c924ef159d152033bb924",
+    "oursBlob": "1f6981bd76472aad499c924ef159d152033bb924",
+    "mainBlob": "637cf2eba196d2780ffe7a8af6897c7e9e5960d6",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/[creatorId]/[[...screen]]/page.tsx",
+    "baseBlob": "fa787cdd59e40df383b1058ac0b8b144c86d2ba3",
+    "oursBlob": "fa787cdd59e40df383b1058ac0b8b144c86d2ba3",
+    "mainBlob": "36d9969447fbb9b4175321a92122b4edae57365c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/activation/page.tsx",
+    "baseBlob": "6163999d119050963667a84139b54852e0f758eb",
+    "oursBlob": "6163999d119050963667a84139b54852e0f758eb",
+    "mainBlob": "7e93e6ab7939801051d9aa478e7bbb9b6ab19d43",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/ai/[[...section]]/page.tsx",
+    "baseBlob": "c98cd4a241d1f5e4c04c914b1746792c853e4370",
+    "oursBlob": "c98cd4a241d1f5e4c04c914b1746792c853e4370",
+    "mainBlob": "f8733a30dff8d503f0fbb617d6ec0d870799f582",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/impact/page.tsx",
+    "baseBlob": "8be7d51ba54c04040031a954d83ee2edf3349433",
+    "oursBlob": "8be7d51ba54c04040031a954d83ee2edf3349433",
+    "mainBlob": "2ce5be8ff0d9194f15fc3f7080a81de0f210608b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/insights/page.tsx",
+    "baseBlob": "d169c38f6d5e3eaa6ac7e34ac56ce7dc1d7f0b81",
+    "oursBlob": "d169c38f6d5e3eaa6ac7e34ac56ce7dc1d7f0b81",
+    "mainBlob": "9fdf9918117d6e2b4b34e8cbdb23b0fee35d9b4a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/measurement/page.tsx",
+    "baseBlob": "c6e6298294e81307b695da692f56676248f6bb46",
+    "oursBlob": "c6e6298294e81307b695da692f56676248f6bb46",
+    "mainBlob": "d477a12b59f6c8424966cf26cba6b043a9e9651f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/setup/page.tsx",
+    "baseBlob": "5d2b19f92922c67511fb98c32ea0c36a540ca85e",
+    "oursBlob": "5d2b19f92922c67511fb98c32ea0c36a540ca85e",
+    "mainBlob": "6ec861758bca361301af26bb1adc1213eabc0853",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/studio/workspace/page.tsx",
+    "baseBlob": "0796a77b9b855e0ce1292221a0aa91f7cf38260e",
+    "oursBlob": "0796a77b9b855e0ce1292221a0aa91f7cf38260e",
+    "mainBlob": "95fd5024885a289fb65d756ece41c8a019c80b58",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/support/feedback/page.tsx",
+    "baseBlob": "a5d5bf162144b4d3232a56b663332b30e04286fa",
+    "oursBlob": "a5d5bf162144b4d3232a56b663332b30e04286fa",
+    "mainBlob": "6942a13ccf66a6c8bcf859f7ed3568fd686f6c31",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/support/page.tsx",
+    "baseBlob": "5c7eef5cacd9a6b47c8419ec7c3a736817642432",
+    "oursBlob": "5c7eef5cacd9a6b47c8419ec7c3a736817642432",
+    "mainBlob": "e6d3bf56e4d8fadaf271af53d04bb710dc077795",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/support/privacy/page.tsx",
+    "baseBlob": "484781a52198b61ced16f3181cbf5f0ab38d4148",
+    "oursBlob": "484781a52198b61ced16f3181cbf5f0ab38d4148",
+    "mainBlob": "e04957d820e0294b3cdfa3f7120fb575af932980",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/app/unsubscribe/[token]/route.ts",
+    "baseBlob": "5dfba70174c19028f9e0a7fec80b8fc52f0cad95",
+    "oursBlob": "5dfba70174c19028f9e0a7fec80b8fc52f0cad95",
+    "mainBlob": "c4cace2276b596eae01bef6b23034a05dc4de9af",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/calls/AvailabilityEditor.tsx",
+    "baseBlob": "fde8f47d67145c75045f4813cd0bffa5990974ab",
+    "oursBlob": "fde8f47d67145c75045f4813cd0bffa5990974ab",
+    "mainBlob": "507c49ca0f6fbd45ae3de0005f9f63e54a499663",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/calls/CallView.tsx",
+    "baseBlob": "1dac63e144a7598a76b7ae95e006d28df610c32b",
+    "oursBlob": "1dac63e144a7598a76b7ae95e006d28df610c32b",
+    "mainBlob": "3344fc2ff4b06288f1ff08ab921f73f1dc147fbb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/commerce/CardEntry.tsx",
+    "baseBlob": "1c8b32b8c78bd660e17db131a967d20da96859f1",
+    "oursBlob": "3df938a5e7d27ec3bb0b1ff017ab1fd81e043cd5",
+    "mainBlob": "1c8b32b8c78bd660e17db131a967d20da96859f1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/commerce/CommerceScreen.tsx",
+    "baseBlob": "07e41799f125afc8d389cd81be8beb1092bc2c1a",
+    "oursBlob": "fbf2fbf9ad38e64cb2e6dcc4d20841efac250e1c",
+    "mainBlob": "07e41799f125afc8d389cd81be8beb1092bc2c1a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/content/Content.tsx",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/web/features/creator-ai/CreatorAI.tsx",
+    "baseBlob": "bf9e26e7459b104ee47b2c046e120d310f809ee3",
+    "oursBlob": "bf9e26e7459b104ee47b2c046e120d310f809ee3",
+    "mainBlob": "784c5f4a196348a4385b3f6cfd515320b926b62f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/creator-ai/creator-ai.css",
+    "baseBlob": "babad669afe920a6e357338a9c7498d56c169295",
+    "oursBlob": "babad669afe920a6e357338a9c7498d56c169295",
+    "mainBlob": "3674830811a805cc5391cf7e5b21cb55446e698a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/actions.tsx",
+    "baseBlob": "cb79321f1b1fe64281aef74601e609fabd1202dc",
+    "oursBlob": "cb79321f1b1fe64281aef74601e609fabd1202dc",
+    "mainBlob": "4bd0ace2d3fa864662d60a096091f9d0d7c54f4f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/development.tsx",
+    "baseBlob": "6c3645303ac042808aa63e2d985797daa9d720d5",
+    "oursBlob": "6c3645303ac042808aa63e2d985797daa9d720d5",
+    "mainBlob": "6878f60972abc1a9b1bafb8c02d88f561136f76b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/feedback.tsx",
+    "baseBlob": "010769b06d6f56f522d8eebca3bb64ec4f8406a6",
+    "oursBlob": "010769b06d6f56f522d8eebca3bb64ec4f8406a6",
+    "mainBlob": "9a87e8a8ddeafb91bb25ccdb7f6a2db315b8f123",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/launch.tsx",
+    "baseBlob": "66292d324acb4306093323772f5c3dffc8b1f957",
+    "oursBlob": "66292d324acb4306093323772f5c3dffc8b1f957",
+    "mainBlob": "b76956a480c46b545324c80d42d74a9522534a50",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/pass.tsx",
+    "baseBlob": "a26c34c4948b8a48221ec13bb4c236ca4c00eafc",
+    "oursBlob": "a26c34c4948b8a48221ec13bb4c236ca4c00eafc",
+    "mainBlob": "1c71967770c3c228753b39c05183ed2325809a1d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/preferences.tsx",
+    "baseBlob": "bd601d7bf22b89c4e50be3428e05347cb9c3537c",
+    "oursBlob": "bd601d7bf22b89c4e50be3428e05347cb9c3537c",
+    "mainBlob": "9e590d0b74a5a0e1b7621af7d1f09d16aacaaa58",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/server.ts",
+    "baseBlob": "01e3e15da3465596bbeea906a668fa882da0f144",
+    "oursBlob": "01e3e15da3465596bbeea906a668fa882da0f144",
+    "mainBlob": "5ecdf50d6a2303753d516ac075ebbc09600ed9fb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/growth/shell.tsx",
+    "baseBlob": "01b7d459615b4a519a7557f1797c375384ec7e3d",
+    "oursBlob": "01b7d459615b4a519a7557f1797c375384ec7e3d",
+    "mainBlob": "2aab57c952065c0cbc849fb5560daca2f500c64d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/identity/account.tsx",
+    "baseBlob": "7fc0afa1c20aa34c86d0485dac38a61ed1e26145",
+    "oursBlob": "7fc0afa1c20aa34c86d0485dac38a61ed1e26145",
+    "mainBlob": "bcb4fa3f9829a9d5c34ad873bf2040d9757b6c17",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/identity/handle.tsx",
+    "baseBlob": "f478942ed2a40641919d87eac564b77feb5990d1",
+    "oursBlob": "f478942ed2a40641919d87eac564b77feb5990d1",
+    "mainBlob": "ecdb27849d7aa3568f714c69ad94d0d2407e8c1a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/identity/setup.tsx",
+    "baseBlob": "1110f85a467e3589731882fd15667c09a7c862a9",
+    "oursBlob": "1110f85a467e3589731882fd15667c09a7c862a9",
+    "mainBlob": "b93f0b25f4982146644a8d1d605526e3941987f8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/identity/welcome.tsx",
+    "baseBlob": "1c9c4d2a8705d54c4db66aee31f323841f985b33",
+    "oursBlob": "f2c05317f726371ca74e2161ccdc2fc1c5bb888d",
+    "mainBlob": "9db86afe451cac667ad40d3299e4d42716aced4a",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "apps/web/features/media/VoicePlayer.tsx",
+    "baseBlob": "1b9bdc11a31f40aafe87b318e8d6045a5062e9cb",
+    "oursBlob": "1b9bdc11a31f40aafe87b318e8d6045a5062e9cb",
+    "mainBlob": "396e125e0f93c723e07b1486ce1061b73370a852",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/media/VoiceRecorder.tsx",
+    "baseBlob": "1cd2e1b0a59610c1e33a374c120d5e87e1e1475a",
+    "oursBlob": "1cd2e1b0a59610c1e33a374c120d5e87e1e1475a",
+    "mainBlob": "c61a5538bb51ecdc931b62b083a0bbc1ec2d0575",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/media/api.ts",
+    "baseBlob": "09e459e133933e0d377ffa03a478b3b7f8215774",
+    "oursBlob": "09e459e133933e0d377ffa03a478b3b7f8215774",
+    "mainBlob": "64e11a3ab65e6dae73382b8039080002c2e1d9dd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/media/recorder.ts",
+    "baseBlob": "1f4535546077c91a45ff4748cba8d585da958944",
+    "oursBlob": "1f4535546077c91a45ff4748cba8d585da958944",
+    "mainBlob": "7c24addd00e8921d8870621e80de448661514449",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/features/studio/Studio.tsx",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/web/features/studio/api.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/web/features/studio/proxy.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/web/features/studio/studio.css",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "apps/web/lib/design.tsx",
+    "baseBlob": "c88e76bfa975901bd96c7fbadbdb9455564166b7",
+    "oursBlob": "c88e76bfa975901bd96c7fbadbdb9455564166b7",
+    "mainBlob": "d0823b677e499eeb105b6304c973ab4c685b778b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "apps/web/lib/session.ts",
+    "baseBlob": "6b769aebec872959a08e1eaffab6ac4c5a2fb8df",
+    "oursBlob": "6b769aebec872959a08e1eaffab6ac4c5a2fb8df",
+    "mainBlob": "54e91c66e28cc75368cd13ebe4e227babb7b7cf1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "config/copy.json",
+    "baseBlob": "6a429df9a0d8567f8a93a2227b48529d8a7d62f4",
+    "oursBlob": "6a429df9a0d8567f8a93a2227b48529d8a7d62f4",
+    "mainBlob": "19299857cae4980064b12f200418a46ad5bf63e2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "config/navigation.json",
+    "baseBlob": "bbd4ca62ecd9ad22970c4718c8f42b71c9431957",
+    "oursBlob": "03d1dcc5ae278d0d2cb75c7b7e06f61013073c1e",
+    "mainBlob": "7d69254150c3f72b1c81871baf68b3975b4f01ba",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "docs/implementation/W1-identity-authority.md",
+    "baseBlob": "915d594434c7bc7d1e831b48ffd4b259d6a6a25e",
+    "oursBlob": "915d594434c7bc7d1e831b48ffd4b259d6a6a25e",
+    "mainBlob": "a88205fded04dde583e0343b624248dcb273cb5f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/implementation/growth.md",
+    "baseBlob": "04be3199d7eac71f7dc925729d7a1a4b8122b31f",
+    "oursBlob": "04be3199d7eac71f7dc925729d7a1a4b8122b31f",
+    "mainBlob": "f6bb1652e4b3aacd0dfb3b250c987bba620819a8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/operations/W8-release.md",
+    "baseBlob": "f63622f20f4acc1334ca453b6d3c92feab290bea",
+    "oursBlob": "f63622f20f4acc1334ca453b6d3c92feab290bea",
+    "mainBlob": "285d88d17c27b345f34a4aa7b91e7fb601384b30",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/operations/W8-runbook.md",
+    "baseBlob": "dd0a948fc72f34990a681dac0c73fce378cb9741",
+    "oursBlob": "dd0a948fc72f34990a681dac0c73fce378cb9741",
+    "mainBlob": "9c432d5bc9b086eb8defe1b9f4f6b99dc560063d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/operations/W8-security.md",
+    "baseBlob": "b3b7318aaa2b339ba8ae70dc726c4fb3a3597d0e",
+    "oursBlob": "b3b7318aaa2b339ba8ae70dc726c4fb3a3597d0e",
+    "mainBlob": "414cf5fcf78d29e18820b39965865c3f017e9ce2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/COVERAGE.md",
+    "baseBlob": "5941878be31a9dec2b44ce39cc87b1beb0d1b12a",
+    "oursBlob": "5941878be31a9dec2b44ce39cc87b1beb0d1b12a",
+    "mainBlob": "5bfaf062bc3cba3946613ed5836bd07542813c4d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W1.md",
+    "baseBlob": "cb21be049a3be0c6e38922730046d293766b202e",
+    "oursBlob": "cb21be049a3be0c6e38922730046d293766b202e",
+    "mainBlob": "cbcb0f591f97b75b258989d4d65ab85020e95a7c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W2.md",
+    "baseBlob": "9ee8f710e7b88f2346e671deec011e928e7a1d3b",
+    "oursBlob": "9ee8f710e7b88f2346e671deec011e928e7a1d3b",
+    "mainBlob": "4e3047bf4a4c559925d6595fdd6cd2bca03844a2",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W4.md",
+    "baseBlob": "d8893e84066ff82f6406bf938de0f04a853962dd",
+    "oursBlob": "f98b0bb47f74ecb39df13b9df74248e2693c0694",
+    "mainBlob": "d8893e84066ff82f6406bf938de0f04a853962dd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W6.md",
+    "baseBlob": "2a284ec44a61d098323c5193a384495db3b372c0",
+    "oursBlob": "2a284ec44a61d098323c5193a384495db3b372c0",
+    "mainBlob": "6c8c13d49eb1d7658a8f045fbe7896341fdbe049",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W7.md",
+    "baseBlob": "600f29538b96341e8fb4916f19557bc12f2f4feb",
+    "oursBlob": "600f29538b96341e8fb4916f19557bc12f2f4feb",
+    "mainBlob": "a6fed1be6538e18470cdf582fc822d9e521d995d",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/coordination/W8-contracts.md",
+    "baseBlob": "3a573727ae957f305e24ce2e1bc0d932e14cee9c",
+    "oursBlob": "3a573727ae957f305e24ce2e1bc0d932e14cee9c",
+    "mainBlob": "d15e56f4d2fbfc4eb6b7387eba58c68dd426769c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W1-platform-identity.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W2-creator-ai-resume.md",
+    "baseBlob": "82f85a42797446e93e820d2e12ee0c12f785c843",
+    "oursBlob": "82f85a42797446e93e820d2e12ee0c12f785c843",
+    "mainBlob": "3d8fda31ef88782cfdce519590397ca7f6b53012",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W2-creator-ai.md",
+    "baseBlob": "fbcac56ca1cb258a437aa014d5483c926a9dbc34",
+    "oursBlob": "fbcac56ca1cb258a437aa014d5483c926a9dbc34",
+    "mainBlob": "a86344da74c2e6a535ced76be28ed2651819fe85",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W4-checkpoint.json",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W4-commerce-handoff.md",
+    "baseBlob": "5ec136884a854d6d8c195223d67a5c1d31732143",
+    "oursBlob": "ee6ac1ae76f8357761bf6d5e1373e3f72cf807b5",
+    "mainBlob": "7903f22b9479227730c7e3363c311a1f18324196",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W6-git-checkpoint.json",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W6.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W7.md",
+    "baseBlob": "b525318c2db0ba410d49ae2d0cb5079c75ee623d",
+    "oursBlob": "b525318c2db0ba410d49ae2d0cb5079c75ee623d",
+    "mainBlob": "8113b5c0fef5253fc27da3d2d23906e29783afa7",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W8-resume-prompt.md",
+    "baseBlob": "72dd97485cebee968a7cac3184ab3ae8d135b580",
+    "oursBlob": "72dd97485cebee968a7cac3184ab3ae8d135b580",
+    "mainBlob": "160b587c5b6ea63437d490394e33aa79db3b0beb",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/W8.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/planning-coordination-resume.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/handoffs/planning-coordination.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/implementation/W4-commerce.md",
+    "baseBlob": "771ae8eeca40f8c0c7ab259e9cf534cf90ce4554",
+    "oursBlob": "fbc169b749dcd00cd8b64031d7f2bd0fced51231",
+    "mainBlob": "771ae8eeca40f8c0c7ab259e9cf534cf90ce4554",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/prompts/README.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/prompts/W1-resume-handoff.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/prompts/W4-resume-to-completion.md",
+    "baseBlob": "09591281da55f2a12f47249b5048cd23fbe14827",
+    "oursBlob": "8a4708067283ebedba5e7e83d97d9460bc0f84af",
+    "mainBlob": "09591281da55f2a12f47249b5048cd23fbe14827",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/prompts/W7-resume.md",
+    "baseBlob": "27632c27e848438f265156bf199e6021156a1a71",
+    "oursBlob": "27632c27e848438f265156bf199e6021156a1a71",
+    "mainBlob": "c64ae573fc56d751ed9c7bbd0fb266b87fd948f9",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W1.md",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W2.md",
+    "baseBlob": "2815b1742adabc07ef957557658a91129470f41e",
+    "oursBlob": "2815b1742adabc07ef957557658a91129470f41e",
+    "mainBlob": "85b7fbf72933bc72b5456c40a87ded62c11ce678",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W4.md",
+    "baseBlob": "8329d024478f6c4f1d0dd041bec95525ef29e99c",
+    "oursBlob": "32bf1d55781dec329053ca5e383fcd96346459c1",
+    "mainBlob": "8329d024478f6c4f1d0dd041bec95525ef29e99c",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W6.md",
+    "baseBlob": "b8cc32115f377b5d752db6d5027895201ab94d1d",
+    "oursBlob": "b8cc32115f377b5d752db6d5027895201ab94d1d",
+    "mainBlob": "892e449e85e64358e5d0c70a506614b7287592fe",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W7.md",
+    "baseBlob": "7a3703ef9a5d781bfd4c097b0a88bb4e78175d28",
+    "oursBlob": "7a3703ef9a5d781bfd4c097b0a88bb4e78175d28",
+    "mainBlob": "41b2a31c84a24e790dea9cd1be356e834990a52b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/status/W8.md",
+    "baseBlob": "b7dee0ce05333c1ad44b2e5649f2e11b36b87706",
+    "oursBlob": "b7dee0ce05333c1ad44b2e5649f2e11b36b87706",
+    "mainBlob": "2e677e024fdb2fc7c3bdb38af440f56c80f87cc8",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "docs/workstreams/verification/W4-2026-09-30.md",
+    "baseBlob": "844bf232c24d946840a32df03bbceacdf296eab1",
+    "oursBlob": "132d703f3ea6313e9c6beddde278faa167a5197a",
+    "mainBlob": "844bf232c24d946840a32df03bbceacdf296eab1",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "infra/containers/trust.Dockerfile",
+    "baseBlob": "4d1e2c8ae5ec9a082c8e4b4d054944a39e0bdd3b",
+    "oursBlob": "4d1e2c8ae5ec9a082c8e4b4d054944a39e0bdd3b",
+    "mainBlob": "d85be883c1ce67916b0ae844782cd3716275a843",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "infra/migrations.json",
+    "baseBlob": "7b0dbc74e35da38c746836f371d1c0c7a430d4d0",
+    "oursBlob": "391c0afe45444045bd2c29d44fa670a575b0cf9a",
+    "mainBlob": "745beaa9160aefc732956cb8bfcaaff50b1d8abe",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "packages/api/generated/openapi.json",
+    "baseBlob": "ead3e8528dd36fc8a94808b152c42248bd75a67c",
+    "oursBlob": "3a39041482008d408fb5ef0836b9a6068f9b5b5e",
+    "mainBlob": "338386e3805353d94b061872121e452865510ebf",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "packages/api/package.json",
+    "baseBlob": "9c3458dcdad7922cf9ca4b25e9bcb38be52cb1b4",
+    "oursBlob": "9c3458dcdad7922cf9ca4b25e9bcb38be52cb1b4",
+    "mainBlob": "0e56b50294275919def044cba2d6e710997e22a5",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/agent/contracts.ts",
+    "baseBlob": "1203962549611e0e620af3f9bd55846b0ab19850",
+    "oursBlob": "1203962549611e0e620af3f9bd55846b0ab19850",
+    "mainBlob": "fd4c9ba170dafda7f3604f6531a1a4f29930292e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/client.ts",
+    "baseBlob": "2da8063df4969c70a41b83ca4635cefd177bcc6d",
+    "oursBlob": "2da8063df4969c70a41b83ca4635cefd177bcc6d",
+    "mainBlob": "2392f2b8f4b44d5d6e4c77f57162967483bf9132",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/commerce/contracts.ts",
+    "baseBlob": "c25f83bc3a3f0f07ef0c8757a3c7706a90b3010e",
+    "oursBlob": "6d7beda782c07f65e8f841089c19b4c248ae2200",
+    "mainBlob": "c25f83bc3a3f0f07ef0c8757a3c7706a90b3010e",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/content.ts",
+    "result": "manual_no_shared_blob"
+  },
+  {
+    "path": "packages/api/src/index.ts",
+    "baseBlob": "b2e0db84d5a9643ae6684bf8ab3aa87032d8b8d7",
+    "oursBlob": "fc27da09c4267443ad237871b6d0678e6a011412",
+    "mainBlob": "6a961d6dddb266bf58d869fea7bb11db8a74de1b",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/media.ts",
+    "baseBlob": "4d067d0de5dab7290b7fb3cc63f4aa70e9131e91",
+    "oursBlob": "4d067d0de5dab7290b7fb3cc63f4aa70e9131e91",
+    "mainBlob": "a75d74d3306e3fb9506559701cb44ee06961a8d3",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/openapi.ts",
+    "baseBlob": "0e02b83429f3ccd55271923028a1450acd5ad37d",
+    "oursBlob": "0e02b83429f3ccd55271923028a1450acd5ad37d",
+    "mainBlob": "88f1f4886e72830a38d0777ae0636e2b1f6cf40f",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/schemas.ts",
+    "baseBlob": "892c93545e4aebdfcf3ad38cf1d2d055853d9a70",
+    "oursBlob": "892c93545e4aebdfcf3ad38cf1d2d055853d9a70",
+    "mainBlob": "12ccc1f94d9a5f2b4a7c9f6b21c91941682eb421",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/api/src/session.ts",
+    "baseBlob": "26ef32aa45e001bd362589820d44e908fd2c09dd",
+    "oursBlob": "26ef32aa45e001bd362589820d44e908fd2c09dd",
+    "mainBlob": "a032861992f2df71ab05f829ca2fff1633f359dc",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/copy/src/index.ts",
+    "baseBlob": "26c2f5d33fe719195ebf324f75be7c119ec8a6bc",
+    "oursBlob": "26c2f5d33fe719195ebf324f75be7c119ec8a6bc",
+    "mainBlob": "dbd5b9e8b676e4ed6d45dd980177dff7fb75c0ab",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/ui-web/src/components.ts",
+    "baseBlob": "597279a9ead90297a9fa3c1bbc1776673bc80a14",
+    "oursBlob": "597279a9ead90297a9fa3c1bbc1776673bc80a14",
+    "mainBlob": "f5e3c960ca548d6d03ab0bedc34ae87fa0b06bdd",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "packages/ui-web/src/contracts.ts",
+    "baseBlob": "c918bbe30fe3b70a0dc9276fcf374e69f6b71b7a",
+    "oursBlob": "c918bbe30fe3b70a0dc9276fcf374e69f6b71b7a",
+    "mainBlob": "f0af2b4135bf17f2da9d8179b92ce471110f5a06",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "playwright.config.ts",
+    "baseBlob": "4955708daf498d988f7bd6e2035caf567fe4dbe4",
+    "oursBlob": "ab70554771bb66fe50871f2a32c7a3b9cb6e873b",
+    "mainBlob": "15a7ff6414153d43aeb768ef7a7129c01b5562c1",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "scripts/generate-native-api.mjs",
+    "baseBlob": "ca5f55334dd1d7a1dec888f0d58c968e263e1ac7",
+    "oursBlob": "ca5f55334dd1d7a1dec888f0d58c968e263e1ac7",
+    "mainBlob": "6fb601998870218dcff1e87cb465f175a2d6c52a",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "scripts/generate-shared.mjs",
+    "baseBlob": "65d09978e00dd2a449b816b7c63aa54205cb8341",
+    "oursBlob": "65d09978e00dd2a449b816b7c63aa54205cb8341",
+    "mainBlob": "6deffd8d0d4cd61a3c5b2c690545a3e053a78021",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "scripts/visual-reference.mjs",
+    "baseBlob": "f69880839857e6e968ad7b3732f7a966a7a50e3b",
+    "oursBlob": "f69880839857e6e968ad7b3732f7a966a7a50e3b",
+    "mainBlob": "9f0cbe1cb3f6ec91b317488fd46831a075f962f6",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "tests/visual/README.md",
+    "baseBlob": "4f4cb5f28282150a70db6424f086d08af539a7aa",
+    "oursBlob": "a5588928ef429a1589f30fb903067c2cb3b10715",
+    "mainBlob": "4f4cb5f28282150a70db6424f086d08af539a7aa",
+    "result": "merged_verified_shared_blob"
+  },
+  {
+    "path": "tests/visual/auth-contract.spec.ts",
+    "baseBlob": "94c61af00c8f745b6f7ec5523d1c4ea58680eac0",
+    "oursBlob": "7819eac8937bd4ff26f4483c93bc6cd5b6b56cc1",
+    "mainBlob": "52cb89d8f424130a5e09a7bc1e1e92762c3e4196",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "tests/visual/catalog.spec.ts",
+    "baseBlob": "9e93d3ee738e0e774d49cd378431adcd2192c8c1",
+    "oursBlob": "30e12e7265889fae41e5048c79afc4df6a255dbc",
+    "mainBlob": "f145991c72dd5422aa9ec449c46d6010264c7b9b",
+    "result": "manual_shared_blob_conflict"
+  },
+  {
+    "path": "tests/visual/foundation.spec.ts",
+    "baseBlob": "958edefe34846ee5be9008d98c999c04a8d8abf7",
+    "oursBlob": "47ff5b6dabab2c093833eecaddbf3ee425dbdfc4",
+    "mainBlob": "75a910df49b6f8b2b2c523484d184c8312669a46",
+    "result": "manual_shared_blob_conflict"
+  }
+]

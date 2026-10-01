@@ -1,0 +1,18 @@
+BEGIN
+SET
+ reply_review_ready 
+--------------------
+ f
+(1 row)
+
+ baseline_notes_schema 
+-----------------------
+ t
+(1 row)
+
+ canonical_migrations 
+----------------------
+                   40
+(1 row)
+
+ROLLBACK
