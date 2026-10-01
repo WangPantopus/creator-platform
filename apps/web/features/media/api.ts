@@ -5,6 +5,35 @@ import type {
   CreatorMediaPurpose,
   CreatorMediaUploadTicket,
 } from "../../../../packages/api/src/media";
+import { CreatorMediaPolicyViewSchema } from "../../../../packages/api/src/media";
+
+/** Current saved-object projection only. Upload rechecks the same real policy. */
+export async function readCreatorMediaPolicy(input: {
+  creatorId: string;
+  objectId: string;
+  purpose: CreatorMediaPurpose;
+  signal?: AbortSignal;
+}) {
+  const query = new URLSearchParams({
+    objectId: input.objectId,
+    purpose: input.purpose,
+  });
+  const result = CreatorMediaPolicyViewSchema.parse(
+    await mediaRequest<unknown>(
+      `creators/${input.creatorId}/media-policy?${query}`,
+      { signal: input.signal },
+    ),
+  );
+  if (
+    result.creatorId !== input.creatorId ||
+    result.objectId !== input.objectId ||
+    result.purpose !== input.purpose
+  )
+    throw new Error(
+      "This recording limit does not match the current saved content.",
+    );
+  return result;
+}
 
 export class MediaRequestError extends Error {
   constructor(

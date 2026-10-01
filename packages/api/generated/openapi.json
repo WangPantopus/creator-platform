@@ -9409,6 +9409,7 @@
               "source_audio",
               "interview_audio",
               "post_photo",
+              "post_audio",
               "human_note"
             ]
           },
@@ -9593,6 +9594,7 @@
                   "source_audio",
                   "interview_audio",
                   "post_photo",
+                  "post_audio",
                   "human_note"
                 ]
               },
@@ -9776,6 +9778,50 @@
           }
         }
       },
+      "MediaCreatorMediaPolicyView": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "creatorId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "objectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "source_audio",
+              "interview_audio",
+              "post_photo",
+              "post_audio",
+              "human_note"
+            ]
+          },
+          "maxBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 268435456
+          },
+          "maxDurationMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600000
+          }
+        },
+        "required": [
+          "creatorId",
+          "objectId",
+          "purpose",
+          "maxBytes",
+          "maxDurationMs"
+        ],
+        "additionalProperties": false
+      },
       "MediaCreatorMediaPurpose": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "string",
@@ -9783,6 +9829,7 @@
           "source_audio",
           "interview_audio",
           "post_photo",
+          "post_audio",
           "human_note"
         ]
       },
@@ -9796,6 +9843,7 @@
               "source_audio",
               "interview_audio",
               "post_photo",
+              "post_audio",
               "human_note"
             ]
           },
@@ -9863,6 +9911,7 @@
                   "source_audio",
                   "interview_audio",
                   "post_photo",
+                  "post_audio",
                   "human_note"
                 ]
               },

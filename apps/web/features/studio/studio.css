@@ -463,6 +463,16 @@
   justify-content: space-between;
   margin-bottom: 24px;
 }
+.w5-fan h1 {
+  font: var(--display-lg-weight) var(--display-lg-size) / var(--display-lg-line)
+    var(--display-lg-font);
+  letter-spacing: var(--display-lg-tracking);
+  overflow-wrap: anywhere;
+}
+.w5-fan .w5-paper > .w5-content-text {
+  font: var(--voice-lg-weight) var(--voice-lg-size) / var(--voice-lg-line)
+    var(--voice-lg-font);
+}
 .w5-fan section {
   margin-top: 32px;
 }
@@ -471,6 +481,7 @@
   gap: 12px;
 }
 .w5-fan textarea {
+  box-sizing: border-box;
   width: 100%;
   min-height: 100px;
   background: var(--surface);

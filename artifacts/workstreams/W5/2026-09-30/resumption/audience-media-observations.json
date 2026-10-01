@@ -1,0 +1,94 @@
+{
+  "recordedAt": "2026-10-01T01:18:51.606443Z",
+  "basis": "Personally operated IAB/UI; actual synthetic development actors, no fabricated producer receipts",
+  "creatorId": "50000000-0000-4000-8000-000000000001",
+  "post": {
+    "id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+    "temporaryPublicationRevisions": [
+      3,
+      4,
+      5
+    ],
+    "author": "Actual current permitted Team member w5_actor_4",
+    "finalState": "archived",
+    "finalRevision": 5,
+    "aiIntent": false
+  },
+  "fanRecovery": {
+    "account": "Actual development fan one in separate30055 cookie namespace",
+    "stall": "Owned API41055 pid39940 SIGSTOP/SIGCONT; restored, not left stopped",
+    "suspended": {
+      "hidden": true,
+      "inert": true,
+      "unsentTextRetained": true,
+      "shareDigest": true,
+      "showIdentity": false
+    },
+    "restored": {
+      "exactUnsentText": true,
+      "shareDigest": true,
+      "showIdentity": false,
+      "keyboardFocus": "Share this text with the creator\u2019s digest checkbox"
+    },
+    "thanksSubmitted": false,
+    "p95Measured": false
+  },
+  "layouts": {
+    "phone": [
+      390,
+      844
+    ],
+    "desktop": [
+      1280,
+      900
+    ],
+    "themes": [
+      "light",
+      "night"
+    ],
+    "finalScrollWidths": [
+      390,
+      1280
+    ],
+    "repairs": [
+      "Real textarea100%+padding overflow repaired with border-box",
+      "Real title overlapping inherited22px leading repaired with source34/36 Newsreader; source Post body18/28"
+    ],
+    "failedEarlierCaptures": [
+      "fan-thanks-restored-390-light.jpg",
+      "fan-thanks-fixed-390-light.jpg",
+      "fan-thanks-fixed-390-night.jpg"
+    ],
+    "finalCaptures": [
+      "fan-final-390-light.jpg",
+      "fan-final-390-night.jpg",
+      "fan-final-1280-light.jpg",
+      "fan-final-1280-night.jpg"
+    ]
+  },
+  "contracts": {
+    "W6PostPurpose": "4ce525ce3725f576fc458a7023b320d32989a04a",
+    "W6Policy": "d15a4519b1c335ff86c6bfe4ed620b192944558e",
+    "W6Recorder": "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+    "W6CanonicalForm": "de17183743a0c2aa3c6fb4ed8e4b0308708b3422"
+  },
+  "limits": [
+    "Genuine signing remains blocked by the human",
+    "No microphone permission/upload/C2PA/media playback/provider/native-device proof",
+    "No new test cases/files/suites or golden/threshold/assertion change",
+    "Current source consumers do not prove an assembled producer"
+  ],
+  "postVoiceEntry": {
+    "title": "W5 count availability boundary",
+    "savedRevision": 2,
+    "viewport": [
+      390,
+      844
+    ],
+    "dialogOpen": true,
+    "recordButtonAvailable": false,
+    "outcome": "Post recording is unavailable. Your written draft is saved. This endpoint is unavailable.",
+    "microphoneRequested": false,
+    "draftTextUnchanged": true
+  }
+}

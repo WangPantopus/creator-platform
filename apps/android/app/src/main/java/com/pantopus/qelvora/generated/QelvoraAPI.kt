@@ -451,6 +451,7 @@ enum class APIMediaCreatorMediaAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -498,6 +499,7 @@ enum class APIMediaCreatorMediaPlaybackTicketAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -513,10 +515,29 @@ enum class APIMediaCreatorMediaPlaybackTicketAssetState {
 }
 
 @Serializable
+data class APIMediaCreatorMediaPolicyView(
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `purpose`: APIMediaCreatorMediaPolicyViewPurpose,
+  val `maxBytes`: Long,
+  val `maxDurationMs`: Long
+)
+
+@Serializable
+enum class APIMediaCreatorMediaPolicyViewPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
 enum class APIMediaCreatorMediaPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -536,6 +557,7 @@ enum class APIMediaCreatorMediaUploadRequestPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -583,6 +605,7 @@ enum class APIMediaCreatorMediaUploadTicketAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 

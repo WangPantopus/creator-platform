@@ -36,6 +36,7 @@ import type {
 import { SignedActReview } from "../identity/signing";
 import { CreatorVoiceRecording } from "../media/VoiceRecorder";
 import { PhotoAttachment } from "./PhotoAttachment";
+import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ApprovedReply } from "./ApprovedReply";
 import { StudioFailure, studioRequest } from "./api";
 import "./studio.css";
@@ -1206,7 +1207,7 @@ function Compose({
               !creator.owned ||
               action.busy ||
               !!pendingPublication ||
-              document.kind !== "note"
+              !["note", "post"].includes(document.kind)
             }
             onClick={() =>
               void action.run(async () => {
@@ -1215,7 +1216,7 @@ function Compose({
               })
             }
           >
-            Voice · up to 60 s
+            {document.kind === "note" ? "Voice · up to 60 s" : "Voice"}
           </button>
         </div>
       </div>
@@ -1469,40 +1470,50 @@ function Compose({
       )}
       {voiceObjectId && (
         <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
-          <CreatorVoiceRecording
-            creatorId={creator.id}
-            creatorName={creator.display_name}
-            objectId={voiceObjectId}
-            onReady={(asset, evidence) => {
-              edit({
-                media: [
-                  ...document.media.filter((item) => item.assetId !== asset.id),
-                  {
-                    assetId: evidence.assetId,
-                    version: evidence.version,
-                    sha256: evidence.sha256,
-                    kind: "voice",
-                    alt: "",
-                  },
-                ],
-              });
-              action.setNotice(
-                "Processed voice added. Save the draft, then review and sign the complete Note.",
-              );
-            }}
-            beforeDiscard={async (assetId) => {
-              if (!document.media.some((item) => item.assetId === assetId))
-                return;
-              const next = {
-                ...document,
-                media: document.media.filter(
-                  (item) => item.assetId !== assetId,
-                ),
-              };
-              await save(next);
-              edit(next);
-            }}
-          />
+          {(() => {
+            const Recorder =
+              document.kind === "post"
+                ? PostVoiceAttachment
+                : CreatorVoiceRecording;
+            return (
+              <Recorder
+                creatorId={creator.id}
+                creatorName={creator.display_name}
+                objectId={voiceObjectId}
+                onReady={(asset, evidence) => {
+                  edit({
+                    media: [
+                      ...document.media.filter(
+                        (item) => item.assetId !== asset.id,
+                      ),
+                      {
+                        assetId: evidence.assetId,
+                        version: evidence.version,
+                        sha256: evidence.sha256,
+                        kind: "voice",
+                        alt: "",
+                      },
+                    ],
+                  });
+                  action.setNotice(
+                    "Processed voice added. Save the draft, then review and sign the complete publication.",
+                  );
+                }}
+                beforeDiscard={async (assetId) => {
+                  if (!document.media.some((item) => item.assetId === assetId))
+                    return;
+                  const next = {
+                    ...document,
+                    media: document.media.filter(
+                      (item) => item.assetId !== assetId,
+                    ),
+                  };
+                  await save(next);
+                  edit(next);
+                }}
+              />
+            );
+          })()}
         </Modal>
       )}
       {photoObjectId && (

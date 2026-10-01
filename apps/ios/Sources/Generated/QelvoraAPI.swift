@@ -609,6 +609,7 @@ public enum APIMediaCreatorMediaAssetPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -676,6 +677,7 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetPurpose: String, Codable, Sen
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -689,10 +691,34 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetState: String, Codable, Senda
   case `deleted` = "deleted"
 }
 
+public struct APIMediaCreatorMediaPolicyView: Codable, Sendable {
+  public let `creatorId`: String
+  public let `objectId`: String
+  public let `purpose`: APIMediaCreatorMediaPolicyViewPurpose
+  public let `maxBytes`: Int
+  public let `maxDurationMs`: Int
+  public init(creatorId: String, objectId: String, purpose: APIMediaCreatorMediaPolicyViewPurpose, maxBytes: Int, maxDurationMs: Int) {
+    self.creatorId = creatorId
+    self.objectId = objectId
+    self.purpose = purpose
+    self.maxBytes = maxBytes
+    self.maxDurationMs = maxDurationMs
+  }
+}
+
+public enum APIMediaCreatorMediaPolicyViewPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
+  case `human_note` = "human_note"
+}
+
 public enum APIMediaCreatorMediaPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -719,6 +745,7 @@ public enum APIMediaCreatorMediaUploadRequestPurpose: String, Codable, Sendable 
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -787,6 +814,7 @@ public enum APIMediaCreatorMediaUploadTicketAssetPurpose: String, Codable, Senda
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 

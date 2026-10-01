@@ -25,7 +25,10 @@
         "name": "creator-platform-w5-local",
         "running": false,
         "port": 55435,
-        "databases": ["creator_w5", "creator_w5_upgrade"],
+        "databases": [
+          "creator_w5",
+          "creator_w5_upgrade"
+        ],
         "lastVerifiedStatus": "exited after own docker stop",
         "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       },
@@ -33,7 +36,9 @@
         "name": "creator-platform-w5-ci",
         "running": false,
         "port": 51360,
-        "databases": ["creator_foundation"],
+        "databases": [
+          "creator_foundation"
+        ],
         "lastVerifiedStatus": "exited after own docker stop",
         "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       }
@@ -93,7 +98,16 @@
   "resourceCleanup": {
     "record": "resource-cleanup.json",
     "allocatedBytesRemovedByThisCleanup": 2407641088,
-    "noListenersVerified": [3005, 3006, 3105, 4105, 5045, 55435, 51360, 5590],
+    "noListenersVerified": [
+      3005,
+      3006,
+      3105,
+      4105,
+      5045,
+      55435,
+      51360,
+      5590
+    ],
     "laterEnvironmentChange": "All W5 /private/tmp resources absent on final recheck; cause unverified. Docker daemon unavailable; do not assume containers or data are accessible."
   },
   "absentAtFinalRecheck": [
@@ -109,9 +123,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T00:56:00Z",
+    "recordedAt": "2026-10-01T01:18:51.606443Z",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "01ad9a53c7a10941b9aafd6c955e04d867f0362e; publication-occurrence correction follows, inspect HEAD",
+    "lastPushedCheckpoint": "1c90032fcfa28a9a87d703851f10c54daaa97926; audience/Post continuation follows, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -119,13 +133,15 @@
         "webPort": 3005,
         "webSession": 67790,
         "apiPort": 4105,
-        "apiSession": 48836
+        "apiSession": 18430,
+        "apiPid": 63600
       },
       "secondary": {
         "webPort": 30055,
         "webSession": 89623,
         "apiPort": 41055,
-        "apiSession": 79742
+        "apiSession": 79742,
+        "apiPid": 39940
       },
       "developmentDatabase": {
         "container": "creator-platform-w5-local",
@@ -145,12 +161,20 @@
       }
     },
     "browser": {
-      "tabs": ["1", "3"],
+      "tabs": [
+        "1",
+        "3"
+      ],
       "nativeInputAvailable": false,
       "cookieNamespaceConsumed": "cf851a5",
       "focused390LightNightVerified": true,
       "modalSuspendRecoveryVerified": true,
-      "savedNoteRevision": 9
+      "savedNoteRevision": 9,
+      "fanInputSuspendRecoveryVerified": true,
+      "fanFinal3901280BothThemesVerified": true,
+      "temporaryPostRestored": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3 archived revision5; Thanks remains withdrawnv2; unsent text never submitted",
+      "postVoiceUnavailablePolicyVerified": true,
+      "countBoundaryDraftRevision": 2
     },
     "mediaMigration": "schema-media-publication.sql proposed, unallocated, unapplied; no applied SQL or checksums rewritten",
     "signing": "Human instructed keep genuine signing blocked; no UV/passkey simulation",
@@ -158,7 +182,7 @@
       "keyLoaded": false,
       "paidCalls": 0
     },
-    "verification": "Existing18backend pass338.03s; canonical generation78 and workspace types/lint/format+web/backend production build pass; final scoped check at push; Swift15nonsnapshot pass/110strict comparisons fail104.294s",
+    "verification": "Generation78 and full client/navigation suffix preserved; API/web/backend types, scoped lint/format+web/backend production builds pass; latest generated schema Swift build43.15s; existing18backend pass338.03s and15nonsnapshot pass/110strict comparisons fail104.294s",
     "unverified": [
       "Genuine signed Note/two-fan reply/reaction",
       "Real media/C2PA and live/replay",
@@ -167,6 +191,9 @@
     ],
     "replyConsumers": "Personal W4 exact approval and W3 Team UI/BFF implemented; actual producer write-purpose/denial/migration assemblies absent; no approval/delivery proof",
     "signatureWithdrawal": "W1 withdrawal-only exact stored command/current publisher/durable actual-actor audit port proposed; absent blocks Team mutation of creator-signed publication",
-    "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version"
+    "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
+    "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
+    "audienceMedia": "Personal current tuple/C2PA/ticket consumer on actual no-Thread W1 audience route; real media producer unmounted/unverified",
+    "mediaLifecycle": "Exact c425ae7 recorder generation and de17183 canonical form; keyed old-node preview/player cleanup plus personal player hidden-authority pause"
   }
 }

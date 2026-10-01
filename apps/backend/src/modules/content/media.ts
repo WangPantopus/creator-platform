@@ -4,7 +4,7 @@ import type { Actor } from "../identity/adapter.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { ContentService } from "./service.js";
 
-type Purpose = "human_note" | "post_photo";
+type Purpose = "human_note" | "post_photo" | "post_audio";
 /** Structural W6 port. The host must pass an asset read under its issued scope. */
 export type ContentMediaAsset = Readonly<{
   id: string;
@@ -41,7 +41,9 @@ export function contentMediaAuthority(
   ) => Promise<boolean>,
 ) {
   const purposeAllowed = (kind: string, purpose: string) =>
-    purpose === "post_photo" || (purpose === "human_note" && kind === "note");
+    purpose === "post_photo" ||
+    (purpose === "human_note" && kind === "note") ||
+    (purpose === "post_audio" && kind === "post");
   const owned = async (client: PoolClient, actor: Actor, creatorId: string) =>
     Boolean(
       (
@@ -83,7 +85,8 @@ export function contentMediaAuthority(
         item.version === asset.version &&
         item.sha256 === asset.sha256 &&
         ((asset.purpose === "human_note" && item.kind === "voice") ||
-          (asset.purpose === "post_photo" && item.kind === "photo")),
+          (asset.purpose === "post_photo" && item.kind === "photo") ||
+          (asset.purpose === "post_audio" && item.kind === "voice")),
     );
     if (
       !attachment ||
@@ -122,7 +125,8 @@ export function contentMediaAuthority(
       operation: "upload" | "read",
     ): Promise<MediaPolicy | null> {
       await content.assertCurrentAllowed(client, actor, creatorId);
-      if (purpose !== "human_note" && purpose !== "post_photo") return null;
+      if (!["human_note", "post_photo", "post_audio"].includes(purpose))
+        return null;
       const owner = await owned(client, actor, creatorId);
       if (owner) await content.role(client, actor, creatorId);
       const row = await content.index(client, creatorId, objectId);
@@ -137,13 +141,14 @@ export function contentMediaAuthority(
       await content.authorizeRead(client, actor, row, owner);
       const current = await content.view(client, actor, row);
       if (!purposeAllowed(current.document.kind, purpose)) return null;
-      const policy = await limits(client, creatorId, purpose);
+      const policy = await limits(client, creatorId, purpose as Purpose);
       if (!policy) return null;
       invariant(
         Number.isSafeInteger(policy.maxBytes) &&
           policy.maxBytes > 0 &&
           Number.isSafeInteger(policy.maxDurationMs) &&
           policy.maxDurationMs >= 0 &&
+          (purpose === "post_photo" || policy.maxDurationMs > 0) &&
           Number.isSafeInteger(policy.retentionSeconds) &&
           policy.retentionSeconds > 0,
         "media_policy_unavailable",

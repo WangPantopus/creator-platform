@@ -35,20 +35,27 @@ export function CreatorVoicePlayer(
     objectId: string;
     /** Present only for an actual W1-authorized audience thread. */
     fanId?: string;
+    /** Actual authenticated W5 content audience; W1 resolves its real fan profile. */
+    audience?: boolean;
   },
 ) {
-  const family = props.fanId
-    ? `threads/${props.creatorId}/${props.fanId}/creator-media`
-    : `creators/${props.creatorId}/media`;
+  const family =
+    props.audience === true
+      ? `creators/${props.creatorId}/audience-media`
+      : props.fanId
+        ? `threads/${props.creatorId}/${props.fanId}/creator-media`
+        : `creators/${props.creatorId}/media`;
   if (
     props.asset.creatorId !== props.creatorId ||
     props.asset.objectId !== props.objectId ||
-    props.asset.purpose !== "human_note" ||
+    !["human_note", "post_audio"].includes(props.asset.purpose) ||
     props.asset.state !== "ready" ||
     props.asset.mimeType !== "audio/mp4"
   )
     return (
-      <p role="status">This recording is unavailable for the current Note.</p>
+      <p role="status">
+        This recording is unavailable for the current content.
+      </p>
     );
   return (
     <Player
@@ -72,6 +79,7 @@ function Player({
   family: string;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
+  const surface = useRef<HTMLElement | null>(null);
   const loadRequest = useRef<AbortController | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +111,29 @@ function Player({
   );
   useEffect(() => {
     if (!src) return;
+    const element = audio.current;
+    const visibility = () => {
+      let hidden = document.hidden;
+      for (let node = surface.current; node; node = node.parentElement)
+        if (
+          node.hidden ||
+          node.inert ||
+          node.getAttribute("aria-hidden") === "true" ||
+          (node instanceof HTMLDialogElement && !node.open)
+        ) {
+          hidden = true;
+          break;
+        }
+      if (hidden) element?.pause();
+    };
+    const observer = new MutationObserver(visibility);
+    for (let node = surface.current; node; node = node.parentElement)
+      observer.observe(node, {
+        attributes: true,
+        attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
+      });
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
     const abort = new AbortController();
     let checking = false;
     const timer = setInterval(() => {
@@ -139,6 +170,13 @@ function Player({
     return () => {
       abort.abort();
       clearInterval(timer);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
+      // A removed audio element can keep playing. Retain the exact element
+      // so source changes and authority-driven unmounts stop its bytes too.
+      element?.pause();
+      element?.removeAttribute("src");
+      element?.load();
     };
   }, [src, family, asset.id, asset.version, asset.sha256]);
   async function load() {
@@ -197,6 +235,7 @@ function Player({
   }
   return (
     <article
+      ref={surface}
       className="qv w6-voice-player"
       aria-label={
         ai ? `${creatorName}'s AI voice note` : `Recorded by ${creatorName}`
@@ -287,6 +326,7 @@ function Player({
         )}
         {src && (
           <audio
+            key={src}
             ref={audio}
             preload="metadata"
             src={src}
