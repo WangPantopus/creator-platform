@@ -60,123 +60,133 @@ export class MemoryService {
     const matcher = this.semantics?.transactionSafe
       ? this.semantics
       : undefined;
-    return this.db.withThread(scope, async (client) => {
-      const thread = (
-        await client.query(
-          "SELECT revision,control_epoch,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR SHARE",
-          pair(scope),
-        )
-      ).rows[0];
-      invariant(
-        thread,
-        "thread_unavailable",
-        "This conversation is unavailable.",
-      );
-      const exclusions = (
-        await client.query<{ key: string; text: string | null }>(
-          "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
-          pair(scope),
-        )
-      ).rows;
-      invariant(
-        exclusions.length <= 1000,
-        "memory_exclusions_capacity",
-        "Memory exclusions need a bounded processing job before this AI can continue.",
-      );
-      // Until a semantic matcher is configured, retained history after deletion is
-      // conservatively omitted. Exact key comparison alone cannot stop paraphrases.
-      const tail = (
-        await client.query<{ id: string; author_kind: string; text: string }>(
-          "SELECT id,author_kind,text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND NOT off_the_record AND delivery_state IN ('accepted','delivered','interrupted') ORDER BY sequence DESC LIMIT 30",
-          pair(scope),
-        )
-      ).rows.reverse();
-      const messages: string[] = [];
-      for (const row of tail) {
-        if (
-          exclusions.length &&
-          (!matcher || (await matcher.matches(row.text, exclusions)))
-        )
-          continue;
-        messages.push(`${row.author_kind}: ${row.text}`);
-      }
-      const candidates =
-        thread.off_the_record || (exclusions.length > 0 && !matcher)
-          ? []
-          : (
-              await client.query<{ text: string }>(
-                `SELECT m.text FROM creator.memory m LEFT JOIN creator.memory_consent c ON c.id=m.consent_id AND c.thread_id=m.thread_id AND c.creator_id=m.creator_id AND c.fan_id=m.fan_id AND c.withdrawn_at IS NULL
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const thread = (
+          await client.query<{
+            revision: number;
+            control_epoch: number;
+            off_the_record: boolean;
+            intro_shared: boolean;
+            exclusions: { key: string; text: string | null }[];
+            provenance_message_id: string | null;
+          }>(
+            `SELECT t.revision,t.control_epoch,t.off_the_record,t.intro_shared,
+            (SELECT coalesce(jsonb_agg(e),'[]'::jsonb) FROM
+              (SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001) e) AS exclusions,
+            (SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='fan' ORDER BY sequence DESC LIMIT 1) AS provenance_message_id
+          FROM creator.thread t WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t`,
+            pair(scope),
+          )
+        ).rows[0];
+        invariant(
+          thread,
+          "thread_unavailable",
+          "This conversation is unavailable.",
+        );
+        // One locked snapshot also carries bounded exclusions and provenance.
+        // Every subquery retains the same explicit family predicate under RLS.
+        const exclusions = thread.exclusions;
+        invariant(
+          exclusions.length <= 1000,
+          "memory_exclusions_capacity",
+          "Memory exclusions need a bounded processing job before this AI can continue.",
+        );
+        // Until a semantic matcher is configured, retained history after deletion is
+        // conservatively omitted. Exact key comparison alone cannot stop paraphrases.
+        const tail = (
+          await client.query<{ id: string; author_kind: string; text: string }>(
+            "SELECT id,author_kind,text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND NOT off_the_record AND delivery_state IN ('accepted','delivered','interrupted') ORDER BY sequence DESC LIMIT 30",
+            pair(scope),
+          )
+        ).rows.reverse();
+        const messages: string[] = [];
+        for (const row of tail) {
+          if (
+            exclusions.length &&
+            (!matcher || (await matcher.matches(row.text, exclusions)))
+          )
+            continue;
+          messages.push(`${row.author_kind}: ${row.text}`);
+        }
+        const candidates =
+          thread.off_the_record || (exclusions.length > 0 && !matcher)
+            ? []
+            : (
+                await client.query<{ text: string }>(
+                  `SELECT m.text FROM creator.memory m LEFT JOIN creator.memory_consent c ON c.id=m.consent_id AND c.thread_id=m.thread_id AND c.creator_id=m.creator_id AND c.fan_id=m.fan_id AND c.withdrawn_at IS NULL
         WHERE m.thread_id=$1 AND m.creator_id=$2 AND m.fan_id=$3 AND m.state='remembered' AND (m.sensitive_category IS NULL OR c.id IS NOT NULL)
         AND NOT EXISTS(SELECT 1 FROM creator.memory_exclusion e WHERE e.thread_id=$1 AND e.creator_id=$2 AND e.fan_id=$3 AND e.semantic_key=m.semantic_key) ORDER BY m.created_at DESC LIMIT 100`,
-                pair(scope),
-              )
-            ).rows.map((row) => row.text);
-      const memory: string[] = [];
-      for (const text of candidates) {
-        if (exclusions.length && (await matcher!.matches(text, exclusions)))
-          continue;
-        memory.push(text);
-      }
-      const profile =
-        thread.intro_shared && !thread.off_the_record
-          ? (
-              await client.query(
-                "SELECT intro FROM creator.fan_profile WHERE id=$1",
-                [scope.fanId],
-              )
-            ).rows[0]
-          : null;
-      let intro: string | null = profile?.intro ?? null;
-      if (
-        intro &&
-        exclusions.length &&
-        (!matcher || (await matcher.matches(intro, exclusions)))
-      )
-        intro = null;
-      const provenance = (
-        await client.query<{ id: string }>(
-          "SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='fan' ORDER BY sequence DESC LIMIT 1",
-          pair(scope),
+                  pair(scope),
+                )
+              ).rows.map((row) => row.text);
+        const memory: string[] = [];
+        for (const text of candidates) {
+          if (exclusions.length && (await matcher!.matches(text, exclusions)))
+            continue;
+          memory.push(text);
+        }
+        const profile =
+          thread.intro_shared && !thread.off_the_record
+            ? (
+                await client.query(
+                  "SELECT intro FROM creator.fan_profile WHERE id=$1",
+                  [scope.fanId],
+                )
+              ).rows[0]
+            : null;
+        let intro: string | null = profile?.intro ?? null;
+        if (
+          intro &&
+          exclusions.length &&
+          (!matcher || (await matcher.matches(intro, exclusions)))
         )
-      ).rows[0];
-      invariant(
-        provenance,
-        "context_source_unavailable",
-        "Send a message before assembling conversation context.",
-      );
-      return {
-        revision: thread.revision,
-        epoch: thread.control_epoch,
-        offTheRecord: thread.off_the_record,
-        intro,
-        messages,
-        memory,
-        excludedKeys: exclusions.map((e) => e.key),
-        provenanceMessageId: provenance.id,
-      };
-    });
+          intro = null;
+        invariant(
+          thread.provenance_message_id,
+          "context_source_unavailable",
+          "Send a message before assembling conversation context.",
+        );
+        return {
+          revision: thread.revision,
+          epoch: thread.control_epoch,
+          offTheRecord: thread.off_the_record,
+          intro,
+          messages,
+          memory,
+          excludedKeys: exclusions.map((e) => e.key),
+          provenanceMessageId: thread.provenance_message_id,
+        };
+      },
+      "read",
+    );
   }
   async list(scope: ThreadScope) {
-    return this.db.withThread(scope, async (client) => {
-      const thread = (
-        await client.query(
-          "SELECT revision,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
-          pair(scope),
-        )
-      ).rows[0];
-      const items = (
-        await client.query<MemoryItem>(
-          `SELECT id,kind,text,provenance_message_id AS "provenanceMessageId",sensitive_category AS "sensitiveCategory",state,edited_by_fan AS "editedByFan",created_at::text AS "createdAt" FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY created_at DESC,id LIMIT 100`,
-          pair(scope),
-        )
-      ).rows;
-      return {
-        revision: thread.revision,
-        offTheRecord: thread.off_the_record,
-        introShared: thread.intro_shared,
-        items,
-      };
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const thread = (
+          await client.query(
+            "SELECT revision,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+            pair(scope),
+          )
+        ).rows[0];
+        const items = (
+          await client.query<MemoryItem>(
+            `SELECT id,kind,text,provenance_message_id AS "provenanceMessageId",sensitive_category AS "sensitiveCategory",state,edited_by_fan AS "editedByFan",created_at::text AS "createdAt" FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY created_at DESC,id LIMIT 100`,
+            pair(scope),
+          )
+        ).rows;
+        return {
+          revision: thread.revision,
+          offTheRecord: thread.off_the_record,
+          introShared: thread.intro_shared,
+          items,
+        };
+      },
+      "read",
+    );
   }
   async propose(scope: ThreadScope, raw: unknown): Promise<boolean> {
     return this.writeProposal(scope, MemoryProposalSchema.parse(raw));

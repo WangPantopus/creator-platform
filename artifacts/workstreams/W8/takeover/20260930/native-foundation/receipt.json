@@ -1,0 +1,143 @@
+{
+  "recordedAt": "2026-09-30T23:58:34.896225+00:00",
+  "sourceHead": "553b443dfd6c43295af39b9548b64781d1ebd9c3",
+  "command": "swift test --package-path apps/ios --scratch-path owned-w8-native/swift --cache-path owned-w8-native/swift-cache --jobs2",
+  "host": {
+    "macOS": "26.7",
+    "build": "25G229",
+    "swift": "6.3.2",
+    "target": "x86_64-apple-macosx26.0"
+  },
+  "totalCases": 18,
+  "functionalCasesPassed": 15,
+  "snapshotCasesFailed": 3,
+  "visualFailures": 110,
+  "images": [
+    {
+      "name": "testWelcomeThemes.light.png",
+      "baselineSHA256": "b7b3b094e96f6712c088593bfdb63fdad567d1d0989974003b3413d91b0f7382",
+      "actualSHA256": "3886f87c1ca7b4f2d20eac34de2b15a98f23df3b1f7ff9d723827072df97eeac",
+      "baselineProfile": {
+        "sha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109",
+        "description": "Display",
+        "bytes": 3368
+      },
+      "actualProfile": {
+        "sha256": "13de002d28277ac8c8c5d271c478d189cc2238281220bfece9a8a2c0704b7ef7",
+        "description": "Display",
+        "bytes": 1164
+      },
+      "dimensions": [
+        780,
+        1688
+      ]
+    },
+    {
+      "name": "testWelcomeThemes.night.png",
+      "baselineSHA256": "bf959e57b158234f1015469ba24b06b5f12d32f2b50c096681b238cbd9db5f78",
+      "actualSHA256": "6e72ffc72e0f92e7d4ffc980be08a62e440a49210f5ecb377cf7ece098454de7",
+      "baselineProfile": {
+        "sha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109",
+        "description": "Display",
+        "bytes": 3368
+      },
+      "actualProfile": {
+        "sha256": "13de002d28277ac8c8c5d271c478d189cc2238281220bfece9a8a2c0704b7ef7",
+        "description": "Display",
+        "bytes": 1164
+      },
+      "dimensions": [
+        780,
+        1688
+      ]
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-light.png",
+      "baselineSHA256": "020546c667440d5bd4f9296db771e0b567f04e1fceed65d0710db25859d1dd35",
+      "actualSHA256": "34dfd4f4be75084e108a104a8458e8ad12ba12c1a256b67c3514582b0f0d54fd",
+      "baselineProfile": {
+        "sha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109",
+        "description": "Display",
+        "bytes": 3368
+      },
+      "actualProfile": {
+        "sha256": "13de002d28277ac8c8c5d271c478d189cc2238281220bfece9a8a2c0704b7ef7",
+        "description": "Display",
+        "bytes": 1164
+      },
+      "dimensions": [
+        780,
+        1688
+      ]
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-light.png",
+      "baselineSHA256": "376647bb88e4fda91d23a595266b70774b2d9607cb4ce896a942e04c6c4c14b4",
+      "actualSHA256": "6a071bad40a12e80418167c7134e486c95c44776c2151af2fcea0151c7b57162",
+      "baselineProfile": {
+        "sha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109",
+        "description": "Display",
+        "bytes": 3368
+      },
+      "actualProfile": {
+        "sha256": "13de002d28277ac8c8c5d271c478d189cc2238281220bfece9a8a2c0704b7ef7",
+        "description": "Display",
+        "bytes": 1164
+      },
+      "dimensions": [
+        780,
+        1688
+      ]
+    }
+  ],
+  "observedWelcomeLight": {
+    "baselineCorner": [
+      243,
+      242,
+      238,
+      255
+    ],
+    "actualCorner": [
+      242,
+      242,
+      238,
+      255
+    ],
+    "changedPixels": 1240167,
+    "dominantDelta": [
+      -1,
+      0,
+      0,
+      0
+    ],
+    "dominantChangedPixels": 1157643
+  },
+  "observedWelcomeNight": {
+    "baselineCorner": [
+      20,
+      18,
+      15,
+      255
+    ],
+    "actualCorner": [
+      26,
+      25,
+      20,
+      255
+    ],
+    "changedPixels": 1315574,
+    "dominantDelta": [
+      6,
+      7,
+      5,
+      0
+    ],
+    "dominantChangedPixels": 1151005
+  },
+  "finding": "Matching2x dimensions and visibly preserved layout/copy, but different embedded ICC profiles and widespread color deltas. This supports a capture-environment/color-management contribution; it does not establish the only cause or waive any comparison.",
+  "goldensChanged": false,
+  "testSetupChanged": false,
+  "toleranceChanged": false,
+  "nativeInteractionVerified": false,
+  "resolverSideEffect": "Swift6.3.2 selected xctest-dynamic-overlay in place of swift-issue-reporting from conditional dependency resolution; original tracked Package.resolved restored, no lockfile change committed."
+}

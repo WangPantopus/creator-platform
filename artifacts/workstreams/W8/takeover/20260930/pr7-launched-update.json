@@ -1,0 +1,10 @@
+{
+  "observedAt": "2026-10-01T03:14:23.610015+00:00",
+  "pr": 7,
+  "headRefOid": "2a765bb2180b6c2c24de167239588029974952cb",
+  "isDraft": true,
+  "normalAuthenticatedCli": true,
+  "bodySha256": "f7f8f1fcf270358b136fbda0a2fd9f77109dc628a7818f456e70a0c5f7b870d2",
+  "fullPreparedBodyReadbackMatches": true,
+  "scope": "Full R1\u2013R10, launched iOS/Android/WAL/drain evidence and honest blockers. No merge, check removal or waiver."
+}

@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-10-01T01:44:53.912510+00:00",
+  "sourceTip": "4f058a0e2c29c179c95c724d0f08064880f81024",
+  "repositoryRecent60Runs": {
+    "queued": 26,
+    "inProgress": 1,
+    "completed": 33
+  },
+  "queuedSince": "2026-10-01T01:11:42Z",
+  "currentPr7Contexts": "All11 queued at4f058a0, including Linux and macOS",
+  "workflowReview": {
+    "foundation": {
+      "concurrencyBlock": false,
+      "jobNeeds": false,
+      "allFiveJobsBothTriggersPreserved": true,
+      "labels": [
+        "ubuntu-latest",
+        "xcode-27",
+        "macos-26",
+        "macos-latest"
+      ]
+    },
+    "trust": {
+      "group": "trust-compilation-${github.ref}",
+      "cancelInProgress": true,
+      "effect": "Only its own ref compilation run is superseded; does not serialize Foundation jobs"
+    }
+  },
+  "runnerApi": {
+    "repositorySelfHostedTotal": 0,
+    "interpretation": "Self-hosted inventory does not report GitHub-hosted capacity"
+  },
+  "officialSources": [
+    {
+      "url": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+      "observation": "xcode-27 public preview, macos-26 and macos-latest are documented valid hosted labels"
+    },
+    {
+      "url": "https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md",
+      "observation": "macOS26 image documents Xcode26.6 baseline"
+    }
+  ],
+  "diagnosis": "No Foundation workflow concurrency or invalid-label cause established. Hosted allocation/account/platform capacity remains unverified; queue status does not prove a product test failure or passing checks.",
+  "actions": {
+    "changedWorkflow": false,
+    "canceledRunOrChangedRequiredCheck": false,
+    "requestedRerun": false,
+    "createdRunnerOrChangedBilling": false,
+    "messagedPeer": false
+  },
+  "limits": [
+    "60 recent runs is a bounded repository observation, not an account-wide concurrency or billing audit",
+    "No runner capacity/billing root cause or fee authorization is inferred",
+    "Original native/visual failures remain independent required gates"
+  ]
+}

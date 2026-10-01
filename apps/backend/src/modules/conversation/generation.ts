@@ -417,25 +417,29 @@ export class ConversationGenerationProcessor {
       assertProcessorConsent: (scope) =>
         this.conversations.assertProcessorConsent(scope),
       assertDeliveryCurrent: async (current, expected) => {
-        await this.db.withThread(current, async (client) => {
-          const row = (
-            await client.query(
-              "SELECT t.control,t.control_epoch,t.revision,t.processor_consent_version,g.worker_token,g.lease_until FROM creator.thread t JOIN creator.generation g ON g.thread_id=t.id AND g.creator_id=t.creator_id AND g.fan_id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND g.id=$4",
-              [scope.threadId, scope.creatorId, scope.fanId, job.id],
-            )
-          ).rows[0];
-          invariant(
-            row &&
-              row.control === "ai_active" &&
-              row.control_epoch === expected.epoch &&
-              row.revision === expected.revision + emitted &&
-              row.worker_token === token &&
-              row.lease_until > new Date() &&
-              row.processor_consent_version,
-            "generation_interrupted",
-            "The conversation changed during generation.",
-          );
-        });
+        await this.db.withThread(
+          current,
+          async (client) => {
+            const row = (
+              await client.query(
+                "SELECT t.control,t.control_epoch,t.revision,t.processor_consent_version,g.worker_token,g.lease_until FROM creator.thread t JOIN creator.generation g ON g.thread_id=t.id AND g.creator_id=t.creator_id AND g.fan_id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND g.id=$4",
+                [scope.threadId, scope.creatorId, scope.fanId, job.id],
+              )
+            ).rows[0];
+            invariant(
+              row &&
+                row.control === "ai_active" &&
+                row.control_epoch === expected.epoch &&
+                row.revision === expected.revision + emitted &&
+                row.worker_token === token &&
+                row.lease_until > new Date() &&
+                row.processor_consent_version,
+              "generation_interrupted",
+              "The conversation changed during generation.",
+            );
+          },
+          "read",
+        );
       },
     };
     try {

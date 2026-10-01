@@ -1,0 +1,54 @@
+{
+  "recordedAt": "2026-09-30T23:49:11.700711+00:00",
+  "sourceHead": "553b443dfd6c43295af39b9548b64781d1ebd9c3",
+  "database": "creator_w8",
+  "retainedContainer": "creator-platform-w8-resume-20260930",
+  "retainedVolume": "2301545bd4de85bf917b17249c6a1b5b3b9b9a6fab9531f6dfe02a459e1027c2",
+  "resetOrReseed": false,
+  "privateDirectory": "/Users/yingpengwang/.config/creator-platform/w8-local",
+  "reviewedBackup": {
+    "path": "/Users/yingpengwang/.config/creator-platform/w8-local/20260930-takeover-reviewed.dump",
+    "bytes": 550738,
+    "mode": "0o600",
+    "sha256": "63145aaea8223b16896fee99da04cdaeb8e09f29df2415b2065164bb1ac26a05",
+    "archiveListSucceeded": true
+  },
+  "state": {
+    "migrations": 40,
+    "cases": 4,
+    "blocks": 1,
+    "restrictions": 0,
+    "tombstones": 1,
+    "privacyJobs": [
+      {
+        "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+        "kind": "delete",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      }
+    ],
+    "case4": {
+      "id": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+      "state": "resolved",
+      "version": 2
+    }
+  },
+  "oldGrowthKeyRecovered": false,
+  "retainedCiphertextRekeyed": false,
+  "limitations": [
+    "Logical same-host backup only; independent encrypted off-site storage/WAL/RPO/RTO remain unverified",
+    "Previous traffic-closed restore retained40 migrations/four cases/one tombstone/eight pending deletion tasks; no domain purge/reopen"
+  ]
+}

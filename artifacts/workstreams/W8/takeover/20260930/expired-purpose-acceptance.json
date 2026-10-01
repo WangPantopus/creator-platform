@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-10-01T01:44:10.187857+00:00",
+  "apiSource": "e33a56847fb85b726c55d9226018b17725bdbd77",
+  "webSource": "ef5ce33 (owned account-switch fix; no case UI change)",
+  "sourceTipAtObservation": "4f058a0e2c29c179c95c724d0f08064880f81024",
+  "caseId": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+  "actor": "Existing synthetic Ops supervisor",
+  "viewport": [
+    1280,
+    720
+  ],
+  "theme": "Light",
+  "actualBrowser": "Purpose gate: Open this case with a reason. Access lasts at most15 minutes. No private evidence shown; no access form submitted.",
+  "correlationId": "c295c934-6278-4cd6-a2ad-0ca260777228",
+  "currentLease": {
+    "unexpiredLeases": 0,
+    "latestGrantedAt": "2026-09-30T23:38:22.381502+00:00",
+    "latestExpiresAt": "2026-09-30T23:53:22.381502+00:00",
+    "databaseNow": "2026-10-01T01:44:10.168865+00:00"
+  },
+  "keyboard": {
+    "action": "Actual Skip to case content link Enter",
+    "focusedTag": "MAIN",
+    "focusedId": "ops-main"
+  },
+  "screenshot": "case-expired-purpose-keyboard-light.jpg",
+  "screenshotSha256": "ba8a92d552f716cf1777b3291f15de090ba8ad175bf804e134c7b4c2ce446699",
+  "newCaseLeaseOrDecision": false,
+  "caseStateChanged": false,
+  "limitations": [
+    "Expired-purpose and keyboard functional proof only; no renewed evidence access, provider outcome or full accessibility/reference acceptance"
+  ]
+}

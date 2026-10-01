@@ -222,83 +222,87 @@ export class ConversationFeature {
     return this.page(scope);
   }
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
-    return this.db.withThread(scope, async (client) => {
-      const t = (
-        await client.query(
-          "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
-          [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows[0];
-      invariant(t, "thread_unavailable", "This conversation is unavailable.");
-      const rows = (
-        await client.query(
-          `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
-          [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
-        )
-      ).rows;
-      const hasOlder = rows.length > 50;
-      const selected = rows
-        .slice(0, 50)
-        .reverse()
-        .map((row) => ConversationMessageSchema.parse(row));
-      const messages = this.lineage
-        ? await this.lineage.enrich(scope, client, selected)
-        : selected;
-      const generations = (
-        await client.query<{ id: string; last_sequence: number }>(
-          "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
-          [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows;
-      const currentConsent = Boolean(
-        this.policy?.verified &&
-          t.processor_consent_version === this.policy.version,
-      );
-      const capabilities = await capabilitySnapshot(client, scope);
-      const hasAccess =
-        capabilities.capabilities.includes("ai_message") &&
-        capabilities.allowance.available > 0;
-      const canSend =
-        t.control === "human_active" ||
-        (currentConsent &&
-          this.generationAvailable &&
-          t.control === "ai_active" &&
-          hasAccess);
-      return {
-        threadId: scope.threadId,
-        creatorId: scope.creatorId,
-        fanId: scope.fanId,
-        creatorName: t.display_name,
-        fanHandle: t.handle,
-        control: t.control,
-        epoch: t.control_epoch,
-        cursor: t.event_cursor,
-        revision: t.revision,
-        generationSequences: Object.fromEntries(
-          generations.map((g) => [g.id, g.last_sequence]),
-        ),
-        messages,
-        before: hasOlder ? messages[0]!.sequence : null,
-        offTheRecord: t.off_the_record,
-        introShared: t.intro_shared,
-        consentCurrent: currentConsent,
-        canSend,
-        unavailableReason: canSend
-          ? null
-          : !currentConsent
-            ? "Review the AI providers before messaging."
-            : !this.generationAvailable
-              ? "AI messaging is not connected yet."
-              : t.control !== "ai_active"
-                ? "AI messaging is paused in this conversation."
-                : !hasAccess
-                  ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
-                  : null,
-        feedbackPolicy: this.lineage
-          ? await this.lineage.policy(scope, client)
-          : null,
-      };
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const t = (
+          await client.query(
+            "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows[0];
+        invariant(t, "thread_unavailable", "This conversation is unavailable.");
+        const rows = (
+          await client.query(
+            `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
+            [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
+          )
+        ).rows;
+        const hasOlder = rows.length > 50;
+        const selected = rows
+          .slice(0, 50)
+          .reverse()
+          .map((row) => ConversationMessageSchema.parse(row));
+        const messages = this.lineage
+          ? await this.lineage.enrich(scope, client, selected)
+          : selected;
+        const generations = (
+          await client.query<{ id: string; last_sequence: number }>(
+            "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows;
+        const currentConsent = Boolean(
+          this.policy?.verified &&
+            t.processor_consent_version === this.policy.version,
+        );
+        const capabilities = await capabilitySnapshot(client, scope);
+        const hasAccess =
+          capabilities.capabilities.includes("ai_message") &&
+          capabilities.allowance.available > 0;
+        const canSend =
+          t.control === "human_active" ||
+          (currentConsent &&
+            this.generationAvailable &&
+            t.control === "ai_active" &&
+            hasAccess);
+        return {
+          threadId: scope.threadId,
+          creatorId: scope.creatorId,
+          fanId: scope.fanId,
+          creatorName: t.display_name,
+          fanHandle: t.handle,
+          control: t.control,
+          epoch: t.control_epoch,
+          cursor: t.event_cursor,
+          revision: t.revision,
+          generationSequences: Object.fromEntries(
+            generations.map((g) => [g.id, g.last_sequence]),
+          ),
+          messages,
+          before: hasOlder ? messages[0]!.sequence : null,
+          offTheRecord: t.off_the_record,
+          introShared: t.intro_shared,
+          consentCurrent: currentConsent,
+          canSend,
+          unavailableReason: canSend
+            ? null
+            : !currentConsent
+              ? "Review the AI providers before messaging."
+              : !this.generationAvailable
+                ? "AI messaging is not connected yet."
+                : t.control !== "ai_active"
+                  ? "AI messaging is paused in this conversation."
+                  : !hasAccess
+                    ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                    : null,
+          feedbackPolicy: this.lineage
+            ? await this.lineage.policy(scope, client)
+            : null,
+        };
+      },
+      "read",
+    );
   }
   async preferences(scope: ThreadScope, raw: unknown) {
     invariant(
@@ -608,19 +612,23 @@ export function conversationFeature(
       router.get(root + "/messages/:id", async (req, res) => {
         const scope = await scopeFor(req);
         const id = IdSchema.parse(req.params.id);
-        const row = await feature.db.withThread(scope, async (client) => {
-          const source = (
-            await client.query(
-              `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
-              [scope.threadId, scope.creatorId, scope.fanId, id],
-            )
-          ).rows[0];
-          if (!source) return undefined;
-          const message = ConversationMessageSchema.parse(source);
-          return feature.lineage
-            ? (await feature.lineage.enrich(scope, client, [message]))[0]
-            : message;
-        });
+        const row = await feature.db.withThread(
+          scope,
+          async (client) => {
+            const source = (
+              await client.query(
+                `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
+                [scope.threadId, scope.creatorId, scope.fanId, id],
+              )
+            ).rows[0];
+            if (!source) return undefined;
+            const message = ConversationMessageSchema.parse(source);
+            return feature.lineage
+              ? (await feature.lineage.enrich(scope, client, [message]))[0]
+              : message;
+          },
+          "read",
+        );
         invariant(
           row,
           "message_unavailable",
@@ -646,6 +654,7 @@ export function conversationFeature(
                 [scope.threadId, scope.creatorId, scope.fanId, id],
               )
             ).rowCount,
+          "read",
         );
         invariant(
           visible,
@@ -759,27 +768,31 @@ export function conversationFeature(
                 .parse(req.body).idempotencyKey
             : SendMessageSchema.shape.idempotencyKey.parse(req.params.key);
         res.json(
-          await feature.db.withThread(scope, async (client) => {
-            const row = (
-              await client.query<{
-                response: {
-                  message?: { threadId?: string };
-                  threadId?: string;
-                };
-              }>(
-                "SELECT response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation IN('send','fan_reply') AND key=$2",
-                [scope.actorAccountId, key],
-              )
-            ).rows[0];
-            // The idempotency table is account-scoped; do not reveal a key from another pair.
-            return {
-              accepted: Boolean(
-                row &&
-                  (row.response.message?.threadId ?? row.response.threadId) ===
-                    scope.threadId,
-              ),
-            };
-          }),
+          await feature.db.withThread(
+            scope,
+            async (client) => {
+              const row = (
+                await client.query<{
+                  response: {
+                    message?: { threadId?: string };
+                    threadId?: string;
+                  };
+                }>(
+                  "SELECT response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation IN('send','fan_reply') AND key=$2",
+                  [scope.actorAccountId, key],
+                )
+              ).rows[0];
+              // The idempotency table is account-scoped; do not reveal a key from another pair.
+              return {
+                accepted: Boolean(
+                  row &&
+                    (row.response.message?.threadId ??
+                      row.response.threadId) === scope.threadId,
+                ),
+              };
+            },
+            "read",
+          ),
         );
       };
       router.get(root + "/messages/status/:key", messageStatus);
@@ -829,6 +842,7 @@ export function conversationFeature(
                   [scope.threadId, scope.creatorId, scope.fanId],
                 )
               ).rows,
+            "read",
           ),
         );
       });

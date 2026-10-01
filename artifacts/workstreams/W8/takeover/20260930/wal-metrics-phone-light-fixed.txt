@@ -1,0 +1,63 @@
+- link "Skip to case content":
+  - /url: "#ops-main"
+- main [active]:
+  - link "Back to cases":
+    - /url: /ops
+  - heading "Trust service metrics" [level=1]
+  - paragraph: Supervisor snapshot of the current process and worker. Message, generation, payment, call, voice and notification collectors must be connected before their reliability or cost can be assessed.
+  - heading "Runtime" [level=2]
+  - paragraph: local-development · f64f165350a415a21f5c09e82a6cbdb0d9d5227a
+  - paragraph: Started 9/30/2026, 7:39:13 PM · uptime 2381 seconds
+  - paragraph: Resident memory 119.6 MiB · heap used 42.2 MiB
+  - paragraph: "Event loop lag: p95 22.1 ms · p99 22.3 ms"
+  - heading "Runtime and transport signals" [level=2]
+  - paragraph: "realtime connections active: 0.00"
+  - paragraph: "realtime subscriptions pending: 0.00"
+  - paragraph: "realtime subscriptions active: 0.00"
+  - paragraph: "privacy queue count: 0.00"
+  - paragraph: "privacy queue age seconds: 0.00"
+  - paragraph: "privacy blocked count: 11.00"
+  - paragraph: "dead letter count: 0.00"
+  - paragraph: "effect blocked count: 0.00"
+  - paragraph: "effect queue age seconds: 0.00"
+  - paragraph: "safety urgent case age seconds: 0.00"
+  - paragraph: "worker pool waiting: 0.00"
+  - paragraph: "worker pool total: 2.00"
+  - heading "PostgreSQL WAL" [level=2]
+  - paragraph: These totals cover the connected PostgreSQL cluster. Recovery targets require a verified archive and restore.
+  - paragraph: Sampled 9/30/2026, 8:18:29 PM · statistics reset 9/30/2026, 4:16:59 PM
+  - paragraph: "Archiving: off"
+  - paragraph: "WAL records: 163,334"
+  - paragraph: "WAL bytes: 18,885,339"
+  - paragraph: "Full-buffer writes: 0"
+  - paragraph: "Archived files: 0"
+  - paragraph: "Archive failures: 0"
+  - paragraph: "Successful samples: 158 · sample errors: 0"
+  - heading "HTTP requests" [level=2]
+  - paragraph: Cumulative counts since this process started. Durations include request handling; these are not provider or visible-sentence latency measurements.
+  - paragraph: GET:/v1/conversations/:creatorId/:fanId:4xx · 446 requests · mean 0.7 ms
+  - paragraph: GET:/v1/trust/session:4xx · 67 requests · mean 3.6 ms
+  - paragraph: GET:/v1/trust/capabilities:2xx · 14 requests · mean 0.5 ms
+  - paragraph: GET:/v1/trust/privacy/jobs:4xx · 1 requests · mean 8.7 ms
+  - paragraph: GET:/v1/trust/operations/metrics:4xx · 1 requests · mean 3.8 ms
+  - paragraph: POST:/v1/trust/dev/session:2xx · 1 requests · mean 21.7 ms
+  - paragraph: GET:/v1/trust/session:2xx · 1128 requests · mean 0.4 ms
+  - paragraph: GET:/v1/trust/operations/metrics:2xx · 7 requests · mean 21.0 ms
+  - paragraph: GET:/v1/trust/privacy/jobs:2xx · 1 requests · mean 8.1 ms
+  - paragraph: GET:/v1/trust/help:2xx · 3 requests · mean 0.5 ms
+  - paragraph: GET:/health/live:2xx · 1 requests · mean 1.1 ms
+  - paragraph: GET:/health/ready:5xx · 1 requests · mean 16.4 ms
+  - paragraph: GET:/v1/identity/session:4xx · 3 requests · mean 0.7 ms
+  - button "Refresh snapshot"
+  - paragraph: Synthetic local accounts · no provider or production identity
+  - generic: Switch to local actor
+  - combobox "Switch to local actor":
+    - option "Fan · @kilnfire"
+    - option "A different fan"
+    - option "Creator · Maya"
+    - option "Ops · supervisor" [selected]
+    - option "Ops · independent reviewer"
+    - option "Ops · verification only"
+  - button "Use local actor"
+  - button "Sign out"
+- alert

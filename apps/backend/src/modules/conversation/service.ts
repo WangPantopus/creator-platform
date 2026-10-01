@@ -463,44 +463,48 @@ export class ConversationService {
     return message(result.rows[0]!);
   }
   async read(scope: ThreadScope): Promise<ConversationTimeline> {
-    return this.db.withThread(scope, async (client) => {
-      const thread = await this.lockThread(client, scope, true);
-      const rows = await client.query<MessageRow>(
-        "SELECT * FROM (SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence DESC LIMIT 100) recent ORDER BY sequence",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      const generations = await client.query<{
-        id: string;
-        last_sequence: number;
-      }>(
-        "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN ('queued','generating')",
-        [scope.threadId, scope.creatorId, scope.fanId],
-      );
-      const selected = rows.rows.map((row) =>
-        ConversationMessageSchema.parse({
-          ...message(row),
-          version: row.version,
-          citations: row.citations,
-          createdAt: row.created_at.toISOString(),
-          offTheRecord: row.off_the_record,
-        }),
-      );
-      const messages = this.delivery.lineage
-        ? await this.delivery.lineage.enrich(scope, client, selected)
-        : selected;
-      return {
-        threadId: scope.threadId,
-        creatorId: scope.creatorId,
-        fanId: scope.fanId,
-        control: thread.control,
-        epoch: thread.control_epoch,
-        cursor: thread.event_cursor,
-        generationSequences: Object.fromEntries(
-          generations.rows.map((row) => [row.id, row.last_sequence]),
-        ),
-        messages,
-      };
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const thread = await this.lockThread(client, scope, true);
+        const rows = await client.query<MessageRow>(
+          "SELECT * FROM (SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence DESC LIMIT 100) recent ORDER BY sequence",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        const generations = await client.query<{
+          id: string;
+          last_sequence: number;
+        }>(
+          "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN ('queued','generating')",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        const selected = rows.rows.map((row) =>
+          ConversationMessageSchema.parse({
+            ...message(row),
+            version: row.version,
+            citations: row.citations,
+            createdAt: row.created_at.toISOString(),
+            offTheRecord: row.off_the_record,
+          }),
+        );
+        const messages = this.delivery.lineage
+          ? await this.delivery.lineage.enrich(scope, client, selected)
+          : selected;
+        return {
+          threadId: scope.threadId,
+          creatorId: scope.creatorId,
+          fanId: scope.fanId,
+          control: thread.control,
+          epoch: thread.control_epoch,
+          cursor: thread.event_cursor,
+          generationSequences: Object.fromEntries(
+            generations.rows.map((row) => [row.id, row.last_sequence]),
+          ),
+          messages,
+        };
+      },
+      "read",
+    );
   }
   async accepted(
     scope: ThreadScope,
@@ -1201,18 +1205,22 @@ export class ConversationService {
       "invalid_limit",
       "The replay page limit is invalid.",
     );
-    return this.db.withThread(scope, async (client) => {
-      const thread = await this.lockThread(client, scope, true);
-      invariant(
-        cursor <= thread.event_cursor,
-        "invalid_cursor",
-        "Refresh the conversation before resuming.",
-      );
-      const rows = await client.query<{ payload: Frame }>(
-        "SELECT payload FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND cursor>$4 ORDER BY cursor LIMIT $5",
-        [scope.threadId, scope.creatorId, scope.fanId, cursor, limit],
-      );
-      return rows.rows.map((row) => row.payload);
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const thread = await this.lockThread(client, scope, true);
+        invariant(
+          cursor <= thread.event_cursor,
+          "invalid_cursor",
+          "Refresh the conversation before resuming.",
+        );
+        const rows = await client.query<{ payload: Frame }>(
+          "SELECT payload FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND cursor>$4 ORDER BY cursor LIMIT $5",
+          [scope.threadId, scope.creatorId, scope.fanId, cursor, limit],
+        );
+        return rows.rows.map((row) => row.payload);
+      },
+      "read",
+    );
   }
 }
