@@ -1,0 +1,248 @@
+{
+  "recordedAt": "2026-10-01T11:55:06.764053+00:00",
+  "branch": "codex/w1-team-state-20261001",
+  "baseRevision": "7f8f41cd93d9ef12dec3f43a946aca33c9315ac8",
+  "sourceState": "Hashes identify final uncommitted implementation built successfully. Captures have explicit development phases; do not infer all captures used final source or production output.",
+  "sourceFiles": [
+    {
+      "path": "apps/web/features/studio/Studio.tsx",
+      "sha256": "80523b3e9355ac7a80c997c9e5b23908d19cf4621fce5c8b1bbe40fede3918d6",
+      "modifiedAt": "2026-10-01T11:37:29.357212+00:00"
+    },
+    {
+      "path": "apps/web/features/studio/studio.css",
+      "sha256": "1200dde2dde69a99fdce34e3780652c1a399e328ae242ab50cd282ef664dd2d8",
+      "modifiedAt": "2026-10-01T11:41:24.262307+00:00"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "38bbb4036e6f67a451a91037ecc511f4668f1731c5575f2cea1afdf8a9646c4d",
+      "modifiedAt": "2026-10-01T11:23:27.607875+00:00"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "2945e387a8cf53c40ccba7554571a06a1b640b036b9bd08959812591d9cdfbde",
+      "modifiedAt": "2026-10-01T11:23:36.233030+00:00"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "746c8ce1c0e9ceed109dca0581b0ca7338eea0a461f18b58e1074ac92acdf3db",
+      "modifiedAt": "2026-10-01T11:23:36.236107+00:00"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "84ffe837be527c8e215d01a1d0f349a5a446b564b2e8aa1e9a381576483c1fa6",
+      "modifiedAt": "2026-10-01T11:23:36.242534+00:00"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "dff42a96460e48f35b4183cdcf4320179ae2f85ac50c9cd64fa0fea93812838c",
+      "modifiedAt": "2026-10-01T11:23:36.238106+00:00"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "ebfcacca109c57a5cc6904e1f5906ba9c94f201b1cb030eccee1aa52f1d525ed",
+      "modifiedAt": "2026-10-01T11:23:36.246915+00:00"
+    }
+  ],
+  "environment": {
+    "macOS": "26.7 (25G229)",
+    "node": "24.19.0",
+    "next": "16.3.7",
+    "xcode": "26.5 (17F42)",
+    "java": "Temurin 21.0.12.1+1",
+    "gradle": "8.9",
+    "identity": "Explicit development-only synthetic actor 1; no genuine creator approval",
+    "database": "creator_w1_resume_20261001",
+    "databaseRole": "creator_runtime, non-owner, NOSUPERUSER/NOBYPASSRLS/NOINHERIT",
+    "migrations": 40,
+    "browser": "Codex in-app Chromium, one cookie jar",
+    "origin": "http://localhost:3011",
+    "nativeControls": "disabled; no alternate native automation",
+    "phoneViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "desktopViewports": [
+      {
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "width": 1280,
+        "height": 900
+      }
+    ],
+    "themes": ["Light", "Night"],
+    "reducedMotion": "Night retry and link focus operated"
+  },
+  "implementation": {
+    "readState": "loading / ready / unavailable; failed or loading reads conceal member/invitation records and disable invitation creation",
+    "creatorGate": "Create remains disabled when current creator verification is not verified; server authority unchanged",
+    "retry": "Focusable while busy with aria-busy/aria-disabled and existing serial useAction guard; no mutation replay",
+    "focus": "Recover only after focused Retry finishes and focus has fallen to BODY while visible; target must be connected, rendered and outside hidden/inert ancestor",
+    "link": "Team account link inherits the author-card text token while keeping underline and existing focus outline",
+    "canonicalCopy": "Three added canonical keys; outputs generated, never edited manually"
+  },
+  "personallyObserved": [
+    "Original failed Team read allowed Create after entering a fictional public handle and Triage. Keyboard submit was denied by current creator verification; focus fell to BODY. No invitation was created.",
+    "Repaired development retries against actual denial and a supported exact Team-GET network block retained handle/Triage and Retry focus in phone/desktop Light/Night, with Create disabled. Clearing the block returned the real pending-creator denial without mutation replay.",
+    "The form also reset twice during the development/build window. Repeated Fast Refresh console messages were observed; this is a possible contributor, not a proven cause. Reset screenshots are retained.",
+    "Final link color/focus was operated in Light desktop and Night phone; full-page phone focus capture needs viewport confirmation for navigation overlap.",
+    "Final production build succeeded and HTTP reachability was confirmed, but supported browser navigation returned ERR_BLOCKED_BY_CLIENT through both documented tab entry points. Old stopped-service tabs were URL-policy-blocked connection-error pages. Production Team operation is not accepted."
+  ],
+  "checks": {
+    "canonicalGenerate": "passed: 12 resources / 96 operations",
+    "canonicalGenerateCheck": "passed",
+    "webTypecheck": "passed after correcting loading Notice tone to the exported neutral variant",
+    "affectedEslint": "passed",
+    "affectedPrettier": "passed",
+    "backendBuild": "passed",
+    "productionWebBuild": "passed after final CSS",
+    "shippingIosSimulatorBuild": "passed, normal local signing, two jobs",
+    "shippingAndroidDebugBuild": "passed, offline/no-daemon/two workers; 52 seconds; 10 tasks executed/27 up-to-date",
+    "newTestCode": false,
+    "hostedCI": "Unavailable pending Code Review GitHub connection; no pass or merge claimed"
+  },
+  "builds": {
+    "artifacts": [
+      {
+        "path": "apps/backend/dist/server.mjs",
+        "sha256": "273b2816f7b3718a854ba9129f45bd95ec56f5c9f5f286fe876c028ee4875374",
+        "modifiedAt": "2026-10-01T11:38:55.070401+00:00"
+      },
+      {
+        "path": "apps/web/.next-w1-onboarding-build-20261001/BUILD_ID",
+        "sha256": "e406a01368dd51b5ba2113784b489e38b9d661f6fd91600730a14929041ae5bb",
+        "modifiedAt": "2026-10-01T11:46:54.964060+00:00"
+      },
+      {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+        "sha256": "5598fa9fe4031327ed930ea85d785fced1ccbf5d15639c2693b89b3f262f08a2",
+        "modifiedAt": "2026-10-01T11:43:30.816503+00:00"
+      },
+      {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+        "sha256": "65136e1d9b4c395a10dff54072fe7df099266784ba93cb28b364573796ea9d3e",
+        "modifiedAt": "2026-10-01T11:43:30.295301+00:00"
+      },
+      {
+        "path": "artifacts/workstreams/W1/build/android-20261001/app/outputs/apk/debug/app-debug.apk",
+        "sha256": "505facc64609382d43b82577b94db94048ab322bd2e22d263aecdb9d68b5a978",
+        "modifiedAt": "2026-10-01T11:46:16.932657+00:00"
+      }
+    ],
+    "webBuildId": "1FdvLpSq6lYPldHIh9X5B",
+    "supportingOnly": true,
+    "nativeDependencyQualifier": "Xcode locally resolved compatible xctest-dynamic-overlay 1.13.1, snapshot-testing 1.19.6 and SwiftSyntax 604.0.0; tracked Package.resolved restored exactly to HEAD.",
+    "serialHeavyBuilds": true
+  },
+  "captures": [
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/account-link-focus-desktop-light.jpg",
+      "sha256": "daaea0d4bd598a3f0a894f9f5c06510cd425062722268830e07d945b820c7968",
+      "modifiedAt": "2026-10-01T11:41:58.680050+00:00",
+      "inspected": true,
+      "phase": "After final TypeScript and CSS repair. Development app; final production browser operation unavailable. Phone focus-obscuration needs viewport-specific confirmation."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/account-link-focus-phone-night.jpg",
+      "sha256": "7915513f2f3541a06ee3bb5134819748d2eff7cd8e31311c500ebe652d39f38e",
+      "modifiedAt": "2026-10-01T11:42:00.090167+00:00",
+      "inspected": true,
+      "phase": "After final TypeScript and CSS repair. Development app; final production browser operation unavailable. Phone focus-obscuration needs viewport-specific confirmation."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/draft-reset-phone-night-final-dev.jpg",
+      "sha256": "ddd4197d16a19c839e1f069f72a5bdcf9e3ce7aef7d4537ccb5a17c6d04e31ec",
+      "modifiedAt": "2026-10-01T11:43:46.005749+00:00",
+      "inspected": true,
+      "phase": "Final development source and completed denial; form unexpectedly reset during build/Fast Refresh window. Unresolved; no production acceptance."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/failed-read-enabled-invite-light.jpg",
+      "sha256": "3fa56161c7575628470dc587a7658fa6190173e16b39b6de1d770662ee24b0bd",
+      "modifiedAt": "2026-10-01T11:22:48.892637+00:00",
+      "inspected": true,
+      "phase": "Original observed failure; Create enabled after failed access read. Desktop viewport 1280x720 despite historical filename."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-denied-desktop-light-contrast-final.jpg",
+      "sha256": "29d3562351baef938bd109a3caae4e72f410fad799c2465ff4c7c55cfa0fd016",
+      "modifiedAt": "2026-10-01T11:41:40.279062+00:00",
+      "inspected": true,
+      "phase": "After final TypeScript and CSS repair. Development app; final production browser operation unavailable. Phone focus-obscuration needs viewport-specific confirmation."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-denied-desktop-light-final.jpg",
+      "sha256": "fd43fe4688bc4d7215b4239f560f373102fdbdeb27e2548476fb9530002cab28",
+      "modifiedAt": "2026-10-01T11:40:27.245425+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-denied-phone-light-final.jpg",
+      "sha256": "b0281e9dc576da91ded447432c7c80dc0b34621f4d2de7a584b171776d6cb1b8",
+      "modifiedAt": "2026-10-01T11:43:32.200168+00:00",
+      "inspected": true,
+      "phase": "After final TypeScript and CSS repair. Development app; final production browser operation unavailable. Phone focus-obscuration needs viewport-specific confirmation."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-denied-phone-light.jpg",
+      "sha256": "7071a0b756d166e35dd0098c11199a6a92e5cd6f733ab1442cbf9ef9cdd77df7",
+      "modifiedAt": "2026-10-01T11:37:05.683348+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-denied-phone-night-reduced-motion.jpg",
+      "sha256": "b555d1cfaaa834e0a38916e09db5bcd0feacfa0a507328fd5cd1b6893795b960",
+      "modifiedAt": "2026-10-01T11:37:49.696593+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-unavailable-desktop-light.jpg",
+      "sha256": "e40c078f2a1e0614ac90ad4ca9a08bf51408483987af878cad08741b2f0a68c6",
+      "modifiedAt": "2026-10-01T11:36:19.785637+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-unavailable-phone-light.jpg",
+      "sha256": "e4fd7984a8bf495aecec22e8ea0a696fe6b03b5b3676761e11b30b0d7e0c634b",
+      "modifiedAt": "2026-10-01T11:36:46.162771+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/retained-draft-unavailable-phone-night-reduced-motion.jpg",
+      "sha256": "a28251148fdf39e158674da01ae02833ce15a82e30a325dee4b7b4fbe2e008c7",
+      "modifiedAt": "2026-10-01T11:38:13.736615+00:00",
+      "inspected": true,
+      "phase": "Intermediate repaired development run before final link CSS; retained draft/retry observation only."
+    },
+    {
+      "path": "artifacts/workstreams/W1/resume/2026-10-01-team/team-read-unavailable-light.jpg",
+      "sha256": "09d86c981cc2c70650e5c3f4ec1073d54e6a5d83df527d2126125b9fa632c96a",
+      "modifiedAt": "2026-10-01T11:28:54.403044+00:00",
+      "inspected": true,
+      "phase": "Early repaired development run, unexpectedly empty fields. Desktop 1280x720; retention not accepted."
+    }
+  ],
+  "openAcceptance": [
+    "Stable production failed-read/retry/input retention and final browser journey",
+    "Phone focused account-link visibility above fixed navigation",
+    "Genuine approved creator invite/accept/remove/expiry/reinvite/races and protected confirmation",
+    "Native operation, physical devices and assistive technologies",
+    "Exact-head hosted CI and merge",
+    "Current Team shared-copy rename compilation beyond the previously recorded 7f8f41c rename checkpoint"
+  ],
+  "nonClaims": [
+    "No genuine creator proof/review/approval, membership, invitation, passkey or signed act fabricated",
+    "No backend/API/schema/migration/authority change",
+    "No original design/reference image change",
+    "No full H08/H15/H17/H20 or production acceptance",
+    "No p95, independent-client or device result"
+  ]
+}

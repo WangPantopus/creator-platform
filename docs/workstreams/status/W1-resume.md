@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — Team access recovery, draft
+
+Personally observed failed Team access followed by an enabled Create invitation and lost keyboard focus after server denial. W1 adds explicit read states, serial focusable Retry, concealed stale team records, a verified/read-ready Create gate, canonical generated copy and readable Account-link color. [Evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-team/run.md) retains successful development draft/focus retries and two unexplained draft resets during a repeated Fast Refresh/build window. Final production browser navigation is currently refused by the control tool despite server reachability. Stable production retention and phone focus visibility remain open, so this increment stays draft.
+
+Backend, final production web, normal shipping iOS Simulator and Android debug compilation, generation/check and affected source checks pass. Native controls and exact-head Code Review CI are unavailable. Fresh persisted state has zero approved creators, invitations, memberships, keys or acts; no positive Team lifecycle acceptance is claimed. All original W1 scope remains active.
+
 ## October 1 — fresh rename compilation
 
 A fresh disposable application 5425598 clone renamed 799 text files/paths to temporary W1Rename. Frozen offline dependency install, generation/check (96 operations), backend/web and shipping iOS Simulator/Android debug builds pass. Metadata confirms renamed local IDs/display names. All 1,111 binary assets, including 110 original iOS references, remain byte-identical. Current e51213a generators retain all 15 renamed output bytes/mtimes. [Exact source/build/custody and cleanup](../../../artifacts/workstreams/W1/resume/2026-10-01-rename/run.md). Renamed products/copy and redundant W1 scratch output were removed after digest evidence. Main final products, private data/keys and peers remain. H17 fresh rename compilation is now personally established as supporting evidence; native operation, external identities and the full H01–H20 acceptance remain open.

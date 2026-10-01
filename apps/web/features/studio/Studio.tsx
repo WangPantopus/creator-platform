@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { copy } from "@qelvora/copy";
 import {
   AuthorLabel,
   AuditBanner,
@@ -2510,6 +2511,12 @@ function Library({ creator }: { creator: Creator }) {
   );
 }
 function Team({ creator }: { creator: Creator }) {
+  const [readState, setReadState] = useState<
+    "loading" | "ready" | "unavailable"
+  >("loading");
+  const retryRef = useRef<HTMLButtonElement>(null);
+  const handleRef = useRef<HTMLInputElement>(null);
+  const retryFocusRequested = useRef(false);
   const [members, setMembers] = useState<
       {
         account_id: string;
@@ -2533,16 +2540,42 @@ function Team({ creator }: { creator: Creator }) {
     [roles, setRoles] = useState<string[]>([]),
     action = useAction();
   const load = useCallback(async () => {
-    const result = await studioRequest<{
-      members: typeof members;
-      invitations: typeof pendingInvites;
-    }>("studio", `${creator.id}/team`);
-    setMembers(result.members);
-    setPendingInvites(result.invitations);
+    setReadState("loading");
+    try {
+      const result = await studioRequest<{
+        members: typeof members;
+        invitations: typeof pendingInvites;
+      }>("studio", `${creator.id}/team`);
+      setMembers(result.members);
+      setPendingInvites(result.invitations);
+      setReadState("ready");
+    } catch (error) {
+      setReadState("unavailable");
+      throw error;
+    }
   }, [creator.id]);
   useEffect(() => {
     void action.run(load);
   }, [load]);
+  useEffect(() => {
+    if (readState === "loading") return;
+    const requested = retryFocusRequested.current;
+    retryFocusRequested.current = false;
+    if (
+      requested &&
+      document.visibilityState === "visible" &&
+      document.activeElement === document.body
+    ) {
+      const target =
+        readState === "ready" ? handleRef.current : retryRef.current;
+      if (
+        target?.isConnected &&
+        !target.closest("[hidden], [inert]") &&
+        target.getClientRects().length
+      )
+        target.focus();
+    }
+  }, [readState]);
   const { request: identityRequest } = useIdentityRequest();
   const identity = async (path: string, body: unknown) => {
     const response = await identityRequest(path, {
@@ -2562,66 +2595,100 @@ function Team({ creator }: { creator: Creator }) {
       <header className="w5-heading">
         <h1>Team</h1>
       </header>
-      <Feedback action={action} />
+      {readState === "ready" ? (
+        <Feedback action={action} />
+      ) : (
+        <>
+          <Notice
+            tone={readState === "loading" ? "neutral" : "error"}
+            title={copy.identityTeamAccessTitle}
+          >
+            <p>{action.error || copy.identityTeamAccessLoading}</p>
+            <p>{copy.identityTeamAccessRequired}</p>
+            <button
+              ref={retryRef}
+              className="qv-btn qv-btn--secondary"
+              aria-busy={action.busy}
+              aria-disabled={action.busy}
+              onClick={(event) => {
+                if (action.busy) return;
+                retryFocusRequested.current =
+                  document.activeElement === event.currentTarget;
+                void action.run(load);
+              }}
+            >
+              {copy.retry}
+            </button>
+          </Notice>
+          {action.notice && (
+            <p role="status" className="qv-help">
+              {action.notice}
+            </p>
+          )}
+        </>
+      )}
       <div className="w5-team-columns">
         <div className="w5-card">
           <h2>Roles</h2>
-          {members.map((m) => (
-            <div className="w5-team-member" key={m.account_id}>
-              <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
-              <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
-              {!m.revoked_at && (
-                <button
-                  className="qv-btn qv-btn--quiet"
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      await identity(
-                        `${creator.id}/team/${m.account_id}/remove`,
-                        {},
-                      );
-                      await load();
-                    })
-                  }
-                >
-                  Remove access
-                </button>
-              )}
-            </div>
-          ))}
-          {pendingInvites
-            .filter((i) => !i.accepted_at && !i.revoked_at)
-            .map((i) => (
-              <article key={i.id}>
-                <strong>
-                  Invitation · {i.handle ? `@${i.handle}` : i.account_id}
-                </strong>
-                <p>
-                  {i.roles.join(" · ")} ·{" "}
-                  {new Date(i.expires_at).getTime() > Date.now()
-                    ? "Expires"
-                    : "Expired"}{" "}
-                  {time(i.expires_at)}
-                </p>
-                <button
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      await identity(
-                        `${creator.id}/team/${i.account_id}/remove`,
-                        {},
-                      );
-                      await load();
-                    })
-                  }
-                >
-                  Remove invitation
-                </button>
-              </article>
+          {readState === "ready" &&
+            members.map((m) => (
+              <div className="w5-team-member" key={m.account_id}>
+                <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
+                <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
+                {!m.revoked_at && (
+                  <button
+                    className="qv-btn qv-btn--quiet"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        await identity(
+                          `${creator.id}/team/${m.account_id}/remove`,
+                          {},
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Remove access
+                  </button>
+                )}
+              </div>
             ))}
+          {readState === "ready" &&
+            pendingInvites
+              .filter((i) => !i.accepted_at && !i.revoked_at)
+              .map((i) => (
+                <article key={i.id}>
+                  <strong>
+                    Invitation · {i.handle ? `@${i.handle}` : i.account_id}
+                  </strong>
+                  <p>
+                    {i.roles.join(" · ")} ·{" "}
+                    {new Date(i.expires_at).getTime() > Date.now()
+                      ? "Expires"
+                      : "Expired"}{" "}
+                    {time(i.expires_at)}
+                  </p>
+                  <button
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        await identity(
+                          `${creator.id}/team/${i.account_id}/remove`,
+                          {},
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Remove invitation
+                  </button>
+                </article>
+              ))}
           <label className="w5-field">
             Public fan handle
             <input
+              ref={handleRef}
               value={account}
               onChange={(e) => setAccount(e.target.value)}
             />
@@ -2660,7 +2727,13 @@ function Team({ creator }: { creator: Creator }) {
           ))}
           <button
             className="qv-btn qv-btn--secondary"
-            disabled={action.busy || !account || !roles.length}
+            disabled={
+              action.busy ||
+              readState !== "ready" ||
+              creator.verification !== "verified" ||
+              !account ||
+              !roles.length
+            }
             onClick={() =>
               void action.run(async () => {
                 await studioRequest(
