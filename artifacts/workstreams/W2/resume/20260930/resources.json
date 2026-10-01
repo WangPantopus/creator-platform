@@ -14,7 +14,7 @@
   "migrations": "canonical 0001\u20130031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
-  "builds": "Retained only active apps/web/.next-w2-review; inactive web/backend/native build outputs and task caches deleted after handoff",
+  "builds": "Active apps/web/.next-w2-review retained; own backend dist recreated by source verification; peer outputs/devices unchanged",
   "nativeDevices": [],
   "provider": {
     "name": "OpenAI",
@@ -64,10 +64,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 24758,
-      "executionSession": 81605
+      "pid": 42986,
+      "executionSession": 18971
     },
-    "observedAt": "2026-09-30T23:56:59.582373+00:00",
+    "observedAt": "2026-10-01T00:23:25.011767+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -104,16 +104,16 @@
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-09-30T23:56:59.582373+00:00",
+    "observedAt": "2026-10-01T00:23:25.011767+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener, PID24758",
+    "apiPort4102": "loopback listener,PID42986; restarted741d8dd provider admission/hold source",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
     "savedData": "123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
     "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
     "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-    "nextAction": "Fresh exact-head CI after journal/audience increment; W8 allocation for cache columns and generation receipts remains pending"
+    "nextAction": "Fresh complete-head CI; W8 allocation for cache/all-attempt generation receipts and protected-store publication remain pending"
   },
   "availabilityHistory": [
     {

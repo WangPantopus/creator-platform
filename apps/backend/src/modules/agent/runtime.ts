@@ -11,7 +11,10 @@ import {
   settleCreatorCostInTransaction,
 } from "./budget.js";
 import { AgentService } from "./service.js";
-import { assertAgentDelivery } from "./delivery-authority.js";
+import {
+  assertAgentDelivery,
+  type CapturedAgentAuthority,
+} from "./delivery-authority.js";
 import type { ProviderExecution } from "./provider-usage.js";
 import {
   licenseRow,
@@ -110,8 +113,19 @@ export class LiveAgentRuntime {
     held.sealed = true;
   }
   /** W3 invokes these inside its existing acceptance/release transaction. */
-  async assertReady(scope: ThreadScope, client: PoolClient) {
-    await assertAgentDelivery(this.service, this.audiences, scope, client);
+  async assertReady(
+    scope: ThreadScope,
+    client: PoolClient,
+    captured?: CapturedAgentAuthority,
+  ) {
+    await assertAgentDelivery(
+      this.service,
+      this.audiences,
+      scope,
+      client,
+      undefined,
+      captured,
+    );
   }
   async assertApproved(
     scope: ThreadScope,
@@ -307,7 +321,11 @@ export class LiveAgentRuntime {
       attemptId: execution.attemptId,
       admit: (journal) =>
         execution.admit(async (client) => {
-          await this.assertReady(scope, client);
+          await this.assertReady(scope, client, {
+            versionId: current.version.id,
+            versionHash: current.version.compiledHash,
+            audienceRevision: grants.revision,
+          });
           return journal(client);
         }),
       sealAdmission: (journal) => execution.sealAdmission(journal),

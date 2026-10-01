@@ -1,5 +1,7 @@
 # W2 continuation — 2026-09-30
 
+**Captured authority follow-up:** [Current source/race and actual preview boundaries](captured-admission-followup.md) additionally pins the immutable version/hash and audience revision inside provider admission. Post-restart synthetic preview cost matches four journal rows; first approved4.581s exceeds the original3s target. Saved companion18/sources/history are preserved. Complete fan/cost/receipt/licensing/feed/native/accessibility/performance acceptance remains open across all nine packages/R01–R14.
+
 **Canonical admission/creator hold:** [Exact W3 contract and W2 consumer source](generation-admission-followup.md) journals on the actual held W3 client before provider I/O and keeps creator holds through memory until same-runtime `sealExecution`. It is not a terminal weighted generation receipt; W8 allocation, all-attempt/cache persistence and executionAttributed readiness remain pending. W5 approved Notes/public-answer context projection remains absent. All nine packages/R01–R14 are retained.
 
 **Evaluation disclosure accessibility:** [Actual keyboard source/receipt](evaluation-accessibility-followup.md) adds expanded/collapsed state, named transcript regions and keyboard toggling. Enter/Tab/focus were operated on the saved companion18 evaluation; full R12 accessibility/native/populated acceptance remains open.

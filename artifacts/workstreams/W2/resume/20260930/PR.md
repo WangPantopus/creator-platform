@@ -14,7 +14,7 @@ Validation: backend/API/web typechecks, changed-file lint/format, generated veri
 
 Completed evaluation cases now expose expanded/collapsed states and named transcript regions; Enter toggles the saved details while retaining focus. Actual keyboard/AX observations verify the behavior without altering stored evaluations or references.
 
-Canonical W3 execution admission is now consumed for each main/memory provider journal on the held client before network I/O. The creator hold survives the main reply until memory completes and the same runtime/execution seals it in W3’s transaction, serialized against cap reservations. This closes early hold release while keeping weighted readiness disabled pending the actual durable receipt allocation.
+Canonical W3 execution admission is now consumed for each main/memory provider journal on the held client before network I/O. Provider admission pins the originally captured immutable version/hash and audience revision, preventing old context from being admitted after publication or access changes. The creator hold survives the main reply until memory completes and the same runtime/execution seals it in W3’s transaction, serialized against cap reservations. This closes early hold release while keeping weighted readiness disabled pending the actual durable receipt allocation.
 
 Memory extraction and each sensitivity call now also require a durable pre-call W2 journal and current W3 authority checks. The creator cap includes memory costs. Consumers must treat the optional usage callback as diagnostic, avoiding duplicate charges. Atomic generation attribution/final sealing remains disabled pending the W3 execution producer and W8 schema allocation; this source change is not a licensed memory runtime receipt.
 
