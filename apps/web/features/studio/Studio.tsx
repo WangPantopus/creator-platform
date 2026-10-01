@@ -1553,6 +1553,7 @@ function Compose({
             return (
               <Recorder
                 creatorId={creator.id}
+                expectedAccountId={creator.viewerAccountId}
                 creatorName={creator.display_name}
                 objectId={voiceObjectId}
                 onReady={(asset, evidence) => {
@@ -1594,7 +1595,9 @@ function Compose({
       {photoObjectId && canDraft && (
         <Modal title="Photo" onClose={() => setPhotoObjectId(null)}>
           <PhotoAttachment
+            key={`${creator.viewerAccountId}/${creator.id}/${photoObjectId}`}
             creatorId={creator.id}
+            expectedAccountId={creator.viewerAccountId}
             objectId={photoObjectId}
             onReady={(asset, alt) => {
               edit({

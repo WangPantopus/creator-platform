@@ -21,6 +21,7 @@ export function PostVoiceAttachment(props: CreatorVoiceRecordingProps) {
           creatorId: props.creatorId,
           objectId: props.objectId,
           purpose: "post_audio",
+          expectedAccountId: props.expectedAccountId,
           signal,
         });
         if (
@@ -50,7 +51,7 @@ export function PostVoiceAttachment(props: CreatorVoiceRecordingProps) {
         if (!signal?.aborted) setLoading(false);
       }
     },
-    [props.creatorId, props.objectId],
+    [props.creatorId, props.objectId, props.expectedAccountId],
   );
   useEffect(() => {
     const abort = new AbortController();

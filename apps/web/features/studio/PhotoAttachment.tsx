@@ -13,11 +13,13 @@ import { mediaRequest, uploadCreatorMedia } from "../media/api";
 export function PhotoAttachment({
   creatorId,
   objectId,
+  expectedAccountId,
   onReady,
   beforeDiscard,
 }: {
   creatorId: string;
   objectId: string;
+  expectedAccountId: string;
   onReady(asset: CreatorMediaAsset, alt: string): void;
   beforeDiscard(assetId: string): Promise<void>;
 }) {
@@ -37,6 +39,7 @@ export function PhotoAttachment({
     const abort = new AbortController();
     void mediaRequest<{ creatorMediaAvailable?: boolean }>("capabilities", {
       signal: abort.signal,
+      expectedAccountId,
     })
       .then((value) => {
         if (!abort.signal.aborted)
@@ -49,7 +52,7 @@ export function PhotoAttachment({
       abort.abort();
       controller.current?.abort();
     };
-  }, []);
+  }, [expectedAccountId]);
   useEffect(() => {
     if (!asset || !["quarantined", "processing"].includes(asset.state)) return;
     const abort = new AbortController();
@@ -59,12 +62,14 @@ export function PhotoAttachment({
         const value = CreatorMediaAssetSchema.parse(
           await mediaRequest(`creators/${creatorId}/media/${asset.id}`, {
             signal: abort.signal,
+            expectedAccountId,
           }),
         );
         if (
           value.creatorId !== creatorId ||
           value.objectId !== objectId ||
-          value.purpose !== "post_photo"
+          value.purpose !== "post_photo" ||
+          value.ownerAccountId !== expectedAccountId
         )
           throw new Error("The photo does not belong to this draft.");
         if (!abort.signal.aborted) setAsset(value);
@@ -84,7 +89,7 @@ export function PhotoAttachment({
       abort.abort();
       clearTimeout(timer);
     };
-  }, [asset, creatorId, objectId]);
+  }, [asset, creatorId, objectId, expectedAccountId]);
   const upload = async () => {
     if (!file || pending.current) return;
     pending.current = true;
@@ -97,6 +102,7 @@ export function PhotoAttachment({
       const value = CreatorMediaAssetSchema.parse(
         await uploadCreatorMedia({
           creatorId,
+          expectedAccountId,
           objectId,
           purpose: "post_photo",
           blob: file,
@@ -133,6 +139,7 @@ export function PhotoAttachment({
         await beforeDiscard(current.id);
         await mediaRequest(`creators/${creatorId}/media/${current.id}`, {
           method: "DELETE",
+          expectedAccountId,
         });
       } else if (uploadKey.current)
         throw new Error(
