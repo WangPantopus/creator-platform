@@ -49,7 +49,14 @@ export class ExtendedCommerce {
     readonly money?: import("./reconciliation.js").MoneyReconciliation,
     readonly settlement?: import("./accounting.js").CreatorSettlement,
     readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
-  ) {}
+    readonly poolJournal?: import("./pass-pool-journal.js").PassPoolJournal,
+  ) {
+    invariant(
+      !poolJournal || poolJournal.isForService(service),
+      "pool_graph_mismatch",
+      "Pool reads require this same prepared commerce graph.",
+    );
+  }
   async storePurchase(
     actor: Actor,
     input: { platform: "apple" | "google"; transaction: string },
@@ -423,7 +430,11 @@ export function allocateSlotDayPool(
     }))
     .sort((a, b) =>
       a.remainder === b.remainder
-        ? a.creatorId.localeCompare(b.creatorId)
+        ? a.creatorId < b.creatorId
+          ? -1
+          : a.creatorId > b.creatorId
+            ? 1
+            : 0
         : a.remainder > b.remainder
           ? -1
           : 1,

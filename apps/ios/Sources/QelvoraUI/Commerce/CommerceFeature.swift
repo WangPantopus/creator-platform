@@ -14,7 +14,7 @@ struct CommerceFeature: View {
     var storeProductIDs: [String] = []
     @State private var overview: CommerceOverview?; @State private var detail: CommerceDetail?
     @State private var screen = "requests"; @State private var category = "Open"; @State private var creator = ""
-    @State private var amount = ""; @State private var choice = ""; @State private var reminders = true
+    @State private var amount = ""; @State private var choice = ""; @State private var reminders = false
     @State private var summary = ""; @State private var info = ""; @State private var selectedMode: String?
     @State private var includeSummary = true; @State private var includeMessages: [IncludeItem] = []
     @State private var visibility: String? = "private"; @State private var busy = false; @State private var failure = ""
@@ -160,11 +160,13 @@ struct CommerceFeature: View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Spending and time").qText("display-md")
             Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency)).qText("spend-total")
-            Text("Charged this calendar month").qText("caption")
+            Text("Charged this UTC calendar month").qText("caption")
+            if let month = data.exposure?.month { Text(month + " · UTC").qText("meta") }
             let limit = data.limits.first { $0.currency == data.policy.currency }
             panel {
                 row("Current limit", limit.map { $0.explicit_none ? "No limit" : CommerceAmount.display(Int64($0.amount ?? "0") ?? 0, $0.currency) } ?? "Choose before your first paid action")
                 row("Held, not charged", CommerceAmount.display(data.exposure?.held ?? 0, data.policy.currency))
+                if let refunded = data.exposure?.refunded { row("Refunds recorded", CommerceAmount.display(refunded, data.policy.currency)) }
                 if let effective = limit?.effective_at { Text("Your increase takes effect \(when(effective)).").qText("caption") }
             }
             VStack(alignment: .leading, spacing: 12) {

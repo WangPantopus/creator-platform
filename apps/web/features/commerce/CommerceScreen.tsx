@@ -21,6 +21,7 @@ import { SessionSchema, type commerceContracts } from "@qelvora/api";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
 import { PassCheckout } from "./PassCheckout";
+import { PoolEarnings } from "./PoolEarnings";
 
 type Mode = {
   id: string;
@@ -86,6 +87,7 @@ type Ledger = {
   amount: string;
   currency: string;
   cause: string;
+  refs?: { pool?: boolean };
   created_at: string;
 };
 type Limit = {
@@ -133,8 +135,11 @@ type Overview = {
     products: { key: string; label: string }[];
   }[];
   payoutAccounts: { creator_id: string; state: string; details_due: boolean }[];
+  poolEarnings: commerceContracts.PoolEarnings[];
   limits: Limit[];
   exposure: {
+    month: string;
+    refunded: number;
     captured: number;
     held: number;
     total: number;
@@ -170,6 +175,7 @@ type Overview = {
     paymentsAvailable: boolean;
     membershipAvailable: boolean;
     passPurchaseAvailable: boolean;
+    poolEarningsAvailable: boolean;
     nativeReplyPurchase: boolean;
     stripePublishableKey: string | null;
   };
@@ -266,17 +272,26 @@ function requestId(id: string) {
   return `REQ-${id.slice(0, 8).toUpperCase()}`;
 }
 async function commerceFetch(path: string, init: RequestInit = {}) {
-  let response = await fetch(path, { ...init, cache: "no-store" });
-  if (response.status === 401) {
-    const refresh = await fetch("/api/platform/identity/refresh", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "{}",
-    });
-    if (refresh.ok)
-      response = await fetch(path, { ...init, cache: "no-store" });
+  try {
+    let response = await fetch(path, { ...init, cache: "no-store" });
+    if (response.status === 401) {
+      const refresh = await fetch("/api/platform/identity/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      if (refresh.ok)
+        response = await fetch(path, { ...init, cache: "no-store" });
+    }
+    return response;
+  } catch (error) {
+    if (error instanceof TypeError)
+      throw new Error(
+        "The connection is unavailable. Your action is not confirmed. Refresh current state before trying again.",
+        { cause: error },
+      );
+    throw error;
   }
-  return response;
 }
 function Button({
   children,
@@ -566,8 +581,11 @@ function CommerceAccountScreen({
   const load = useCallback(async () => {
     setLoading(true);
     try {
+      const query = new URLSearchParams();
+      if (creatorId) query.set("creatorId", creatorId);
+      if (screen === "pool") query.set("poolEarnings", "1");
       const response = await accountFetch(
-        `/api/commerce/overview${creatorId ? `?creatorId=${encodeURIComponent(creatorId)}` : ""}`,
+        `/api/commerce/overview${query.size ? `?${query}` : ""}`,
         { cache: "no-store" },
       );
       const body = await response.json();
@@ -611,7 +629,7 @@ function CommerceAccountScreen({
     } finally {
       setLoading(false);
     }
-  }, [creatorId, packetId, accountFetch]);
+  }, [screen, creatorId, packetId, accountFetch]);
   useEffect(() => {
     void load();
   }, [load]);
@@ -765,6 +783,17 @@ function CommerceAccountScreen({
     ) ?? [];
   const chosen = modes.find((m) => m.id === selectedMode);
   const limit = data?.limits.find((l) => l.currency === currency);
+  const hasSpendingLimit = Boolean(limit && !limit.explicit_none);
+  const exposurePercent = hasSpendingLimit
+    ? Number(limit?.amount) > 0
+      ? Math.min(
+          100,
+          ((data?.exposure?.total ?? 0) / Number(limit?.amount)) * 100,
+        )
+      : (data?.exposure?.total ?? 0) > 0
+        ? 100
+        : 0
+    : 0;
   const chosenAmount = chosen
     ? visibility === "public"
       ? chosen.public_amount
@@ -796,7 +825,15 @@ function CommerceAccountScreen({
       c.verification === "verified",
   )?.id;
   const creatorLedger =
-    data?.ledger.filter((l) => l.creator_id === earningsCreator) ?? [];
+    data?.ledger.filter(
+      (l) =>
+        l.creator_id === earningsCreator &&
+        l.kind !== "pool_alloc" &&
+        !l.refs?.pool,
+    ) ?? [];
+  const poolSummary = data?.poolEarnings?.find(
+    (p) => p.creatorId === earningsCreator,
+  );
   const selectedTier = data?.tiers.find((t) => t.id === membershipTier);
   const suffix = activeCreator ? `?creatorId=${activeCreator}` : "";
   function creatorPicker() {
@@ -840,7 +877,12 @@ function CommerceAccountScreen({
               Earnings
             </Link>
             {data?.policy.passEnabled && (
-              <Link href={`/commerce/pool${suffix}`}>Pool earnings</Link>
+              <Link
+                href={`/commerce/pool${suffix}`}
+                aria-current={screen === "pool" ? "page" : undefined}
+              >
+                Pool earnings
+              </Link>
             )}
           </nav>
         </aside>
@@ -872,7 +914,13 @@ function CommerceAccountScreen({
           {["packet", "checkout"].includes(screen) && (
             <div className="commerce-grabber" aria-hidden="true" />
           )}
-          {screen !== "spending" && <h1>{titles[screen]}</h1>}
+          {screen !== "spending" &&
+            !(
+              screen === "pool" &&
+              data?.policy.passEnabled &&
+              data.capabilities.poolEarningsAvailable &&
+              poolSummary
+            ) && <h1>{titles[screen]}</h1>}
           <p className="commerce-announcement" role="status" aria-live="polite">
             {notice}
           </p>
@@ -965,8 +1013,13 @@ function CommerceAccountScreen({
                     {new Intl.DateTimeFormat(undefined, {
                       month: "long",
                       year: "numeric",
+                      timeZone: "UTC",
                     })
-                      .format(new Date())
+                      .format(
+                        new Date(
+                          `${data.exposure?.month ?? new Date().toISOString().slice(0, 7)}-01T00:00:00Z`,
+                        ),
+                      )
                       .toUpperCase()}
                   </span>
                   <div className="commerce-spend-total">
@@ -981,17 +1034,22 @@ function CommerceAccountScreen({
                   </p>
                   <div
                     className="commerce-progress"
-                    role="progressbar"
+                    role={hasSpendingLimit ? "progressbar" : "img"}
                     aria-label="Monthly exposure"
-                    aria-valuemin={0}
-                    aria-valuemax={
-                      limit?.amount ? Number(limit.amount) : undefined
+                    aria-valuemin={hasSpendingLimit ? 0 : undefined}
+                    aria-valuemax={hasSpendingLimit ? 100 : undefined}
+                    aria-valuenow={
+                      hasSpendingLimit ? exposurePercent : undefined
                     }
-                    aria-valuenow={data.exposure?.total ?? 0}
+                    aria-valuetext={
+                      hasSpendingLimit
+                        ? `${money(data.exposure?.total ?? 0, currency)} including pending holds, of your ${money(limit?.amount ?? 0, currency)} limit`
+                        : undefined
+                    }
                   >
                     <span
                       style={{
-                        width: `${limit?.amount ? Math.min(100, ((data.exposure?.total ?? 0) / Number(limit.amount)) * 100) : 0}%`,
+                        width: `${exposurePercent}%`,
                       }}
                     />
                   </div>
@@ -1001,21 +1059,7 @@ function CommerceAccountScreen({
                     <dt>Pending holds and requests</dt>
                     <dd>{money(data.exposure?.held ?? 0, currency)}</dd>
                     <dt>Refunds recorded</dt>
-                    <dd>
-                      {money(
-                        data.ledger
-                          .filter(
-                            (l) =>
-                              l.kind === "refund" &&
-                              l.currency === currency &&
-                              l.fan_id === data.fan?.id &&
-                              l.created_at.slice(0, 7) ===
-                                new Date().toISOString().slice(0, 7),
-                          )
-                          .reduce((a, l) => a + BigInt(l.amount), 0n),
-                        currency,
-                      )}
-                    </dd>
+                    <dd>{money(data.exposure?.refunded ?? 0, currency)}</dd>
                   </dl>
                   {data.spendingNotices.map((n) => (
                     <p role="status" className="commerce-help" key={n.id}>
@@ -2097,10 +2141,19 @@ function CommerceAccountScreen({
                     <Empty title="Creator access required">
                       Earnings belong to the verified creator account.
                     </Empty>
-                  ) : screen === "pool" && !data.policy.passEnabled ? (
+                  ) : screen === "pool" &&
+                    (!data.policy.passEnabled ||
+                      !data.capabilities.poolEarningsAvailable) ? (
                     <Empty title="Pool earnings are unavailable">
-                      The pass is not enabled yet.
+                      The pass pool is not connected yet. Your other earnings
+                      remain available.
                     </Empty>
+                  ) : screen === "pool" ? (
+                    <PoolEarnings
+                      key={earningsCreator}
+                      summary={poolSummary}
+                      money={money}
+                    />
                   ) : (
                     <>
                       <div className="commerce-stats">
@@ -2163,11 +2216,6 @@ function CommerceAccountScreen({
                         markets and tax reporting require configured account
                         details.
                       </p>
-                      {screen === "pool" && (
-                        <p>
-                          The pool splits by slots held, not by messages sent.
-                        </p>
-                      )}
                     </>
                   )}
                 </>
@@ -2214,7 +2262,7 @@ function LimitForm({
     [none, setNone] = useState(
       limit?.pending_none ?? limit?.explicit_none ?? false,
     ),
-    [reminders, setReminders] = useState(limit?.reminders_on ?? true),
+    [reminders, setReminders] = useState(limit?.reminders_on ?? false),
     [error, setError] = useState("");
   function submit(e: FormEvent) {
     e.preventDefault();

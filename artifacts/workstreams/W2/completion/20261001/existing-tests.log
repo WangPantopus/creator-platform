@@ -1,0 +1,44 @@
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running test in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/copy:build: cache hit, replaying logs 0cac4356cca28abd
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/api:build: cache hit, replaying logs 7d9876fb27872c34
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/api:test: cache bypass, force executing 57115e6eb2b4ca6f
+@qelvora/api:test: $ vitest run --passWithNoTests
+@qelvora/api:test: 
+@qelvora/api:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/api
+@qelvora/api:test: 
+@qelvora/api:test: No test files found, exiting with code 0
+@qelvora/api:test: 
+@qelvora/api:test: include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+@qelvora/api:test: exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+@qelvora/api:test: 
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/backend:test: cache bypass, force executing 91b21045b7630532
+@qelvora/backend:test: $ vitest run
+@qelvora/backend:test: 
+@qelvora/backend:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend
+@qelvora/backend:test: 
+@qelvora/backend:test:  ✓ tests/contracts.test.ts (9 tests) 156ms
+@qelvora/backend:test:  ✓ tests/postgres.integration.test.ts (9 tests) 297898ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads  294219ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once  364ms
+@qelvora/backend:test: 
+@qelvora/backend:test:  Test Files  2 passed (2)
+@qelvora/backend:test:       Tests  18 passed (18)
+@qelvora/backend:test:    Start at  03:08:53
+@qelvora/backend:test:    Duration  301.59s (transform 723ms, setup 0ms, collect 2.45s, tests 298.05s, environment 0ms, prepare 303ms)
+@qelvora/backend:test: 
+
+ Tasks:    6 successful, 6 total
+Cached:    4 cached, 6 total
+  Time:    5m7.151s 
+
