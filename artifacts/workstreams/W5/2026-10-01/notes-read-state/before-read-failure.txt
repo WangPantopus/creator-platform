@@ -1,0 +1,56 @@
+- alert
+- complementary:
+  - navigation "Studio":
+    - generic: W
+    - generic: W5 pending creator boundary
+    - generic: Qelvora Studio
+    - link "Notes":
+      - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/notes
+      - generic: Notes
+    - link "Requests":
+      - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/requests
+      - generic: Requests
+    - link "Threads":
+      - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/threads
+      - generic: Threads
+    - link "My AI":
+      - /url: /studio/ai
+      - generic: My AI
+    - link "Offers":
+      - /url: /commerce/offers
+      - generic: Offers
+    - link "Publish":
+      - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/publish
+      - generic: Publish
+    - link "Insights":
+      - /url: /studio/insights
+      - generic: Insights
+    - link "Earnings":
+      - /url: /commerce/earnings
+      - generic: Earnings
+    - link "Team":
+      - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/team
+      - generic: Team
+    - generic: Creator workspace
+- main:
+  - link "Qelvora Studio":
+    - /url: /studio/workspace
+  - generic: W5 pending creator boundary
+  - button "Refresh role"
+  - heading "Notes" [level=1]
+  - link "New Note":
+    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/compose
+  - alert:
+    - generic: Action status
+    - generic: Current creator verification and recovery are required.
+  - heading "Your first Note" [level=3]
+  - paragraph: Write one Note for your audience. Each fan's reply stays private.
+  - generic: REPLIES · 0
+  - generic: Only you and your triage team see these
+  - text: Show replies
+  - combobox "Show replies":
+    - option "All reviewed replies" [selected]
+    - option "Unread"
+    - option "Reacted"
+    - option "Flagged"
+  - paragraph: Reviewed private replies appear here when fans reply to a published Note. Replies waiting for safety review stay out of the feed.
