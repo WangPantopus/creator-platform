@@ -1,0 +1,89 @@
+{
+  "recordedAt": "2026-10-01T14:15:16.132740+00:00",
+  "applicationSourceRevision": "81d3c6fd41e318ecc24b0c880c9b1c9654cee828",
+  "baseRevision": "6dc6f67079a3382d1a301ddc27bf5e89897a9712",
+  "branch": "codex/w1-native-verification-20261001",
+  "sourceFiles": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "fe13d40e9b8bddbe24c8fc025dd506256a8d85285abf4cb02cf3b0212737e622",
+      "bytes": 67119
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "sha256": "cbacaeeebde6de8e7f835c5a1964f9c380211c7405bfd3be2dea26d7843d7228",
+      "bytes": 1727
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+      "sha256": "99fbfa00a4aaeb6185be974d58055e0e2729f3cbc2a7a870cb37ea42978aea46",
+      "bytes": 16689
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
+      "sha256": "2a8f1e858fa6f7b48fbade0df2c193fd1977226a16c6df6132d782170f6882af",
+      "bytes": 12299
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "b354829e19a9ad5f2b8c152c376e3f4f400925d039542a9fcccd4248998fa98b",
+      "bytes": 99972
+    },
+    {
+      "path": "apps/ios/App/QelvoraApp.swift",
+      "sha256": "9d614d0d8f027401baae38dd5446e562a366e8d64dcfa71bb440a00d90f0cb7f",
+      "bytes": 3061
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "f6712884abc32c15b7e488534e085739cdf171792b221274a6c7826345cc86e5",
+      "bytes": 252042
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "48dcf8a01a29ef56e196c0a640495b35c0f860a16f91caa1b9d22bc0ec7b5d53",
+      "bytes": 65700
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+      "sha256": "fbf449f7e947edabf69245321f85a06992dc90a82d568ac91a44aaa0abe990a8",
+      "bytes": 17251
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
+      "sha256": "34570e6508683529f634cd5357f86990455cc1898af3984b8c66df7156c67205",
+      "bytes": 11580
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "d157563e6b6800ee1129251b37f67a3546b6085520d3fb50884d606312fdae48",
+      "bytes": 62984
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "46b3f9fade954385361193054ac716ad1d32a7cec7ac564f5c51813aff83bf59",
+      "bytes": 63611
+    }
+  ],
+  "sourceCustody": {
+    "addedCopyKeys": 39,
+    "changedExistingCopyKeys": [],
+    "changedExistingIosStringEntries": [],
+    "newIosStringEntries": 37,
+    "unchangedOpenapiAndNativeApi": true,
+    "changedDesignReferences": false
+  },
+  "supportingSourceChecks": {
+    "canonicalSharedGeneration": "passed; 12 resources",
+    "canonicalSharedGenerationCheck": "passed; 12 resources",
+    "nativeApiGeneratorCheck": "passed; 97 operations",
+    "gitDiffCheck": "passed",
+    "newTestsOrScripts": false
+  },
+  "nativeBuild": "not run; cleanup restriction",
+  "webBackendConsumerBuild": "not run for new shared-copy source; cleanup restriction",
+  "currentFreshRename": "not run for this new source; cleanup restriction",
+  "appOperation": "not performed; browser/native control and cleanup gates remain",
+  "hostedCi": "Code Review GitHub connection unavailable; no provider head or pass returned",
+  "resources": "No owned build/server/database/device started; private config/keys and source/evidence retained; generated resources/tools/dependencies removed under cleanup"
+}

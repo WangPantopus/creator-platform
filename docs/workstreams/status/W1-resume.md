@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — native Signed destination source, uncompiled draft
+
+Application `81d3c6f` connects both shipping native `/verify/:id` destinations to the existing unauthenticated public-signature operation. It preserves private/withdrawn metadata limits, separates approved AI authorship, rejects a mismatched act response, clears departed/background content and rechecks on foreground/explicit refresh. Explicitly public native features also remain reachable before Handle setup. Thirty-nine shared copy keys are canonically generated; shared resource check 12/12 and unchanged API model check 97 operations pass. [Exact source review and pending acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-verification/run.md).
+
+This new native/shared source is not compiled or operated. Heavy local builds/runtimes remain off under the coordinated cleanup restriction; main generated products, native toolchain, database resources and dependencies are removed, while source/private configuration/keys/evidence remain. All-consumer compilation, current rename, native/public/revocation/privacy/design journeys and Code Review CI are outstanding. Earlier build receipts retain their exact source qualification. Full W1 acceptance remains open.
+
 ## October 1 — main 3de0f14 integration and cleanup restriction
 
 Application `aade864` normally integrates current main `3de0f14` through all seven owned W1 branches, retaining the Home navigation and signing authority repairs. Generation/check validates 12 resources and 97 operations with no generated drift; backend, production web, normal shipping iOS/Android and nine unchanged backend contracts pass. A fresh rename passes generation/backend/web/iOS with all 1,219 binary assets and 110 original iOS references unchanged. Its Android build was not run because the coordinated cleanup request forbids new heavy local builds/runtimes until explicit resumption. [Exact current-source results and qualifications](../../../artifacts/workstreams/W1/resume/2026-10-01-main-3de0f14/run.md).
