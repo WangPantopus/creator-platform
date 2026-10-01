@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — current main integration, source checks only
+
+Application `c46c5de` normally integrates main `ef3619b` through all eight owned W1 branches, including W4's payout-onboarding contracts/98th operation and W2's ingestion-recovery and cleanup corrections. W1 reviewed the changed source and owner receipts; owner app/CI receipts retain their original authors and revisions. Current canonical source checks pass for 12 shared resources and 98 Swift/Kotlin operations. [Exact integration and remaining checks](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md). W2's pool-error follow-up PR40 is still separate and unmerged in this checkpoint.
+
+The current combined source has not been rebuilt, renamed or operated after cleanup. Native verification source `8915ebd` remains draft in [PR42](https://github.com/WangPantopus/creator-platform/pull/42). Earlier `aade864` builds and partial rename validate that earlier revision only. Heavy builds/runtimes stay off until explicit resumption; removed database state is not inferred from retained private config/keys. Hosted W1 CI still lacks its Code Review GitHub connection. The identity-authority guide now describes the actual installed policies/features and reconfirms the remaining native one-ID call lookup. Full original scope and H01–H20 acceptance remain open.
+
 ## October 1 — native Signed destination source, uncompiled draft
 
 Application `8915ebd` connects both shipping native `/verify/:id` destinations to the existing unauthenticated public-signature operation. It preserves private/withdrawn metadata limits, separates approved AI authorship, rejects a mismatched act response, clears departed/background content and rechecks on foreground/explicit refresh. Explicitly public native features also remain reachable before Handle setup. Thirty-nine shared copy keys are canonically generated; shared resource check 12/12 and unchanged API model check 97 operations pass. [Exact source review and pending acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-verification/run.md).

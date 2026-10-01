@@ -1,0 +1,90 @@
+{
+  "recordedAt": "2026-10-01T14:46:21.003993+00:00",
+  "applicationSourceRevision": "c46c5de1dc1d16bfd3c123aa24e861144b110907",
+  "mainSnapshot": "ef3619bb35579963c1c86fafa91ad09b3e18552c",
+  "originalCheckpointAncestor": "5e104cd20f33b96c366f11f74b793c56071d0457",
+  "branchRevisionsBeforeReceiptCommit": {
+    "codex/w1-resume-20261001": "77d2f232c9bac0fadcda37f4d96fb3e5cf0f765f",
+    "codex/w1-onboarding-timing-20261001": "c8eb9fb2659c1df4644ec57a8c7bf11892698d29",
+    "codex/w1-comprehension-focus-20261001": "72ee2f2111c7c70a421d5c9fb097b09a49b6bddf",
+    "codex/w1-generation-efficiency-20261001": "0b7b30a83c1adc530623945e2f12fc3aedcb484a",
+    "codex/w1-team-state-20261001": "f791e863e63037adc436c64131fdbba36cc36420",
+    "codex/w1-home-host-20261001": "6a15dc09ec73342290e0b269251980a8563398db",
+    "codex/w1-signing-authority-20261001": "a220161632511d6089aa96a6d56105c4ae069c21",
+    "codex/w1-native-verification-20261001": "c46c5de1dc1d16bfd3c123aa24e861144b110907"
+  },
+  "integration": "Ordinary sequential main/parent merges; no conflicts or force push; no peer checkout changes.",
+  "sourceFiles": [
+    {
+      "path": "config/copy.json",
+      "sha256": "d157563e6b6800ee1129251b37f67a3546b6085520d3fb50884d606312fdae48",
+      "bytes": 62984
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "7b16daded7c46ee932ffea6c9204376a76c79831d4afa315d09c5b36bd6b969f",
+      "bytes": 774134
+    },
+    {
+      "path": "scripts/generate-shared.mjs",
+      "sha256": "d85bd80d7b57d1c0bba17a4e6b7d52b4fbb85bd0fe85651cbee315f2bb4ef508",
+      "bytes": 16174
+    },
+    {
+      "path": "scripts/generate-native-api.mjs",
+      "sha256": "4ccbd8a738cfbf67beb61fd3fd1dbc45cef0949b200ff13527b5aa06c0525323",
+      "bytes": 28242
+    },
+    {
+      "path": "apps/backend/src/server.ts",
+      "sha256": "0117ea1afabc87a2b34c46a1a122709569d1b28ec49ac4f28979e2277c28612a",
+      "bytes": 5559
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/payout-onboarding.ts",
+      "sha256": "d218bad13e53d4efe6ab3e316b07bc4ce3d02e6e19f9f53ef9ed69e1d37ecdb7",
+      "bytes": 5658
+    },
+    {
+      "path": "packages/api/src/commerce/contracts.ts",
+      "sha256": "16a129aff4314a365faf769dc32eb98e19d40ef768a977a925f543027182319a",
+      "bytes": 9448
+    },
+    {
+      "path": "apps/ios/App/QelvoraApp.swift",
+      "sha256": "9d614d0d8f027401baae38dd5446e562a366e8d64dcfa71bb440a00d90f0cb7f",
+      "bytes": 3061
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
+      "sha256": "1f21ee5c23224205258ce26311bc949aabc1a8e1044602a5a04ac8f6d480b0d4",
+      "bytes": 11665
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "sha256": "cbacaeeebde6de8e7f835c5a1964f9c380211c7405bfd3be2dea26d7843d7228",
+      "bytes": 1727
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
+      "sha256": "63b0e8fb1ebe4f86da97e11b131ae710fea1029ac9d867c75246f54c855ef901",
+      "bytes": 12341
+    }
+  ],
+  "supportingChecks": {
+    "sharedResourceCheck": "passed; 12 outputs",
+    "nativeApiCheck": "passed; 98 operations",
+    "originalCheckpointAncestry": "passed",
+    "mainSnapshotAncestry": "passed"
+  },
+  "currentCompilation": "not run; coordinated resource restriction",
+  "currentFreshRename": "not run; coordinated resource restriction",
+  "currentAppOperation": "not performed",
+  "hostedW1Ci": "Last Code Review discovery requires GitHub connection; no returned provider head or pass.",
+  "historicalBuildQualification": "aade864 only: normal backend/web/iOS/Android passed; fresh renamed backend/web/iOS passed and renamed Android not run.",
+  "nativeVerificationSourceRevision": "8915ebd4c0ca644941190e2eed4088ff8de5debd",
+  "separateUnmergedDependency": "W2 pool-error listener, draft PR40",
+  "resourceState": "No owned runtime/build/device started; dependencies/native tools/products/database container and volume removed during cleanup. Private config/keys/evidence retained; no database restoration inferred.",
+  "restriction": "Do not recreate heavy local builds/runtimes until explicit resumption.",
+  "fullW1Acceptance": "open; all seven groups and H01\u2013H20 retained"
+}
