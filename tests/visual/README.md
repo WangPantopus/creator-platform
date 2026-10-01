@@ -11,8 +11,10 @@ corrections and uses the same locally bundled fonts and generated theme tokens.
 The implementation compiles layouts into React with the typed component port.
 Neither reference rendering nor its stylesheet imports application components.
 
-Six committed baselines cover Welcome, creator home and handle entry in Light
-and Night. Their baseline and fresh source-to-app comparisons require zero
+Six committed baselines cover explicit Welcome, creator-home and handle-entry
+foundation fixtures in Light and Night. The fixture routes compile the production
+component port; genuine product routes require configured identity/growth data
+and must not invent Maya or arrival context. Their baseline and fresh source-to-app comparisons require zero
 pixel difference. The committed PNGs were created on macOS; CI uses macOS for
 those baseline checks. Fresh reference comparisons avoid OS-specific goldens
 for the entire catalog.
@@ -25,9 +27,15 @@ font substitution or layout shifts. Every nonzero comparison attaches both
 renders, a bright-red pixel diff and measured counts to the HTML report. Review
 retained example evidence under `evidence/` before changing this bound.
 
-Auth tests verify provider-unconfigured failures and preserved arrival paths.
+Auth tests exercise actual product routes and verify provider-unconfigured
+failures, the Home fallback, rejected form text and preserved opaque arrival paths.
 Catalog fidelity does not verify backend behavior, device accessibility,
 keyboard flows, store billing or pilot comprehension thresholds.
+
+For an isolated local run, set `CREATOR_VISUAL_PORT`, `REFERENCE_PORT` and
+`CREATOR_NEXT_OUTPUT` to unused ports and a dedicated in-project build directory.
+The default CI ports remain 3000/3101. Foundation comparisons decode PNG pixels;
+different PNG metadata/compression cannot masquerade as a visual regression.
 
 An additional explicit correction changes the Packet and StepIn packet-state
 heading from the original "What Maya will see" to `includedInRequest`. Product

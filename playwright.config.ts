@@ -11,6 +11,7 @@ export default defineConfig({
   workers: 1,
   snapshotPathTemplate: "{testDir}/baselines/{arg}{ext}",
   use: {
+    baseURL: visualWebURL,
     browserName: "chromium",
     deviceScaleFactor: 1,
     reducedMotion: "reduce",

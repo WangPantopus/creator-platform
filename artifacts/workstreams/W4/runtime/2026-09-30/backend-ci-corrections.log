@@ -1,0 +1,21 @@
+Scope: all 8 workspace projects
+✓ Lockfile passes supply-chain policies (verified 8h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 5.6s using pnpm v11.25.0
+$ vitest run
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/backend
+
+ ✓ tests/postgres.integration.test.ts (9 tests) 305549ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads  299634ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames  319ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once  384ms
+ ✓ tests/contracts.test.ts (9 tests) 484ms
+   ✓ authority boundaries > local backend exposes health and honestly refuses sign-in  407ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  10:40:32
+   Duration  313.89s (transform 536ms, setup 0ms, collect 3.97s, tests 306.03s, environment 1ms, prepare 874ms)

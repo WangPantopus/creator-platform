@@ -94,8 +94,22 @@ export function contentPrivacyHook(
             [scope[0], scope[1], scope[3]],
           )
         ).rows;
+        const replyReads = (
+          await client.query(
+            "SELECT * FROM creator.content_reply_read WHERE account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND $3::uuid IS NULL ORDER BY reply_id LIMIT 1001",
+            [scope[0], scope[1], scope[3]],
+          )
+        ).rows;
+        const replyReviews = (
+          await client.query(
+            "SELECT m.* FROM creator.content_reply_review m JOIN creator.fan_profile f ON f.id=m.fan_id WHERE f.account_id=$1 AND ($2::uuid IS NULL OR m.creator_id=$2) AND $3::uuid IS NULL ORDER BY m.reply_id LIMIT 1001",
+            [scope[0], scope[1], scope[3]],
+          )
+        ).rows;
         invariant(
-          replies.length <= 1000 &&
+          replyReads.length <= 1000 &&
+            replyReviews.length <= 1000 &&
+            replies.length <= 1000 &&
             thanks.length <= 1000 &&
             revisions.length <= 1000 &&
             drafts.length <= 1000 &&
@@ -115,7 +129,16 @@ export function contentPrivacyHook(
               revisions: revisions.length,
               complete: true,
             },
-            data: { replies, thanks, revisions, drafts, consents, preferences },
+            data: {
+              replies,
+              thanks,
+              revisions,
+              drafts,
+              consents,
+              preferences,
+              replyReads,
+              replyReviews,
+            },
           };
         }
         const prior = (
@@ -159,6 +182,10 @@ export function contentPrivacyHook(
             "DELETE FROM creator.studio_reply_draft WHERE creator_id=$1 AND fan_id=$2 AND account_id=$3",
             [draft.creator_id, draft.fan_id, draft.account_id],
           );
+        await client.query(
+          "DELETE FROM creator.content_reply_read WHERE account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND $3::uuid IS NULL",
+          [scope[0], scope[1], scope[3]],
+        );
         const replyIds = replies.map((row) => row.id);
         await client.query(
           "DELETE FROM creator.content_fan_effect WHERE subject_id=ANY($1::uuid[]) OR creator_id=ANY($2::uuid[]) OR (account_id=$3 AND $4::uuid IS NULL AND ($5::uuid IS NULL OR creator_id=$5))",

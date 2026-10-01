@@ -95,10 +95,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 88089,
-      "executionSession": 95811
+      "pid": 98687,
+      "executionSession": 94732
     },
-    "observedAt": "2026-10-01T05:46:44.376150+00:00",
+    "observedAt": "2026-10-01T06:04:24.500280+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -135,9 +135,9 @@
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-10-01T05:46:44.376150+00:00",
+    "observedAt": "2026-10-01T06:04:24.500280+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "Loopback listener PID88089/session95811; current main protected privacy/operations and W2 source, saved18/current evaluation unchanged",
+    "apiPort4102": "Loopback PID98687/session94732, current c4b4a4f reconciliation; saved18/sevenPASS and publicationdisabled",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
@@ -180,40 +180,38 @@
     "receipt": "visual-origin-followup.json"
   },
   "nativeVerification": {
-    "state": "Final current source: signed iOS2/2 zero failures34.863s; AOSP35 Android4/4 zero failures6.650s plus Night shipping case1.831s and clean Light/Night cold launches2084/1835ms; authentic licensed fan delivery unavailable",
+    "state": "Current c4b4a4f source: signed iOS2/2 zero failures28.407s; Android4/4 zero failures4.425s plus Night1.318s; personally inspected clean Light and settledNight shipping, cost2,374micros matchesactualusage",
     "simulator": {
       "name": "Creator Platform W2 Resume 20260930",
       "id": "09FA41B1-C300-4970-9F09-26F7CB884425",
       "runtime": "iOS26.5",
-      "state": "Final originalUI2/2 passed34.863s; normally shut down/app-data retained",
+      "state": "Currentc4b original2/2 PASS28.407s; normallyShutdown/dataretained",
       "peerDevices": "All preserved",
       "evidence": [
-        "final-ios-welcome.png",
-        "final-ios-signin-night.png",
-        "final-ios-catalog-identities.png"
+        "w4-merge-ios-signin-night.png",
+        "w4-merge-ios-identities.png"
       ]
     },
     "android": {
       "emulatorPort": 5562,
       "adbServerPort": 5042,
-      "state": "Final4/4+Night passed; personally inspected clean Light/Night shipping Welcome; original debug-key installs preserve data; normally stopped",
+      "state": "Currentc4b original4/4 andNightPASS; ownQEMU99414 normalTERM/exit0 verified, saveddataretained",
       "evidence": [
-        "final-android-light.png",
-        "final-android-night.png",
-        "final-android-ui.log",
-        "final-android-night-ui.log",
-        "final-android-signing-incompatible.log"
+        "w4-merge-android-light.png",
+        "w4-merge-android-night-settled.png",
+        "w4-merge-android-ui.log",
+        "w4-merge-android-night-ui.log"
       ],
       "previousExecutionSession": 21120,
       "nextAvd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
       "networkDiscovery": "Own netsim-aosp35 TMPDIR/ANDROID_TMP; default isolated discovery; HCI15602; peers unchanged",
-      "observedAt": "2026-10-01T05:46:44.376150+00:00",
-      "executionSession": 7274,
-      "pid": 92867,
+      "observedAt": "2026-10-01T06:04:24.500280+00:00",
+      "executionSession": 16128,
+      "pid": 99414,
       "nextNetworkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api34-clean TMPDIR/ANDROID_TMP, default netsim instance; HCI15602 reused only after own API35 stopped"
     },
     "ownedDirectory": "tmp/w2-native-20260930",
     "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse",
-    "receipt": "final-app-verification.json"
+    "receipt": "w4-merge-app-verification.json"
   }
 }

@@ -128,12 +128,8 @@
       host.cacheDisplay(in: host.bounds, to: bitmap)
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
-      // CoreText/AppKit antialiasing also varies across Intel/Apple Silicon
-      // and OS revisions. Require 99.5% of pixels at the library's documented
-      // human-perception precision (98%); do not lower the geometry requirement.
-      // keep original geometry/content references, without rerecording images.
       assertSnapshot(
-        of: image, as: .image(precision: 0.995, perceptualPrecision: 0.98), named: name, record: record, file: file,
+        of: image, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
       window.contentView = nil
     }

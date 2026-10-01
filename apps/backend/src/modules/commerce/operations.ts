@@ -139,10 +139,13 @@ export function commercePrivacyHook(
             "privacy_scope_invalid",
             "A complete, verified commerce export scope is required.",
           );
+          const exportCreator =
+            input.scope === "account" ? null : input.creatorId;
+          const exportThread = input.scope === "thread" ? input.threadId : null;
           const packets = (
             await client.query(
               "SELECT id,creator_id,fan_id,thread_id,snapshot,disclosure,visibility,state,payment_state,created_at,submitted_at,accepted_at FROM creator.commerce_packet WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY created_at,id LIMIT 2001",
-              [input.creatorId, input.threadId],
+              [exportCreator, exportThread],
             )
           ).rows;
           const ids = packets.map((row) => row.id);
@@ -184,6 +187,30 @@ export function commercePrivacyHook(
             data[name] = rows;
           };
           const commitmentIds = commitments.map((row) => row.id);
+          const approvalSchema = (
+            await client.query<{
+              drafts: string | null;
+              approvals: string | null;
+            }>(
+              "SELECT to_regclass('creator.commerce_reply_draft')::text AS drafts,to_regclass('creator.commerce_approval')::text AS approvals",
+            )
+          ).rows[0]!;
+          invariant(
+            Boolean(approvalSchema.drafts) ===
+              Boolean(approvalSchema.approvals),
+            "approval_schema_incomplete",
+            "Draft approval history needs schema reconciliation before this export can complete.",
+          );
+          if (approvalSchema.approvals)
+            for (const [name, relation] of [
+              ["replyDrafts", "commerce_reply_draft"],
+              ["approvals", "commerce_approval"],
+            ] as const)
+              await bounded(
+                name,
+                `SELECT * FROM creator.${relation} WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY id LIMIT 2001`,
+                [exportCreator, exportThread],
+              );
           await bounded(
             "authorizationHistory",
             "SELECT packet_id,attempt,snapshot,created_at FROM creator.commerce_authorization_lineage WHERE packet_id=ANY($1::uuid[]) ORDER BY packet_id,attempt LIMIT 2001",
@@ -252,6 +279,36 @@ export function commercePrivacyHook(
             );
           }
           if (input.scope === "account") {
+            const passSchema = (
+              await client.query<{ count: string }>(
+                "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+              )
+            ).rows[0]!;
+            invariant(
+              passSchema.count === "0" || passSchema.count === "4",
+              "pass_schema_incomplete",
+              "The complete pass billing history is required before publishing this export.",
+            );
+            if (passSchema.count === "4")
+              for (const [name, query] of [
+                [
+                  "passBillingAccounts",
+                  "SELECT fan_id,currency,desired_renewal,version,retention_policy_version FROM creator.commerce_pass_billing_account LIMIT 2001",
+                ],
+                [
+                  "passQuotes",
+                  "SELECT id,fan_id,account_version,currency,amount,monthly_amount,quoted_at,expires_at,period_end,retention_policy_version FROM creator.commerce_pass_quote LIMIT 2001",
+                ],
+                [
+                  "passBillingEffects",
+                  "SELECT id,fan_id,operation,intent_version,quote_id,state,attempt,error_code,created_at,updated_at,retention_policy_version FROM creator.commerce_pass_billing_effect LIMIT 2001",
+                ],
+                [
+                  "passReceipts",
+                  "SELECT id,fan_id,subscription_ref,invoice_ref,line_ref,payment_ref,paid_minor,currency,period_start,period_end,paid_at,created_at,retention_policy_version FROM creator.commerce_pass_receipt LIMIT 2001",
+                ],
+              ] as const)
+                await bounded(name, query);
             for (const [name, query] of [
               [
                 "spendingLimits",

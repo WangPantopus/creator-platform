@@ -1,0 +1,78 @@
+BEGIN
+SET
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE TABLE
+CREATE TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+GRANT
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+RESET
+SET
+                                                                   QUERY PLAN                                                                   
+------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.15..1096.97 rows=50 width=68)
+   ->  Index Scan using commerce_reply_draft_id_thread_id_creator_id_fan_id_key on commerce_reply_draft  (cost=0.15..8072.80 rows=368 width=68)
+         Filter: ((ANY (creator_id = (hashed SubPlan 2).col1)) OR (ANY (creator_id = (hashed SubPlan 4).col1)))
+         SubPlan 2
+           ->  Index Scan using creator_profile_account_id_key on creator_profile cp  (cost=0.16..8.18 rows=1 width=16)
+                 Index Cond: (account_id = (NULLIF(current_setting('app.account_id'::text, true), ''::text))::uuid)
+         SubPlan 4
+           ->  Index Scan using team_membership_pkey on team_membership tm  (cost=0.16..18.26 rows=1 width=16)
+                 Index Cond: (account_id = (NULLIF(current_setting('app.account_id'::text, true), ''::text))::uuid)
+                 Filter: ((revoked_at IS NULL) AND ('drafter'::text = ANY (roles)))
+(10 rows)
+
+                                                                            QUERY PLAN                                                                             
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.14..841.28 rows=50 width=36)
+   ->  Index Scan using commerce_approval_pkey on commerce_approval  (cost=0.14..1934.75 rows=115 width=36)
+         Filter: ((approver_account_id = (NULLIF(current_setting('app.account_id'::text, true), ''::text))::uuid) OR (ANY (creator_id = (hashed SubPlan 2).col1)))
+         SubPlan 2
+           ->  Index Scan using team_membership_pkey on team_membership tm  (cost=0.16..18.26 rows=1 width=16)
+                 Index Cond: (account_id = (NULLIF(current_setting('app.account_id'::text, true), ''::text))::uuid)
+                 Filter: ((revoked_at IS NULL) AND ('drafter'::text = ANY (roles)))
+(7 rows)
+
+ visible_drafts 
+----------------
+              0
+(1 row)
+
+ visible_approvals 
+-------------------
+                 0
+(1 row)
+
+RESET
+       relname        | relrowsecurity | relforcerowsecurity 
+----------------------+----------------+---------------------
+ commerce_approval    | t              | t
+ commerce_reply_draft | t              | t
+(2 rows)
+
+ROLLBACK

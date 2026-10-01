@@ -1,0 +1,4 @@
+d0261153dd26f4a58275200cb32bd148b6bcd72b398b28ab40dcaaf999510c86  apps/backend/src/integration.ts
+f31febcaf5e9662e2c9eef43f082f46e7d38cd6d5886bcde3de51ec16bd7dcd6  apps/web/features/identity/welcome.tsx
+44b8f5a50dfa66e6ec1578dba5862a0b4b0a8c7e1a065aa5548f1ba91f346b59  apps/ios/Sources/QelvoraUI/FanShell.swift
+cc736fbffd7311e26a287c59fbd32edab5139df664d844ba25cc9ef3834a78ba  apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt

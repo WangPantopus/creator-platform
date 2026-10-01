@@ -8,11 +8,12 @@
   "sharedDependencyCommit": "65848112751a6cca6b7ac084e39db7548640251c",
   "commitSubjects": [
     "Checkpoint shared application dependencies for W4 continuation",
-    "Preserve W4 commerce implementation and completion handoff"
+    "Preserve W4 commerce implementation and completion handoff",
+    "Document W4 resource release after handoff"
   ],
   "ownershipNote": "Shared dependencies/context are preserved existing user/peer source, docs, assets and tests required by application roots. W4 did not author or accept those domains and wrote no new test code.",
   "verificationNote": "The prior 36-file implementation evidence hashes still match. Existing evidence is partial; no fresh paid/native-UI/design acceptance is implied by publication.",
-  "manifestNote": "This file excludes itself from hashes to avoid recursion. The final branch commit identifies the manifest and complete tree; sharedDependencyCommit is filled before the W4 commit.",
+  "manifestNote": "This file excludes itself from hashes to avoid recursion. Existing source/context are frozen from implementationHandoffCommit; W4 handoff documentation includes the subsequent local resource release. The branch commit identifies this manifest and complete tree.",
   "excludedPaths": [
     "artifacts/native/ios/device-final/1BC14721-55E6-43F7-9E82-1BE8CE73036D.png",
     "artifacts/native/ios/device-final/42A7C47B-E035-4E44-9457-0AA8AAC0FDFE.png",
@@ -179,7 +180,7 @@
   ],
   "counts": {
     "W4ImplementationFiles": 36,
-    "W4FilesExcludingManifest": 54,
+    "W4FilesExcludingManifest": 56,
     "sharedDependencyFiles": 1008,
     "excludedPeerArtifacts": 156
   },
@@ -7667,8 +7668,24 @@
     {
       "path": "docs/workstreams/handoffs/W4-commerce-handoff.md",
       "scope": "W4",
-      "sha256": "dbee7eb0ae2d7352b54022377322f73008d57261c198651e9700d7a720377d43",
-      "bytes": 62817,
+      "sha256": "9959c574d3d4bd7a3831cc2d7a391a8601f228a510263a0b21c857e6f5e65cad",
+      "bytes": 63079,
+      "executable": false,
+      "symlink": false
+    },
+    {
+      "path": "docs/workstreams/handoffs/W4-resource-release.json",
+      "scope": "W4",
+      "sha256": "117ca69d6040f58c51b3cede01ac89b9e56211a8c793de3e831f002de8788757",
+      "bytes": 6788,
+      "executable": false,
+      "symlink": false
+    },
+    {
+      "path": "docs/workstreams/handoffs/W4-resource-release.md",
+      "scope": "W4",
+      "sha256": "976a9d6b637bc685f8a9b0e8a55eb51d0664ee52d273ec41ae667e243ccb46b8",
+      "bytes": 4176,
       "executable": false,
       "symlink": false
     },
@@ -7811,8 +7828,8 @@
     {
       "path": "docs/workstreams/prompts/W4-resume-to-completion.md",
       "scope": "W4",
-      "sha256": "42b905c19f5c2afdbe7a39a9e1b8e9b3a44f5cdab50f29a4202d03f8f3bb4451",
-      "bytes": 20487,
+      "sha256": "a0d0cee600835600e1ba8109ab34d97bfea0eeeb14f23a481c84fae15a1d80e6",
+      "bytes": 20975,
       "executable": false,
       "symlink": false
     },
@@ -8682,7 +8699,7 @@
     }
   ],
   "publicationValidation": {
-    "W4DocumentLocalReferencesResolved": 196,
+    "W4DocumentLocalReferencesResolved": 201,
     "W4ImplementationHashesMatchPriorEvidence": 36,
     "W4DocumentationFormatting": "passed",
     "credentialPatternScan": "no matches; private local state excluded",
@@ -8702,6 +8719,18 @@
       "assets/fonts/Newsreader-OFL.txt"
     ],
     "preservedDependencyWhitespaceNote": "Existing font license whitespace and Windows Gradle wrapper line endings are retained byte-for-byte; no unrelated cleanup was performed.",
-    "paidAndNativeUIAcceptance": "incomplete; see historical evidence and handoff"
+    "paidAndNativeUIAcceptance": "incomplete; see historical evidence and handoff",
+    "preservedW4RawLogWhitespacePaths": [
+      "artifacts/workstreams/W4/runtime/2026-09-29/android-build.log",
+      "artifacts/workstreams/W4/runtime/2026-09-29/ios-build.log"
+    ],
+    "W4SourceAndDocumentationWhitespaceCheck": "passed; raw historical native build logs preserved byte-for-byte"
+  },
+  "implementationHandoffCommit": "9800bb3376b5f9f76763a5554c273dc454b1290b",
+  "localResourceRelease": {
+    "record": "docs/workstreams/handoffs/W4-resource-release.md",
+    "removedAllocatedDirectoryGiB": 6.94,
+    "DockerRemoval": "unconfirmed; Docker Desktop unable to start",
+    "sourceAndEvidence": "preserved"
   }
 }

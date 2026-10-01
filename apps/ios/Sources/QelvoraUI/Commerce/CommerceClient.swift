@@ -33,7 +33,7 @@ struct CommerceMembership: Decodable, Identifiable, Sendable {
     let state: String; let period_end: String; let cancel_at_end: Bool
 }
 struct CommerceSpendingNotice: Decodable, Identifiable, Sendable { let id: String; let threshold: Int; let created_at: String }
-struct CommercePass: Decodable, Identifiable, Sendable { let id: String; let version: Int; let slot_capacity: Int; let cycle_start: String; let cycle_end: String; let allowance: Int; let used: Int; let reserved: Int }
+struct CommercePass: Decodable, Identifiable, Sendable { let id: String; let state: String; let version: Int; let slot_capacity: Int; let cycle_start: String; let cycle_end: String; let allowance: Int; let used: Int; let reserved: Int }
 struct CommercePassChoices: Decodable, Sendable { struct Creator: Decodable, Identifiable, Sendable { let id: String; let display_name: String }; let creators: [Creator]; let replaceableSlotIds: [String] }
 struct CommerceSlot: Decodable, Identifiable, Sendable {
     let id: String; let creator_id: String; let cycle_start: String; let display_name: String; let state: String; let position: Int; let ends_at: String
