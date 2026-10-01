@@ -181,7 +181,7 @@ internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, cre
                     }
                 }
             })
-        BasicText(if (loading) "Loading recording…" else elapsed(position), style = qText("data-sm"))
-        if (failure.isNotEmpty()) BasicText(failure, style = qText("caption"))
+        BasicText(if (loading) "Loading recording…" else elapsed(position), style = qText("data-sm").copy(color = qColor("ink")))
+        if (failure.isNotEmpty()) BasicText(failure, style = qText("caption").copy(color = qColor("ink")))
     }
 }
