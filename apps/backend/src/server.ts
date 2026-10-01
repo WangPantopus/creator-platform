@@ -48,25 +48,22 @@ const configured =
             ? createCommerceRuntime({ ...runtime, ...commerceConfiguration })
             : undefined;
           const conversation = createConversationRuntime(runtime);
-          const content = commerce
-            ? createContentStudio({
-                pool: runtime.pool,
-                owners: {
-                  commerce: commerce.service,
-                  conversation: runtime.conversation,
-                  access: runtime.access,
-                  profiles: runtime.identity?.profiles,
-                },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
-              })
-            : undefined;
-          if (content)
-            runtime.configureSignedSubjects([content.signedSubjects]);
+          const content = createContentStudio({
+            pool: runtime.pool,
+            owners: {
+              commerce: commerce?.service,
+              conversation: runtime.conversation,
+              access: runtime.access,
+              profiles: runtime.identity?.profiles,
+            },
+            dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+          });
+          runtime.configureSignedSubjects([content.signedSubjects]);
           return [
             conversation.registration,
             mediaFeature({}),
             ...(commerce ? [commerce.feature] : []),
-            ...(content?.features ?? []),
+            ...content.features,
             ...(features.growth ? [features.growth.feature] : []),
           ];
         },

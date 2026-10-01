@@ -2860,6 +2860,320 @@ public enum APIContentThanksCommandTargetKind: String, Codable, Sendable {
   case `message` = "message"
 }
 
+public struct APIStudioContentVersionCommand: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public init(version: Int, idempotencyKey: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioStudioAudiences: Codable, Sendable {
+  public let `audienceCountsAvailable`: Bool
+  public let `tiers`: [APIStudioStudioAudiencesTiersItem]
+  public let `groups`: [APIStudioStudioAudiencesGroupsItem]
+  public init(audienceCountsAvailable: Bool, tiers: [APIStudioStudioAudiencesTiersItem], groups: [APIStudioStudioAudiencesGroupsItem]) {
+    self.audienceCountsAvailable = audienceCountsAvailable
+    self.tiers = tiers
+    self.groups = groups
+  }
+}
+
+public struct APIStudioStudioAudiencesTiersItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioStudioAudiencesGroupsItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioStudioControlCommand: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public init(idempotencyKey: String) {
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioStudioCorrection: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public let `expectedRevision`: Int
+  public let `paraphrasedPrompt`: String
+  public let `rule`: String
+  public let `unacceptableAnswer`: String
+  public init(idempotencyKey: String, expectedRevision: Int, paraphrasedPrompt: String, rule: String, unacceptableAnswer: String) {
+    self.idempotencyKey = idempotencyKey
+    self.expectedRevision = expectedRevision
+    self.paraphrasedPrompt = paraphrasedPrompt
+    self.rule = rule
+    self.unacceptableAnswer = unacceptableAnswer
+  }
+}
+
+public struct APIStudioStudioDraftVersion: Codable, Sendable {
+  public let `version`: Int
+  public init(version: Int) {
+    self.version = version
+  }
+}
+
+public struct APIStudioStudioInvitation: Codable, Sendable {
+  public let `id`: String
+  public let `roles`: [APIStudioStudioInvitationRolesItem]
+  public let `creatorId`: String?
+  public let `accountId`: String?
+  public let `expiresAt`: String?
+  public let `accepted`: Bool?
+  public init(id: String, roles: [APIStudioStudioInvitationRolesItem], creatorId: String? = nil, accountId: String? = nil, expiresAt: String? = nil, accepted: Bool? = nil) {
+    self.id = id
+    self.roles = roles
+    self.creatorId = creatorId
+    self.accountId = accountId
+    self.expiresAt = expiresAt
+    self.accepted = accepted
+  }
+}
+
+public enum APIStudioStudioInvitationRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioInvite: Codable, Sendable {
+  public let `handle`: String
+  public let `roles`: [APIStudioStudioInviteRolesItem]
+  public init(handle: String, roles: [APIStudioStudioInviteRolesItem]) {
+    self.handle = handle
+    self.roles = roles
+  }
+}
+
+public enum APIStudioStudioInviteRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioQueueQuery: Codable, Sendable {
+  public let `cursor`: String?
+  public let `filter`: APIStudioStudioQueueQueryFilter
+  public let `limit`: Int
+  public init(cursor: String? = nil, filter: APIStudioStudioQueueQueryFilter, limit: Int) {
+    self.cursor = cursor
+    self.filter = filter
+    self.limit = limit
+  }
+}
+
+public enum APIStudioStudioQueueQueryFilter: String, Codable, Sendable {
+  case `all` = "all"
+  case `due` = "due"
+  case `decide` = "decide"
+  case `more_info` = "more_info"
+}
+
+public struct APIStudioStudioReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `version`: Int
+  public let `sentMessageId`: String?
+  public init(text: String, version: Int, sentMessageId: String? = nil) {
+    self.text = text
+    self.version = version
+    self.sentMessageId = sentMessageId
+  }
+}
+
+public struct APIStudioStudioRevision: Codable, Sendable {
+  public let `revision`: Int
+  public init(revision: Int) {
+    self.revision = revision
+  }
+}
+
+public struct APIStudioStudioSaveReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(text: String, expectedVersion: Int, idempotencyKey: String) {
+    self.text = text
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioStudioSendReplyDraft: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIStudioStudioSession: Codable, Sendable {
+  public let `creators`: [APIStudioStudioSessionCreatorsItem]
+  public let `invitations`: [APIStudioStudioSessionInvitationsItem]
+  public let `serverTime`: String
+  public init(creators: [APIStudioStudioSessionCreatorsItem], invitations: [APIStudioStudioSessionInvitationsItem], serverTime: String) {
+    self.creators = creators
+    self.invitations = invitations
+    self.serverTime = serverTime
+  }
+}
+
+public struct APIStudioStudioSessionCreatorsItem: Codable, Sendable {
+  public let `id`: String
+  public let `display_name`: String
+  public let `handle`: String
+  public let `verification`: String
+  public let `owned`: Bool
+  public let `roles`: [APIStudioStudioSessionCreatorsItemRolesItem]
+  public let `memberHandle`: String?
+  public let `viewerAccountId`: String
+  public init(id: String, display_name: String, handle: String, verification: String, owned: Bool, roles: [APIStudioStudioSessionCreatorsItemRolesItem], memberHandle: String? = nil, viewerAccountId: String) {
+    self.id = id
+    self.display_name = display_name
+    self.handle = handle
+    self.verification = verification
+    self.owned = owned
+    self.roles = roles
+    self.memberHandle = memberHandle
+    self.viewerAccountId = viewerAccountId
+  }
+}
+
+public enum APIStudioStudioSessionCreatorsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioSessionInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `roles`: [APIStudioStudioSessionInvitationsItemRolesItem]
+  public let `expiresAt`: String
+  public init(id: String, creatorId: String, creatorName: String, roles: [APIStudioStudioSessionInvitationsItemRolesItem], expiresAt: String) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.roles = roles
+    self.expiresAt = expiresAt
+  }
+}
+
+public enum APIStudioStudioSessionInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioTeam: Codable, Sendable {
+  public let `members`: [APIStudioStudioTeamMembersItem]
+  public let `invitations`: [APIStudioStudioTeamInvitationsItem]
+  public init(members: [APIStudioStudioTeamMembersItem], invitations: [APIStudioStudioTeamInvitationsItem]) {
+    self.members = members
+    self.invitations = invitations
+  }
+}
+
+public struct APIStudioStudioTeamMembersItem: Codable, Sendable {
+  public let `account_id`: String
+  public let `roles`: [APIStudioStudioTeamMembersItemRolesItem]
+  public let `revoked_at`: String?
+  public let `handle`: String?
+  public init(account_id: String, roles: [APIStudioStudioTeamMembersItemRolesItem], revoked_at: String? = nil, handle: String? = nil) {
+    self.account_id = account_id
+    self.roles = roles
+    self.revoked_at = revoked_at
+    self.handle = handle
+  }
+}
+
+public enum APIStudioStudioTeamMembersItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioTeamInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `account_id`: String
+  public let `handle`: String?
+  public let `roles`: [APIStudioStudioTeamInvitationsItemRolesItem]
+  public let `expires_at`: String
+  public let `accepted_at`: String?
+  public let `revoked_at`: String?
+  public init(id: String, account_id: String, handle: String? = nil, roles: [APIStudioStudioTeamInvitationsItemRolesItem], expires_at: String, accepted_at: String? = nil, revoked_at: String? = nil) {
+    self.id = id
+    self.account_id = account_id
+    self.handle = handle
+    self.roles = roles
+    self.expires_at = expires_at
+    self.accepted_at = accepted_at
+    self.revoked_at = revoked_at
+  }
+}
+
+public enum APIStudioStudioTeamInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioStudioThreadEntries: Codable, Sendable {
+  public let `items`: [APIStudioStudioThreadEntriesItemsItem]
+  public let `nextCursor`: String?
+  public let `coverage`: APIStudioStudioThreadEntriesCoverage
+  public init(items: [APIStudioStudioThreadEntriesItemsItem], nextCursor: String? = nil, coverage: APIStudioStudioThreadEntriesCoverage) {
+    self.items = items
+    self.nextCursor = nextCursor
+    self.coverage = coverage
+  }
+}
+
+public struct APIStudioStudioThreadEntriesItemsItem: Codable, Sendable {
+  public let `fanId`: String
+  public let `handle`: String
+  public let `sources`: [APIStudioStudioThreadEntriesItemsItemSourcesItem]
+  public let `updatedAt`: String
+  public init(fanId: String, handle: String, sources: [APIStudioStudioThreadEntriesItemsItemSourcesItem], updatedAt: String) {
+    self.fanId = fanId
+    self.handle = handle
+    self.sources = sources
+    self.updatedAt = updatedAt
+  }
+}
+
+public enum APIStudioStudioThreadEntriesItemsItemSourcesItem: String, Codable, Sendable {
+  case `note_reply` = "note_reply"
+  case `request` = "request"
+}
+
+public enum APIStudioStudioThreadEntriesCoverage: String, Codable, Sendable {
+  case `notes_and_requests` = "notes_and_requests"
+}
+
 public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
 public struct CreatorAPIBinaryResponse: Sendable {
   public let body: Data
@@ -3036,9 +3350,9 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$"]
     let literalValues = ["offer": "1"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }

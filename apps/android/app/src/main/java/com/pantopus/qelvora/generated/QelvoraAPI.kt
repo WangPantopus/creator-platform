@@ -2154,6 +2154,234 @@ enum class APIContentThanksCommandTargetKind {
   @SerialName("message") MESSAGE
 }
 
+@Serializable
+data class APIStudioContentVersionCommand(
+  val `version`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioAudiences(
+  val `audienceCountsAvailable`: Boolean,
+  val `tiers`: List<APIStudioStudioAudiencesTiersItem>,
+  val `groups`: List<APIStudioStudioAudiencesGroupsItem>
+)
+
+@Serializable
+data class APIStudioStudioAudiencesTiersItem(
+  val `id`: String,
+  val `name`: String
+)
+
+@Serializable
+data class APIStudioStudioAudiencesGroupsItem(
+  val `id`: String,
+  val `name`: String
+)
+
+@Serializable
+data class APIStudioStudioControlCommand(
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioCorrection(
+  val `idempotencyKey`: String,
+  val `expectedRevision`: Long,
+  val `paraphrasedPrompt`: String,
+  val `rule`: String,
+  val `unacceptableAnswer`: String
+)
+
+@Serializable
+data class APIStudioStudioDraftVersion(
+  val `version`: Long
+)
+
+@Serializable
+data class APIStudioStudioInvitation(
+  val `id`: String,
+  val `roles`: List<APIStudioStudioInvitationRolesItem>,
+  val `creatorId`: String? = null,
+  val `accountId`: String? = null,
+  val `expiresAt`: String? = null,
+  val `accepted`: Boolean? = null
+)
+
+@Serializable
+enum class APIStudioStudioInvitationRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioInvite(
+  val `handle`: String,
+  val `roles`: List<APIStudioStudioInviteRolesItem>
+)
+
+@Serializable
+enum class APIStudioStudioInviteRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioQueueQuery(
+  val `cursor`: String? = null,
+  val `filter`: APIStudioStudioQueueQueryFilter,
+  val `limit`: Long
+)
+
+@Serializable
+enum class APIStudioStudioQueueQueryFilter {
+  @SerialName("all") ALL,
+  @SerialName("due") DUE,
+  @SerialName("decide") DECIDE,
+  @SerialName("more_info") MORE_INFO
+}
+
+@Serializable
+data class APIStudioStudioReplyDraft(
+  val `text`: String,
+  val `version`: Long,
+  val `sentMessageId`: String? = null
+)
+
+@Serializable
+data class APIStudioStudioRevision(
+  val `revision`: Long
+)
+
+@Serializable
+data class APIStudioStudioSaveReplyDraft(
+  val `text`: String,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioSendReplyDraft(
+  val `version`: Long,
+  val `idempotencyKey`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIStudioStudioSession(
+  val `creators`: List<APIStudioStudioSessionCreatorsItem>,
+  val `invitations`: List<APIStudioStudioSessionInvitationsItem>,
+  val `serverTime`: String
+)
+
+@Serializable
+data class APIStudioStudioSessionCreatorsItem(
+  val `id`: String,
+  val `display_name`: String,
+  val `handle`: String,
+  val `verification`: String,
+  val `owned`: Boolean,
+  val `roles`: List<APIStudioStudioSessionCreatorsItemRolesItem>,
+  val `memberHandle`: String? = null,
+  val `viewerAccountId`: String
+)
+
+@Serializable
+enum class APIStudioStudioSessionCreatorsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioSessionInvitationsItem(
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `roles`: List<APIStudioStudioSessionInvitationsItemRolesItem>,
+  val `expiresAt`: String
+)
+
+@Serializable
+enum class APIStudioStudioSessionInvitationsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioTeam(
+  val `members`: List<APIStudioStudioTeamMembersItem>,
+  val `invitations`: List<APIStudioStudioTeamInvitationsItem>
+)
+
+@Serializable
+data class APIStudioStudioTeamMembersItem(
+  val `account_id`: String,
+  val `roles`: List<APIStudioStudioTeamMembersItemRolesItem>,
+  val `revoked_at`: String? = null,
+  val `handle`: String? = null
+)
+
+@Serializable
+enum class APIStudioStudioTeamMembersItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioTeamInvitationsItem(
+  val `id`: String,
+  val `account_id`: String,
+  val `handle`: String? = null,
+  val `roles`: List<APIStudioStudioTeamInvitationsItemRolesItem>,
+  val `expires_at`: String,
+  val `accepted_at`: String? = null,
+  val `revoked_at`: String? = null
+)
+
+@Serializable
+enum class APIStudioStudioTeamInvitationsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioThreadEntries(
+  val `items`: List<APIStudioStudioThreadEntriesItemsItem>,
+  val `nextCursor`: String? = null,
+  val `coverage`: APIStudioStudioThreadEntriesCoverage
+)
+
+@Serializable
+data class APIStudioStudioThreadEntriesItemsItem(
+  val `fanId`: String,
+  val `handle`: String,
+  val `sources`: List<APIStudioStudioThreadEntriesItemsItemSourcesItem>,
+  val `updatedAt`: String
+)
+
+@Serializable
+enum class APIStudioStudioThreadEntriesItemsItemSourcesItem {
+  @SerialName("note_reply") NOTE_REPLY,
+  @SerialName("request") REQUEST
+}
+
+@Serializable
+enum class APIStudioStudioThreadEntriesCoverage {
+  @SerialName("notes_and_requests") NOTES_AND_REQUESTS
+}
+
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
@@ -2228,9 +2456,9 @@ object ApplicationDestination {
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
-    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$")
+    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$")
     val literalValues = mapOf("offer" to "1")
     val fields = parts[1].split('&')
     if (fields.size > 2) return false

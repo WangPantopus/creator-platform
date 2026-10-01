@@ -13,11 +13,11 @@ export function AvailabilityEditor({
   fanId,
 }: {
   creatorId: string;
-  fanId: string;
+  fanId?: string;
 }) {
   return (
     <AvailabilityForm
-      key={`${creatorId}/${fanId}`}
+      key={`${creatorId}/${fanId ?? "creator"}`}
       creatorId={creatorId}
       fanId={fanId}
     />
@@ -28,9 +28,11 @@ function AvailabilityForm({
   fanId,
 }: {
   creatorId: string;
-  fanId: string;
+  fanId?: string;
 }) {
-  const root = `threads/${creatorId}/${fanId}/call-availability`;
+  const root = fanId
+    ? `threads/${creatorId}/${fanId}/call-availability`
+    : `creators/${creatorId}/call-availability`;
   const [current, setCurrent] = useState<Availability | null>(null);
   const [zone, setZone] = useState("");
   const [windows, setWindows] = useState<Availability["windows"]>([]);

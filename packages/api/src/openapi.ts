@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
 import * as conversation from "./conversation/contracts.ts";
 import * as content from "./content.ts";
+import * as studio from "./studio.ts";
 import { mediaPaths } from "./media-openapi.ts";
 
 // Aggregate owner contracts here after the core module initializes; conversation
@@ -10,6 +11,7 @@ const domainSchemas = Object.fromEntries(
   [
     ["Conversation", conversation],
     ["Content", content],
+    ["Studio", studio],
   ].flatMap(([prefix, values]) =>
     Object.entries(values as Record<string, unknown>)
       .filter(([, schema]) => schema instanceof z.ZodType)
