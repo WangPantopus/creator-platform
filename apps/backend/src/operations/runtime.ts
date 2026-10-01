@@ -22,6 +22,7 @@ import { DomainError } from "../core/errors.js";
 import { TrustTelemetry } from "./telemetry.js";
 import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
+import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
 
 /** W1 mounts this runtime in the canonical backend; no development identity fallback. */
 export async function createTrustRuntime(options: {
@@ -33,6 +34,7 @@ export async function createTrustRuntime(options: {
   actor: (request: Request) => Promise<Actor>;
   dependencies: TrustDependencies;
   privacyHooks: PrivacyHook[];
+  privacyArtifacts?: PrivacyArtifactStore;
   effectHooks: EffectHook[];
   probes: Probe[];
   restoreReady: () => Promise<boolean>;
@@ -95,6 +97,20 @@ export async function createTrustRuntime(options: {
         };
   });
   const privacyProbeNames = PrivacyDomains.map((domain) => `privacy_${domain}`);
+  const exportProbe = options.probes.find(
+    (probe) => probe.name === "privacy_exports",
+  );
+  const exportReadiness: Probe =
+    options.privacyArtifacts && options.dependencies.verifyExport && exportProbe
+      ? { ...exportProbe, required: true }
+      : {
+          name: "privacy_exports",
+          required: true,
+          run: async () => ({
+            state: "unavailable",
+            code: "protected_storage_fresh_auth_and_owner_probe_required",
+          }),
+        };
   const privacyProbes: Probe[] = PrivacyDomains.map((domain) => {
     const name = `privacy_${domain}`;
     const supplied = options.probes.find((probe) => probe.name === name);
@@ -114,7 +130,11 @@ export async function createTrustRuntime(options: {
   const store = new TrustStore(options.apiPool);
   await store.assertRole();
   await new TrustStore(options.workerPool).assertRole(true);
-  const service = new TrustService(store, options.dependencies);
+  const service = new TrustService(
+    store,
+    options.dependencies,
+    options.privacyArtifacts,
+  );
   const telemetry = new TrustTelemetry(options.environment, options.release);
   const restored = async () => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -182,9 +202,11 @@ export async function createTrustRuntime(options: {
       },
       ...providerProbes,
       ...privacyProbes,
+      exportReadiness,
       ...options.probes.filter(
         (probe) =>
           !providerNames.includes(probe.name) &&
+          probe.name !== "privacy_exports" &&
           !privacyProbeNames.includes(probe.name),
       ),
     ],
@@ -201,6 +223,7 @@ export async function createTrustRuntime(options: {
       ["worker_errors", "privacy_retry"].includes(name)
         ? telemetry.increment(name, value)
         : telemetry.observe(name, value),
+    options.privacyArtifacts,
   );
   const router = createTrustRouter({
     service,

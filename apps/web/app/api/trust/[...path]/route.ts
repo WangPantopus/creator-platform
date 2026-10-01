@@ -4,7 +4,7 @@ import { sessionCookie } from "../../../../lib/session";
 import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 const readable =
-  /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download)?|operations\/(metrics|audits))$/i;
+  /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download(\/(identity|conversation|agent|commerce|content|media|growth|trust))?)?|operations\/(metrics|audits))$/i;
 const writable =
   /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
 async function forward(
@@ -110,6 +110,9 @@ async function forward(
       { status: 409 },
     );
   try {
+    const streaming = /^privacy\/jobs\/[0-9a-f-]{36}\/download\/[^/]+$/iu.test(
+      target,
+    );
     const body = request.method === "POST" ? await request.text() : undefined;
     if (body && Buffer.byteLength(body) > 65536)
       return NextResponse.json(
@@ -135,8 +138,26 @@ async function forward(
       },
       ...(body ? { body } : {}),
       cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
+      signal: streaming
+        ? AbortSignal.any([request.signal, AbortSignal.timeout(300_000)])
+        : AbortSignal.timeout(10_000),
     });
+    if (streaming && result.ok && result.body) {
+      const headers = new Headers({
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      });
+      for (const name of [
+        "content-type",
+        "content-length",
+        "content-disposition",
+        "x-correlation-id",
+      ]) {
+        const value = result.headers.get(name);
+        if (value) headers.set(name, value);
+      }
+      return new NextResponse(result.body, { status: result.status, headers });
+    }
     const data = await result.json();
     if (target === "dev/session" && result.ok) {
       const response = NextResponse.json({ localDevelopment: true });

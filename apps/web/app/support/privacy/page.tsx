@@ -93,6 +93,29 @@ function Job({ id }: { id: string }) {
               </a>
             )}
           </div>
+          {data.kind === "export" &&
+            data.state === "complete" &&
+            data.tasks.some((task) => task.receipt?.artifact) && (
+              <nav aria-label="Export files">
+                {data.tasks
+                  .filter(
+                    (task) =>
+                      task.state === "complete" &&
+                      task.receipt?.artifact &&
+                      typeof task.receipt.artifact === "object" &&
+                      "format" in task.receipt.artifact &&
+                      task.receipt.artifact.format === "privacy-stream-v1",
+                  )
+                  .map((task) => (
+                    <a
+                      key={task.domain}
+                      href={`/api/trust/privacy/jobs/${id}/download/${task.domain}`}
+                    >
+                      Download {task.domain} file
+                    </a>
+                  ))}
+              </nav>
+            )}
           <ErrorState error={actionError} />
         </>
       )}
@@ -202,6 +225,14 @@ export default function PrivacyPage() {
         </a>
       </nav>
       <TrustSession />
+      {capability.data?.verificationMethod === "current_session" && (
+        <p>
+          <Link href="/signin?returnTo=%2Fsupport%2Fprivacy">
+            Verify with Pantopus again
+          </Link>{" "}
+          before requesting or downloading your data.
+        </p>
+      )}
       <ErrorState error={error} retry={() => void refresh()} />
       <form
         className="trust-panel"
