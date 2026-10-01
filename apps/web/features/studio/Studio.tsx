@@ -2468,10 +2468,14 @@ function Library({ creator }: { creator: Creator }) {
           </div>
         </article>
       ))}
-      {!page.items.length && !action.busy && (
+      {!page.items.length && !action.busy && !action.error && (
         <EmptyState
-          title="Your library is empty"
-          body="Save a draft, choose its audience, and review its exact publication."
+          title={query || filter ? "No matching items" : "Your library is empty"}
+          body={
+            query || filter
+              ? "Try another search or choose All states."
+              : "Save a draft, choose its audience, and review its exact publication."
+          }
         />
       )}
       {page.nextCursor && (
