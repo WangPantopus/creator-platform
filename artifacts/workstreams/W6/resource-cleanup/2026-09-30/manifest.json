@@ -1,0 +1,151 @@
+{
+  "recordedAt": "2026-09-30T22:00:37.805117+00:00",
+  "sourceCheckpoint": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+  "ownershipChecks": "Explicit W6-owned paths; no matching open handles; no tracked files deleted; shared resources preserved.",
+  "removed": [
+    {
+      "path": "/tmp/qelvora-w6-ci-proposal-ios-20260930",
+      "allocatedKiBBefore": 11996,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-ci-proposal-ios-simulator-20260930",
+      "allocatedKiBBefore": 259388,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-ci-proposal-swift-20260930",
+      "allocatedKiBBefore": 286356,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-resume-swift-20260930",
+      "allocatedKiBBefore": 259144,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-ci-android-report-20260930",
+      "allocatedKiBBefore": 11724,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-current-android-report-20260930",
+      "allocatedKiBBefore": 11724,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-current-snapshots-20260930",
+      "allocatedKiBBefore": 9336,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-explicit-scale-20260930",
+      "allocatedKiBBefore": 9336,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-local-review-20260930",
+      "allocatedKiBBefore": 404,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-normalized-baselines-20260930",
+      "allocatedKiBBefore": 9660,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-normalized-capture-20260930",
+      "allocatedKiBBefore": 9332,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-snapshots-20260930",
+      "allocatedKiBBefore": 9472,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-swift-srgb-snapshots-20260930",
+      "allocatedKiBBefore": 9332,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-android-toolchain-20260930/jdk.tar.gz",
+      "allocatedKiBBefore": 189764,
+      "removed": true
+    },
+    {
+      "path": "/tmp/qelvora-w6-android-toolchain-20260930/cmdline-tools.zip",
+      "allocatedKiBBefore": 151940,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/web/.next",
+      "allocatedKiBBefore": 291424,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/web/.next-w6-ci-visual",
+      "allocatedKiBBefore": 82480,
+      "removed": true
+    }
+  ],
+  "removedAllocatedKiB": 1612812,
+  "hostAvailableBytesBefore": 336211656704,
+  "hostAvailableBytesAfter": 337561001984,
+  "hostAvailableBytesDelta": 1349345280,
+  "measurementLimit": "Allocated estimates may include shared APFS extents; host free-space delta includes concurrent peer activity.",
+  "docker": {
+    "container": "creator-platform-w6-ci-20260930",
+    "containerId": "29b5cd9c8fcf",
+    "volume": "184e9de621c5316def8da917a69521f2ed5176d06b83a20283fd62303ae50961",
+    "volumeSizeBefore": "68.51MB",
+    "state": "pending_daemon_unavailable",
+    "removed": false,
+    "nextAction": "When the shared daemon is already running for necessary work, verify exact old container ID29b5cd9c8fcf remains stopped and its volume has no peer users; then docker rm -v creator-platform-w6-ci-20260930. Do not remove a rebuilt container or shared images/virtual disk."
+  },
+  "openaiRequests": 0,
+  "retainedImmediatelyAfterCleanup": [
+    "/tmp/qelvora-w6-android-toolchain-20260930/jdk",
+    "/tmp/qelvora-w6-android-toolchain-20260930/sdk",
+    "/tmp/qelvora-w6-gradle-20260930",
+    "/tmp/qelvora-w6-android-app-build-20260930",
+    "/tmp/qelvora-w6-ci-repair-swift-20260930",
+    "/tmp/qelvora-w6-swift-ios-consent-20260930",
+    "/tmp/qelvora-w6-swift-host-coordinate-20260930",
+    "/tmp/qelvora-w6-w5-density-reference-20260930",
+    "/tmp/qelvora-w6-ci-ios-srgb-20260930",
+    "/Users/yingpengwang/.codex/worktrees/970d/creator-platform/node_modules"
+  ],
+  "resumeInspection": {
+    "recordedAt": "2026-09-30T22:45:52.622735+00:00",
+    "hostBootTimeLocal": "2026-09-30 15:36:25 America/Los_Angeles",
+    "formerlyRetainedTemporaryPathsNowAbsent": [
+      "/tmp/qelvora-w6-android-toolchain-20260930/jdk",
+      "/tmp/qelvora-w6-android-toolchain-20260930/sdk",
+      "/tmp/qelvora-w6-gradle-20260930",
+      "/tmp/qelvora-w6-android-app-build-20260930",
+      "/tmp/qelvora-w6-ci-repair-swift-20260930",
+      "/tmp/qelvora-w6-swift-ios-consent-20260930",
+      "/tmp/qelvora-w6-swift-host-coordinate-20260930",
+      "/tmp/qelvora-w6-w5-density-reference-20260930",
+      "/tmp/qelvora-w6-ci-ios-srgb-20260930"
+    ],
+    "currentlyAvailable": [
+      "/Users/yingpengwang/.codex/worktrees/970d/creator-platform/node_modules"
+    ],
+    "causeLimit": "These paths were retained and existed after the recorded cleanup; all W6 /tmp resources are absent after the later host restart. Additional removal is not attributed to this cleanup operation.",
+    "matchingW6Processes": [],
+    "dockerDaemon": "unavailable at unix:///Users/yingpengwang/.docker/run/docker.sock",
+    "installedDockerCLI": "/Applications/Docker.app/Contents/Resources/bin/docker",
+    "sourceCIRun": 36780139572,
+    "sourceCIState": {
+      "webAndBackend": "passed",
+      "androidRuntime": "passed",
+      "trustCompile": "passed",
+      "androidFoundation": "queued",
+      "iosFoundation": "queued",
+      "webVisual": "queued"
+    },
+    "documentationPublication": "[skip ci] for documentation/evidence only, preserving the queued source run; new required checks remain necessary before merge."
+  }
+}

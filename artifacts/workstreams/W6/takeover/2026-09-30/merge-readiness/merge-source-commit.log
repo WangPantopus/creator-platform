@@ -1,0 +1,14 @@
+[codex/w6-calls-media-handoff dacfd76] Reconcile W1 foundation while preserving W6 media recovery
+ Committer: Yingpeng Wang <yingpengwang@Yingpengs-iMac.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+

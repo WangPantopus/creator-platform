@@ -1,0 +1,135 @@
+{
+  "startedAt": "2026-09-30T04:38:55.235591+00:00",
+  "pr": "https://github.com/WangPantopus/creator-platform/pull/4",
+  "processes": [
+    {
+      "pid": 97516,
+      "port": 4106,
+      "result": "SIGTERM requested after ownership check"
+    },
+    {
+      "pid": 59732,
+      "port": 3006,
+      "result": "SIGTERM requested after ownership check"
+    }
+  ],
+  "devices": {
+    "android": {
+      "serial": "emulator-5566",
+      "avd": "CreatorPlatform_W6",
+      "stopExitCode": 0
+    },
+    "ios": {
+      "udid": "50C7BB1D-FA6B-45CA-897E-B58E78072CDB",
+      "shutdownExitCode": 0,
+      "deleteExitCode": 0
+    }
+  },
+  "removedPaths": [
+    {
+      "path": "/private/tmp/creator-w6-android-current",
+      "allocatedBytesBefore": 93581312,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-android-project-cache",
+      "allocatedBytesBefore": 1359872,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-android-source",
+      "allocatedBytesBefore": 84635648,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-avd",
+      "allocatedBytesBefore": 1060057088,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-avd-data",
+      "result": "already absent"
+    },
+    {
+      "path": "/private/tmp/creator-w6-gradle-current-cache",
+      "allocatedBytesBefore": 2592768,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-gradle-project-cache",
+      "allocatedBytesBefore": 1642496,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-handoff-vxdlhw48",
+      "allocatedBytesBefore": 667648,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-ios",
+      "allocatedBytesBefore": 383848448,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-ios-packages",
+      "allocatedBytesBefore": 262782976,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-ios-source",
+      "allocatedBytesBefore": 622833664,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-runtime",
+      "allocatedBytesBefore": 450560,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-web",
+      "allocatedBytesBefore": 1990656,
+      "result": "removed"
+    },
+    {
+      "path": "/private/tmp/creator-w6-workspace",
+      "allocatedBytesBefore": 68198400,
+      "result": "removed"
+    },
+    {
+      "path": "/Users/yingpengwang/Library/Logs/CoreSimulator/50C7BB1D-FA6B-45CA-897E-B58E78072CDB",
+      "allocatedBytesBefore": 425984,
+      "result": "removed dedicated simulator log directory"
+    }
+  ],
+  "preservedSharedResources": [
+    "Shared main checkout and index",
+    "Peer/Pantopus processes and devices",
+    "Shared Node/pnpm/Gradle/Android/Xcode dependencies and SDKs",
+    "Committed source and W6 verification evidence"
+  ],
+  "temporaryDirectoryAllocatedBytesRemoved": 2584641536,
+  "privateRuntimeConfigurationRemoved": true,
+  "docker": {
+    "status": "pending",
+    "reason": "Docker Desktop UI reports fatal Disk full: no space left on device writing vm/init.log. Owned build/device data was removed, but engine inspection still does not respond. Restarting shared Docker Desktop would affect other workstreams and was not performed.",
+    "container": "creator-platform-w6-local",
+    "port": 55436,
+    "actionsPending": [
+      "Inspect/remove W6 container and its exclusive volume after engine recovery",
+      "Remove only exclusive W6 image/cache if any; keep shared postgres/SDK resources"
+    ],
+    "finalInspect": "timed out after10 seconds",
+    "uiError": "Docker Desktop - Disk full",
+    "restartApproval": "Requested from founder because Docker Desktop is shared; no restart performed without explicit reply."
+  },
+  "temporaryCleanupCompletedAt": "2026-09-30T04:41:03.874948+00:00",
+  "otherSimulatorStatesUnchanged": false,
+  "otherAndroidDevicesStillPresent": false,
+  "releasedPorts": [3006, 4106, 5566],
+  "browserPreviews": "Current task in-app browser inventory has no tabs; no unknown/user Chrome tabs closed.",
+  "verifiedAt": "2026-09-30T04:43:05.053461+00:00",
+  "iosSimulatorDataBytesBefore": 2080235520,
+  "approximateOwnedDataBytesRemoved": 4664877056,
+  "peerResourceActions": "No peer resource was targeted. Some peer device states changed concurrently between inventories; equality checks are not treated as proof of unchanged global state.",
+  "globalPackages": "No W6-exclusive global installation identified. Shared Node/pnpm/Gradle caches, Android SDK/system images/JBR, Xcode/iOS runtimes and repo dependencies retained; W6-only downloaded package/build copies removed."
+}

@@ -1,0 +1,104 @@
+{
+  "recordedAt": "2026-10-01T01:05:51.812608+00:00",
+  "parentRevision": "5ea0a99b17b1f6b984ea70acd68f4a3c9f7c1bc0",
+  "generatorRevision": "1ada9369fa85fa72fccc7a98182559929bea2ab9",
+  "policyRevision": "d15a4519b1c335ff86c6bfe4ed620b192944558e",
+  "recordingRevision": "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+  "sourceSHA256": {
+    "scripts/generate-native-api.mjs": "9ce61818c67af777debbe540dd6fd07f032fc6377d69891943086fa04ef1fc5d",
+    "packages/api/src/media.ts": "b9ac6ea889342aa8830af0cf0e31a5fcaa5f0282ae63a79cc86dca4d92fc6f9b",
+    "packages/api/src/media-openapi.ts": "3d36764d70503b83650677f5688d3045cb5c6688e3922c2772ba5587b150b673",
+    "packages/api/generated/openapi.json": "dee28d42a4e2bb7c2912f82dfe89af1e28228d5b53b26c2b71af6374faf1a9bf",
+    "apps/backend/src/modules/media/creator-service.ts": "702da0dec4152fc4cc043c11a43507a39320431d565e6cd3cb5bbb8e2d13421d",
+    "apps/backend/src/modules/media/router.ts": "363a28b71c53bf8b2920604c1361bc5fabd8ece56877a10b0600e7c552d0870f",
+    "apps/web/features/media/api.ts": "d0d457031c59c456ed4616715e053904362457c120e986a0f9689d833c204dc5",
+    "apps/web/features/media/recorder.ts": "6dc610a8dc207c33c2774f79feebff4aa29760362a98f25226b1f282dc9cddca",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "5cc7a29751e36ac04481aaeaf37305efd7d4ff2e0739d16ce2a793e959301045",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "0cebade272ddbc4150e04c76e85d8dc95cd31262538aa0841c13f8753c845cab"
+  },
+  "checks": {
+    "backendProductionBuild": "passed",
+    "existingBackendContracts": {
+      "tests": 9,
+      "failures": 0,
+      "runnerDurationMs": 2240,
+      "testDurationMs": 211,
+      "limit": "Existing schema contracts; no added route cases or actual configured media journey"
+    },
+    "webTypecheckLintFormat": "passed after recording-generation repair",
+    "sourceLintFormat": "passed",
+    "existingSharedResourceChecks": {
+      "tests": 2,
+      "failures": 0,
+      "durationMs": 1095
+    },
+    "canonicalGeneration": {
+      "resources": 12,
+      "operations": 48,
+      "consistent": true
+    },
+    "iosSimulatorLibrary": {
+      "target": "QelvoraUI",
+      "result": "passed",
+      "durationSeconds": 50.33
+    },
+    "androidKotlin": {
+      "task": ":app:compileDebugKotlin",
+      "result": "passed",
+      "durationSeconds": 177,
+      "packagedNewAPK": false,
+      "compiledClasses": {
+        "CreatorAPIClient": {
+          "path": "/tmp/qelvora-w6-native-recovery-20260930/app-build/tmp/kotlin-classes/debug/com/pantopus/qelvora/generated/CreatorAPIClient.class",
+          "sha256": "183517f16c4da7114cb21faead654256b43cc56e719fb06982e2ec421043804e",
+          "bytes": 76125
+        },
+        "ReadCreatorMediaPolicyPurpose": {
+          "path": "/tmp/qelvora-w6-native-recovery-20260930/app-build/tmp/kotlin-classes/debug/com/pantopus/qelvora/generated/ReadCreatorMediaPolicyPurpose.class",
+          "sha256": "ba0309385d02da1240737da56c78947ff786254ef26feba5b72651dccdfc5cae",
+          "bytes": 4196
+        }
+      },
+      "bytecodeInspection": "Actual policy/audience methods and closed enum present; no authenticated network journey"
+    },
+    "priorAPK": "publication-audience.json preserves actual47-operation APK; no48-operation APK claim",
+    "priorAndroidCases": "19 existing cases predate creator-helper/audience/policy additions; no new coverage claim"
+  },
+  "logs": {
+    "policy-ios-library.log": {
+      "sha256": "4b71ed598681940c72c8cea6762e16f21ed7d106b117a89087f9f468f4b4cabe",
+      "bytes": 21616
+    },
+    "policy-android-compile.log": {
+      "sha256": "0c554b84f9a73a41bfb6f3a252b2c6a4f9a6a973cdf7eba6a371ca507921875b",
+      "bytes": 1262
+    }
+  },
+  "generatorOwnership": "Narrow W1 lease acknowledged in direct coordination; personally repaired by W6. Existing unsupported inputs and assertions preserved.",
+  "policy": "Same actual current saved-object upload callback/verified creator/held denial; no approved-duration or retention fallback. Read creates no upload or publication. Upload rechecks current authority.",
+  "recordingRecovery": "Interrupted pending permission is generation-cancelled; late success stops its tracks, stale errors/end events cannot stop a newer capture. Existing recorded audio remains when paused; actual microphone race acceptance unverified.",
+  "inspectedW5PublicationProducer": "1c90032fcfa28a9a87d703851f10c54daaa97926; original recording occurrence independent from current publication association; source inspected, not composed into this branch runtime",
+  "reservedSQL": {
+    "version": "0047_w6_creator_media",
+    "sha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+    "active": false,
+    "applied": false
+  },
+  "preservedCI": {
+    "runId": 36780139572,
+    "revision": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+    "iosReviewAvailable": false,
+    "iosFoundation": "queued",
+    "webVisual": "queued",
+    "localChangesPushed": false
+  },
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "newTestsCasesSuitesHarnesses": 0,
+  "goldensOrThresholdsChanged": false,
+  "actualMediaProviderHardwareAcceptance": false,
+  "paidRequests": 0
+}
