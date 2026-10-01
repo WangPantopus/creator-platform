@@ -1,0 +1,269 @@
+{
+  "counts": {
+    "sources": 124,
+    "versions": 105,
+    "usageRows": 755,
+    "evaluations": 22
+  },
+  "capturedAt": "2026-10-01T11:08:48.971883+00:00",
+  "workspaces": [
+    {
+      "paused": true,
+      "revision": 18,
+      "creatorId": "20000000-0000-4000-8000-000000000002",
+      "liveVersionId": null
+    },
+    {
+      "paused": true,
+      "revision": 16,
+      "creatorId": "20000000-0000-4000-8000-000000000003",
+      "liveVersionId": null
+    }
+  ],
+  "sourceCommit": "067b11159e58fe28b88914d92e6e2f39320c2fcb",
+  "integratedMain": "70ba74a7983dc4f5d0fd0ccd6bcfb657576f9a0b",
+  "primaryPreview": {
+    "durationMs": 3823,
+    "firstApprovedMs": 3811,
+    "displayedCostUsdMicros": 2194,
+    "persistedCostUsdMicros": 2194,
+    "providerUsage": [
+      {
+        "id": "64adae66-c708-487d-b49d-1ce8acc95d29",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T11:06:31.229094+00:00",
+        "cost_micros": 93,
+        "duration_ms": 1643,
+        "input_tokens": 136,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 24
+      },
+      {
+        "id": "67a43212-fa5e-44d0-a442-10cfc24f5682",
+        "model": "text-embedding-3-small",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T11:06:32.874906+00:00",
+        "cost_micros": 1,
+        "duration_ms": 561,
+        "input_tokens": 19,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 0
+      },
+      {
+        "id": "68d271f5-2c3f-4176-99eb-d01ebd809f8f",
+        "model": "gpt-4.1-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T11:06:33.448455+00:00",
+        "cost_micros": 1834,
+        "duration_ms": 1602,
+        "input_tokens": 661,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 64
+      },
+      {
+        "id": "30b3e5ef-db36-405c-8986-c5474a295170",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T11:06:34.37823+00:00",
+        "cost_micros": 266,
+        "duration_ms": 660,
+        "input_tokens": 589,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 19
+      }
+    ],
+    "scope": "One real synthetic canonical-session Studio preview after API restart; no p95 or licensed fan-delivery acceptance"
+  },
+  "earlierUnsupportedPreview": {
+    "displayedCostUsdMicros": 2753,
+    "persistedCostUsdMicros": 2753,
+    "providerUsage": [
+      {
+        "id": "d16bd6fe-d265-43b6-8e23-db1a9cacebe4",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T10:23:35.249002+00:00",
+        "cost_micros": 93,
+        "duration_ms": 1581,
+        "input_tokens": 136,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 24
+      },
+      {
+        "id": "9b799c74-e4a5-4469-830a-f06fc7d47e6a",
+        "model": "text-embedding-3-small",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T10:23:36.834157+00:00",
+        "cost_micros": 1,
+        "duration_ms": 671,
+        "input_tokens": 20,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 0
+      },
+      {
+        "id": "f64befce-475a-40fe-94e5-d7e75b68ad9d",
+        "model": "gpt-4.1-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T10:23:37.539225+00:00",
+        "cost_micros": 2162,
+        "duration_ms": 2936,
+        "input_tokens": 661,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 105
+      },
+      {
+        "id": "46e1b490-c594-48c9-8667-b404145d499f",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T10:23:38.18929+00:00",
+        "cost_micros": 213,
+        "duration_ms": 833,
+        "input_tokens": 455,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 19
+      },
+      {
+        "id": "2c0e5f38-b7ac-4b2a-96bb-09bd937f44e4",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "provider": "OpenAI",
+        "created_at": "2026-10-01T10:23:39.042557+00:00",
+        "cost_micros": 284,
+        "duration_ms": 1362,
+        "input_tokens": 624,
+        "version_hash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+        "output_tokens": 21
+      }
+    ]
+  },
+  "checks": {
+    "generation": {
+      "result": "pass",
+      "sharedResources": 12,
+      "nativeOperations": 96
+    },
+    "typecheck": {
+      "result": "pass",
+      "tasks": 7,
+      "durationSeconds": 35.584
+    },
+    "build": {
+      "result": "pass",
+      "tasks": 6,
+      "durationSeconds": 47.034
+    },
+    "lint": "pass",
+    "format": "pass",
+    "existingBackendPG": {
+      "result": "18/18 pass before W4 integration",
+      "isolationPairs": 10000,
+      "queries": 30000,
+      "durationMs": 294219,
+      "unchangedDeadlineMs": 300000
+    }
+  },
+  "ciAtSourceCommit": {
+    "pushFoundation": 36851627862,
+    "prFoundation": 36851778378,
+    "trust": 36852048460,
+    "passed": [
+      "push web-and-backend",
+      "PR web-and-backend",
+      "push android-runtime",
+      "PR android-runtime",
+      "Trust compile"
+    ],
+    "queued": [
+      "push web-visual",
+      "PR web-visual",
+      "push ios-foundation",
+      "PR ios-foundation",
+      "push android-foundation",
+      "PR android-foundation"
+    ]
+  },
+  "resources": {
+    "web": {
+      "port": 3002,
+      "pid": 57271
+    },
+    "api": {
+      "port": 4102,
+      "pid": 88868
+    },
+    "reference": {
+      "port": 3102,
+      "pid": 68400
+    },
+    "postgres": {
+      "port": 55442,
+      "container": "creator-platform-w2-recovery-20261001",
+      "database": "creator_w2_resume",
+      "state": "running, preserved"
+    },
+    "checkPostgres": {
+      "container": "creator-platform-w2-checks-20261001",
+      "state": "normally stopped, data retained"
+    },
+    "iosDevice": {
+      "id": "90EC068E-4631-4EFC-886A-78800EA30A53",
+      "state": "normally stopped, data retained"
+    },
+    "androidDevice": {
+      "name": "W2_Completion_20261001",
+      "ports": [5562, 5563],
+      "adbServerPort": 5042,
+      "state": "normally stopped; own private ADB server stopped; AVD/data retained"
+    }
+  },
+  "native": {
+    "builtSourceCommit": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+    "ios": {
+      "device": "iPhone 17",
+      "os": "iOS 26.5",
+      "build": "pass, normal simulator signing and strict codesign verification",
+      "observed": "Shipping Welcome; live UI input not performed",
+      "packageResolution": "Local compiler resolved SnapshotTesting 1.19.6 with compiler-specific transitive dependencies; tracked Package.resolved restored and unchanged. This does not establish full checked-in CI dependency graph acceptance."
+    },
+    "android": {
+      "os": "Android API 35 Google APIs x86_64",
+      "profile": "Pixel 6, 1080x2400, 2 GiB, 2 cores, host GPU",
+      "apiOrigin": "http://10.0.2.2:4102",
+      "build": "assembleDebug pass, 37 tasks, 10m42s, two workers/in-process Kotlin",
+      "bootMs": 193223,
+      "lightLaunch": {
+        "status": "ok",
+        "totalMs": 10143,
+        "waitMs": 10438
+      },
+      "nightLaunch": {
+        "status": "ok",
+        "totalMs": 9263,
+        "waitMs": 9605
+      },
+      "observed": "Clean shipping Welcome in Light/Night, no live UI input or licensed delivery acceptance"
+    },
+    "androidApk": {
+      "bytes": 14055362,
+      "sha256": "c79c07db84f6bc7cb07468dad6ac847f6739be9ff6d6251bac40d177caeb0e3a"
+    },
+    "iosExecutable": {
+      "bytes": 123808,
+      "sha256": "a9428ed10afc55f28e7e70a994f33a9697d4235ba7bc6162fe9b043f3b22747b"
+    }
+  },
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/development-server.ts": "dbdca42b800fdc33f9d16c2c4b5eeefdd20051926e5f8f58a61cdc5aed7c4190",
+    "apps/backend/src/modules/agent/repository.ts": "b666fd212c6340b79adb4090c882b0b5d438dc707a19412faebfd93263be705b",
+    "apps/web/features/creator-ai/CreatorAI.tsx": "7c8387c3927a3a7b657fc8e9498fb936bc995442d56fc44f35289f17bd1ddcd1"
+  }
+}
