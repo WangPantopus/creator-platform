@@ -4,6 +4,10 @@ This is an October 1 checkpoint, not complete workstream or pilot acceptance. Th
 
 Worktree: `/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform`. Continuation branch: `codex/w2-completion`, based on verified `origin/main` `2f0319dbb6979878c5a9019e68503506902f9ea0`. The original `codex/w2-creator-ai-handoff` at `9f805888932c63c5a59d1efab29a7a4f47a42a98` is preserved. Current source hashes and sanitized database/provider facts are recorded separately. No implementation or app acceptance was delegated.
 
+## Current process-loss and merge checkpoint
+
+[Actual source process-loss recovery, current expert27 evaluation and wrapped transcripts](source-process-recovery.md) records normally merged PR32/head35dd3a3/merged31afb6, actual attempt2 recovery of171 exact chunks, preserved unknown admitted cost, actual revocation and fresh expert27 seven-case pass. Primary companion19 remains current. Counts125/105/25/939 and40 migrations are dated13:40UTC. W4 main3de0f14 is incorporated; current branch is codex/w2-source-recovery. The current transcript wrapping defect is repaired and personally operated in desktop/phone Light/Night; full licensed/native/accessibility/performance acceptance remains open.
+
 ## Current citation, revision and keyboard continuation
 
 [PR23 normal merge and the current companion19/expert17 pipeline10 evidence](citation-keyboard-continuation.md) supersede the older revision/count/PR-open observations below. Counts124/105/24/865 are dated12:17UTC. Current branch is `codex/w2-acceptance`. Unsupported companion citations are withheld, previews bind to their submitted revision and keyboard focus clears fixed navigation. All release/acceptance boundaries remain in the matrix.
