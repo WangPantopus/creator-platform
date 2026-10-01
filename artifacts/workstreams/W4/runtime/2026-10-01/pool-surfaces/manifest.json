@@ -1,0 +1,104 @@
+{
+  "recordedAt": "2026-10-01T12:14:10.977268+00:00",
+  "baseline": "257b3b6105c86f82a114a73e9945ec69155e07c6",
+  "branch": "codex/w4-pool-surfaces-20261001",
+  "scope": "Guarded pool projection, complete UTC monthly refunds, spending progress and short-page phone layout; no positive provider/creator acceptance.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "api": 4104,
+    "web": 3004,
+    "webMode": "Next16.3.7 production",
+    "database": "creator_w4",
+    "reviewDatabase": "creator_w4_sql_review",
+    "identity": "canonical development fan w4_local_fan; no verified creator",
+    "providerMode": "unconfigured; no provider requests/writes",
+    "viewports": ["390x1000 fan", "1280x900 Studio", "320x900 reflow"],
+    "themes": ["Light", "Night"],
+    "iOS": "normally simulator-signed shipping iPhone16Pro/iOS26.5 build",
+    "Android": "shipping Debug APK; compilation only in this increment"
+  },
+  "checks": {
+    "backendBuild": "passed final source",
+    "webProductionBuild": "passed final proxy/model source",
+    "workspaceTypechecks": "7 passed; web repeated after restoring local generated next-env path",
+    "scopedEslint": "passed including query proxy",
+    "scopedPrettier": "passed",
+    "generationConsistency": "12 resources and96 operations passed after regenerating new pool OpenAPI/Swift/Kotlin models",
+    "shippingIOSBuild": "BUILD SUCCEEDED final generated model",
+    "shippingAndroidBuild": "BUILD SUCCESSFUL final generated model,37 tasks4 executed,3m",
+    "completeDDLAndQueries": "revised0055 plus exact final non-owner projection SQL compiled then rolled back;40 migrations and no proposed tables/index",
+    "browser": "Actual final production spending/pass Light/Night390, fan pool authority denial Light/Night1280. Keyboard Tab focuses explicit No-limit; progress0..100 with monetary text; no overflow390/320. Short pass navigation top931/bottom1000. Keyboard scroll reveals time-use unavailable content above sticky footer. Screenshots personally inspected.",
+    "database": "non-owner actual app retains40 canonical migrations, zero packet/ledger rows, no proposed payout/pool relations/index; API ready:false",
+    "localTiming": "one personally operated loopback overview Refresh returned200; recorded receiveHeadersEnd171.203ms only, no percentile/load/provider claim"
+  },
+  "preservedFailures": [
+    "Transient dev import failure while new PoolEarnings file was being created; file and final production build corrected.",
+    "Initial final consistency check reported stale OpenAPI, then stale native generated models; regenerated from canonical source and check passes.",
+    "Actual production pool query was rejected by old proxy allowlist; strict supported overview parameter validation repaired it and actual fan now sees Creator access required.",
+    "Browser heading wait used Spending while actual heading is Spending and time; DOM inspection verified actual page.",
+    "Initial root-level diagnostic import could not resolve workspace pg; corrected via backend package resolution, no DB call in failed command.",
+    "A relative native restore command used Android working directory and failed before changes/build; corrected explicit repository path restored only own generated drift.",
+    "Debugger response/finish timestamp delta was negative and is retained as unusable; no elapsed-duration claim.",
+    "Earlier source patch used wrong relative working directory before Gradle invocation; no patch applied; corrected at repository root."
+  ],
+  "migration": {
+    "allocation": "0055_w4_pass_pool_effects",
+    "state": "reserved/unregistered/unapplied/inactive",
+    "sourceSha256": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca",
+    "registryOrAppliedBytesChanged": false
+  },
+  "limitations": [
+    "No Stripe/store credentials, approved cash/catalog policy or genuine verified creator/passkey exists.",
+    "No positive pool cash, monthly refund population, compensation/provider crash or signed creator journey claimed.",
+    "Native UI input unavailable; final native proof is shipping compilation. Earlier actual iOS/Android entry/environment evidence remains separately scoped.",
+    "No VoiceOver/TalkBack/200-percent-text/full strict-reference/performance acceptance claim.",
+    "Time-use producer and account-scoped W7 spending event remain unavailable.",
+    "DDL and empty-population plans are not installation/load or positive money proof.",
+    "No new tests/cases/automated journey scripts/assertion/reference changes."
+  ],
+  "sourceHashes": "source-sha256.json",
+  "buildHashes": "build-sha256.json",
+  "webBuildHashes": "web-build-sha256.json",
+  "databaseDiagnostics": "database-diagnostics.json",
+  "ddlEvidence": "ddl-query-review-rollback.json",
+  "readiness": "readiness.json",
+  "localTiming": "local-overview-observation.json",
+  "screenshots": {
+    "pass-final-production-light.jpg": {
+      "sha256": "69cb026d30abffbdd32c61efdbc70f2591bf10d66aeee76a8a52fe9c20c4b926",
+      "kind": "final production"
+    },
+    "pass-final-production-night.jpg": {
+      "sha256": "75a6c1b4e2c200beff5fdcc54fe125be5b00844ed34d146df9c4675f0871f1bc",
+      "kind": "final production"
+    },
+    "pass-gate-bottom-light.jpg": {
+      "sha256": "5054bacbf4541d62539301adfa6e6f7ba8e7f7a572c4c05e0a97cc73347373bc",
+      "kind": "interim layout observation"
+    },
+    "pool-final-production-wrong-role-light.jpg": {
+      "sha256": "a008c90ec7be5eba07ba3a3ea21d79769993ced4fbd81ff5060f0e255b0ac50e",
+      "kind": "final production"
+    },
+    "pool-final-production-wrong-role-night.jpg": {
+      "sha256": "481ba53ad6bc3ffb075206541bfbeec785859a428dbb94059393b11ce8de3665",
+      "kind": "final production"
+    },
+    "spending-final-production-light.jpg": {
+      "sha256": "9ad08009444cb67cfe8b51ab9be9db84203859a3160dd50f88f91f697dda52a6",
+      "kind": "final production"
+    },
+    "spending-final-production-night.jpg": {
+      "sha256": "7859d31b8151debe14b9063e66047bb43eec16106ff6c98e1ad5c6d80ca7ff4c",
+      "kind": "final production"
+    },
+    "spending-night-keyboard-scroll.jpg": {
+      "sha256": "259481942d7c317ea6b2f9a214704fe1a01c682487965bcf118a3e6f3d54f96c",
+      "kind": "final production"
+    },
+    "spending-production-light.jpg": {
+      "sha256": "8dfabb3a68423bcb045918c1186f3447f2666ba997d64bab02053e354f6f696b",
+      "kind": "interim layout observation"
+    }
+  }
+}

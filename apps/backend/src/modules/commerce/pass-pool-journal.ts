@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { PoolClient } from "pg";
 import { z } from "zod";
+import { PoolEarnings } from "../../../../../packages/api/src/commerce/contracts.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
@@ -76,7 +77,7 @@ type Effect = {
   compensation_request: unknown;
 };
 export const POOL_EFFECT_SOURCE_SHA256 =
-  "9392b556d185adff8724a3b094591c2ce80c3e64c3f09f8703fad39233169544";
+  "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca";
 export function poolSnapshotHash(truth: VerifiedPoolCycle) {
   const order = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
   return contentHash({
@@ -108,6 +109,116 @@ export class PassPoolJournal {
   ) {}
   isForService(service: CommerceService) {
     return this.service === service;
+  }
+  async earnings(actor: Actor, creatorId: string) {
+    return this.service.account(
+      actor,
+      async (client) => {
+        await this.assertInstalled(client);
+        const creators = await client.query<{ id: string }>(
+          "SELECT id FROM creator.creator_profile WHERE account_id=$1 AND verification='verified' AND NOT recovery_required AND id=$2 LIMIT 1",
+          [actor.accountId, creatorId],
+        );
+        const summaries = [];
+        for (const creator of creators.rows) {
+          // Complete creator-scoped aggregate, independent of overview row limits.
+          // These are recorded slots, not a claim of current provider funding.
+          const current = (
+            await client.query<{
+              cycle: string;
+              observed_at: Date;
+              closes_at: Date;
+              fans: string;
+              slots: string;
+            }>(
+              `SELECT to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS cycle,
+          now() AS observed_at,
+          (date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC' AS closes_at,
+          count(DISTINCT fan_id)::text AS fans,count(*)::text AS slots
+          FROM creator.commerce_pass_slot WHERE creator_id=$1
+          AND state='active' AND grant_id IS NOT NULL AND starts_at<=now() AND ends_at>now()
+          AND cycle_start=date_trunc('month',now() AT TIME ZONE 'UTC')::date`,
+              [creator.id],
+            )
+          ).rows[0]!;
+          const posted = await client.query<{
+            cycle: string;
+            currency: string;
+            allocation_minor: string;
+            transferred_minor: string;
+            reversed_minor: string;
+            slot_seconds: string;
+            total_slot_seconds: string;
+            pending_effects: string;
+            unconfirmed_cash: boolean;
+            reversal_pending: boolean;
+            posted_at: Date;
+          }>(
+            `SELECT c.cycle,c.currency,l.amount::text AS allocation_minor,l.created_at AS posted_at,
+          l.refs->>'slotSeconds' AS slot_seconds,l.refs->>'totalSlotSeconds' AS total_slot_seconds,
+          (SELECT coalesce(sum(amount),0)::text FROM creator.commerce_ledger
+            WHERE creator_id=$1 AND kind='payout' AND currency=c.currency
+            AND refs->>'pool'='true' AND refs->>'cycle'=c.cycle) AS transferred_minor,
+          (SELECT coalesce(sum(amount),0)::text FROM creator.commerce_ledger
+            WHERE creator_id=$1 AND kind='adjustment' AND currency=c.currency
+            AND refs->>'pool'='true' AND refs->>'direction'='credit' AND refs->>'cycle'=c.cycle) AS reversed_minor,
+          (SELECT count(*)::text FROM creator.commerce_pool_effect
+            WHERE creator_id=$1 AND cycle=c.cycle AND state IN('pending','processing','unknown')) AS pending_effects,
+          ((SELECT coalesce(sum((request->'transfer'->>'amount')::bigint),0)
+            FROM creator.commerce_pool_effect WHERE creator_id=$1 AND cycle=c.cycle)<>l.amount
+            OR EXISTS(SELECT 1 FROM creator.commerce_pool_effect e WHERE e.creator_id=$1 AND e.cycle=c.cycle
+            AND (e.state<>'failed' OR e.error_code IS DISTINCT FROM 'provider_transfer_failed')
+            AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger cash WHERE cash.creator_id=e.creator_id
+              AND cash.kind='payout' AND cash.cause=e.provider_key AND cash.provider_ref=e.provider_ref
+              AND cash.amount=(e.request->'transfer'->>'amount')::bigint AND cash.currency=c.currency))) AS unconfirmed_cash,
+          EXISTS(SELECT 1 FROM creator.commerce_pool_effect e WHERE e.creator_id=$1 AND e.cycle=c.cycle
+            AND e.compensation_required AND e.state IN('pending','processing','unknown')) AS reversal_pending
+          FROM creator.commerce_pool_cycle c JOIN creator.commerce_ledger l
+            ON l.creator_id=$1 AND l.kind='pool_alloc' AND l.currency=c.currency
+            AND l.cause='pool:'||c.cycle||':'||$1::text
+          ORDER BY c.cycle DESC LIMIT 13`,
+            [creator.id],
+          );
+          for (const cycle of posted.rows)
+            invariant(
+              BigInt(cycle.reversed_minor) <= BigInt(cycle.transferred_minor) &&
+                BigInt(cycle.transferred_minor) <=
+                  BigInt(cycle.allocation_minor),
+              "pool_cash_conflict",
+              "Original posted pool cash needs reconciliation.",
+            );
+          summaries.push(
+            PoolEarnings.parse({
+              creatorId: creator.id,
+              cycle: current.cycle,
+              observedAt: current.observed_at.toISOString(),
+              closesAt: current.closes_at.toISOString(),
+              fanCount: Number(current.fans),
+              slotCount: Number(current.slots),
+              historyLimited: posted.rows.length > 12,
+              postedCycles: posted.rows.slice(0, 12).map((c) => ({
+                cycle: c.cycle,
+                currency: c.currency,
+                allocationMinor: c.allocation_minor,
+                transferredMinor: c.unconfirmed_cash
+                  ? null
+                  : c.transferred_minor,
+                reversedMinor:
+                  c.unconfirmed_cash || c.reversal_pending
+                    ? null
+                    : c.reversed_minor,
+                slotSeconds: c.slot_seconds,
+                totalSlotSeconds: c.total_slot_seconds,
+                pendingEffects: Number(c.pending_effects),
+                postedAt: c.posted_at.toISOString(),
+              })),
+            }),
+          );
+        }
+        return summaries;
+      },
+      { isolation: "repeatable read" },
+    );
   }
   static async prepare(input: {
     service: CommerceService;
@@ -152,6 +263,7 @@ export class PassPoolJournal {
        AND (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
          WHERE n.nspname='creator' AND c.relname IN('commerce_pool_cycle','commerce_pool_effect')
          AND c.relrowsecurity AND c.relforcerowsecurity AND c.relowner<>r.oid)=2
+       AND EXISTS(SELECT 1 FROM pg_index i WHERE i.indexrelid=to_regclass('creator.commerce_pass_creator_cycle') AND i.indrelid=to_regclass('creator.commerce_pass_slot') AND i.indisvalid AND i.indisready)
        AND EXISTS(SELECT 1 FROM pg_trigger WHERE tgrelid=to_regclass('creator.commerce_pool_cycle') AND tgname='commerce_pool_cycle_immutable' AND tgenabled='O')
        AND EXISTS(SELECT 1 FROM pg_trigger WHERE tgrelid=to_regclass('creator.commerce_pool_effect') AND tgname='commerce_pool_effect_fence' AND tgenabled='O') AS ready
        FROM pg_roles r WHERE r.rolname=current_user`,

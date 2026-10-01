@@ -40,15 +40,27 @@ export function createCommerceRouter(input: {
       passEnabled: input.extended?.pass?.configured ?? false,
       passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
+      poolEarningsAvailable: Boolean(input.extended?.poolJournal),
     }),
   );
   router.get("/overview", async (req, res) => {
+    const actor = await actorFor(req);
     const value = await service().overview(
-      await actorFor(req),
+      actor,
       req.query.creatorId ? id(req.query.creatorId) : undefined,
     );
+    const poolCreator = req.query.creatorId
+      ? id(req.query.creatorId)
+      : value.owned.find((c) => c.verification === "verified")?.id;
     res.json({
       ...value,
+      poolEarnings:
+        req.query.poolEarnings === "1" && poolCreator
+          ? ((await input.extended?.poolJournal?.earnings(
+              actor,
+              poolCreator,
+            )) ?? [])
+          : [],
       tierCatalog:
         (await input.extended?.tiers?.choices(await actorFor(req))) ?? [],
       policy: {
@@ -64,6 +76,7 @@ export function createCommerceRouter(input: {
         membershipAvailable: input.extended?.billing?.configured ?? false,
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
+        poolEarningsAvailable: Boolean(input.extended?.poolJournal),
       },
     });
   });
