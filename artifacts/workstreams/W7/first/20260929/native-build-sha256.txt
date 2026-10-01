@@ -1,0 +1,10 @@
+360cd77c8cac1be05968e5c6274e0b1d3df7c6da016c0778fb8982ffa3a2cf22  /private/tmp/creator-w7-ios/App/QelvoraApp.swift
+841bc4567103b8bb4ae5ea45630e830f4750052c674b524671e02a8c8c26def3  /private/tmp/creator-w7-ios/Sources/QelvoraUI/Growth.swift
+a0f8534b532808c34dde8ac36b0c344b1ea1026f308ea5758c4c08a173b1e625  /private/tmp/creator-w7-ios/Sources/QelvoraUI/GrowthPreferences.swift
+b46d6c015fff3b67021f299d8e931422c3ba84f77b0d39271fc89d3244805f35  /private/tmp/creator-w7-ios/QelvoraApp.xcodeproj/project.pbxproj
+a28f40e6ce1ac9e133a25dc584784dfc8fbfee7bc5690190367513289cf9f983  /private/tmp/creator-w7-ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp
+3d59d66ea3d670082d07392341ce4a34fe1da68b0333c47e16a17a6484fa5541  /private/tmp/creator-w7-android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt
+d60d69e1353728c02cc1afdbf8c38142f49c6839a77e85b898bc84fa36ad950a  /private/tmp/creator-w7-android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt
+9f47b192a3d802f529bacae9142d386c0129bb05762f207efc196a6ac9478f73  /private/tmp/creator-w7-android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt
+fea0fe793c99dd880b4030de4b54e63f6bdd9a05162b61d2b5c86bb615bbe71e  /private/tmp/creator-w7-android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt
+c8375514976d0874d48ef28e62dcefe0c319ab9af27fc4391f807f03c2c4501e  /private/tmp/creator-w7-android/app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,25 @@
+{
+  "sourceCommit": "238f5ed5be5ca95e6be75286c536084462fb7416",
+  "nativeBuildSource": "d2ca5d1081441b8572b31f99bd033054499280e1",
+  "APICommit": "d2ca5d1081441b8572b31f99bd033054499280e1",
+  "binarySHA256": "f9273b99619917c44081828cab28bb93fa71024a8a6375c51d8fba1fcc8585ad",
+  "strictSignatureVerified": true,
+  "device": "80BBDCB3-C80B-4D63-BEA9-4C3AE12690BC",
+  "canonicalLightActor2SignIn": true,
+  "NightSavedActor1Restoration": true,
+  "profilesDistinct": true,
+  "identityActionsPreserved": true,
+  "refresh": "Personally tapped; same actor without visible error",
+  "currentSignOut": true,
+  "allDeviceSignOut": true,
+  "coldLightAndNightSignedOutRelaunch": true,
+  "officialManualMaestroRequests": [
+    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24
+  ],
+  "dataPreserved": true,
+  "normallyShutdown": true,
+  "at": "2026-10-01T06:24:31.382705+00:00",
+  "newTestsOrFlows": false,
+  "fullLicensedFanAcceptance": false
+}

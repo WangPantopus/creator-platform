@@ -1,0 +1,121 @@
+{
+  "incomingMain": "0a9a9a74b063ca7ddbd43bbcee6585935ad62ecf",
+  "resolutions": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/com/pantopus/qelvora/NativeAcceptanceTest.kt",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsLight_composer.png",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsNight_composer.png",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesLight_composer_ended.png",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesNight_composer_ended.png",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/access/commerce.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/conversation-adapter.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/model.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/streaming.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/trust-adapter.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/approved-generator.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "resolution": "Both W3 generation-journal/cost imports and accepted send continuation; auto-merged current approval graph retained"
+    },
+    {
+      "path": "apps/backend/tests/postgres.integration.test.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/ios/UITests/FoundationFlowTests.swift",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "artifacts/workstreams/W2/handoff/20260929/commit-scope.json",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/README.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/coordination/W2.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/handoffs/W2-creator-ai-resume.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/handoffs/W2-creator-ai.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/handoffs/planning-coordination-resume.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/handoffs/planning-coordination.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "docs/workstreams/status/W2.md",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "playwright.config.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "tests/visual/auth-contract.spec.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "tests/visual/catalog.spec.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    },
+    {
+      "path": "tests/visual/foundation.spec.ts",
+      "resolution": "Exact published current-main bytes, reviewed producer/assertion/reference/document authority"
+    }
+  ]
+}
