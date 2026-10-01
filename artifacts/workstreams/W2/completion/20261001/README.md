@@ -4,6 +4,10 @@ This is an October 1 checkpoint, not complete workstream or pilot acceptance. Th
 
 Worktree: `/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform`. Continuation branch: `codex/w2-completion`, based on verified `origin/main` `2f0319dbb6979878c5a9019e68503506902f9ea0`. The original `codex/w2-creator-ai-handoff` at `9f805888932c63c5a59d1efab29a7a4f47a42a98` is preserved. Current source hashes and sanitized database/provider facts are recorded separately. No implementation or app acceptance was delegated.
 
+## Subsequent main and import recovery
+
+[Current 250,001-character refusal, corrected same-file reselection and W4 PR25 integration](source-import-final-checkpoint.md) records the remaining personally operated import boundary. Main 817940d is incorporated as 907813b; current generation/type/build checks pass and W2 implementation hashes remain unchanged.
+
 ## Current integrated checkpoint
 
 [PR #23, post-integration checks, restart/cited provider proof and released native devices](integrated-app-checkpoint.md) supersede older resource statements below. W4 main 70ba74a is consumed in 067b111. Generation/type/lint/format/build pass on the integrated source; its hosted backend/Android runtime/Trust pass while six Mac jobs remain queued. Current real preview cost 2,194 matches four durable charges; first approved 3,811 ms exceeds the warm target. Current counts 124 / 105 / 22 / 755 preserve companion 18 and expert 16. Both native devices and private ADB are normally stopped with data retained. Full W2 and release acceptance remain open.
