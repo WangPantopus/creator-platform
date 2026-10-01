@@ -92,15 +92,6 @@ const configured =
                       runtime.access,
                       runtime.database,
                       runtime.identity.signing,
-                      async (creatorId) => {
-                        const result = await runtime.pool.query<{
-                          handle: string;
-                        }>(
-                          "SELECT handle FROM creator.creator_profile WHERE id=$1",
-                          [creatorId],
-                        );
-                        return result.rows[0]?.handle ?? null;
-                      },
                     ),
                   },
                 }

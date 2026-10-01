@@ -33,7 +33,6 @@ export function canonicalConversationHome(
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "publicVerification">,
-  handleFor: (creatorId: string) => Promise<string | null>,
 ): GrowthOwners["home"] {
   return async (actor) => {
     const entries: z.infer<typeof Directory>["threads"] = [];
@@ -92,8 +91,6 @@ export function canonicalConversationHome(
             copy.growthErrorPrivateReplyUnavailable,
             503,
           );
-        const handle = await handleFor(scope.creatorId);
-        if (!handle || !/^[a-z0-9_]{3,30}$/u.test(handle)) continue;
         const row = await database.withThread(scope, async (client) => {
           const thread = (
             await client.query(
@@ -139,7 +136,7 @@ export function canonicalConversationHome(
           creatorName: scope.creatorName,
           label,
           preview,
-          destination: `/creators/${handle}/chat`,
+          destination: `/threads/${scope.creatorId}/${scope.fanId}`,
           updatedAt: new Date(
             message?.created_at ?? row.thread.privacy_notice_at,
           ).toISOString(),
