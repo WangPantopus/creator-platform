@@ -9,6 +9,7 @@ import {
   type MemoryItem,
 } from "../../../../../packages/api/src/conversation/contracts.js";
 import type { ThreadSnapshot } from "../agent/pipeline.js";
+import type { MemoryProposalPort } from "../agent/memory-proposals.js";
 
 export interface SemanticExclusionPort {
   /** Retain only the canonical exclusion vector/reference, under the same scope
@@ -181,13 +182,19 @@ export class MemoryService {
     scope: ThreadScope,
     raws: readonly unknown[],
   ): Promise<number> {
+    return (await this.writeProposalsWithReceipt(scope, raws)).written;
+  }
+  async writeProposalsWithReceipt(
+    scope: ThreadScope,
+    raws: readonly unknown[],
+  ): Promise<{ written: number; revision: number | null }> {
     invariant(
       raws.length <= 5,
       "memory_batch_large",
       "Shorten this memory proposal batch.",
     );
     const proposals = raws.map((raw) => MemoryProposalSchema.parse(raw));
-    if (!proposals.length) return 0;
+    if (!proposals.length) return { written: 0, revision: null };
     const revision = proposals[0]!.expectedRevision;
     invariant(
       proposals.every((p) => p.expectedRevision === revision),
@@ -201,14 +208,14 @@ export class MemoryService {
           "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR UPDATE",
           [...pair(scope), revision],
         );
-        if (!current.rowCount) return 0;
+        if (!current.rowCount) return { written: 0, revision: null };
         const exclusions = (
           await client.query<{ key: string; text: string | null }>(
             "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
             pair(scope),
           )
         ).rows;
-        if (exclusions.length > 1000) return 0;
+        if (exclusions.length > 1000) return { written: 0, revision };
         let written = 0;
         for (const proposal of proposals) {
           const key = normalized(proposal.semanticKey);
@@ -255,29 +262,22 @@ export class MemoryService {
             "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
             pair(scope),
           );
-        return written;
+        return { written, revision: revision + (written ? 1 : 0) };
       },
       "write",
     );
   }
   async requestConsentOnce(
     scope: ThreadScope,
-    item: {
-      itemHash: string;
-      text: string;
-      category: string;
-      expectedRevision: number;
-      provenanceMessageId: string;
-      question: string;
-    },
+    item: Parameters<MemoryProposalPort["requestConsentOnce"]>[1],
   ) {
-    // C05 currently omits the key/kind for sensitive items. Bind consent to this
-    // immutable proposal hash; W2 must add canonical semantic metadata for full matching.
+    // C05 now supplies the canonical semantic identity. The exact durable
+    // proposal remains subject to revisions, exclusions and item consent.
     await this.writeProposals(scope, [
       {
-        kind: "fact",
+        kind: item.kind,
         text: item.text,
-        semanticKey: item.itemHash,
+        semanticKey: item.semanticKey,
         provenanceMessageId: item.provenanceMessageId,
         expectedRevision: item.expectedRevision,
         sensitiveCategory: item.category,

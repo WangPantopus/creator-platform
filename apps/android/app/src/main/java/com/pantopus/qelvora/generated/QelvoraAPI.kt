@@ -1487,7 +1487,7 @@ enum class APIMessageDeliveryState {
 @Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
-  val `generationId`: String
+  val `generationId`: String? = null
 )
 
 @Serializable

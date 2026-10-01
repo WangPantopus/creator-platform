@@ -80,27 +80,26 @@ actor W3ConversationClient {
         }
         return try JSONDecoder().decode(T.self, from: data)
     }
-    func socket() async throws -> URLSessionWebSocketTask {
-        guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
-        guard let token = try await credentials.read() else { throw W3Failure(message: "Continue with Pantopus again.", status: 401) }
-        var target = URLComponents(url: baseURL.appendingPathComponent("v1/realtime"), resolvingAgainstBaseURL: false)!
-        target.scheme = target.scheme == "https" ? "wss" : "ws"
-        var request = URLRequest(url: target.url!); request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-        request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
-        request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
-        let socket = session.webSocketTask(with: request); socket.resume(); return socket
+    func realtime(page: W3Page) async throws -> W3Realtime.Lease {
+        guard let accountId = expectedAccountId else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
+        return try await W3Realtime.shared.subscribe(baseURL: baseURL, accountId: accountId, page: page)
     }
+
 }
 
 @MainActor
 final class W3ThreadModel: ObservableObject {
     struct Pending { let key: String; let text: String; let clientSequence: Int; let destination: String; var uncertain = false; var rejected = false }
     @Published var page: W3Page?; @Published var older: [W3Message] = []; @Published var before: Int?
-    @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = false
+    @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = true
     @Published var pending: Pending?
     let client: W3ConversationClient; let creatorId: String; let fanId: String
     private let accountId: String
-    private var resumeCursor: Int?
+    private var active = false
+    private var transportReady = false
+    private var authorizationDenied = false
+    private var connectionRun: UUID?
+    private var activeLease: UUID?
     private var resumeActivated = false
     private let presenceId = UUID().uuidString.lowercased()
     private var storageScope: String { client.baseURL.absoluteString + "/" + root }
@@ -111,49 +110,64 @@ final class W3ThreadModel: ObservableObject {
         do {
             if !resumeActivated {
                 await W3ResumeStorage.shared.activate(accountId: accountId)
-                resumeCursor = await W3ResumeStorage.shared.cursor(accountId: accountId, scope: storageScope)?.cursor
                 resumeActivated = true
             }
             let fresh: W3Page = try await client.request(root)
             guard !Task.isCancelled else { return }
-            guard page == nil || fresh.cursor >= page!.cursor else { return }
+            guard page == nil || (fresh.cursor >= page!.cursor && fresh.epoch >= page!.epoch && fresh.revision >= page!.revision) else { return }
             page = fresh; if before == nil && older.isEmpty { before = fresh.before }
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
             await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
-            offline = false; failure = ""
+            offline = !transportReady; authorizationDenied = false; failure = ""
             if let pending { let status: W3Status = try await client.request(root + "/messages/status/" + pending.key); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
         } catch { failed(error) }
     }
+    func setActive(_ value: Bool) {
+        active = value
+        if !value { transportReady = false; offline = true }
+    }
     func connect() async {
-        while !Task.isCancelled {
+        let run = UUID(); connectionRun = run
+        var delay = 1.0
+        defer { if connectionRun == run { transportReady = false; offline = true } }
+        while active && !Task.isCancelled {
+            transportReady = false; offline = true
             await refresh()
+            if authorizationDenied || Task.isCancelled || !active { return }
             if let page {
                 do {
-                    let socket = try await client.socket()
-                    // The authenticated snapshot establishes the current boundary.
-                    // Older persisted replay is deduplicated by that fresh gate.
-                    let subscription = APISubscribe(kind: .subscribe, creatorId: creatorId, fanId: fanId, cursor: min(resumeCursor ?? page.cursor, page.cursor))
-                    resumeCursor = nil
-                    try await socket.send(.data(JSONEncoder().encode(subscription)))
+                    // The current authorized page covers all earlier cursors.
+                    // Persisted metadata cannot authorize replay of old content.
+                    let lease = try await client.realtime(page: page)
+                    activeLease = lease.id
                     await withTaskCancellationHandler {
                         do {
-                            while !Task.isCancelled {
-                                let incoming = try await socket.receive()
-                                let data: Data
-                                switch incoming { case .data(let value): data = value; case .string(let value): data = Data(value.utf8); @unknown default: throw URLError(.badServerResponse) }
-                                let frame = try JSONDecoder().decode(APIFrame.self, from: data)
-                                if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
+                            for try await event in lease.events {
+                                guard active, !Task.isCancelled, connectionRun == run else { break }
+                                switch event {
+                                case .connected:
+                                    transportReady = true; delay = 1
+                                    await refresh()
+                                case .frame(let frame):
+                                    if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
+                                }
+                                if authorizationDenied { break }
                             }
                         } catch { if !Task.isCancelled { failed(error) } }
-                    } onCancel: { socket.cancel(with: .goingAway, reason: nil) }
-                    socket.cancel(with: .goingAway, reason: nil)
-                } catch { failed(error) }
+                    } onCancel: { Task { await W3Realtime.shared.release(lease.id) } }
+                    await W3Realtime.shared.release(lease.id)
+                    if activeLease == lease.id { activeLease = nil }
+                } catch { if !Task.isCancelled { failed(error) } }
             }
-            try? await Task.sleep(for: .seconds(3))
+            transportReady = false; offline = true
+            if authorizationDenied || Task.isCancelled || !active { return }
+            do { try await Task.sleep(for: .seconds(delay + Double.random(in: 0...0.5))) }
+            catch { return }
+            delay = min(15, delay * 2)
         }
     }
     func send(retry: Bool = false) async {
-        guard !busy, !offline, let page else { return }
+        guard active, !busy, !offline, let page, page.canSend, page.generationSequences.isEmpty else { return }
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard retry ? pending != nil : !text.isEmpty else { return }
         let item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
@@ -180,9 +194,11 @@ final class W3ThreadModel: ObservableObject {
         catch { failed(error) }
     }
     private func failed(_ error: Error) {
+        transportReady = false; offline = true
+        if let id = activeLease { Task { await W3Realtime.shared.release(id) } }
         if let failure = error as? W3Failure {
             self.failure = failure.message
-            if [401,403,404].contains(failure.status) { page = nil; older = []; draft = ""; pending = nil; gate = nil; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
+            if [401,403,404].contains(failure.status) { authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
         } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
     }
 }

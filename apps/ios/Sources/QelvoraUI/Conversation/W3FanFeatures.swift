@@ -3,7 +3,7 @@ import SwiftUI
 @MainActor
 public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
-    public static func clearPrivateState() async { await W3ResumeStorage.shared.purge() }
+    public static func clearPrivateState() async { await W3Realtime.shared.purge(); await W3ResumeStorage.shared.purge() }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
             let path = destination.components(separatedBy: "?")[0]
@@ -31,6 +31,7 @@ private struct W3ThreadScreen: View {
     @State private var privacy = false
     @State private var source: W3Passage?
     @State private var sourceFailure = ""
+    @State private var connectionRetry = 0
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
@@ -52,7 +53,7 @@ private struct W3ThreadScreen: View {
                                 row(message, page: page).id(message.id)
                             }
                             if let pending = model.pending {
-                                Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.uncertain ? nil : .pending)
+                                Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending)
                                 if pending.uncertain {
                                     Text("Acceptance has not been confirmed. Retry checks the same message without a duplicate.").qText("caption")
                                     Button("Retry", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.send(retry: true) } }
@@ -72,25 +73,36 @@ private struct W3ThreadScreen: View {
                             .lineLimit(1...5).qText("body").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
-                        Button("Send", variant: .ai, disabled: !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                     }
                     Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
                     HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } }
                 }.padding(QelvoraTokens.space4).background(qColor("ground", scheme))
             } else {
                 Notice(title: "Conversation unavailable", children: model.failure.isEmpty ? "Loading your messages…" : model.failure).padding(16)
-                Button("Refresh", variant: .secondary) { Task { await model.refresh() } }
+                Button("Refresh", variant: .secondary) { connectionRetry += 1 }
                 Button("Help and safety", variant: .quiet) { session.open("/support") }
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task(id: scenePhase) { if scenePhase == .active { await model.connect() } }
-            .task(id: scenePhase) { if scenePhase == .active { while !Task.isCancelled { try? await Task.sleep(for: .seconds(5)); if !Task.isCancelled { await model.refresh() } } } }
-            .task(id: "\(scenePhase)-\(privacy)-\(model.page != nil)") {
-                if scenePhase != .active || privacy { await model.presence(active: false) }
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(connectionRetry)") {
+                let active = scenePhase == .active && !privacy && source == nil
+                model.setActive(active)
+                if active { await model.connect() }
+            }
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)") {
+                if scenePhase == .active && !privacy && source == nil {
+                    while !Task.isCancelled { try? await Task.sleep(for: .seconds(15)); if !Task.isCancelled { await model.refresh() } }
+                }
+            }
+            .onChange(of: scenePhase) { _, value in model.setActive(value == .active && !privacy && source == nil) }
+            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil) }
+            .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value) }
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(model.page != nil)") {
+                if scenePhase != .active || privacy || source != nil { await model.presence(active: false) }
                 else { while !Task.isCancelled { await model.presence(active: true); try? await Task.sleep(for: .seconds(20)) } }
             }
-            .onDisappear { Task { await model.presence(active: false) } }
+            .onDisappear { model.setActive(false); Task { await model.presence(active: false) } }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, name: model.page?.creatorName ?? "the creator", session: session) }
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("meta"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }

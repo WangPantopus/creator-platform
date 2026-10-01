@@ -1,0 +1,64 @@
+{
+  "parent": "7393dd0c41a67103f118086679471283eb5ac220",
+  "producers": {
+    "W2": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+    "W3": "7f5f63d8a78a3114933dc420a4a4ea2c9312b87c"
+  },
+  "sourceHashes": {
+    "apps/backend/src/modules/agent/lifecycle.ts": "3ee9c416034d16cc062a06bb27e6cc1465cfb4263cc37fa4e300792a7722c7a8",
+    "apps/backend/src/modules/agent/pipeline.ts": "69a14faad779addf3af52f751021855d1f9fe32bc4ad74e9ec694a1cdc1f399c",
+    "apps/backend/src/modules/agent/provider-usage.ts": "7ef8b552fd2f2ed28136b1d82225540880be68a2fb8ac9d16561a5324ff36b1b",
+    "apps/backend/src/modules/conversation/memory.ts": "21f74a25ef2db46a769b9b2aca00d6bf962aa90d8906494721d4b96ef12e2b20",
+    "apps/backend/src/modules/conversation/service.ts": "43a0155157389f6460b550f7a7c1d6970c350f2764c27b45fa5960ccf5c68b2e",
+    "packages/api/src/schemas.ts": "cc044d4f954d987272ffa5c8f00341fe9d4653f0fa5fe6f23406967234400340",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift": "964329b6a604e757c287e1153d5d9e54a9b40efb4929af8c19934b2026f774f0",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "58020da5234645569a86bc6c10b877585c63113f7fe6f982667af508af898c77",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3Realtime.swift": "9ca084c88a07d8701e8afd2827f98dad3deb0214d04e77d4a7708a05697491aa"
+  },
+  "logHashes": {
+    "/private/tmp/creator-w1-continuation-recovery-swift-test.log": "b337c17036249aa2fc03d26d59e1f9add9518f9c49ae7a425d008df6a9e67c99",
+    "/private/tmp/creator-w1-continuation-ios-recovery-build.log": "a7080484749805c6e611676f16d6862680b55aff0adf0e4bc1373179815ac982",
+    "/private/tmp/creator-w1-continuation-rename-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-rename-web.log": "a5d5856b097af385f13d5cc6e98365397f3f84544120253e9ba4195e03660460",
+    "/private/tmp/creator-w1-continuation-rename-ios.log": "8ad5d66c5ab277b9bf46542697e190e8afbadb0cf1e3f007a5af02b0ab1c0a28",
+    "/private/tmp/creator-w1-continuation-rename-project.log": "d9ff9499bae2ae221e9465ba1942516accfd5d1ba11056914da6e15fe1a041b5"
+  },
+  "checks": {
+    "Swift": {
+      "existingCases": 18,
+      "imageComparisons": 110,
+      "failures": 0,
+      "caseSeconds": 26.048,
+      "shippingNormallySignedBuild": true
+    },
+    "backend": {
+      "contractsPassed": 9,
+      "targetedPostgresPassed": 2,
+      "targetedPostgresSkipped": 7,
+      "targetedPostgresNames": ["T-18/T-24", "T-27"],
+      "targetedPostgresSeconds": 1.3
+    },
+    "renamedConsumers": {
+      "name": "FolioPreview",
+      "backend": true,
+      "web": true,
+      "iOSNormallySigned": true,
+      "Android": false,
+      "qualification": "Original7393dd0 source plus the nine listed current source files; copied source was processed by canonical rename, all generated outputs regenerated."
+    }
+  },
+  "toolOrigin": {
+    "owner": "W1",
+    "run": "continuation-20260930",
+    "url": "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip",
+    "version": "2.46.0",
+    "sha256": "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806"
+  },
+  "acceptance": {
+    "providerOperation": false,
+    "nativeOperation": false,
+    "grantFreeEmitterIntegrated": false,
+    "teamAndNamedPublication": false,
+    "releaseReady": false
+  }
+}

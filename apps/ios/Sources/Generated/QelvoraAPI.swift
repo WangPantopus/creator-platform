@@ -1954,8 +1954,8 @@ public enum APIMessageDeliveryState: String, Codable, Sendable {
 
 public struct APIAcceptedMessage: Codable, Sendable {
   public let `message`: APIAcceptedMessageMessage
-  public let `generationId`: String
-  public init(message: APIAcceptedMessageMessage, generationId: String) {
+  public let `generationId`: String?
+  public init(message: APIAcceptedMessageMessage, generationId: String? = nil) {
     self.message = message
     self.generationId = generationId
   }

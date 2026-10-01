@@ -249,7 +249,10 @@ export class ConversationService {
       };
     });
   }
-  async send(scope: ThreadScope, raw: unknown): Promise<AcceptedMessage> {
+  async send(
+    scope: ThreadScope,
+    raw: unknown,
+  ): Promise<AcceptedMessage & { generationId: string }> {
     const body = SendMessageSchema.parse(raw);
     invariant(
       scope.authority === "fan",
