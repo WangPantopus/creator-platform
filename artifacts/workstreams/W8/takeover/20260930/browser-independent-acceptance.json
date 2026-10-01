@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T00:22:10.302204+00:00",
+  "browser": "supported Codex in-app browser",
+  "apiRelease": "w8-takeover-6fa75e99f212",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "theme": "light",
+  "steps": [
+    {
+      "surface": "privacy",
+      "observed": "Preserved first fan export has seven complete domains/content blocked. No Download control; no retry/new job/delete action performed.",
+      "image": "privacy-progress-phone-light.jpeg"
+    },
+    {
+      "surface": "trust help",
+      "observed": "Public authored-label, scoped-access, privacy and provider-disclosure limitations visible.",
+      "image": "trust-help-phone-light.jpeg"
+    },
+    {
+      "surface": "status",
+      "observed": "Non-owner database available, identity synthetic, providers and all privacy readiness gates unavailable. Old growth receipt does not imply current configured growth.",
+      "image": "status-phone-light.jpeg"
+    },
+    {
+      "surface": "access history",
+      "observed": "First fan sees own CASE-001/002 access purposes. After actual local actor switch, second fan sees only own CASE-003/004 history/decision purposes.",
+      "images": [
+        "access-history-phone-light.jpeg",
+        "access-history-account-switch-phone-light.jpeg"
+      ]
+    },
+    {
+      "surface": "feedback",
+      "observed": "Typed synthetic unsent comment, selected Expert/useful Yes, then switched account. Comment, mode and radio selection cleared. No feedback submission or pilot-response claim.",
+      "image": "feedback-draft-account-reset-phone-light.jpeg"
+    }
+  ],
+  "geometry": {
+    "documentScrollWidth": 390,
+    "viewportWidth": 390
+  },
+  "limitations": [
+    "This is a Light phone sample, not the entire reference/state matrix.",
+    "No200-percent browser zoom, screen reader, reduced-motion or native interaction claim.",
+    "No export completion or binary/system-save claim."
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "observedAt": "2026-10-01T03:00:15.712582+00:00",
+  "actualGitHub": {
+    "headRefOid": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a",
+    "isDraft": true,
+    "mergeStateStatus": "UNSTABLE",
+    "number": 7,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T02:37:06Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482990/job/110191851343",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T02:35:11Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T02:38:47Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806477099/job/110191832565",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T02:36:32Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T02:36:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482993/job/110191851984",
+        "name": "compile",
+        "startedAt": "2026-10-01T02:36:06Z",
+        "status": "COMPLETED",
+        "workflowName": "Trust release compilation"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482990/job/110191851350",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T02:34:37Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806477099/job/110191832488",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T02:34:32Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482990/job/110191851260",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T02:34:37Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806477099/job/110191832471",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T02:34:32Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482990/job/110191851372",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T02:34:37Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806477099/job/110191832336",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T02:34:32Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T02:40:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806482990/job/110191851370",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T02:34:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T02:39:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36806477099/job/110191832531",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T02:35:02Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      }
+    ]
+  },
+  "gate": "Required checks plus personally launched enabled-scope E2E; five successes/six queued do not prove readiness",
+  "changes": "No checks/runners/workflow/run cancellation or waiver"
+}

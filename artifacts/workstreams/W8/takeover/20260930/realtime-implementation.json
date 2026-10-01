@@ -1,0 +1,60 @@
+{
+  "observedAt": "2026-10-01T01:14:50.150668+00:00",
+  "sourceParent": "b02c2aaf005e9934edb6a65adb8b919244fd89dc",
+  "files": [
+    {
+      "path": "apps/backend/src/realtime/gateway.ts",
+      "sha256": "2e9a48b2636cf5c52af2b94c114984f4568878c68c4da0f5dafe10c705e1a5e2"
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "sha256": "875446755793102a9834e5c361204016e80315b897e6978a763c01438099ecfa"
+    },
+    {
+      "path": "apps/backend/src/operations/local-server.ts",
+      "sha256": "84319c21d4989fa36c75a3f73a0893956b7193778fc48223550300c2f13a1bcb"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "619d43cf27fb25f1dcf8a2a0fca8cf2ba1b47e51d0f72a81f5b1c668de40f330"
+    },
+    {
+      "path": "apps/web/app/ops/metrics/page.tsx",
+      "sha256": "d690a3a812df1c941449cb7e1b1f37f399d5ab768cd859104bbde0a24d5df9a7"
+    }
+  ],
+  "implementation": {
+    "gateway": "Existing canonical session, exact origin, one-use30-second ticket and participant restriction reused; local harness now mounts the existing realtime transport",
+    "fixedCounters": "Connections/subscriptions/queued and transport-callback-sent frames/bytes/refusals/errors/backpressure",
+    "gauges": "Active connections/subscriptions/pending mutations and observed peak buffered bytes; closed sockets cannot register late subscriptions",
+    "timings": "Cumulative replay-batch and successful transport send-callback histogram; fixed bucket boundaries and at most120 timing names",
+    "privacy": "No account/thread/creator/frame/ticket/cursor/text/provider labels or contents",
+    "shutdown": "Local harness closes sockets and terminates remaining connections after5 seconds; actual drain not established by source alone"
+  },
+  "verification": {
+    "backendBuild": "pass",
+    "webTypecheck": "pass",
+    "productionWebBuild": "pass",
+    "changedSourceEslint": "pass",
+    "changedSourcePrettier": "pass",
+    "existingContracts": {
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 275
+    },
+    "generatedNextEnvRestored": true
+  },
+  "acceptance": {
+    "gatewayMountedInCurrentRunningApi": false,
+    "canonicalBrowserSocketPersonallyVerified": false,
+    "generationToVisibleToSettlement": false,
+    "paidProviderCalls": 0
+  },
+  "limitations": [
+    "Current running API still3240da0 until a narrow verified restart",
+    "Browser BFF requires the explicit local W3_WEBSOCKET_URL config before socket acceptance",
+    "Successful send callback means transport completion, not client visibility or settlement",
+    "No p95/p99 or5-second in-flight denial SLO claim",
+    "No new tests, SQL, role, RLS or grant changes"
+  ]
+}

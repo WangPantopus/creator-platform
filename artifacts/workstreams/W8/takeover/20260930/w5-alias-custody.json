@@ -1,0 +1,98 @@
+{
+  "observedAt": "2026-10-01T03:09:19.571951+00:00",
+  "producerEvidenceCommit": "e0995381cf3621d1bf862732d95e4029ef6b0f92",
+  "producerEvidencePath": "artifacts/workstreams/W5/2026-09-30/resumption/migration-alias-observations.json",
+  "producerEvidenceSha256": "242f81a6d2a2df2f54e5ba1440a6bc51cec696294cc3ece6832fc88f54b8ac5b",
+  "producerReportedLedgerCount": 35,
+  "producerReportedLedgerThrough": "0038_w5_reply_review",
+  "currentCanonicalActiveCount": 40,
+  "currentCanonicalThrough": "0043_w8_relationship_backfill",
+  "aliasesProposed": [
+    {
+      "producerVersion": "0032_w5_content",
+      "canonicalVersion": "0035_w5_content",
+      "sourcePath": "apps/backend/src/modules/content/schema.sql",
+      "sourceSha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0033_w5_content_reconciliation",
+      "canonicalVersion": "0036_w5_content_reconciliation",
+      "sourcePath": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "sourceSha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0034_w5_studio_drafts",
+      "canonicalVersion": "0037_w5_studio_drafts",
+      "sourcePath": "apps/backend/src/modules/studio/schema.sql",
+      "sourceSha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0035_w5_content_consent",
+      "canonicalVersion": "0038_w5_content_consent",
+      "sourcePath": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "sourceSha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0036_w5_content_thread_privacy",
+      "canonicalVersion": "0039_w5_content_thread_privacy",
+      "sourcePath": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "sourceSha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0037_w5_content_fan_effects",
+      "canonicalVersion": "0040_w5_content_fan_effects",
+      "sourcePath": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "sourceSha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "active",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    },
+    {
+      "producerVersion": "0038_w5_reply_review",
+      "canonicalVersion": "0045_w5_reply_review",
+      "sourcePath": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "sourceSha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+      "sourceBytesPersonallyCompared": true,
+      "canonicalState": "reserved_unapplied",
+      "reportedLedgerChecksumMatches": true,
+      "rootPersonallyOperatedPeerLedger": false
+    }
+  ],
+  "adoptionApplied": false,
+  "canonicalRegistryActiveEntriesAltered": false,
+  "oldSqlLedgerRowsOrChecksumsRewritten": false,
+  "finding": "All six source-local aliases are byte-identical to canonical active SQL. Already-applied local0038 reply-review matches reserved0045 exact35-line bytes; it is not older/different. Its alias cannot become an active0045 by metadata alone.",
+  "runnerReview": "Existing migrate-trust.ts rejects unregistered applied versions and out-of-order backfills. producerVersion only removes a source-written alias during fresh DDL application; it does not safely adopt already-applied alias schema.",
+  "requiredNext": [
+    "Use a preserved disposable clone/snapshot to verify complete35-row ledger and actual constraints/RLS/grants before any reconciliation",
+    "Custodied explicit exact-version/exact-hash mappings; preserve original alias/hash provenance in an append-only adoption receipt, never fill missing/null checksums",
+    "Resolve reserved0044/0045 activation and actual source/generation dependencies; applying earlier missing0032-34 and0041-43 while retaining installed localreplyreview needs coordinated rollout, not ordinary highest-version bypass",
+    "Fresh canonical and preserved-upgrade proof, immutable existing SQL/RLS/grants and actual non-owner behavior; never replay DDL for an already-applied identical alias",
+    "Do not run this proposal on the peer/current W8 database or mark W5 canonical/native acceptance passed"
+  ],
+  "limitations": [
+    "Published producer ledger observation is dependency evidence; W8 verifies published source bytes but has not accessed/modified W5 live database",
+    "No active alias implementation, schema/ledger mutation, new tests or provider/fee claim"
+  ]
+}

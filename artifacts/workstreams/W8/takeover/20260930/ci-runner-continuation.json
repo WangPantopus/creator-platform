@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T00:06:27.682057+00:00",
+  "source": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+  "verifiedProducerBaseline": "1e897375042df6001c559ae4f0e805b1aee51ca5",
+  "producerIosJob": "https://github.com/WangPantopus/creator-platform/actions/runs/36774068733/job/110087447438",
+  "officialImage": "https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md",
+  "change": "iOS runner selects macos-26/Xcode26.6, an available iOS26 iPhone, waits for boot completion, and runs the full existing app scheme serially.",
+  "preserved": [
+    "all five Foundation jobs",
+    "both push and pull_request triggers",
+    "every existing Swift/package/UI test",
+    "all reference images",
+    "all tolerances and assertion budgets",
+    "all source migrations and security policies"
+  ],
+  "limitations": [
+    "No fixture or capture corrections beyond the five human-authorized exceptions.",
+    "W2 passing snapshots used its separately authorized capture setup; that test source is not integrated into W8.",
+    "New W8 exact-head iOS execution remains required; local110 snapshot failures remain recorded.",
+    "This does not establish personally operated native flows."
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "source": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+  "observedAt": "2026-10-01T04:51:06.991814+00:00",
+  "responses": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "correlationId": "d5b32ae7-4ea3-42b4-962a-e384b1dfd079",
+      "response": {
+        "alive": true
+      }
+    },
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "correlationId": "7da349bf-e1e1-447c-a76c-8146a901ce1a",
+      "response": {
+        "ready": false,
+        "environment": "local-development",
+        "release": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+        "capabilities": [
+          {
+            "name": "database",
+            "required": true,
+            "state": "available",
+            "code": "non_owner_rls_verified",
+            "checkedAt": "2026-10-01T04:51:07.082Z"
+          },
+          {
+            "name": "identity",
+            "required": true,
+            "state": "development",
+            "code": "synthetic_local_accounts",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "model",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "payments",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "calls",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "voice",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "push",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_identity",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_conversation",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_agent",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_commerce",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_content",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_media",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_growth",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          },
+          {
+            "name": "privacy_trust",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:51:07.069Z"
+          }
+        ]
+      }
+    }
+  ]
+}

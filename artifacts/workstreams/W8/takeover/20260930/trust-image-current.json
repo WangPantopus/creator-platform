@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-01T00:50:19.419650+00:00",
+  "sourceCommit": "884c35bb3e8725ee9f573531aacfe07c05fde71f",
+  "tag": "creator-platform-w8:884c35b",
+  "digest": "sha256:1cf696d5d741365170b718353e7a0e13565f1dd1433c5a2e20a112330e956f37",
+  "baseDigest": "sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6",
+  "platform": "linux/amd64",
+  "node": "v24.21.0",
+  "configuredUser": "node",
+  "observedUid": 1000,
+  "productionPackages": 163,
+  "compilerPackages": [],
+  "backendSourceIncluded": false,
+  "rootEnvironmentFiles": [],
+  "newImageBuild": true,
+  "unconfiguredNetworkNoneStartup": {
+    "exit": 1,
+    "reason": "Choose a deployed environment."
+  },
+  "sbom": {
+    "path": "trust-installed.cdx.json",
+    "sha256": "3181d824f33926d05cd69ef67fb1ebb8b12389fb9aa137dfd7ec71a1f9170fae",
+    "components": 251,
+    "nodePackages": 163,
+    "osPackages": 88,
+    "schemaValidation": "Official CycloneDX1.5 structure and supported formats pass with existing Ajv6; iri-reference/idn-email unknown formats ignored, and sibling ref keywords reported ignored.",
+    "signed": false,
+    "externalVersionsAbsentFromWorkspaceLock": [],
+    "schemaSources": [
+      {
+        "url": "https://raw.githubusercontent.com/CycloneDX/specification/1.5/schema/spdx.schema.json",
+        "sha256": "4f6e2b05c05d26a4f2dc5879fbc2fca94b0a28db46289d0c51345621b71cfbfc"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/CycloneDX/specification/1.5/schema/bom-1.5.schema.json",
+        "sha256": "067f7824b08653839ea050ae9e09ca48375eadc2652b0e2a299476e7db90335b"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/CycloneDX/specification/1.5/schema/jsf-0.82.schema.json",
+        "sha256": "8bae002c25e723db7ee1f26afde680ae1a2b1a8f6b4b4b0fd65dc3becb090aae"
+      }
+    ],
+    "workspaceLockSha256": "e2e1a26f8056d3abf364f68d87a82f3dc85eeec8688daa38c0229d7bfab4c817",
+    "workspaceLockComparison": "Compared deployed packages with the application document, after the separate package-manager document in the multi-document lockfile."
+  },
+  "sourceChecks": [
+    "Docker backend typecheck and esbuild passed",
+    "Installed dependency graph resolves all required runtime/peer bindings",
+    "Scoped SBOM ESLint/Prettier passed"
+  ],
+  "limitations": [
+    "Trust-only local image; no canonical API/web staging or provider calls",
+    "Unsigned inventory excludes embedded Node/npm component graph, mounted integrations and remote services",
+    "No approved vulnerability/license disposition or deployment/signing authority",
+    "BuildKit unsigned local provenance is not a release signature"
+  ],
+  "runningReviewResourcesChanged": false,
+  "newSqlApplied": false
+}

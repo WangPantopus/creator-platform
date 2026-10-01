@@ -1,0 +1,321 @@
+{
+  "recordedAt": "2026-09-30T23:45:02.363956+00:00",
+  "sourceCheckpoint": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4",
+  "fixtureCommit": "439c33695dc4c9a45404bedbdd70b59ecf00c8e6",
+  "browser": "Supported Codex in-app browser, personally operated through cua_repl; native APIs disabled",
+  "origin": "http://localhost:3008",
+  "syntheticAccount": "canonical Development actor two, W8 local Ops supervisor for purpose review",
+  "creatorId": "20000000-0000-4000-8000-000000000001",
+  "messageId": "50000000-0000-4000-8000-000000000002",
+  "caseId": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+  "caseNumber": 4,
+  "caseState": "resolved",
+  "reportSteps": [
+    "Canonical W1 continuation from the exact thread",
+    "Actual per-AI-message Report link",
+    "Prefilled exact creator/message references without an AI grant",
+    "Send synthetic report; reload own history",
+    "Acquire 15-minute Ops purpose lease",
+    "Review only the reported AI message; confirm reasoned closure",
+    "Reporter signs in through canonical continuation; sees own resolved case and inbox",
+    "Sign out clears private form/history; exact Report return destination survives ordinary reauthentication"
+  ],
+  "viewports": {
+    "initialSupport": [
+      726,
+      1230
+    ],
+    "phone": [
+      390,
+      844
+    ],
+    "opsDesktop": [
+      1280,
+      900
+    ]
+  },
+  "appearance": "Light and explicit supported ?theme=night; appearance queries were not used as identity return targets",
+  "keyboard": {
+    "purposeGate": "MAIN#ops-main",
+    "audits": "MAIN#ops-main",
+    "metrics": "MAIN#ops-main"
+  },
+  "phoneCase": {
+    "horizontalOverflow": false,
+    "metadataColumnGapPx": 16
+  },
+  "reportHttp": [
+    {
+      "timestamp": "2026-09-30T23:19:35.274Z",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "durationMs": 56.86,
+      "correlationId": "d791e0a3-d14f-44b3-b441-8470bc7e8b0e",
+      "failureClass": null
+    }
+  ],
+  "beforePresence": [
+    {
+      "timestamp": "2026-09-30T23:19:07.808Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 503,
+      "durationMs": 2043.69,
+      "correlationId": "9259b901-542a-4522-b8d9-db19febb07a1",
+      "failureClass": "database_deadlock"
+    },
+    {
+      "timestamp": "2026-09-30T23:19:08.910Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 503,
+      "durationMs": 1040.91,
+      "correlationId": "2dbdd26a-fea2-4097-9af2-5c68771cf67f",
+      "failureClass": "database_deadlock"
+    },
+    {
+      "timestamp": "2026-09-30T23:19:08.931Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 1061.01,
+      "correlationId": "fb924320-cb88-480b-8362-fdb0af61bfbe",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:24:57.933Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 503,
+      "durationMs": 2067.46,
+      "correlationId": "910e4d8d-94ba-46c7-9c3c-0d379bd17d42",
+      "failureClass": "database_deadlock"
+    },
+    {
+      "timestamp": "2026-09-30T23:25:00.587Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 503,
+      "durationMs": 1057.49,
+      "correlationId": "0bdd48e0-04c5-426e-8a89-58324750412d",
+      "failureClass": "database_deadlock"
+    },
+    {
+      "timestamp": "2026-09-30T23:25:00.624Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 1089.85,
+      "correlationId": "170272b4-80e8-46aa-895a-2f4040e46793",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:25:19.575Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 52.44,
+      "correlationId": "7b9b9b16-0698-4860-a41d-b8fc26dae491",
+      "failureClass": null
+    }
+  ],
+  "afterPresence": [
+    {
+      "timestamp": "2026-09-30T23:42:17.693Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 96.7,
+      "correlationId": "43ad444f-1d45-4ac7-a25e-f6a887eef196",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:42:17.821Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 91.56,
+      "correlationId": "e9c4c20d-4173-42bc-af93-78048bd67ef3",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:42:17.826Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 89.81,
+      "correlationId": "f392e309-f643-451c-9bdc-f0888ef30ce5",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.127Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 95.57,
+      "correlationId": "d0198665-d4bb-47a8-ae6f-a953ed65e5e7",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.256Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 81.19,
+      "correlationId": "b6f323db-ccd3-4887-967f-acde200ca62b",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.260Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 88.12,
+      "correlationId": "386a374e-53d7-45df-94df-4d210b94ba1b",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.307Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 48.23,
+      "correlationId": "1e53c6bc-66a6-4105-b6a2-e368a16e883e",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.420Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 58.9,
+      "correlationId": "814b7524-c970-468f-baa5-431f62c4a9db",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:43:57.424Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 61.23,
+      "correlationId": "2aba94aa-0feb-4900-a812-4424790392bd",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:01.940Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 102.44,
+      "correlationId": "a31d9092-60ab-4c02-bd4a-7167b1a21060",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:02.040Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 114.67,
+      "correlationId": "a38394d7-e4f1-4177-aef4-2537f422e5c9",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:02.040Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 142.08,
+      "correlationId": "366b562f-3ef9-4eb5-bac1-b27c5624b7fe",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:02.083Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 131.78,
+      "correlationId": "f7387e46-3f7a-42bf-a07b-fdec7834598f",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:02.083Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 81.51,
+      "correlationId": "2b52cc07-24c2-45ef-af93-27e492e3eda1",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:02.086Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 83.3,
+      "correlationId": "e3db1b24-1ca3-49ab-a13a-46f40df53650",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:21.967Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 46.06,
+      "correlationId": "5e9bb024-ff09-4f5f-8888-46ba8323726f",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:22.036Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 45.93,
+      "correlationId": "ece9c6e0-9d38-4fa9-9e22-3354dbcbd689",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:41.968Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 46.97,
+      "correlationId": "be5ac4c4-ee5a-42f1-b0ae-4a77eebdfcab",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:44:42.036Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 46.11,
+      "correlationId": "a26982a3-48f1-46b4-957e-ef59e8dc72f9",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:45:01.963Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 44.46,
+      "correlationId": "bebcb8a2-527c-4db0-afdb-6ba1440ac669",
+      "failureClass": null
+    },
+    {
+      "timestamp": "2026-09-30T23:45:02.032Z",
+      "method": "POST",
+      "route": "/v1/conversations/:creatorId/:fanId/presence",
+      "status": 200,
+      "durationMs": 43.4,
+      "correlationId": "c90959e9-d9fd-4144-9c9c-a179c697a0bc",
+      "failureClass": null
+    }
+  ],
+  "limitations": [
+    "Synthetic local identities and static seeded history; no provider generation/payment/external notice",
+    "Two actual browser clients and reload/presence boundaries are a sample, not a capacity/SLO proof",
+    "Native interaction, complete screen/state/reference and accessibility matrix remain open",
+    "Growth encryption key from former temporary env is unavailable; no replacement key was applied to retained data",
+    "No paid OpenAI calls"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "observedAt": "2026-10-01T01:39:37.108083+00:00",
+  "sourceCommit": "3cda401692fab65fe1af36eb4a8c41ac81b01f8c",
+  "sourceSha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911",
+  "reservedId": "0058",
+  "state": "reserved_unapplied",
+  "publishedSourceVerifiedBy": "Remote codex/w3-conversations tip equals exact source commit",
+  "fullSqlPersonallyRead": true,
+  "activeRegistration": false,
+  "finding": "The published final proposal adds exact original/correction family/version constraints, consumed correction command and immutable terminal identity/sequence/epoch/citations/provenance. Its remaining approved_draft foundation-only fallback still replaces0044 current personal Approval lookup/checks. Published source custody is pinned; signing composition is not accepted.",
+  "mustPreserveFrom0044": [
+    "Exact Approval id and current draft/version/text",
+    "Current creator/key approval epochs and verified/no-recovery/unrevoked-key authority",
+    "Approval immutable command/content hash and exact creator signature",
+    "Initial message version and delivered-message reuse fence"
+  ],
+  "historicalReview": "correction-signing-custody.json",
+  "oldDraftsNotPinned": [
+    "62d05887ccbeb5f496f42d5854d14b5665fc88f9ee2409c703432bd7756d2c67",
+    "adb1a1042c7498ec833534a9f5b6e20bebe5ea7021b31667f3fa68b813114aeb"
+  ],
+  "sqlChangedOrApplied": false,
+  "requires": "Published composed W1/W3/W4 signing predicate followed by actual fresh/preserved-upgrade/non-owner behavior after earlier reserved entries are resolved"
+}

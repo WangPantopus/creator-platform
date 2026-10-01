@@ -1,0 +1,68 @@
+{
+  "observedAt": "2026-10-01T02:22:24.901Z",
+  "node": "v24.19.0",
+  "role": {
+    "role": "creator_trust_worker",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "server_version": "17.11 (Debian 17.11-1.pgdg12+2)"
+  },
+  "wal": {
+    "wal_records": "148989",
+    "wal_fpi": "1773",
+    "wal_bytes": "17569557",
+    "wal_buffers_full": "0",
+    "wal_write": "29126",
+    "wal_sync": "29120",
+    "wal_write_time": 0,
+    "wal_sync_time": 0,
+    "stats_reset": "2026-09-30T23:16:59.443Z"
+  },
+  "archive": {
+    "archived_count": "0",
+    "failed_count": "0",
+    "stats_reset": "2026-09-30T23:16:59.443Z"
+  },
+  "config": [
+    {
+      "name": "archive_mode",
+      "setting": "off"
+    },
+    {
+      "name": "archive_timeout",
+      "setting": "0"
+    },
+    {
+      "name": "track_wal_io_timing",
+      "setting": "off"
+    },
+    {
+      "name": "wal_level",
+      "setting": "replica"
+    }
+  ],
+  "scope": "Read-only aggregate dedicated local cluster observation; no replication, archive command, credential, message, actor or thread data.",
+  "mutations": false,
+  "reviewedDocs": [
+    "https://www.postgresql.org/docs/17/monitoring-stats.html"
+  ],
+  "currentSourceParent": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+  "implementationScope": "New W8-owned15-second non-overlapping aggregate observer; explicit available/error/reset/sample/archiving fields. Dedicated local host only. No current canonical production deployment configured.",
+  "timingDisposition": "track_wal_io_timing is off; zero write/sync times are not accepted timing samples and are not emitted by the observer.",
+  "recoveryDisposition": "archive_mode off, zero archived files. No archived restore/RPO/RTO proven.",
+  "acceptance": "Actual non-owner PostgreSQL17.11 readback is verified; current observer host restart/supervisor UI acceptance follows its clean commit.",
+  "newTestsWritten": false,
+  "sqlRolesRlsGrantsChanged": false,
+  "verification": {
+    "backendBuild": "pass",
+    "changedSourceLint": "pass",
+    "webTypecheck": "pass",
+    "newTestsWritten": false,
+    "existingTestsChanged": false
+  },
+  "sourceHashes": {
+    "apps/backend/src/operations/wal.ts": "45f120f918ef2b2ff4fa0d1e75f3437fe319fac3a81e624b67ccf1dd5ba287a1",
+    "apps/backend/src/operations/local-server.ts": "52a27612e144a4c036d452b5a54a99ba4abe86b9bb1cdd607a61405b85c3c0f0",
+    "apps/web/app/ops/metrics/page.tsx": "956f10f2396a2edca69c06062513bd4ea90eb95ca91599e621c08d9c81971f10"
+  }
+}

@@ -64,8 +64,9 @@ export class Database {
         "The conversation operation is unavailable.",
         400,
       );
-    // Mutations acquire their exclusive lock during authorization, before any
-    // domain/idempotency/allowance locks. Concurrent writers must not both take
+    // Reviewed reads opt into SHARE. Unannotated producer operations take
+    // UPDATE during authorization, before domain/idempotency/allowance locks.
+    // Concurrent writers must not both take
     // SHARE and deadlock when they subsequently upgrade to UPDATE.
     const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
