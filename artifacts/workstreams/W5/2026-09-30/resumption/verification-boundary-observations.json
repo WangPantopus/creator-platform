@@ -1,0 +1,69 @@
+{
+  "recordedAt": "2026-10-01T02:29:23.813194+00:00",
+  "sourceSha256": {
+    "apps/web/features/studio/Studio.tsx": "bd3f9303790e70f1c7b6801dcd77868c66b8c42d015338593c3b625336db6cd4",
+    "apps/web/app/you/page.tsx": "5fe05cbcb0905d8b4d826567389a332c9cdcea1cd89575f8e1d09ed491256e50",
+    "apps/backend/src/modules/conversation/service.ts": "9f76f3493e6dd40e16e5f9d12f09657562891619e5dc9714ef3c73a5a3f3dac8",
+    "apps/backend/src/modules/conversation/lineage-projection.ts": "0489f71baf06252393116f798440095776dd54d2ed0658b2b242c8d5c01c2706",
+    "apps/backend/src/modules/studio/service.ts": "36d8dbea90ebea8e1ab4fae2b80927e1f07f95bc57f2a205901f8fa4effad005"
+  },
+  "pendingCreator": {
+    "id": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+    "identity": "existing declared W5 development fan two; canonical creator-profile UI; stored profile pending",
+    "externalProofRequested": false,
+    "passkeyRequested": false,
+    "typedLocalText": "W5 pending verification check. These words stay local until genuine creator verification is available.",
+    "remoteControlsDisabled": [
+      "Save draft",
+      "Review and sign",
+      "Photo",
+      "Voice"
+    ],
+    "captures": [
+      "pending-composer-390-light.jpg",
+      "pending-composer-390-night.jpg",
+      "pending-composer-1280-light.jpg",
+      "pending-composer-1280-night.jpg"
+    ],
+    "actualDimensions": {
+      "phone": [
+        390,
+        390
+      ],
+      "desktop": [
+        1280,
+        1280
+      ],
+      "sidebar": 248
+    },
+    "themes": "actual application theme=light/night query; manually typed independent local input in each freshly navigated theme",
+    "viewportLimitation": "Changing the browser override did not resize the existing tab3. Preserved390px unchanged-viewport capture; newly created tab5 actually measured1280px.",
+    "laterSessionExpiry": "Actual session ended cleared private composer/input. No transport-restart input recovery is inferred from that later observation."
+  },
+  "accountAlias": {
+    "ownerLease": "W1 explicit no-query compatibility route; unsupported query intent must be preserved",
+    "noQuery": "Actual /you arrival redirected to protected /identity/account; real current development actor3/pending creator displayed",
+    "scopedArrival": "Actual creatorId/fanId query retained in /you URL; unavailable notice; explicit Open general account choice",
+    "captures": [
+      "account-alias-current.jpg",
+      "account-alias-scoped-unavailable.jpg"
+    ]
+  },
+  "lineage": {
+    "ownerSource": "37f727eb6ba3a72e4c0762d96fc5ea77c0a15f2c",
+    "exactTypeFileSha256": "0489f71baf06252393116f798440095776dd54d2ed0658b2b242c8d5c01c2706",
+    "consumer": "Optional same-pool prepared project(scope,actual held client,bounded current page IDs), only passed by audited Studio read. IDs/order/thread/full namespaced schema validated. Absent port preserves old foundation Message output.",
+    "mounted": false,
+    "gates": [
+      "actual canonical base metadata columns",
+      "W8 immutable aliases/fresh+upgrade custody",
+      "genuine prepared owner instance"
+    ]
+  },
+  "validation": {
+    "scope": "API/web types, backend/web production builds, changed lint/format pass; actual launched browser operations above",
+    "testsAdded": false,
+    "unitTestsRunThisContinuation": false,
+    "endToEndMergeGatePassed": false
+  }
+}

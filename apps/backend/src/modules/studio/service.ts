@@ -15,6 +15,7 @@ import type { AgentService } from "../agent/service.js";
 import { ContentPage } from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { identityTransaction } from "../identity/transaction.js";
+import type { ConversationLineageProjection } from "../conversation/lineage-projection.js";
 
 export class StudioService {
   constructor(
@@ -25,6 +26,7 @@ export class StudioService {
       access: AccessService;
       agent?: AgentService;
       profiles?: IdentityProfiles;
+      conversationLineageProjection?: ConversationLineageProjection;
     },
   ) {}
   private commerce() {
@@ -430,7 +432,10 @@ export class StudioService {
       "studio_role_required",
       "Open your fan conversation from the fan app.",
     );
-    const timeline = await this.owners.conversation.read(scope);
+    const timeline = await this.owners.conversation.read(
+      scope,
+      audit ? this.owners.conversationLineageProjection : undefined,
+    );
     return {
       timeline,
       authority: scope.authority,

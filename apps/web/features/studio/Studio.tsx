@@ -861,9 +861,10 @@ function Compose({
   post?: boolean;
 }) {
   const canDraft =
-    creator.owned ||
-    creator.roles.includes("drafter") ||
-    creator.roles.includes("publisher");
+    creator.verification === "verified" &&
+    (creator.owned ||
+      creator.roles.includes("drafter") ||
+      creator.roles.includes("publisher"));
   const [document, setDocument] = useState<ContentBody>(
       emptyBody(post ? "post" : "note"),
     ),
@@ -989,6 +990,10 @@ function Compose({
     setReview(null);
   };
   const save = async (documentOverride = document) => {
+    if (!canDraft)
+      throw new Error(
+        "A verified creator and a current drafting role are required to save this draft. Your local text is kept.",
+      );
     if (pendingPublication)
       throw new Error(
         "Check the pending publication before saving another revision.",
@@ -1020,6 +1025,13 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {creator.verification !== "verified" && (
+        <Notice title="Creator verification">
+          Current creator status: {creator.verification.replaceAll("_", " ")}.
+          You can write locally. Saving, attaching media and publishing require
+          a verified creator.
+        </Notice>
+      )}
       <div className="w5-gutter">
         <span className="qv-meta">TO</span>
         <div className="qv-seg w5-audience" role="group" aria-label="Audience">
@@ -1205,7 +1217,9 @@ function Compose({
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
-            disabled={!creator.owned || action.busy || !!pendingPublication}
+            disabled={
+              !canDraft || !creator.owned || action.busy || !!pendingPublication
+            }
             onClick={() =>
               void action.run(async () => {
                 const current = await save();
@@ -1219,6 +1233,7 @@ function Compose({
             className="qv-btn qv-btn--quiet"
             type="button"
             disabled={
+              !canDraft ||
               !creator.owned ||
               action.busy ||
               !!pendingPublication ||
@@ -1365,7 +1380,7 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
-      {review && (
+      {review && canDraft && (
         <Modal
           title={
             document.scheduledAt
@@ -1483,7 +1498,7 @@ function Compose({
           )}
         </Modal>
       )}
-      {voiceObjectId && (
+      {voiceObjectId && canDraft && (
         <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
           {(() => {
             const Recorder =
@@ -1531,7 +1546,7 @@ function Compose({
           })()}
         </Modal>
       )}
-      {photoObjectId && (
+      {photoObjectId && canDraft && (
         <Modal title="Photo" onClose={() => setPhotoObjectId(null)}>
           <PhotoAttachment
             creatorId={creator.id}

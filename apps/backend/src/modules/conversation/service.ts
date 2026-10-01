@@ -23,6 +23,8 @@ import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
+import type { ConversationLineageProjection } from "./lineage-projection.js";
+import { ConversationMessageSchema } from "../../../../../packages/api/src/conversation/contracts.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -122,7 +124,11 @@ export class ConversationService {
     );
     return message(result.rows[0]!);
   }
-  async read(scope: ThreadScope): Promise<ThreadTimeline> {
+  async read(
+    scope: ThreadScope,
+    projection?: ConversationLineageProjection,
+  ): Promise<ThreadTimeline> {
+    projection?.assertPool(this.db.pool);
     return this.db.withThread(scope, async (client) => {
       const thread = await this.lockThread(client, scope);
       const rows = await client.query<MessageRow>(
@@ -136,6 +142,29 @@ export class ConversationService {
         "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN ('queued','generating')",
         [scope.threadId, scope.creatorId, scope.fanId],
       );
+      // Only an actual prepared owner port reads richer metadata. The canonical
+      // foundation read keeps its existing shape when that port is absent.
+      const messages = projection
+        ? ConversationMessageSchema.array()
+            .max(100)
+            .parse(
+              await projection.project(
+                scope,
+                client,
+                rows.rows.map((row) => row.id),
+              ),
+            )
+        : rows.rows.map(message);
+      invariant(
+        messages.length === rows.rows.length &&
+          messages.every(
+            (item, index) =>
+              item.id === rows.rows[index]!.id &&
+              item.threadId === scope.threadId,
+          ),
+        "conversation_projection_changed",
+        "Refresh this conversation's current visible message page.",
+      );
       return {
         threadId: scope.threadId,
         creatorId: scope.creatorId,
@@ -146,7 +175,7 @@ export class ConversationService {
         generationSequences: Object.fromEntries(
           generations.rows.map((row) => [row.id, row.last_sequence]),
         ),
-        messages: rows.rows.map(message),
+        messages,
       };
     });
   }
