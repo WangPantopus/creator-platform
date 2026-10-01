@@ -3250,6 +3250,7 @@
       ],
       "get": {
         "operationId": "playAudienceCreatorMedia",
+        "description": "Serve the exact playbackFile variant, SHA-256 and byte count pinned by the current playback ticket. This file can differ from the immutable processed signing tuple.",
         "security": [
           {
             "PantopusSession": []
@@ -4313,6 +4314,7 @@
       ],
       "get": {
         "operationId": "playCreatorMedia",
+        "description": "Serve the exact playbackFile variant, SHA-256 and byte count pinned by the current playback ticket. This file can differ from the immutable processed signing tuple.",
         "security": [
           {
             "PantopusSession": []
@@ -4680,6 +4682,7 @@
       ],
       "get": {
         "operationId": "playFanCreatorMedia",
+        "description": "Serve the exact playbackFile variant, SHA-256 and byte count pinned by the current playback ticket. This file can differ from the immutable processed signing tuple.",
         "security": [
           {
             "PantopusSession": []
@@ -6426,12 +6429,40 @@
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "playbackFile": {
+            "type": "object",
+            "properties": {
+              "variant": {
+                "type": "string",
+                "enum": [
+                  "processed",
+                  "credentialed"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 268435456
+              }
+            },
+            "required": [
+              "variant",
+              "sha256",
+              "bytes"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
           "asset",
           "url",
-          "expiresAt"
+          "expiresAt",
+          "playbackFile"
         ],
         "additionalProperties": false,
         "$defs": {
@@ -7036,6 +7067,34 @@
           "revoked",
           "deleted"
         ]
+      },
+      "MediaPlaybackFile": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "variant": {
+            "type": "string",
+            "enum": [
+              "processed",
+              "credentialed"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 268435456
+          }
+        },
+        "required": [
+          "variant",
+          "sha256",
+          "bytes"
+        ],
+        "additionalProperties": false
       },
       "MediaProcessedMediaEvidence": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

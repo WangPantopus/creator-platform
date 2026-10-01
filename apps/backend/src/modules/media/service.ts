@@ -5,10 +5,12 @@ import {
   MediaSignSchema,
   UploadRequestSchema,
   ProcessedMediaEvidenceSchema,
+  PlaybackFileSchema,
   type MediaAsset,
   type MediaPolicy,
   type MediaPurpose,
   type ProcessedMediaEvidence,
+  type PlaybackFile,
 } from "../../../../../packages/api/src/media.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
@@ -125,8 +127,36 @@ function verifiedRecordingProvenance(row: AssetRow) {
       proof.processedMediaDurationMs === row.duration_ms &&
       proof.transform === "aac_m4a" &&
       typeof proof.fileSha256 === "string" &&
-      /^[a-f0-9]{64}$/u.test(proof.fileSha256),
+      /^[a-f0-9]{64}$/u.test(proof.fileSha256) &&
+      typeof proof.fileBytes === "number" &&
+      Number.isSafeInteger(proof.fileBytes) &&
+      proof.fileBytes > 0 &&
+      proof.fileVariant === "credentialed" &&
+      proof.fileBytes <= Number(row.max_bytes),
   );
+}
+function playbackFile(row: AssetRow): PlaybackFile {
+  if (row.provenance?.c2paVerified === true) {
+    invariant(
+      row.purpose === "ai_audio"
+        ? row.provenance.fileSha256 === row.output_sha256 &&
+            row.provenance.fileVariant === "credentialed" &&
+            row.provenance.fileBytes === Number(row.bytes)
+        : verifiedRecordingProvenance(row),
+      "media_provenance_pending",
+      "This media's exact content credentials are unavailable.",
+    );
+    return PlaybackFileSchema.parse({
+      variant: "credentialed",
+      sha256: row.provenance.fileSha256,
+      bytes: row.provenance.fileBytes,
+    });
+  }
+  return PlaybackFileSchema.parse({
+    variant: "processed",
+    sha256: row.output_sha256,
+    bytes: Number(row.bytes),
+  });
 }
 export class MediaService {
   readonly chunkBytes = 1024 * 1024;
@@ -666,25 +696,35 @@ export class MediaService {
     }
     return recording;
   }
+  private async playbackState(
+    scope: ThreadScope,
+    client: PoolClient,
+    id: string,
+  ) {
+    const row = await this.row(scope, client, id);
+    invariant(
+      row.state === "ready",
+      "media_processing",
+      "This media is still processing.",
+    );
+    if (
+      row.owner_account_id !== scope.actorAccountId &&
+      ["human_note", "human_reply"].includes(row.purpose)
+    )
+      invariant(
+        verifiedRecordingProvenance(row),
+        "media_provenance_pending",
+        "This recording is awaiting its signature and content credentials.",
+      );
+    return { asset: assetView(row), playbackFile: playbackFile(row) };
+  }
   async playback(scope: ThreadScope, id: string) {
     return this.db.withThread(scope, async (client) => {
-      const row = await this.row(scope, client, id);
-      invariant(
-        row.state === "ready",
-        "media_processing",
-        "This media is still processing.",
-      );
-      if (
-        row.owner_account_id !== scope.actorAccountId &&
-        ["human_note", "human_reply"].includes(row.purpose)
-      )
-        invariant(
-          verifiedRecordingProvenance(row),
-          "media_provenance_pending",
-          "This recording is awaiting its signature and content credentials.",
-        );
+      const current = await this.playbackState(scope, client, id);
+      const actual = await this.storage.openPlayback(id, current.playbackFile);
+      await actual.handle.close();
       return {
-        asset: assetView(row),
+        ...current,
         ...this.tickets.issue(
           {
             assetId: id,
@@ -692,7 +732,8 @@ export class MediaService {
             fanId: scope.fanId,
             accountId: scope.actorAccountId,
             operation: "play",
-            version: row.version,
+            version: current.asset.version,
+            playbackFile: current.playbackFile,
           },
           60,
         ),
@@ -701,26 +742,40 @@ export class MediaService {
   }
   async download(scope: ThreadScope, id: string, token: string) {
     const ticket = this.tickets.verify(token, scope.actorAccountId, id, "play");
-    const current = await this.playback(scope, id);
-    invariant(
-      current.asset.version === ticket.version,
-      "media_version_changed",
-      "Request a new media link.",
-    );
+    const current = await this.db.withThread(scope, async (client) => {
+      const current = await this.playbackState(scope, client, id);
+      invariant(
+        current.asset.version === ticket.version &&
+          ticket.creatorId === scope.creatorId &&
+          ticket.fanId === scope.fanId &&
+          contentHash(current.playbackFile) ===
+            contentHash(ticket.playbackFile),
+        "media_version_changed",
+        "Request a new media link.",
+      );
+      return current;
+    });
     return {
-      asset: current.asset,
-      file: this.storage.file(id, "output"),
-      size: await this.storage.size(id),
+      ...current,
+      ...(await this.storage.openPlayback(id, current.playbackFile)),
     };
   }
   /** An already-open response must also stop when current access or the asset version changes. */
-  async assertPlaybackCurrent(scope: ThreadScope, id: string, version: number) {
-    const current = await this.playback(scope, id);
-    invariant(
-      current.asset.version === version,
-      "media_version_changed",
-      "This media is no longer available.",
-    );
+  async assertPlaybackCurrent(
+    scope: ThreadScope,
+    id: string,
+    version: number,
+    expected: PlaybackFile,
+  ) {
+    await this.db.withThread(scope, async (client) => {
+      const current = await this.playbackState(scope, client, id);
+      invariant(
+        current.asset.version === version &&
+          contentHash(current.playbackFile) === contentHash(expected),
+        "media_version_changed",
+        "This media is no longer available.",
+      );
+    });
   }
   async revoke(scope: ThreadScope, id: string) {
     await this.db.withThread(scope, async (client) => {

@@ -171,6 +171,8 @@ export class MediaWorker {
         const provenance = JSON.stringify({
           ...manifest,
           fileSha256: MediaService.digest(signed.bytes),
+          fileBytes: signed.bytes.length,
+          fileVariant: "credentialed",
         });
         await update(
           "UPDATE creator.media_asset SET provenance=$4,manifest_pending=false,job_lease_until=NULL,failure_code=NULL WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND state='ready'",

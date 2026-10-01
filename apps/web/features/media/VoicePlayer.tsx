@@ -8,6 +8,7 @@ import type {
   CreatorMediaAsset,
   CreatorMediaPlaybackTicket,
 } from "../../../../packages/api/src/media";
+import { PlaybackFileSchema } from "../../../../packages/api/src/media";
 import { mediaRequest } from "./api";
 import "./media.css";
 
@@ -204,6 +205,7 @@ function Player({
           : {}),
       });
       const url = new URL(ticket.url);
+      const proof = PlaybackFileSchema.parse(ticket.playbackFile);
       // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.
       const path = `${family}/${asset.id}/play`;
       if (
@@ -211,6 +213,19 @@ function Player({
         ticket.asset.id !== asset.id ||
         ticket.asset.version !== asset.version ||
         ticket.asset.sha256 !== asset.sha256 ||
+        ticket.asset.bytes !== asset.bytes ||
+        ticket.asset.mimeType !== asset.mimeType ||
+        ticket.asset.durationMs !== asset.durationMs ||
+        !Number.isFinite(Date.parse(ticket.expiresAt)) ||
+        Date.parse(ticket.expiresAt) <= Date.now() ||
+        (proof.variant === "processed"
+          ? proof.sha256 !== ticket.asset.sha256 ||
+            proof.bytes !== ticket.asset.bytes ||
+            ticket.asset.provenance?.c2paVerified === true
+          : ticket.asset.provenance?.c2paVerified !== true ||
+            ticket.asset.provenance.fileVariant !== "credentialed" ||
+            ticket.asset.provenance.fileSha256 !== proof.sha256 ||
+            ticket.asset.provenance.fileBytes !== proof.bytes) ||
         !url.searchParams.has("ticket") ||
         [...url.searchParams.keys()].some((name) => name !== "ticket")
       )

@@ -31,6 +31,8 @@ const binary = {
 };
 const playback = (operationId: string) => ({
   operationId,
+  description:
+    "Serve the exact playbackFile variant, SHA-256 and byte count pinned by the current playback ticket. This file can differ from the immutable processed signing tuple.",
   security: [{ PantopusSession: [] }],
   parameters: [
     {

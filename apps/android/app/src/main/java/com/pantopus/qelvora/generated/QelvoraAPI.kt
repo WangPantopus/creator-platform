@@ -460,7 +460,8 @@ enum class APIMediaCreatorMediaAssetState {
 data class APIMediaCreatorMediaPlaybackTicket(
   val `asset`: APIMediaCreatorMediaPlaybackTicketAsset,
   val `url`: String,
-  val `expiresAt`: String
+  val `expiresAt`: String,
+  val `playbackFile`: APIMediaCreatorMediaPlaybackTicketPlaybackFile
 )
 
 @Serializable
@@ -502,6 +503,19 @@ enum class APIMediaCreatorMediaPlaybackTicketAssetState {
   @SerialName("rejected") REJECTED,
   @SerialName("revoked") REVOKED,
   @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaCreatorMediaPlaybackTicketPlaybackFile(
+  val `variant`: APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant,
+  val `sha256`: String,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant {
+  @SerialName("processed") PROCESSED,
+  @SerialName("credentialed") CREDENTIALED
 }
 
 @Serializable
@@ -696,6 +710,19 @@ enum class APIMediaMediaState {
   @SerialName("rejected") REJECTED,
   @SerialName("revoked") REVOKED,
   @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaPlaybackFile(
+  val `variant`: APIMediaPlaybackFileVariant,
+  val `sha256`: String,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIMediaPlaybackFileVariant {
+  @SerialName("processed") PROCESSED,
+  @SerialName("credentialed") CREDENTIALED
 }
 
 @Serializable

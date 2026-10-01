@@ -3,7 +3,7 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
-import { createReadStream } from "node:fs";
+import type { FileHandle } from "node:fs/promises";
 import { pipeline } from "node:stream/promises";
 import { z, ZodError } from "zod";
 import { DomainError } from "../../core/errors.js";
@@ -205,6 +205,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         result.asset.version,
         result.accessEpoch,
         result.publication,
+        result.playbackFile,
       ),
     );
   });
@@ -231,6 +232,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         result.asset.version,
         result.accessEpoch,
         result.publication,
+        result.playbackFile,
       ),
     );
   });
@@ -256,6 +258,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         result.asset.version,
         result.accessEpoch,
         result.publication,
+        result.playbackFile,
       ),
     );
   });
@@ -345,6 +348,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         currentScope,
         assetId,
         result.asset.version,
+        result.playbackFile,
       ),
     );
   });
@@ -456,59 +460,68 @@ function assertExpectedAccount(req: Request, accountId: string) {
 async function streamMedia(
   req: Request,
   res: Response,
-  result: { file: string; size: number; asset: { mimeType: string } },
+  result: { handle: FileHandle; size: number; asset: { mimeType: string } },
   assertCurrent: () => Promise<void>,
 ) {
-  const range = req.headers.range;
-  let start = 0;
-  let end = result.size - 1;
-  if (range) {
-    const match = /^bytes=(\d*)-(\d*)$/u.exec(range);
-    if (!match || (!match[1] && !match[2])) {
-      res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
-      res.end();
-      return;
-    }
-    if (!match[1]) start = Math.max(0, result.size - Number(match[2]));
-    else {
-      start = Number(match[1]);
-      if (match[2]) end = Math.min(end, Number(match[2]));
-    }
-    if (
-      !Number.isSafeInteger(start) ||
-      !Number.isSafeInteger(end) ||
-      start > end ||
-      start >= result.size
-    ) {
-      res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
-      res.end();
-      return;
-    }
-    res
-      .status(206)
-      .setHeader("Content-Range", `bytes ${start}-${end}/${result.size}`);
-  }
-  res.setHeader("Accept-Ranges", "bytes");
-  res.setHeader("Content-Type", result.asset.mimeType);
-  res.setHeader("Content-Length", end - start + 1);
-  const controller = new AbortController();
-  let checking = false;
-  // A slow or backpressured response can outlive its initial range authorization.
-  // Fail closed on unavailable authority; bound the serialized checks and release them with the stream.
-  const recheck = setInterval(() => {
-    if (checking || controller.signal.aborted) return;
-    checking = true;
-    const pending = assertCurrent().finally(() => {
-      checking = false;
-    });
-    void withDeadline(pending, 1000).catch(() => controller.abort());
-  }, 1000);
   try {
-    await pipeline(createReadStream(result.file, { start, end }), res, {
-      signal: controller.signal,
-    });
+    await assertCurrent();
+    const range = req.headers.range;
+    let start = 0;
+    let end = result.size - 1;
+    if (range) {
+      const match = /^bytes=(\d*)-(\d*)$/u.exec(range);
+      if (!match || (!match[1] && !match[2])) {
+        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+        res.end();
+        return;
+      }
+      if (!match[1]) start = Math.max(0, result.size - Number(match[2]));
+      else {
+        start = Number(match[1]);
+        if (match[2]) end = Math.min(end, Number(match[2]));
+      }
+      if (
+        !Number.isSafeInteger(start) ||
+        !Number.isSafeInteger(end) ||
+        start > end ||
+        start >= result.size
+      ) {
+        res.status(416).setHeader("Content-Range", `bytes */${result.size}`);
+        res.end();
+        return;
+      }
+      res
+        .status(206)
+        .setHeader("Content-Range", `bytes ${start}-${end}/${result.size}`);
+    }
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Content-Type", result.asset.mimeType);
+    res.setHeader("Content-Length", end - start + 1);
+    const controller = new AbortController();
+    let checking = false;
+    // A slow or backpressured response can outlive its initial range authorization.
+    // Fail closed on unavailable authority; bound the serialized checks and release them with the stream.
+    const recheck = setInterval(() => {
+      if (checking || controller.signal.aborted) return;
+      checking = true;
+      const pending = assertCurrent().finally(() => {
+        checking = false;
+      });
+      void withDeadline(pending, 1000).catch(() => controller.abort());
+    }, 1000);
+    try {
+      await pipeline(
+        result.handle.createReadStream({ start, end, autoClose: false }),
+        res,
+        {
+          signal: controller.signal,
+        },
+      );
+    } finally {
+      clearInterval(recheck);
+      controller.abort();
+    }
   } finally {
-    clearInterval(recheck);
-    controller.abort();
+    await result.handle.close();
   }
 }

@@ -617,10 +617,12 @@ public struct APIMediaCreatorMediaPlaybackTicket: Codable, Sendable {
   public let `asset`: APIMediaCreatorMediaPlaybackTicketAsset
   public let `url`: String
   public let `expiresAt`: String
-  public init(asset: APIMediaCreatorMediaPlaybackTicketAsset, url: String, expiresAt: String) {
+  public let `playbackFile`: APIMediaCreatorMediaPlaybackTicketPlaybackFile
+  public init(asset: APIMediaCreatorMediaPlaybackTicketAsset, url: String, expiresAt: String, playbackFile: APIMediaCreatorMediaPlaybackTicketPlaybackFile) {
     self.asset = asset
     self.url = url
     self.expiresAt = expiresAt
+    self.playbackFile = playbackFile
   }
 }
 
@@ -679,6 +681,22 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetState: String, Codable, Senda
   case `rejected` = "rejected"
   case `revoked` = "revoked"
   case `deleted` = "deleted"
+}
+
+public struct APIMediaCreatorMediaPlaybackTicketPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
 }
 
 public struct APIMediaCreatorMediaPolicyView: Codable, Sendable {
@@ -921,6 +939,22 @@ public enum APIMediaMediaState: String, Codable, Sendable {
   case `rejected` = "rejected"
   case `revoked` = "revoked"
   case `deleted` = "deleted"
+}
+
+public struct APIMediaPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
 }
 
 public struct APIMediaProcessedMediaEvidence: Codable, Sendable {

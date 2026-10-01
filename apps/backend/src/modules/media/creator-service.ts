@@ -6,10 +6,12 @@ import {
   CreatorMediaUploadRequestSchema,
   CreatorMediaPolicyViewSchema,
   ProcessedMediaEvidenceSchema,
+  PlaybackFileSchema,
   type CreatorMediaAsset,
   type CreatorMediaPurpose,
   type MediaPolicy,
   type ProcessedMediaEvidence,
+  type PlaybackFile,
 } from "../../../../../packages/api/src/media.js";
 import type {
   CreatorIdentityAuthority,
@@ -128,8 +130,32 @@ function verifiedProvenance(row: CreatorAssetRow) {
       provenance.processedMediaMimeType === row.mime_type &&
       provenance.processedMediaDurationMs === row.duration_ms &&
       typeof provenance.fileSha256 === "string" &&
-      /^[a-f0-9]{64}$/u.test(provenance.fileSha256),
+      /^[a-f0-9]{64}$/u.test(provenance.fileSha256) &&
+      typeof provenance.fileBytes === "number" &&
+      Number.isSafeInteger(provenance.fileBytes) &&
+      provenance.fileBytes > 0 &&
+      provenance.fileVariant === "credentialed" &&
+      provenance.fileBytes <= Number(row.max_bytes),
   );
+}
+function playbackFile(row: CreatorAssetRow): PlaybackFile {
+  if (row.provenance?.c2paVerified === true) {
+    invariant(
+      verifiedProvenance(row),
+      "media_provenance_pending",
+      "This media's exact content credentials are unavailable.",
+    );
+    return PlaybackFileSchema.parse({
+      variant: "credentialed",
+      sha256: row.provenance.fileSha256,
+      bytes: row.provenance.fileBytes,
+    });
+  }
+  return PlaybackFileSchema.parse({
+    variant: "processed",
+    sha256: row.output_sha256,
+    bytes: Number(row.bytes),
+  });
 }
 export class CreatorMediaService {
   readonly chunkBytes = 1024 * 1024;
@@ -682,8 +708,12 @@ export class CreatorMediaService {
           "This media is awaiting its signature and content credentials.",
         );
       const publication = await this.playbackPublication(scope, client, row);
+      const fileProof = playbackFile(row);
+      const actual = await this.storage.openPlayback(id, fileProof);
+      await actual.handle.close();
       return {
         asset: creatorAssetView(row),
+        playbackFile: fileProof,
         ...this.tickets.issue(
           {
             assetId: id,
@@ -696,6 +726,7 @@ export class CreatorMediaService {
             version: row.version,
             accessEpoch: row.access_epoch,
             ...(publication ? { publication } : {}),
+            playbackFile: fileProof,
           },
           60,
         ),
@@ -753,7 +784,7 @@ export class CreatorMediaService {
       id,
       "play",
     );
-    return this.transaction(scope, async (client) => {
+    const current = await this.transaction(scope, async (client) => {
       const row = await this.row(scope, client, id);
       invariant(
         row.state === "ready" &&
@@ -774,14 +805,23 @@ export class CreatorMediaService {
         "media_publication_changed",
         "Request a new media link for the current publication.",
       );
+      const fileProof = playbackFile(row);
+      invariant(
+        contentHash(fileProof) === contentHash(ticket.playbackFile),
+        "media_file_changed",
+        "Request a new media link for the current file.",
+      );
       return {
         asset: creatorAssetView(row),
         accessEpoch: row.access_epoch,
         publication,
-        file: this.storage.file(id, "output"),
-        size: await this.storage.size(id),
+        playbackFile: fileProof,
       };
     });
+    return {
+      ...current,
+      ...(await this.storage.openPlayback(id, current.playbackFile)),
+    };
   }
   async assertPlaybackCurrent(
     scope: CreatorMediaReadScope,
@@ -789,6 +829,7 @@ export class CreatorMediaService {
     version: number,
     accessEpoch: number,
     publication: CreatorMediaPublicationBinding | null = null,
+    expected?: PlaybackFile,
   ) {
     await this.transaction(scope, async (client) => {
       const row = await this.row(scope, client, id);
@@ -805,6 +846,11 @@ export class CreatorMediaService {
           contentHash(publication),
         "media_publication_changed",
         "This media is no longer in the same published revision.",
+      );
+      invariant(
+        expected && contentHash(playbackFile(row)) === contentHash(expected),
+        "media_file_changed",
+        "This media is no longer the same file.",
       );
     });
   }
