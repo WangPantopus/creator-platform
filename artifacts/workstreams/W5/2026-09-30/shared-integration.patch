@@ -1,0 +1,87 @@
+--- a/apps/ios/App/QelvoraApp.swift
++++ b/apps/ios/App/QelvoraApp.swift
+@@ -22,7 +22,7 @@
+         }
+     }
+     private var features: [FanFeatureRegistration] {
+-        [CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), FanFeatureRegistration(matches: { GrowthFanFeature.matches($0) && !$0.components(separatedBy: "?")[0].hasSuffix("/chat") }, allowsSignedOut: { destination in destination == "/discover" || destination.hasPrefix("/invite/") || destination.hasPrefix("/share/") || (destination.hasPrefix("/creators/") && !destination.contains("/chat")) }, screen: { session in AnyView(GrowthFanFeature(baseURL: apiURL, destination: session.destination, onSignIn: { session.open($0); Task { await session.beginSignIn() } })) })] + W6FanFeatures.registrations
++        [ContentFanFeature.registration(baseURL: apiURL), CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), FanFeatureRegistration(matches: { GrowthFanFeature.matches($0) && !$0.components(separatedBy: "?")[0].hasSuffix("/chat") }, allowsSignedOut: { destination in destination == "/discover" || destination.hasPrefix("/invite/") || destination.hasPrefix("/share/") || (destination.hasPrefix("/creators/") && !destination.contains("/chat")) }, screen: { session in AnyView(GrowthFanFeature(baseURL: apiURL, destination: session.destination, onSignIn: { session.open($0); Task { await session.beginSignIn() } })) })] + W6FanFeatures.registrations
+     }
+     private var apiURL: URL? {
+         #if DEBUG
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt
+@@ -2,6 +2,7 @@
+
+ import android.content.Context
+ import androidx.compose.runtime.rememberCoroutineScope
++import com.pantopus.qelvora.content.ContentFanFeature
+ import com.pantopus.qelvora.commerce.CommerceFanFeature
+ import com.pantopus.qelvora.media.W6FanFeatures
+ import com.pantopus.qelvora.ui.GrowthFanFeature
+@@ -10,6 +11,7 @@
+
+ /** Authority remains in the owning API. Order gives Access to Commerce. */
+ fun fanFeatures(context: Context, baseURL: String?): List<FanFeatureRegistration> = listOf(
++    ContentFanFeature.registration(context, baseURL),
+     CommerceFanFeature.registration(context, baseURL),
+     trustFanRegistration(context, baseURL),
+     W6FanFeatures.callRegistration(baseURL),
+--- a/infra/migrations.json
++++ b/infra/migrations.json
+@@ -146,6 +146,36 @@
+       "version": "0031_w4_purchase_history",
+       "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
+       "owner": "W4"
++    },
++    {
++      "version": "0032_w5_content",
++      "path": "apps/backend/src/modules/content/schema.sql",
++      "owner": "W5"
++    },
++    {
++      "version": "0033_w5_content_reconciliation",
++      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
++      "owner": "W5"
++    },
++    {
++      "version": "0034_w5_studio_drafts",
++      "path": "apps/backend/src/modules/studio/schema.sql",
++      "owner": "W5"
++    },
++    {
++      "version": "0035_w5_content_consent",
++      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
++      "owner": "W5"
++    },
++    {
++      "version": "0036_w5_content_thread_privacy",
++      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
++      "owner": "W5"
++    },
++    {
++      "version": "0037_w5_content_fan_effects",
++      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
++      "owner": "W5"
+     }
+   ],
+   "reserved": [
+--- a/config/navigation.json
++++ b/config/navigation.json
+@@ -1,12 +1,14 @@
+ {
+-  "pathPattern": "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:setup|notes|requests|threads|ai|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|requests|threads|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$",
++  "pathPattern": "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$",
+   "contextParameter": "context",
+   "queryParameters": {
+     "context": "^/creators/",
+     "creatorId": "^(?:/commerce/|/support$)",
+     "packetId": "^/commerce/",
+     "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$",
+-    "messageId": "^/support$"
++    "messageId": "^/support$",
++    "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$",
++    "packet": "^/studio/[a-f0-9-]{36}/publish$"
+   },
+   "literalQueryValues": {
+     "offer": "1"

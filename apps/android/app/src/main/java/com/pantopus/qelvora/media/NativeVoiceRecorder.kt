@@ -24,6 +24,7 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
     val snapshot: StateFlow<RecordingSnapshot> = mutable
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
+    private var closed = false
     private var accumulated = 0L
     private var activeAt = 0L
     private val handler = Handler(Looper.getMainLooper())
@@ -42,6 +43,7 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
     init { require(maxDurationMs > 0); manager.registerAudioDeviceCallback(routeCallback, handler) }
     @Suppress("DEPRECATION")
     fun start() {
+        if (closed) return
         discard()
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) { deny(); return }
         val file = File(context.cacheDir, "voice-${UUID.randomUUID()}.m4a")
@@ -52,8 +54,8 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
             value.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             value.setAudioSamplingRate(48000); value.setAudioEncodingBitRate(96000); value.setAudioChannels(1)
             value.setMaxDuration(maxDurationMs.toInt()); value.setOutputFile(file.absolutePath)
-            value.setOnInfoListener { _, what, _ -> if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) stop() }
-            value.setOnErrorListener { _, _, _ -> pause("Recording was interrupted. Preview it or record again.") }
+            value.setOnInfoListener { source, what, _ -> if (source === recorder && what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) stop() }
+            value.setOnErrorListener { source, _, _ -> if (source === recorder) pause("Recording was interrupted. Preview it or record again.") }
             recorder = value; value.prepare(); value.start(); activeAt = android.os.SystemClock.elapsedRealtime()
             mutable.value = RecordingSnapshot("recording", file = file); handler.post(tick)
         } catch (_: Exception) { recorder?.release(); recorder = null; file.delete(); mutable.value = RecordingSnapshot("failed", reason = "The microphone is unavailable. Try again.") }
@@ -91,5 +93,5 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
         recorder?.release(); recorder = null; player?.release(); player = null; mutable.value.file?.delete(); accumulated = 0
         mutable.value = RecordingSnapshot()
     }
-    fun close() { discard(); manager.unregisterAudioDeviceCallback(routeCallback) }
+    fun close() { closed = true; discard(); manager.unregisterAudioDeviceCallback(routeCallback) }
 }

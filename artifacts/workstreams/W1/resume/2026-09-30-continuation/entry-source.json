@@ -1,0 +1,439 @@
+{
+  "recordedAt": "2026-10-01T02:24:43.565643+00:00",
+  "sourceParent": "f2426e582e7eaa27f7325db428bc4dc8686a2c27",
+  "publishedProducer": {
+    "W3": "16162c4f778c2c0dd6e49ab658acadbda05c1bee"
+  },
+  "sourceSha256": {
+    "apps/backend/src/modules/conversation/feature.ts": "e964af6809f3e65c3783e55f417d46234f740b97a9b898b532391cc88ae262bd",
+    "apps/backend/src/modules/conversation/service.ts": "f443abbd39ac9beb01aedfd9fb9ddc2f4da6a5c444fbe8c1adbb0604b17ab38f",
+    "apps/web/app/chat/[handle]/page.tsx": "f2211bc8703632a50c107e8e80dcbc2fe9073ee2e61f83b06f60cca69f18e299",
+    "apps/web/app/creators/[handle]/chat/page.tsx": "cfbdd2b701ea1665cc7c33ba90a2f98953210ac71a4cd43ed163e84f1840d53b",
+    "apps/web/features/conversation/ConsentScreen.tsx": "fa5d9b306ffc8b35035bbfe685a05476de95e5ab30b4e13ec720406662d28128",
+    "packages/api/src/client.ts": "0b65bc631480579456dc7704aebf5a87b1ee33df69e3beae089ec5ce5adc2d33",
+    "packages/api/src/openapi.ts": "8ee00d843ab94605abdaba41d5a616d6f4c58cb9ca3f832166f063b8633ec21c",
+    "packages/api/src/conversation/contracts.ts": "039f15d986314a9a7ee21d2cb16420e555c102321875dc549252e1ca10fe6109",
+    "apps/web/features/studio/Studio.tsx": "cf979a70cd03ab938b9c2bf809d1ed202c8e495906bef1c542584531d8cd1329",
+    "packages/api/generated/openapi.json": "fefed6456c720c918041758045745f0aad9f8dd5d81a9356131b6d61ce88ed9e",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "c693fc1732b14615fbe82a2d58082fb333585a42ebe3724324f286a1487c8ce2",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "ce14878459ca09701dcb62d7ee2fd334106c0567610b03354ee52c9b0a612748"
+  },
+  "canonicalApi": {
+    "operations": 48,
+    "operationDiff": {
+      "parent": "f2426e582e7eaa27f7325db428bc4dc8686a2c27",
+      "unchangedOperationIds": [
+        "health",
+        "identityCapabilities",
+        "continueWithPantopus",
+        "completeIdentity",
+        "identitySession",
+        "refreshSession",
+        "logout",
+        "revokeSessions",
+        "saveFanProfile",
+        "saveCreatorProfile",
+        "creatorProof",
+        "beginCreatorProof",
+        "submitCreatorProof",
+        "passkeys",
+        "beginPasskey",
+        "registerPasskey",
+        "recoverPasskeys",
+        "revokePasskey",
+        "cancelPasskey",
+        "inviteTeamMember",
+        "acceptTeamInvitation",
+        "removeTeamMember",
+        "cancelSignedAct",
+        "publicSignature",
+        "beginSignedAct",
+        "verifySignedAct",
+        "sendMessage",
+        "takeover",
+        "handback",
+        "sendHumanReply",
+        "readCreatorMediaPolicy",
+        "readAudienceCreatorMedia",
+        "audienceCreatorMediaPlayback",
+        "playAudienceCreatorMedia",
+        "readCreatorCallAvailability",
+        "saveCreatorCallAvailability",
+        "beginCreatorMedia",
+        "readCreatorMedia",
+        "revokeCreatorMedia",
+        "resumeCreatorMedia",
+        "uploadCreatorMediaChunk",
+        "finishCreatorMedia",
+        "creatorMediaPlayback",
+        "playCreatorMedia",
+        "readFanCreatorMedia",
+        "fanCreatorMediaPlayback",
+        "playFanCreatorMedia"
+      ],
+      "changedOperationIds": [
+        "readThread"
+      ],
+      "newPaths": []
+    },
+    "generatedByExistingToolOnly": true
+  },
+  "renameCanonicalInputs": [
+    {
+      "canonical": "apps/backend/src/modules/conversation/feature.ts",
+      "sourceSha256": "e964af6809f3e65c3783e55f417d46234f740b97a9b898b532391cc88ae262bd"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/service.ts",
+      "sourceSha256": "f443abbd39ac9beb01aedfd9fb9ddc2f4da6a5c444fbe8c1adbb0604b17ab38f"
+    },
+    {
+      "canonical": "apps/web/app/chat/[handle]/page.tsx",
+      "sourceSha256": "f2211bc8703632a50c107e8e80dcbc2fe9073ee2e61f83b06f60cca69f18e299"
+    },
+    {
+      "canonical": "apps/web/app/creators/[handle]/chat/page.tsx",
+      "sourceSha256": "cfbdd2b701ea1665cc7c33ba90a2f98953210ac71a4cd43ed163e84f1840d53b"
+    },
+    {
+      "canonical": "apps/web/features/conversation/ConsentScreen.tsx",
+      "sourceSha256": "fa5d9b306ffc8b35035bbfe685a05476de95e5ab30b4e13ec720406662d28128"
+    },
+    {
+      "canonical": "packages/api/src/client.ts",
+      "sourceSha256": "0b65bc631480579456dc7704aebf5a87b1ee33df69e3beae089ec5ce5adc2d33"
+    },
+    {
+      "canonical": "packages/api/src/openapi.ts",
+      "sourceSha256": "8ee00d843ab94605abdaba41d5a616d6f4c58cb9ca3f832166f063b8633ec21c"
+    },
+    {
+      "canonical": "packages/api/src/conversation/contracts.ts",
+      "sourceSha256": "039f15d986314a9a7ee21d2cb16420e555c102321875dc549252e1ca10fe6109"
+    },
+    {
+      "canonical": "apps/web/features/studio/Studio.tsx",
+      "sourceSha256": "cf979a70cd03ab938b9c2bf809d1ed202c8e495906bef1c542584531d8cd1329"
+    }
+  ],
+  "identityRestorationDependencies": {
+    "checkpoint": "f2426e582e7eaa27f7325db428bc4dc8686a2c27",
+    "purpose": "Review complete cookie/server restore/bridge/client boundary and actual backend session authority together; do not transplant isolated session.ts",
+    "files": {
+      "apps/web/lib/session.ts": "04fdcaa34a92e8b2d0c979ef8f46b987c8825632db51d723b6cc7b74454e5937",
+      "apps/web/lib/request-origin.ts": "77b8e76204a9abd7e796bc0520ad68c5643d076525f4aad4c0413119b36f4c84",
+      "apps/web/app/api/platform/[...path]/route.ts": "1e7fca62b0bac336418123624732a52dd98cf0f21426a7ec26cb5ef8f1b103cd",
+      "apps/web/app/api/auth/restore/route.ts": "1cfcd7a7828122dd3e116736e1496c7bb07ee81760f77dd0018883cadac95f14",
+      "apps/web/app/api/auth/continue/route.ts": "ed192e096333cddcc3d6d8a573fb8eda6f33f377d0e2258022341ce788857bb0",
+      "apps/web/app/api/auth/complete/route.ts": "fb25758a38de04c5db640537b90f317476bdd5d6017f21b71e4ed311bb98d28a",
+      "apps/web/app/auth/continue/page.tsx": "1b0c11cd2e64913d149cb186704ce7bcd99917e5b0a2ad9396a8921c935a76d9",
+      "apps/web/app/auth/development/page.tsx": "ad62b1840e72d7dad1a7e9359fb83f9df6e6bc0f9ef5b923e4dc045694c631ed",
+      "apps/web/app/identity/account/page.tsx": "475c51ea3c0a8e8133dd839e9de104d9f9ef002efb250e07a7713c2f32a1b553",
+      "apps/web/app/onboarding/handle/page.tsx": "3cf90256e43de07958bff3721cf357d397c38735d7c8824b2f126415da2e909c",
+      "apps/web/app/studio/setup/page.tsx": "7d0afe7799dc554ca2b3f73745cb9aa37b3d8a17bf85c01b7d2b99e29d3f2598",
+      "apps/web/features/identity/account.tsx": "458cea8ed00dbde2dd95e3784466bfdef2cac4d2c879a65f3f3ced88360af332",
+      "apps/web/features/identity/comprehension.tsx": "087101123f0a6bcf68f950117ad40750676cbb53dc71a0eb151e5de4b0838f38",
+      "apps/web/features/identity/handle.tsx": "d9591f78f867ffce59444486c828a1d18b235ed12f44a01493b953e78fbd4fe0",
+      "apps/web/features/identity/passkey.ts": "078e0aab863fda5abb3ddbf1e5a0ba20f15dc6ab8dd9b90d48d4e80ef686da5a",
+      "apps/web/features/identity/session-boundary.tsx": "b84c2162ce2444c0f88f2f87794d2e26cf3cb5947cc1239fb607449d658980d1",
+      "apps/web/features/identity/setup.tsx": "9017b243c1ac9d1f5347e5c9aa99ecf8bc08b64bc093e9726a008645898429b2",
+      "apps/web/features/identity/signing.tsx": "6f3b7f701be263cac59d0a0dced1418c6443f13909a2968ba52e6d96dc16e988",
+      "apps/web/features/identity/welcome.tsx": "ccc16bd146613ac3b49d1c820f9947234ca4455056bdbd8e0e198bdd82cd0bbd",
+      "apps/backend/src/modules/identity/adapter.ts": "309945984babbbb74ea0389f3bf99c0aa62fd508d8faeafa336ef2a6b60067b0",
+      "apps/backend/src/modules/identity/audience-scope.ts": "f9cc6e0246d9afe65c0f5b281a2a532b3a4d05d28b91c65cba0f9584eef896ea",
+      "apps/backend/src/modules/identity/consent.ts": "55c1113d5986a869f23e31c714083e1f58850dc71cd0664fa3cbb7a7370cd596",
+      "apps/backend/src/modules/identity/creator-scope.ts": "05a0a1b0aed8b533e53c4805d0a3372db81a2eb282e8c9face3a3c32e79dbad1",
+      "apps/backend/src/modules/identity/development.ts": "ab64391e824afa15aa23d2f4ff8c3ffeb4bc2a1db4da7affeb019f228c0e7f5b",
+      "apps/backend/src/modules/identity/passkeys.ts": "b00dc9f59962a9e76e0e3fe865bed15e52af2bf0e4e338625a194edec48ace56",
+      "apps/backend/src/modules/identity/profiles.ts": "fe88d936da9566c1647e16435abce75056125cc3fbd236c4c81019c4a1230c81",
+      "apps/backend/src/modules/identity/read.ts": "00467be153c5b1114cac58180b165eda375bd0bf52063d36934bb7fbd6a578a2",
+      "apps/backend/src/modules/identity/request-authority.ts": "42c02fdda43855be37b0013cebce0fc97a4b4386626de2c2dbef8c10f60efd4e",
+      "apps/backend/src/modules/identity/router.ts": "270cede461a821774ea0f8e058e49a26e47ecf9ae081d069897918338b56e8ca",
+      "apps/backend/src/modules/identity/sessions.ts": "bfa7c1c013073836f6d2359b94a85a4676679618bc2ee0a3f602830ba41ad6ba",
+      "apps/backend/src/modules/identity/signed-acts.ts": "179d193e173499a1798643601bf2333beee5aa5fba2c9af95b62da4afc152066",
+      "apps/backend/src/modules/identity/subjects.ts": "ed8685927ff32db00ba266f2b5ec8f66a7660c3a2d118d2d78e4625bbde078d2",
+      "apps/backend/src/modules/identity/transaction.ts": "8840ab237262f50458f11d23608f3ded555c78b03d703a9887a1e458e5fc078e",
+      "apps/backend/src/integration.ts": "c5b1205ee3aeb1d09c7f1d108a299f5937627b116efee7063109616c0d760bdc",
+      "apps/backend/src/db/database.ts": "76b566f2d02ed15105e213714ca24f262c7027476749657343e10d120af35889",
+      "packages/api/src/identity.ts": "834bd744497fc24f65e81b8199433a284dea6184b9e3705253d3657b4dc47206",
+      "packages/api/src/schemas.ts": "d082bed889bfafe2474ed40b01a4028296b3ad9880de717b1221b272aac9f976",
+      "packages/api/src/client.ts": "5451e7fbcf70dc3a4b846d8b509179b4590baa462d1b90eb253027ecd6b4beac",
+      "packages/api/src/index.ts": "1902c5c35fe7688e4033ee1774fe3cf5a37c0c53b2c3edf5cc2053d455e8f408",
+      "apps/backend/src/app.ts": "ee0a5150551f95a07c3c1809e75279d60db3e7072ee2f515867192a4b57a9d64"
+    }
+  },
+  "browser": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "documentWidth": 390
+    },
+    "actor": "Explicit synthetic development account, existing pending creator",
+    "verified": [
+      "Old route redirects preserving duplicate/empty/unknown arrival values",
+      "Invalid arrival refused before session restoration",
+      "Retry retains duplicate context",
+      "Actual denied Note save preserves text, zero durable draft/publication",
+      "Final pending Notice + text retained through role refresh + Save/Sign disabled",
+      "Protected /you retains actual saved handle/intro after API rebuild"
+    ],
+    "limits": [
+      "No approved creator/provider/role/publication fabricated",
+      "No persisted Note/reload recovery claimed"
+    ]
+  },
+  "ios": {
+    "device": "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+    "model": "iPhone17",
+    "os": "iOS26.5",
+    "signing": "Normal Sign to Run Locally; codesign deep/strict verified",
+    "existingUI": {
+      "tests": 2,
+      "failures": 0,
+      "seconds": 69.822,
+      "journeys": [
+        "Welcome/Continue unconfigured in Light/Dark",
+        "Illustrative catalog Message identities"
+      ]
+    },
+    "physicalProviderPasskeyAcceptance": false,
+    "postUI": "Owned simulator shut down after successful UI run to free memory; no peer device changed"
+  },
+  "android": {
+    "ownedAVD": "CreatorPlatformW1E2E20260930",
+    "api": 35,
+    "serial": "emulator-5574",
+    "adbPort": 5051,
+    "state": "4 existing launched UI checks passed; subsequent actual cold-launch screen obscured by System UI ANR; owned restart in progress; no clean launch claim",
+    "existingUI": {
+      "name": "com.pantopus.qelvora.DialogRuntimeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "44.713",
+      "timestamp": "2026-10-01T02:28:26",
+      "hostname": "localhost",
+      "testcases": [
+        {
+          "name": "dialogActionsFitAndSafeActionReceivesClicks",
+          "classname": "com.pantopus.qelvora.DialogRuntimeTest",
+          "time": "11.322"
+        },
+        {
+          "name": "catalogSelectsRealInteractiveModeList",
+          "classname": "com.pantopus.qelvora.NativeAcceptanceTest",
+          "time": "9.446"
+        },
+        {
+          "name": "unavailableSignInNeverPretendsToAuthenticate",
+          "classname": "com.pantopus.qelvora.NativeAcceptanceTest",
+          "time": "7.455"
+        },
+        {
+          "name": "arrivalContextCanBeRemoved",
+          "classname": "com.pantopus.qelvora.NativeAcceptanceTest",
+          "time": "6.915"
+        }
+      ],
+      "sha256": "0157a997c1289f18413a3e64374e0fd16f288f7995c4db6386ff6edb8e8a516c"
+    },
+    "apkSha256": "f8732a78e3e5e54381f542599cf96db2a139809e620ca7632c372d1ce1f3f23a",
+    "repositoryXml": "Only CRLF normalized to LF for repository whitespace checks; original XML SHA256 retained in existingUI.sha256"
+  },
+  "checks": {
+    "canonicalGenerateCheck": "passed48",
+    "backendProduction": "passed",
+    "webProduction": "passed; final arrival recheck completed",
+    "affectedLintFormat": "passed",
+    "signedGenericShippingIOS": "passed",
+    "androidShippingAssemble": "passed",
+    "FolioPreview": "All four refreshed consumer builds passed, including final arrival web after correcting a missed brand transform in the temporary copied entry source",
+    "originalPostgresNonOwnerT34": "passed1; supporting consistency, not E2E"
+  },
+  "gates": [
+    "Missing genuine production identity and HTTPS/RP/native associations",
+    "No current verified creator/passkeys/team or configured licensed providers",
+    "Default held denial/media/correction/generation remain unavailable",
+    "SQL proposals unallocated/unapplied",
+    "Exact pushed-head CI and affected launched-app acceptance before merge"
+  ],
+  "logs": {
+    "creator-w1-continuation-entry-android-emulator-restart.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-emulator-restart.log",
+      "sha256": "cb01a1f9720d01ac73e0fb6044a6a525dac6f6f1a68b463597b5cff2db96ae56"
+    },
+    "creator-w1-continuation-entry-android-emulator.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-emulator.log",
+      "sha256": "c6df0e8cd00e7bebbf32ca729f663aab2b8f33ea7165ebcba826b537e9c73417"
+    },
+    "creator-w1-continuation-entry-android-install.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-install.log",
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "creator-w1-continuation-entry-android-instrumentation-build.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-instrumentation-build.log",
+      "sha256": "a9ba9021d0699da988a4512ff69593e6217383ad7fc9cc6494b600f71bae927e"
+    },
+    "creator-w1-continuation-entry-android-launch.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-launch.log",
+      "sha256": "023e574d3fb7d79f8cb5e7663e1b0beaaea013ce8e4e3ca6812613a7e80d2b35"
+    },
+    "creator-w1-continuation-entry-android-provision.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-provision.log",
+      "sha256": "d9b025874381214f482f5731bf2345486a22e8874e9e1c746c431eb7e4284d22"
+    },
+    "creator-w1-continuation-entry-android-runtime.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-runtime.log",
+      "sha256": "2b9073244aa405b24e1c877d9b3efdba0e35e7d935c8b0a75e0e9f744f803b3d"
+    },
+    "creator-w1-continuation-entry-android-system-ui-diagnostic.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android-system-ui-diagnostic.log",
+      "sha256": "602d81e664140f72ada4d4536ef252f453ca7a3b28d8e8a3be13b878005a9afa"
+    },
+    "creator-w1-continuation-entry-android.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-android.log",
+      "sha256": "3d492349f5be447fada83f642945fb9466a8544cb386d364db3a4bd7c0c724b8"
+    },
+    "creator-w1-continuation-entry-arrival-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-arrival-format.log",
+      "sha256": "0644f127dba3872a91cc743e398aae482ea413cbdafd50a9f670795ff24197bc"
+    },
+    "creator-w1-continuation-entry-arrival-lint.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-arrival-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-entry-arrival-rename-web-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-arrival-rename-web-final.log",
+      "sha256": "75b1f6029070903f26b86dde2875ebe76cbebf1995db93f888aead1135b7db76"
+    },
+    "creator-w1-continuation-entry-arrival-rename-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-arrival-rename-web.log",
+      "sha256": "34307a2d00be88843453f0b82b3d879f013df4bd41ddd513e44e06e3f18f5dbd"
+    },
+    "creator-w1-continuation-entry-arrival-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-arrival-web.log",
+      "sha256": "818e83453e7b209ef30de3ce901a1392977f01196d777aca81ffa8cb3c6cd6e7"
+    },
+    "creator-w1-continuation-entry-backend.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "creator-w1-continuation-entry-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "creator-w1-continuation-entry-generate-check.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-generate-check.log",
+      "sha256": "2b7c099f006c9ec898a779ce993a0ba17ecc6d55eb32372bdf6c854f252fbef4"
+    },
+    "creator-w1-continuation-entry-generate.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-generate.log",
+      "sha256": "14c9029d31d8984b01a2d494bae96e7ba32115809d1a6ac2f278a765d6d49347"
+    },
+    "creator-w1-continuation-entry-ios-attachments.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios-attachments.log",
+      "sha256": "305825954fab816d622d1baba8cdbf2adcdfb7fc5e6f11e1f157e23d0131f7a2"
+    },
+    "creator-w1-continuation-entry-ios-boot.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios-boot.log",
+      "sha256": "7924edf3bc701ea085dab326376d9db6b50e53936fd86d3d8fba71ee560603b4"
+    },
+    "creator-w1-continuation-entry-ios-codesign.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios-codesign.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-entry-ios-shutdown.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios-shutdown.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-entry-ios-ui.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios-ui.log",
+      "sha256": "05fa61ad15740c7c1c17f01a01995305a606a26d1a916453c56e724096584769"
+    },
+    "creator-w1-continuation-entry-ios.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-ios.log",
+      "sha256": "79385f8294a144718a79b659fb0bec799026d4a949c739d853bf1ed81de335cd"
+    },
+    "creator-w1-continuation-entry-lint.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-entry-postgres.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-postgres.log",
+      "sha256": "72b19c2f147703063e03ed0f156e5bb07b72250984a2a5e02fdbcd570d4a0a2a"
+    },
+    "creator-w1-continuation-entry-rename-android.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-android.log",
+      "sha256": "27dce57f7a1b2dbe5c736e54f2466c938bbf0e68dcb9ab024e0deeacddf1d3d9"
+    },
+    "creator-w1-continuation-entry-rename-backend.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "creator-w1-continuation-entry-rename-brand.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-brand.log",
+      "sha256": "d8ce44f81dd90831bfa7bc7e3bc8c2bae5896de492ed0d8095cdf73b9ddc7326"
+    },
+    "creator-w1-continuation-entry-rename-generate-check.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-generate-check.log",
+      "sha256": "70f03652067b29e82cfe5bc4757386717f2cbb5c1146b534907344da5458223b"
+    },
+    "creator-w1-continuation-entry-rename-generate.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-generate.log",
+      "sha256": "2549321e068a180c2edba93d1fb4f38979e5521931090f2a0243394dd92b9ee4"
+    },
+    "creator-w1-continuation-entry-rename-ios.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-ios.log",
+      "sha256": "db213e9a2af144c459d25596267231fa909ed01d49983b51bff3eb393f359fba"
+    },
+    "creator-w1-continuation-entry-rename-web-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-web-final.log",
+      "sha256": "2037a881bc32d08f8812524efba5931f051e3f946cf1cf5bf1f8dbcc2fdc2af9"
+    },
+    "creator-w1-continuation-entry-rename-web-verified-role.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-web-verified-role.log",
+      "sha256": "34e33b3b8d28a62803b6262c532df60375cc1877337a58e117ebc6625a818d3c"
+    },
+    "creator-w1-continuation-entry-rename-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-rename-web.log",
+      "sha256": "8e0fd8bd3cf1e3d4e724e446eb94328e8e627d9c6606950524b49d549ebb5b57"
+    },
+    "creator-w1-continuation-entry-studio-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-studio-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "creator-w1-continuation-entry-studio-lint.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-studio-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-entry-web-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-web-final.log",
+      "sha256": "99f98fc640a084ea8dee415f8cb36bc891a699913d93aef1eab3f80d03fc4215"
+    },
+    "creator-w1-continuation-entry-web-verified-role.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-web-verified-role.log",
+      "sha256": "5f64bb1862af4c596cc8bfa1c9a35bae7cec66191187d86bfbedf71e16ccde50"
+    },
+    "creator-w1-continuation-entry-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-entry-web.log",
+      "sha256": "435792e79f4337feaf52517e7e6a937033cc1df2791aece6cc5b8d3b598b40c6"
+    }
+  },
+  "evidenceSha256": {
+    "entry-account-readback.png": "9361612102d285080ccd3e302380541897fe16499ba8f82547c28b2e84ac9b86",
+    "entry-android-runtime.xml": "b779cff5f67df246deb3af99273e6e76d1357dbf597594a792deb791c60d811e",
+    "entry-android-system-ui-obscured.png": "421605512a71f262d02f46816ec72f8c487f4df28befe3a810edd34315dc36ce",
+    "entry-duplicate-context.png": "6da862076307cb32b18a02b8dfd55ba6fd0de0650586e7f6895e99076444636a",
+    "entry-integration.md": "ac3eb9f2463855cd848377fd928fe2d13a33c608431dbae51078f5a3c310a442",
+    "entry-ios-attachments.json": "f3c324c74edc48ba0b54b5e69b98dc3cd28414e86b27726306c509095ae0778d",
+    "entry-ios-unconfigured-light.png": "ad2042f3e57d0e55ca51f170dae8e112dd23ab81a5244ec0516fac74bea71f92",
+    "entry-ios-unconfigured-night.png": "b5e0bfcb39061bc88cc05e27432f39022cfc4c73d5d2f7f963d8ca23311e1543",
+    "entry-pending-durable.json": "7666ca195f13afd260218aec5ab04d78e307ca043468dff9c92d65de76a2c55a",
+    "entry-pending-note-controls.png": "a312131f4359852aab714322da6c5a37a111b61f0269a5cf24240af307751c76",
+    "entry-pending-note-denial.png": "c43dc974015731a7e72da1c75b1a3a8af8490260cf1e1f381171c55d39c51b8f"
+  },
+  "newTestsOrAssertionReferenceChanges": false,
+  "releaseReady": false
+}

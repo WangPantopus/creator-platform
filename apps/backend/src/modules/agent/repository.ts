@@ -2,6 +2,10 @@ import type { Pool, PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import {
+  assertCurrentSession,
+  requestAuthority,
+} from "../identity/request-authority.js";
+import {
   DraftConfig,
   type Configuration,
   type Evaluation,
@@ -43,6 +47,21 @@ export class AgentRepository {
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [scope.creatorId, scope.accountId],
       );
+      const authority = requestAuthority.getStore();
+      if (authority) {
+        // Fan generation can use the creator's repository scope. Hold the
+        // actual HTTP actor's session, then restore the repository account.
+        await client.query("SELECT set_config('app.account_id',$1,true)", [
+          authority.accountId,
+        ]);
+        try {
+          await assertCurrentSession(client, authority.accountId);
+        } finally {
+          await client.query("SELECT set_config('app.account_id',$1,true)", [
+            scope.accountId,
+          ]);
+        }
+      }
       const tombstone = await client.query(
         "SELECT 1 FROM creator.ai_tombstone WHERE creator_id=$1",
         [scope.creatorId],
@@ -57,7 +76,7 @@ export class AgentRepository {
         name: string;
         verification: string;
       }>(
-        "SELECT id,display_name AS name,verification FROM creator.creator_profile WHERE id=$1 AND account_id=$2",
+        "SELECT id,display_name AS name,verification FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
         [scope.creatorId, scope.accountId],
       );
       invariant(
@@ -230,4 +249,20 @@ export async function versionRows(
     [creatorId, beforeNumber],
   );
   return JSON.parse(JSON.stringify(rows.rows)) as Version[];
+}
+
+/** A display page is never the authority for the live pointer or rollback. */
+export async function versionRow(
+  client: PoolClient,
+  creatorId: string,
+  id: string | null,
+): Promise<Version | null> {
+  if (!id) return null;
+  const rows = await client.query(
+    `SELECT id,number,state,configuration,compiled_hash AS "compiledHash",source_set AS "sourceSet",pipeline_hash AS "pipelineHash",evaluation_id AS "evaluationId",changes,published_at AS "publishedAt" FROM creator.ai_version WHERE creator_id=$1 AND id=$2`,
+    [creatorId, id],
+  );
+  return rows.rows[0]
+    ? (JSON.parse(JSON.stringify(rows.rows[0])) as Version)
+    : null;
 }

@@ -117,9 +117,19 @@ const server = http.createServer((req, res) => {
     res.end("Not found");
     return;
   }
+  // Match the catalog's existing theme selection for manual paired review.
+  // The source exports and default reference rendering remain unchanged.
+  const theme = url.searchParams.get("theme");
+  if (type === "text/html" && (theme === "light" || theme === "night"))
+    data = String(data).replace(
+      /<html\b([^>]*)>/i,
+      (_, attributes) =>
+        `<html${attributes.replace(/\sdata-theme=(?:"[^"]*"|'[^']*')/gi, "")} data-theme="${theme}">`,
+    );
   res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-store" });
   res.end(data);
 });
-server.listen(Number(process.env.REFERENCE_PORT ?? 3101), "127.0.0.1", () =>
-  console.log(`Design reference server on ${server.address().port}`),
+const port = Number(process.env.REFERENCE_PORT ?? 3101);
+server.listen(port, "127.0.0.1", () =>
+  console.log(`Design reference server on ${port}`),
 );

@@ -12,6 +12,7 @@ import { AgentService } from "./service.js";
 import type { CreatorScope } from "./repository.js";
 import type { ShadowReplay } from "./shadow.js";
 import { EvaluationRequest } from "../../../../../packages/api/src/agent/contracts.js";
+import { once } from "node:events";
 
 export function createAgentRouter(input: {
   service: AgentService;
@@ -51,6 +52,13 @@ export function createAgentRouter(input: {
   router.get("/:creatorId/state", async (req, res) =>
     res.json(await input.service.read(scope(req, res))),
   );
+  router.get("/:creatorId/versions", async (req, res) => {
+    const before =
+      req.query.before === undefined
+        ? null
+        : z.coerce.number().int().positive().parse(req.query.before);
+    res.json(await input.service.versions(scope(req, res), before));
+  });
   router.get("/:creatorId/comparisons", async (req, res) => {
     const items = await input.service.repository.transaction(
       scope(req, res),
@@ -163,7 +171,7 @@ export function createAgentRouter(input: {
   );
   router.post("/:creatorId/evaluations/cancel", async (req, res) => {
     await input.service.read(scope(req, res));
-    res.json(input.service.cancelEvaluation(scope(req, res)));
+    res.json(await input.service.cancelEvaluation(scope(req, res)));
   });
   router.post("/:creatorId/publish", async (req, res) =>
     res.json(await input.service.publish(scope(req, res), key(req), req.body)),
@@ -185,11 +193,25 @@ export function createAgentRouter(input: {
       "Content-Disposition",
       "attachment; filename=creator-ai-export.json",
     );
-    res.json(await input.service.export(scope(req, res)));
+    const abort = signal(res);
+    res.type("application/json");
+    await input.service.exportTo(
+      scope(req, res),
+      async (part) => {
+        abort.throwIfAborted();
+        if (!res.write(part)) await once(res, "drain", { signal: abort });
+      },
+      abort,
+    );
+    res.end();
   });
   router.use(
     (error: unknown, _req: Request, res: Response, next: NextFunction) => {
       void next;
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
       const fault =
         error instanceof DomainError
           ? error

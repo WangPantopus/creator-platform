@@ -1,16 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import { IdentityCompletionSchema, ReturnTargetSchema } from "@qelvora/api";
 import {
   applicationOrigin,
   sameRequestOrigin,
 } from "../../../../lib/request-origin";
-import { IdentityCompletionSchema } from "@qelvora/api";
 import {
   continuationCookie,
+  continuationReturnCookie,
   sessionCookie,
   cookieOptions,
   platformFetch,
 } from "../../../../lib/session";
-import { trustLocalSessionCookie } from "../../../../lib/trust-session";
+
+function retry(request: NextRequest, error: string) {
+  const saved = ReturnTargetSchema.safeParse(
+    request.cookies.get(continuationReturnCookie)?.value,
+  );
+  const target = new URL("/auth/continue", applicationOrigin(request));
+  target.searchParams.set("returnTo", saved.success ? saved.data : "/home");
+  target.searchParams.set("error", error);
+  const response = NextResponse.redirect(target, 303);
+  response.headers.set("Cache-Control", "no-store");
+  response.cookies.delete(continuationCookie);
+  return response;
+}
 
 export async function POST(request: NextRequest) {
   if (!sameRequestOrigin(request))
@@ -21,13 +34,7 @@ export async function POST(request: NextRequest) {
   const form = await request.formData();
   const continuationId = request.cookies.get(continuationCookie)?.value;
   if (!continuationId || form.get("continuationId") !== continuationId)
-    return NextResponse.redirect(
-      new URL(
-        "/auth/continue?error=continuation_expired",
-        applicationOrigin(request),
-      ),
-      303,
-    );
+    return retry(request, "continuation_expired");
   return complete(request, continuationId, form.get("code"), form.get("state"));
 }
 
@@ -41,13 +48,7 @@ export async function GET(request: NextRequest) {
     query.getAll("code").length !== 1 ||
     query.getAll("state").length !== 1
   )
-    return NextResponse.redirect(
-      new URL(
-        "/auth/continue?error=continuation_expired",
-        applicationOrigin(request),
-      ),
-      303,
-    );
+    return retry(request, "continuation_expired");
   return complete(
     request,
     continuationId,
@@ -76,7 +77,15 @@ async function complete(
       },
       false,
     );
-    if (!response.ok) throw new Error("Sign-in unavailable");
+    if (!response.ok) {
+      const failure = await response.json();
+      return retry(
+        request,
+        failure.error?.code === "continuation_expired"
+          ? "continuation_expired"
+          : "continuation_failed",
+      );
+    }
     const result = IdentityCompletionSchema.parse(await response.json());
     const target = result.session.fan
       ? result.returnTo
@@ -93,16 +102,11 @@ async function complete(
       process.env.W8_LOCAL_DEVELOPMENT === "true" &&
       process.env.NODE_ENV !== "production"
     )
-      redirect.cookies.delete(trustLocalSessionCookie);
+      redirect.cookies.delete("w8_local_session");
     redirect.cookies.delete(continuationCookie);
+    redirect.cookies.delete(continuationReturnCookie);
     return redirect;
   } catch {
-    return NextResponse.redirect(
-      new URL(
-        "/auth/continue?error=continuation_failed",
-        applicationOrigin(request),
-      ),
-      303,
-    );
+    return retry(request, "continuation_failed");
   }
 }

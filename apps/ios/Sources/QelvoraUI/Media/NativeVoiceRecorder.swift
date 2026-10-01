@@ -67,6 +67,11 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
         } catch { state = .failed; reason = "The microphone is unavailable. Try again."; deactivate() }
     }
     public func pause(interrupted: Bool = false) {
+        if interrupted && state == .requesting {
+            generation += 1; state = .idle
+            reason = "Microphone request cancelled after an interruption. Record when you return."
+            return
+        }
         guard state == .recording else { return }
         duration = recorder?.currentTime ?? duration; recorder?.pause(); state = .paused
         if interrupted { reason = "Recording paused after an interruption. Resume or preview what was saved." }
@@ -110,6 +115,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
         #endif
     }
     public func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
+        guard self.recorder === recorder else { return }
         stop(); reason = "Recording was interrupted. Preview what was saved or record again."
     }
 }

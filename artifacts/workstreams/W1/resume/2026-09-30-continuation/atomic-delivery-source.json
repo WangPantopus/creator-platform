@@ -1,0 +1,53 @@
+{
+  "parent": "5f3d007855d8a5d27375afd6a23a523f2cafa719",
+  "ownerRevisions": {
+    "W2": "823e02025c53993800f127b8958d18a2d7f5d3c6",
+    "W3": "aef138374818e0d218d8e03bb81c061cfb62b4d7"
+  },
+  "personalIntegration": true,
+  "sha256": {
+    "apps/backend/src/modules/agent/delivery-authority.ts": "2f15002d1d27b21b41328f7492647528bd1f8430ad9ac5817a40a52ce5706686",
+    "apps/backend/src/modules/agent/integration.ts": "10869dc0992a26dc6b39bdbefd22482c7a3dec8499dae27288e4ef20982621e5",
+    "apps/backend/src/modules/agent/memory-proposals.ts": "afdd4b00e9b1016e252a6a66824e21977edc2663f5aaa2e77d09651246119386",
+    "apps/backend/src/modules/agent/model.ts": "7b6eeb57dfa37549948953dfc984964fc6a7763203ccf8d64ac1e2a9ffe1af5b",
+    "apps/backend/src/modules/agent/pipeline.ts": "751d778d96b1addc627f6bfc7347af565757b4e8c516b75d025ab9c9555df137",
+    "apps/backend/src/modules/agent/response-usage.ts": "7f44d5e38b1e925113bdc13540be70fa47bf040e36ed43f316e4452965caaa50",
+    "apps/backend/src/modules/agent/runtime.ts": "fdde1984abfb2f879b033f952f78cdebe574e5651200bea923c3ea22841f4230",
+    "apps/backend/src/modules/agent/service.ts": "e2c19054837fbc73f2d8e81d5c5d8d7e77e4381bdf6292f9357f11ba3fd0b298",
+    "apps/backend/src/modules/agent/streaming.ts": "0557804f9ac82c5ccbb933543de9a301a0d3115cc74f5dc604c27ef4b2456b8c",
+    "packages/api/src/agent/contracts.ts": "7aa1cfdacba4273f22b74c552dfcbaea776f6e927cd00ba08317f284e3efa0c7",
+    "apps/web/app/api/studio/ai/[...path]/route.ts": "77ac2e4d00531f88bf5260eca5470be96d55aa56aa1a0e816d6d2c865c265410",
+    "apps/android/app/build.gradle.kts": "b268ef0e97d5e151762cad5ce24064a35117e8c5187349733277a46168f50404",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "65333b0ab1f54cf07533636480aa2733de70aa5a1eaca8aa27f55d0bf7a57396",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "c0b085d5afbe63274af1c33966c805cd5d64d24d4ac513c7173a782f2cc39eb9",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRealtime.kt": "3b85a34411c2700db919f9bbed4335e644ffedd7758407ed39d89475515c4dba",
+    "apps/backend/src/modules/conversation/approved-generator.ts": "80c12cbaa2b10d9c25a03de2621d63e59f44a67a38c4964a0279b3020ec67b66",
+    "apps/backend/src/modules/conversation/generation.ts": "e9ad9708cd9f20e473859c31b553079925fcd7ea9572e10fcabcad633d9df9bd",
+    "apps/backend/src/modules/conversation/service.ts": "9d5f212232e1d622c2a5aac7d59db1421779c45c4796e66590bffe3b50058e7c",
+    "apps/backend/src/features.ts": "1665e32c84159a215b24cbcac715e8ef062abd2b56161a86180a571898572ce0"
+  },
+  "existingChecks": {
+    "postgresIntegration": {
+      "passed": 9,
+      "durationSeconds": 138.52,
+      "randomPairs": 10000,
+      "observedScopedContextQueries": 50000,
+      "container": "creator-platform-w1-resume-check-20260930",
+      "port": 55441,
+      "database": "creator_w1_foundation_test"
+    },
+    "contracts": {
+      "passed": 9,
+      "durationSeconds": 0.654
+    },
+    "shared": {
+      "passed": 2
+    }
+  },
+  "limits": [
+    "Two existing backend files ran separately; not one 18-case invocation.",
+    "Android changes await new-head hosted compile and actual native operation.",
+    "No genuine identity/passkey/license/provider or participant acceptance.",
+    "No new test suite or script."
+  ]
+}

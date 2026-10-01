@@ -73,10 +73,11 @@
       let window = NSWindow(
         contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
         backing: .buffered, defer: false)
+      // Keep capture independent of the attached display's calibration.
       window.colorSpace = .sRGB
       window.isReleasedWhenClosed = false
-      // AppKit's layer cache follows the actual display. Enlarge the rendered
-      // view on a1x host, not the cached pixels, to retain native text and glow.
+      // Render at the reference pixel scale before AppKit caches its layers.
+      // Enlarging a1x cached bitmap alone also enlarges blurred text.
       let captureScale = 2 / window.backingScaleFactor
       let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
       let host = NSHostingView(
@@ -96,8 +97,8 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      // A transform alone magnifies the1x layer cache. Redraw each hosted
-      // layer at the reference scale before AppKit composites the bitmap.
+      // Redraw hosted layers at the reference scale before compositing. A1x
+      // layer cache would otherwise magnify blurred text on a hosted display.
       func prepareLayer(_ layer: CALayer) {
         layer.contentsScale = 2
         layer.rasterizationScale = 2
@@ -108,7 +109,6 @@
       }
       if let layer = host.layer { prepareLayer(layer) }
       print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas)")
-      // Match the existing2x references without inheriting a runner display's scale/profile.
       guard
         let context = CGContext(
           data: nil, width: Int(size.width * 2), height: Int(size.height * 2),

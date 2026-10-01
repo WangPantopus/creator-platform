@@ -1,16 +1,17 @@
+import { visualWebURL } from "../../playwright.config";
 import { expect, test } from "@playwright/test";
 
-const origin = `http://localhost:${process.env.WEB_VISUAL_PORT ?? 3000}`;
+const origin = visualWebURL;
 const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",
   "https://outside.invalid",
-  "/creators/maya/requests?draft=" + "x".repeat(1200),
   "/creators/maya/nested\\draft",
   "/creators/maya/nested\u0000draft",
   "/creators/maya/nested\tdraft",
   "/creators/maya/nested\r\ndraft",
   "/" + "x".repeat(2048),
+  "/creators/maya/requests?draft=" + "x".repeat(1200),
 ];
 
 function authURL(path: string, returnTo: string) {
@@ -38,7 +39,7 @@ test("auth seam rejects external, nested backslash and control-character context
   }
 });
 
-test("welcome and auth seam use the same context contract and preserve registered arrival", async ({
+test("welcome and auth seam preserve an opaque context reference", async ({
   page,
   request,
 }) => {

@@ -2,46 +2,39 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Notice } from "@qelvora/ui-web";
-import type { Session } from "@qelvora/api";
+import { useIdentityRequest } from "./session-boundary";
 
 export function HandleForm({
   returnTo,
-  mode,
   initialHandle = "",
   initialIntro = "",
 }: {
   returnTo: string;
-  mode: Session["mode"];
   initialHandle?: string;
   initialIntro?: string;
 }) {
   const router = useRouter();
+  const identity = useIdentityRequest();
   const [handle, setHandle] = useState(initialHandle);
   const [intro, setIntro] = useState(initialIntro);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   return (
     <form
-      className="qv identity-handle"
+      className="identity-handle"
       onSubmit={async (event) => {
         event.preventDefault();
         if (saving) return;
         setSaving(true);
         setError("");
         try {
-          const response = await fetch("/api/platform/identity/fan-profile", {
+          const response = await identity.request("fan-profile", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ handle, intro }),
           });
           const result = await response.json();
           if (!response.ok) {
-            if (response.status === 401) {
-              location.assign(
-                `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
-              );
-              return;
-            }
             throw new Error(result.error?.message);
           }
           router.replace(returnTo);
@@ -70,7 +63,7 @@ export function HandleForm({
           </svg>
         </a>
         <span className="qv-meta">
-          {mode === "development"
+          {identity.session.mode === "development"
             ? "DEVELOPMENT SIGN-IN"
             : "SIGNED IN WITH PANTOPUS"}
         </span>

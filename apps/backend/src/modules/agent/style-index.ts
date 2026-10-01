@@ -2,6 +2,7 @@ import type { Configuration } from "../../../../../packages/api/src/agent/contra
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { AgentModel } from "./model.js";
 import { contentHash } from "../../core/canonical.js";
+import { withProviderUsage } from "./provider-usage.js";
 export async function indexStyleExamples(
   repository: AgentRepository,
   scope: CreatorScope,
@@ -31,9 +32,18 @@ export async function indexStyleExamples(
         ),
     );
     if (!missing.length) continue;
-    const embedded = await model.embed(
-      missing.map((e) => e.text),
+    const embedded = await withProviderUsage(
+      repository,
+      scope,
+      model,
+      contentHash({ examples: missing }),
+      "style_index",
       signal,
+      () =>
+        model.embed(
+          missing.map((e) => e.text),
+          signal,
+        ),
     );
     await repository.transaction(scope, async (client) => {
       for (const [index, example] of missing.entries())
@@ -47,17 +57,6 @@ export async function indexStyleExamples(
             model.embeddingModel,
           ],
         );
-      await client.query(
-        "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,$5,0,$6,'style_index',0)",
-        [
-          scope.creatorId,
-          contentHash({ examples: missing.map((e) => e.id) }),
-          embedded.usage.provider,
-          embedded.usage.model,
-          embedded.usage.inputTokens,
-          embedded.usage.costMicros,
-        ],
-      );
     });
   }
 }

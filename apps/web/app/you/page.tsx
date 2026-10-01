@@ -1,28 +1,34 @@
-import { redirect } from "next/navigation";
-import { Notice } from "@qelvora/ui-web";
-import { copy as growthCopy } from "@qelvora/copy";
-import { GrowthShell } from "../../features/growth/shell";
-
+import { IdSchema } from "@qelvora/api";
+import { currentSession } from "../../lib/session";
+import { IdentityWelcome } from "../../features/identity/welcome";
+import { AccountScreen } from "../../features/conversation/AccountScreen";
+import { IdentitySessionBoundary } from "../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
-
 export default async function YouPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<{ creatorId?: string; fanId?: string }>;
 }) {
-  // W1's protected account route is available here. The richer W3 account
-  // and pair/privacy graph is not installed; never discard scoped context.
-  if (Object.keys(await searchParams).length) {
-    return (
-      <GrowthShell active="You">
-        <section className="growth-stack">
-          <Notice title={growthCopy.growthTemporarilyUnavailable}>
-            {growthCopy.growthThisFeatureIsNotConnectedYet}
-          </Notice>
-        </section>
-      </GrowthShell>
-    );
-  }
-  redirect("/identity/account");
+  const query = await searchParams;
+  const validPair =
+    IdSchema.safeParse(query.creatorId).success &&
+    IdSchema.safeParse(query.fanId).success;
+  const returnTo = validPair
+    ? `/you?creatorId=${query.creatorId}&fanId=${query.fanId}`
+    : "/you";
+  const session = await currentSession(returnTo);
+  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  return (
+    <IdentitySessionBoundary
+      key={`${session.accountId}:${returnTo}`}
+      initial={session}
+      returnTo={returnTo}
+    >
+      <AccountScreen
+        creatorId={validPair ? query.creatorId : undefined}
+        fanId={validPair ? query.fanId : undefined}
+      />
+    </IdentitySessionBoundary>
+  );
 }

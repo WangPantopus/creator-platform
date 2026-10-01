@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.pantopus.qelvora.DialogRuntimeTest" tests="4" failures="0" errors="0" skipped="0" time="44.713" timestamp="2026-10-01T02:28:26" hostname="localhost">
+  <properties>
+    <property name="device" value="CreatorPlatformW1E2E20260930(AVD) - 15" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="dialogActionsFitAndSafeActionReceivesClicks" classname="com.pantopus.qelvora.DialogRuntimeTest" time="11.322" />
+  <testcase name="catalogSelectsRealInteractiveModeList" classname="com.pantopus.qelvora.NativeAcceptanceTest" time="9.446" />
+  <testcase name="unavailableSignInNeverPretendsToAuthenticate" classname="com.pantopus.qelvora.NativeAcceptanceTest" time="7.455" />
+  <testcase name="arrivalContextCanBeRemoved" classname="com.pantopus.qelvora.NativeAcceptanceTest" time="6.915" />
+</testsuite>

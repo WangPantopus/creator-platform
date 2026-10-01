@@ -28,6 +28,11 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.serialization.json.*
 
 object CommerceFanFeature {
@@ -35,7 +40,7 @@ object CommerceFanFeature {
 }
 
 @Composable private fun CommerceFeature(context: Context, baseURL: String?, session: FanSession) {
-    val api = remember(baseURL) { baseURL?.let { CommerceClient(context, it) } }; val scope = rememberCoroutineScope()
+    val api = remember(baseURL,session.session?.accountId) { baseURL?.let { CommerceClient(context, it, session.session?.accountId) } }; val scope = rememberCoroutineScope()
     var data by remember { mutableStateOf<CommerceOverview?>(null) }; var detail by remember { mutableStateOf<CommerceDetail?>(null) }
     val arrival = remember(session.destination) { Uri.parse(session.destination) }; val arrivalPath = arrival.path.orEmpty()
     var screen by remember { mutableStateOf(if (arrivalPath.startsWith("/commerce/")) arrivalPath.substringAfterLast("/") else if (arrivalPath.endsWith("/access")) "access" else "requests") }
@@ -46,6 +51,17 @@ object CommerceFanFeature {
     var passSelection by remember { mutableStateOf(setOf<String>()) }
     var replacement by remember { mutableStateOf("") }
     val keys = remember { mutableMapOf<String, String>() }
+    var access by remember { mutableStateOf<CommerceAccess?>(null) }
+    var accessReceivedAt by remember { mutableStateOf<Instant?>(null) }
+    var accessNow by remember { mutableStateOf(Instant.now()) }
+    var limitVersion by remember { mutableStateOf<Int?>(null) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var foreground by remember { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, _ -> foreground = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
     suspend fun report(error: Exception) {
         if (error is CancellationException) throw error
         failure = if (error is CommerceFailure || error is IllegalArgumentException) error.message.orEmpty() else "Reconnect to refresh. Your input is kept; actions are unavailable while offline."
@@ -53,7 +69,21 @@ object CommerceFanFeature {
     }
     suspend fun refresh() {
         val client = api ?: run { failure = "Commerce is not connected yet."; return }; busy = true
-        try { val current = client.overview(); data = current; if (creator.isEmpty()) creator = current.creators.firstOrNull()?.id.orEmpty(); detail?.let { detail = client.detail(it.packet.id) }; failure = "" }
+        try {
+            val accountId = session.session?.accountId
+            val current = client.overview()
+            if (accountId != session.session?.accountId) return
+            data = current
+            current.limits.firstOrNull { it.currency == current.policy.currency }?.let { limit ->
+                if (limit.version != limitVersion) {
+                    val pending = limit.effective_at != null
+                    choice = if (if (pending) limit.pending_none == true else limit.explicit_none) "No limit" else "Choose an amount"
+                    amount = (if (pending) limit.pending_amount else limit.amount)?.toBigDecimal()?.movePointLeft(java.util.Currency.getInstance(limit.currency).defaultFractionDigits)?.stripTrailingZeros()?.toPlainString().orEmpty()
+                    reminders = limit.reminders_on; limitVersion = limit.version
+                }
+            }
+            if (creator.isEmpty()) creator = current.creators.firstOrNull()?.id.orEmpty(); detail?.let { detail = client.detail(it.packet.id) }; failure = ""
+        }
         catch (error: Exception) { report(error) } finally { busy = false }
     }
     suspend fun mutate(path: String, values: JsonObject, message: String) {
@@ -67,6 +97,28 @@ object CommerceFanFeature {
         refresh()
         creator = arrival.getQueryParameter("creatorId") ?: data?.creators?.firstOrNull { arrivalPath.startsWith("/creators/${it.handle}/") }?.id ?: creator
         if (screen == "status") arrival.getQueryParameter("packetId")?.let { id -> try { detail = api?.detail(id) } catch (error: Exception) { report(error) } }
+    }
+    LaunchedEffect(screen, creator, data?.fan?.id, foreground) {
+        access = null; accessReceivedAt = null
+        val fanId = data?.fan?.id
+        val client = api
+        if (screen != "access" || !foreground || creator.isEmpty() || fanId == null || client == null) return@LaunchedEffect
+        val creatorId = creator; val accountId = session.session?.accountId
+        while (isActive) {
+            val checkedAt = Instant.now()
+            try {
+                val value = client.access(creatorId, fanId)
+                if (!isActive || session.session?.accountId != accountId || value.creatorId != creatorId || value.fanId != fanId) return@LaunchedEffect
+                access = value; accessReceivedAt = checkedAt; accessNow = Instant.now()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                access = null; accessReceivedAt = null
+            }
+            delay(4000)
+        }
+    }
+    LaunchedEffect(screen, foreground) {
+        while (screen == "access" && foreground && isActive) { accessNow = Instant.now(); delay(1000) }
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = if (screen == "packet") 20.dp else 16.dp).padding(top = 20.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -101,15 +153,27 @@ object CommerceFanFeature {
                 CommerceText(if (screen == "access") "Access" else "Included in your request", "display-md")
                 if (screen == "access") {
                     current.creators.forEach { owner -> Button(owner.display_name, ButtonVariant.QUIET, block = true) { creator = owner.id } }
-                    AccessLines(name, "Review current offers and manage requests.", if (current.memberships.any { it.creator_id == creator && it.state in listOf("active", "grace") }) "Your current membership." else "No active membership for this creator.", "Human services below, subject to capacity.", "Memberships renew separately from requests; pass reach grants no tier depth.")
+                    val currentAccess = access?.takeIf { value -> value.creatorId == creator && value.fanId == current.fan?.id && accessReceivedAt?.plusSeconds(5)?.isAfter(accessNow) == true && (value.validUntil == null || runCatching { Instant.parse(value.validUntil).isAfter(accessNow) }.getOrDefault(false)) }
+                    val can = currentAccess?.let { value -> listOf(
+                        if (value.capabilities.contains("ai_message")) if (value.allowance.available > 0) "Message this AI." else "Your AI allowance is used for this period." else "",
+                        if (value.capabilities.contains("note")) "Read included notes." else "",
+                        if (value.capabilities.contains("request")) "Request available services." else ""
+                    ).filter { it.isNotEmpty() }.joinToString(" ").ifEmpty { "Read your existing conversations." } } ?: "Current access is unavailable. Refresh to try again."
+                    val labels = mapOf("membership" to "Membership", "comp" to "Gifted access", "commitment" to "Accepted service", "pass_slot" to "Pass AI reach", "trial" to "Conversation trial")
+                    val included = currentAccess?.sources?.map { labels[it.source] ?: "Current access" }?.distinct()?.sorted()?.joinToString(", ")?.ifEmpty { "No included access for this creator." } ?: "Benefits cannot be confirmed."
+                    val paid = current.memberships.filter { it.creator_id == creator && it.state in listOf("active", "grace", "cancelled") && runCatching { Instant.parse(it.period_end).isAfter(accessNow) }.getOrDefault(false) }
+                    val availableModes = modes.filter { it.state == "offered" && it.used + it.reserved < it.weekly_limit }
+                    val changes = (paid.map { "${it.name}: ${if (it.cancel_at_end || it.state == "cancelled") "ends" else "renews"} ${commerceWhen(it.period_end)}" } + (currentAccess?.sources?.filter { it.source != "membership" }?.map { "${labels[it.source] ?: "Access"} ends ${commerceWhen(it.validUntil)}" } ?: emptyList())).joinToString("; ")
+                    AccessLines(name, can, included, if (availableModes.isEmpty()) "No human modes are currently available." else availableModes.joinToString(", ") { it.title }, changes.ifEmpty { "Access refreshes from the server." })
                 } else { CommerceText("Change anything; nothing is sent until you do."); IncludeList(summary, name = name, onSummary = { summary = it }) }
                 ModeList(modes.map { RequestMode(it.title, "${it.delivery_hours} h · ${maxOf(0, it.weekly_limit - it.used - it.reserved)} left", it.amount?.toLongOrNull()?.let { value -> commerceMoney(value, it.currency) } ?: "Price not set", selectedMode == it.id, it.state != "offered" || it.used + it.reserved >= it.weekly_limit) }) { index -> selectedMode = modes[index].id }
-                if (screen == "access") { Button("Ask $name to step in", ButtonVariant.SECONDARY, block = true, disabled = modes.isEmpty()) { screen = "packet" }; Button("Manage membership", ButtonVariant.QUIET, block = true) { screen = "membership" } }
+                if (screen == "access") { Button("Ask $name to step in", ButtonVariant.SECONDARY, block = true, disabled = modes.none { it.state == "offered" && it.used + it.reserved < it.weekly_limit }) { screen = "packet" }; Button("Manage membership", ButtonVariant.QUIET, block = true) { screen = "membership" } }
                 else { Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app. Your draft stays on this screen."); Button("Send request", ButtonVariant.SECONDARY, block = true, disabled = true) {} }
             }
             "checkout" -> Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app.")
             "status" -> detail?.let { value ->
                 val packet = value.packet
+                val name = current.creators.firstOrNull { it.id == packet.creator_id }?.display_name ?: "the creator"
                 CommerceText(packet.snapshot.title, "display-md"); RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
                 CommerceRow("Decision deadline", commerceWhen(packet.decision_at)); CommerceRow("Bank authorization expires", commerceWhen(packet.hold_expires_at)); value.commitment?.let { CommerceRow("Delivery deadline", commerceWhen(it.due_at)) }
                 if (packet.state == "more_info") {
@@ -118,16 +182,23 @@ object CommerceFanFeature {
                 }
                 if (packet.state in listOf("submitting", "submitted", "more_info", "offer_pending")) Button("Withdraw request", ButtonVariant.SECONDARY, block = true, disabled = busy) { scope.launch { mutate("packets/${packet.id}/withdraw", buildJsonObject { put("version", packet.version) }, "Hold release is being confirmed.") } }
                 if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = "Payment processing", children = "The provider must confirm payment. No completion is inferred from this screen.")
-                if (value.commitment?.state == "delivered") {
-                    CommercePanel { CommerceText("Receipt", "receipt-title"); CommerceRow("Charged", commerceMoney(packet.snapshot.amount, packet.snapshot.currency)); CommerceRow("Delivered", commerceWhen(value.commitment.delivered_at)); CommerceText("Signed proof is available with the delivered reply.", "caption") }
-                    Button(if (value.share?.fan_choice == true) "Revoke sharing" else "Allow sharing without your handle", ButtonVariant.SECONDARY, block = true, disabled = busy || !packet.snapshot.shareable || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, "Your sharing choice is saved.") } }
+                if (value.commitment?.delivered_at != null && value.commitment.state in listOf("delivered", "refunded", "resolved")) {
+                    val signedActId = value.commitment.evidence?.signedActId ?: value.commitment.accept_act_id
+                    val label = if (value.commitment.evidence?.authorKind == "approved_draft") "Prepared by AI · approved by $name" else "${packet.snapshot.title} · personally fulfilled by $name"
+                    val refund = value.ledger.filter { it.kind == "refund" && it.currency == packet.snapshot.currency }.sumOf { it.amount.toLong() }
+                    val rows = listOf("Charged" to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), "Delivered" to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf("Refund confirmed" to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
+                    if (signedActId != null) Receipt(name = name, reqId = commerceID(packet.id), title = packet.snapshot.title, rows = rows, label = label, onVerify = { session.destination = "/verify/$signedActId" })
+                    else CommercePanel { CommerceText("Receipt", "receipt-title"); rows.forEach { (label, amount) -> CommerceRow(label, amount) }; CommerceText(label, "caption") }
+                    if (value.commitment.state == "delivered" || value.share?.fan_choice == true) Button(if (value.share?.fan_choice == true) "Revoke sharing" else "Allow sharing without your handle", ButtonVariant.SECONDARY, block = true, disabled = busy || (!packet.snapshot.shareable && value.share?.fan_choice != true) || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, "Your sharing choice is saved.") } }
                 }
             }
             "membership" -> {
                 CommerceText("Manage membership", "display-md")
                 if (current.memberships.isEmpty()) CommerceText("No memberships yet")
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
-                Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                val accountId=session.session?.accountId
+                if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
+                else Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
                 CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
             }
             "pass" -> {
@@ -153,8 +224,8 @@ object CommerceFanFeature {
             }
             else -> {
                 CommerceText("Requests", "display-lg"); Segmented(listOf("Open", "Delivered", "Closed"), category) { category = it }
-                val visible = current.packets.filter { if (category == "Delivered") it.commitment_state == "delivered" else if (category == "Closed") it.state in listOf("draft", "declined", "withdrawn", "expired") else it.state !in listOf("draft", "declined", "withdrawn", "expired") && it.commitment_state != "delivered" }
-                if (visible.isEmpty()) CommerceText("No requests here. Requests appear after you send them. Nothing is held or charged here.")
+                val visible = current.packets.filter { commerceRequestCategory(it) == category }
+                if (visible.isEmpty()) CommerceText(if (current.packets.isEmpty()) "No requests here. Requests appear after you send them." else "No requests here. Choose another category to view your requests and retained receipts.")
                 visible.forEach { packet ->
                     RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
                     Button("View request", ButtonVariant.SECONDARY, block = true, disabled = busy) { scope.launch { try { busy = true; detail = api?.detail(packet.id); screen = "status" } catch (error: Exception) { report(error) } finally { busy = false } } }
@@ -173,4 +244,9 @@ object CommerceFanFeature {
 @Composable private fun CommerceField(label: String, value: String, onChange: (String) -> Unit, lines: Int = 1) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { CommerceText(label, "label"); BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), minLines = lines) } }
 private fun commerceWhen(value: String?): String = value?.let { runCatching { DateTimeFormatter.ofPattern("MMM d, uuuu HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(it)) }.getOrDefault(it) } ?: "—"
 private fun commerceID(value: String) = "REQ-" + value.take(8).uppercase()
-private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to "Hold released · nothing charged", "failed" to "Payment failed · nothing charged", "unknown" to "Confirming payment", "requires_action" to "Payment authentication needed", "refund_pending" to "Refund processing", "refunded" to "Refund confirmed")[packet.payment_state] ?: if (packet.commitment_state == "delivered") "Delivered" else packet.state.replace('_', ' ')
+private fun commerceRequestCategory(packet: CommercePacket): String = when {
+    packet.delivered_at != null || packet.commitment_state == "delivered" -> "Delivered"
+    packet.state in listOf("draft", "declined", "withdrawn", "expired") || packet.commitment_state in listOf("refunded", "resolved") -> "Closed"
+    else -> "Open"
+}
+private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to "Hold released · nothing charged", "failed" to "Payment failed · nothing charged", "unknown" to "Confirming payment", "requires_action" to "Payment authentication needed", "refund_pending" to "Refund processing", "refunded" to "Refund confirmed")[packet.payment_state] ?: if (packet.delivered_at != null || packet.commitment_state == "delivered") "Delivered" else packet.state.replace('_', ' ')

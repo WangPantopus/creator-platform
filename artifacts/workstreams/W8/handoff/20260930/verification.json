@@ -1,0 +1,16 @@
+{
+  "sourceCheckpoint": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+  "scope": "Documentation and sanitized handoff receipts only; no runtime or test source changed.",
+  "checks": {
+    "scopedPrettier": "passed",
+    "gitDiffWhitespace": "passed",
+    "relativeLocalLinks": "all resolve",
+    "receiptJsonParsing": "passed",
+    "caseAndJobIdsMatchMetadata": "passed",
+    "privateRecoveryHashesAnd0600Modes": "passed",
+    "allR1ThroughR10Retained": true,
+    "backendAndInfraUnchangedFromDa03": true,
+    "nativeUnchangedFrom8636": true
+  },
+  "limits": "No new application acceptance or full CI success is claimed. The new logical snapshot was listed but not restored; full provider, native, release and Foundation gates remain as recorded. No test/golden/check was changed or waived."
+}

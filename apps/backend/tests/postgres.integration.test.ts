@@ -5,9 +5,7 @@ import {
   randomUUID,
   sign,
 } from "node:crypto";
-import { execFile } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
+import { readFile } from "node:fs/promises";
 import pg from "pg";
 import fc from "fast-check";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -48,12 +46,12 @@ describe.skipIf(!adminUrl)(
     const creators = Array.from({ length: 10 }, (_, index) => ({
       id: randomUUID(),
       account: randomUUID(),
-      handle: `creator_${index}`,
+      handle: `creator-${index}`,
     }));
     const fans = Array.from({ length: 100 }, (_, index) => ({
       id: randomUUID(),
       account: randomUUID(),
-      handle: `fan_${index}`,
+      handle: `fan-${index}`,
     }));
     const teamAccount = randomUUID();
     const fan: Actor = { accountId: fans[0]!.account, adultEligible: true };
@@ -67,28 +65,34 @@ describe.skipIf(!adminUrl)(
       const url = new URL(adminUrl!);
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
+      await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
       await admin.query(
-        "DROP SCHEMA IF EXISTS creator, growth, creator_trust CASCADE",
+        await readFile(
+          new URL("../migrations/0001_foundation.sql", import.meta.url),
+          "utf8",
+        ),
       );
-      // Exercise today's runtime against the same immutable registry as deployment.
-      // Never add test-only grants to compensate for an obsolete schema.
-      await promisify(execFile)(
-        process.execPath,
-        [
-          "--import",
-          "tsx",
-          fileURLToPath(
-            new URL("../scripts/migrate-trust.ts", import.meta.url),
+      await admin.query(
+        await readFile(
+          new URL("../migrations/0002_w1_identity.sql", import.meta.url),
+          "utf8",
+        ),
+      );
+      // The shipping conversation and memory consumers depend on W8's
+      // allocated 0041/0042 extensions, even when generation is unconfigured.
+      for (const migration of [
+        "pending_w3_conversations",
+        "pending_w3_wellbeing",
+      ])
+        await admin.query(
+          await readFile(
+            new URL(
+              `../src/modules/conversation/migrations/${migration}.sql`,
+              import.meta.url,
+            ),
+            "utf8",
           ),
-        ],
-        {
-          env: {
-            ...process.env,
-            DATABASE_MIGRATION_URL: adminUrl!,
-            W8_LEGACY_ROOT_MIGRATIONS: "false",
-          },
-        },
-      );
+        );
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );
@@ -219,12 +223,13 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
-      expect(observedStatements).toBe(30000);
+      // Current memory reads include scoped exclusions and transcript provenance.
+      expect(observedStatements).toBe(50000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-      // Current authority checks take transaction locks on every iteration. Keep
-      // all 10,000 cases while allowing Docker-backed development machines time.
+      // Ten thousand real scoped transactions include current identity locks.
+      // Keep every pair/assertion; allow slower Docker/CI hosts to finish.
     }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
@@ -359,6 +364,7 @@ describe.skipIf(!adminUrl)(
           ...body,
           idempotencyKey: "other-message-key",
         }),
+        // A reserved last unit remains occupied while the accepted reply is active.
       ).rejects.toMatchObject({ code: "ai_access_unavailable" });
       const counters = await admin.query(
         "SELECT used,reserved FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2",

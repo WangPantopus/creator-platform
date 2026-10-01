@@ -100,12 +100,12 @@ public struct Message: View {
         case .split:
             VStack(spacing: 0) {
                 VStack(alignment: .leading, spacing: QelvoraTokens.token("space-2")) {
-                    HStack(spacing: QelvoraLayout.authorGap) { Mark(); Text(QelvoraCopy.text("preparedByAI")).qText("caption", weight: .semibold).foregroundStyle(qColor("ai-ink", scheme)) }
-                    Text(children).qText("body")
+                    HStack(spacing: QelvoraLayout.authorGap) { Mark(); Text(QelvoraCopy.text("preparedByAI")).qText("caption", weight: .semibold).foregroundStyle(qColor("ai-ink", scheme)) }.accessibilityHidden(true)
+                    Text(children).qText("body").accessibilityLabel(QelvoraCopy.text("preparedByAI") + " · " + QelvoraCopy.text("approvedBy", values: ["name": name]) + ". " + children)
                 }.padding(.vertical, QelvoraTokens.token("space-3")).padding(.horizontal, QelvoraTokens.token("message-padding")).frame(maxWidth: .infinity, alignment: .leading).background(qColor("ai-surface", scheme))
                 ViewThatFits(in: .horizontal) {
-                    HStack(spacing: QelvoraTokens.space2) { approvalLabel; Spacer(minLength: 0); SignedMarker(name: name, time: time, onMaya: true, action: onVerify).fixedSize() }
-                    VStack(alignment: .leading, spacing: QelvoraTokens.space1) { approvalLabel; SignedMarker(name: name, time: time, onMaya: true, action: onVerify) }
+                    HStack(spacing: QelvoraTokens.space2) { approvalLabel.accessibilityHidden(true); Spacer(minLength: 0); SignedMarker(name: name, time: time, onMaya: true, action: onVerify).fixedSize() }
+                    VStack(alignment: .leading, spacing: QelvoraTokens.space1) { approvalLabel.accessibilityHidden(true); SignedMarker(name: name, time: time, onMaya: true, action: onVerify) }
                 }.padding(.horizontal, QelvoraTokens.messagePadding).padding(.vertical, QelvoraTokens.composerGap).frame(maxWidth: .infinity, alignment: .leading).background(qColor("maya-surface", scheme))
             }.clipShape(BubbleShape()).overlay(BubbleShape().stroke(qColor("maya-line", scheme), lineWidth: 1))
         case .gradient:

@@ -71,7 +71,7 @@ export function calculateClocks(input: {
       const gap = Math.max(0, interval.start - prior.end);
       const remaining = Math.max(0, budget - reconnect);
       reconnect += Math.min(gap, remaining);
-      if (gap >= remaining) {
+      if (gap > 0 && gap >= remaining) {
         exhaustedAt = prior.end + remaining;
         break;
       }
@@ -89,7 +89,7 @@ export function calculateClocks(input: {
     const gap = Math.max(0, end - last.end);
     const remaining = Math.max(0, budget - reconnect);
     reconnect += Math.min(gap, remaining);
-    if (gap >= remaining) exhaustedAt = last.end + remaining;
+    if (gap > 0 && gap >= remaining) exhaustedAt = last.end + remaining;
   }
   return {
     connectedMilliseconds: consumed,
@@ -113,7 +113,7 @@ export function determineOutcome(input: {
   fanJoinedByGrace: boolean;
   graceElapsed: boolean;
 }): SessionOutcome | null {
-  if (!input.connectedMilliseconds && input.graceElapsed) {
+  if (input.graceElapsed) {
     // Both absent has no approved source rule; keep evidence unresolved for W4/W8 decision.
     if (!input.creatorJoinedByGrace && !input.fanJoinedByGrace) return null;
     if (!input.creatorJoinedByGrace) return "creator_no_show";

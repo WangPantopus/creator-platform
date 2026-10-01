@@ -26,13 +26,6 @@ renders, a bright-red pixel diff and measured counts to the HTML report. Review
 retained example evidence under `evidence/` before changing this bound.
 
 Auth tests verify provider-unconfigured failures and preserved arrival paths.
-Foundation pixel checks use the existing typed design routes with the exact
-reference content. The live Welcome and creator routes now use canonical owner
-data, so an unconfigured backend cannot supply their former Maya fixtures.
-Those routes remain covered by the real auth checks and workstream operation;
-the design checks retain their independent references, original baselines and
-zero-pixel limits. Arrival parameters use registered C11 UUIDs and the current
-Home fallback rather than arbitrary draft text or invented creator metadata.
 Catalog fidelity does not verify backend behavior, device accessibility,
 keyboard flows, store billing or pilot comprehension thresholds.
 

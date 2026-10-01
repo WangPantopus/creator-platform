@@ -608,9 +608,15 @@ public enum QelvoraCopy {
     "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
     "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
   ]
+  private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
-    guard var result = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
-    for (key, value) in values { result = result.replacingOccurrences(of: "{\(key)}", with: value) }; return result
+    guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+    let source = template as NSString
+    let result = NSMutableString(string: template)
+    for match in variables.matches(in: template, range: NSRange(location: 0, length: source.length)).reversed() {
+      if let value = values[source.substring(with: match.range(at: 1))] { result.replaceCharacters(in: match.range, with: value) }
+    }
+    return result as String
   }
   public static let brandName = "Qelvora"
   public static let studioName = "Qelvora Studio"

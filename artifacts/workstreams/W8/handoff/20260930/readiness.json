@@ -1,0 +1,113 @@
+{
+  "ready": false,
+  "environment": "local-development",
+  "release": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "capabilities": [
+    {
+      "name": "database",
+      "required": true,
+      "state": "available",
+      "code": "non_owner_rls_verified",
+      "checkedAt": "2026-09-30T21:03:49.158Z"
+    },
+    {
+      "name": "identity",
+      "required": true,
+      "state": "development",
+      "code": "synthetic_local_accounts",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "model",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "payments",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "calls",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "voice",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "push",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_identity",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_conversation",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_agent",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_commerce",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_content",
+      "required": true,
+      "state": "unavailable",
+      "code": "owner_hook_unconfigured",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_media",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_growth",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    },
+    {
+      "name": "privacy_trust",
+      "required": true,
+      "state": "unavailable",
+      "code": "export_hook_registered_retention_gated",
+      "checkedAt": "2026-09-30T21:03:49.143Z"
+    }
+  ],
+  "httpStatus": 503
+}

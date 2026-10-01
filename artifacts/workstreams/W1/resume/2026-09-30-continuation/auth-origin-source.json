@@ -1,0 +1,54 @@
+{
+  "parentRevision": "4a1262357eb12281cdf030ead7974d580c964ff2",
+  "producer": "a010a030378a0c62a44d6c14e714cc397722e702",
+  "consumption": "Only the explicit production configured-origin gate/503 handling; preserve W1 strict query guards and navigation-retention cookie",
+  "source": {
+    "apps/web/app/api/auth/continue/route.ts": "ed192e096333cddcc3d6d8a573fb8eda6f33f377d0e2258022341ce788857bb0"
+  },
+  "logs": {
+    "auth-origin-build": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-build.log",
+      "sha256": "eee4c2aabd8bdab95c90197588f95cf8dcbca6a31caf2e7e31a6d9f67b307540"
+    },
+    "auth-origin-lint": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "auth-origin-contracts": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-contracts.log",
+      "sha256": "d42416534181d34442d8aef342d9807132208e502882cd69facf385392d59bec"
+    },
+    "auth-origin-rename": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-rename.log",
+      "sha256": "922e178a3c96f48b0905c4b8b3e3add2ea7a15a2b9c579b8c8fbd9648f5a30a5"
+    },
+    "auth-origin-rename-web": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-rename-web.log",
+      "sha256": "1bda8d5fa8600f72d45f5a5bb38fa82eaa340e8c1ed0a058c41c64c20f90ccdc"
+    },
+    "productionMissingOrigin": {
+      "path": "/private/tmp/creator-w1-continuation-auth-origin-production-response.txt",
+      "sha256": "870e4322b597046d735b42610239274ebb5226300152884685417da92956e5c8"
+    }
+  },
+  "checks": {
+    "webProductionBuild": "passed",
+    "renamedWebProductionBuild": "passed",
+    "existingAuthCases": 2,
+    "authRunnerSeconds": 20.8,
+    "affectedLint": "passed",
+    "actualProductionMissingOrigin": {
+      "serverPort": 3011,
+      "apiConfigured": false,
+      "HTTPStatus": 503,
+      "errorCode": "identity_unconfigured",
+      "operation": "GET /api/auth/continue?returnTo=%2Fhome"
+    }
+  },
+  "limits": [
+    "No production identity/domain credential or approval fabricated",
+    "No new tests/scripts, private credentials or account tokens in evidence",
+    "Development safe-context checks pass; actual production missing-origin route denial is observed",
+    "Configured production Pantopus/provider/native passkey acceptance remains gated"
+  ]
+}

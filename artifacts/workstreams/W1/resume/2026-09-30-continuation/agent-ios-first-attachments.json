@@ -1,0 +1,230 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "579CA97F-3235-4D6C-9129-E539A3D562E2.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Native-Message-identities_0_97C15B73-7E45-4857-93A8-62416F66C5CC.png",
+        "timestamp" : 1790826197.45
+      }
+    ],
+    "testIdentifier" : "FoundationFlowTests/testCreatorAndAIRemainLabeledInNativeCatalog()",
+    "testIdentifierURL" : "test://com.apple.xcode/QelvoraApp/QelvoraUITests/FoundationFlowTests/testCreatorAndAIRemainLabeledInNativeCatalog"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "12071234-5EC4-41AC-B33B-0196FA77359F.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "SignIn-unconfigured-Dark_0_370D5453-5274-4B73-925D-C8BD8A3AB200.png",
+        "timestamp" : 1790826263.051
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "AD3D0B22-4B26-41B2-AF4C-8857063BA8B3",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI Snapshot 2026-09-30 at 08.44.21 PM",
+        "timestamp" : 1790826261.215
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "DCDBF2D4-715D-4FDC-B312-790DA032E93F",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Synthesized Event 2026-09-30 at 08.44.21 PM",
+        "timestamp" : 1790826261.54
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "264B270B-F77B-411C-AD29-C8E7E18428A7.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Welcome-Dark_0_6E3230DF-ECF9-4389-8DE9-766EA3ECED5B.png",
+        "timestamp" : 1790826260.019
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "23C2360B-6AC9-4888-BEA0-B77F6B2E14E8",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI Snapshot 2026-09-30 at 08.44.16 PM",
+        "timestamp" : 1790826256.763
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "14FDB1D3-B474-4279-B862-88B4C002C036",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Synthesized Event 2026-09-30 at 08.44.17 PM",
+        "timestamp" : 1790826257.199
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "01712E01-7B28-4A76-8734-4B965F53020A.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "App UI hierarchy for com.pantopus_0_9C83AA5E-1741-415E-8882-E6D044D40DBA.qelvora",
+        "timestamp" : 1790826239.973
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "B6A72DCD-B74B-4640-9C8B-148E9A41698D",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI Snapshot 2026-09-30 at 08.43.59 PM",
+        "timestamp" : 1790826239.973
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "57009C90-DB3C-4ACC-B8D2-9DE63DB24FCC.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_13115175-7678-4ECC-9B85-A93FACB2A050.txt",
+        "timestamp" : 1790826239.947
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "1CAA87A4-223A-466A-8E41-66E66BEC2356.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_C29356E0-8482-4D58-A4FD-25CF6C95EC51.txt",
+        "timestamp" : 1790826238.994
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "6FA154C4-9646-41D9-9A2F-DF786BB00F5D.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_07A6C8AC-8C89-4D83-9A85-A3EB7B373634.txt",
+        "timestamp" : 1790826237.948
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "172A11A4-5E9B-4A37-90D2-BC2AD2F6AA1B.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_4193EC66-0522-4BBB-A619-77D95D543F6F.txt",
+        "timestamp" : 1790826237.017
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "F8F19822-671B-48BA-B577-9A808977AC83.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_3562A585-9186-408F-B1F4-8BE373D4C031.txt",
+        "timestamp" : 1790826235.982
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "ED212E51-6432-4C5B-BE68-DAA4DA089004.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_E8F4B0FE-D167-4C48-ACC9-A9300B8EB56D.txt",
+        "timestamp" : 1790826235.036
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "F09A12E0-D366-48C4-A4E8-E0E27F4A3687.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_F6AB574A-B9BF-408D-B438-9A735D5DC76C.txt",
+        "timestamp" : 1790826233.999
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "87CE52D4-7DAE-4B2F-96BF-FDA260FB8148.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_5B90A202-A5EB-4521-81C7-79D0073DEFE1.txt",
+        "timestamp" : 1790826232.97
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "A418A7B0-BC6F-47DC-B5D2-D64BB00E6677.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_4B79F39C-900A-4004-82AB-0139AEC7BCF2.txt",
+        "timestamp" : 1790826232.03
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "CB134B18-2EB8-4FEF-8757-C8AF4FC3458B.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Debug description for `\"continue-with-pantopus\" Button`_0_E468F6CF-F212-457D-BBF1-E26F43D45455.txt",
+        "timestamp" : 1790826230.99
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "4B57D21C-6466-4217-A293-1CEA9BA4CD29.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "SignIn-unconfigured-Light_0_E57C8AB8-7874-473D-B885-CD7AADA7A54A.png",
+        "timestamp" : 1790826221.649
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "6EB8C163-40A6-48FE-9455-E67BE68CC6F0",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI Snapshot 2026-09-30 at 08.43.39 PM",
+        "timestamp" : 1790826219.57
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "945AE84B-B952-433E-B06E-F63AD215F61C",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Synthesized Event 2026-09-30 at 08.43.40 PM",
+        "timestamp" : 1790826220.01
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "4BC735A4-5B51-4833-885B-9271D53B0694.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Welcome-Light_0_960ABC0E-85DD-45F1-91B1-C01CAE22F4A1.png",
+        "timestamp" : 1790826219.436
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+        "deviceName" : "Creator Platform W1 Resume 20260930",
+        "exportedFileName" : "554F905A-F667-4164-B9EC-FB51547D7021.mp4",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Screen Recording 2026-09-30 at 08.43.27 PM.mp4",
+        "timestamp" : 1790826207.848
+      }
+    ],
+    "testIdentifier" : "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+    "testIdentifierURL" : "test://com.apple.xcode/QelvoraApp/QelvoraUITests/FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes"
+  }
+]

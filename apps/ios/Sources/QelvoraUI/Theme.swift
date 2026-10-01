@@ -47,6 +47,20 @@ struct QelvoraTextStyle: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder func qDisableAutoCapitalization() -> some View {
+        #if os(iOS)
+        self.textInputAutocapitalization(.never)
+        #else
+        self
+        #endif
+    }
+    @ViewBuilder func qDecimalKeyboard() -> some View {
+        #if os(iOS)
+        self.keyboardType(.decimalPad)
+        #else
+        self
+        #endif
+    }
     func qText(_ name: String, weight: Font.Weight? = nil, italic: Bool = false) -> some View {
         modifier(QelvoraTextStyle(name, weight: weight, italic: italic))
     }
