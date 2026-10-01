@@ -55,6 +55,10 @@ export interface GenerationAllowance {
 
 export class AccessService {
   private generationAllowance?: GenerationAllowance;
+  /** Read-only identity check for a prepared domain reconciliation port. */
+  isGenerationAllowance(allowance: GenerationAllowance): boolean {
+    return this.generationAllowance === allowance;
+  }
   configureGenerationAllowance(allowance: GenerationAllowance) {
     invariant(
       !this.generationAllowance,

@@ -10,6 +10,8 @@ Stripe pass SDK effects now recover the original creation invoice, validate cons
 
 The allocated0054 proposal and PassPurchaseJournal now persist the actual provider preview before consent, current fan renewal intent, original body/key/hash and attempt/lease, exact first cash/refund causes and actual payment time. Late activation after cancellation requires a fresh durable compensation; prior uncertain recurring writes retain read-only recovery until terminal provider truth. Pending pass exposure and both financial exporters consume the journal without double-counting a captured purchase. Guarded runtime/status/quote/purchase/cancel/reconciliation routes and the existing pass worker use the same canonical pass graph; default activation stays false pending exact installation, current authority, reviewed retention/renewal and real pool composition. The attributed-cost adapter consumes W2's actual immutable terminal receipt under the original explicitly reviewed rule, without inferring zero from missing usage.
 
+Late cost reconciliation is now an identity-bound port from the actual prepared CommerceGenerationAllowance on the same canonical AccessService. It verifies that binding on every call and directly performs weighted generation settlement, so an absent adapter cannot fall back to fixed-unit accounting and consume another reservation. Current-scope reconciliation and privacy-family lifecycle remain distinct; reviewed finite financial retention/expiry is still pending.
+
 Other implemented behavior:
 
 - Account-bound fan web/Swift/Kotlin Access, immutable request disclosures, capacity/spending order, immediate limit lowers and 24-hour delayed raises.

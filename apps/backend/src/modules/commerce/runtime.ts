@@ -58,6 +58,9 @@ export async function createCommerceRuntime(input: {
     : undefined;
   if (generationAllowance)
     input.access.configureGenerationAllowance(generationAllowance);
+  const generationCostReconciliation = generationAllowance?.reconciliation(
+    input.access,
+  );
   const service = new CommerceService(
     input.pool,
     input.database,
@@ -106,6 +109,7 @@ export async function createCommerceRuntime(input: {
     // W3 readiness consumes this after awaiting composition. It must not
     // configure a second allowance/reservation path or infer it from keys.
     generationAllowanceAvailable: Boolean(generationAllowance),
+    generationCostReconciliation,
     audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),
   };

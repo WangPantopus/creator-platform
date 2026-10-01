@@ -5,7 +5,21 @@ import {
   settleCostAllowance,
   recordCostAllowanceOutput,
 } from "../access/commerce.js";
-import type { GenerationAllowance, ThreadScope } from "../access/scope.js";
+import type {
+  AccessService,
+  GenerationAllowance,
+  ThreadScope,
+} from "../access/scope.js";
+
+export interface GenerationCostReconciliation {
+  reconcile(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+    grantId: string,
+    outputDelivered: boolean,
+  ): Promise<void>;
+}
 
 export const GENERATION_COST_MIGRATION_VERSION =
   "0049_w4_generation_cost_settlement";
@@ -39,6 +53,36 @@ export interface GenerationCostPolicy {
  * unique generation key within the same acceptance transaction. */
 export class CommerceGenerationAllowance implements GenerationAllowance {
   private constructor(private readonly policy: GenerationCostPolicy) {}
+  /** Only this successfully prepared instance can issue its port. Each call
+   * proves identity against the same canonical AccessService and bypasses the
+   * legacy fixed-unit method entirely; missing configuration retains the hold. */
+  reconciliation(access: AccessService): GenerationCostReconciliation {
+    const assertBound = () =>
+      invariant(
+        access.isGenerationAllowance(this),
+        "generation_cost_reconciliation_unavailable",
+        "Late cost reconciliation requires this exact configured cost adapter.",
+      );
+    assertBound();
+    return Object.freeze({
+      reconcile: async (
+        scope: ThreadScope,
+        client: PoolClient,
+        generationId: string,
+        grantId: string,
+        outputDelivered: boolean,
+      ) => {
+        assertBound();
+        await this.settle(
+          scope,
+          client,
+          generationId,
+          grantId,
+          outputDelivered,
+        );
+      },
+    });
+  }
   static async prepare(pool: Pool, policy: GenerationCostPolicy) {
     invariant(
       policy.version.length > 0 &&
