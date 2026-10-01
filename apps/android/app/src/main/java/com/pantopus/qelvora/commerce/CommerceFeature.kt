@@ -200,7 +200,10 @@ object CommerceFanFeature {
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
                 val accountId=session.session?.accountId
                 if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
-                else Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                else {
+                    Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                    if(current.memberships.any {it.provider=="google"}) key(accountId) {StoreSubscriptionManagement(context)}
+                }
                 CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
             }
             "pass" -> {
