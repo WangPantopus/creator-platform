@@ -23,6 +23,7 @@ import { CardEntry, authenticateCard } from "./CardEntry";
 import { PassCheckout } from "./PassCheckout";
 import { PoolEarnings } from "./PoolEarnings";
 import { CreatorEarnings } from "./CreatorEarnings";
+import { PayoutAccount } from "./PayoutAccount";
 
 type Mode = {
   id: string;
@@ -135,7 +136,12 @@ type Overview = {
     creatorId: string;
     products: { key: string; label: string }[];
   }[];
-  payoutAccounts: { creator_id: string; state: string; details_due: boolean }[];
+  payoutAccounts: {
+    creator_id: string;
+    state: string;
+    details_due: boolean;
+    version: number;
+  }[];
   poolEarnings: commerceContracts.PoolEarnings[];
   creatorEarnings: commerceContracts.CreatorEarnings | null;
   limits: Limit[];
@@ -178,6 +184,7 @@ type Overview = {
     membershipAvailable: boolean;
     passPurchaseAvailable: boolean;
     poolEarningsAvailable: boolean;
+    payoutOnboardingAvailable?: boolean;
     nativeReplyPurchase: boolean;
     stripePublishableKey: string | null;
   };
@@ -2178,19 +2185,21 @@ function CommerceAccountScreen({
                           return page;
                         }}
                       />
-                      <section className="commerce-card">
-                        <h2>Payout account</h2>
-                        <p>
-                          {data.payoutAccounts.find(
+                      {accountId && (
+                        <PayoutAccount
+                          key={`${accountId}:${earningsCreator}:${data.payoutAccounts.find((a) => a.creator_id === earningsCreator)?.version ?? "unconfigured"}`}
+                          accountId={accountId}
+                          creatorId={earningsCreator}
+                          record={data.payoutAccounts.find(
                             (a) => a.creator_id === earningsCreator,
-                          )?.state ?? "Not configured"}
-                          {data.payoutAccounts.find(
-                            (a) => a.creator_id === earningsCreator,
-                          )?.details_due
-                            ? " · Verification details required"
-                            : ""}
-                        </p>
-                      </section>
+                          )}
+                          available={
+                            data.capabilities.payoutOnboardingAvailable ?? false
+                          }
+                          disabled={busy || !identityAvailable}
+                          fetchAccount={accountFetch}
+                        />
+                      )}
                       <p>
                         Payout eligibility starts seven days after delivery and
                         remains held during a dispute. Provider fees, payout

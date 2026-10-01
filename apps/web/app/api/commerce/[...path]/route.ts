@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { platformFetch } from "../../../../lib/session";
 const route =
-  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|billing|quote|purchase|purchase-status|cancel|effects\/[a-f0-9-]{36}\/reconcile|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|commitments\/[a-f0-9-]{36}\/release|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|reconcile-money|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|earnings|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
+  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|billing|quote|purchase|purchase-status|cancel|effects\/[a-f0-9-]{36}\/reconcile|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|commitments\/[a-f0-9-]{36}\/release|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|reconcile-money|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|earnings|payout-onboarding|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
 async function proxy(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -20,6 +20,11 @@ async function proxy(
     return Response.json(
       { error: { message: "Use this app to perform the action." } },
       { status: 403 },
+    );
+  if (target.endsWith("/payout-onboarding") && request.method !== "POST")
+    return Response.json(
+      { error: { message: "Use the payout verification action." } },
+      { status: 405 },
     );
   const query = request.nextUrl.searchParams;
   if (
