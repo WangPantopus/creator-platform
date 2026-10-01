@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="qv">
+      <body>
         <Theme />
         {children}
       </body>

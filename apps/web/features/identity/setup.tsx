@@ -97,7 +97,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     "Sources, style, rules, tests",
   ];
   return (
-    <main className="creator-setup">
+    <main className="creator-setup qv">
       <aside className="qv-on-maya setup-rail">
         <span>{brand.studioName}</span>
         <h1>An AI that speaks for you only as far as you allow.</h1>

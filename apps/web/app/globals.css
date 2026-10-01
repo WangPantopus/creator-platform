@@ -34,6 +34,10 @@ html[data-theme="night"] {
   max-width: 100%;
   margin-inline: auto;
 }
+.foundation,
+.foundation * {
+  box-sizing: border-box;
+}
 .foundation > div {
   max-width: 100%;
 }
