@@ -1,5 +1,10 @@
 # Resume W5 from the pushed implementation checkpoint
 
+## Current continuation correction
+
+Continue from actual current HEAD, including final served-file consumer e0995381cf3621d1bf862732d95e4029ef6b0f92; do not reset to historical hashes below. PR9 exists. Local registry and ledger are35entries ending0038, not38; W8 canonical40 aliases plus already-applied identical reply-review0038→reserved0045 and reserved0051 remain pending custody. Native implementation is committed; actual iOS sign-in launches and AndroidAPI35 ANR/timeouts are recorded in resumption/file-proof-observations.json. Own native devices are gracefully stopped/data preserved; W6 officialAPI34 readonly image provision is pending. Human explicitly keeps genuine signing blocked and requires actual launched-app E2E before merge. All nine packages remain incomplete; current status/handoff supersede old resource/PR facts below.
+
+
 You are the directly assigned primary W5 owner. Continue personally from the existing implementation; complete all remaining original workstream scope, not just CI or a first increment.
 
 Work in `/Users/yingpengwang/.codex/worktrees/35e3/creator-platform`, branch `codex/w5-studio-content`. Inspect actual HEAD/status, fetch latest and preserve all user/peer changes. Latest application checkpoint is `eedf35fc82544ab9216384896b84e376f2c323f4`; a subsequent documentation commit contains the handoff. Do not reset to the historical `codex/w5-studio-handoff` or documentation-only main. This branch contains reviewed foundation22aa088 via44ebd35. At last fetch main2e337a1 was already included.

@@ -123,9 +123,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T02:33:40.140874+00:00",
+    "recordedAt": "2026-10-01T03:06:41.861363+00:00",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "cea5e07d302bd36d4eeb99dd627989b0f9ea6d26 application checkpoint; documentation checkpoint follows, inspect HEAD",
+    "lastPushedCheckpoint": "e0995381cf3621d1bf862732d95e4029ef6b0f92 application checkpoint; documentation follows, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -182,15 +182,16 @@
       "pendingCreatorControlsBothWidthsThemesVerified": true,
       "pendingCreatorId": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
       "accountAliasCurrentAndScopedUnavailableVerified": true,
-      "currentPrivateSessionExpired": true
+      "currentPrivateSessionExpired": true,
+      "pendingRoleRefreshVerified": true
     },
-    "mediaMigration": "schema-media-publication.sql proposed, unallocated, unapplied; no applied SQL or checksums rewritten",
+    "mediaMigration": "W8 reserved0051_w5_media_publication at0742900 / SHA256f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e; unapplied pending immutable aliases/fresh+upgrade custody",
     "signing": "Human instructed keep genuine signing blocked; no UV/passkey simulation",
     "OpenAI": {
       "keyLoaded": false,
       "paidCalls": 0
     },
-    "verification": "Final API/web types, scoped lint/format and backend/web production builds pass; actual launched pending-profile web 390/1280 Light/Night and /you account/query journeys verified. No unit tests run this continuation. Historical18 backend pass/15 nonsnapshot pass/110 strict comparisons fail remain unchanged; no current all-CI or E2E merge-ready claim.",
+    "verification": "Final web types/lint/format/production build, API types/backend production and generation/generate:check pass;78complete operation objects/client suffixes retained. Final shipping iOS/AndroidAPK build pass. Launched native iOS actualSignIn both themes; Android actualANR/timeout fails acceptance. No units/newtests thiscontinuation; no completeE2E merge gate.",
     "unverified": [
       "Genuine signed Note/two-fan reply/reaction",
       "Real media/C2PA and live/replay",
@@ -201,25 +202,26 @@
     "signatureWithdrawal": "Published held-client ContentSignatureWithdrawal + authorizePublicationSignatureWithdrawal exact domain/revision/full-command policy. W1 consumed registry/current held W8 denial/durable real publisher audit + W8 RLS remain required and absent.",
     "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
     "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
-    "audienceMedia": "Web actual-account-bound consumer committed; provisional native attachments uncommitted pending W6 mandatory final served-file SHA/size/variant contract. Processed publication signature tuple is preserved; mismatch fails closed. No real bytes/provider playback proof.",
+    "audienceMedia": "Final mandatory served-file proof consumed exactly fromW6 682766c, distinct original processed signing tuple; personal native bounded ranges/hash/private cleanup and web audience credentialed proof; no actual mounted producer/bytes/playback acceptance.",
     "mediaLifecycle": "Exact c425ae7 recorder generation and de17183 canonical form; keyed old-node preview/player cleanup plus personal player hidden-authority pause",
-    "nativeAuthority": "Serialized monotonic5s/scene expiry, private state keyed to route, signature closure, actual-account GET binding; compile only, native operation unverified",
+    "nativeAuthority": "Personal final audience attachments/currentviewer+publication+asset binding/serial monotonic5s/scene expiry; actualnativeauth/mediaoperation remains blocked/unverified",
     "nativeBuildResources": {
       "owned": "/private/tmp/creator-w5-native-authority",
       "jdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/jdk-x64/jdk-21.0.12.1+1/Contents/Home",
       "sdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/sdk",
-      "androidBuild": "Final provisional attachment assembleDebug passes351s; APK SHA25610c37134e29483d1ff3bc0e988df47ba24d6d4a5eb39be2d36a75a54a8110d8f. No Android emulator launched yet.",
-      "iosBuild": "Full shipping simulator host and final AudioSession incremental build pass. Normal FanAppShell installed and visibly launched to genuine Pantopus sign-in on owned W5 iPhone17/iOS26.5; launch-only, not authenticated/native E2E.",
+      "androidBuild": "Final file-proof corrected assembleDebug PASS280s; APK7cb4a2aaa07b2a99769376c94a1199ea3cad646bfda45b6b4e3cdda15b8f92c7 installed ownAPI35. LightcoldStatusok19897ms, Nighttimeout26354ms +actualSystemUIANR. Not runtime acceptance.",
+      "iosBuild": "Final corrected final-file proof shipping build PASS; actual normal FanAppShell correct/content destination bothLight/Night genuineSignInonly; no authenticatedcontent/bytes.",
       "ownCachesPreserved": true,
       "iosOwned": "/private/tmp/creator-w5-native-audience-host",
-      "iosSimulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27 booted; peer devices preserved",
+      "iosSimulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27 gracefully shutdown aftercaptures/data preserved; peerdevices untouched",
       "xcodegenReadonlyLease": "/private/tmp/creator-w1-continuation-tools-20260930/xcodegen/bin/xcodegen",
-      "runtimeEmulatorLease": "W6 official SDK/image installation completed; await owner verified read-only lease. Reserve W5-only ADB5045/emulator5590/AVD/userdata."
+      "runtimeEmulatorLease": "Verified readonly W6 emulator37.1.11/API35image/platformtools; ownoverlay runtime-sdk/AVDhomes/TMP/ADB5045/emulator5590/netsim5. OwnAPI35 emulator gracefully stopped/data preserved afterANR. W6 officialAPI34 provision pending; do notwritepeerSDK."
     },
     "corrections": "Personal strict3cda401 command/input/UI/BFF; exact source version/current account, bounded expiry, original retry, real five-field receipt plus full delivered metadata readback. Original directory empty; genuine UV held; producer/migration/unallocated lineage and audited timeline metadata integration still required. Pending reload recovery unverified.; exact16162 contracts consumed, newest100 query only; genuine lineage port/current missing message columns await W3/W8; actual correction label/exact original-version opener prepared.",
-    "hostedCI": "Last inspected d17e148 PR9 draft with required contexts incomplete; no current head all-green/E2E acceptance and no merge. PR1\u20139 inspected; none has complete app-level acceptance plus required head gates.",
+    "hostedCI": "Inspected parent3fa1 PR9 fiveSUCCESS/sixQUEUED; newly pushed e099 currentrequiredjobs must be inspected. xcode-27 validhostedpreview, queuecause/ETAunverified; no workflowchange/no PRmerge/noallgreenE2Eclaim.",
     "preparedStudioRead": "Exact W3 37f727eb type-only port and personal bounded same-pool held-client consumer committed cea5e07. Unmounted pending actual canonical base columns, W8 alias/fresh-upgrade custody and genuine prepared owner instance.",
-    "creatorVerification": "Actual pending creator profile disables Save/review/Photo/Voice while local text remains editable; explicit later session expiry clears private input.",
-    "accountAlias": "Explicit W1 lease: unscoped protected identity/account redirect; any query preserved with unavailable notice and deliberate general-account navigation."
+    "creatorVerification": "Current verified owner/publisher canPublish guard and review guard; pending Refresh role retains exact local input/focus with remote controls disabled. Actual latest browser session expiry clears private view.",
+    "accountAlias": "Explicit W1 lease: unscoped protected identity/account redirect; any query preserved with unavailable notice and deliberate general-account navigation.",
+    "migrationAudit": "Readonly35local/ledger matching checksums; canonical40 aliases six0032\u20130037\u21920035\u20130040 plus applied0038reply-review\u2192reserved0045 identical current SQL. Earlier different-reserved-bytes claim retracted. No SQL/ledger/checksum changes; see migration-alias-observations.json."
   }
 }
