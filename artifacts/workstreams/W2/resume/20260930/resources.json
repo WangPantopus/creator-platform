@@ -19,14 +19,15 @@
     {
       "workstream": "W2",
       "simulator": "09FA41B1-C300-4970-9F09-26F7CB884425",
-      "state": "Completed UI proof; own simulator shut down, app/data retained"
+      "state": "Current signed UI2/2passed; shut down normally/data retained"
     },
     {
       "workstream": "W2",
       "avd": "CreatorPlatform_W2_Resume_20260930",
       "serial": "emulator-5562",
       "adbServerPort": 5042,
-      "state": "API34 scoped clean-network retry session15249 boot55298ms; actual coldlaunch8498ms stillshowsSystemUI ANR; data preserved"
+      "hciPort": 15602,
+      "state": "Stopped; savedapp/data/failurelogsretained"
     },
     {
       "workstream": "W2",
@@ -34,7 +35,15 @@
       "serial": "emulator-5562",
       "adbServerPort": 5042,
       "hciPort": 15602,
-      "state": "API35 stopped with installed app/data retained after visible SystemUI failure; own API34 retry with corrected isolated default network discovery pending"
+      "state": "GoogleimageSystemUIANRbeforeapp atlauncher; stoppednormally/dataretained"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "hciPort": 15602,
+      "state": "OfficialAOSP35clean shipping andUI4/4+Nightverified; stoppednormally/dataretained"
     }
   ],
   "provider": {
@@ -95,10 +104,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 46299,
-      "executionSession": 63089
+      "pid": 61358,
+      "executionSession": 15346
     },
-    "observedAt": "2026-10-01T04:03:29.712278+00:00",
+    "observedAt": "2026-10-01T04:42:11.900016+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -139,9 +148,9 @@
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-10-01T02:12:23.278087+00:00",
+    "observedAt": "2026-10-01T04:42:11.900016+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener, PID46299/session63089; actual reported-usage preservation source loaded, saved18/current evaluation unchanged",
+    "apiPort4102": "loopback listener PID61358/session15346; reconciled W2 journal/accounting/session source, saved18/current evaluation unchanged",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
@@ -187,12 +196,12 @@
     "receipt": "visual-origin-followup.json"
   },
   "nativeVerification": {
-    "state": "iOS2 and Android4 existing UI interactions verified; clean Android launch recovery ongoing; canonical licensed fan journeys unavailable",
+    "state": "Current native source: signed iOS2/2 pass0fail41.046s; officialAOSP35 clean shipping launch, originalAndroid4/4pass0fail19.235s + Night shipping sign-in4.378s and cleanpostUIlaunch3967ms; actualcanonicallicensedfanjourneysunavailable",
     "simulator": {
       "name": "Creator Platform W2 Resume 20260930",
       "id": "09FA41B1-C300-4970-9F09-26F7CB884425",
       "runtime": "iOS26.5",
-      "state": "Signed app installed/visibly launched, existing2 UI cases PASS0fail44.250s including sign-in Light/Night; owned device now shut down, app/data retained",
+      "state": "Rebuilt signed actual current source, both originalUIcasesPASS0fail41.046s Light/Night; own simulator shut down normally; data retained",
       "peerDevices": "All preserved",
       "evidence": [
         "ios-welcome-launched.png",
@@ -202,17 +211,17 @@
     "android": {
       "emulatorPort": 5562,
       "adbServerPort": 5042,
-      "state": "API34 scoped clean-network retry session15249 boot55298ms; actual coldlaunch8498ms stillshowsSystemUI ANR; data preserved",
+      "state": "CurrentAPK cleanofficialAOSP35launch and all4originalUIcasesPASS0fail19.235s; Night shipping sign-inPASS4.378s; cleanposttestshippinglaunch3967ms; ownAOSP emulatornormallystopped/dataretained",
       "evidence": [
-        "android-systemui-failure.png",
-        "android-systemui-after-ui.png",
-        "android-api35-systemui-failure.png"
+        "merged-android-aosp-welcome.png",
+        "merged-android-aosp-night.png",
+        "merged-android-google-image-startup-failure.png"
       ],
       "previousExecutionSession": 21120,
-      "nextAvd": "CreatorPlatform_W2_Resume_20260930",
-      "networkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api35 TMPDIR and ANDROID_TMP; default netsim instance and unused HCI15602. No peer/global daemon changes.",
-      "observedAt": "2026-10-01T03:57:07.419026+00:00",
-      "executionSession": 15249,
+      "nextAvd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
+      "networkDiscovery": "Own netsim-aosp35 TMPDIR/ANDROID_TMP; default isolated discovery; HCI15602; peers unchanged",
+      "observedAt": "2026-10-01T04:42:11.900016+00:00",
+      "executionSession": 82381,
       "pid": 35646,
       "nextNetworkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api34-clean TMPDIR/ANDROID_TMP, default netsim instance; HCI15602 reused only after own API35 stopped"
     },
