@@ -149,9 +149,10 @@ export function createConversationRuntime(input: {
     memory,
     wellbeing,
     processor,
-    signedSubjectPolicies: input.corrections
-      ? [input.corrections.signedSubjectPolicy()]
-      : [],
+    signedSubjectPolicies: [
+      ...(input.corrections ? [input.corrections.signedSubjectPolicy()] : []),
+      ...(input.recordings ? [input.recordings.signedSubjectPolicy()] : []),
+    ],
     close: () => processor?.close(),
   };
 }

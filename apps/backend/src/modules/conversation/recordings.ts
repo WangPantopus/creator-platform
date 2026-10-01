@@ -8,6 +8,7 @@ import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { Actor } from "../identity/adapter.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import type { SignedSubjectPolicy } from "../identity/subjects.js";
 import {
   assertThreadScope,
   type AccessService,
@@ -37,8 +38,8 @@ const unavailableCodes = new Set([
 ]);
 
 /** Only an actual registered schema and exact W6 instance can enable associations.
- * First-signing still requires W1's real private selected-thread signing seam;
- * this class never invents it or consumes W6's signature a second time. */
+ * W1 supplies the genuine selected-thread signing scope on its held client;
+ * this class never issues it or consumes W6's signature a second time. */
 export class ConversationRecordings {
   private constructor(
     private readonly db: Database,
@@ -122,6 +123,60 @@ export class ConversationRecordings {
       input.access,
       input.media,
     );
+  }
+  signedSubjectPolicy(): SignedSubjectPolicy {
+    return {
+      name: "conversation.recording",
+      prepare: async (client, actor, creatorId, requested, threadScope) => {
+        if (
+          requested.actType !== "reply" ||
+          typeof requested.content !== "object" ||
+          requested.content === null ||
+          Array.isArray(requested.content) ||
+          !("mediaAssetId" in requested.content)
+        )
+          return null;
+        const command = ConversationRecordingCommandSchema.parse(requested);
+        invariant(
+          threadScope,
+          "recording_scope_required",
+          "Select this conversation before signing its recording.",
+        );
+        assertThreadScope(threadScope);
+        invariant(
+          threadScope.authority === "creator" &&
+            threadScope.actorAccountId === actor.accountId &&
+            threadScope.creatorAccountId === actor.accountId &&
+            threadScope.creatorId === creatorId &&
+            command.subjectId === threadScope.threadId,
+          "recording_scope_invalid",
+          "Only the current creator can sign this exact conversation recording.",
+        );
+        await assertCurrentSession(client, actor.accountId);
+        const active = await client.query(
+          "SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL AND control='human_active' FOR UPDATE",
+          [threadScope.threadId, threadScope.creatorId, threadScope.fanId],
+        );
+        invariant(
+          active.rowCount === 1,
+          "takeover_required",
+          "Take over this conversation before signing its recording.",
+        );
+        const current = await this.media.signingCommandInTransaction(
+          threadScope,
+          client,
+          ProcessedMediaEvidenceSchema.parse({
+            assetId: command.content.mediaAssetId,
+            version: command.content.version,
+            sha256: command.content.sha256,
+            mimeType: command.content.mimeType,
+            durationMs: command.content.durationMs,
+            bytes: command.content.bytes,
+          }),
+        );
+        return ConversationRecordingCommandSchema.parse(current);
+      },
+    };
   }
   async deliver(actor: Actor, creatorId: string, fanId: string, raw: unknown) {
     const body = ConversationRecordingInputSchema.parse(raw);
