@@ -6,6 +6,8 @@ Application `1e390c6e` personally repairs unchecked Keychain deletion/replacemen
 
 This remains an uncompiled/unoperated draft under the controlling cleanup restriction. The process fence does not prove persistent deletion after OS failure or across restart. Consumer builds, current rename, actual storage/revocation/account/device/accessibility journeys and exact-head CI remain open. W1 also completed source reading of all 54 supplied component previews; no visual or participant acceptance is inferred. The peer-reported hosted image failure remains independently uninspected, with capture/reference/assertion bytes preserved. All seven original groups and H01–H20 remain active.
 
+Follow-up `1a722a8b` on the same draft PR48 uses the existing native lifecycle APIs to start a fresh identity read on foreground and stop the four-second loop when inactive. Cancelled Swift reads cannot update account state; a completed credential rotation still persists under its account/credential guard. Canonical checks still pass 12/98. No measured resource/latency/revocation or actual native acceptance is claimed.
+
 ## October 1 — current public integrity and held-read integration
 
 Application `4fda909e` normally integrates main `c1c615e6` through all eight W1 branches, including W4's held creator financial-read guard. No genuine held producer is invented or bound; owner money remains unavailable without it. Current canonical resource/native API checks pass for 12 outputs/98 operations. [Current source/branch qualification](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md).

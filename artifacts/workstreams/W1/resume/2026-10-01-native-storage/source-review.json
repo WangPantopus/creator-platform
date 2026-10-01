@@ -59,5 +59,30 @@
     "passesClaimed": false
   },
   "runtimeResourcesCreated": false,
-  "testsOrTestScriptsAdded": false
+  "testsOrTestScriptsAdded": false,
+  "foregroundFollowup": {
+    "applicationRevision": "1a722a8b8c37bcd9c0d1ced3aa0c5b75b710b2b5",
+    "sourceFiles": {
+      "apps/ios/Sources/QelvoraUI/FanShell.swift": "885e9f8f960fa29eabb352e2c8375a0ce200f895dbe55199892207e57f4d8b6b",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "75b38cd9e1b5ee46801e30dc2cc4059f7cff8bf819107cc6c4e8c537c0cf4441"
+    },
+    "existingCanonicalChecks": [
+      {
+        "command": "/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/generate-shared.mjs --check",
+        "exitCode": 0,
+        "stdout": "Verified 12 shared web, Swift and Kotlin resources.\n",
+        "stderr": ""
+      },
+      {
+        "command": "/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/generate-native-api.mjs --check",
+        "exitCode": 0,
+        "stdout": "Verified Swift/Kotlin API models and 98 operations from OpenAPI.\n",
+        "stderr": ""
+      }
+    ],
+    "newDependencies": false,
+    "sourceOnly": true,
+    "actualForegroundBackgroundRotationRevocationAcceptance": "not run",
+    "p95OrRevocationBoundClaimed": false
+  }
 }
