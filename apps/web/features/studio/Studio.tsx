@@ -267,7 +267,7 @@ export function Studio({
   }, [conceal, creator, freshUntil]);
   useEffect(() => {
     if (suspended) {
-      if (!loading && !document.hidden) reconnectButton.current?.focus();
+      if (!document.hidden) reconnectButton.current?.focus();
     } else if (previousFocus.current?.isConnected) {
       previousFocus.current.focus();
       previousFocus.current = null;
@@ -418,7 +418,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
-            disabled={loading}
+            aria-busy={loading}
             onClick={() => void refresh()}
           >
             Check connection and roles
