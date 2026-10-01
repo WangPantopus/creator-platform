@@ -1260,13 +1260,16 @@ export class GrowthService {
   }
   async privacyDelete(
     accountId: string,
-    ownedCreatorIds: readonly string[] = [],
-    signal?: AbortSignal,
+    ownedCreatorIds: readonly string[],
+    signal: AbortSignal,
+    assertAuthority: () => Promise<void>,
   ) {
     await this.db.transaction(
       this.db.worker,
       async (client) => {
+        await assertAuthority();
         await this.erasure.mark(client, accountId, ownedCreatorIds);
+        await assertAuthority();
         await client.query(
           "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
           [accountId],
@@ -1371,6 +1374,8 @@ export class GrowthService {
           "DELETE FROM growth.creator_public WHERE id=ANY($1::uuid[])",
           [ownedCreatorIds],
         );
+        // Losing the exact task lease rolls back the whole erasure transaction.
+        await assertAuthority();
       },
       signal,
     );

@@ -167,9 +167,7 @@ export async function createGrowthRuntime(input: {
       producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),
       activationSource: Boolean(input.activationSource),
-      privacyOwnership: Boolean(
-        input.privacyScope || input.privacyTaskAuthority,
-      ),
+      privacyOwnership: Boolean(input.privacyTaskAuthority),
       privacyStreaming: Boolean(input.privacyTaskAuthority),
       experimentsEnabled: input.experimentsEnabled ?? false,
     }),
