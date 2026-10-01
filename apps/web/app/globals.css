@@ -316,6 +316,9 @@ a.qv-stepin {
   flex-direction: column;
   gap: 14px;
 }
+.identity-welcome-actions .qv-btn {
+  box-sizing: border-box;
+}
 .identity-welcome-actions > p {
   margin: 0;
   font-size: 12px;
