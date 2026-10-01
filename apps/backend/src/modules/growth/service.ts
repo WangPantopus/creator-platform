@@ -621,22 +621,64 @@ export class GrowthService {
         permission: z.enum(["granted", "denied"]),
       })
       .parse(input);
-    return this.db.actor(actor, null, async (client) => {
-      const hash = createHash("sha256").update(value.token).digest("hex");
-      const result = await client.query(
-        `INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,$6,CASE WHEN $6='denied' THEN now() ELSE NULL END)
-        ON CONFLICT(account_id,installation_id) DO UPDATE SET token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission=excluded.permission,revoked_at=excluded.revoked_at,updated_at=now() RETURNING id`,
-        [
+    const hash = createHash("sha256").update(value.token).digest("hex");
+    return this.db.fencedWorkerActor(
+      actor,
+      async (client) => {
+        // Serialize only matching physical registration pointers. Never use
+        // a previous account identifier as positive runtime authority.
+        for (const key of [
+          `growth.device:installation:${value.installationId}`,
+          `growth.device:token:${hash}`,
+        ].sort())
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [key],
+          );
+        const previous = await client.query(
+          "SELECT DISTINCT account_id FROM growth.device WHERE installation_id=$1 OR token_hash=$2 LIMIT 257",
+          [value.installationId, hash],
+        );
+        if (previous.rowCount! > 256)
+          throw new DomainError(
+            "device_registration_unavailable",
+            copy.growthErrorGrowthAuthorityRequired,
+            503,
+          );
+        await this.erasure.lockSubjects(client, [
           actor.accountId,
-          value.installationId,
-          value.platform,
-          hash,
-          this.seal(value.token),
-          value.permission,
-        ],
-      );
-      return { id: result.rows[0].id };
-    });
+          ...previous.rows.map((row) => row.account_id),
+        ]);
+        if (!(await this.erasure.subjects(client, [actor.accountId])))
+          throw new DomainError(
+            "growth_data_erased",
+            copy.growthErrorGrowthDataErased2,
+            410,
+          );
+      },
+      async (client) => {
+        // The token is globally unique. Remove its former binding and any
+        // former account on this installation in the same transaction as
+        // registration, so logout failure cannot retain the old recipient.
+        await client.query(
+          "DELETE FROM growth.device WHERE (installation_id=$1 OR token_hash=$2) AND (account_id<>$3 OR installation_id<>$1)",
+          [value.installationId, hash, actor.accountId],
+        );
+        const result = await client.query(
+          `INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,$6,CASE WHEN $6='denied' THEN now() ELSE NULL END)
+        ON CONFLICT(account_id,installation_id) DO UPDATE SET platform=excluded.platform,token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission=excluded.permission,revoked_at=excluded.revoked_at,updated_at=now() RETURNING id`,
+          [
+            actor.accountId,
+            value.installationId,
+            value.platform,
+            hash,
+            this.seal(value.token),
+            value.permission,
+          ],
+        );
+        return { id: result.rows[0].id };
+      },
+    );
   }
   async revokeDevice(actor: Actor, id: string) {
     await this.db.actor(actor, null, async (client) => {
@@ -670,18 +712,34 @@ export class GrowthService {
     return { unsubscribeToken: token };
   }
   async unsubscribe(token: string) {
-    await this.db.worker.query(
-      "UPDATE growth.email SET unsubscribed_at=now() WHERE unsubscribe_hash=$1",
-      [createHash("sha256").update(token).digest("hex")],
-    );
+    const hash = createHash("sha256").update(token).digest("hex");
+    const binding = (
+      await this.db.worker.query(
+        "SELECT account_id FROM growth.email WHERE unsubscribe_hash=$1",
+        [hash],
+      )
+    ).rows[0];
+    if (binding)
+      await this.db.transaction(this.db.worker, async (client) => {
+        if (!(await this.erasure.subjects(client, [binding.account_id])))
+          return;
+        await client.query(
+          "UPDATE growth.email SET unsubscribed_at=coalesce(unsubscribed_at,now()) WHERE account_id=$1 AND unsubscribe_hash=$2",
+          [binding.account_id, hash],
+        );
+      });
     return { unsubscribed: true };
   }
   /** Only a signature-verified provider webhook calls this. */
   async bounce(accountId: string) {
-    await this.db.worker.query(
-      "UPDATE growth.email SET bounced_at=now() WHERE account_id=$1",
-      [accountId],
-    );
+    z.uuid().parse(accountId);
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.subjects(client, [accountId]))) return;
+      await client.query(
+        "UPDATE growth.email SET bounced_at=coalesce(bounced_at,now()) WHERE account_id=$1",
+        [accountId],
+      );
+    });
   }
   async createShare(actor: Actor, grantId: string) {
     z.uuid().parse(grantId);

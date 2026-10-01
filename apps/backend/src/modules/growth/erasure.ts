@@ -77,6 +77,14 @@ export class GrowthErasure {
       )
     ).rowCount;
   }
+  /** Negative fences only. Device transfer may remove an erased account's
+   * old registration, but must never recreate any of its data. */
+  async lockSubjects(client: PoolClient, accountIds: readonly string[]) {
+    await this.lock(
+      client,
+      accountIds.map((id) => this.key("account", id)),
+    );
+  }
   async event(
     client: PoolClient,
     event: GrowthEvent,

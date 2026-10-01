@@ -143,10 +143,11 @@ export class GrowthDatabase {
       }
     }
   }
-  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
-  async workerActor<T>(
+  /** Device transfer removes former bindings through worker-only negative
+   * scopes, while retaining the new account's actual session through commit. */
+  async fencedWorkerActor<T>(
     actor: Actor,
-    creatorId: string,
+    fence: (client: PoolClient) => Promise<void>,
     work: (client: PoolClient) => Promise<T>,
   ) {
     if (!actor.adultEligible || !this.actorFence)
@@ -155,15 +156,42 @@ export class GrowthDatabase {
         copy.growthErrorGrowthAuthorityRequired,
         503,
       );
-    return this.transaction(this.worker, async (worker) => {
-      await this.actorFence!(worker, actor.accountId, creatorId);
-      return this.transaction(this.runtime, async (runtime) => {
+    const worker = await this.worker.connect();
+    try {
+      await worker.query("BEGIN");
+      await worker.query(
+        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+      );
+      // Acquire negative scopes before locking the actual session, matching
+      // account controls and erasure. The runtime lock survives worker COMMIT.
+      await fence(worker);
+      return await this.transaction(this.runtime, async (runtime) => {
         await runtime.query("SELECT set_config('app.account_id',$1,true)", [
           actor.accountId,
         ]);
         await assertCurrentSession(runtime, actor.accountId);
-        return work(worker);
+        const result = await work(worker);
+        await worker.query("COMMIT");
+        return result;
       });
-    });
+    } catch (error) {
+      await worker.query("ROLLBACK").catch(() => {});
+      throw error;
+    } finally {
+      worker.release();
+    }
+  }
+
+  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
+  async workerActor<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    return this.fencedWorkerActor(
+      actor,
+      (worker) => this.actorFence!(worker, actor.accountId, creatorId),
+      work,
+    );
   }
 }
