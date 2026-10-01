@@ -107,20 +107,33 @@ export class GrowthExperiments {
     if (!this.enabled) return null;
     const creator = await this.service.creator(handle);
     if (!creator || creator.state !== "published") return null;
-    const row = (
-      await this.service.db.worker.query(
-        "SELECT approved_document FROM growth.experiment WHERE creator_id=$1 AND state='active' AND approved_at IS NOT NULL AND starts_at<=now() AND ends_at>now() AND approved_document->>'surface'=$2 ORDER BY approved_at,id LIMIT 1",
-        [creator.id, surface],
+    return this.service.db.workerActor(actor, creator.id, async (client) => {
+      // Hold the current account/session and erasure boundary through allocation.
+      // Recheck the public creator after acquiring it; the earlier lookup can
+      // become stale while waiting for a purge or publication transition.
+      const row = (
+        await client.query(
+          "SELECT e.approved_document FROM growth.experiment e JOIN growth.creator_public c ON c.id=e.creator_id WHERE e.creator_id=$1 AND c.handle=$3 AND c.state='published' AND c.document->>'verified'='true' AND e.state='active' AND e.approved_at IS NOT NULL AND e.starts_at<=clock_timestamp() AND e.ends_at>clock_timestamp() AND e.approved_document->>'surface'=$2 ORDER BY e.approved_at,e.id LIMIT 1 FOR SHARE OF e,c",
+          [creator.id, surface, handle],
+        )
+      ).rows[0];
+      if (!row) return null;
+      const approved = ExperimentApproval.parse(row.approved_document);
+      const now = Date.now();
+      if (
+        approved.creatorId !== creator.id ||
+        approved.surface !== surface ||
+        Date.parse(approved.startsAt) > now ||
+        Date.parse(approved.endsAt) <= now
       )
-    ).rows[0];
-    if (!row) return null;
-    const approved = ExperimentApproval.parse(row.approved_document);
-    const index =
-      createHmac("sha256", this.service.privacySubjectKey(actor.accountId))
-        .update(approved.id)
-        .digest()
-        .readUInt32BE(0) % approved.variants.length;
-    return { experimentId: approved.id, ...approved.variants[index]! };
+        return null;
+      const index =
+        createHmac("sha256", this.service.privacySubjectKey(actor.accountId))
+          .update(approved.id)
+          .digest()
+          .readUInt32BE(0) % approved.variants.length;
+      return { experimentId: approved.id, ...approved.variants[index]! };
+    });
   }
   async stop(actor: Actor, id: string) {
     const creatorId = await this.service.requireCreator(actor);
