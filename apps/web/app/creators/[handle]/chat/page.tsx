@@ -1,12 +1,12 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { IdSchema, ReturnTargetSchema } from "@qelvora/api";
-import { copy, formatCopy } from "@qelvora/copy";
-import { currentSession } from "../../../../lib/session";
 import { Button, Notice } from "@qelvora/ui-web";
+import { currentSession } from "../../../../lib/session";
+import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
+import { ConsentScreen } from "../../../../features/conversation/ConsentScreen";
 import { growthRequest } from "../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../features/growth/shell";
 import type { Creator, Post } from "../../../../features/growth/types";
-import { ConsentScreen } from "../../../../features/conversation/ConsentScreen";
-import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 /** Context destination; W3 owns the authenticated conversation body and consent. */
@@ -15,56 +15,70 @@ export default async function ContextualChat({
   searchParams,
 }: {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ context?: string | string[] }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { handle } = await params;
-  const { context } = await searchParams;
+  const arrival = await searchParams;
+  const { context } = arrival;
   const directEntry = `/creators/${handle}/chat`;
   if (!ReturnTargetSchema.safeParse(directEntry).success)
     return (
       <GrowthShell>
-        <Failure error={new Error("This creator is unavailable.")} />
+        <Failure
+          error={new Error(growthCopy.growthThisPostIsUnavailable)}
+          returnTo="/discover"
+        />
       </GrowthShell>
     );
   const query = new URLSearchParams();
-  for (const value of context === undefined
-    ? []
-    : Array.isArray(context)
-      ? context
-      : [context])
-    query.append("context", value);
+  for (const [name, values] of Object.entries(arrival))
+    for (const value of values === undefined
+      ? []
+      : Array.isArray(values)
+        ? values
+        : [values])
+      query.append(name, value);
   const requestedEntry = `${directEntry}${query.size ? `?${query}` : ""}`;
-  const returnTo = ReturnTargetSchema.safeParse(requestedEntry).success
-    ? requestedEntry
-    : directEntry;
-  // Session restoration may redirect. Keep that control flow outside the
-  // domain-error boundary so the canonical host can resume this destination.
-  const session = await currentSession();
+  // Reject unsupported arrival inputs before any restoration can redirect.
+  // Only an explicit context-removal action may discard those inputs.
+  if (
+    Object.keys(arrival).some((name) => name !== "context") ||
+    !ReturnTargetSchema.safeParse(requestedEntry).success ||
+    (context !== undefined && !IdSchema.safeParse(context).success)
+  )
+    return (
+      <GrowthShell>
+        <Failure
+          error={new Error(growthCopy.growthThisPostIsUnavailable)}
+          returnTo={requestedEntry}
+        />
+        {context !== undefined ? (
+          <Button href={directEntry} variant="quiet" block>
+            {growthCopy.removeContext}
+          </Button>
+        ) : null}
+      </GrowthShell>
+    );
+  const returnTo = requestedEntry;
+  // Restoration redirects must stay outside the domain-error presentation.
+  const session = await currentSession(returnTo);
   try {
-    if (
-      context !== undefined &&
-      (!IdSchema.safeParse(context).success ||
-        !ReturnTargetSchema.safeParse(requestedEntry).success)
-    )
-      throw new Error("This post is unavailable.");
     const { creator } = await growthRequest<{ creator: Creator }>(
       `public/creators/${encodeURIComponent(handle)}`,
     );
-    if (context !== undefined) {
-      const post = (
+    let post: Post | undefined;
+    if (typeof context === "string") {
+      post = (
         await growthRequest<{ post: Post }>(
           `public/creators/${handle}/posts/${context}`,
         )
       ).post;
       if (!post.aiContextEligible)
-        throw new Error("This post cannot be used as conversation context.");
-      // A public projection does not install W3's exact current W5/W2 context
-      // custody. Never silently drop a requested post when starting a thread.
-      throw new Error(
-        "This post is unavailable for AI context. Remove it to open the conversation.",
-      );
+        throw new Error(
+          growthCopy.growthThisPostCannotBeUsedAsConversationContext,
+        );
     }
-    if (session && creator.state === "published")
+    if (session && creator.state === "published" && !post)
       return (
         <IdentitySessionBoundary
           key={`${session.accountId}:${creator.id}`}
@@ -84,31 +98,58 @@ export default async function ContextualChat({
           <a href={`/creators/${handle}`}>{creator.name}</a>
         </header>
         <div className="growth-stack">
-          <h1>{formatCopy("aiAuthor", { name: creator.name })}</h1>
-          <p>{formatCopy("identityStrip", { name: creator.name })}</p>
-          <Notice
-            title={
-              creator.state !== "published"
-                ? "AI paused"
-                : "Sign in to continue"
-            }
-          >
-            {creator.state !== "published"
-              ? `${creator.name}'s AI is paused.`
-              : "Sign in to review who processes and can read your conversation before your first message."}
-          </Notice>
+          <h1>{growthFormat("growthSAi", { value1: creator.name })}</h1>
+          <p>
+            {growthFormat("growthYouReTalkingToSAiStepsInOnRequest", {
+              value1: creator.name,
+              value2: creator.name,
+            })}
+          </p>
+          {post ? (
+            <>
+              <div className="qv qv-context">
+                <div className="qv-context__text">
+                  <span className="qv-meta">{growthCopy.growthFromAPost}</span>
+                  <span>{post.title}</span>
+                </div>
+                <a
+                  className="qv-icon-btn"
+                  aria-label={growthCopy.removeContext}
+                  href={`/creators/${handle}/chat`}
+                >
+                  ×
+                </a>
+              </div>
+            </>
+          ) : null}
+          {creator.state !== "published" ? (
+            <Notice title={growthCopy.growthAiPaused}>
+              {growthFormat("growthSAiIsPaused", { value1: creator.name })}
+            </Notice>
+          ) : post ? (
+            <Notice title="Post context unavailable">
+              This post's conversation context is not connected yet. Remove the
+              post context to continue to the current AI provider review.
+            </Notice>
+          ) : !session ? (
+            <Notice title={growthCopy.growthSignInToContinue}>
+              Sign in to review who processes and can read your conversation
+              before your first message.
+            </Notice>
+          ) : null}
           {!session ? (
             <Button
               href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
               variant="ai"
               block
             >
-              {copy.continueWithPantopus}
+              {growthCopy.continueWithPantopus}
             </Button>
           ) : null}
           <p className="growth-help">
-            A first conversation lasts about 24 hours once available. No message
-            has been sent.
+            {
+              growthCopy.growthAFirstConversationLastsAbout24HoursOnceAvailableNo
+            }
           </p>
         </div>
       </GrowthShell>
@@ -119,7 +160,7 @@ export default async function ContextualChat({
         <Failure error={error} returnTo={requestedEntry} />
         {context !== undefined ? (
           <Button href={directEntry} variant="quiet" block>
-            {copy.removeContext}
+            {growthCopy.removeContext}
           </Button>
         ) : null}
       </GrowthShell>

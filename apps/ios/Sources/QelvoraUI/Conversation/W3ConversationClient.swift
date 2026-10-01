@@ -75,6 +75,7 @@ actor W3ConversationClient {
         var request = URLRequest(url: target.url!)
         request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = 15
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let requestCredential = publicRead ? nil : try await credentials.read()
         if !publicRead {
             guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }

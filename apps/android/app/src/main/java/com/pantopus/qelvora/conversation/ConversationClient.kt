@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 
 @Serializable data class ConversationMessage(
     val id: String, val threadId: String, val authorKind: APIMessageAuthorKind, val text: String,
@@ -60,6 +61,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
             connection.connectTimeout = 10000; connection.readTimeout = 15000; connection.useCaches = false
             connection.requestMethod = if (body == null) "GET" else "POST"
             connection.setRequestProperty("Accept", "application/json")
+            connection.setRequestProperty("X-Correlation-Id", UUID.randomUUID().toString())
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (!publicRead) connection.setRequestProperty("X-Expected-Account-Id", expectedAccountId)
             if (body != null) {

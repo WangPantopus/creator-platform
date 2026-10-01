@@ -1,9 +1,0 @@
-{
-  "recordTimeDevice": "2026-09-29 17:28:54",
-  "process": "com.google.android.apps.nexuslauncher",
-  "reason": "Input dispatching timed out waiting for focus loss",
-  "reportedWaitMilliseconds": 5012,
-  "source": "read-only dumpsys activity lastanr on emulator-5566",
-  "visibleArtifact": "android-recorder-current.png",
-  "qelvoraCrashConclusion": "No conclusion; launcher diagnostic is not proof of app health"
-}

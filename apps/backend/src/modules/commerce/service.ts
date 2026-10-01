@@ -22,7 +22,7 @@ import type {
   GenerationAllowance,
   ThreadScope,
 } from "../access/scope.js";
-import { capabilitySnapshot } from "../access/commerce.js";
+import { capabilitySnapshot, sourceAudienceSnapshot } from "../access/commerce.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
@@ -163,6 +163,7 @@ export class CommerceService {
   async account<T>(
     actor: Actor,
     work: (client: PoolClient) => Promise<T>,
+    options?: { isolation: "repeatable read" },
   ): Promise<T> {
     invariant(
       actor.adultEligible,
@@ -172,12 +173,17 @@ export class CommerceService {
     await this.assertActorAllowed?.(actor);
     const client = await this.pool.connect();
     try {
-      await client.query("BEGIN");
+      await client.query(
+        options?.isolation === "repeatable read"
+          ? "BEGIN ISOLATION LEVEL REPEATABLE READ"
+          : "BEGIN",
+      );
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         actor.accountId,
       ]);
       await assertCurrentSession(client, actor.accountId);
       const value = await work(client);
+      await this.assertActorAllowed?.(actor);
       await client.query("COMMIT");
       return value;
     } catch (e) {
@@ -198,6 +204,31 @@ export class CommerceService {
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `${actor.accountId}:${operation}:${key}`,
     ]);
+    const cached = await this.cachedCommand<T>(
+      client,
+      actor,
+      operation,
+      key,
+      body,
+    );
+    if (cached.found) return cached.response;
+    const hash = contentHash({ operation, body });
+    const result = await work();
+    await client.query(
+      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
+      [actor.accountId, operation, key, hash, JSON.stringify(result)],
+    );
+    return result;
+  }
+  /** Read a completed command before provider I/O. Call within current actor
+   * authority; command() still serializes and rechecks after that I/O. */
+  async cachedCommand<T>(
+    client: PoolClient,
+    actor: Actor,
+    operation: string,
+    key: string,
+    body: unknown,
+  ): Promise<{ found: false } | { found: true; response: T }> {
     const hash = contentHash({ operation, body });
     const prior = (
       await client.query<{ request_hash: string; response: T }>(
@@ -211,14 +242,9 @@ export class CommerceService {
         "idempotency_conflict",
         "This retry key was used for another action.",
       );
-      return prior.response;
+      return { found: true, response: prior.response };
     }
-    const result = await work();
-    await client.query(
-      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
-      [actor.accountId, operation, key, hash, JSON.stringify(result)],
-    );
-    return result;
+    return { found: false };
   }
   private async fan(client: PoolClient, actor: Actor) {
     const fan = (
@@ -233,7 +259,7 @@ export class CommerceService {
   private async creator(client: PoolClient, actor: Actor, creatorId: string) {
     const row = (
       await client.query<{ id: string; display_name: string }>(
-        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified'",
+        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required",
         [creatorId, actor.accountId],
       )
     ).rows[0];
@@ -318,8 +344,8 @@ export class CommerceService {
       if (fan) await this.effectiveLimit(client, fan.id, this.policy.currency);
       const tiers = (
         await client.query(
-          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.state='active' AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
-          [creatorId ?? null],
+          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.state,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE (t.state='active' OR cp.account_id=$2) AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
+          [creatorId ?? null, actor.accountId],
         )
       ).rows;
       const limits = fan
@@ -699,6 +725,12 @@ export class CommerceService {
     const scope = await this.access.openThread(actor, creatorId, fanId, false);
     return this.db.withThread(scope, (client) =>
       capabilitySnapshot(client, scope),
+    );
+  }
+  /** Already-issued W1/W3 authority is revalidated inside the scoped transaction. */
+  async sourceAudienceFor(scope: import("../access/scope.js").ThreadScope) {
+    return this.db.withThread(scope, (client) =>
+      sourceAudienceSnapshot(client, scope),
     );
   }
   async packetDisclosure(actor: Actor, creatorId: string, fanId: string) {
@@ -1744,13 +1776,21 @@ export class CommerceService {
             "The request mode changed. Refresh before choosing sharing.",
           );
           const c = (
-            await client.query<{ id: string; state: string }>(
-              "SELECT id,state FROM creator.commerce_commitment WHERE packet_id=$1",
+            await client.query<{
+              id: string;
+              state: string;
+              delivered_at: Date | null;
+            }>(
+              "SELECT id,state,delivered_at FROM creator.commerce_commitment WHERE packet_id=$1",
               [id],
             )
           ).rows[0];
           invariant(
-            c?.state === "delivered",
+            c &&
+              (body.enabled
+                ? c.state === "delivered"
+                : c.delivered_at !== null &&
+                  ["delivered", "refunded", "resolved"].includes(c.state)),
             "delivery_required",
             "Sharing needs a delivered reply.",
           );
@@ -1933,21 +1973,34 @@ export class CommerceService {
           );
           return;
         }
+        const recovered =
+          !packet.intent_ref && effect.attempt > 1
+            ? await this.provider.recoverAuthorization?.({
+                packetId: effect.packet_id,
+                amount: effect.request.amount,
+                currency: effect.request.currency,
+                paymentMethodId: effect.request.paymentMethodId!,
+                key: effect.provider_key,
+              })
+            : undefined;
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
-          Date.now() - effect.created_at.getTime() < 23 * 3600000,
+          packet.intent_ref !== null ||
+            recovered ||
+            Date.now() - effect.created_at.getTime() < 23 * 3600000,
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
         const intent = packet.intent_ref
           ? await this.provider.fetchIntent(packet.intent_ref)
-          : await this.provider.authorize({
+          : (recovered ??
+            (await this.provider.authorize({
               packetId: effect.packet_id,
               amount: effect.request.amount,
               currency: effect.request.currency,
               paymentMethodId: effect.request.paymentMethodId!,
               key: effect.provider_key,
-            });
+            })));
         await this.applyIntent(actor, effect, intent);
       } else {
         let intentId = effect.request.intentId;
@@ -1974,19 +2027,28 @@ export class CommerceService {
               : await this.provider.release(intentId, effect.provider_key);
           await this.applyIntent(actor, effect, intent);
         } else if (effect.operation === "refund") {
+          const recovered = !effect.provider_ref
+            ? await this.provider.recoverRefund?.({
+                intentId,
+                amount: effect.request.amount,
+                key: effect.provider_key,
+              })
+            : undefined;
           invariant(
             effect.provider_ref ||
+              recovered ||
               Date.now() - effect.created_at.getTime() < 23 * 3600000,
             "operator_reconciliation_required",
             "The original refund needs provider reconciliation; no second refund is attempted.",
           );
           const refund = effect.provider_ref
             ? await this.provider.fetchRefund(effect.provider_ref)
-            : await this.provider.refund(
+            : (recovered ??
+              (await this.provider.refund(
                 intentId,
                 effect.request.amount,
                 effect.provider_key,
-              );
+              )));
           await this.account(actor, async (client) => {
             const p = await this.lockPacket(client, effect.packet_id);
             await this.fenceEffect(client, effect);
@@ -2106,7 +2168,8 @@ export class CommerceService {
     invariant(
       own.rows[0] &&
         (effect.reconciliation
-          ? own.rows[0].state !== "processing"
+          ? own.rows[0].state !== "processing" &&
+            own.rows[0].attempt === effect.attempt
           : own.rows[0].state === "processing" &&
             own.rows[0].attempt === effect.attempt),
       "effect_lease_lost",

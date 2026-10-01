@@ -1,3 +1,4 @@
+import { copy, formatCopy } from "@qelvora/copy";
 function escape(value: string) {
   return value.replace(
     /[&<>"']/gu,
@@ -30,8 +31,8 @@ export function notificationEmail(input: {
   const human = input.authorship === "human";
   return {
     subject: input.sender,
-    text: `${input.brand}\n${input.sender}\n\n${input.preview}\n\nOpen in the app: ${input.url}\nEmail preferences / unsubscribe: ${input.unsubscribeUrl}`,
-    html: `<!doctype html><html lang="en"><body style="margin:0;padding:40px 20px;background:#E6E4DE;color:#1B1A18;font-family:Arial,sans-serif"><main style="max-width:520px;margin:auto;background:#FFFFFF;border:1px solid #DAD8D2;border-radius:20px;padding:28px"><p style="font-family:Georgia,serif;font-style:italic;font-size:24px">${brand}</p><strong>${label}</strong><p style="padding:24px;background:${human ? "#221E1A" : input.authorship === "ai" ? "#F2F0FC" : "#F7F6F3"};color:${human ? "#F7EEDD" : input.authorship === "ai" ? "#514195" : "#1B1A18"};font-family:${human ? "Georgia,serif" : "Arial,sans-serif"};font-size:22px;line-height:30px">${preview}</p><p><a href="${url}">Open in the app</a></p><p style="font-size:12px;line-height:18px">Your in-app record remains available. <a href="${unsubscribe}">Unsubscribe from optional email</a></p></main></body></html>`,
+    text: `${input.brand}\n${input.sender}\n\n${input.preview}\n\n${copy.growthEmailOpen}: ${input.url}\n${copy.growthEmailControls}: ${input.unsubscribeUrl}`,
+    html: `<!doctype html><html lang="en"><body style="margin:0;padding:40px 20px;background:#E6E4DE;color:#1B1A18;font-family:Arial,sans-serif"><main style="max-width:520px;margin:auto;background:#FFFFFF;border:1px solid #DAD8D2;border-radius:20px;padding:28px"><p style="font-family:Georgia,serif;font-style:italic;font-size:24px">${brand}</p><strong>${label}</strong><p style="padding:24px;background:${human ? "#221E1A" : input.authorship === "ai" ? "#F2F0FC" : "#F7F6F3"};color:${human ? "#F7EEDD" : input.authorship === "ai" ? "#514195" : "#1B1A18"};font-family:${human ? "Georgia,serif" : "Arial,sans-serif"};font-size:22px;line-height:30px">${preview}</p><p><a href="${url}">${escape(copy.growthEmailOpen)}</a></p><p style="font-size:12px;line-height:18px">${escape(copy.growthEmailRecord)} <a href="${unsubscribe}">${escape(copy.growthEmailUnsubscribe)}</a></p></main></body></html>`,
     headers: {
       "List-Unsubscribe": `<${input.unsubscribeUrl}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -62,13 +63,13 @@ export function notificationDigest(input: {
   const rows = input.entries
     .map(
       (entry) =>
-        `<section style="padding:20px 0;border-top:1px solid #DAD8D2"><strong>${escape(entry.sender)}</strong><p style="font-family:${entry.authorship === "human" ? "Georgia,serif" : "Arial,sans-serif"};font-size:18px;line-height:26px">${escape(entry.preview)}</p><a href="${escape(entry.url)}">Open in the app</a></section>`,
+        `<section style="padding:20px 0;border-top:1px solid #DAD8D2"><strong>${escape(entry.sender)}</strong><p style="font-family:${entry.authorship === "human" ? "Georgia,serif" : "Arial,sans-serif"};font-size:18px;line-height:26px">${escape(entry.preview)}</p><a href="${escape(entry.url)}">${escape(copy.growthEmailOpen)}</a></section>`,
     )
     .join("");
   return {
-    subject: `${input.brand} · your updates`,
+    subject: formatCopy("growthEmailSubject", { brand: input.brand }),
     text: emails.map((email) => email.text).join("\n\n—\n\n"),
-    html: `<!doctype html><html lang="en"><body style="margin:0;padding:40px 20px;background:#E6E4DE;color:#1B1A18;font-family:Arial,sans-serif"><main style="max-width:520px;margin:auto;background:white;border:1px solid #DAD8D2;border-radius:20px;padding:28px"><p style="font-family:Georgia,serif;font-style:italic;font-size:24px">${escape(input.brand)}</p><h1 style="font-size:28px">Your updates</h1>${rows}<p style="font-size:12px">Your in-app record remains available. <a href="${escape(input.unsubscribeUrl)}">Unsubscribe from optional email</a></p></main></body></html>`,
+    html: `<!doctype html><html lang="en"><body style="margin:0;padding:40px 20px;background:#E6E4DE;color:#1B1A18;font-family:Arial,sans-serif"><main style="max-width:520px;margin:auto;background:white;border:1px solid #DAD8D2;border-radius:20px;padding:28px"><p style="font-family:Georgia,serif;font-style:italic;font-size:24px">${escape(input.brand)}</p><h1 style="font-size:28px">${escape(copy.growthYourUpdates)}</h1>${rows}<p style="font-size:12px">${escape(copy.growthEmailRecord)} <a href="${escape(input.unsubscribeUrl)}">${escape(copy.growthEmailUnsubscribe)}</a></p></main></body></html>`,
     headers: emails[0]!.headers,
   };
 }

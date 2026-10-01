@@ -78,14 +78,16 @@ describe.skipIf(!adminUrl)(
           "utf8",
         ),
       );
-      // Existing checks must exercise the current W3 schema. These immutable
-      // proposals are installed only in this explicitly disposable database;
-      // W8 still owns their canonical production registry allocation.
-      for (const name of ["pending_w3_conversations", "pending_w3_wellbeing"])
+      // The shipping conversation and memory consumers depend on W8's
+      // allocated 0041/0042 extensions, even when generation is unconfigured.
+      for (const migration of [
+        "pending_w3_conversations",
+        "pending_w3_wellbeing",
+      ])
         await admin.query(
           await readFile(
             new URL(
-              `../src/modules/conversation/migrations/${name}.sql`,
+              `../src/modules/conversation/migrations/${migration}.sql`,
               import.meta.url,
             ),
             "utf8",
@@ -221,8 +223,7 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
-      // Five actual scoped context statements now include exclusion and
-      // provenance reads. Every statement still checks both family IDs.
+      // Current memory reads include scoped exclusions and transcript provenance.
       expect(observedStatements).toBe(50000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
@@ -363,6 +364,7 @@ describe.skipIf(!adminUrl)(
           ...body,
           idempotencyKey: "other-message-key",
         }),
+        // A reserved last unit remains occupied while the accepted reply is active.
       ).rejects.toMatchObject({ code: "ai_access_unavailable" });
       const counters = await admin.query(
         "SELECT used,reserved FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2",

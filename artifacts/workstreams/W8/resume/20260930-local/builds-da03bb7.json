@@ -1,0 +1,56 @@
+{
+  "backendBuild": {
+    "path": "/private/tmp/creator-w8-grantless-backend-build.log",
+    "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "bytes": 41
+  },
+  "webProductionBuild": {
+    "path": "/private/tmp/creator-w8-grantless-web-build.log",
+    "sha256": "f6664ba805612718d7dfeb1caebb5e0340a1a43af4a187c8e9e82127d52b9e18",
+    "bytes": 2614
+  },
+  "lint": {
+    "path": "/private/tmp/creator-w8-da03bb7-lint.log",
+    "sha256": "c6c4b725b7860cec20bca1c59d73a2bc21483bcdd227bf52f856967ca122f448",
+    "bytes": 110
+  },
+  "format": {
+    "path": "/private/tmp/creator-w8-da03bb7-format.log",
+    "sha256": "8488f5b2421bda28ce47eddc32b8fee98def934f4f8d9133c2fcf83cdb53727d",
+    "bytes": 157
+  },
+  "generated": {
+    "path": "/private/tmp/creator-w8-da03bb7-generated.log",
+    "sha256": "90de7138975851ef4c9b6bf1a563a3e03a7c28f6c3ceb0195935a2d4dfb3f399",
+    "bytes": 297
+  },
+  "iosBuild": {
+    "path": "/private/tmp/creator-w8-final-ios-build.log",
+    "sha256": "cbea7ce64033d1256e9e6c5b60cc36f243fe0ed05c5d1ebb08a86e41507a9193",
+    "bytes": 67128
+  },
+  "androidBuild": {
+    "path": "/private/tmp/creator-w8-final-android-build.log",
+    "sha256": "0e79bc872326efa660a8c4d83f02fcc8320b97ea0fabc886c00ebc8f67fb1c83",
+    "bytes": 2553
+  },
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "outcomes": {
+    "backendBuild": "passed",
+    "webProductionBuild": "passed",
+    "lint": "passed",
+    "format": "passed",
+    "generated": "passed",
+    "iosBuild": "passed",
+    "androidBuild": "passed"
+  },
+  "nativeSourceRevision": "8636dd7c6302dd1667cf78364e85d14555bac9f7",
+  "nativeSourceUnchangedThroughCurrent": true,
+  "nativeScope": "Whole ad-hoc signed iOS Simulator SDK26.5 app; whole Android debug APK,37 tasks,249 seconds. Compilation only; no interactive/hardware/store acceptance.",
+  "androidAPK": {
+    "path": "/private/tmp/creator-w8-integrated-android/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "5ae59b35fad1e021b5efe830875ef6bb43753040cc432fd0e443750daea1b810",
+    "bytes": 12922651
+  },
+  "paidAICalls": 0
+}

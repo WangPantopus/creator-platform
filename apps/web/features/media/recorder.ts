@@ -17,6 +17,7 @@ export class VoiceRecorder {
   private recorder: MediaRecorder | null = null;
   private stream: MediaStream | null = null;
   private chunks: Blob[] = [];
+  private recordedBytes = 0;
   private activeAt = 0;
   private elapsed = 0;
   private generation = 0;
@@ -77,8 +78,18 @@ export class VoiceRecorder {
       });
       this.recorder = recorder;
       recorder.ondataavailable = (event) => {
-        if (generation === this.generation && event.data.size)
-          this.chunks.push(event.data);
+        if (generation !== this.generation || !event.data.size) return;
+        if (event.data.size > 268_435_456 - this.recordedBytes) {
+          this.discard();
+          this.publish({
+            state: "failed",
+            reason:
+              "This recording reached the file limit. Record a shorter clip.",
+          });
+          return;
+        }
+        this.recordedBytes += event.data.size;
+        this.chunks.push(event.data);
       };
       recorder.onstop = () => {
         if (generation !== this.generation) return;
@@ -87,6 +98,8 @@ export class VoiceRecorder {
           Math.round(this.elapsed),
         );
         const blob = new Blob(this.chunks, { type: mimeType.split(";")[0] });
+        this.chunks = [];
+        this.recordedBytes = 0;
         this.release();
         this.publish({
           state: blob.size && durationMs > 0 ? "preview" : "failed",
@@ -98,6 +111,7 @@ export class VoiceRecorder {
         });
       };
       recorder.onerror = () => {
+        if (generation !== this.generation) return;
         this.publish({
           reason:
             "Recording was interrupted. Preview what was saved or record again.",
@@ -106,6 +120,7 @@ export class VoiceRecorder {
       };
       stream.getAudioTracks().forEach((track) => {
         track.onended = () => {
+          if (generation !== this.generation) return;
           this.publish({
             reason:
               "The microphone was disconnected. Preview what was saved or record again.",
@@ -122,8 +137,8 @@ export class VoiceRecorder {
         if (durationMs >= this.maxDurationMs) this.stop();
       }, 100);
     } catch (error) {
-      this.release();
       if (generation !== this.generation) return;
+      this.release();
       const denied =
         error instanceof DOMException &&
         ["NotAllowedError", "SecurityError"].includes(error.name);
@@ -138,6 +153,18 @@ export class VoiceRecorder {
     }
   }
   pause(interrupted = false) {
+    if (interrupted && this.snapshot.state === "requesting") {
+      // A late permission response must not start capture on a hidden screen.
+      // The existing start generation fence stops any subsequently issued stream.
+      this.generation++;
+      this.release();
+      this.publish({
+        state: "idle",
+        reason:
+          "Microphone request cancelled while you left this screen. Record when you return.",
+      });
+      return;
+    }
     if (this.recorder?.state !== "recording") return;
     this.elapsed = this.duration();
     this.recorder.pause();
@@ -178,6 +205,7 @@ export class VoiceRecorder {
     this.recorder = null;
     this.release();
     this.chunks = [];
+    this.recordedBytes = 0;
     this.elapsed = 0;
     this.publish({ state: "idle", durationMs: 0, blob: null, reason: null });
   }

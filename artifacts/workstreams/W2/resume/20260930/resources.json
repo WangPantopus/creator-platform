@@ -1,0 +1,40 @@
+{
+  "workstream": "W2",
+  "date": "2026-09-30",
+  "sourceBranch": "codex/w2-creator-ai-handoff",
+  "foundation": "22aa088",
+  "workspace": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform",
+  "ports": { "web": 3002, "api": 4102, "postgres": 55442 },
+  "database": "creator_w2_resume",
+  "runtimeRole": "creator_runtime (non-owner, forced RLS)",
+  "migrations": "canonical 0001–0031; immutable histories preserved",
+  "container": "creator-platform-w2-resume-20260930",
+  "queue": "w2-resume-20260930",
+  "builds": "isolated worktree .next and backend dist",
+  "nativeDevices": [],
+  "provider": {
+    "name": "OpenAI",
+    "secretReference": "/Users/yingpengwang/.config/creator-platform/secrets/openai.env",
+    "secretHandling": "Loaded by backend Node env-file only; never printed/copied/committed",
+    "smallModel": "gpt-4.1-mini-2025-04-14",
+    "largeModel": "gpt-4.1-2025-04-14",
+    "embeddingModel": "text-embedding-3-small",
+    "authorization": "Founder-authorized isolated synthetic verification",
+    "productionPolicy": "unapproved; store:false is not zero-retention proof",
+    "publication": "disabled: no reviewed license/current verification, cap zero"
+  },
+  "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
+  "reviewRuntime": "Own web/API/database left running for review; stop only these named resources when released",
+  "existingTestCluster": {
+    "container": "creator-platform-w2-checks-20260930",
+    "port": 55449,
+    "database": "creator_w2_test",
+    "purpose": "Existing tests reset schema/runtime password; isolated from Studio and peers",
+    "disposable": true,
+    "state": "removed after existing-test evidence captured"
+  },
+  "preflight": "Ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved.",
+  "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
+  "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
+  "git": "Existing PR #1 draft; checkpoint pushes work, metadata update 403; no merge with failed checks/open gates"
+}

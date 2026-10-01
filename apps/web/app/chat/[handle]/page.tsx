@@ -5,13 +5,13 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 
-/** Older W3 links enter the same canonical session/consent/context boundary. */
+/** Older links retain every arrival input at the canonical session boundary. */
 export default async function ConversationEntry({
   params,
   searchParams,
 }: {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ context?: string | string[] }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { handle } = await params;
   const destination = `/creators/${handle}/chat`;
@@ -23,13 +23,13 @@ export default async function ConversationEntry({
         </Notice>
       </main>
     );
-  const { context } = await searchParams;
   const query = new URLSearchParams();
-  for (const value of context === undefined
-    ? []
-    : Array.isArray(context)
-      ? context
-      : [context])
-    query.append("context", value);
+  for (const [name, values] of Object.entries(await searchParams))
+    for (const value of values === undefined
+      ? []
+      : Array.isArray(values)
+        ? values
+        : [values])
+      query.append(name, value);
   redirect(`${destination}${query.size ? `?${query}` : ""}`);
 }

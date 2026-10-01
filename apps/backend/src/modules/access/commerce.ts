@@ -18,6 +18,43 @@ export type CostAllowanceSettlement = {
   | { state: "final"; units: number; reference: string }
 );
 
+/** W2 source audiences use real tier IDs, independently of spend counters.
+ * Group grants require their canonical producer; absence confers no group access. */
+export async function sourceAudienceSnapshot(
+  client: PoolClient,
+  scope: ThreadScope,
+) {
+  assertThreadScope(scope);
+  const memberships = await client.query<{
+    tier_id: string;
+    version: number;
+    valid_until: Date;
+  }>(
+    `SELECT m.tier_id,m.version,least(g.valid_until,CASE WHEN m.state='grace' THEN m.grace_end ELSE m.period_end END) AS valid_until
+     FROM creator.commerce_membership m JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id
+     WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN ('active','grace','cancelled')
+     AND g.state='active' AND g.source='membership' AND g.valid_from<=now() AND g.valid_until>now()
+     AND CASE WHEN m.state='grace' THEN m.grace_end>now() ELSE m.period_end>now() END
+     ORDER BY m.tier_id,m.id`,
+    [scope.creatorId, scope.fanId],
+  );
+  return {
+    revision: contentHash({
+      creatorId: scope.creatorId,
+      fanId: scope.fanId,
+      memberships: memberships.rows,
+    }),
+    tierIds: [...new Set(memberships.rows.map((m) => m.tier_id))],
+    groupIds: [] as string[],
+    validUntil: new Date(
+      Math.min(
+        Date.now() + 60_000,
+        ...memberships.rows.map((m) => m.valid_until.getTime()),
+      ),
+    ).toISOString(),
+  };
+}
+
 /** Select one authoritative AI grant; overlapping equivalent allowances never sum. */
 export async function capabilitySnapshot(
   client: PoolClient,
@@ -58,7 +95,7 @@ export async function capabilitySnapshot(
     creatorId: scope.creatorId,
     fanId: scope.fanId,
     version: contentHash({
-      pass,
+      pass: pass ?? null,
       grants: grants.rows.map((g) => ({
         id: g.id,
         source: g.source,

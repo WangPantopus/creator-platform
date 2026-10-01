@@ -4,6 +4,8 @@ import { AuthorLabel, SignedMarker } from "@qelvora/ui-web";
 import type {
   MediaAsset,
   PlaybackTicket,
+  CreatorMediaAsset,
+  CreatorMediaPlaybackTicket,
 } from "../../../../packages/api/src/media";
 import { PlaybackFileSchema } from "../../../../packages/api/src/media";
 import { mediaRequest } from "./api";
@@ -30,6 +32,42 @@ export function VoicePlayer(props: VoicePlayerProps) {
     />
   );
 }
+export function CreatorVoicePlayer(
+  props: Omit<VoicePlayerProps, "asset" | "fanId"> & {
+    asset: CreatorMediaAsset;
+    objectId: string;
+    /** Present only for an actual W1-authorized audience thread. */
+    fanId?: string;
+    /** Actual authenticated W5 content audience; W1 resolves its real fan profile. */
+    audience?: boolean;
+  },
+) {
+  const family =
+    props.audience === true
+      ? `creators/${props.creatorId}/audience-media`
+      : props.fanId
+        ? `threads/${props.creatorId}/${props.fanId}/creator-media`
+        : `creators/${props.creatorId}/media`;
+  if (
+    props.asset.creatorId !== props.creatorId ||
+    props.asset.objectId !== props.objectId ||
+    !["human_note", "post_audio"].includes(props.asset.purpose) ||
+    props.asset.state !== "ready" ||
+    props.asset.mimeType !== "audio/mp4"
+  )
+    return (
+      <p role="status">
+        This recording is unavailable for the current content.
+      </p>
+    );
+  return (
+    <Player
+      key={`${props.expectedAccountId ?? ""}/${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      {...props}
+      family={family}
+    />
+  );
+}
 function Player({
   asset,
   creatorName,
@@ -38,7 +76,7 @@ function Player({
   family,
   expectedAccountId,
 }: {
-  asset: MediaAsset;
+  asset: MediaAsset | CreatorMediaAsset;
   creatorName: string;
   transcript?: string;
   time?: string;
@@ -109,12 +147,15 @@ function Player({
     const timer = setInterval(() => {
       if (checking) return;
       checking = true;
-      void mediaRequest<MediaAsset>(`${family}/${asset.id}`, {
-        signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]),
-        ...(expectedAccountId
-          ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
-          : {}),
-      })
+      void mediaRequest<MediaAsset | CreatorMediaAsset>(
+        `${family}/${asset.id}`,
+        {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]),
+          ...(expectedAccountId
+            ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+            : {}),
+        },
+      )
         .then((current) => {
           if (
             current.id !== asset.id ||
@@ -155,17 +196,16 @@ function Player({
     loadRequest.current = abort;
     setLoading(true);
     try {
-      const ticket = await mediaRequest<PlaybackTicket>(
-        `${family}/${asset.id}/playback`,
-        {
-          method: "POST",
-          body: "{}",
-          signal: abort.signal,
-          ...(expectedAccountId
-            ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
-            : {}),
-        },
-      );
+      const ticket = await mediaRequest<
+        PlaybackTicket | CreatorMediaPlaybackTicket
+      >(`${family}/${asset.id}/playback`, {
+        method: "POST",
+        body: "{}",
+        signal: abort.signal,
+        ...(expectedAccountId
+          ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+          : {}),
+      });
       const url = new URL(ticket.url);
       const proof = PlaybackFileSchema.parse(ticket.playbackFile);
       // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.

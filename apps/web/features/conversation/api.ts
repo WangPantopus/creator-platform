@@ -23,6 +23,7 @@ export async function conversationRequest<T>(
     cache: "no-store",
     headers: {
       Accept: "application/json",
+      "X-Correlation-Id": crypto.randomUUID(),
       ...(expectedAccountId
         ? { "X-Expected-Account-Id": expectedAccountId }
         : {}),

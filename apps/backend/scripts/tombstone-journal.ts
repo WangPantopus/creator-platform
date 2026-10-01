@@ -18,13 +18,34 @@ const Row = z
     created_at: z.iso.datetime({ offset: true }),
   })
   .refine((r) => r.scope === "account" || r.creator_id !== null)
-  .refine((r) => r.scope !== "thread" || r.thread_id !== null);
-const Journal = z.strictObject({
-  schemaVersion: z.literal(1),
+  .refine((r) => r.scope !== "thread" || r.thread_id !== null)
+  .refine(
+    (r) =>
+      r.scope !== "account" || (r.creator_id === null && r.thread_id === null),
+  )
+  .refine((r) => r.scope !== "creator" || r.thread_id === null);
+const OwnershipRow = Row.safeExtend({
+  owned_creator_ids: z.array(z.uuid()).max(100).nullable(),
+  ownership_ref: z.string().trim().min(8).max(200).nullable(),
+})
+  .refine((r) => (r.owned_creator_ids === null) === (r.ownership_ref === null))
+  .refine((r) => r.scope === "account" || r.owned_creator_ids === null);
+const journalFields = {
   createdAt: z.iso.datetime(),
   sourceDatabase: z.string().min(1).max(128),
-  tombstones: z.array(Row).max(100000),
-});
+};
+const Journal = z.discriminatedUnion("schemaVersion", [
+  z.strictObject({
+    schemaVersion: z.literal(1),
+    ...journalFields,
+    tombstones: z.array(Row).max(100000),
+  }),
+  z.strictObject({
+    schemaVersion: z.literal(2),
+    ...journalFields,
+    tombstones: z.array(OwnershipRow).max(100000),
+  }),
+]);
 const [operation, fileArgument] = process.argv.slice(2);
 if (!["export", "restore"].includes(operation ?? "") || !fileArgument)
   throw new Error(
@@ -47,14 +68,28 @@ try {
   if (operation === "export") {
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const result = await client.query(
-      "SELECT id,account_id,scope,creator_id,thread_id,job_id,created_at FROM creator_trust.tombstone ORDER BY created_at,id LIMIT 100001",
+      `SELECT t.id,t.account_id,t.scope,t.creator_id,t.thread_id,t.job_id,t.created_at,j.owned_creator_ids,j.ownership_ref
+       FROM creator_trust.tombstone t JOIN creator_trust.privacy_job j ON j.id=t.job_id
+       WHERE j.kind='delete' AND j.account_id=t.account_id AND j.scope=t.scope
+         AND j.creator_id IS NOT DISTINCT FROM t.creator_id AND j.thread_id IS NOT DISTINCT FROM t.thread_id
+       ORDER BY t.created_at,t.id LIMIT 100001`,
     );
+    const total = await client.query<{ count: string }>(
+      "SELECT count(*) FROM creator_trust.tombstone",
+    );
+    if (
+      Number(total.rows[0]?.count) !== result.rows.length &&
+      result.rows.length <= 100000
+    )
+      throw new Error(
+        "Tombstone job provenance is inconsistent; no journal was exported.",
+      );
     if (result.rows.length > 100000)
       throw new Error(
         "Journal needs a partitioned export; no records were truncated.",
       );
     const value = Journal.parse({
-      schemaVersion: 1,
+      schemaVersion: 2,
       createdAt: new Date().toISOString(),
       sourceDatabase: new URL(url).pathname.slice(1),
       tombstones: result.rows.map((r) => ({
@@ -107,20 +142,52 @@ try {
     for (const row of value.tombstones) {
       const prior = (
         await client.query(
-          "SELECT account_id,scope,creator_id,thread_id FROM creator_trust.privacy_job WHERE id=$1 FOR UPDATE",
+          "SELECT account_id,kind,scope,creator_id,thread_id,owned_creator_ids,ownership_ref FROM creator_trust.privacy_job WHERE id=$1 FOR UPDATE",
           [row.job_id],
         )
       ).rows[0];
       if (
         prior &&
-        (prior.account_id !== row.account_id ||
+        (prior.kind !== "delete" ||
+          prior.account_id !== row.account_id ||
           prior.scope !== row.scope ||
           prior.creator_id !== row.creator_id ||
           prior.thread_id !== row.thread_id)
       )
         throw new Error("Restored job scope conflicts with the journal.");
+      const ownership =
+        "owned_creator_ids" in row ? row.owned_creator_ids : null;
+      const ownershipRef = "ownership_ref" in row ? row.ownership_ref : null;
+      if (
+        ownership !== null &&
+        prior?.owned_creator_ids !== null &&
+        prior?.owned_creator_ids !== undefined &&
+        (JSON.stringify(
+          [...new Set(prior.owned_creator_ids as string[])].sort(),
+        ) !== JSON.stringify([...new Set(ownership)].sort()) ||
+          prior.ownership_ref !== ownershipRef)
+      )
+        throw new Error("Restored ownership proof conflicts with the journal.");
+      const priorTombstone = (
+        await client.query(
+          "SELECT id,job_id,account_id,scope,creator_id,thread_id FROM creator_trust.tombstone WHERE id=$1 OR job_id=$2 FOR UPDATE",
+          [row.id, row.job_id],
+        )
+      ).rows;
+      if (
+        priorTombstone.some(
+          (t) =>
+            t.id !== row.id ||
+            t.job_id !== row.job_id ||
+            t.account_id !== row.account_id ||
+            t.scope !== row.scope ||
+            t.creator_id !== row.creator_id ||
+            t.thread_id !== row.thread_id,
+        )
+      )
+        throw new Error("Restored tombstone conflicts with the journal.");
       await client.query(
-        "INSERT INTO creator_trust.privacy_job(id,account_id,kind,scope,creator_id,thread_id,state,verified_at,verification_ref,created_at) VALUES($1,$2,'delete',$3,$4,$5,'queued',$6,'restoration_journal',$6) ON CONFLICT(id) DO UPDATE SET state='queued',completed_at=NULL,updated_at=now()",
+        "INSERT INTO creator_trust.privacy_job(id,account_id,kind,scope,creator_id,thread_id,state,verified_at,verification_ref,created_at,owned_creator_ids,ownership_ref) VALUES($1,$2,'delete',$3,$4,$5,'queued',$6,'restoration_journal',$6,$7,$8) ON CONFLICT(id) DO UPDATE SET state='queued',completed_at=NULL,updated_at=now(),owned_creator_ids=coalesce(creator_trust.privacy_job.owned_creator_ids,excluded.owned_creator_ids),ownership_ref=coalesce(creator_trust.privacy_job.ownership_ref,excluded.ownership_ref)",
         [
           row.job_id,
           row.account_id,
@@ -128,6 +195,8 @@ try {
           row.creator_id,
           row.thread_id,
           row.created_at,
+          ownership,
+          ownershipRef,
         ],
       );
       await client.query(

@@ -202,7 +202,7 @@ export function conversationPrivacyHook(input: {
           const pair = [family.threadId, family.creatorId, family.fanId];
           const thread = (
             await client.query(
-              "SELECT t.id,t.creator_id,t.fan_id,t.control,t.control_epoch,t.revision,t.deleted_at,cp.display_name FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR UPDATE OF t",
+              "SELECT t.id,t.creator_id,t.fan_id,t.control,t.control_epoch,t.revision,t.deleted_at,t.off_the_record,t.intro_shared,t.memory_revision,t.human_active_until,t.last_activity_at,t.session_started_at,t.last_reminder_at,cp.display_name FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR UPDATE OF t",
               pair,
             )
           ).rows[0];
@@ -248,6 +248,24 @@ export function conversationPrivacyHook(input: {
                 pair,
               )
             ).rows;
+            const events = (
+              await client.query(
+                "SELECT id,cursor,type,payload,actor_account_id,created_at,published_at FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY cursor LIMIT 2001",
+                pair,
+              )
+            ).rows;
+            const exclusions = (
+              await client.query(
+                "SELECT semantic_key,normalized_text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY semantic_key LIMIT 2001",
+                pair,
+              )
+            ).rows;
+            const generations = (
+              await client.query(
+                "SELECT id,fan_message_id,ai_message_id,grant_id,reservation_id,epoch,last_sequence,state,context_revision,accepted_at,first_visible_at,completed_at,failure_code FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY accepted_at,id LIMIT 2001",
+                pair,
+              )
+            ).rows;
             invariant(
               [
                 messages,
@@ -256,6 +274,9 @@ export function conversationPrivacyHook(input: {
                 consents,
                 memoryConsents,
                 usageDays,
+                events,
+                exclusions,
+                generations,
               ].every((rows) => rows.length <= 2000),
               "bounded_subjob_required",
               "This export needs a paginated conversation subjob.",
@@ -297,6 +318,9 @@ export function conversationPrivacyHook(input: {
               consents,
               memoryConsents,
               usageDays,
+              events,
+              exclusions,
+              generations,
             });
             invariant(
               Buffer.byteLength(JSON.stringify(data), "utf8") <= 8_000_000,

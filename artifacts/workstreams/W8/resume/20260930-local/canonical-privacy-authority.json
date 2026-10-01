@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-09-30T09:04:15.362Z",
+  "environment": "isolated synthetic creator_w8; canonical W1 authority primitives",
+  "blockedRelationshipDeletionScope": "verified",
+  "blockedRelationshipExport": "scope_revoked",
+  "otherFanDeletionScope": "scope_unavailable",
+  "developmentSessionFreshVerification": "fresh_verification_required",
+  "ownAiEvidence": {
+    "items": 1,
+    "author": "ai"
+  },
+  "otherFanAiEvidence": "message_unavailable",
+  "deletionReplay": {
+    "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+    "immediateDeny": true,
+    "ownJobs": 1
+  },
+  "realPantopusFreshSession": "unconfigured; not claimed"
+}

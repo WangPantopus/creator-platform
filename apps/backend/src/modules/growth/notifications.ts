@@ -1,3 +1,4 @@
+import { copy, formatCopy } from "@qelvora/copy";
 import { createHash, randomUUID } from "node:crypto";
 import { DomainError } from "../../core/errors.js";
 import { canonical } from "../../core/canonical.js";
@@ -12,6 +13,7 @@ import {
   type NotificationState,
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
+import type { GrowthErasure } from "./erasure.js";
 
 const authorKinds: Record<
   NotificationKind,
@@ -62,22 +64,22 @@ export function present(type: NotificationKind, state: NotificationState) {
   if (!authorKinds[type].includes(state.authorKind))
     throw new DomainError(
       "notification_author_mismatch",
-      "The event author does not match its notification type.",
+      copy.growthErrorNotificationAuthorMismatch,
       409,
     );
   if (type === "content_match" && !state.contentMatchConsent)
     throw new DomainError(
       "content_match_consent_required",
-      "Content matching requires consent.",
+      copy.growthErrorContentMatchConsentRequired,
     );
   const name = state.creatorName;
-  let sender = "System";
+  let sender: string = copy.growthSystem;
   switch (type) {
     case "ai_reply":
-      sender = `${name}'s AI`;
+      sender = formatCopy("aiAuthor", { name });
       break;
     case "approved_draft":
-      sender = `Approved by ${name}`;
+      sender = formatCopy("approvedNotification", { name });
       break;
     case "personal_reply":
     case "creator_offer":
@@ -86,20 +88,28 @@ export function present(type: NotificationKind, state: NotificationState) {
     case "announcement":
       sender =
         state.authorKind === "team"
-          ? `${name}'s team${state.teamName ? ` · ${state.teamName}` : ""}`
-          : `${name} · to ${state.audienceLabel ?? "followers"}`;
+          ? state.teamName
+            ? formatCopy("teamAuthor", { name, member: state.teamName })
+            : formatCopy("growthCreatorTeam", { name })
+          : formatCopy("noteAudience", {
+              name,
+              audience: state.audienceLabel ?? copy.growthFollowers,
+            });
       break;
     case "note":
       if (!state.audienceLabel)
         throw new DomainError(
           "audience_label_required",
-          "A Note must name its audience.",
+          copy.growthErrorAudienceLabelRequired,
           409,
         );
-      sender = `${name} · to ${state.audienceLabel}`;
+      sender = formatCopy("noteAudience", {
+        name,
+        audience: state.audienceLabel,
+      });
       break;
     case "reaction":
-      sender = `${name} reacted to your reply`;
+      sender = formatCopy("reaction", { name });
       break;
   }
   // These types never accept a preview carrying financial or private source material.
@@ -117,7 +127,7 @@ export function present(type: NotificationKind, state: NotificationState) {
   if (restrictedPreviewTypes.includes(type))
     preview = preview.replace(
       /(?:[$€£¥]\s*[\d,.]+|\b[\d,.]+\s*(?:USD|EUR|GBP)\b)/giu,
-      "[amount hidden]",
+      copy.growthAmountHidden,
     );
   if (
     type === "call_reminder" &&
@@ -125,9 +135,7 @@ export function present(type: NotificationKind, state: NotificationState) {
   )
     return null;
   // Provider queues cannot prevent a late lock-screen delivery; keep call copy safe.
-  if (type === "call_reminder")
-    preview =
-      "Your scheduled call has an update. Open the app to check its current status.";
+  if (type === "call_reminder") preview = copy.growthCallUpdate;
   return {
     sender,
     preview,
@@ -198,6 +206,7 @@ export class Notifications {
   constructor(
     private readonly db: GrowthDatabase,
     private readonly owners: GrowthOwners,
+    private readonly erasure: GrowthErasure,
     private readonly provider?: DeliveryProvider,
   ) {}
   async consume(input: unknown) {
@@ -212,7 +221,15 @@ export class Notifications {
         state: await this.owners.notificationState(event, recipient),
       })),
     );
+    if (states.some(({ state }) => state.retryable))
+      throw new DomainError(
+        "notification_owner_unconfigured",
+        copy.growthErrorNotificationOwnerUnconfigured,
+        503,
+      );
     return this.db.transaction(this.db.worker, async (client) => {
+      const retained = await this.erasure.event(client, event);
+      if (!retained) return { duplicate: false, created: 0 };
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [event.id],
@@ -225,18 +242,22 @@ export class Notifications {
         if (prior.rows[0].envelope_hash !== envelopeHash)
           throw new DomainError(
             "event_id_conflict",
-            "This event ID already has different content.",
+            copy.growthErrorEventIdConflict,
             409,
           );
         return { duplicate: true, created: 0 };
       }
       await client.query(
         "INSERT INTO growth.event_inbox(id,envelope,envelope_hash) VALUES($1,$2,$3)",
-        [event.id, event, envelopeHash],
+        [event.id, retained, envelopeHash],
       );
       let created = 0;
       for (const { recipient, state } of states) {
         if (
+          !retained.recipients.some(
+            (r) =>
+              r.accountId === recipient.accountId && r.role === recipient.role,
+          ) ||
           !state.available ||
           !state.authorized ||
           state.version < event.aggregateVersion ||
@@ -302,6 +323,7 @@ export class Notifications {
         );
         if (!recipient) throw new Error("recipient_missing");
         const state = await this.owners.notificationState(event, recipient);
+        if (state.retryable) throw new Error("notification_owner_unconfigured");
         const prefs = (notification.preference ??
           defaultPreferences) as NotificationPreferences;
         const channel = job.channel as "push" | "email";
@@ -333,22 +355,36 @@ export class Notifications {
           continue;
         }
         if (!this.provider) throw new Error("provider_unconfigured");
-        const delivered = await this.provider.send({
-          channel,
-          accountId: job.account_id,
-          notificationId: notification.id,
-          idempotencyKey: job.id,
-          sender: view.sender,
-          preview: prefs.hideSensitive
-            ? "You have an update. Open the app to view it."
-            : view.preview,
-          destination: view.destination,
-          authorship: view.authorship,
+        await this.db.transaction(this.db.worker, async (client) => {
+          const retained = await this.erasure.event(client, event);
+          if (!retained?.recipients.some((r) => r.accountId === job.account_id))
+            return;
+          if (
+            !(
+              await client.query(
+                "SELECT 1 FROM growth.delivery WHERE id=$1 AND lease_id=$2 AND state='leased'",
+                [job.id, leaseId],
+              )
+            ).rowCount
+          )
+            return;
+          const delivered = await this.provider!.send({
+            channel,
+            accountId: job.account_id,
+            notificationId: notification.id,
+            idempotencyKey: job.id,
+            sender: view.sender,
+            preview: prefs.hideSensitive
+              ? copy.growthHiddenUpdate
+              : view.preview,
+            destination: view.destination,
+            authorship: view.authorship,
+          });
+          await client.query(
+            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2",
+            [job.id, leaseId, delivered.providerRef],
+          );
         });
-        await this.db.worker.query(
-          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2",
-          [job.id, leaseId, delivered.providerRef],
-        );
       } catch (error) {
         await this.db.worker.query(
           "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2",
@@ -410,6 +446,7 @@ export class Notifications {
       if (!jobs.length) break;
       claimed += jobs.length;
       const eligible: typeof jobs = [];
+      const eligibleEvents: ReturnType<typeof EventEnvelope.parse>[] = [];
       const entries: NonNullable<
         Parameters<DeliveryProvider["send"]>[0]["entries"]
       > = [];
@@ -431,6 +468,8 @@ export class Notifications {
           }
           const state = await this.owners.notificationState(event, recipient),
             prefs = Preferences.parse(row.preference ?? defaultPreferences);
+          if (state.retryable)
+            throw new Error("notification_owner_unconfigured");
           if (
             !state.available ||
             !state.authorized ||
@@ -449,31 +488,41 @@ export class Notifications {
           }
           if (quietNow(prefs, new Date())) throw new QuietDelivery();
           eligible.push(job);
+          eligibleEvents.push(event);
           entries.push({
             ...view,
             preview: prefs.hideSensitive
-              ? "You have an update. Open the app to view it."
+              ? copy.growthHiddenUpdate
               : view.preview,
           });
         }
         if (!entries.length) continue;
         if (!this.provider) throw new DeliveryFailure(60);
         const first = entries[0]!;
-        const result = await this.provider.send({
-          channel: "email",
-          accountId: jobs[0]!.account_id,
-          notificationId: eligible[0]!.notification_id,
-          idempotencyKey: jobs[0]!.digest_id,
-          sender: "Your updates",
-          preview: first.preview,
-          destination: "/notifications",
-          authorship: "system",
-          entries,
+        await this.db.transaction(this.db.worker, async (client) => {
+          await this.erasure.lockEvents(client, eligibleEvents);
+          const current = await client.query(
+            "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
+            [eligible.map((job) => job.id), leaseId],
+          );
+          // Purge may have completed while owners were being read. Rebuild on the next lease.
+          if (current.rowCount !== eligible.length) return;
+          const result = await this.provider!.send({
+            channel: "email",
+            accountId: jobs[0]!.account_id,
+            notificationId: eligible[0]!.notification_id,
+            idempotencyKey: jobs[0]!.digest_id,
+            sender: copy.growthYourUpdates,
+            preview: first.preview,
+            destination: "/notifications",
+            authorship: "system",
+            entries,
+          });
+          await client.query(
+            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
+            [eligible.map((job) => job.id), leaseId, result.providerRef],
+          );
         });
-        await this.db.worker.query(
-          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
-          [eligible.map((job) => job.id), leaseId, result.providerRef],
-        );
       } catch (error) {
         if (error instanceof QuietDelivery) {
           await this.db.worker.query(
@@ -534,6 +583,12 @@ export class Notifications {
       );
       if (!recipient) continue;
       const state = await this.owners.notificationState(event, recipient);
+      if (state.retryable)
+        throw new DomainError(
+          "notification_owner_unconfigured",
+          copy.growthErrorNotificationOwnerUnconfigured2,
+          503,
+        );
       if (!state.authorized) continue;
       const current = state.available ? present(event.type, state) : null;
       output.push({
@@ -542,7 +597,7 @@ export class Notifications {
         sender: current?.sender ?? row.sender,
         authorKind: state.available ? state.authorKind : "system",
         creatorName: state.creatorName,
-        preview: current?.preview ?? "This update is no longer available.",
+        preview: current?.preview ?? copy.growthUpdateUnavailable,
         destination: current?.destination ?? "/notifications",
         readAt: row.read_at,
         createdAt: row.created_at,

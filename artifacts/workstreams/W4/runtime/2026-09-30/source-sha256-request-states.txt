@@ -1,0 +1,7 @@
+a9727b2d3a866594c47f3f9cb91e682af641dd3e17a4b1df1771efdd19075889  apps/web/features/commerce/CommerceScreen.tsx
+048e967d5d30a0332bf4ebbc84fbfb18c6da252a5b951850bc86ccac2355c5fc  apps/web/features/commerce/CardEntry.tsx
+89e4ea9b01d1918f53f33a45da8f5d802383b3c1ff00f37dddee7d3346b3970f  apps/web/features/commerce/commerce.css
+313ad543b48fe20d18fa4c4996265c2353f11daef513d4e18dccc37af24a32e4  apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift
+a96152aadc2b8928f5ce340b3c16133ca6b3c3a62f047abf6d373e2866a42a64  apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift
+848a7055a5db40cd667d83005177dd11733ed89ec77dc7c3fb3d0b567f6b2cbb  apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt
+6cf5155bb849f900301c3bf0c92d4d9e0c7d85cf9005853d06b7c981a2291538  apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt

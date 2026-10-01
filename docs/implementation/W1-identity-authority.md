@@ -1,5 +1,7 @@
 # W1 identity and authority integration
 
+Current September30 launch/resource and final integration facts: [W1 current handoff](../workstreams/handoffs/W1-resume-2026-09-30.md). Older leased commands below remain historical templates; use the new worktree/private env/device/ports after ownership checks.
+
 This is implementation/configuration documentation, not release sign-off. W1 personally authored the code, built and launched the clients. No new test code was added. See [current status](../workstreams/status/W1.md), [producer record](../workstreams/coordination/W1.md) and [verification rules](../workstreams/VERIFICATION.md).
 
 ## Identity boundary
@@ -33,13 +35,17 @@ Identity and thread transactions recheck the session row; logout/revocation seri
 Examples contain placeholders, not working credentials. Generated Swift/Kotlin API clients supply the credential from secure storage; web uses the origin-checked HttpOnly-cookie bridge.
 
 ```json
-{"returnTo":"/identity/account"}
+{ "returnTo": "/identity/account" }
 ```
 
 POST /v1/identity/continue returns redirectUrl and continuationId. A registered relative C11 destination is required; encoded separators, arbitrary URLs, controls, empty/duplicate query fields and unknown query keys are denied. Query scopes come from config/navigation.json and are generated to both native clients. Support crisis/access/feedback and Studio activation routes are registered; only exact /support accepts creatorId/messageId UUID query fields. Existing context/commerce IDs require canonical UUIDs; the exact offer=1 value is allowed only on a three-ID call path and chooses the offer composition. It supplies no participant, booking, payment or grant authority. Validation identifies destinations; each domain still checks object access after sign-in.
 
 ```json
-{"continuationId":"00000000-0000-4000-8000-000000000001","code":"<provider one-use code>","state":"<returned saved state>"}
+{
+  "continuationId": "00000000-0000-4000-8000-000000000001",
+  "code": "<provider one-use code>",
+  "state": "<returned saved state>"
+}
 ```
 
 POST /v1/identity/complete returns an app token, canonical returnTo and server-derived Session. Session contains fan/creator profiles and distinct creatorId-scoped triage/drafter/publisher/scheduler roles. Fan handles are normalized ASCII3–30characters; chosen intro is≤240characters and is not AI-use consent. D-07 team invitation/accept/removal is creator/account-scoped. W5 owns the settings compositions.
@@ -54,7 +60,7 @@ Public /verify/{signedActId} reads sanitized metadata and current valid/key_revo
 
 ## Client and feature configuration
 
-Web: QELVORA_API_URL is a server-only URL. /api/auth/complete binds the continuation cookie, exchanges the code, sets qelvora_session (HttpOnly, SameSite=Lax, Secure in production), then redirects to the saved app object. Sensitive OAuth query logging is disabled. /api/platform/identity forwards only allowed paths, rejects cross-origin writes, rotates/deletes cookies on session actions, and never puts tokens in browser storage.
+Web: QELVORA_API_URL is a server-only URL. /api/auth/complete binds the continuation cookie, exchanges the code, sets qelvora_session (HttpOnly, SameSite=Lax, Secure in production), then redirects to the saved app object. For parallel loopback development, explicitly set WEB_ORIGIN (or QELVORA_PUBLIC_ORIGIN) to this app origin; session, continuation and return cookies are suffixed with its port (for example qelvora_session_3001). Production retains the standard cookie names. Sensitive OAuth query logging is disabled. /api/platform/identity forwards only allowed paths, rejects cross-origin writes, rotates/deletes cookies on session actions, and never puts tokens in browser storage.
 
 Backend host: createConfiguredBackend accepts an explicit PantopusIdentityAdapter, guardrail adapter, signedSubjectPolicies and registerFeatures(runtime). registerDomainFeatures integrates existing Agent/Commerce/Media/Growth/Trust factories with one actorFor/scopeFor. W8 trust mounts at root because its router owns /v1/trust and /health/ready. Account restrictions use assertActorAllowed; creator/thread restrictions use assertScopeAllowed. Dedicated W8/W7 worker/runtime pools must retain their exact non-owner role contracts. Domain/provider services and policies must be supplied by their owners. The default development runtime deliberately reports missing generation/payment/media/growth/trust services unavailable; /health foundationReady is not readiness sign-off.
 
@@ -64,18 +70,20 @@ Android root: FanAppShell with Keystore, same registrations, validated return in
 
 ## Device support and release gates
 
-| Surface | Implemented adapter | Current evidence limit |
-| --- | --- | --- |
-| Secure web on supported passkey browser | navigator.credentials create/get; UV, abort, base64url | Genuine RP/device enrollment and exact named-act publication remain unverified |
-| iOS17+ | AuthenticationServices platform register/assert; cancellation; Keychain | Final RP/domain, associated domains, physical-device proof and actual sheets absent |
-| Android API28+ | Credential Manager1.6 create/get; cancellation; encrypted Keystore | Provider/Digital Asset Links/signing-certificate origin and physical-device proof absent |
-| Android API26–27 | Fan shell; explicit unsupported signing | No weaker credential/signature fallback |
+| Surface                                 | Implemented adapter                                                     | Current evidence limit                                                                   |
+| --------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Secure web on supported passkey browser | navigator.credentials create/get; UV, abort, base64url                  | Genuine RP/device enrollment and exact named-act publication remain unverified           |
+| iOS17+                                  | AuthenticationServices platform register/assert; cancellation; Keychain | Final RP/domain, associated domains, physical-device proof and actual sheets absent      |
+| Android API28+                          | Credential Manager1.6 create/get; cancellation; encrypted Keystore      | Provider/Digital Asset Links/signing-certificate origin and physical-device proof absent |
+| Android API26–27                        | Fan shell; explicit unsupported signing                                 | No weaker credential/signature fallback                                                  |
 
 Use generated tokens/copy/fonts/glyphs in Light/Night. All53 component registry entries exist across the three clients; independent reference comparisons, keyboard/focus,200% text, VoiceOver/TalkBack and reduced-motion acceptance remain open. Structural repairs are not acceptance evidence. Missing whole-screen compositions DG-W1-01..05 and DI09 optional-intro timing remain in the coordination record. Final naming/domain/RP/bundle/store identities are undecided; see [naming](../NAMING.md). The disposable rename preview is recorded with run evidence.
 
 ## Leased local launch
 
-W1 owns API4101/web3001/.next-w1, creator_w1 on port55431, Docker creator-platform-w1-local, simulator B622C222-8292-46EF-A2B2-A9DA67763DE6, emulator-5560/CreatorPlatform_W1 and artifacts/workstreams/W1/build. Never use global booted/unspecified adb or another workstream's data. The isolated W1 ADB server uses port5041. Private configuration is /private/tmp/creator-w1-runtime.env; do not copy its contents into logs.
+**Cleanup update:** The former W1 local runtime was released at the user's request after [PR #6](https://github.com/WangPantopus/creator-platform/pull/6) was created. See the [resource-release record](../workstreams/handoffs/W1-resource-release.json) and [continuation prompt](../workstreams/prompts/W1-resume-handoff.md). The servers are stopped; simulator/AVD/data, leased build outputs/caches and private env were removed. The following commands are historical templates. Provision fresh private development config, isolated data, devices and leases, then substitute the new paths/UUID/serial/ports before running them. Docker engine failure prevents confirmed container/image/volume removal; coordinate restoration and do not prune shared storage.
+
+Former W1 lease values: API4101/web3001/.next-w1, creator_w1 on port55431, Docker creator-platform-w1-local, simulator B622C222-8292-46EF-A2B2-A9DA67763DE6, emulator-5560/CreatorPlatform_W1 and artifacts/workstreams/W1/build. Never use global booted/unspecified adb or another workstream's data. The former isolated W1 ADB server used port5041. Former private configuration path was /private/tmp/creator-w1-runtime.env; do not copy its contents into logs.
 
 ```sh
 # In creator-platform, load the private development configuration without printing it.

@@ -25,6 +25,21 @@ const TicketSchema = z.strictObject({
   playbackFile: PlaybackFileSchema.optional(),
 });
 type Ticket = z.infer<typeof TicketSchema>;
+export const CreatorMediaPublicationBindingSchema = z.strictObject({
+  signedActId: z.uuid(),
+  version: z.number().int().positive(),
+});
+export type CreatorMediaPublicationBinding = z.infer<
+  typeof CreatorMediaPublicationBindingSchema
+>;
+const CreatorTicketSchema = TicketSchema.omit({ fanId: true }).extend({
+  objectId: z.uuid(),
+  accessEpoch: z.number().int().positive(),
+  fanId: z.uuid().optional(),
+  publication: CreatorMediaPublicationBindingSchema.optional(),
+  audience: z.literal(true).optional(),
+});
+type CreatorTicket = z.infer<typeof CreatorTicketSchema>;
 export class MediaTickets {
   constructor(
     private readonly secret: Buffer,
@@ -105,6 +120,103 @@ export class MediaTickets {
     }
     if (
       value.accountId !== accountId ||
+      value.assetId !== assetId ||
+      value.operation !== operation ||
+      (operation === "play" && !value.playbackFile) ||
+      value.expires <= Math.floor(Date.now() / 1000)
+    )
+      throw new DomainError(
+        "media_ticket_expired",
+        "Media access has expired. Request a new link.",
+        403,
+      );
+    return value;
+  }
+}
+
+/** Creator objects have distinct signed routes; an optional fan ID comes only from an issued read scope. */
+export class CreatorMediaTickets {
+  constructor(
+    private readonly secret: Buffer,
+    private readonly origin: string,
+  ) {
+    // Reuse the existing configuration checks without issuing a thread ticket.
+    new MediaTickets(secret, origin);
+  }
+  issue(input: Omit<CreatorTicket, "expires" | "nonce">, ttlSeconds = 120) {
+    if (!Number.isSafeInteger(ttlSeconds) || ttlSeconds < 1 || ttlSeconds > 120)
+      throw new Error(
+        "Media ticket lifetime must be between 1 and 120 seconds.",
+      );
+    const value = CreatorTicketSchema.parse({
+      ...input,
+      expires: Math.floor(Date.now() / 1000) + ttlSeconds,
+      nonce: randomUUID(),
+    });
+    const payload = Buffer.from(JSON.stringify(value)).toString("base64url");
+    const signature = createHmac("sha256", this.secret)
+      .update(payload)
+      .digest("base64url");
+    const route =
+      input.audience === true
+        ? `creators/${input.creatorId}/audience-media`
+        : input.fanId
+          ? `threads/${input.creatorId}/${input.fanId}/creator-media`
+          : `creators/${input.creatorId}/media`;
+    return {
+      url: `${this.origin}/v1/w6/${route}/${input.assetId}/${input.operation}?ticket=${payload}.${signature}`,
+      expiresAt: new Date(value.expires * 1000).toISOString(),
+    };
+  }
+  verify(
+    token: string,
+    scope: {
+      accountId: string;
+      creatorId: string;
+      fanId?: string;
+      audience?: true;
+    },
+    assetId: string,
+    operation: CreatorTicket["operation"],
+  ) {
+    if (token.length > 2048)
+      throw new DomainError(
+        "media_ticket_invalid",
+        "Media access has expired.",
+        403,
+      );
+    const [payload, signature, extra] = token.split(".");
+    const expected = createHmac("sha256", this.secret)
+      .update(payload ?? "")
+      .digest();
+    const supplied = Buffer.from(signature ?? "", "base64url");
+    if (
+      extra ||
+      supplied.length !== expected.length ||
+      !timingSafeEqual(expected, supplied)
+    )
+      throw new DomainError(
+        "media_ticket_invalid",
+        "Media access has expired.",
+        403,
+      );
+    let value: CreatorTicket;
+    try {
+      value = CreatorTicketSchema.parse(
+        JSON.parse(Buffer.from(payload!, "base64url").toString("utf8")),
+      );
+    } catch {
+      throw new DomainError(
+        "media_ticket_invalid",
+        "Media access has expired.",
+        403,
+      );
+    }
+    if (
+      value.accountId !== scope.accountId ||
+      value.creatorId !== scope.creatorId ||
+      value.fanId !== scope.fanId ||
+      value.audience !== scope.audience ||
       value.assetId !== assetId ||
       value.operation !== operation ||
       (operation === "play" && !value.playbackFile) ||

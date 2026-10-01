@@ -1,0 +1,83 @@
+{
+  "observedAt": "2026-09-30T08:23:14.174Z",
+  "environment": "isolated synthetic creator_w8",
+  "providers": "unconfigured",
+  "roles": [
+    "creator_runtime",
+    "creator_trust_runtime",
+    "creator_trust_worker"
+  ],
+  "before": {
+    "creatorScopedMessageCount": 1
+  },
+  "block": {
+    "status": 200,
+    "caseId": "27fbf5f9-7e9e-456e-8594-153a3ebcabfd",
+    "enforcement": "deny_record_committed"
+  },
+  "outcomes": {
+    "fresh_fan": "scope_revoked",
+    "fresh_creator": "scope_revoked",
+    "issued_fan": "scope_revoked",
+    "issued_creator": "scope_revoked"
+  },
+  "totalDenyObservationMs": 108,
+  "unrelatedThreadAllowed": "40000000-0000-4000-8000-000000000002",
+  "ownPrivacyProgressReadable": 1,
+  "exportMetadata": [
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "cases"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "blocks"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "events"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "notices"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "accesses"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "evidence"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "feedback"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "requests"
+    },
+    {
+      "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+      "state": "blocked",
+      "trust_state": "complete",
+      "exported_section": "casesAboutYou"
+    }
+  ]
+}

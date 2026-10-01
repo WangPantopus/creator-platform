@@ -87,7 +87,7 @@ export default function QueuePage() {
         <Link href="/status">Service status</Link>
         <TrustSession />
       </nav>
-      <main className="ops-main" id="ops-main">
+      <main className="ops-main" id="ops-main" tabIndex={-1}>
         <h1>
           {queue === "support"
             ? "Support requests"

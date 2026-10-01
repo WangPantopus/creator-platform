@@ -1,3 +1,5 @@
+import { growthLabel } from "../../features/growth/copy";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { growthRequest } from "../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
 import type { Creator } from "../../features/growth/types";
@@ -26,7 +28,7 @@ export default async function Discover({
     <GrowthShell active="Discover">
       <Connection />
       <header className="growth-header">
-        <h1>Discover</h1>
+        <h1>{growthCopy.navDiscover}</h1>
       </header>
       <form
         action="/discover"
@@ -34,7 +36,7 @@ export default async function Discover({
         style={{ paddingBottom: 0, gap: 16 }}
       >
         <label className="qv-sr" htmlFor="q">
-          Search creators
+          {growthCopy.growthSearchCreators}
         </label>
         <input
           className="qv-input"
@@ -42,17 +44,17 @@ export default async function Discover({
           name="q"
           defaultValue={q}
           maxLength={120}
-          placeholder="Search creators, crafts or questions"
+          placeholder={growthCopy.growthSearchCreatorsCraftsOrQuestions}
         />
         <input type="hidden" name="category" value={category} />
         <button className="qv-sr" type="submit">
-          Search
+          {growthCopy.growthSearch}
         </button>
-        <nav className="growth-seg" aria-label="Categories">
+        <nav className="growth-seg" aria-label={growthCopy.growthCategories}>
           {["For you", "Crafts", "Music", "Food"].map((cat) => (
             <a
               href={`/discover?q=${encodeURIComponent(q)}&category=${cat === "For you" ? "" : cat}`}
-              key={cat}
+              key={growthLabel(cat)}
               aria-current={
                 (category || "For you") === cat ? "page" : undefined
               }
@@ -82,30 +84,34 @@ export default async function Discover({
                     </strong>
                     <p className="growth-help">{c.biography}</p>
                     <p className="growth-help">
-                      {c.name}'s AI can talk about: {c.topics.join(", ")}.
+                      {growthFormat("growthSAiCanTalkAbout", {
+                        value1: c.name,
+                        value2: c.topics.join(", "),
+                      })}
                     </p>
                     <p className="growth-capacity growth-rule">{c.capacity}</p>
                     <p className="growth-help">
                       {c.state === "paused"
-                        ? `${c.name}'s AI is paused.`
-                        : "Official AI · try a first conversation when available"}
+                        ? growthFormat("growthSAiIsPaused", { value1: c.name })
+                        : growthCopy.growthOfficialAiTryAFirstConversationWhenAvailable}
                     </p>
                   </div>
                 </a>
               </article>
             ))
           ) : (
-            <NoData title="No creators found">
-              Try a different need or browse a category.
+            <NoData title={growthCopy.growthNoCreatorsFound}>
+              {growthCopy.growthTryADifferentNeedOrBrowseACategory}
             </NoData>
           )}
           <p className="growth-help">
-            Public creator information · alphabetical order. Official means the
-            creator authorized this AI.
+            {
+              growthCopy.growthPublicCreatorInformationAlphabeticalOrderOfficialMeansTheCreatorAuthorized
+            }
           </p>
           {data.hasMore ? (
             <p className="growth-help">
-              Refine your search to see more creators.
+              {growthCopy.growthRefineYourSearchToSeeMoreCreators}
             </p>
           ) : null}
         </div>

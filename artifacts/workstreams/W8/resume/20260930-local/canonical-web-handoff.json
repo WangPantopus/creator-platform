@@ -1,0 +1,28 @@
+{
+  "sourceParent": "8636dd7c6302dd1667cf78364e85d14555bac9f7",
+  "followup": "Ignore an empty local override cookie before canonical fallback",
+  "scope": "Direct operator HTTP observation; separate from browser acceptance",
+  "steps": [
+    {
+      "step": "complete_web",
+      "status": 200,
+      "path": "/support"
+    },
+    {
+      "endpoint": "/api/trust/session",
+      "status": 200,
+      "accountId": "10000000-0000-4000-8000-000000000002",
+      "messageCount": null,
+      "cidSent": "fb15deb0-12ab-4a5e-850d-a73c2a8a0ff9",
+      "cidReturned": "fb15deb0-12ab-4a5e-850d-a73c2a8a0ff9"
+    },
+    {
+      "endpoint": "/api/conversations/20000000-0000-4000-8000-000000000001/30000000-0000-4000-8000-000000000002",
+      "status": 503,
+      "error": "service_unavailable",
+      "cidSent": "86c88aa7-ea94-4cde-b910-e00c84d23b2a",
+      "cidReturned": "86c88aa7-ea94-4cde-b910-e00c84d23b2a"
+    }
+  ],
+  "paidAICalls": 0
+}

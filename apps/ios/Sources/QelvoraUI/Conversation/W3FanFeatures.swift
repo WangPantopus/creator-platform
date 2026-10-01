@@ -118,14 +118,14 @@ private struct W3ThreadScreen: View {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
         }
         else if let kind = MessageKind(rawValue: message.authorKind.rawValue) {
-            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.correction == nil && message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open("/support") }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
+            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.correction == nil && message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open(reportDestination(message)) }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
                 .accessibilityLabel(message.authorLabel(name: page.creatorName))
             if let correction = message.correction {
                 Text(QelvoraCopy.text("correctionAuthor", values: ["name": page.creatorName])).qText("label")
                 Button("Original AI reply · version \(correction.originalVersion)", variant: .quiet) { Task { do { let original: W3Message = try await model.client.request(model.root + "/messages/" + correction.originalMessageId); guard original.id == correction.originalMessageId, original.version == correction.originalVersion, original.authorKind == .ai else { sourceFailure = "The original reply changed."; return }; originalReply = original } catch { sourceFailure = "No longer accessible to you" } } }
             }
             if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
-            if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open("/support") } }
+            if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open(reportDestination(message)) } }
             if message.authorKind == .ai, message.agentVersion != nil, message.deliveryState == .delivered || message.deliveryState == .interrupted, let policy = page.feedbackPolicy {
                 DisclosureGroup(QelvoraCopy.text("thisHelped")) {
                     Text(policy.notice).qText("caption")
@@ -165,9 +165,12 @@ private struct W3ThreadScreen: View {
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
             }
         }
-        Button("Report", variant: .quiet) { session.open("/support") }
+        Button("Report", variant: .quiet) { session.open(reportDestination(message)) }
     }
 
+    private func reportDestination(_ message: W3Message) -> String {
+        "/support?creatorId=" + model.creatorId + (message.authorKind == .ai ? "&messageId=" + message.id : "")
+    }
 }
 private struct W3Passage: Decodable, Identifiable, Sendable { let id: String; let title: String; let text: String }
 

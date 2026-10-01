@@ -133,6 +133,7 @@ export const defaultPreferences: NotificationPreferences = {
 
 /** Produced only by an authenticated owner-module adapter; never accepted from HTTP bodies. */
 export interface NotificationState {
+  retryable?: boolean;
   available: boolean;
   authorized: boolean;
   version: number;
@@ -210,6 +211,7 @@ export interface GrowthOwners {
 }
 export const unavailableOwners: GrowthOwners = {
   notificationState: async () => ({
+    retryable: true,
     available: false,
     authorized: false,
     version: 0,

@@ -16,7 +16,7 @@ export default function AccessAudits() {
     "operations/audits",
   );
   return (
-    <main className="trust-page" id="ops-main">
+    <main className="trust-page" id="ops-main" tabIndex={-1}>
       <Link href="/ops">Back to cases</Link>
       <h1>Access audits</h1>
       <AuditBanner>

@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.QelvoraCopy
@@ -57,11 +58,11 @@ fun Message(kind: MessageKind = MessageKind.AI, children: String = "", name: Str
                     when (treatment) {
                         DraftTreatment.SPLIT -> Column(Modifier.fillMaxWidth().clip(bubble).border(QelvoraTokens.hairline, qColor("maya-line"), bubble)) {
                             Column(Modifier.fillMaxWidth().background(qColor("ai-surface")).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.space3), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.composerGap)) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) { Mark(); TextLine(copy("preparedByAI"), "caption", "ai-ink", true) }
-                                TextLine(children, "body")
+                                Row(Modifier.clearAndSetSemantics {}, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) { Mark(); TextLine(copy("preparedByAI"), "caption", "ai-ink", true) }
+                                TextLine(children, "body", modifier = Modifier.clearAndSetSemantics { contentDescription = copy("preparedByAI") + " · " + copy("approvedBy", "name" to name) + ". " + children })
                             }
                             FlowRow(Modifier.fillMaxWidth().background(qColor("maya-surface")).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.composerGap), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.space1)) {
-                                Row(Modifier.heightIn(min = QelvoraTokens.space6), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(initial = name.take(1), onMaya = true); TextLine(copy("approvedBy", "name" to name), "caption", "maya-accent", true) }
+                                Row(Modifier.heightIn(min = QelvoraTokens.space6).clearAndSetSemantics {}, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(initial = name.take(1), onMaya = true); TextLine(copy("approvedBy", "name" to name), "caption", "maya-accent", true) }
                                 SignedMarker(name, time, onMaya = true, onClick = onVerify)
                             }
                         }

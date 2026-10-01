@@ -8,6 +8,7 @@ import type {
   ConversationAccountPage,
 } from "../../../../packages/api/src/conversation/contracts";
 import { useConversationRequest, ConversationError } from "./api";
+import { useIdentityRequest } from "../identity/session-boundary";
 import "./conversation.css";
 type Account = ConversationAccountPage;
 type MemoryView = {
@@ -31,11 +32,12 @@ export function AccountScreen({
   fanId?: string;
 }) {
   const request = useConversationRequest();
+  const { session } = useIdentityRequest();
   const [account, setAccount] = useState<Account | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (creatorId && fanId) return;
     let active = true;
@@ -74,7 +76,11 @@ export function AccountScreen({
     <main className="conversation-account">
       <div className="account-title">
         <h1>{account ? `@${account.fan.handle}` : "You"}</h1>
-        <p className="conversation-quiet">Signed in with Pantopus</p>
+        <p className="conversation-quiet">
+          {session.mode === "development"
+            ? "Synthetic local account. Pantopus production sign-in is not connected."
+            : "Signed in with Pantopus"}
+        </p>
       </div>
       {error && (
         <section>
@@ -91,15 +97,19 @@ export function AccountScreen({
           </button>
         </section>
       )}
-      {account && (
-        <section>
-          <h2>Your intro</h2>
-          <p>{account.fan.intro || "You haven’t added an intro yet."}</p>
-          <Button href="/identity/account" variant="quiet">
-            Edit handle and intro
-          </Button>
-        </section>
-      )}
+      <section>
+        <h2>Your intro</h2>
+        <p>
+          {account
+            ? account.fan.intro || "You haven’t added an intro yet."
+            : error
+              ? "Your intro is unavailable."
+              : "Loading your account…"}
+        </p>
+        <Button href="/identity/account" variant="quiet">
+          Edit handle and intro
+        </Button>
+      </section>
       <section>
         <nav aria-label="Your account">
           <article>
@@ -150,7 +160,7 @@ export function AccountScreen({
           <article key={thread.id}>
             <a
               className="conversation-row"
-              href={`/you?creator=${thread.creatorId}&fan=${thread.fanId}`}
+              href={`/you?creatorId=${thread.creatorId}&fanId=${thread.fanId}`}
             >
               <span>{thread.name} · memories and access history</span>
               <span aria-hidden="true">›</span>
@@ -188,7 +198,15 @@ export function AccountScreen({
           Export or delete my data
         </Button>
       </section>
-      <TabBar active="You" />
+      <TabBar
+        active="You"
+        hrefs={{
+          Home: "/home",
+          Discover: "/discover",
+          Requests: "/requests",
+          You: "/you",
+        }}
+      />
     </main>
   );
 }
@@ -204,7 +222,7 @@ function ConversationPrivacy({
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [memory, setMemory] = useState<MemoryView | null>(null);
-  const [audit, setAudit] = useState<Audit[]>([]);
+  const [audit, setAudit] = useState<Audit[] | null>(null);
   const [usage, setUsage] = useState<
     | import("../../../../packages/api/src/conversation/contracts").ConversationUsage
     | null
@@ -238,7 +256,7 @@ function ConversationPrivacy({
       ) {
         setPage(null);
         setMemory(null);
-        setAudit([]);
+        setAudit(null);
         setUsage(null);
         setEditing(null);
         setText("");
@@ -428,7 +446,13 @@ function ConversationPrivacy({
         )}
         <h2>Who opened your conversations</h2>
         <article>
-          {audit.length === 0 ? (
+          {audit === null ? (
+            <div className="conversation-row">
+              {error
+                ? "Opening history unavailable."
+                : "Loading opening history…"}
+            </div>
+          ) : audit.length === 0 ? (
             <div className="conversation-row">No logged openings.</div>
           ) : (
             audit.map((entry) => (

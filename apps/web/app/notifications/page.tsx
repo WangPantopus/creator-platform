@@ -1,3 +1,4 @@
+import { copy as growthCopy } from "@qelvora/copy";
 import { growthRequest } from "../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
 import { Inbox, Connection } from "../../features/growth/actions";
@@ -15,15 +16,15 @@ export default async function Notifications() {
       <GrowthShell>
         <Connection />
         <header className="growth-header">
-          <h1>Notifications</h1>
-          <a href="/notifications/settings">Settings</a>
+          <h1>{growthCopy.growthNotifications}</h1>
+          <a href="/notifications/settings">{growthCopy.growthSettings}</a>
         </header>
         <section className="growth-stack">
           {notifications.length ? (
             <Inbox items={notifications} timeZone={preferences.timeZone} />
           ) : (
-            <NoData title="No updates yet">
-              Your in-app record will appear here. Push and email are optional.
+            <NoData title={growthCopy.growthNoUpdatesYet}>
+              {growthCopy.growthYourInAppRecordWillAppearHerePushAndEmail}
             </NoData>
           )}
         </section>

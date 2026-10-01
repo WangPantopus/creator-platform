@@ -563,7 +563,7 @@ export function ConversationScreen({
           </div>
           <a
             className="qv-icon-btn"
-            href={`/you?creator=${creatorId}&fan=${fanId}`}
+            href={`/you?creatorId=${creatorId}&fanId=${fanId}`}
             aria-label="Conversation privacy"
           >
             ⋯
@@ -837,13 +837,13 @@ export function ConversationScreen({
                 <div className="conversation-actions">
                   <a
                     className="qv-link-btn"
-                    href={`/support?messageId=${message.id}`}
+                    href={`/support?creatorId=${creatorId}${message.authorKind === "ai" ? `&messageId=${message.id}` : ""}`}
                   >
                     Report
                   </a>
                   <a
                     className="qv-link-btn"
-                    href={`/you?creator=${creatorId}&fan=${fanId}#memory`}
+                    href={`/you?creatorId=${creatorId}&fanId=${fanId}#memory`}
                   >
                     What it remembers
                   </a>
@@ -960,7 +960,7 @@ export function ConversationScreen({
           Ask {page.creatorName} to step in
         </Button>
         <div className="conversation-actions">
-          <a href={`/you?creator=${creatorId}&fan=${fanId}`}>Me and privacy</a>
+          <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>Me and privacy</a>
           <a href="/trust/crisis">Get support</a>
         </div>
       </footer>

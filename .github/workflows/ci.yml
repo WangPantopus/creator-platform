@@ -2,6 +2,9 @@ name: Foundation checks
 on:
   push:
   pull_request:
+concurrency:
+  group: foundation-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   web-and-backend:
     runs-on: ubuntu-latest
@@ -21,28 +24,28 @@ jobs:
     env:
       CREATOR_TEST_DATABASE_URL: postgresql://postgres:foundation-test-only@127.0.0.1:5432/creator_foundation
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
   web-visual:
-    # Match W1's preserved-image verification environment.
+    # Match the macOS26/Intel environment used to verify the preserved images.
     runs-on: macos-26-intel
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install chromium
       - run: pnpm test:visual
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: visual-review
@@ -50,13 +53,11 @@ jobs:
             playwright-report
             test-results
   ios-foundation:
-    runs-on: macos-26
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: macos-26-intel
     steps:
-      - uses: actions/checkout@v4
-      - run: xcodebuild -version
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Verify native Swift package
+        timeout-minutes: 20
         run: |
           nativeTemporaryDirectory="${RUNNER_TEMP}/creator-native-${GITHUB_RUN_ID}-${GITHUB_JOB}"
           mkdir -p "$nativeTemporaryDirectory"
@@ -69,20 +70,13 @@ jobs:
           xcrun simctl list devices available --json | python3 -c '
           import json, os, sys
           devices = json.load(sys.stdin)["devices"]
-          runtimes = sorted(
-              (runtime for runtime in devices if ".iOS-26-" in runtime),
-              key=lambda runtime: tuple(int(part) for part in runtime.rsplit("iOS-", 1)[1].split("-")),
-              reverse=True,
-          )
-          phones = [d for runtime in runtimes for d in devices[runtime] if d["name"].startswith("iPhone")]
-          if not phones: raise SystemExit("No available iOS 26 iPhone simulator on the pinned runner")
-          phone = phones[0]
+          phone = next(d for runtime, entries in devices.items() if ".iOS-" in runtime for d in entries if d["name"].startswith("iPhone"))
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
       - name: Wait for the selected simulator to finish booting
         run: xcrun simctl bootstatus '${{ steps.simulator.outputs.id }}' -b
-      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=NO
-      - uses: actions/upload-artifact@v4
+      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -resultBundlePath artifacts/ios/FoundationFlow.xcresult
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: ios-review
@@ -92,29 +86,30 @@ jobs:
   android-foundation:
     runs-on: macos-26-intel
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
         with:
           packages: platform-tools
       - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug
         working-directory: apps/android
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: android-review
           path: |
             apps/android/app/build/reports
+            apps/android/app/build/paparazzi/failures
             apps/android/app/build/outputs/apk/debug/*.apk
   android-runtime:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: 21
@@ -123,12 +118,12 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - uses: reactivecircus/android-emulator-runner@v2
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
           arch: x86_64
           script: cd apps/android && ./gradlew :app:connectedDebugAndroidTest
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: android-runtime-review

@@ -1,0 +1,31 @@
+{
+  "fanProfiles": [
+    {
+      "account_id": "10000000-0000-4000-8000-000000000001",
+      "handle": "w1_resume_one",
+      "intro": ""
+    },
+    {
+      "account_id": "10000000-0000-4000-8000-000000000002",
+      "handle": "w1_resume_two",
+      "intro": "W1 disposable intro retained while reconnecting"
+    }
+  ],
+  "creatorProfiles": [
+    {
+      "account_id": "10000000-0000-4000-8000-000000000002",
+      "handle": "w1_creator_two",
+      "verification": "pending"
+    }
+  ],
+  "migrations": [
+    {
+      "version": "0001_foundation",
+      "checksum": "1ccd0d6a99e11865850cd40f27d9446035e7d769d9b47f4f6d5c80776274117b"
+    },
+    {
+      "version": "0002_w1_identity",
+      "checksum": "5aa91502d511375eb7a43e0f226f3e1aeeee896981b7ea4b6faf1aa5bee97f82"
+    }
+  ]
+}

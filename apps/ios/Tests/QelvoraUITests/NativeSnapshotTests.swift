@@ -7,9 +7,6 @@
 
   @MainActor
   final class NativeSnapshotTests: XCTestCase {
-    private final class CaptureWindow: NSWindow {
-      override var backingScaleFactor: CGFloat { 2 }
-    }
     private let size = CGSize(width: 390, height: 844)
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
@@ -73,34 +70,62 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
-      let host = NSHostingView(
-        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
-      host.frame = NSRect(origin: .zero, size: size)
-      let window = CaptureWindow(
-        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      let window = NSWindow(
+        contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
+        backing: .buffered, defer: false)
       // Keep capture independent of the attached display's calibration.
       window.colorSpace = .sRGB
+      window.isReleasedWhenClosed = false
+      // Render at the reference pixel scale before AppKit caches its layers.
+      // Enlarging a1x cached bitmap alone also enlarges blurred text.
+      let captureScale = 2 / window.backingScaleFactor
+      let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
+      let host = NSHostingView(
+        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }
+          .frame(width: size.width, height: size.height)
+          .scaleEffect(captureScale, anchor: .topLeading)
+          .frame(width: canvas.width, height: canvas.height, alignment: .topLeading))
+      host.frame = NSRect(origin: .zero, size: canvas)
+      window.setContentSize(canvas)
       window.contentView = host
-      host.viewDidChangeBackingProperties()
+      defer {
+        window.contentView = nil
+        window.close()
+      }
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      // W4's published capture correction: references contain 2x pixels,
-      // whereas a headless CI display is 1x. Render into a fixed-resolution
-      // bitmap instead of resizing a lower-resolution capture afterward.
-      let bitmap = NSBitmapImageRep(
-        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
-        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
-        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
-        bytesPerRow: 0, bitsPerPixel: 0
-      )!.retagging(with: .sRGB)!
-      bitmap.size = size
+      // Redraw hosted layers at the reference scale before compositing. A1x
+      // layer cache would otherwise magnify blurred text on a hosted display.
+      func prepareLayer(_ layer: CALayer) {
+        layer.contentsScale = 2
+        layer.rasterizationScale = 2
+        layer.setNeedsDisplay()
+        for child in layer.sublayers ?? [] { prepareLayer(child) }
+        if let mask = layer.mask { prepareLayer(mask) }
+        layer.displayIfNeeded()
+      }
+      if let layer = host.layer { prepareLayer(layer) }
+      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas)")
+      guard
+        let context = CGContext(
+          data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
+          bitsPerComponent: 8, bytesPerRow: 0,
+          space: CGColorSpace(name: CGColorSpace.sRGB)!,
+          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ), let pixels = context.makeImage()
+      else {
+        XCTFail("Snapshot bitmap could not be allocated.", file: file, line: line)
+        return
+      }
+      let bitmap = NSBitmapImageRep(cgImage: pixels)
+      bitmap.size = canvas
       host.cacheDisplay(in: host.bounds, to: bitmap)
-      let rendered = NSImage(size: size)
-      rendered.addRepresentation(bitmap)
+      bitmap.size = size
+      let image = NSImage(size: size)
+      image.addRepresentation(bitmap)
       var imageStrategy = Snapshotting<NSImage, NSImage>.image
       let compare = imageStrategy.diffing.diffV2
       imageStrategy.diffing.diffV2 = { reference, rendered in
@@ -127,7 +152,7 @@
         // Color-profile rounding and native blur/text rasterization vary across
         // macOS hosts. Require 99.85% of decoded sRGB pixels to match within eight
         // channel units; retain exact dimensions and original failure images.
-        // Byte comparison avoids Core Image's host-dependent dark-color Delta E.
+        // Byte comparison applies the same channel bound in both themes.
         let a = expected.data!.assumingMemoryBound(to: UInt8.self)
         let b = actual.data!.assumingMemoryBound(to: UInt8.self)
         var different = 0
@@ -150,9 +175,8 @@
         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
       }
       assertSnapshot(
-        of: rendered, as: imageStrategy, named: name, record: record, file: file,
+        of: image, as: imageStrategy, named: name, record: record, file: file,
         testName: testName, line: line)
-      window.contentView = nil
     }
   }
 #endif
