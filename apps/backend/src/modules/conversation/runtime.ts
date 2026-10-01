@@ -30,7 +30,10 @@ export function createConversationRuntime(input: {
   /** W4's prepared port proves the exact configured AccessService identity.
    * Keep allowance absent to select its single canonical generation path. */
   generationCostReconciliation?: GenerationCostReconciliation;
-  firstConversation?: Pick<CommerceService, "openTrial">;
+  firstConversation?: Pick<
+    CommerceService,
+    "pool" | "firstConversationAvailable" | "openTrialInTransaction"
+  >;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
   /** Prepared only after W8's real migration/checksum and lifecycle policy. */
@@ -53,6 +56,12 @@ export function createConversationRuntime(input: {
     !input.corrections || input.lineage,
     "correction_lineage_unavailable",
     "Signed corrections require the prepared original-message lineage projection.",
+  );
+  invariant(
+    !input.firstConversation ||
+      input.firstConversation.pool === input.database.pool,
+    "trial_pool_mismatch",
+    "First-conversation admission must use this actual conversation database pool.",
   );
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
@@ -120,6 +129,7 @@ export function createConversationRuntime(input: {
     (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
     input.lineage,
     input.corrections,
+    input.assertReady,
   );
   return {
     feature,

@@ -9,6 +9,12 @@ import type { ConversationMessage } from "../../../../../packages/api/src/conver
  * into an older Studio consumer. Reads remain on its actual scoped client. */
 export interface ConversationLineageProjection {
   assertPool(pool: Pool): void;
+  /** Read actual registered row metadata for this bounded existing page. */
+  project(
+    scope: ThreadScope,
+    client: PoolClient,
+    messageIds: readonly string[],
+  ): Promise<ConversationMessage[]>;
   enrich(
     scope: ThreadScope,
     client: PoolClient,

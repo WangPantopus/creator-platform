@@ -17,7 +17,11 @@ import { contentHash } from "../../core/canonical.js";
 import type { Actor } from "../identity/adapter.js";
 import { consumeSignedAct } from "../identity/signed-acts.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import type { AccessService } from "../access/scope.js";
+import type {
+  AccessService,
+  GenerationAllowance,
+  ThreadScope,
+} from "../access/scope.js";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
@@ -92,6 +96,14 @@ type EffectRow = {
   updated_at: Date;
   created_at: Date;
 };
+export type CommerceTrialAdmission = Readonly<{
+  allowance: GenerationAllowance;
+  units: number;
+  /** Actual fully prepared W3 generator/current W2 license, source and budget
+   * readiness. Durable reads/locks on this client, never provider I/O or a
+   * successful default. This must reject before the one-time window starts. */
+  assertReady(scope: ThreadScope, client: PoolClient): Promise<void>;
+}>;
 const ModeCommand = z
   .strictObject({
     title: z.string().trim().min(1).max(100),
@@ -134,7 +146,20 @@ export class CommerceService {
     private readonly access: AccessService,
     readonly policy: CommercePolicy,
     readonly provider?: PaymentProvider,
+    private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
+    private readonly trialAdmission?: CommerceTrialAdmission,
   ) {}
+  get firstConversationAvailable() {
+    return Boolean(
+      this.trialAdmission &&
+        this.access.isGenerationAllowance(this.trialAdmission.allowance) &&
+        this.access.threadScopeInTransactionAvailable &&
+        Number.isSafeInteger(this.trialAdmission.units) &&
+        this.trialAdmission.units > 0 &&
+        this.trialAdmission.units <= 2147483647 &&
+        typeof this.trialAdmission.assertReady === "function",
+    );
+  }
   async account<T>(
     actor: Actor,
     work: (client: PoolClient) => Promise<T>,
@@ -144,6 +169,7 @@ export class CommerceService {
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
+    await this.assertActorAllowed?.(actor);
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
@@ -697,41 +723,70 @@ export class CommerceService {
     });
   }
   async openTrial(actor: Actor, creatorId: string, fanId: string) {
-    const scope = await this.access.openThread(actor, creatorId, fanId, false);
+    return this.account(actor, (client) =>
+      this.openTrialInTransaction(client, actor, creatorId, fanId),
+    );
+  }
+  /** W3 joins this before its consent/intro/admission transaction commits.
+   * W1 issues the current canonical fan scope on that exact held client. */
+  async openTrialInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+  ) {
+    invariant(
+      this.firstConversationAvailable,
+      "trial_unconfigured",
+      "The first conversation needs actual prepared generation and current admission authority.",
+    );
+    const scope = await this.access.openThreadInTransaction(
+      client,
+      actor,
+      creatorId,
+      fanId,
+      false,
+      "write",
+    );
     invariant(
       scope.authority === "fan",
       "fan_required",
       "Only the fan can open a first conversation.",
     );
-    const allowance = this.policy.trialAllowance;
-    invariant(
-      allowance !== undefined && this.policy.costAllowanceIntegrated === true,
-      "trial_unconfigured",
-      "The first conversation allowance is not configured.",
+    await this.trialAdmission!.assertReady(scope, client);
+    // Included or exhausted paid AI access must never be topped up by a new
+    // trial. The old one-time grant remains history even after its expiry.
+    const current = await capabilitySnapshot(client, scope);
+    if (current.capabilities.includes("ai_message")) return current;
+    await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      `trial:${creatorId}:${fanId}`,
+    ]);
+    const prior = await client.query(
+      "SELECT grant_id FROM creator.commerce_trial WHERE creator_id=$1 AND fan_id=$2",
+      [creatorId, fanId],
     );
-    return this.db.withThread(scope, async (client) => {
+    if (!prior.rowCount) {
+      const earlier = await client.query(
+        "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1",
+        [scope.threadId, creatorId, fanId],
+      );
+      invariant(
+        !earlier.rowCount,
+        "first_conversation_elapsed",
+        "A prior AI conversation cannot start another first-conversation allowance.",
+      );
+      const grant = (
+        await client.query<{ id: string }>(
+          `INSERT INTO creator.access_grant(creator_id,fan_id,capabilities,source,state,valid_from,valid_until,allowance) VALUES($1,$2,ARRAY['ai_message'],'trial','active',now(),now()+interval '24 hours',$3) RETURNING id`,
+          [creatorId, fanId, this.trialAdmission!.units],
+        )
+      ).rows[0]!;
       await client.query(
-        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
-        [`trial:${creatorId}:${fanId}`],
+        "INSERT INTO creator.commerce_trial(creator_id,fan_id,grant_id) VALUES($1,$2,$3)",
+        [creatorId, fanId, grant.id],
       );
-      const prior = await client.query(
-        "SELECT grant_id FROM creator.commerce_trial WHERE creator_id=$1 AND fan_id=$2",
-        [creatorId, fanId],
-      );
-      if (!prior.rowCount) {
-        const grant = (
-          await client.query<{ id: string }>(
-            `INSERT INTO creator.access_grant(creator_id,fan_id,capabilities,source,state,valid_from,valid_until,allowance) VALUES($1,$2,ARRAY['ai_message'],'trial','active',now(),now()+interval '24 hours',$3) RETURNING id`,
-            [creatorId, fanId, allowance],
-          )
-        ).rows[0]!;
-        await client.query(
-          "INSERT INTO creator.commerce_trial(creator_id,fan_id,grant_id) VALUES($1,$2,$3)",
-          [creatorId, fanId, grant.id],
-        );
-      }
-      return capabilitySnapshot(client, scope);
-    });
+    }
+    return capabilitySnapshot(client, scope);
   }
   async submit(actor: Actor, input: unknown) {
     const body = SubmitPacket.parse(input);

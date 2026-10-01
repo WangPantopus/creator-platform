@@ -1,0 +1,68 @@
+{
+  "workstream": "W3",
+  "increment": 17,
+  "predecessor": "2f56e0f644b6166714de08a7b325526e9fbac9d4",
+  "implementation": "personal; no new tests or applied SQL edits",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/commerce/service.ts",
+      "sha256": "d1b9d9c1638e1761e88c201020a1c701eb7011de0ed0424d135565690f1aea56",
+      "gitBlob": "aded61c3c76520aa2910fe324c1766ed8f4727fc"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "sha256": "25023349be8bf138b6c4c7007f37f30db98c04f9f8ecc592868882cfd503a0bc",
+      "gitBlob": "e654585ec0adf7de6ec8b566ed9cd31478c3a941"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "sha256": "48925f08a2b3fced5151bc72e1f782ab006c41815ba7dc965685bc544e55c66b",
+      "gitBlob": "dcb3285bc0bea6ff50b069b0138f53cb66889086"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage.ts",
+      "sha256": "954a592d8c1703fc936868c6b2381468a706ce4b42d9a4bfbbc1c227ca3904da",
+      "gitBlob": "68d14cb00c90d3e0666c749093ae77d1fa48bb71"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage-projection.ts",
+      "sha256": "0489f71baf06252393116f798440095776dd54d2ed0658b2b242c8d5c01c2706",
+      "gitBlob": "bfd8663e0d4a905258b0ed1dcedabaab7e5911b5"
+    }
+  ],
+  "W4Producer": {
+    "commit": "62af6606b767a86a1483ed483dba4e69052c8d21",
+    "scope": "Exact trial type and openTrial/openTrialInTransaction method region, constructor/getter and actor-denial callback; unrelated full runtime/billing/commerce changes not copied",
+    "exactRegionSha256": {
+      "trialAdmissionType": "3ed971c1f7f63229a6168b169da9ef35c947e129f80fb3b408cf3269621b429d",
+      "trialMethods": "0c30d32501aeecdcd7d3b3276967185303519898c7de0fae8a999b49e43c01ea"
+    }
+  },
+  "reviewedW8Registry": {
+    "commit": "3746829cee8911f62284576193ad6f157d7178c5",
+    "W3Lineage": "0056_w3_correction_feedback_lineage",
+    "W3Consent": "0057_w3_feedback_consent",
+    "W3Correction": "0058_w3_correction_signature",
+    "state": "reserved_unapplied; not executable registration or local activation"
+  },
+  "nativeLaunch": {
+    "device": "80BBDCB3-C80B-4D63-BEA9-4C3AE12690BC",
+    "name": "Creator Platform W3 Conversations 20260930",
+    "bundle": "com.pantopus.qelvora",
+    "build": "CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES; own DerivedData; deep/strict verify pass",
+    "executableSha256": "a5517b6441417af439931c87fc261baf6d1f5e2fcb8abda1ff7e45bc525189f8",
+    "debugLibrarySha256": "af04a0d66fc0c1b3f1d6a1042921074d73409f22c9080dbfac7c1d311104cfab",
+    "UIJourneyComplete": false,
+    "meaning": "Unsigned app Keychain entitlement error corrected by simulator signing; launched Welcome personally inspected. No native taps/sign-in/provider/functional acceptance claimed."
+  },
+  "screenshots": [
+    {
+      "path": "ios-unsigned-launch.png",
+      "sha256": "8ee45c68131bbd5181a3e7449432da0f4052e95646e92dc25d11d8cccfc2c5fd"
+    },
+    {
+      "path": "ios-signed-launch.png",
+      "sha256": "f6eb7658bcdfdfa935a2d7737530198ec614c918c38a1fbaee9fdc6b3520bb71"
+    }
+  ]
+}

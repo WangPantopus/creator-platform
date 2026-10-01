@@ -47,7 +47,10 @@ export class ConversationFeature {
     readonly tickets?: ConversationSocketTickets,
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
     readonly wellbeing?: ConversationWellbeing,
-    readonly firstConversation?: Pick<CommerceService, "openTrial">,
+    readonly firstConversation?: Pick<
+      CommerceService,
+      "pool" | "firstConversationAvailable" | "openTrialInTransaction"
+    >,
     readonly routeSafety?: (
       scope: ThreadScope,
       text: string,
@@ -57,6 +60,10 @@ export class ConversationFeature {
     readonly afterBoundary?: (scope: ThreadScope, epoch: number) => void,
     readonly lineage?: ConversationLineage,
     readonly corrections?: ConversationCorrections,
+    readonly assertReady?: (
+      scope: ThreadScope,
+      client: import("pg").PoolClient,
+    ) => Promise<void>,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -65,11 +72,14 @@ export class ConversationFeature {
       providers: this.policy,
       consentAvailable: Boolean(this.policy?.verified),
       generationAvailable:
-        this.generationAvailable && Boolean(this.policy?.verified),
-      firstConversationAvailable:
-        Boolean(this.firstConversation) &&
         this.generationAvailable &&
-        Boolean(this.policy?.verified),
+        Boolean(this.policy?.verified && this.assertReady) &&
+        this.access.threadScopeInTransactionAvailable,
+      firstConversationAvailable:
+        Boolean(this.firstConversation?.firstConversationAvailable) &&
+        this.generationAvailable &&
+        Boolean(this.policy?.verified && this.assertReady) &&
+        this.access.threadScopeInTransactionAvailable,
       correctionsAvailable: Boolean(this.corrections),
       accessDisclosure,
     };
@@ -87,7 +97,7 @@ export class ConversationFeature {
       "AI providers and their verified terms are not configured yet.",
     );
     invariant(
-      this.generationAvailable,
+      this.capabilities().generationAvailable,
       "generation_unavailable",
       "AI conversations are not available yet. No first conversation has started.",
     );
@@ -148,6 +158,36 @@ export class ConversationFeature {
           "UPDATE creator.thread SET processor_consent_version=$1,privacy_notice_at=now(),revision=revision+1 WHERE id=$2 AND creator_id=$3 AND fan_id=$4 AND processor_consent_version IS DISTINCT FROM $1",
           [this.policy.version, threadId, body.creatorId, fanId],
         );
+      const current = await this.access.openThreadInTransaction(
+        client,
+        actor,
+        body.creatorId,
+        fanId,
+        false,
+        "write",
+      );
+      invariant(
+        current.authority === "fan",
+        "fan_required",
+        "Only the fan can begin this conversation.",
+      );
+      // This exact transaction retains current license/source/budget locks.
+      // Failure rolls back the thread, consent and any one-time trial together.
+      await this.assertReady!(current, client);
+      const access = await capabilitySnapshot(client, current);
+      if (!access.capabilities.includes("ai_message")) {
+        invariant(
+          this.firstConversation?.firstConversationAvailable,
+          "trial_unconfigured",
+          "The first conversation is not available yet. No conversation has started.",
+        );
+        await this.firstConversation!.openTrialInTransaction(
+          client,
+          actor,
+          body.creatorId,
+          fanId,
+        );
+      }
       await client.query(
         "INSERT INTO creator.processor_consent(thread_id,creator_id,fan_id,account_id,version,providers) SELECT $1,$2,$3,$4,$5,$6 WHERE NOT EXISTS(SELECT 1 FROM creator.processor_consent WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND version=$5 AND withdrawn_at IS NULL)",
         [
@@ -176,16 +216,6 @@ export class ConversationFeature {
       fanId!,
       false,
     );
-    if (this.firstConversation) {
-      const access = await this.db.withThread(scope, (client) =>
-        capabilitySnapshot(client, scope),
-      );
-      // W4 decides the actual one-time trial and configured units. Current paid
-      // AI access needs no extra trial grant; exhausted access cannot be topped
-      // up by starting another conversation.
-      if (!access.capabilities.includes("ai_message"))
-        await this.firstConversation.openTrial(actor, body.creatorId, fanId!);
-    }
     return this.page(scope);
   }
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
