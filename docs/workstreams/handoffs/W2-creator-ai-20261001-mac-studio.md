@@ -136,7 +136,8 @@ Unset `W2_PG_SUPERUSER_PASSWORD` before launching. Add the provider env only aft
 ## 7. Branches and PRs at handoff
 
 - `codex/w2-pool-recovery` / PR40: merged as `19a3d297`.
-- `claude/w2-development-licensing`: holds this handoff and the increment in §3; its ready PR is linked in the session's final report and in the PR list.
+- `claude/w2-development-licensing` / [PR65](https://github.com/WangPantopus/creator-platform/pull/65) (ready, unmerged at handoff): holds this handoff and the increment in §3.
+- W3 pushed its host composition on `codex/w3-generation-host` (`e70f8d52`, draft [PR63](https://github.com/WangPantopus/creator-platform/pull/63)): `composeConversationHost(runtime, config, { licenseVerifier, journalPolicy, media, bindRecordingPublication })` in `apps/backend/src/modules/conversation/host.ts`. Once PR65 lands, pass `DevelopmentLicenseVerifier.create(...)` and `developmentSyntheticJournalPolicy(...)` there. W3's session has also handed off; see `docs/workstreams/handoffs/W3-mac-studio-2026-10-01.md` on its branch.
   - **First action:** read exact-head CI. `web-and-backend` is the relevant fast job; `web-visual` and `ios-foundation` are known main failures.
   - Then reconcile main and merge normally.
   - Operate the error-focus fix in a visible browser (Test page → Send to draft AI without a provider → the notice should be in view and focused), in both Light and Night.
