@@ -25,11 +25,13 @@ type ThreadRecordingProps = {
   creatorName?: string;
   purpose?: "human_note" | "human_reply";
   maxDurationMs: number;
+  /** Current host account precondition; it never supplies identity authority. */
+  expectedAccountId?: string;
 };
 export function VoiceRecording(props: ThreadRecordingProps) {
   return (
     <RecordingForm
-      key={`${props.creatorId}/${props.fanId}/${props.purpose}`}
+      key={`${props.expectedAccountId ?? ""}/${props.creatorId}/${props.fanId}/${props.purpose}`}
       {...props}
     />
   );
@@ -38,6 +40,7 @@ export type CreatorVoiceRecordingProps = {
   creatorId: string;
   /** Actual saved W5 draft, issued by content authority. Never a fan/thread ID. */
   objectId: string;
+  expectedAccountId?: string;
   creatorName?: string;
   /** Client host owns saving the attachment and signing the complete Note. */
   onReady?: (
@@ -50,7 +53,7 @@ export type CreatorVoiceRecordingProps = {
 export function CreatorVoiceRecording(props: CreatorVoiceRecordingProps) {
   return (
     <RecordingForm
-      key={`${props.creatorId}/${props.objectId}`}
+      key={`${props.expectedAccountId ?? ""}/${props.creatorId}/${props.objectId}`}
       {...props}
       purpose="human_note"
       maxDurationMs={60_000}
@@ -72,7 +75,7 @@ export function CreatorPostVoiceRecording(
     );
   return (
     <RecordingForm
-      key={`${props.creatorId}/${props.objectId}/post_audio/${props.maxDurationMs}`}
+      key={`${props.expectedAccountId ?? ""}/${props.creatorId}/${props.objectId}/post_audio/${props.maxDurationMs}`}
       {...props}
       purpose="post_audio"
     />
@@ -87,6 +90,7 @@ function RecordingForm({
   maxDurationMs,
   onReady,
   beforeDiscard,
+  expectedAccountId,
 }: Omit<ThreadRecordingProps, "purpose"> &
   Omit<CreatorVoiceRecordingProps, "creatorId" | "objectId"> & {
     objectId?: string;
@@ -126,6 +130,22 @@ function RecordingForm({
   const uploadKey = useRef<string | undefined>(undefined);
   const pendingUpload = useRef<Promise<void> | null>(null);
   const [discarding, setDiscarding] = useState(false);
+  const recordingAction = useRef<HTMLButtonElement | null>(null);
+  const restoreRecordingFocus = useRef(false);
+  useEffect(() => {
+    const action = recordingAction.current;
+    if (!restoreRecordingFocus.current || !action || action.disabled) return;
+    restoreRecordingFocus.current = false;
+    if (
+      document.activeElement === document.body &&
+      !document.hidden &&
+      action.getClientRects().length > 0 &&
+      !action.closest(
+        '[hidden], [inert], [aria-hidden="true"], dialog:not([open])',
+      )
+    )
+      action.focus();
+  }, [discarding, recording.state, upload]);
   useEffect(() => {
     const value = new BrowserRecorder(maxDurationMs, setRecording);
     recorder.current = value;
@@ -212,7 +232,7 @@ function RecordingForm({
       try {
         const current = await mediaRequest<MediaAsset | CreatorMediaAsset>(
           `${family}/${asset.id}`,
-          { signal: abort.signal },
+          { signal: abort.signal, expectedAccountId },
         );
         if (!abort.signal.aborted) setAsset(current);
       } catch (error) {
@@ -236,7 +256,7 @@ function RecordingForm({
       abort.abort();
       clearTimeout(timer);
     };
-  }, [asset, family]);
+  }, [asset, family, expectedAccountId]);
   useEffect(() => {
     if (
       !objectId ||
@@ -252,6 +272,8 @@ function RecordingForm({
       asset.creatorId !== creatorId ||
       asset.objectId !== objectId ||
       asset.purpose !== purpose ||
+      (expectedAccountId !== undefined &&
+        asset.ownerAccountId !== expectedAccountId) ||
       asset.mimeType !== "audio/mp4"
     ) {
       setError(copy.w6TheProcessedRecordingDoesNotMatchThisSavedContentRefresh);
@@ -277,7 +299,15 @@ function RecordingForm({
     }
     notified.current = occurrence;
     onReady(asset, evidence.data);
-  }, [asset, creatorId, objectId, onReady, purpose, maxDurationMs]);
+  }, [
+    asset,
+    creatorId,
+    objectId,
+    onReady,
+    purpose,
+    maxDurationMs,
+    expectedAccountId,
+  ]);
   async function send() {
     if (!recording.blob || !creatorId || !family || pendingUpload.current)
       return;
@@ -289,6 +319,7 @@ function RecordingForm({
     try {
       const common = {
         creatorId,
+        expectedAccountId,
         blob: recording.blob,
         durationMs: Math.round(recording.durationMs),
         idempotencyKey: uploadKey.current,
@@ -338,6 +369,7 @@ function RecordingForm({
         await beforeDiscard?.(current.asset.id);
         await mediaRequest(`${family}/${current.asset.id}`, {
           method: "DELETE",
+          expectedAccountId,
         });
       } catch {
         setError(copy.w6TheUploadedFileCouldNotBeRemovedTryAgainBefore);
@@ -388,48 +420,41 @@ function RecordingForm({
         </span>
       </div>
       <div className="w6-actions">
-        {!active && recording.state !== "requesting" && (
-          <button
-            className="qv-btn qv-btn--maya"
-            disabled={upload === "uploading" || discarding}
-            onClick={() => {
+        <button
+          ref={recordingAction}
+          className={`qv-btn ${active || recording.state === "requesting" ? "qv-btn--secondary" : "qv-btn--maya"}`}
+          disabled={upload === "uploading" || discarding}
+          onClick={(event) => {
+            restoreRecordingFocus.current =
+              document.activeElement === event.currentTarget;
+            if (recording.state === "requesting") recorder.current?.discard();
+            else if (recording.state === "recording") recorder.current?.pause();
+            else if (recording.state === "paused") recorder.current?.resume();
+            else {
               void discard().then((discarded) => {
                 if (discarded) void recorder.current?.start();
               });
-            }}
-          >
-            {" "}
-            {preview ? copy.w6RecordAgain : copy.w6Record}
-          </button>
-        )}
-        {recording.state === "requesting" && (
-          <button
-            className="qv-btn qv-btn--secondary"
-            onClick={() => recorder.current?.discard()}
-          >
-            {copy.w6CancelPermissionRequest}
-          </button>
-        )}
-        {recording.state === "recording" && (
-          <button
-            className="qv-btn qv-btn--secondary"
-            onClick={() => recorder.current?.pause()}
-          >
-            {copy.w6Pause}
-          </button>
-        )}
-        {recording.state === "paused" && (
-          <button
-            className="qv-btn qv-btn--secondary"
-            onClick={() => recorder.current?.resume()}
-          >
-            {copy.w6Resume}
-          </button>
-        )}
+            }
+          }}
+        >
+          {recording.state === "requesting"
+            ? copy.w6CancelPermissionRequest
+            : recording.state === "recording"
+              ? copy.w6Pause
+              : recording.state === "paused"
+                ? copy.w6Resume
+                : preview
+                  ? copy.w6RecordAgain
+                  : copy.w6Record}
+        </button>
         {active && (
           <button
             className="qv-btn qv-btn--maya"
-            onClick={() => recorder.current?.stop()}
+            onClick={(event) => {
+              restoreRecordingFocus.current =
+                document.activeElement === event.currentTarget;
+              recorder.current?.stop();
+            }}
           >
             {copy.w6StopAndPreview}
           </button>
@@ -449,7 +474,9 @@ function RecordingForm({
           <button
             className="qv-btn qv-btn--quiet"
             disabled={discarding}
-            onClick={() => {
+            onClick={(event) => {
+              restoreRecordingFocus.current =
+                document.activeElement === event.currentTarget;
               void discard();
             }}
           >
@@ -511,6 +538,7 @@ function RecordingForm({
           <CreatorVoicePlayer
             asset={asset}
             creatorId={creatorId}
+            expectedAccountId={expectedAccountId}
             objectId={objectId}
             creatorName={creatorName ?? "the creator"}
           />
@@ -523,12 +551,14 @@ function RecordingForm({
             <VoicePlayer
               asset={asset}
               creatorId={creatorId}
+              expectedAccountId={expectedAccountId}
               fanId={fanId}
               creatorName={creatorName ?? "the creator"}
             />
             <SignRecording
               asset={asset}
               creatorId={creatorId}
+              expectedAccountId={expectedAccountId}
               fanId={fanId}
               onSigned={setAsset}
             />

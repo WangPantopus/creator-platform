@@ -11,10 +11,12 @@ export function SignRecording({
   creatorId,
   fanId,
   onSigned,
+  expectedAccountId,
 }: {
   asset: MediaAsset;
   creatorId: string;
   fanId: string;
+  expectedAccountId?: string;
   onSigned: (value: MediaAsset) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -41,7 +43,11 @@ export function SignRecording({
     try {
       const result = await mediaRequest<{ asset: MediaAsset }>(
         `threads/${creatorId}/${fanId}/media/${asset.id}/sign`,
-        { method: "POST", body: JSON.stringify(publication.current) },
+        {
+          method: "POST",
+          body: JSON.stringify(publication.current),
+          expectedAccountId,
+        },
       );
       setUnknown(false);
       setError(null);
@@ -63,6 +69,7 @@ export function SignRecording({
     try {
       const command = await mediaRequest<SignedActCommand>(
         `threads/${creatorId}/${fanId}/media/${asset.id}/signing-command`,
+        { expectedAccountId },
       );
       const challenge = await platform<{
         challengeId: string;

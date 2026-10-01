@@ -13,6 +13,7 @@ export async function readCreatorMediaPolicy(input: {
   creatorId: string;
   objectId: string;
   purpose: CreatorMediaPurpose;
+  expectedAccountId?: string;
   signal?: AbortSignal;
 }) {
   const query = new URLSearchParams({
@@ -22,7 +23,7 @@ export async function readCreatorMediaPolicy(input: {
   const result = CreatorMediaPolicyViewSchema.parse(
     await mediaRequest<unknown>(
       `creators/${input.creatorId}/media-policy?${query}`,
-      { signal: input.signal },
+      { signal: input.signal, expectedAccountId: input.expectedAccountId },
     ),
   );
   if (
@@ -48,13 +49,19 @@ export class MediaRequestError extends Error {
 
 export async function mediaRequest<T>(
   path: string,
-  init: RequestInit = {},
+  init: RequestInit & { expectedAccountId?: string } = {},
 ): Promise<T> {
+  const { expectedAccountId, ...request } = init;
+  const headers = new Headers(request.headers);
+  if (!headers.has("Content-Type"))
+    headers.set("Content-Type", "application/json");
+  if (expectedAccountId !== undefined)
+    headers.set("x-qelvora-expected-account", expectedAccountId);
   const response = await fetch(`/api/w6/${path}`, {
-    ...init,
+    ...request,
     credentials: "same-origin",
     cache: "no-store",
-    headers: { "Content-Type": "application/json", ...init.headers },
+    headers,
   });
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
@@ -74,6 +81,8 @@ export type RecordingUploadInput = {
   purpose: "human_note" | "human_reply" | "interview_audio";
   blob: Blob;
   durationMs: number;
+  /** Current host account precondition, never identity or access authority. */
+  expectedAccountId?: string;
   /** Retain with the recording, including when the initial response is lost. */
   idempotencyKey: string;
   signal: AbortSignal;
@@ -105,7 +114,9 @@ export function uploadCreatorMedia(
     if (
       ticket.asset.creatorId !== input.creatorId ||
       ticket.asset.objectId !== input.objectId ||
-      ticket.asset.purpose !== input.purpose
+      ticket.asset.purpose !== input.purpose ||
+      (input.expectedAccountId !== undefined &&
+        ticket.asset.ownerAccountId !== input.expectedAccountId)
     )
       throw new Error(copy.w6ThisUploadDoesNotBelongToTheCurrentContentRefresh);
     input.onTicket(ticket);
@@ -123,6 +134,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   declaration: Record<string, string>;
   blob: Blob;
   durationMs?: number;
+  expectedAccountId?: string;
   idempotencyKey: string;
   signal: AbortSignal;
   progress: (ratio: number) => void;
@@ -130,6 +142,11 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   onTicket: (ticket: BinaryTicket<A>) => void;
 }): Promise<A> {
   const family = input.family;
+  const request = <T>(path: string, init: RequestInit = {}) =>
+    mediaRequest<T>(path, {
+      ...init,
+      expectedAccountId: input.expectedAccountId,
+    });
   if (
     !Number.isSafeInteger(input.blob.size) ||
     input.blob.size <= 0 ||
@@ -159,7 +176,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   input.signal.throwIfAborted();
   let ticket =
     input.resumed ??
-    (await mediaRequest<BinaryTicket<A>>(family, {
+    (await request<BinaryTicket<A>>(family, {
       method: "POST",
       body: JSON.stringify({
         ...input.declaration,
@@ -189,7 +206,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   const assetId = ticket.asset.id;
   input.onTicket(ticket);
   // A finish response may be lost after the worker has already claimed or processed the asset.
-  const current = await mediaRequest<A>(`${family}/${ticket.asset.id}`, {
+  const current = await request<A>(`${family}/${ticket.asset.id}`, {
     signal: input.signal,
   });
   if (current.id !== assetId)
@@ -198,7 +215,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     ["quarantined", "processing", "ready", "rejected"].includes(current.state)
   )
     return current;
-  ticket = await mediaRequest<BinaryTicket<A>>(
+  ticket = await request<BinaryTicket<A>>(
     `${family}/${ticket.asset.id}/resume`,
     {
       method: "POST",
@@ -214,7 +231,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   input.progress(offset / input.blob.size);
   while (offset < input.blob.size) {
     if (Date.parse(ticket.expiresAt) <= Date.now() + 5000) {
-      ticket = await mediaRequest<BinaryTicket<A>>(
+      ticket = await request<BinaryTicket<A>>(
         `${family}/${ticket.asset.id}/resume`,
         { method: "POST", body: "{}", signal: input.signal },
       );
@@ -226,7 +243,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     }
     const url = new URL(ticket.url);
     const next = Math.min(input.blob.size, offset + ticket.chunkBytes);
-    const asset = await mediaRequest<A>(
+    const asset = await request<A>(
       `${family}/${ticket.asset.id}/upload${url.search}`,
       {
         method: "PUT",
@@ -245,7 +262,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     offset = asset.uploadedBytes;
     input.progress(offset / input.blob.size);
   }
-  return mediaRequest<A>(`${family}/${ticket.asset.id}/finish`, {
+  return request<A>(`${family}/${ticket.asset.id}/finish`, {
     method: "POST",
     body: "{}",
     signal: input.signal,

@@ -1,10 +1,12 @@
 import { VoiceRecording } from "../../../features/media/VoiceRecorder";
+import { currentSession } from "../../../lib/session";
 export default async function VoicePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = await searchParams;
+  const session = await currentSession();
   const uuid = /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/iu;
   const creatorId =
     typeof query.creatorId === "string" && uuid.test(query.creatorId)
@@ -18,8 +20,9 @@ export default async function VoicePage({
   return (
     <main>
       <VoiceRecording
-        creatorId={creatorId}
-        fanId={fanId}
+        creatorId={session ? creatorId : undefined}
+        fanId={session ? fanId : undefined}
+        expectedAccountId={session?.accountId}
         purpose="human_note"
         maxDurationMs={60_000}
       />
