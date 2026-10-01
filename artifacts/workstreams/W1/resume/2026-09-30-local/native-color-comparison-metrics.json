@@ -1,0 +1,992 @@
+[
+  {
+    "file": "testComponentCatalogThemes.CallChip-night.png",
+    "percent": 97.15,
+    "gt2": 2.31,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 90,
+    "mean": 1.051
+  },
+  {
+    "file": "testComponentCatalogThemes.ThreadHeader-night.png",
+    "percent": 99.25,
+    "gt2": 1.92,
+    "gt8": 0.04,
+    "gt32": 0.03,
+    "max": 107,
+    "mean": 1.071
+  },
+  {
+    "file": "testComponentCatalogThemes.Avatar-night.png",
+    "percent": 99.83,
+    "gt2": 1.9,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 45,
+    "mean": 1.057
+  },
+  {
+    "file": "testComponentCatalogThemes.CallChip-light.png",
+    "percent": 4.82,
+    "gt2": 1.47,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 94,
+    "mean": 0.109
+  },
+  {
+    "file": "testComponentCatalogThemes.Seal-night.png",
+    "percent": 99.89,
+    "gt2": 1.39,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 92,
+    "mean": 1.042
+  },
+  {
+    "file": "testComponentCatalogThemes.IdentityStrip-night.png",
+    "percent": 87.38,
+    "gt2": 1.19,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 65,
+    "mean": 0.915
+  },
+  {
+    "file": "testComponentCatalogThemes.ThreadHeader-light.png",
+    "percent": 4.22,
+    "gt2": 0.91,
+    "gt8": 0.04,
+    "gt32": 0.03,
+    "max": 112,
+    "mean": 0.097
+  },
+  {
+    "file": "testComponentCatalogThemes.Avatar-light.png",
+    "percent": 4.08,
+    "gt2": 0.9,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 44,
+    "mean": 0.075
+  },
+  {
+    "file": "testComponentCatalogThemes.IdentityStrip-light.png",
+    "percent": 3.42,
+    "gt2": 0.82,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 86,
+    "mean": 0.067
+  },
+  {
+    "file": "testComponentCatalogThemes.Seal-light.png",
+    "percent": 2.96,
+    "gt2": 0.53,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 91,
+    "mean": 0.052
+  },
+  {
+    "file": "testAuthorIdentitySurfaces.night.png",
+    "percent": 57.8,
+    "gt2": 0.24,
+    "gt8": 0.07,
+    "gt32": 0.02,
+    "max": 95,
+    "mean": 0.604
+  },
+  {
+    "file": "testComponentCatalogThemes.Message-night.png",
+    "percent": 65.75,
+    "gt2": 0.22,
+    "gt8": 0.07,
+    "gt32": 0.02,
+    "max": 98,
+    "mean": 0.685
+  },
+  {
+    "file": "testComponentCatalogThemes.Composer-night.png",
+    "percent": 89.11,
+    "gt2": 0.2,
+    "gt8": 0.07,
+    "gt32": 0.03,
+    "max": 73,
+    "mean": 0.919
+  },
+  {
+    "file": "testComponentCatalogThemes.LabelPreview-light.png",
+    "percent": 0.48,
+    "gt2": 0.17,
+    "gt8": 0.1,
+    "gt32": 0.04,
+    "max": 80,
+    "mean": 0.033
+  },
+  {
+    "file": "testComponentCatalogThemes.LabelPreview-night.png",
+    "percent": 98.83,
+    "gt2": 0.17,
+    "gt8": 0.1,
+    "gt32": 0.03,
+    "max": 73,
+    "mean": 1.014
+  },
+  {
+    "file": "testComponentCatalogThemes.Message-light.png",
+    "percent": 1.59,
+    "gt2": 0.17,
+    "gt8": 0.07,
+    "gt32": 0.02,
+    "max": 97,
+    "mean": 0.041
+  },
+  {
+    "file": "testComponentCatalogThemes.QueueCard-light.png",
+    "percent": 0.95,
+    "gt2": 0.17,
+    "gt8": 0.08,
+    "gt32": 0.05,
+    "max": 118,
+    "mean": 0.05
+  },
+  {
+    "file": "testComponentCatalogThemes.EmailFrame-night.png",
+    "percent": 86.65,
+    "gt2": 0.16,
+    "gt8": 0.08,
+    "gt32": 0.03,
+    "max": 79,
+    "mean": 0.895
+  },
+  {
+    "file": "testComponentCatalogThemes.TestConsole-light.png",
+    "percent": 0.38,
+    "gt2": 0.16,
+    "gt8": 0.09,
+    "gt32": 0.04,
+    "max": 104,
+    "mean": 0.038
+  },
+  {
+    "file": "testComponentCatalogThemes.TestConsole-night.png",
+    "percent": 96.19,
+    "gt2": 0.16,
+    "gt8": 0.09,
+    "gt32": 0.03,
+    "max": 86,
+    "mean": 0.991
+  },
+  {
+    "file": "testComponentCatalogThemes.ReservedLabel-night.png",
+    "percent": 98.43,
+    "gt2": 0.15,
+    "gt8": 0.08,
+    "gt32": 0.03,
+    "max": 76,
+    "mean": 1.006
+  },
+  {
+    "file": "testComponentCatalogThemes.VoiceNote-night.png",
+    "percent": 82.24,
+    "gt2": 0.15,
+    "gt8": 0.06,
+    "gt32": 0.03,
+    "max": 89,
+    "mean": 0.854
+  },
+  {
+    "file": "testAuthorIdentitySurfaces.light.png",
+    "percent": 1.19,
+    "gt2": 0.14,
+    "gt8": 0.07,
+    "gt32": 0.02,
+    "max": 95,
+    "mean": 0.033
+  },
+  {
+    "file": "testComponentCatalogThemes.Composer-light.png",
+    "percent": 0.85,
+    "gt2": 0.14,
+    "gt8": 0.07,
+    "gt32": 0.03,
+    "max": 85,
+    "mean": 0.038
+  },
+  {
+    "file": "testComponentCatalogThemes.ReservedLabel-light.png",
+    "percent": 0.2,
+    "gt2": 0.14,
+    "gt8": 0.08,
+    "gt32": 0.03,
+    "max": 82,
+    "mean": 0.025
+  },
+  {
+    "file": "testComponentCatalogThemes.EmailFrame-light.png",
+    "percent": 0.36,
+    "gt2": 0.13,
+    "gt8": 0.08,
+    "gt32": 0.04,
+    "max": 89,
+    "mean": 0.036
+  },
+  {
+    "file": "testComponentCatalogThemes.Sheet-light.png",
+    "percent": 1.53,
+    "gt2": 0.13,
+    "gt8": 0.08,
+    "gt32": 0.04,
+    "max": 117,
+    "mean": 0.064
+  },
+  {
+    "file": "testComponentCatalogThemes.Sheet-night.png",
+    "percent": 96.23,
+    "gt2": 0.13,
+    "gt8": 0.08,
+    "gt32": 0.04,
+    "max": 148,
+    "mean": 0.991
+  },
+  {
+    "file": "testComponentCatalogThemes.AuthorLabel-light.png",
+    "percent": 1.16,
+    "gt2": 0.12,
+    "gt8": 0.06,
+    "gt32": 0.02,
+    "max": 77,
+    "mean": 0.034
+  },
+  {
+    "file": "testComponentCatalogThemes.Note-night.png",
+    "percent": 60.56,
+    "gt2": 0.12,
+    "gt8": 0.04,
+    "gt32": 0.01,
+    "max": 77,
+    "mean": 0.621
+  },
+  {
+    "file": "testComponentCatalogThemes.QueueCard-night.png",
+    "percent": 98.11,
+    "gt2": 0.12,
+    "gt8": 0.08,
+    "gt32": 0.04,
+    "max": 112,
+    "mean": 1.013
+  },
+  {
+    "file": "testComponentCatalogThemes.NotificationRow-night.png",
+    "percent": 94.63,
+    "gt2": 0.11,
+    "gt8": 0.04,
+    "gt32": 0.01,
+    "max": 63,
+    "mean": 0.956
+  },
+  {
+    "file": "testComponentCatalogThemes.ShareCard-night.png",
+    "percent": 66.3,
+    "gt2": 0.11,
+    "gt8": 0.05,
+    "gt32": 0.03,
+    "max": 77,
+    "mean": 0.686
+  },
+  {
+    "file": "testComponentCatalogThemes.VoiceNote-light.png",
+    "percent": 1.65,
+    "gt2": 0.11,
+    "gt8": 0.06,
+    "gt32": 0.03,
+    "max": 102,
+    "mean": 0.045
+  },
+  {
+    "file": "testComponentCatalogThemes.AuthorLabel-night.png",
+    "percent": 99.08,
+    "gt2": 0.1,
+    "gt8": 0.06,
+    "gt32": 0.02,
+    "max": 72,
+    "mean": 1.011
+  },
+  {
+    "file": "testComponentCatalogThemes.CapacityHeader-night.png",
+    "percent": 86.76,
+    "gt2": 0.1,
+    "gt8": 0.05,
+    "gt32": 0.03,
+    "max": 98,
+    "mean": 0.894
+  },
+  {
+    "file": "testComponentCatalogThemes.Correction-night.png",
+    "percent": 86.47,
+    "gt2": 0.1,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 85,
+    "mean": 0.876
+  },
+  {
+    "file": "testComponentCatalogThemes.Receipt-light.png",
+    "percent": 0.39,
+    "gt2": 0.1,
+    "gt8": 0.07,
+    "gt32": 0.04,
+    "max": 117,
+    "mean": 0.043
+  },
+  {
+    "file": "testComponentCatalogThemes.Receipt-night.png",
+    "percent": 98.85,
+    "gt2": 0.1,
+    "gt8": 0.08,
+    "gt32": 0.04,
+    "max": 148,
+    "mean": 1.021
+  },
+  {
+    "file": "testComponentCatalogThemes.TermsBlock-light.png",
+    "percent": 0.16,
+    "gt2": 0.1,
+    "gt8": 0.06,
+    "gt32": 0.03,
+    "max": 117,
+    "mean": 0.029
+  },
+  {
+    "file": "testComponentCatalogThemes.TermsBlock-night.png",
+    "percent": 98.39,
+    "gt2": 0.1,
+    "gt8": 0.06,
+    "gt32": 0.03,
+    "max": 148,
+    "mean": 1.008
+  },
+  {
+    "file": "testComponentCatalogThemes.Countdown-light.png",
+    "percent": 0.24,
+    "gt2": 0.09,
+    "gt8": 0.03,
+    "gt32": 0.02,
+    "max": 118,
+    "mean": 0.023
+  },
+  {
+    "file": "testComponentCatalogThemes.InsteadMenu-night.png",
+    "percent": 97.37,
+    "gt2": 0.09,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 95,
+    "mean": 0.981
+  },
+  {
+    "file": "testComponentCatalogThemes.Note-light.png",
+    "percent": 0.85,
+    "gt2": 0.09,
+    "gt8": 0.04,
+    "gt32": 0.01,
+    "max": 74,
+    "mean": 0.022
+  },
+  {
+    "file": "testComponentCatalogThemes.ShareCard-light.png",
+    "percent": 0.59,
+    "gt2": 0.09,
+    "gt8": 0.06,
+    "gt32": 0.03,
+    "max": 80,
+    "mean": 0.028
+  },
+  {
+    "file": "testWelcomeThemes.night.png",
+    "percent": 94.56,
+    "gt2": 0.09,
+    "gt8": 0.04,
+    "gt32": 0.01,
+    "max": 66,
+    "mean": 0.96
+  },
+  {
+    "file": "testComponentCatalogThemes.AccessLines-night.png",
+    "percent": 98.35,
+    "gt2": 0.08,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 73,
+    "mean": 0.998
+  },
+  {
+    "file": "testComponentCatalogThemes.DigestItem-night.png",
+    "percent": 98.11,
+    "gt2": 0.08,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 98,
+    "mean": 0.996
+  },
+  {
+    "file": "testComponentCatalogThemes.Notice-light.png",
+    "percent": 0.42,
+    "gt2": 0.08,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 44,
+    "mean": 0.009
+  },
+  {
+    "file": "testComponentCatalogThemes.NotificationRow-light.png",
+    "percent": 0.29,
+    "gt2": 0.08,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 62,
+    "mean": 0.009
+  },
+  {
+    "file": "testWelcomeThemes.light.png",
+    "percent": 0.27,
+    "gt2": 0.08,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 85,
+    "mean": 0.019
+  },
+  {
+    "file": "testComponentCatalogThemes.CapacityHeader-light.png",
+    "percent": 0.44,
+    "gt2": 0.07,
+    "gt8": 0.05,
+    "gt32": 0.03,
+    "max": 108,
+    "mean": 0.032
+  },
+  {
+    "file": "testComponentCatalogThemes.Correction-light.png",
+    "percent": 0.69,
+    "gt2": 0.07,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 77,
+    "mean": 0.017
+  },
+  {
+    "file": "testComponentCatalogThemes.DigestItem-light.png",
+    "percent": 0.76,
+    "gt2": 0.07,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 97,
+    "mean": 0.025
+  },
+  {
+    "file": "testComponentCatalogThemes.InsteadMenu-light.png",
+    "percent": 0.17,
+    "gt2": 0.07,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 94,
+    "mean": 0.008
+  },
+  {
+    "file": "testComponentCatalogThemes.Notice-night.png",
+    "percent": 88.39,
+    "gt2": 0.07,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 48,
+    "mean": 0.889
+  },
+  {
+    "file": "testComponentCatalogThemes.SigningSheet-light.png",
+    "percent": 1.45,
+    "gt2": 0.07,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 97,
+    "mean": 0.039
+  },
+  {
+    "file": "testComponentCatalogThemes.SigningSheet-night.png",
+    "percent": 92.15,
+    "gt2": 0.07,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 98,
+    "mean": 0.931
+  },
+  {
+    "file": "testComponentCatalogThemes.SpendLimit-night.png",
+    "percent": 97.84,
+    "gt2": 0.07,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 110,
+    "mean": 0.999
+  },
+  {
+    "file": "testComponentCatalogThemes.AccessLines-light.png",
+    "percent": 0.12,
+    "gt2": 0.06,
+    "gt8": 0.03,
+    "gt32": 0.02,
+    "max": 77,
+    "mean": 0.015
+  },
+  {
+    "file": "testComponentCatalogThemes.RequestStatus-night.png",
+    "percent": 98.71,
+    "gt2": 0.06,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 73,
+    "mean": 0.998
+  },
+  {
+    "file": "testComponentCatalogThemes.SpendLimit-light.png",
+    "percent": 0.12,
+    "gt2": 0.06,
+    "gt8": 0.04,
+    "gt32": 0.02,
+    "max": 116,
+    "mean": 0.023
+  },
+  {
+    "file": "testComponentCatalogThemes.IncludeList-night.png",
+    "percent": 97.89,
+    "gt2": 0.05,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 63,
+    "mean": 0.983
+  },
+  {
+    "file": "testComponentCatalogThemes.RequestStatus-light.png",
+    "percent": 0.15,
+    "gt2": 0.05,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 88,
+    "mean": 0.014
+  },
+  {
+    "file": "testComponentCatalogThemes.SourceRow-light.png",
+    "percent": 0.2,
+    "gt2": 0.05,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 120,
+    "mean": 0.015
+  },
+  {
+    "file": "testComponentCatalogThemes.SourceRow-night.png",
+    "percent": 98.79,
+    "gt2": 0.05,
+    "gt8": 0.03,
+    "gt32": 0.01,
+    "max": 101,
+    "mean": 0.998
+  },
+  {
+    "file": "testComponentCatalogThemes.Button-night.png",
+    "percent": 93.56,
+    "gt2": 0.04,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 79,
+    "mean": 0.939
+  },
+  {
+    "file": "testComponentCatalogThemes.Countdown-night.png",
+    "percent": 99.57,
+    "gt2": 0.04,
+    "gt8": 0.03,
+    "gt32": 0.02,
+    "max": 112,
+    "mean": 1.013
+  },
+  {
+    "file": "testComponentCatalogThemes.IncludeList-light.png",
+    "percent": 0.11,
+    "gt2": 0.04,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 62,
+    "mean": 0.005
+  },
+  {
+    "file": "testComponentCatalogThemes.MemoryChip-night.png",
+    "percent": 98.09,
+    "gt2": 0.04,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 72,
+    "mean": 0.984
+  },
+  {
+    "file": "testComponentCatalogThemes.Sidebar-night.png",
+    "percent": 95.96,
+    "gt2": 0.04,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 65,
+    "mean": 0.963
+  },
+  {
+    "file": "testComponentCatalogThemes.SignedMarker-light.png",
+    "percent": 0.33,
+    "gt2": 0.04,
+    "gt8": 0.02,
+    "gt32": 0.01,
+    "max": 97,
+    "mean": 0.01
+  },
+  {
+    "file": "testComponentCatalogThemes.SystemLine-night.png",
+    "percent": 98.14,
+    "gt2": 0.04,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 72,
+    "mean": 0.986
+  },
+  {
+    "file": "testComponentCatalogThemes.VersionList-night.png",
+    "percent": 98.94,
+    "gt2": 0.04,
+    "gt8": 0.02,
+    "gt32": 0,
+    "max": 66,
+    "mean": 0.994
+  },
+  {
+    "file": "testComponentCatalogThemes.Button-light.png",
+    "percent": 0.21,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 62,
+    "mean": 0.005
+  },
+  {
+    "file": "testComponentCatalogThemes.ContextCard-light.png",
+    "percent": 0.05,
+    "gt2": 0.03,
+    "gt8": 0.02,
+    "gt32": 0.01,
+    "max": 85,
+    "mean": 0.012
+  },
+  {
+    "file": "testComponentCatalogThemes.ContextCard-night.png",
+    "percent": 99.45,
+    "gt2": 0.03,
+    "gt8": 0.02,
+    "gt32": 0.01,
+    "max": 72,
+    "mean": 1.004
+  },
+  {
+    "file": "testComponentCatalogThemes.Dialog-night.png",
+    "percent": 18,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 38,
+    "mean": 0.182
+  },
+  {
+    "file": "testComponentCatalogThemes.EmptyState-light.png",
+    "percent": 0.07,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 64,
+    "mean": 0.004
+  },
+  {
+    "file": "testComponentCatalogThemes.EmptyState-night.png",
+    "percent": 98.73,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 65,
+    "mean": 0.991
+  },
+  {
+    "file": "testComponentCatalogThemes.MemoryChip-light.png",
+    "percent": 0.6,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 71,
+    "mean": 0.009
+  },
+  {
+    "file": "testComponentCatalogThemes.Sidebar-light.png",
+    "percent": 0.09,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 64,
+    "mean": 0.003
+  },
+  {
+    "file": "testComponentCatalogThemes.SignedMarker-night.png",
+    "percent": 95.09,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 98,
+    "mean": 0.956
+  },
+  {
+    "file": "testComponentCatalogThemes.StepIn-night.png",
+    "percent": 97.43,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 65,
+    "mean": 0.976
+  },
+  {
+    "file": "testComponentCatalogThemes.VersionList-light.png",
+    "percent": 0.1,
+    "gt2": 0.03,
+    "gt8": 0.01,
+    "gt32": 0.01,
+    "max": 86,
+    "mean": 0.006
+  },
+  {
+    "file": "testComponentCatalogThemes.AuditBanner-light.png",
+    "percent": 0.05,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 62,
+    "mean": 0.002
+  },
+  {
+    "file": "testComponentCatalogThemes.AuditBanner-night.png",
+    "percent": 93.96,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 63,
+    "mean": 0.942
+  },
+  {
+    "file": "testComponentCatalogThemes.CitationChip-light.png",
+    "percent": 0.15,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 71,
+    "mean": 0.003
+  },
+  {
+    "file": "testComponentCatalogThemes.CitationChip-night.png",
+    "percent": 99.02,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 72,
+    "mean": 0.992
+  },
+  {
+    "file": "testComponentCatalogThemes.Dialog-light.png",
+    "percent": 1.25,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 49,
+    "mean": 0.026
+  },
+  {
+    "file": "testComponentCatalogThemes.EtaLine-light.png",
+    "percent": 0.04,
+    "gt2": 0.02,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 62,
+    "mean": 0.002
+  },
+  {
+    "file": "testComponentCatalogThemes.EtaLine-night.png",
+    "percent": 99.38,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 63,
+    "mean": 0.995
+  },
+  {
+    "file": "testComponentCatalogThemes.ModeList-light.png",
+    "percent": 0.05,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 59,
+    "mean": 0.002
+  },
+  {
+    "file": "testComponentCatalogThemes.ModeList-night.png",
+    "percent": 92.15,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 67,
+    "mean": 0.923
+  },
+  {
+    "file": "testComponentCatalogThemes.ReactionChip-night.png",
+    "percent": 98.15,
+    "gt2": 0.02,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 72,
+    "mean": 0.983
+  },
+  {
+    "file": "testComponentCatalogThemes.Segmented-light.png",
+    "percent": 0.03,
+    "gt2": 0.02,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 97,
+    "mean": 0.002
+  },
+  {
+    "file": "testComponentCatalogThemes.Segmented-night.png",
+    "percent": 95.73,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 98,
+    "mean": 0.959
+  },
+  {
+    "file": "testComponentCatalogThemes.StepIn-light.png",
+    "percent": 0.3,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 64,
+    "mean": 0.006
+  },
+  {
+    "file": "testComponentCatalogThemes.StudioTabBar-light.png",
+    "percent": 0.04,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0.01,
+    "max": 216,
+    "mean": 0.011
+  },
+  {
+    "file": "testComponentCatalogThemes.StudioTabBar-night.png",
+    "percent": 99.35,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0.01,
+    "max": 216,
+    "mean": 1.004
+  },
+  {
+    "file": "testComponentCatalogThemes.SystemLine-light.png",
+    "percent": 0.16,
+    "gt2": 0.02,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 89,
+    "mean": 0.006
+  },
+  {
+    "file": "testComponentCatalogThemes.Mark-light.png",
+    "percent": 0.24,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 91,
+    "mean": 0.004
+  },
+  {
+    "file": "testComponentCatalogThemes.Mark-night.png",
+    "percent": 99.76,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 92,
+    "mean": 0.999
+  },
+  {
+    "file": "testComponentCatalogThemes.ReactionChip-light.png",
+    "percent": 0.07,
+    "gt2": 0.01,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 91,
+    "mean": 0.002
+  },
+  {
+    "file": "testComponentCatalogThemes.Skeleton-light.png",
+    "percent": 0.02,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 61,
+    "mean": 0.001
+  },
+  {
+    "file": "testComponentCatalogThemes.Skeleton-night.png",
+    "percent": 99.79,
+    "gt2": 0.01,
+    "gt8": 0.01,
+    "gt32": 0,
+    "max": 60,
+    "mean": 0.999
+  },
+  {
+    "file": "testComponentCatalogThemes.TabBar-light.png",
+    "percent": 0.02,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 45,
+    "mean": 0.001
+  },
+  {
+    "file": "testComponentCatalogThemes.TabBar-night.png",
+    "percent": 99.6,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 46,
+    "mean": 0.997
+  },
+  {
+    "file": "testComponentCatalogThemes.Toast-light.png",
+    "percent": 0.02,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 45,
+    "mean": 0.001
+  },
+  {
+    "file": "testComponentCatalogThemes.Toast-night.png",
+    "percent": 99.42,
+    "gt2": 0.01,
+    "gt8": 0,
+    "gt32": 0,
+    "max": 48,
+    "mean": 0.995
+  }
+]

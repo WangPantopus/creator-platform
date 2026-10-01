@@ -1,0 +1,79 @@
+{
+  "sourceRevision": "4fab21cf44b7b921924eae5037734b7a9bfa2281",
+  "checks": [
+    {
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609609/job/110092624804"
+    },
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609674/job/110092624801"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609674/job/110092624577"
+    },
+    {
+      "name": "android-runtime",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609674/job/110092624496"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609674/job/110092624485"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775609674/job/110092624149"
+    },
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775604532/job/110092607081"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775604532/job/110092606984"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775604532/job/110092606903"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775604532/job/110092606774"
+    },
+    {
+      "name": "android-runtime",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775604532/job/110092606676"
+    }
+  ],
+  "confirmedLatestBackendFailure": [
+    "Existing positive context=kiln continuation400 versus expected503;8 pass/1 fail",
+    "Existing PostgreSQL setup0001/profile permission42501;9 cases not run"
+  ],
+  "prMetadataWriteAfterPush": "403 Resource not accessible by integration",
+  "testFixtureException": "pending; no test/golden/setup edit authorized or performed",
+  "mergeReady": false,
+  "paidAICalls": 0
+}

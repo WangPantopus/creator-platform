@@ -1,0 +1,30 @@
+{
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "tag": "creator-platform-w8:da03bb7",
+  "imageId": "sha256:b6717ff1bec066e8d3fadf405c94291ca09c461dfc9d2f18e5ab22b4c3e5e9ea",
+  "bytes": 395462890,
+  "user": "node",
+  "uid": 1000,
+  "nodeVersion": "24.21.0",
+  "bundledEntrypointPresent": true,
+  "typescriptCompilerPresent": false,
+  "backendSourcePresent": false,
+  "unconfiguredStartup": {
+    "exitCode": 1,
+    "message": "Choose a deployed environment.",
+    "network": "none"
+  },
+  "buildLog": {
+    "path": "/private/tmp/creator-w8-image-da03bb7-build.log",
+    "sha256": "6f8b0eaa49ed7c8ade7d9b143462214f95733e0264f81156a6cfdbbc8f71adae",
+    "bytes": 7174
+  },
+  "startupLog": {
+    "path": "/private/tmp/creator-w8-image-da03bb7-startup.log",
+    "sha256": "8a052a9e065f6d74103bcaf53b129f059b1a7d83116ae28a159a35f4dc45cea9",
+    "bytes": 445
+  },
+  "limitations": [
+    "Local immutable image only; no remote deployment, SBOM/signature, TLS or real-provider readiness established."
+  ]
+}

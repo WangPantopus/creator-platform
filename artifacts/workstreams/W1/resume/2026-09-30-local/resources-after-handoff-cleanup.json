@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-30",
+  "sourceRevision": "ea82025fff129ef8132d932b9c30a8cc2b5821a1",
+  "remove": [
+    {
+      "path": "/private/tmp/creator-w1-resume-rename",
+      "allocatedKiBBefore": 1544440,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-current",
+      "allocatedKiBBefore": 688588,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-integrated",
+      "allocatedKiBBefore": 887628,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-ios-build",
+      "allocatedKiBBefore": 715040,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-rename-ios-current",
+      "allocatedKiBBefore": 724124,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-rename-ios-integrated",
+      "allocatedKiBBefore": 796148,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-ci-swift-tmp",
+      "allocatedKiBBefore": 9372,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-catalog",
+      "allocatedKiBBefore": 18860,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-catalog.swift",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-diagnostic.swift",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-0-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-1-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-NativeSnapshotTests-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-ios-ui-failures",
+      "allocatedKiBBefore": 10592,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-integrated-source.tar",
+      "allocatedKiBBefore": 44152,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-late-owner-integration",
+      "allocatedKiBBefore": 136,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-integration-resolution.json",
+      "allocatedKiBBefore": 8,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-native-color-metrics.json",
+      "allocatedKiBBefore": 20,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-session-before.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-ci-artifacts",
+      "allocatedKiBBefore": 0,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-17.0.20.1+1",
+      "allocatedKiBBefore": 316548,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-release.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-release-x64.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk17.tar.gz",
+      "allocatedKiBBefore": 181496,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk17-x64.tar.gz",
+      "allocatedKiBBefore": 176348,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/xcodegen.zip",
+      "allocatedKiBBefore": 4180,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-android/rename-app-build",
+      "allocatedKiBBefore": 87756,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-android/rename-project-cache",
+      "allocatedKiBBefore": 4600,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/artifacts/workstreams/W1/build/resume-ios",
+      "allocatedKiBBefore": 721824,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/artifacts/workstreams/W1/build/ios-existing-ui-20260930.xcresult",
+      "allocatedKiBBefore": 65484,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-build",
+      "allocatedKiBBefore": 140360,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-integrated-build",
+      "allocatedKiBBefore": 164172,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-ci",
+      "allocatedKiBBefore": 149792,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-resume-build",
+      "allocatedKiBBefore": 108624,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/test-results",
+      "allocatedKiBBefore": 400,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/playwright-report",
+      "allocatedKiBBefore": 912,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next",
+      "allocatedKiBBefore": 108344,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-cleanup-plan-20260930.json",
+      "allocatedKiBBefore": 12,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained."
+    },
+    {
+      "path": "/private/tmp/creator-w1-cleanup-result-20260930.json",
+      "allocatedKiBBefore": 20,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained."
+    }
+  ],
+  "allocatedKiBBefore": 7670468,
+  "retained": [
+    "W1 source and committed evidence",
+    "API4101/web3001/live Next output and backend bundle",
+    "Interactive DB55431 with40 checksummed entries",
+    "Test DB55441 data/container, stopped for handoff",
+    "Private env and pre-integration backup",
+    "Owned shutdown Simulator365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+    "Canonical ios-signed, swift-package and final UI result",
+    "Canonical Android app-build/project-cache/gradle-home",
+    "Canonical Android SDK,x64JDK17,XcodeGen and workspace Node dependencies",
+    "Referenced diagnostic logs"
+  ],
+  "stopPids": [71074, 71372],
+  "testContainer": "creator-platform-w1-resume-check-20260930",
+  "removed": [
+    {
+      "path": "/private/tmp/creator-w1-resume-rename",
+      "allocatedKiBBefore": 1544440,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-current",
+      "allocatedKiBBefore": 688588,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-integrated",
+      "allocatedKiBBefore": 887628,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-rename-ios-build",
+      "allocatedKiBBefore": 715040,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-rename-ios-current",
+      "allocatedKiBBefore": 724124,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-rename-ios-integrated",
+      "allocatedKiBBefore": 796148,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-ci-swift-tmp",
+      "allocatedKiBBefore": 9372,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-catalog",
+      "allocatedKiBBefore": 18860,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-catalog.swift",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-color-diagnostic.swift",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-0-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-1-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-NativeSnapshotTests-normalized.png",
+      "allocatedKiBBefore": 156,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-ios-ui-failures",
+      "allocatedKiBBefore": 10592,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-integrated-source.tar",
+      "allocatedKiBBefore": 44152,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-late-owner-integration",
+      "allocatedKiBBefore": 136,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-integration-resolution.json",
+      "allocatedKiBBefore": 8,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-native-color-metrics.json",
+      "allocatedKiBBefore": 20,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-session-before.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-ci-artifacts",
+      "allocatedKiBBefore": 0,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-17.0.20.1+1",
+      "allocatedKiBBefore": 316548,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-release.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk-release-x64.json",
+      "allocatedKiBBefore": 4,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk17.tar.gz",
+      "allocatedKiBBefore": 181496,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/jdk17-x64.tar.gz",
+      "allocatedKiBBefore": 176348,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-tools/xcodegen.zip",
+      "allocatedKiBBefore": 4180,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-android/rename-app-build",
+      "allocatedKiBBefore": 87756,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-resume-android/rename-project-cache",
+      "allocatedKiBBefore": 4600,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/artifacts/workstreams/W1/build/resume-ios",
+      "allocatedKiBBefore": 721824,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/artifacts/workstreams/W1/build/ios-existing-ui-20260930.xcresult",
+      "allocatedKiBBefore": 65484,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-build",
+      "allocatedKiBBefore": 140360,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-integrated-build",
+      "allocatedKiBBefore": 164172,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-ci",
+      "allocatedKiBBefore": 149792,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next-w1-resume-build",
+      "allocatedKiBBefore": 108624,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/test-results",
+      "allocatedKiBBefore": 400,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/playwright-report",
+      "allocatedKiBBefore": 912,
+      "purpose": "Redundant W1-only scratch/build/download; committed source, evidence or canonical cache retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform/apps/web/.next",
+      "allocatedKiBBefore": 108344,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-cleanup-plan-20260930.json",
+      "allocatedKiBBefore": 12,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained.",
+      "absentAfter": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-cleanup-result-20260930.json",
+      "allocatedKiBBefore": 20,
+      "purpose": "Unused default W1 Next build or duplicate temporary cleanup manifest; canonical live output and committed cleanup record retained.",
+      "absentAfter": true
+    }
+  ],
+  "errors": [],
+  "completedAtUTC": "2026-09-30T21:54:20.577006+00:00",
+  "allocatedKiBRemoved": 7670468,
+  "verification": {
+    "committedApplicationSourceUnchanged": true,
+    "canonicalBuildHashesUnchanged": true,
+    "compilerPidsAbsent": [71074, 71372],
+    "testDatabase": "Stopped cleanly; container and data volume retained; port55441 absent.",
+    "runtime": "API4101/web3001 and interactive DB55431 still listening; API foundationReady=true/ready=false.",
+    "simulator": "Owned365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5 still Shutdown; data retained.",
+    "privateFiles": "Owned env and database backup retained at0600; no values included.",
+    "browser": "Completed agent-created localhost/you verification tab7 closed; other user tabs preserved.",
+    "allTargetsAbsent": true
+  },
+  "residentKiBStoppedObserved": 1626512,
+  "diskSpaceQualification": "7.32GiB is the sum of allocated KiB for removed paths before deletion. APFS cloning/compression/snapshots can make the actual physical free-space change different.",
+  "retainedPurposes": {
+    "API/web/interactiveDB/env": "Continue actual account/draft/return/revocation acceptance without recreating synthetic actor/profile data or keys.",
+    "testDB": "Reuse isolated existing10000-pair integration checks after docker start; kept stopped while idle.",
+    "canonicalAndroidSDK,x64JDK,XcodeGen,Gradledeps": "Rebuild and diagnose pending final-head native CI; avoid downloads or new license setup.",
+    "canonicalios-signed,Swiftcache,Androidapp-build": "Reuse exactly validated native binaries and incremental rebuilds for remaining native acceptance/CI repairs.",
+    "ownedShutdownSimulator": "Resume native UI/passkey acceptance on the documented device when input capability/configuration is supplied; no CPU while shutdown.",
+    "source,node_modules,committedevidence,referencedlogs": "Continue development, compare current CI/source and preserve provenance; no shared/global dependency cache touched."
+  },
+  "updatedAtUTC": "2026-09-30T21:58:27.877572+00:00"
+}

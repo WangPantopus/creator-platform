@@ -1,0 +1,74 @@
+{
+  "environment": "Isolated W5 synthetic development actors; genuine producer commands; HTTP operations only",
+  "actions": [
+    {
+      "action": "Read current audience catalog as creator",
+      "status": 200
+    },
+    {
+      "action": "Read missing live producer as unavailable",
+      "status": 200,
+      "available": false
+    },
+    {
+      "action": "Read current W2 correction revision",
+      "status": 200,
+      "revision": 0
+    },
+    {
+      "action": "Invite existing public handle through W1",
+      "status": 200,
+      "id": "fc7b25d6-1ebf-4e13-9190-66b6637ac777",
+      "roles": [
+        "drafter"
+      ]
+    },
+    {
+      "action": "Recover current identical invitation",
+      "status": 200,
+      "id": "fc7b25d6-1ebf-4e13-9190-66b6637ac777",
+      "roles": [
+        "drafter"
+      ]
+    },
+    {
+      "action": "Wrong recipient cannot accept invitation",
+      "status": 403,
+      "errorCode": "invitation_unavailable"
+    },
+    {
+      "action": "Intended recipient accepts through W1",
+      "status": 200
+    },
+    {
+      "action": "Intended recipient current workspace includes team role",
+      "status": 200
+    },
+    {
+      "action": "Creator removes current team access through W1",
+      "status": 200
+    },
+    {
+      "action": "Workspace refresh after removal",
+      "status": 200,
+      "creatorCount": 0
+    },
+    {
+      "action": "Fan repeats withdrawal as explicit saved version update",
+      "status": 200,
+      "id": "fe9717f8-7ced-4ee4-bff1-66aef729dfb6",
+      "version": 3
+    },
+    {
+      "action": "Fan repeats withdrawal as explicit saved version update",
+      "status": 200,
+      "id": "95f06f4e-4cb1-448b-bf59-095818322cef",
+      "version": 3
+    },
+    {
+      "action": "Current creator drains pending outbox without configured distribution",
+      "status": 200,
+      "processed": 5
+    }
+  ]
+}

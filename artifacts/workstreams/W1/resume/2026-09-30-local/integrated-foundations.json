@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-30",
+  "worktree": "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform",
+  "branch": "codex/w1-handoff-2026-09-29",
+  "W1BeforeIntegration": "90240c5",
+  "ownerIntegration": "bf44ada37268bb489c97d32432e4c4d81f25c8f9",
+  "additionalW3": "27b982998fc6995e700c43b3b9dba32cf85d9c91",
+  "virtualMergeBase": "e9769876a5d1da78c3e376df61dfea50e4dd02c3",
+  "sourceOwnership": "Producer implementations remain attributed to their owners; W1 reconciles roots and its repairs. Shared/peer worktrees untouched.",
+  "checks": {
+    "backend": "18/18; 10000 pairs and 50000 scoped queries;387.07s",
+    "swift": "18/18;110 images;181.099s",
+    "android": "all19 existing cases, assembleDebug and verifyPaparazziDebug;9m18s",
+    "ios": "normal ad-hoc signed generic iOS Simulator BUILD SUCCEEDED",
+    "web": "production build passed; subsequent restoration-origin change has scoped lint/source verification and personally operated browser evidence",
+    "registry": "40 entries through0043; prior0001/0002 unchanged; checksum replay passed",
+    "generation": "12 resources;31 operations; W3/W5 schemas aggregated into generated native models"
+  },
+  "runtime": {
+    "api": 4101,
+    "web": 3001,
+    "databasePort": 55431,
+    "database": "creator_w1_resume",
+    "identity": "explicit synthetic development adapter",
+    "generation": "unconfigured",
+    "features": ["conversation"],
+    "Studio": "not mounted without approved commerce policy; UI reports endpoint unavailable without claiming no role"
+  },
+  "browser": {
+    "actor": "Development actor two",
+    "steps": [
+      "Continue from Account -> development chooser -> persisted Account",
+      "Studio workspace arrival -> unavailable service, no false role denial",
+      "Current synthetic session deliberately access-expired; browser restore to Studio then Account"
+    ],
+    "observed": "registered target retained on localhost:3001; Account still displays existing handle and pending creator state",
+    "screenshot": "integrated-account.png",
+    "limitations": [
+      "one browser cookie jar",
+      "no genuine proof/passkey/publication/provider acceptance",
+      "screenshot1280x720 is not mobile reference evidence",
+      "foreground polling may renew before explicit restoration navigation"
+    ]
+  },
+  "logs": {
+    "backend": {
+      "path": "/private/tmp/creator-w1-integrated-backend-tests-final.log",
+      "sha256": "26b13db95631c86357f8e2a0786aca3092df2d7fcd59973436fd3d688aef7e54"
+    },
+    "swift": {
+      "path": "/private/tmp/creator-w1-integrated-swift.log",
+      "sha256": "1a4dd73d694c7740b351dbc2332c9edda4d143dc20dd685261c8ae7e2bfb7b51"
+    },
+    "ios": {
+      "path": "/private/tmp/creator-w1-integrated-ios.log",
+      "sha256": "5392a4222c4033fa12be7be2749298b58c18032ae8250e8dd1c9855a009f2cb4"
+    },
+    "android": {
+      "path": "/private/tmp/creator-w1-integrated-android.log",
+      "sha256": "8dda383dc605bf110e4c02c05fb72a4eab26f2a2947967798abfdde6d47aaccc"
+    },
+    "web": {
+      "path": "/private/tmp/creator-w1-integrated-web-build-final.log",
+      "sha256": "83a26a958a6ba7988aa1e6b412da41a01a69ac32c61266129b74cf16792c2567"
+    },
+    "migrations": {
+      "path": "/private/tmp/creator-w1-integrated-migrations.log",
+      "sha256": "a7f2e843e5138e43ffff5c3bcac0e1ad3a14871d01579a17c5c0dbfaed5fa9a6"
+    },
+    "migrationReplay": {
+      "path": "/private/tmp/creator-w1-integrated-migrations-replay.log",
+      "sha256": "abd7ce10672933b44f078e7f9d868a098ea4b84d7732bcc60d5728413350f2d1"
+    }
+  }
+}

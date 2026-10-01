@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-09-30T02:59:40.632906+00:00",
+  "environment": "isolated W8 development restore",
+  "database": "creator_w8_restore",
+  "backupKind": "earlier logical pg_dump custom archive",
+  "journalSha256": "a012a27c55fbca85dc9079a51b2b02a2ade4618dd706ba5aafb26cd72571f623",
+  "matchesObservedJournal": true,
+  "earlierReplayElapsedMs": 298,
+  "replayMeasurementIncludes": "journal import only",
+  "trafficReady": false,
+  "currentMetadata": {
+    "tombstones": 1,
+    "privacyTasks": [
+      {
+        "state": "pending",
+        "count": 8
+      }
+    ]
+  },
+  "rpoMeasured": false,
+  "totalRtoMeasured": false,
+  "liveJournalCommitted": false
+}

@@ -1,0 +1,24 @@
+Already applied: 0001_foundation
+Already applied: 0002_w1_identity
+Already applied: 0007_growth
+Already applied: 0008_trust_operations
+Already applied: 0010_w8_operational_guardrails
+Already applied: 0011_growth_retention
+Already applied: 0012_w8_crisis_event_rls
+Applied: 0017_growth_delivery
+Applied: 0018_growth_activation
+Applied: 0023_w8_action_recovery
+Already applied: 0001_foundation
+Already applied: 0002_w1_identity
+Already applied: 0007_growth
+Already applied: 0008_trust_operations
+Already applied: 0010_w8_operational_guardrails
+Already applied: 0011_growth_retention
+Already applied: 0012_w8_crisis_event_rls
+Already applied: 0017_growth_delivery
+Already applied: 0018_growth_activation
+Already applied: 0023_w8_action_recovery
+Applied: 0024_growth_insight_versions
+Applied: 0025_growth_closed_windows
+Applied: 0026_growth_window_backfill
+Applied: 0027_w8_privacy_ownership

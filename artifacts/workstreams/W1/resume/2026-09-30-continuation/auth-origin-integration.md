@@ -1,0 +1,7 @@
+# Production login origin gate
+
+W1 personally consumes only W2 `a010a030378a0c62a44d6c14e714cc397722e702` production configured-origin gate and503 handling onto parent `4a1262357eb12281cdf030ead7974d580c964ff2`. W1 already uses the canonical applicationOrigin helper. The route now refuses a missing production origin or one rejected by that helper with `identity_unconfigured`/503. It retains duplicate/unknown-query rejection, validated registered return targets, five-minute continuation and thirty-minute navigation retention, canonical cookie policies and provider redirect checks. No whole older producer route replaces these current repairs.
+
+Current web production build, affected lint and refreshed canonical FolioPreview web build pass. Both existing auth-contract cases pass20.8s in isolated3091/3191 outputs without API credentials. The rebuilt production server was actually launched on W1-owned3011 with no application-origin/API configuration: GET `/api/auth/continue?returnTo=%2Fhome` returns503 and the expected error message. This is a real unavailable-path operation, not a fabricated production identity ceremony. Native/backend/generated source is unchanged.
+
+Exact source/log/response hashes: [auth-origin-source.json](auth-origin-source.json). Production Pantopus contract, approved HTTPS/RP/app associations, real provider and device acceptance remain open. No new test suite/script, source artboard, SQL or production approval is introduced.

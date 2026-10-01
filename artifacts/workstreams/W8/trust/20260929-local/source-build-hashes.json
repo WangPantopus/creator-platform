@@ -1,0 +1,266 @@
+{
+  "capturedAt": "2026-09-30T03:09:09.041709+00:00",
+  "gitHead": "ba2ee4f",
+  "workingTree": "shared uncommitted foundation; not an immutable release",
+  "sourceScope": "allowlisted W8 source and applied history",
+  "sources": [
+    {
+      "path": ".github/workflows/trust-release.yml",
+      "sha256": "37b5c339ce9f92133ff89a613b353d39266cb19013924046697775bc47557476"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+      "sha256": "ae6c5e88f61a5912540532e3f1eecc0ff90fcb58d1fbf61ce392d44cb28ffaab"
+    },
+    {
+      "path": "apps/backend/migrations/0008_trust_operations.sql",
+      "sha256": "f88465f4d15dfb19176893789429aef648a0b16fed3403c4dd27a0ffbcf5b50c"
+    },
+    {
+      "path": "apps/backend/migrations/0010_w8_operational_guardrails.sql",
+      "sha256": "5b7be49722ccaf787b1b0f1df17aaea48b5b29b6539a62e55d40328a153dd0b8"
+    },
+    {
+      "path": "apps/backend/migrations/0012_w8_crisis_event_rls.sql",
+      "sha256": "1f60f00ac0457c506296a818de81af473c2aa8e057d5355a387a3fcc55b7cbd1"
+    },
+    {
+      "path": "apps/backend/migrations/0023_w8_action_recovery.sql",
+      "sha256": "4c2ec5cee7e66d7a6178b87271c21a4b060fe34e9e6a587ddaf9ebe39852a720"
+    },
+    {
+      "path": "apps/backend/migrations/0027_w8_privacy_ownership.sql",
+      "sha256": "de8587672985d79c480bafb41961041be9390f565b3612ca14285d87d2319028"
+    },
+    {
+      "path": "apps/backend/scripts/migrate-trust.ts",
+      "sha256": "7b8a3f9d8867ca5bf24ac69a8df479628ed17da9ed37d0349ee9689221cee7d3"
+    },
+    {
+      "path": "apps/backend/scripts/tombstone-journal.ts",
+      "sha256": "dc3244e29d775d1bdd1be647f110d92c69be4073fa7f20a9d156b04359a3963a"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/contracts.ts",
+      "sha256": "7c1c7606235db0d70f7dcf545e91676dd6229e251a42444255401da0f260f16b"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/crisis.ts",
+      "sha256": "d4051836efe6ba241dcd918a877bec18b4afdce23957f92a658972cf4268c7d2"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/domain-adapters.ts",
+      "sha256": "769b22b246589e51bb22e04efbdfc95a1fbdd8880136cbe24e1bd02e27be1f0b"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/own-privacy-hook.ts",
+      "sha256": "e5b89a1b887382fdf0d24de0362abbfb19fa18453d825f0dcd6a64e755fa03ec"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-ownership.ts",
+      "sha256": "ec5321715c294445472fb72085a4b699eefa8e0f3d1fcb692a45dcd6e4b89e66"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/router.ts",
+      "sha256": "819f9f8ac168cccb9572b2cf13ac75655fcc4ced3647249ee3e0e905ba610cbd"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/service.ts",
+      "sha256": "e70cd3d9380101a3e993646ba6cc29c87bd66174c1036e0309674bd326efa99c"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/store.ts",
+      "sha256": "c3ee7085365394209da7d37e28dd2c83ccdb220e089e8d2f236afa92b9782bbd"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/worker.ts",
+      "sha256": "6b865e1b589885d2335d4c3152c1fde0c649ec2675652df6dce19b301395007a"
+    },
+    {
+      "path": "apps/backend/src/operations/deploy.ts",
+      "sha256": "b72c2e6f5ebdaef9a9d5b5efcb904fd2693a6c1eee31fc1575fbff1c69318b6f"
+    },
+    {
+      "path": "apps/backend/src/operations/local-server.ts",
+      "sha256": "68708035ea87005d3f7b54206b1e525c3b065764aacb85358833e561147d3c7f"
+    },
+    {
+      "path": "apps/backend/src/operations/readiness.ts",
+      "sha256": "6f8149eb8513e838aea0c20e5c5dc6abff5e1cbee8228ec4065799c2a5187da2"
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "sha256": "c9de0b7f71366c60620dc518d5ebccb021dae002270907d151eda4ba97a32e68"
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "sha256": "239b7696665c2584b4a1d9fd06b7a8e36fb83388be7448656cb94cc9239152f1"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+      "sha256": "13e8117266d44e7653148777699852c75830b3cfce702eb0a9d0fb8d5310384b"
+    },
+    {
+      "path": "apps/web/app/api/trust/[...path]/route.ts",
+      "sha256": "4a2a40b9a44e559c811222e671795edf42e7846249b58636539017d62c8d5be6"
+    },
+    {
+      "path": "apps/web/app/ops/audits/page.tsx",
+      "sha256": "ee34dcb85c2663b71ad299e90cfa1a50a2b2e130d86008f58621c4c254dda47a"
+    },
+    {
+      "path": "apps/web/app/ops/cases/[id]/page.tsx",
+      "sha256": "730c2f14f4c9baea1882a502b2bc0382ede61484e23234943394c5f2fa29e3ee"
+    },
+    {
+      "path": "apps/web/app/ops/layout.tsx",
+      "sha256": "4fc05f0f659e319d31abf26cd312803f10981f4032dd2a4c4516c4782fb31a96"
+    },
+    {
+      "path": "apps/web/app/ops/metrics/page.tsx",
+      "sha256": "722adc106cfdbfca335c7f4a4f36f0e79df07cd81b1eb30f894449429f3b4f5a"
+    },
+    {
+      "path": "apps/web/app/ops/page.tsx",
+      "sha256": "c264100a525fe7ec1665f85b638a543daa52d93043b2ea1516fe9a95f8de7ceb"
+    },
+    {
+      "path": "apps/web/app/ops/trust-client.tsx",
+      "sha256": "4d06af9b56b750d8bca44dbb38e639c2cbec7b3b617f59350f1825253309affb"
+    },
+    {
+      "path": "apps/web/app/ops/trust.css",
+      "sha256": "05082d84ce42d905e0ad1b4bcb9f7fe3d1072ee4d2ae9eee65a4030cd332d7fe"
+    },
+    {
+      "path": "apps/web/app/status/page.tsx",
+      "sha256": "f516f7a870513a130c300989d303dcf459e3b805533c6164b14a294a4f3b66ce"
+    },
+    {
+      "path": "apps/web/app/support/access/page.tsx",
+      "sha256": "7241447754dd59804ecfcc5066aafd278570ac9f3b4238c0c104433aba297ac3"
+    },
+    {
+      "path": "apps/web/app/support/feedback/page.tsx",
+      "sha256": "ed39aa9e4191428f55ced6dceaa47504ed384743df8f8f295d68c98873b37729"
+    },
+    {
+      "path": "apps/web/app/support/layout.tsx",
+      "sha256": "64a1af9f9f4049a163300910a8e7a6781ae05138350e9f4f32c4ddfded33b482"
+    },
+    {
+      "path": "apps/web/app/support/page.tsx",
+      "sha256": "8070e8b1766925f4593573896a4441bd019c0fe565784faf269fa61fdf2360e4"
+    },
+    {
+      "path": "apps/web/app/support/privacy/page.tsx",
+      "sha256": "776c2c0b943d5e04de720abd4c6506c758ff064568fac891c889b339a1a718fe"
+    },
+    {
+      "path": "apps/web/app/trust/crisis/page.tsx",
+      "sha256": "96d1c91dba39d8d5ac8da4eb71c8b3750504c3f9b6564fe6622fa2f876e40b9c"
+    },
+    {
+      "path": "apps/web/app/trust/page.tsx",
+      "sha256": "99c823c7829e3f8cfe565f0a80cbc17cf44321bffc53da7e560f1bc6363125db"
+    },
+    {
+      "path": "apps/web/app/trust/terms/page.tsx",
+      "sha256": "26ad4f20b0912a30886187a8ab7b77432c47837f114bc491625f6d7aa8861a7d"
+    },
+    {
+      "path": "infra/alerts.json",
+      "sha256": "2111599760bea7ae62d5869cd2503936c0f65835100ef3022efe4d927b94cd84"
+    },
+    {
+      "path": "infra/containers/trust.Dockerfile",
+      "sha256": "e558643be2c9d69783d185b61b39584087525c3806407ed99ecb8e23a0025a84"
+    },
+    {
+      "path": "infra/containers/trust.Dockerfile.dockerignore",
+      "sha256": "07f071a92b4287f57b5d876613ddc9172f3fd162e8afa3bc66405bb88b59fd04"
+    },
+    {
+      "path": "infra/containers/trust.compose.yml",
+      "sha256": "4d68b4965233deab1cac88703273269d43af3507b2177a192b7a0e68e4cbf947"
+    },
+    {
+      "path": "infra/environments.json",
+      "sha256": "588923ee86f1cb9e8bc0a16988183295d8d58d93407a752efffe9bdbd5662d1d"
+    },
+    {
+      "path": "infra/local/seed-w8.sql",
+      "sha256": "84196eeedad980ba96a58fffbb01cdcf26216181051198b575f7918ad6bac0ed"
+    },
+    {
+      "path": "infra/migrations/history/0013_w2_agent_extensions.sql",
+      "sha256": "7fc5995956d2e407475f815a2a707737c225cce0346643b8fd6b345d972fe59c"
+    },
+    {
+      "path": "infra/migrations/history/0015_w4_reliability.sql",
+      "sha256": "5a94d77858838e26c94c6df559b01034d9cd48b94fd1530ebe937ab9840a89b4"
+    },
+    {
+      "path": "infra/migrations/history/0016_w4_disclosure.sql",
+      "sha256": "927291027eb0ad9942679b188f5e3f2cd74c1767d1b30aab7284f86de114fc89"
+    },
+    {
+      "path": "infra/migrations/history/0019_w2_shadow_jobs.sql",
+      "sha256": "1f8e6e5ef1aa11859e3d972fb87273bec9fe233b4b406f51bc02df922d75158b"
+    },
+    {
+      "path": "infra/migrations/history/0020_w2_purge_tombstone.sql",
+      "sha256": "419dd13b87d853363cfa3fee934f1916d78423dd0a6bdd88abcf4f1853d540ca"
+    },
+    {
+      "path": "infra/migrations/history/0022_w4_lineage.sql",
+      "sha256": "03705311adf220a1658ec5b1cc2e3d661a3b5a8367664bd3204b51c4d3bba698"
+    },
+    {
+      "path": "infra/migrations.json",
+      "sha256": "4b8011fcea21745460cd3a2e1056fe2bf3cf1851afd8e73b52a7b95ca188ec39"
+    }
+  ],
+  "builtOrCopiedArtifacts": [
+    {
+      "path": "/private/tmp/creator-w8-trust-deploy.mjs",
+      "bytes": 72495,
+      "sha256": "78d103e1319d8f65ef0f5872416c3ae79d6a0b4556efd0c4eae787e51d1b3223"
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios/Sources/QelvoraUI/Trust.swift",
+      "bytes": 19780,
+      "sha256": "13e8117266d44e7653148777699852c75830b3cfce702eb0a9d0fb8d5310384b"
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios/App/QelvoraApp.swift",
+      "bytes": 2827,
+      "sha256": "5e65c0196c0c3a3e80b3e623d4a0bdb6494ba91d6ceb8746edad14f269b5a45e"
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "bytes": 40144,
+      "sha256": "12e41dd34a6db63942aa12cf0c94bdcffe3381b9b56291109ac177407f46d328"
+    },
+    {
+      "path": "/private/tmp/creator-w8-ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+      "bytes": 17047456,
+      "sha256": "0d0b7e65ed9e28c7032f4fcd42f91fcd650cdbf64028e496d39e67e390bf473e"
+    },
+    {
+      "path": "/private/tmp/creator-w8-android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+      "bytes": 22326,
+      "sha256": "ae6c5e88f61a5912540532e3f1eecc0ff90fcb58d1fbf61ce392d44cb28ffaab"
+    },
+    {
+      "path": "/private/tmp/creator-w8-android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt",
+      "bytes": 2176,
+      "sha256": "d432323fb84b9d7d103d56953bfccaf723e299a57e480ec97ed76542a70befbc"
+    },
+    {
+      "path": "/private/tmp/creator-w8-android-build/outputs/apk/debug/app-debug.apk",
+      "bytes": 11963023,
+      "sha256": "737a5ec15df6951a321869421c43f95eb12d3e0fd6f775de9dbf8398535cb7a0"
+    }
+  ]
+}

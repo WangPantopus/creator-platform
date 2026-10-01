@@ -1,0 +1,73 @@
+{
+  "parent": "1c2e7b579de9f1ffda8028c5eb8125c424aba79e",
+  "W6Producer": "4515a6a0ac16423f15f2cfb961489744ebc93033",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "9c1773fde91714cf4fb820c5a80aa873efdd177a2af5628d51ce79f5399d67e3",
+    "apps/backend/src/core/idempotency.ts": "b147c300dac4ed515ac903ff7eaedb16fb985fee34ddc7ca63fede22de5dd0ab",
+    "apps/backend/src/modules/media/ai-audio.ts": "b1ee612b6254dd27460612026a9832af59490e44f69fb76592a984a54811b335",
+    "apps/backend/src/modules/media/lifecycle.ts": "d392df9dad5644acf1ab5f141edfe937bf8ebace195cc7d0efb70dd43d6b5b68",
+    "apps/backend/src/modules/media/registration.ts": "4a84bc5784a742d429d7d96e3e66ecf6d45ac86fd52c4485184fe07b3c7e7e11",
+    "apps/backend/src/modules/media/router.ts": "23c19b733f826974f0f989977cef79f654eded096a88d961ff0d96d99eee7243",
+    "apps/backend/src/modules/media/service.ts": "7898b1f19deb262c3c731068404acd8316cbbea536b4c8728350b8556a606424",
+    "apps/backend/src/modules/media/storage.ts": "a15e5bb964baf0eda81395f626c611ceccd0832a40ede1a9711b52f18921f15f",
+    "apps/backend/src/modules/media/worker.ts": "45a6e55f1ee67dfe2c196f0f9b8c2668ffe09c6bf4747098f2872bd0d445afbd",
+    "apps/backend/src/modules/session/availability.ts": "36c7f767d3e124ba2fb1a1d707de1d60548094ef13aa0a770e898238ffb63357",
+    "apps/backend/src/modules/session/commerce.ts": "cc14393b0f968e9f37dc83fb18c5dd3db8ffaa9f62814398e6ae7000536fc4ae",
+    "apps/backend/src/modules/session/provider.ts": "cf5fd0ba9aec952eefbc45fc7102f6ade517935c2ef08c8d1a4073d2355faec6",
+    "apps/backend/src/modules/session/service.ts": "3f250446fb1330bb3a11383c7de510967722a0788c1471e1a0f6f6c7a0c870d6",
+    "apps/backend/src/modules/session/worker.ts": "39ef9b1887d7b187ef1ad1a3d7875092fac2cd14980c54e80a1dca576a853c4d",
+    "apps/backend/src/server.ts": "a0fab15cbf170803eaf8a8f7aec255c402b75fdfa4ea51455cdd30b7e84f99ee",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "ce20c1490c2984fbcdb9e42c09191ecf2ce92e3f6c50878cd3a7f07b3d5d9199",
+    "apps/web/app/api/w6/[...path]/route.ts": "ea60063b22ab5e7f06e738cae5e069ccb2e3dc69436f37e6371837940b34c837",
+    "packages/api/generated/openapi.json": "546e66d74d8e2bbd6d741153226b41c51e4261286e8eed3a1fb27932d62705a9",
+    "packages/api/src/media.ts": "0e3a1a34667478e8426aad430fdadf5670d596778bca17791f7b2cd50a55d8bf",
+    "packages/api/src/openapi.ts": "3c942375fd7d579110d29cd57b4af59d7c4a5abb9e3f6b95b733df688ca69c5f",
+    "packages/api/src/session.ts": "9fad71027f65b3e55e93f25106ed379d25c94607fdaecbc47e89cc1bd651bb92",
+    "scripts/generate-native-api.mjs": "10adadbad480eedb976c04eb8137c584fdc5fbf950c4368ca44b7363dcd0c1cb",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "c0d18225869c2407e3daa602af7b27cf56065d729cdca1a300a1e62e66fae872",
+    "apps/backend/src/modules/media/creator-scope.sql": "73623261f537b4df65c46bafdbfedf80f1a92f0505d5e8e9420522cfcf5e2016",
+    "apps/backend/src/modules/media/creator-service.ts": "e4d38ffc36e2253f5ba9b94463fa0d71d9ab447969c60e6ff53bf9cc5fc59f2d",
+    "apps/backend/src/modules/media/creator-worker.ts": "009111feed6958c724127d6ccab8d4adad4c9a9920be7550a97a047527dd05eb",
+    "apps/backend/src/modules/media/processor.ts": "d329433f578779e00e14fc68e4e9a0f42b2b8e5ccb335b0094a1cdffbbc0f59b",
+    "packages/api/src/media-openapi.ts": "0cb3256ffa4442b5ad884e4fa264ce37c091a74c9ad7257f8b2655677ea94991"
+  },
+  "generation": {
+    "operations": 44,
+    "newOperations": 13,
+    "previous31SwiftAndKotlinMethodBodiesUnchanged": true,
+    "previousOpenAPIPathsAndComponentSchemasUnchanged": true,
+    "handEditedOutput": false
+  },
+  "checks": {
+    "swiftPackageBuildSeconds": 17.32,
+    "normallySignedSimulatorAppBuild": "passed",
+    "iOSBuildLogSha256": "0b9ad8873ecddd602ec08a26bd056f4842d06bf6966356d721b8c1cafad2c046",
+    "existingContractsPassed": 9,
+    "backendBuild": "passed",
+    "webTypecheck": "passed",
+    "generationAndAffectedLintFormat": "passed",
+    "webProductionBuild": "passed"
+  },
+  "observedAPI": {
+    "port": 4101,
+    "identityMode": "development",
+    "foundationReady": true,
+    "ready": false,
+    "generation": "unconfigured",
+    "registeredFeatures": ["conversation", "media"],
+    "mediaAvailable": false,
+    "callsAvailable": false,
+    "aiAudioAvailable": false,
+    "availabilityResponse": {
+      "status": 503,
+      "code": "availability_unconfigured"
+    }
+  },
+  "gates": [
+    "Creator-media SQL unallocated/unapplied.",
+    "Availability SQL, same-client restrictions, purpose-worker authority, reviewed policy/limits/retention and provider effects absent.",
+    "Fresh Android source compile is pending hosted CI; local SDK/JDK/licenses absent.",
+    "No binary/C2PA/native/provider/whole-account privacy acceptance.",
+    "Creator recorder/player interface pending real saved content object."
+  ]
+}

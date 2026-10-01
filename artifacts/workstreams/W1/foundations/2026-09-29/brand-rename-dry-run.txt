@@ -1,0 +1,354 @@
+Would update 353 text files/paths from Qelvora to FolioPreview. Pantopus is preserved.
+.github/workflows/ci.yml
+.github/workflows/trust-release.yml
+CLAUDE.md
+README.md
+apps/android/app/build.gradle.kts
+apps/android/app/src/androidTest/java/com/pantopus/qelvora/DialogRuntimeTest.kt → apps/android/app/src/androidTest/java/com/pantopus/foliopreview/DialogRuntimeTest.kt
+apps/android/app/src/androidTest/java/com/pantopus/qelvora/NativeAcceptanceTest.kt → apps/android/app/src/androidTest/java/com/pantopus/foliopreview/NativeAcceptanceTest.kt
+apps/android/app/src/main/AndroidManifest.xml
+apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/MainActivity.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/commerce/CommerceClient.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/commerce/CommerceFeature.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/generated/FolioPreviewAPI.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/generated/FolioPreviewCopy.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraTokens.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/generated/FolioPreviewTokens.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/identity/CredentialSettings.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/identity/CredentialSettings.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/identity/FanFeatures.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/identity/FanShell.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/identity/PasskeyCeremony.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/identity/PasskeyCeremony.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/identity/SecureSessionStorage.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/identity/SecureSessionStorage.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallConnectionService.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/NativeCallConnectionService.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/NativeCallOffers.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/NativeCallScreen.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/NativeMediaClient.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/NativeVoiceRecorder.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/VoiceRecordingScreen.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/media/W6FanFeatures.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/media/W6FanFeatures.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/AccessComponents.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/AccessComponents.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Catalog.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Catalog.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/ComponentPreview.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/ComponentPreview.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Controls.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Controls.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Conversation.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Conversation.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/DeliveryProtocol.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/DeliveryProtocol.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Glyph.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Glyph.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Growth.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/GrowthPreferences.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Identity.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Identity.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Navigation.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Navigation.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Overlays.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Overlays.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/StudioComponents.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/StudioComponents.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Theme.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Theme.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/ThreadComponents.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/ThreadComponents.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Trust.kt
+apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt → apps/android/app/src/main/java/com/pantopus/foliopreview/ui/Welcome.kt
+apps/android/app/src/main/res/values/strings.xml
+apps/android/app/src/main/res/values/themes.xml
+apps/android/app/src/test/java/com/pantopus/qelvora/DeliveryProtocolTest.kt → apps/android/app/src/test/java/com/pantopus/foliopreview/DeliveryProtocolTest.kt
+apps/android/app/src/test/java/com/pantopus/qelvora/GeneratedContractTest.kt → apps/android/app/src/test/java/com/pantopus/foliopreview/GeneratedContractTest.kt
+apps/android/app/src/test/java/com/pantopus/qelvora/NativeSnapshotsTest.kt → apps/android/app/src/test/java/com/pantopus/foliopreview/NativeSnapshotsTest.kt
+apps/android/settings.gradle.kts
+apps/backend/package.json
+apps/backend/src/app.ts
+apps/backend/src/core/outbox.ts
+apps/backend/src/modules/agent/providers.ts
+apps/backend/src/modules/commerce/registration.ts
+apps/backend/src/modules/commerce/scheduling.ts
+apps/backend/src/modules/conversation/service.ts
+apps/backend/src/modules/growth/development.ts
+apps/backend/src/modules/identity/consent.ts
+apps/backend/src/modules/identity/passkeys.ts
+apps/backend/src/modules/identity/profiles.ts
+apps/backend/src/modules/identity/router.ts
+apps/backend/src/modules/identity/sessions.ts
+apps/backend/src/modules/identity/signed-acts.ts
+apps/backend/src/modules/identity/subjects.ts
+apps/backend/src/modules/media/service.ts
+apps/backend/src/operations/local-server.ts
+apps/backend/src/realtime/gateway.ts
+apps/backend/tests/contracts.test.ts
+apps/backend/tests/postgres.integration.test.ts
+apps/ios/App/Info.plist
+apps/ios/App/QelvoraApp.swift → apps/ios/App/FolioPreviewApp.swift
+apps/ios/Package.swift
+apps/ios/README.md
+apps/ios/Sources/Generated/QelvoraAPI.swift → apps/ios/Sources/Generated/FolioPreviewAPI.swift
+apps/ios/Sources/Generated/QelvoraCopy.swift → apps/ios/Sources/Generated/FolioPreviewCopy.swift
+apps/ios/Sources/Generated/QelvoraTokens.swift → apps/ios/Sources/Generated/FolioPreviewTokens.swift
+apps/ios/Sources/QelvoraUI/AccessComponents.swift → apps/ios/Sources/FolioPreviewUI/AccessComponents.swift
+apps/ios/Sources/QelvoraUI/Catalog.swift → apps/ios/Sources/FolioPreviewUI/Catalog.swift
+apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift → apps/ios/Sources/FolioPreviewUI/Commerce/CommerceClient.swift
+apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift → apps/ios/Sources/FolioPreviewUI/Commerce/CommerceFeature.swift
+apps/ios/Sources/QelvoraUI/Commerce/StoreMembership.swift → apps/ios/Sources/FolioPreviewUI/Commerce/StoreMembership.swift
+apps/ios/Sources/QelvoraUI/Commerce/StoreMembershipPane.swift → apps/ios/Sources/FolioPreviewUI/Commerce/StoreMembershipPane.swift
+apps/ios/Sources/QelvoraUI/ComponentPreview.swift → apps/ios/Sources/FolioPreviewUI/ComponentPreview.swift
+apps/ios/Sources/QelvoraUI/Controls.swift → apps/ios/Sources/FolioPreviewUI/Controls.swift
+apps/ios/Sources/QelvoraUI/Conversation.swift → apps/ios/Sources/FolioPreviewUI/Conversation.swift
+apps/ios/Sources/QelvoraUI/CredentialSettings.swift → apps/ios/Sources/FolioPreviewUI/CredentialSettings.swift
+apps/ios/Sources/QelvoraUI/DeliveryProtocol.swift → apps/ios/Sources/FolioPreviewUI/DeliveryProtocol.swift
+apps/ios/Sources/QelvoraUI/FanShell.swift → apps/ios/Sources/FolioPreviewUI/FanShell.swift
+apps/ios/Sources/QelvoraUI/Glyph.swift → apps/ios/Sources/FolioPreviewUI/Glyph.swift
+apps/ios/Sources/QelvoraUI/Growth.swift → apps/ios/Sources/FolioPreviewUI/Growth.swift
+apps/ios/Sources/QelvoraUI/GrowthPreferences.swift → apps/ios/Sources/FolioPreviewUI/GrowthPreferences.swift
+apps/ios/Sources/QelvoraUI/Identity.swift → apps/ios/Sources/FolioPreviewUI/Identity.swift
+apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift → apps/ios/Sources/FolioPreviewUI/Media/NativeCallCoordinator.swift
+apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift → apps/ios/Sources/FolioPreviewUI/Media/NativeCallOffers.swift
+apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift → apps/ios/Sources/FolioPreviewUI/Media/NativeCallView.swift
+apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift → apps/ios/Sources/FolioPreviewUI/Media/NativeMediaClient.swift
+apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift → apps/ios/Sources/FolioPreviewUI/Media/NativeVoiceRecorder.swift
+apps/ios/Sources/QelvoraUI/Media/W6FanFeatures.swift → apps/ios/Sources/FolioPreviewUI/Media/W6FanFeatures.swift
+apps/ios/Sources/QelvoraUI/Navigation.swift → apps/ios/Sources/FolioPreviewUI/Navigation.swift
+apps/ios/Sources/QelvoraUI/Overlays.swift → apps/ios/Sources/FolioPreviewUI/Overlays.swift
+apps/ios/Sources/QelvoraUI/PasskeyCeremony.swift → apps/ios/Sources/FolioPreviewUI/PasskeyCeremony.swift
+apps/ios/Sources/QelvoraUI/SessionStorage.swift → apps/ios/Sources/FolioPreviewUI/SessionStorage.swift
+apps/ios/Sources/QelvoraUI/StudioComponents.swift → apps/ios/Sources/FolioPreviewUI/StudioComponents.swift
+apps/ios/Sources/QelvoraUI/Theme.swift → apps/ios/Sources/FolioPreviewUI/Theme.swift
+apps/ios/Sources/QelvoraUI/ThreadComponents.swift → apps/ios/Sources/FolioPreviewUI/ThreadComponents.swift
+apps/ios/Sources/QelvoraUI/Trust.swift → apps/ios/Sources/FolioPreviewUI/Trust.swift
+apps/ios/Sources/QelvoraUI/Welcome.swift → apps/ios/Sources/FolioPreviewUI/Welcome.swift
+apps/ios/Tests/QelvoraUITests/DeliveryProtocolTests.swift → apps/ios/Tests/FolioPreviewUITests/DeliveryProtocolTests.swift
+apps/ios/Tests/QelvoraUITests/GeneratedContractTests.swift → apps/ios/Tests/FolioPreviewUITests/GeneratedContractTests.swift
+apps/ios/Tests/QelvoraUITests/IdentityTests.swift → apps/ios/Tests/FolioPreviewUITests/IdentityTests.swift
+apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift → apps/ios/Tests/FolioPreviewUITests/NativeSnapshotTests.swift
+apps/ios/Tools/NativeSnapshots/main.swift
+apps/ios/project.yml
+apps/web/README.md
+apps/web/app/api/auth/complete/route.ts
+apps/web/app/api/auth/continue/route.ts
+apps/web/app/api/growth-development/route.ts
+apps/web/app/api/studio/ai/[...path]/route.ts
+apps/web/app/api/trust/[...path]/route.ts
+apps/web/app/auth/continue/page.tsx
+apps/web/app/auth/development/page.tsx
+apps/web/app/creators/[handle]/chat/page.tsx
+apps/web/app/creators/[handle]/page.tsx
+apps/web/app/creators/[handle]/posts/[id]/page.tsx
+apps/web/app/growth-development/page.tsx
+apps/web/app/home/page.tsx
+apps/web/app/invite/[id]/page.tsx
+apps/web/app/layout.tsx
+apps/web/app/media/ai-voice/page.tsx
+apps/web/app/onboarding/handle/page.tsx
+apps/web/app/ops/audits/page.tsx
+apps/web/app/ops/cases/[id]/page.tsx
+apps/web/app/ops/page.tsx
+apps/web/app/trust/page.tsx
+apps/web/app/unsubscribe/[token]/route.ts
+apps/web/app/verify/[id]/page.tsx
+apps/web/features/calls/CallView.tsx
+apps/web/features/calls/OfferTimes.tsx
+apps/web/features/commerce/CommerceScreen.tsx
+apps/web/features/creator-ai/CreatorAI.tsx
+apps/web/features/growth/actions.tsx
+apps/web/features/growth/server.ts
+apps/web/features/growth/shell.tsx
+apps/web/features/identity/account.tsx
+apps/web/features/identity/comprehension.tsx
+apps/web/features/identity/handle.tsx
+apps/web/features/identity/setup.tsx
+apps/web/features/identity/signing.tsx
+apps/web/features/identity/welcome.tsx
+apps/web/features/media/SignRecording.tsx
+apps/web/features/media/VoicePlayer.tsx
+apps/web/features/media/VoiceRecorder.tsx
+apps/web/lib/design.tsx
+apps/web/lib/session.ts
+apps/web/next.config.ts
+apps/web/package.json
+config/brand.json
+design/design-system/README.md
+design/design-system/project/README.md
+design/design-system/project/components/AccessLines/preview.html
+design/design-system/project/components/AuditBanner/preview.html
+design/design-system/project/components/AuthorLabel/preview.html
+design/design-system/project/components/Avatar/preview.html
+design/design-system/project/components/Button/preview.html
+design/design-system/project/components/CallChip/preview.html
+design/design-system/project/components/CapacityHeader/preview.html
+design/design-system/project/components/CitationChip/preview.html
+design/design-system/project/components/Composer/preview.html
+design/design-system/project/components/ContextCard/preview.html
+design/design-system/project/components/Correction/preview.html
+design/design-system/project/components/Countdown/preview.html
+design/design-system/project/components/Cover/preview.html
+design/design-system/project/components/Dialog/preview.html
+design/design-system/project/components/DigestItem/preview.html
+design/design-system/project/components/EmailFrame/README.md
+design/design-system/project/components/EmailFrame/preview.html
+design/design-system/project/components/EmptyState/preview.html
+design/design-system/project/components/EtaLine/preview.html
+design/design-system/project/components/IdentityStrip/preview.html
+design/design-system/project/components/IncludeList/preview.html
+design/design-system/project/components/InsteadMenu/preview.html
+design/design-system/project/components/LabelPreview/preview.html
+design/design-system/project/components/Mark/preview.html
+design/design-system/project/components/MemoryChip/preview.html
+design/design-system/project/components/Message/preview.html
+design/design-system/project/components/ModeList/preview.html
+design/design-system/project/components/Note/preview.html
+design/design-system/project/components/Notice/preview.html
+design/design-system/project/components/NotificationRow/preview.html
+design/design-system/project/components/QueueCard/preview.html
+design/design-system/project/components/ReactionChip/preview.html
+design/design-system/project/components/Receipt/preview.html
+design/design-system/project/components/RequestStatus/preview.html
+design/design-system/project/components/ReservedLabel/preview.html
+design/design-system/project/components/Seal/preview.html
+design/design-system/project/components/Segmented/preview.html
+design/design-system/project/components/ShareCard/preview.html
+design/design-system/project/components/Sheet/preview.html
+design/design-system/project/components/Sidebar/README.md
+design/design-system/project/components/Sidebar/preview.html
+design/design-system/project/components/SignedMarker/preview.html
+design/design-system/project/components/SigningSheet/preview.html
+design/design-system/project/components/Skeleton/preview.html
+design/design-system/project/components/SourceRow/preview.html
+design/design-system/project/components/SpendLimit/preview.html
+design/design-system/project/components/StepIn/preview.html
+design/design-system/project/components/StudioTabBar/preview.html
+design/design-system/project/components/SystemLine/preview.html
+design/design-system/project/components/TabBar/preview.html
+design/design-system/project/components/TermsBlock/preview.html
+design/design-system/project/components/TestConsole/preview.html
+design/design-system/project/components/ThreadHeader/preview.html
+design/design-system/project/components/Toast/preview.html
+design/design-system/project/components/VersionList/preview.html
+design/design-system/project/components/VoiceNote/preview.html
+design/design-system/project/components/bundle.js
+design/design-system/project/components/index.d.ts
+design/design-system/project/design-system.json
+design/design-system/project/tokens.json
+design/design-system/tools/gen_components.py
+design/handoff/tokens.json
+design/phase2-directions/AHome.dc.html
+design/phase2-directions/BHome.dc.html
+design/phase2-directions/CHome.dc.html
+design/phase2-directions/DHome.dc.html
+design/phase2-directions/DKit.dc.html
+design/phase2-directions/README.md
+design/phase2-directions/canvas.json
+design/phase4a-fan-core/Checkout.dc.html
+design/phase4a-fan-core/Consent.dc.html
+design/phase4a-fan-core/Ended.dc.html
+design/phase4a-fan-core/Handle.dc.html
+design/phase4a-fan-core/Invite.dc.html
+design/phase4a-fan-core/Limit.dc.html
+design/phase4a-fan-core/Main.dc.html
+design/phase4a-fan-core/NoteThread.dc.html
+design/phase4a-fan-core/Notifications.dc.html
+design/phase4a-fan-core/Packet.dc.html
+design/phase4a-fan-core/Post.dc.html
+design/phase4a-fan-core/README.md
+design/phase4a-fan-core/States.dc.html
+design/phase4a-fan-core/Status.dc.html
+design/phase4a-fan-core/Thread.dc.html
+design/phase4a-fan-core/ThreadLive.dc.html
+design/phase4a-fan-core/Welcome.dc.html
+design/phase4a-fan-core/canvas.json
+design/phase4b-fan-account/Access.dc.html
+design/phase4b-fan-account/Discover.dc.html
+design/phase4b-fan-account/Main.dc.html
+design/phase4b-fan-account/Privacy.dc.html
+design/phase4b-fan-account/README.md
+design/phase4b-fan-account/Requests.dc.html
+design/phase4b-fan-account/Spending.dc.html
+design/phase4b-fan-account/Verify.dc.html
+design/phase4b-fan-account/You.dc.html
+design/phase4b-fan-account/canvas.json
+design/phase4c-studio-phone/Impact.dc.html
+design/phase4c-studio-phone/Main.dc.html
+design/phase4c-studio-phone/More.dc.html
+design/phase4c-studio-phone/MyAI.dc.html
+design/phase4c-studio-phone/NoteCompose.dc.html
+design/phase4c-studio-phone/PacketDetail.dc.html
+design/phase4c-studio-phone/README.md
+design/phase4c-studio-phone/Replies.dc.html
+design/phase4c-studio-phone/Sign.dc.html
+design/phase4c-studio-phone/ThreadView.dc.html
+design/phase4c-studio-phone/Threads.dc.html
+design/phase4c-studio-phone/canvas.json
+design/phase4d-studio-desktop/Earnings.dc.html
+design/phase4d-studio-desktop/License.dc.html
+design/phase4d-studio-desktop/Main.dc.html
+design/phase4d-studio-desktop/Offers.dc.html
+design/phase4d-studio-desktop/README.md
+design/phase4d-studio-desktop/Sources.dc.html
+design/phase4d-studio-desktop/Style.dc.html
+design/phase4d-studio-desktop/Team.dc.html
+design/phase4d-studio-desktop/Test.dc.html
+design/phase4d-studio-desktop/canvas.json
+design/phase4e-4i/AIVoice.dc.html
+design/phase4e-4i/CallAfter.dc.html
+design/phase4e-4i/CallLive.dc.html
+design/phase4e-4i/DiscoverPass.dc.html
+design/phase4e-4i/Email.dc.html
+design/phase4e-4i/IAP.dc.html
+design/phase4e-4i/Insights.dc.html
+design/phase4e-4i/Main.dc.html
+design/phase4e-4i/NotifMatrix.dc.html
+design/phase4e-4i/OfferTimes.dc.html
+design/phase4e-4i/OpsCase.dc.html
+design/phase4e-4i/OpsQueue.dc.html
+design/phase4e-4i/PassYou.dc.html
+design/phase4e-4i/Pool.dc.html
+design/phase4e-4i/PublicAnswer.dc.html
+design/phase4e-4i/Push.dc.html
+design/phase4e-4i/README.md
+design/phase4e-4i/ShareSheet.dc.html
+design/phase4e-4i/canvas.json
+design/phase5-prototypes/Comprehension.dc.html
+design/phase5-prototypes/Daily.dc.html
+design/phase5-prototypes/Main.dc.html
+design/phase5-prototypes/Onboard.dc.html
+design/phase5-prototypes/README.md
+design/phase5-prototypes/StepIn.dc.html
+design/phase5-prototypes/canvas.json
+docs/BRIEF.md
+docs/BUILD_PROMPT.md
+docs/DESIGN_PLAN.md
+docs/NAMING.md
+docs/implementation/FOUNDATION.md
+docs/implementation/W1-identity-authority.md
+docs/implementation/backend-foundation.md
+docs/implementation/design-verification.md
+docs/implementation/growth.md
+docs/implementation/native-foundation.md
+docs/implementation/pantopus-integration.md
+docs/operations/W8-release.md
+docs/research/UX_RESEARCH.md
+docs/workstreams/DECISIONS.md
+docs/workstreams/README.md
+docs/workstreams/W1-platform-identity.md
+docs/workstreams/coordination/W1.md
+docs/workstreams/coordination/W7.md
+docs/workstreams/coordination/W8-contracts.md
+docs/workstreams/prompts/ALL_WORKSTREAM_PROMPTS.md
+docs/workstreams/prompts/W1-platform-identity.md
+docs/workstreams/prompts/W2-creator-ai.md
+docs/workstreams/prompts/W3-conversations.md
+docs/workstreams/prompts/W4-commerce-requests.md
+docs/workstreams/prompts/W5-studio-content.md
+docs/workstreams/prompts/W6-calls-media.md
+docs/workstreams/prompts/W7-growth-insights.md
+docs/workstreams/prompts/W8-trust-release.md
+docs/workstreams/research/backend-inventory.md
+docs/workstreams/research/design-inventory.md
+docs/workstreams/research/platform-inventory.md
+infra/containers/trust.Dockerfile
+package.json
+packages/api/package.json
+packages/api/scripts/generate-openapi.ts
+packages/brand/package.json
+packages/brand/src/index.ts
+packages/copy/package.json
+packages/tokens/package.json
+packages/ui-web/README.md
+packages/ui-web/package.json
+packages/ui-web/src/components.ts
+packages/ui-web/src/contracts.ts
+playwright.config.ts
+pnpm-lock.yaml
+scripts/generate-native-api.mjs
+scripts/generate-shared.mjs
+scripts/shared.test.mjs
+scripts/visual-support.ts

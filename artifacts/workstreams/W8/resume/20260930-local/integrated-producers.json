@@ -1,0 +1,373 @@
+{
+  "baselineRemoteW8": "7f442081861395d3aacaf64d82bf3f379a22d93b",
+  "main": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "producerCommits": [
+    {
+      "integratedCommit": "8f9ef5c990c1a163ee54ff2161a71104ccd80847",
+      "producerCommit": "e9769876a5d1da78c3e376df61dfea50e4dd02c3",
+      "title": "Fix W1 identity recovery and isolate account drafts"
+    },
+    {
+      "integratedCommit": "3d89bf4d8838d6c5b13fd575b1b53b59229b5ee7",
+      "producerCommit": "0d8183ce4bd1c7baef86ec9084637aff88aa7f9a",
+      "title": "Implement W3 scoped conversation and privacy foundations"
+    },
+    {
+      "integratedCommit": "fb79a437fa7aed32828ea422f7694ceb6d67d608",
+      "producerCommit": "7d407a3997aff1f9fdfbbfb7c058aa92df89ea04",
+      "title": "Implement W3 native conversation and privacy clients"
+    },
+    {
+      "integratedCommit": "9599a53b21fca2396e9efb5211ff96f3a90145e0",
+      "producerCommit": "fbc52247168b4140f18b2a0068e60004a6cc8490",
+      "title": "Add W3 wellbeing timing and per-message memory exclusion"
+    },
+    {
+      "integratedCommit": "98b1194680cb83e5af50b10f89a4fedead9a48a1",
+      "producerCommit": "da43a5cb7cc459817188c25c4447266f1521530e",
+      "title": "Record W3 runtime evidence and remaining integration gates"
+    },
+    {
+      "integratedCommit": "8d2e402b4b429a305f090945f0ca7f38c32837c4",
+      "producerCommit": "7450cea6d9ebc197b6016b42e59998d248fa601b",
+      "title": "Correct W3 Apple toolchain evidence metadata"
+    },
+    {
+      "integratedCommit": "bf0b172b5e4c7f8c2597a16960878ed9e4298933",
+      "producerCommit": "b215e38ae9ad244f815c82e666ec79134faeeafd",
+      "title": "feat(w5): persist Studio content, consent and fulfillment consumers"
+    },
+    {
+      "integratedCommit": "ab9bde4625621c4ba8ee8b66a58add57f080beb1",
+      "producerCommit": "793b0cc637fa3e2951e142bd9cb99455b903ca01",
+      "title": "fix(w5): bind content commands to current accounts and verify native builds"
+    },
+    {
+      "integratedCommit": "d6081a6ad363d193c6d790e474e4acfe4d43e75a",
+      "producerCommit": "81d92355dadcb808e5332fd409398c3647824b3f",
+      "title": "feat(commerce): integrate runtime, billing providers and durable access"
+    },
+    {
+      "integratedCommit": "246dafa29a8a89c94d3101892b648e4a9c2b0ca9",
+      "producerCommit": "76112a6fcf2d5e6fa2604ac5047ae3358d992b1f",
+      "title": "feat(commerce): verify store memberships and paginate financial exports"
+    },
+    {
+      "integratedCommit": "8ba8e6eaa1ae931ba6d9babaf12800edff01f4f5",
+      "producerCommit": "d11b33334d6fa63991a17526d26c89c2ffaa6629",
+      "title": "feat(commerce): reconcile provider cash and recover transfer reversals"
+    },
+    {
+      "integratedCommit": "e8865bfedbaa6cb547f4f4e106a4cfb02f2eff06",
+      "producerCommit": "b258a18836807f484502791fe4794b4ddfae66ff",
+      "title": "fix(commerce): fence account state and recover interrupted billing"
+    },
+    {
+      "integratedCommit": "5e9b27da5815fbbe1161d53ad5312878258cd9fd",
+      "producerCommit": "0e963151460d6c9eba5253e5afa8dfdcf2e8dbfa",
+      "title": "fix(web): contain commerce session recovery within phone gutters"
+    },
+    {
+      "integratedCommit": "4998359b64a23c7c77d0b1a930174bdcb1334588",
+      "producerCommit": "555b7c9b76ae394698914778731804fc172819c5",
+      "title": "fix(commerce): preserve request history and exact checkout state"
+    },
+    {
+      "integratedCommit": "05718bdc9ffbbf3346f9a6d697a10440fa7890f6",
+      "producerCommit": "ada430cf8ff5ddfc98a6b60bcecff2f69620ec24",
+      "title": "docs(w4): record current request-state source and CI blockers"
+    },
+    {
+      "integratedCommit": "25e2ec86f78b0960c260a8d54e43ac517597651b",
+      "producerCommit": "515da971a3352dfdccce31229d9740cb86d26cc2",
+      "title": "fix(agent): resume W2 lifecycle, exports and runtime integration"
+    },
+    {
+      "integratedCommit": "955f00a2131e9b2c25b99e729ccfe32ca254f7dd",
+      "producerCommit": "abc7f647b39b831a894658bbc02b2ce34bf481da",
+      "title": "fix(agent): guard corrected refusals and persist recovery authority"
+    },
+    {
+      "integratedCommit": "08f01efd36640438b225b247f57120b61c9d8d7f",
+      "producerCommit": "112c04ab2807f7b0ef7cb154f53745024a090c6b",
+      "title": "fix(agent): preserve evaluation retries and required correction redirects"
+    },
+    {
+      "integratedCommit": "1cedb1928f6f243ad756ab69ecdea1bef022b3a0",
+      "producerCommit": "fa6af82f7ceb103b77085db2301e9dc6b3da12d7",
+      "title": "Fix W6 media recovery and call consent reconciliation"
+    },
+    {
+      "integratedCommit": "d0830bee88a79c7ec0b539ab13ecc601d0a5c084",
+      "producerCommit": "796d4e849c2ae28ab9f22fdc9632c79cfff096d8",
+      "title": "Preserve W6 early-end clocks and document CI repair gates"
+    },
+    {
+      "integratedCommit": "d0d8ba96de3f3db4c283bcb1c546f5481563690a",
+      "producerCommit": "598ee825a67b9baf5c39aeda313a08721b246eb5",
+      "title": "Preserve W6 recording occurrence across consent revocation"
+    },
+    {
+      "integratedCommit": "a5921527865d44c88c142dab994499675a30ad81",
+      "producerCommit": "a7e38a9ebbe3768ee2e1d4c60423dcbe0f9d1bbf",
+      "title": "Resume W7 with canonical runtime and durable owner relay"
+    },
+    {
+      "integratedCommit": "f01f7e4bc78c35818366558b20c2f82f81970937",
+      "producerCommit": "6b34a2005c233c3224533de8b91f4a4b730b34df",
+      "title": "Complete W7 optional growth controls and fence privacy replay"
+    },
+    {
+      "integratedCommit": "7dca2a7b74daa22468e894b4d40c2dc781c4a96d",
+      "producerCommit": "0ecf061ea926ae843e5f1076616e9ee7be7741ee",
+      "title": "Move W7 copy into shared catalogs and repair Android SDK setup"
+    },
+    {
+      "integratedCommit": "6c39ae7c7c83a34011eabbb7e4270dd547b80d8b",
+      "producerCommit": "d9157ebb1842d46241d7b62bb917c50242081299",
+      "title": "Record W7 final verification and CI limitations"
+    }
+  ],
+  "migrationFiles": [
+    {
+      "version": "0001_foundation",
+      "owner": "W1",
+      "path": "apps/backend/migrations/0001_foundation.sql",
+      "sha256": "1ccd0d6a99e11865850cd40f27d9446035e7d769d9b47f4f6d5c80776274117b"
+    },
+    {
+      "version": "0002_w1_identity",
+      "owner": "W1",
+      "path": "apps/backend/migrations/0002_w1_identity.sql",
+      "sha256": "5aa91502d511375eb7a43e0f226f3e1aeeee896981b7ea4b6faf1aa5bee97f82"
+    },
+    {
+      "version": "0003_w2_agent",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0003_w2_agent.sql",
+      "sha256": "73996996033babd30c919a9f06822f352270987630e96c588ae5f6fe73aef510"
+    },
+    {
+      "version": "0004_commerce",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema.sql",
+      "sha256": "5a4aaeb45cc02d53a72d3c4e1558609e9dbf52b2f15b94d7f228d308813c76cc"
+    },
+    {
+      "version": "0006_w6_media_sessions",
+      "owner": "W6",
+      "path": "apps/backend/src/modules/media/schema.sql",
+      "sha256": "0206427e525c5569c7f1753b92d39556bfe56ca0c1df61932213514da681a427"
+    },
+    {
+      "version": "0007_growth",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0007_growth.sql",
+      "sha256": "1ead3fb1b0c213c253bc2170e67467bf945821c9d6a9bb7d3b700b39d7d75c42"
+    },
+    {
+      "version": "0008_trust_operations",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0008_trust_operations.sql",
+      "sha256": "f88465f4d15dfb19176893789429aef648a0b16fed3403c4dd27a0ffbcf5b50c"
+    },
+    {
+      "version": "0010_w8_operational_guardrails",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0010_w8_operational_guardrails.sql",
+      "sha256": "5b7be49722ccaf787b1b0f1df17aaea48b5b29b6539a62e55d40328a153dd0b8"
+    },
+    {
+      "version": "0011_growth_retention",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0011_growth_retention.sql",
+      "sha256": "69478a0f75d4c91f61d74d5f3416e8c07077fffcbe7978325fc7131fb847f79c"
+    },
+    {
+      "version": "0012_w8_crisis_event_rls",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0012_w8_crisis_event_rls.sql",
+      "sha256": "1f60f00ac0457c506296a818de81af473c2aa8e057d5355a387a3fcc55b7cbd1"
+    },
+    {
+      "version": "0013_w2_agent_extensions",
+      "owner": "W2",
+      "path": "infra/migrations/history/0013_w2_agent_extensions.sql",
+      "sha256": "7fc5995956d2e407475f815a2a707737c225cce0346643b8fd6b345d972fe59c"
+    },
+    {
+      "version": "0015_w4_reliability",
+      "owner": "W4",
+      "path": "infra/migrations/history/0015_w4_reliability.sql",
+      "sha256": "5a94d77858838e26c94c6df559b01034d9cd48b94fd1530ebe937ab9840a89b4"
+    },
+    {
+      "version": "0016_w4_disclosure",
+      "owner": "W4",
+      "path": "infra/migrations/history/0016_w4_disclosure.sql",
+      "sha256": "927291027eb0ad9942679b188f5e3f2cd74c1767d1b30aab7284f86de114fc89"
+    },
+    {
+      "version": "0017_growth_delivery",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0014_growth_delivery.sql",
+      "sha256": "9a0623260bebbda477f95a81e692b8cc39d991891e282c5cf144963efafaf33b"
+    },
+    {
+      "version": "0018_growth_activation",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0015_growth_activation.sql",
+      "sha256": "615ce7b38c2d894dc54767953dc5c0d1e9b17aa9c77d5867cd1b1619a850e509"
+    },
+    {
+      "version": "0019_w2_shadow_jobs",
+      "owner": "W2",
+      "path": "infra/migrations/history/0019_w2_shadow_jobs.sql",
+      "sha256": "1f8e6e5ef1aa11859e3d972fb87273bec9fe233b4b406f51bc02df922d75158b"
+    },
+    {
+      "version": "0020_w2_purge_tombstone",
+      "owner": "W2",
+      "path": "infra/migrations/history/0020_w2_purge_tombstone.sql",
+      "sha256": "419dd13b87d853363cfa3fee934f1916d78423dd0a6bdd88abcf4f1853d540ca"
+    },
+    {
+      "version": "0021_w4_lifecycle",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-lifecycle.sql",
+      "sha256": "5c6d0225bd8180341877b6881214f035af89a8377d6265c1223dfa6d82a5a965"
+    },
+    {
+      "version": "0022_w4_lineage",
+      "owner": "W4",
+      "path": "infra/migrations/history/0022_w4_lineage.sql",
+      "sha256": "03705311adf220a1658ec5b1cc2e3d661a3b5a8367664bd3204b51c4d3bba698"
+    },
+    {
+      "version": "0023_w8_action_recovery",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0023_w8_action_recovery.sql",
+      "sha256": "4c2ec5cee7e66d7a6178b87271c21a4b060fe34e9e6a587ddaf9ebe39852a720"
+    },
+    {
+      "version": "0024_growth_insight_versions",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0016_growth_insight_versions.sql",
+      "sha256": "bfbc1d4380037e7accd313ba06e720b31dd5af9cdfc94157e7bebd7c246efea4"
+    },
+    {
+      "version": "0025_growth_closed_windows",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0017_growth_closed_windows.sql",
+      "sha256": "a52750f6db6ff8f114f67ee14cf5966da5d936f7fccc06e714c0a9c2b08c182d"
+    },
+    {
+      "version": "0026_growth_window_backfill",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0018_growth_window_backfill.sql",
+      "sha256": "63e50cb371ac650c31a0a05310de6e7ddc6db09643e0670d573e93f4f62d5466"
+    },
+    {
+      "version": "0027_w8_privacy_ownership",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0027_w8_privacy_ownership.sql",
+      "sha256": "de8587672985d79c480bafb41961041be9390f565b3612ca14285d87d2319028"
+    },
+    {
+      "version": "0028_w4_membership_history",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-membership-history.sql",
+      "sha256": "b8af45b7fa1804e5127bc0a49287fca0bad80be7eb84bf86a3afc4f85f2a880c"
+    },
+    {
+      "version": "0029_w4_recovery_fencing",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-recovery-fencing.sql",
+      "sha256": "b7b8a04af277d9be7877c691e1f1eeeeffbcfb440ba74b519a14206d7fc4ead9"
+    },
+    {
+      "version": "0030_w4_spending_notices",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-spending-notices.sql",
+      "sha256": "ac608681416e8a5388ec3e966b68bae7fe0e77553b0eb4dd16cf0941c12e2dcd"
+    },
+    {
+      "version": "0031_w4_purchase_history",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
+      "sha256": "72d14f4065cad72a5a836daa724c816abd79557078f5f0602bd9a39e64c00a6e"
+    },
+    {
+      "version": "0032_growth_continuation",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "sha256": "669a9d73446a6ec932dcf70a3bf257a6f07b7033cee56ea88fcfe5ac7d27eb61"
+    },
+    {
+      "version": "0033_growth_prompt_claims",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "sha256": "d693befce3bbfe6fb5fa9077acf238f16d22b41e5604a82be0deb96378bfbca9"
+    },
+    {
+      "version": "0034_growth_erasure_fence",
+      "owner": "W7",
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "sha256": "24e5eb660d23d181f13847734d4007851c36bd4ff74c8d1a064b748cb16c050b"
+    },
+    {
+      "version": "0035_w5_content",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "sha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d"
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "sha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5"
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "sha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd"
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "sha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a"
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "sha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6"
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "sha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9"
+    },
+    {
+      "version": "0041_w3_conversations",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_conversations.sql",
+      "sha256": "2c6f20f0a1152952ad9f864fbe3cd73efd40e182de3b8d93b64ecf0c89604456"
+    },
+    {
+      "version": "0042_w3_wellbeing",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_wellbeing.sql",
+      "sha256": "1f57a65084256d08ab906f9f15d2da893a8c0665dd34589cd9417decbb838a0a"
+    },
+    {
+      "version": "0043_w8_relationship_backfill",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "sha256": "503a6e637f790491b060066cd9d5b0dd84d5e5b737d476c1f325204c4e87f8f6"
+    }
+  ]
+}

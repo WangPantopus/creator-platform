@@ -1,0 +1,47 @@
+{
+  "syntheticTrustFixture": true,
+  "productionVerification": false,
+  "workerRole": "creator_trust_worker",
+  "wrongLease": "privacy_authority_changed",
+  "wrongOwner": "privacy_authority_changed",
+  "first": {
+    "receipt": {
+      "domain": "agent",
+      "jobId": "b54a1ff4-803a-492c-936a-55122ba00e67",
+      "purgedCreators": 1,
+      "receipts": [
+        {
+          "domain": "agent",
+          "jobId": "469c5abf7098198e6fc40c80764769e7d9395c24d717fc42ed971c31d9051220",
+          "purged": true,
+          "remainingMedia": "not_owned_by_agent"
+        }
+      ]
+    }
+  },
+  "afterProfileDeletion": {
+    "receipt": {
+      "domain": "agent",
+      "jobId": "b54a1ff4-803a-492c-936a-55122ba00e67",
+      "purgedCreators": 1,
+      "receipts": [
+        {
+          "domain": "agent",
+          "jobId": "469c5abf7098198e6fc40c80764769e7d9395c24d717fc42ed971c31d9051220",
+          "purged": true,
+          "remainingMedia": "not_owned_by_agent"
+        }
+      ]
+    }
+  },
+  "counts": {
+    "workspace": "0",
+    "commands": "0",
+    "tombstones": "1"
+  },
+  "expiredLease": "privacy_authority_changed",
+  "directOldVersion": {
+    "number": 1,
+    "state": "retired"
+  }
+}

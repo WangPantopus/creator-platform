@@ -1,0 +1,367 @@
+{
+  "workstream": "W1",
+  "requestedAt": "2026-09-30T04:40:38.406775+00:00",
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/6",
+  "branch": "codex/w1-handoff-2026-09-29",
+  "handoffCommitBeforeCleanup": "649fca1e2732a27037ea244b5cc99b9faa159dca",
+  "authorization": "User explicitly requested release of W1 resources after handoff/PR; preserve shared resources and committed source/evidence.",
+  "filesystemInventory": [
+    {
+      "path": "/Users/yingpengwang/creator-platform/artifacts/workstreams/W1/build",
+      "allocatedKiBBefore": 1059112,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/creator-platform/apps/web/.next-w1",
+      "allocatedKiBBefore": 306164,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/creator-platform/apps/web/.next-w1-build",
+      "allocatedKiBBefore": 122488,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-android-recovery",
+      "allocatedKiBBefore": 1204840,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-avd",
+      "allocatedKiBBefore": 1350408,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-c11-check.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-final-dry-run.log",
+      "allocatedKiBBefore": 24,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-final-preview",
+      "allocatedKiBBefore": 49216,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-final-result.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-preview",
+      "allocatedKiBBefore": 495772,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-preview-dry-run.log",
+      "allocatedKiBBefore": 24,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-brand-preview-result.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-checkpoint-message.txt",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-emulator-recovery.log",
+      "allocatedKiBBefore": 12,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-emulator-restart.log",
+      "allocatedKiBBefore": 12,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-generate-check-final.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-generate-final.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-build-final.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-build-final2.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-build-isolated.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-build.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-c11-late.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-call-integration-retry.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-call-integration.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-isolated",
+      "allocatedKiBBefore": 1183940,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-project",
+      "allocatedKiBBefore": 4196,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-gradle-stack.txt",
+      "allocatedKiBBefore": 112,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-handoff-message.txt",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-handoff.index",
+      "allocatedKiBBefore": 144,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-next-build-final.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-next-build.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-next-c11-late.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-next-root-final.log",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-pr-body.md",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-runtime.env",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-verification-response.html",
+      "allocatedKiBBefore": 16,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-verify-invalid.html",
+      "allocatedKiBBefore": 16,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-welcome-response.html",
+      "allocatedKiBBefore": 16,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-welcome.html",
+      "allocatedKiBBefore": 16,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-build.log",
+      "allocatedKiBBefore": 72,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-c11-late.log",
+      "allocatedKiBBefore": 52,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-call-integration.log",
+      "allocatedKiBBefore": 76,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-call-signed-final.log",
+      "allocatedKiBBefore": 64,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-call-signed.log",
+      "allocatedKiBBefore": 48,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w1-xcode-final.log",
+      "allocatedKiBBefore": 64,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.android/avd/CreatorPlatform_W1.ini",
+      "allocatedKiBBefore": 4,
+      "symlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/Library/Logs/CoreSimulator/B622C222-8292-46EF-A2B2-A9DA67763DE6",
+      "allocatedKiBBefore": 548,
+      "symlink": false,
+      "removed": true
+    }
+  ],
+  "state": "W1 servers/devices/owned files released; Docker container/image/volume cleanup blocked by shared engine startup failure",
+  "filesystemRemovedAt": "2026-09-30T04:43:04.490579+00:00",
+  "totalEnumeratedFilesystemAllocatedKiBRemoved": 5777536,
+  "docker": {
+    "container": "creator-platform-w1-local",
+    "removeAttempt": {
+      "httpStatus": "000",
+      "clientExit": 28,
+      "response": "",
+      "clientError": "curl timeout after 8 seconds with zero response bytes; removal not verified"
+    },
+    "containerRemovalVerified": false,
+    "engineReadStatus": "503 Docker Desktop is unable to start",
+    "imagesAndVolumes": "Could not inspect ownership or remove safely while engine is unavailable. No shared Docker VM/data/images/volumes were deleted or pruned.",
+    "nextAction": "Restore shared Docker Desktop with owner coordination, inspect exact W1 container/mounts and image reuse, remove W1 container and only exclusively owned/unreferenced W1 data/images. Shared engine restart is outside W1-only resource release.",
+    "desktopStartAttempt": {
+      "command": "docker desktop start --detach --timeout 15",
+      "exit": 0,
+      "response": "Docker Desktop is already running",
+      "engineRecovered": false
+    }
+  },
+  "devices": {
+    "ios": {
+      "udid": "B622C222-8292-46EF-A2B2-A9DA67763DE6",
+      "shutdownAndDeleted": true,
+      "deviceDataAbsent": true,
+      "lastRecordedLogicalDataBytesBeforeDeletion": 3260952576,
+      "sizeNote": "Logical device data size; not included in allocated file-inventory sum and not a physical reclaimed-space guarantee."
+    },
+    "android": {
+      "name": "CreatorPlatform_W1",
+      "serial": "emulator-5560",
+      "stopped": true,
+      "ownOriginalAndRecoveryDataRemoved": true,
+      "ownAvdRegistryRemoved": true,
+      "isolatedAdb5041Stopped": true
+    }
+  },
+  "processes": {
+    "verifiedW1ApiAndWebStopped": true,
+    "stoppedProcessPids": [24699, 35266, 96637, 96636, 96635],
+    "portsReleased": [4101, 3001, 5041, 5560],
+    "globalDockerOrSimulatorApplicationsStopped": false,
+    "noImplementationSubagentsRunning": true
+  },
+  "retainedSharedResources": [
+    {
+      "resource": "Repository source, existing tests, manifests, lockfile, 8.5MB sanitized W1 evidence and handoff documents",
+      "reason": "Committed deliverables needed for the next agent; preserved."
+    },
+    {
+      "resource": "Repository node_modules and package stores; Xcode, iOS runtimes, Android Studio/JBR/SDK/API34 system image, Homebrew tools; global Gradle cache",
+      "reason": "Shared/pre-existing dependencies actively used by peer workstreams. W1 private Gradle caches removed."
+    },
+    {
+      "resource": "apps/ios/.build; apps/android/.gradle, .kotlin, app/build",
+      "reason": "Existing shared foundation outputs lack exclusive W1 ownership; W1 leased build tree removed."
+    },
+    {
+      "resource": "Shared Docker Desktop VM/container-image-volume storage",
+      "reason": "Engine is unavailable and ownership/reuse cannot be verified. No global prune or reset."
+    }
+  ],
+  "uiControlAttempt": {
+    "result": "Native Docker inspection timed out; existing CUA service remains unavailable. No UI action completed."
+  },
+  "verifiedAt": "2026-09-30T05:11:18.227523+00:00",
+  "verification": {
+    "allInventoriedPathsAbsent": true,
+    "w1TempPrefixRemaining": [],
+    "w1ListeningPorts": "none",
+    "sharedMainIndexSha256": "8258bf3059d2fb2edeef988caa30574774b227bdfff051c3f73c93a74523097f",
+    "nativeDeviceRemovalPersonallyVerified": true
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@qelvora/backend",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc --noEmit && node scripts/build.mjs",
+    "start": "node dist/server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run tests/postgres.integration.test.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "worker:generation": "tsx src/workers/start.ts generation",
+    "worker:ingestion": "tsx src/workers/start.ts ingestion"
+  },
+  "dependencies": {
+    "@apple/app-store-server-library": "3.1.0",
+    "@qelvora/api": "workspace:*",
+    "@qelvora/copy": "workspace:*",
+    "@simplewebauthn/server": "^13.2.2",
+    "express": "^5.1.0",
+    "google-auth-library": "11.1.0",
+    "pg": "^8.16.3",
+    "stripe": "22.6.2",
+    "ws": "^8.18.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/pg": "^8.15.5",
+    "@types/ws": "^8.18.1",
+    "esbuild": "^0.25.12",
+    "fast-check": "^4.3.0",
+    "tsx": "^4.20.6",
+    "vitest": "3.2.4"
+  }
+}

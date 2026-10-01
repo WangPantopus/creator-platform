@@ -1,0 +1,38 @@
+{
+  "name": "qelvora-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "generate": "pnpm --filter @qelvora/api generate && node scripts/generate-shared.mjs && node scripts/generate-native-api.mjs",
+    "generate:check": "pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check",
+    "brand:rename": "node scripts/rename-brand.mjs",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint apps/backend packages apps/web scripts tests playwright.config.ts --ignore-pattern '**/generated/**'",
+    "format": "prettier --write apps packages config scripts tests '*.json' '*.yaml' '.github/**/*.yml'",
+    "format:check": "prettier --check apps packages config scripts tests '*.json' '*.yaml' '.github/**/*.yml'",
+    "test": "node --test scripts/shared.test.mjs && turbo run test",
+    "test:visual": "playwright test",
+    "check": "pnpm generate:check && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "@types/pngjs": "6.0.5",
+    "eslint": "9.39.1",
+    "globals": "16.5.0",
+    "pngjs": "7.0.0",
+    "prettier": "3.6.2",
+    "tsx": "4.20.6",
+    "turbo": "2.11.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.4",
+    "vitest": "3.2.4"
+  }
+}

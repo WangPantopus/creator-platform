@@ -1,0 +1,26 @@
+{
+  "name": "@qelvora/api",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas.ts",
+    "./protocol": "./src/protocol.ts",
+    "./conversation": "./src/conversation/contracts.ts",
+    "./content": "./src/content.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "generate": "tsx scripts/generate-openapi.ts",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "vitest": "3.2.4"
+  }
+}

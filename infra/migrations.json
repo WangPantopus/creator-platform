@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "migrations": [
+    {
+      "version": "0001_foundation",
+      "path": "apps/backend/migrations/0001_foundation.sql",
+      "owner": "W1"
+    },
+    {
+      "version": "0002_w1_identity",
+      "path": "apps/backend/migrations/0002_w1_identity.sql",
+      "owner": "W1"
+    },
+    {
+      "version": "0003_w2_agent",
+      "path": "apps/backend/src/modules/agent/migrations/0003_w2_agent.sql",
+      "owner": "W2"
+    },
+    {
+      "version": "0004_commerce",
+      "path": "apps/backend/src/modules/commerce/schema.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0006_w6_media_sessions",
+      "path": "apps/backend/src/modules/media/schema.sql",
+      "owner": "W6"
+    },
+    {
+      "version": "0007_growth",
+      "path": "apps/backend/migrations/0007_growth.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0008_trust_operations",
+      "path": "apps/backend/migrations/0008_trust_operations.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0010_w8_operational_guardrails",
+      "path": "apps/backend/migrations/0010_w8_operational_guardrails.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0011_growth_retention",
+      "path": "apps/backend/migrations/0011_growth_retention.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0012_w8_crisis_event_rls",
+      "path": "apps/backend/migrations/0012_w8_crisis_event_rls.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0013_w2_agent_extensions",
+      "producerVersion": "0003_w2_agent_extensions",
+      "path": "infra/migrations/history/0013_w2_agent_extensions.sql",
+      "owner": "W2"
+    },
+    {
+      "version": "0015_w4_reliability",
+      "path": "infra/migrations/history/0015_w4_reliability.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0016_w4_disclosure",
+      "path": "infra/migrations/history/0016_w4_disclosure.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0017_growth_delivery",
+      "path": "apps/backend/migrations/0014_growth_delivery.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0018_growth_activation",
+      "path": "apps/backend/migrations/0015_growth_activation.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0019_w2_shadow_jobs",
+      "path": "infra/migrations/history/0019_w2_shadow_jobs.sql",
+      "owner": "W2",
+      "producerVersion": "0013_w2_shadow_jobs"
+    },
+    {
+      "version": "0020_w2_purge_tombstone",
+      "path": "infra/migrations/history/0020_w2_purge_tombstone.sql",
+      "owner": "W2",
+      "producerVersion": "0015_w2_purge_tombstone"
+    },
+    {
+      "version": "0021_w4_lifecycle",
+      "path": "apps/backend/src/modules/commerce/schema-lifecycle.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0022_w4_lineage",
+      "path": "infra/migrations/history/0022_w4_lineage.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0023_w8_action_recovery",
+      "path": "apps/backend/migrations/0023_w8_action_recovery.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0024_growth_insight_versions",
+      "producerVersion": "0016_growth_insight_versions",
+      "path": "apps/backend/migrations/0016_growth_insight_versions.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0025_growth_closed_windows",
+      "producerVersion": "0017_growth_closed_windows",
+      "path": "apps/backend/migrations/0017_growth_closed_windows.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0026_growth_window_backfill",
+      "producerVersion": "0018_growth_window_backfill",
+      "path": "apps/backend/migrations/0018_growth_window_backfill.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0027_w8_privacy_ownership",
+      "path": "apps/backend/migrations/0027_w8_privacy_ownership.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0028_w4_membership_history",
+      "path": "apps/backend/src/modules/commerce/schema-membership-history.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0029_w4_recovery_fencing",
+      "path": "apps/backend/src/modules/commerce/schema-recovery-fencing.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0030_w4_spending_notices",
+      "path": "apps/backend/src/modules/commerce/schema-spending-notices.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0031_w4_purchase_history",
+      "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
+      "owner": "W4"
+    },
+    {
+      "version": "0032_growth_continuation",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0033_growth_prompt_claims",
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0034_growth_erasure_fence",
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "owner": "W7"
+    },
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0041_w3_conversations",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_conversations.sql",
+      "owner": "W3"
+    },
+    {
+      "version": "0042_w3_wellbeing",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_wellbeing.sql",
+      "owner": "W3"
+    },
+    {
+      "version": "0043_w8_relationship_backfill",
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "owner": "W8"
+    }
+  ],
+  "reserved": [
+    {
+      "id": "0005",
+      "owner": "W5",
+      "state": "producer_allocated_at_0035"
+    },
+    {
+      "id": "0009",
+      "owner": "W3",
+      "state": "producer_allocated_at_0041"
+    }
+  ]
+}

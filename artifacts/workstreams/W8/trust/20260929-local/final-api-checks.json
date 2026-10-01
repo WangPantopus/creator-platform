@@ -1,0 +1,72 @@
+[
+  {
+    "actor": "creator",
+    "step": "restart_replay",
+    "status": 202,
+    "ack": {
+      "id": "b0ba7560-7cf3-430a-ba10-8ad0a243db0d",
+      "kind": "export",
+      "state": "queued",
+      "immediateDeny": false,
+      "domainIntegration": "pending"
+    }
+  },
+  {
+    "actor": "fan",
+    "step": "restart_replay",
+    "status": 202,
+    "ack": {
+      "id": "95632ec2-890f-485d-a611-61df26d39db5",
+      "kind": "export",
+      "state": "queued",
+      "immediateDeny": false,
+      "domainIntegration": "pending"
+    }
+  },
+  {
+    "actor": "fan",
+    "step": "irrelevant_scope_denied",
+    "status": 400,
+    "errorCode": "invalid_request"
+  },
+  {
+    "actor": "fan",
+    "step": "metrics_role_denied",
+    "status": 403,
+    "errorCode": "supervisor_required"
+  },
+  {
+    "step": "/health/live",
+    "status": 200
+  },
+  {
+    "step": "/health/ready",
+    "status": 503
+  },
+  {
+    "step": "/v1/trust/help",
+    "status": 200
+  },
+  {
+    "step": "/v1/trust/capabilities",
+    "status": 200
+  },
+  {
+    "actor": "creator",
+    "step": "final_bounded_ownership_capture",
+    "status": 202,
+    "ack": {
+      "id": "b14ca79c-da59-4ede-9781-048eceeb5acd",
+      "kind": "export",
+      "state": "queued",
+      "immediateDeny": false,
+      "domainIntegration": "pending"
+    },
+    "operatorElapsedMs": 92,
+    "measurementIncludes": "local session and export acceptance, no domain export completion"
+  },
+  {
+    "step": "web_capabilities_bff",
+    "status": 200
+  }
+]
