@@ -36,6 +36,10 @@ export class TrustTelemetry {
     string,
     { count: number; sum: number; buckets: number[] }
   >();
+  private readonly timings = new Map<
+    string,
+    { count: number; sum: number; buckets: number[] }
+  >();
   private readonly lag = monitorEventLoopDelay({ resolution: 20 });
   constructor(
     readonly environment: string,
@@ -61,6 +65,27 @@ export class TrustTelemetry {
       (this.values.size < 120 || this.values.has(name))
     )
       this.values.set(name, (this.values.get(name) ?? 0) + amount);
+  }
+  timing(name: string, durationMs: number) {
+    if (
+      !/^[a-z_]{1,60}$/.test(name) ||
+      !Number.isFinite(durationMs) ||
+      durationMs < 0 ||
+      (this.timings.size >= 120 && !this.timings.has(name))
+    )
+      return;
+    const measure = this.timings.get(name) ?? {
+      count: 0,
+      sum: 0,
+      buckets: buckets.map(() => 0),
+    };
+    measure.count++;
+    measure.sum += durationMs;
+    buckets.forEach((bucket, index) => {
+      if (durationMs <= bucket)
+        measure.buckets[index] = (measure.buckets[index] ?? 0) + 1;
+    });
+    this.timings.set(name, measure);
   }
   middleware(): RequestHandler {
     return (req, res, next) => {
@@ -139,6 +164,8 @@ export class TrustTelemetry {
       },
       signals: Object.fromEntries(this.values),
       http: Object.fromEntries(this.durations),
+      timingBucketsMs: buckets,
+      timings: Object.fromEntries(this.timings),
     };
   }
   close() {

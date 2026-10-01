@@ -39,6 +39,7 @@ import { PrivacyDomains } from "../modules/trust/contracts.js";
 import { GrowthDatabase } from "../modules/growth/database.js";
 import { GrowthService } from "../modules/growth/service.js";
 import { unavailableOwners } from "../modules/growth/contracts.js";
+import { attachRealtime } from "../realtime/gateway.js";
 
 // Explicit local harness, never imported by production bootstrap. No production identity fallback.
 if (
@@ -630,6 +631,18 @@ const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
 );
 await worker.start();
 const server = createServer(app);
+const sockets = attachRealtime(
+  server,
+  nativeIdentity,
+  access,
+  conversation,
+  origin,
+  {
+    assertActorAllowed: (actor) => service.assertAllowed(actor),
+    resolveSession: (token) => nativeIdentity.resolve(token),
+    telemetry,
+  },
+);
 server.requestTimeout = 15_000;
 server.headersTimeout = 10_000;
 server.keepAliveTimeout = 5000;
@@ -642,8 +655,16 @@ let stopping = false;
 const stop = async () => {
   if (stopping) return;
   stopping = true;
+  for (const connection of sockets.clients)
+    connection.close(1001, "Server shutdown");
+  const drain = setTimeout(() => {
+    for (const connection of sockets.clients) connection.terminate();
+  }, 5000);
+  drain.unref();
   await worker.stop();
   await new Promise<void>((resolve) => server.close(() => resolve()));
+  await new Promise<void>((resolve) => sockets.close(() => resolve()));
+  clearTimeout(drain);
   telemetry.close();
   await Promise.all([
     pool.end(),

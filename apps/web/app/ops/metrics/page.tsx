@@ -11,6 +11,7 @@ type Metrics = {
   eventLoopLagMs: { p95: number; p99: number };
   signals: Record<string, number>;
   http: Record<string, { count: number; sum: number; buckets: number[] }>;
+  timings?: Record<string, { count: number; sum: number; buckets: number[] }>;
 };
 export default function MetricsPage() {
   const { data, error, loading, refresh } =
@@ -47,7 +48,7 @@ export default function MetricsPage() {
             </p>
           </section>
           <section className="trust-panel">
-            <h2>Worker signals</h2>
+            <h2>Runtime and transport signals</h2>
             {Object.entries(data.signals).map(([name, value]) => (
               <p key={name}>
                 {name.replaceAll("_", " ")}:{" "}
@@ -55,9 +56,25 @@ export default function MetricsPage() {
               </p>
             ))}
             {Object.keys(data.signals).length === 0 && (
-              <p>No worker sample is available yet.</p>
+              <p>No signal sample is available yet.</p>
             )}
           </section>
+          {data.timings && Object.keys(data.timings).length > 0 && (
+            <section className="trust-panel">
+              <h2>Transport timing</h2>
+              <p>
+                Replay time measures server work. Send time ends at the
+                transport callback; client display and settlement require
+                separate receipts.
+              </p>
+              {Object.entries(data.timings).map(([name, value]) => (
+                <p key={name}>
+                  <span className="qv-mono">{name}</span> · {value.count}{" "}
+                  samples · mean {(value.sum / value.count).toFixed(1)} ms
+                </p>
+              ))}
+            </section>
+          )}
           <section className="trust-panel">
             <h2>HTTP requests</h2>
             <p>
