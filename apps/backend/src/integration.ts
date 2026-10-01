@@ -7,6 +7,7 @@ import { Database } from "./db/database.js";
 import {
   AccessService,
   type ScopeRestriction,
+  type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
 import { ConversationService } from "./modules/conversation/service.js";
 import type { GuardrailProvider } from "./modules/agent/providers.js";
@@ -65,6 +66,8 @@ export async function createConfiguredBackend(input: {
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  /** Genuine current denial on the caller-held non-owner core transaction. */
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
   /** Held-client, purpose-specific content denial; never substitute a thread. */
   assertAudienceAllowed?: AudienceRestriction;
   assertCreatorAllowed?: (
@@ -115,7 +118,12 @@ export async function createConfiguredBackend(input: {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, assertScopeAllowed);
+  const access = new AccessService(
+    pool,
+    undefined,
+    assertScopeAllowed,
+    input.assertScopeAllowedInTransaction,
+  );
   const conversation = new ConversationService(
     database,
     access,
