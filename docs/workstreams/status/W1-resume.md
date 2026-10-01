@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — authorship practice keyboard recovery
+
+Personally operated four keyboard answers and observed focus fall to the page on completion. The web repair moves focus to Restart only when the completed answer owned focus and focus has not moved to another control. Light 4/4 and Night/reduced-motion 1/4 both recover focus; Restart resets card/score and Tab returns to answers. [Evidence and exact source/build hashes](../../../artifacts/workstreams/W1/resume/2026-10-01-comprehension/run.md). Production web build, typecheck and affected lint/formatting pass. Cards, author labels, score semantics and original references are preserved. This closes the observed browser focus defect only; H15's full visual/accessibility matrix and H16's consented-participant study remain open.
+
 ## October 1 — onboarding timing and interview estimate
 
 W1 personally resolves DI09's initial Handle timing through the governing Product Design S-F1/S-F5: new profiles collect only a handle, while an existing profile retains its optional intro editor. Web, Swift and Kotlin follow the same profile-state distinction. The later one-time offer after a useful thread answer remains unfinished; saving an intro grants no per-creator AI permission. The live setup estimate follows S-C14/A10's about 20-minute voice/text interview. [Recorded decision](../DECISIONS.md#w1-source-conflicts-resolved--october-1-2026) preserves original artboards/references and the optional imported-source path.
