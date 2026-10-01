@@ -1,0 +1,83 @@
+{
+  "capturedAt": "2026-10-01T12:16:03.447Z",
+  "creatorRole": "secondary expert; canonical Studio session",
+  "revision": 17,
+  "status": 200,
+  "response": {
+    "compiledHash": "13196362cdab1e24cd18694157716d5f2bdec5893d8fc3a4502c5314b0753cd9",
+    "sentences": [
+      {
+        "text": "The recovered creator-owned source provides the following guidance on the source review workflow: \"Synthetic workshop guidance: let the sample clay dry slowly before bisque firing. Use these invented notes only for local source recovery review.\"",
+        "citations": ["eeb66d2e-c0fa-4555-adb8-490d673e345e"]
+      }
+    ],
+    "blocked": false,
+    "category": null,
+    "passages": [
+      {
+        "id": "eeb66d2e-c0fa-4555-adb8-490d673e345e",
+        "sourceId": "675448b0-de08-4206-a98e-ed8e12359661",
+        "sourceRevision": 3,
+        "title": "W2 recovered source lifecycle",
+        "text": "Synthetic workshop guidance: let the sample clay dry slowly before bisque firing. Use these invented notes only for local source recovery review.",
+        "start": 0,
+        "end": 145,
+        "audience": {
+          "kind": "public"
+        }
+      },
+      {
+        "id": "198eb5d4-9bd7-4c3c-87e6-15e8fb8b0ff4",
+        "sourceId": "1b8fbe9c-e113-4496-a998-e1e3df9436c4",
+        "sourceRevision": 1,
+        "title": "Synthetic ingestion usage recovery check",
+        "text": "Synthetic verification material. A test tile should dry fully before another thin coat. This source contains no real person or private data. September 30 usage journal check.",
+        "start": 0,
+        "end": 174,
+        "audience": {
+          "kind": "public"
+        }
+      }
+    ],
+    "contextHash": "146f66f0d331c4a107b794919953807aedf870d47039da7014f791641e90a044",
+    "usage": [
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 138,
+        "outputTokens": 24,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 94
+      },
+      {
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "inputTokens": 21,
+        "outputTokens": 0,
+        "costMicros": 1
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 663,
+        "outputTokens": 19,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 296
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-2025-04-14",
+        "inputTokens": 753,
+        "outputTokens": 91,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 2234
+      }
+    ],
+    "durationMs": 3394,
+    "firstApprovedMs": 3359,
+    "route": "large"
+  }
+}
