@@ -70,26 +70,43 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
+      let window = NSWindow(
+        contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
+        backing: .buffered, defer: false)
+      window.colorSpace = .sRGB
+      window.isReleasedWhenClosed = false
+      // Scale the SwiftUI graph before its layers are cached. Changing only
+      // AppKit frame/bounds enlarges the headless display's cached 1x text.
+      let captureScale = 2 / window.backingScaleFactor
+      let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
       let host = NSHostingView(
         rootView: view.environment(\.displayScale, 2)
           .transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
-      host.frame = NSRect(origin: .zero, size: size)
-      let window = NSWindow(
-        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
-      window.colorSpace = .sRGB
+            width: size.width, height: size.height)
+          .scaleEffect(captureScale, anchor: .topLeading)
+          .frame(width: canvas.width, height: canvas.height, alignment: .topLeading))
+      host.frame = NSRect(origin: .zero, size: canvas)
+      window.setContentSize(canvas)
       window.contentView = host
-      // Preserve sharp 2x rasterization even when the attached display is 1x.
-      let hostScale = 2 / window.backingScaleFactor
-      window.setContentSize(
-        CGSize(width: size.width * hostScale, height: size.height * hostScale))
-      host.frame = NSRect(origin: .zero, size: window.contentLayoutRect.size)
-      host.bounds = NSRect(origin: .zero, size: size)
+      defer {
+        window.contentView = nil
+        window.close()
+      }
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      func prepareLayer(_ layer: CALayer) {
+        layer.contentsScale = 2
+        layer.rasterizationScale = 2
+        layer.setNeedsDisplay()
+        for child in layer.sublayers ?? [] { prepareLayer(child) }
+        if let mask = layer.mask { prepareLayer(mask) }
+        layer.displayIfNeeded()
+      }
+      if let layer = host.layer { prepareLayer(layer) }
+      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas), logical=\(size)")
       // Match the existing 2x references independently of a runner's attached display.
       guard let context = CGContext(
         data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
@@ -101,14 +118,14 @@
         return
       }
       let bitmap = NSBitmapImageRep(cgImage: pixels)
-      bitmap.size = size
+      bitmap.size = canvas
       host.cacheDisplay(in: host.bounds, to: bitmap)
+      bitmap.size = size
       let snapshot = NSImage(size: size)
       snapshot.addRepresentation(bitmap)
       assertSnapshot(
         of: snapshot, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
-      window.contentView = nil
     }
   }
 #endif
