@@ -206,4 +206,282 @@
   <string name="publishing_pending" formatted="false">Publishing waits until every test passes.</string>
   <string name="sign_biometric" formatted="false">Sign with biometrics</string>
   <string name="exact_biometric_signature" formatted="false">Biometrics sign exactly this. Any change needs a new signature.</string>
+  <string name="w6_signing_is_unavailable" formatted="false">Signing is unavailable.</string>
+  <string name="w6_signature_submission_is_unconfirmed_retry_this_exact_act_or_refresh" formatted="false">Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again.</string>
+  <string name="w6_signing_was_cancelled_nothing_was_shared" formatted="false">Signing was cancelled. Nothing was shared.</string>
+  <string name="w6_sign_this_exact_recording" formatted="false">Sign this exact recording</string>
+  <string name="w6_recording_fingerprint" formatted="false">Recording fingerprint</string>
+  <string name="w6_review_the_processed_recording_before_signing_a_signature_applies_to" formatted="false">Review the processed recording before signing. A signature applies to these exact audio bytes. Adding content credentials is a separate processing step.</string>
+  <string name="w6_signature_saved" formatted="false">Signature saved</string>
+  <string name="w6_waiting_for_your_passkey" formatted="false">Waiting for your passkey</string>
+  <string name="w6_sign_recording" formatted="false">Sign recording</string>
+  <string name="w6_retry_this_exact_signature" formatted="false">Retry this exact signature</string>
+  <string name="w6_this_recording_is_unavailable_for_the_current_content" formatted="false">This recording is unavailable for the current content.</string>
+  <string name="w6_this_recording_changed_or_is_no_longer_available" formatted="false">This recording changed or is no longer available.</string>
+  <string name="w6_audio_access_could_not_be_confirmed_refresh_the_link_to" formatted="false">Audio access could not be confirmed. Refresh the link to try again.</string>
+  <string name="w6_the_playback_link_is_unavailable_for_this_recording" formatted="false">The playback link is unavailable for this recording.</string>
+  <string name="w6_audio_is_unavailable" formatted="false">Audio is unavailable.</string>
+  <string name="w6_playback_could_not_start_try_again" formatted="false">Playback could not start. Try again.</string>
+  <string name="w6_loading_audio" formatted="false">Loading audio</string>
+  <string name="w6_load_voice_note" formatted="false">Load voice note</string>
+  <string name="w6_pause_voice_note" formatted="false">Pause voice note</string>
+  <string name="w6_play_voice_note" formatted="false">Play voice note</string>
+  <string name="w6_the_audio_link_expired_or_access_changed_refresh_it_to" formatted="false">The audio link expired or access changed. Refresh it to try again.</string>
+  <string name="w6_refresh_audio_link" formatted="false">Refresh audio link</string>
+  <string name="w6_read_transcript" formatted="false">Read transcript</string>
+  <string name="w6_recording_is_awaiting_its_current_duration_limit" formatted="false">Recording is awaiting its current duration limit.</string>
+  <string name="w6_processing_is_unavailable" formatted="false">Processing is unavailable.</string>
+  <string name="w6_the_processed_recording_does_not_match_this_saved_content_refresh" formatted="false">The processed recording does not match this saved content. Refresh before continuing.</string>
+  <string name="w6_the_processed_recording_evidence_is_unavailable_refresh_before_continuing" formatted="false">The processed recording evidence is unavailable. Refresh before continuing.</string>
+  <string name="w6_upload_paused_retry_to_resume_from_the_saved_position" formatted="false">Upload paused. Retry to resume from the saved position.</string>
+  <string name="w6_upload_failed_your_preview_is_still_here" formatted="false">Upload failed. Your preview is still here.</string>
+  <string name="w6_the_uploaded_file_could_not_be_removed_try_again_before" formatted="false">The uploaded file could not be removed. Try again before discarding.</string>
+  <string name="w6_the_upload_is_unconfirmed_retry_it_to_find_and_remove" formatted="false">The upload is unconfirmed. Retry it to find and remove the saved file before discarding.</string>
+  <string name="w6_record_a_voice_note" formatted="false">Record a voice note</string>
+  <string name="w6_your_own_voice" formatted="false">Your own voice</string>
+  <string name="w6_record_listen_and_sign_the_exact_recording_before_it_is" formatted="false">Record, listen, and sign the exact recording before it is shared.</string>
+  <string name="w6_record_again" formatted="false">Record again</string>
+  <string name="w6_record" formatted="false">Record</string>
+  <string name="w6_cancel_permission_request" formatted="false">Cancel permission request</string>
+  <string name="w6_pause" formatted="false">Pause</string>
+  <string name="w6_resume" formatted="false">Resume</string>
+  <string name="w6_stop_and_preview" formatted="false">Stop and preview</string>
+  <string name="w6_private_preview_your_recording" formatted="false">Private preview · your recording</string>
+  <string name="w6_preview_your_own_recording" formatted="false">Preview your own recording</string>
+  <string name="w6_discard_recording" formatted="false">Discard recording</string>
+  <string name="w6_audio_upload_progress" formatted="false">Audio upload progress</string>
+  <string name="w6_pause_upload" formatted="false">Pause upload</string>
+  <string name="w6_retry_upload" formatted="false">Retry upload</string>
+  <string name="w6_upload_recording" formatted="false">Upload recording</string>
+  <string name="w6_processed_review_and_sign_the_exact_recording_in_studio" formatted="false">Processed. Review and sign the exact recording in Studio.</string>
+  <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
+  <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
+  <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
+  <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
+  <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
+  <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>
+  <string name="w6_choose_a_supported_file_within_the_content_s_media_limit" formatted="false">Choose a supported file within the content\'s media limit.</string>
+  <string name="w6_the_resumed_upload_does_not_match_this_recording_start_a" formatted="false">The resumed upload does not match this recording. Start a new upload.</string>
+  <string name="w6_the_saved_upload_could_not_be_confirmed" formatted="false">The saved upload could not be confirmed.</string>
+  <string name="w6_the_resumed_upload_changed" formatted="false">The resumed upload changed.</string>
+  <string name="w6_upload_progress_could_not_be_confirmed_resume_this_recording" formatted="false">Upload progress could not be confirmed. Resume this recording.</string>
+  <string name="w6_recording_is_unavailable_in_this_browser_use_a_supported_browser" formatted="false">Recording is unavailable in this browser. Use a supported browser over HTTPS.</string>
+  <string name="w6_this_browser_cannot_produce_a_supported_recording" formatted="false">This browser cannot produce a supported recording.</string>
+  <string name="w6_this_recording_reached_the_file_limit_record_a_shorter_clip" formatted="false">This recording reached the file limit. Record a shorter clip.</string>
+  <string name="w6_no_audio_was_recorded_try_again" formatted="false">No audio was recorded. Try again.</string>
+  <string name="w6_recording_was_interrupted_preview_what_was_saved_or_record_again" formatted="false">Recording was interrupted. Preview what was saved or record again.</string>
+  <string name="w6_the_microphone_was_disconnected_preview_what_was_saved_or_record" formatted="false">The microphone was disconnected. Preview what was saved or record again.</string>
+  <string name="w6_microphone_access_is_off_allow_it_in_your_browser_settings" formatted="false">Microphone access is off. Allow it in your browser settings, then try again.</string>
+  <string name="w6_the_microphone_is_unavailable" formatted="false">The microphone is unavailable.</string>
+  <string name="w6_microphone_request_cancelled_while_you_left_this_screen_record_when" formatted="false">Microphone request cancelled while you left this screen. Record when you return.</string>
+  <string name="w6_recording_paused_while_you_left_this_screen_resume_or_preview" formatted="false">Recording paused while you left this screen. Resume or preview it.</string>
+  <string name="w6_availability_could_not_be_loaded" formatted="false">Availability could not be loaded.</string>
+  <string name="w6_use_i_s_o_times_with_an_explicit_u_t_c_offset_for_each" formatted="false">Use ISO times with an explicit UTC offset for each boundary.</string>
+  <string name="w6_availability_saved" formatted="false">Availability saved.</string>
+  <string name="w6_availability_could_not_be_saved_your_changes_are_kept" formatted="false">Availability could not be saved. Your changes are kept.</string>
+  <string name="w6_call_availability" formatted="false">Call availability</string>
+  <string name="w6_use_dated_windows_each_offered_call_and_its_reconnect_allowance" formatted="false">Use dated windows. Each offered call and its reconnect allowance must fit inside one window. Existing bookings keep their agreed time.</string>
+  <string name="w6_your_time_zone" formatted="false">Your time zone</string>
+  <string name="w6_no_windows_saved" formatted="false">No windows saved.</string>
+  <string name="w6_add_a_window" formatted="false">Add a window</string>
+  <string name="w6_save_availability" formatted="false">Save availability</string>
+  <string name="w6_reload_saved_windows" formatted="false">Reload saved windows</string>
+  <string name="w6_the_call_is_unavailable" formatted="false">The call is unavailable.</string>
+  <string name="w6_camera_or_microphone_access_is_off_or_unavailable_check_your" formatted="false">Camera or microphone access is off or unavailable. Check your device settings and try again.</string>
+  <string name="w6_calling_is_not_connected_yet_your_booking_is_unchanged" formatted="false">Calling is not connected yet. Your booking is unchanged.</string>
+  <string name="w6_connection_failed_rejoin_the_same_call" formatted="false">Connection failed. Rejoin the same call.</string>
+  <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
+  <string name="w6_the_call_could_not_be_ended_try_again" formatted="false">The call could not be ended. Try again.</string>
+  <string name="w6_the_summary_could_not_be_changed" formatted="false">The summary could not be changed.</string>
+  <string name="w6_this_call_is_unavailable" formatted="false">This call is unavailable</string>
+  <string name="w6_opening_your_call" formatted="false">Opening your call</string>
+  <string name="w6_checking_the_booking_and_participant_access" formatted="false">Checking the booking and participant access.</string>
+  <string name="w6_continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="w6_get_help" formatted="false">Get help</string>
+  <string name="w6_you_missed_the_call" formatted="false">You missed the call.</string>
+  <string name="w6_the_call_ended_because_of_a_technical_problem" formatted="false">The call ended because of a technical problem.</string>
+  <string name="w6_this_call_was_cancelled" formatted="false">This call was cancelled.</string>
+  <string name="w6_call_outcome_is_being_reconciled" formatted="false">Call outcome is being reconciled.</string>
+  <string name="w6_recording_requested_waiting_for_provider_confirmation" formatted="false">Recording requested · waiting for provider confirmation</string>
+  <string name="w6_recording_is_stopping_awaiting_provider_confirmation" formatted="false">Recording is stopping · awaiting provider confirmation</string>
+  <string name="w6_recording_state_could_not_be_confirmed" formatted="false">Recording state could not be confirmed</string>
+  <string name="w6_ending_confirming_provider_history" formatted="false">Ending · confirming provider history</string>
+  <string name="w6_waiting_for_both_participants" formatted="false">Waiting for both participants</string>
+  <string name="w6_connection_lost_displayed_times_are_from_the_last_server_update" formatted="false">Connection lost · displayed times are from the last server update.</string>
+  <string name="w6_recording" formatted="false">Recording</string>
+  <string name="w6_awaiting_confirmation" formatted="false">Awaiting confirmation</string>
+  <string name="w6_if_either_of_you_drops" formatted="false">If either of you drops</string>
+  <string name="w6_time_zone" formatted="false">Time zone</string>
+  <string name="w6_the_fan_s_live_video" formatted="false">The fan\'s live video</string>
+  <string name="w6_reconnecting_timer_paused" formatted="false">Reconnecting · timer paused</string>
+  <string name="w6_private_device_check" formatted="false">Private device check</string>
+  <string name="w6_your_private_camera_preview" formatted="false">Your private camera preview</string>
+  <string name="w6_microphone_change_failed" formatted="false">Microphone change failed.</string>
+  <string name="w6_camera_change_failed" formatted="false">Camera change failed.</string>
+  <string name="w6_camera" formatted="false">Camera</string>
+  <string name="w6_leave" formatted="false">Leave</string>
+  <string name="w6_both_of_you_can_get_a_short_summary" formatted="false">Both of you can get a short summary</string>
+  <string name="w6_separate_permissions" formatted="false">Separate permissions</string>
+  <string name="w6_i_d_like_a_summary" formatted="false">I\'d like a summary</string>
+  <string name="w6_allow_recording" formatted="false">Allow recording</string>
+  <string name="w6_allow_content_reuse" formatted="false">Allow content reuse</string>
+  <string name="w6_allow_use_as_an_a_i_source" formatted="false">Allow use as an AI source</string>
+  <string name="w6_each_purpose_needs_both_people_s_permission_without_recording_permission" formatted="false">Each purpose needs both people\'s permission. Without recording permission, a summary uses only the packet and a creator-typed note. Either of you can delete it.</string>
+  <string name="w6_your_post_call_note" formatted="false">Your post-call note</string>
+  <string name="w6_save_note_for_summary" formatted="false">Save note for summary</string>
+  <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
+  <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
+  <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
+  <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
+  <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>
+  <string name="w6_enter_the_waiting_room" formatted="false">Enter the waiting room</string>
+  <string name="w6_check_camera_and_microphone" formatted="false">Check camera and microphone</string>
+  <string name="w6_end_this_call" formatted="false">End this call?</string>
+  <string name="w6_ending_by_choice_counts_as_your_completed_call_a_technical" formatted="false">Ending by choice counts as your completed call. A technical problem is sent for reconciliation.</string>
+  <string name="w6_ending_before_enough_connected_time_sends_this_call_for_partial" formatted="false">Ending before enough connected time sends this call for partial-delivery reconciliation.</string>
+  <string name="w6_end_by_choice" formatted="false">End by choice</string>
+  <string name="w6_end_call" formatted="false">End call</string>
+  <string name="w6_technical_problem" formatted="false">Technical problem</string>
+  <string name="w6_stay_in_the_call" formatted="false">Stay in the call</string>
+  <string name="w6_publication_is_unconfirmed_retry_this_exact_signed_command_or_reload" formatted="false">Publication is unconfirmed. Retry this exact signed command or reload the saved offer before signing again.</string>
+  <string name="w6_review_and_sign_the_accepted_call_request_before_offering_times" formatted="false">Review and sign the accepted call request before offering times.</string>
+  <string name="w6_each_time_needs_an_explicit_u_t_c_offset_for_example2026" formatted="false">Each time needs an explicit UTC offset, for example 2026-10-14T16:00-07:00.</string>
+  <string name="w6_the_offer_could_not_be_saved" formatted="false">The offer could not be saved.</string>
+  <string name="w6_s_t_u_d_i_o_c_a_l_l_r_e_q_u_e_s_t" formatted="false">STUDIO · CALL REQUEST</string>
+  <string name="w6_times_offered" formatted="false">Times offered</string>
+  <string name="w6_offer_three_times" formatted="false">Offer three times</string>
+  <string name="w6_open_a_call_request_to_load_both_time_zones_and" formatted="false">Open a call request to load both time zones and its signed acceptance.</string>
+  <string name="w6_the_fan_picks_one_this_request_was_charged_on_acceptance" formatted="false">The fan picks one. This request was charged on acceptance; offering times does not add another charge. Creator no-show is refunded in full. A fan no-show is charged as agreed.</string>
+  <string name="w6_edit_your_availability" formatted="false">Edit your availability</string>
+  <string name="w6_review_these_exact_offered_times" formatted="false">Review these exact offered times</string>
+  <string name="w6_your_zone" formatted="false">Your zone</string>
+  <string name="w6_fan_s_zone" formatted="false">Fan\'s zone</string>
+  <string name="w6_offer_expires" formatted="false">Offer expires</string>
+  <string name="w6_enter_three_distinct_future_times_with_explicit_u_t_c_offsets_both" formatted="false">Enter three distinct future times with explicit UTC offsets, both confirmed IANA zones, and an expiry before the first time to review and sign.</string>
+  <string name="w6_retry_this_exact_signed_offer" formatted="false">Retry this exact signed offer</string>
+  <string name="w6_reload_saved_offer" formatted="false">Reload saved offer</string>
+  <string name="w6_send_signed_times" formatted="false">Send signed times</string>
+  <string name="w6_open_an_accepted_request_from_studio_to_review_the_exact" formatted="false">Open an accepted request from Studio to review the exact signed offer.</string>
+  <string name="w6_the_times_could_not_be_loaded" formatted="false">The times could not be loaded.</string>
+  <string name="w6_this_time_is_unavailable_reload_the_current_offer" formatted="false">This time is unavailable. Reload the current offer.</string>
+  <string name="w6_c_a_l_l_r_e_q_u_e_s_t" formatted="false">CALL REQUEST</string>
+  <string name="w6_choose_a_time" formatted="false">Choose a time</string>
+  <string name="w6_your_request_s_accepted_terms_and_payment_stay_with_its" formatted="false">Your request\'s accepted terms and payment stay with its receipt. Choosing a time cannot create a second charge.</string>
+  <string name="w6_confirm_this_time" formatted="false">Confirm this time</string>
+  <string name="w6_open_your_scheduled_call" formatted="false">Open your scheduled call</string>
+  <string name="w6_this_offer_changed_or_expired_open_requests_for_its_current" formatted="false">This offer changed or expired. Open Requests for its current options.</string>
+  <string name="w6_checking_the_current_offer_and_participant_access" formatted="false">Checking the current offer and participant access.</string>
+  <string name="w6_reload_current_offer" formatted="false">Reload current offer</string>
+  <string name="w6_open_requests" formatted="false">Open Requests</string>
+  <string name="w6_the_captured_call_could_not_be_loaded" formatted="false">The captured call could not be loaded.</string>
+  <string name="w6_times_already_offered" formatted="false">Times already offered</string>
+  <string name="w6_open_the_scheduled_call" formatted="false">Open the scheduled call</string>
+  <string name="w6_checking_the_current_captured_request_and_creator_access" formatted="false">Checking the current captured request and creator access.</string>
+  <string name="w6_open_studio_requests" formatted="false">Open Studio requests</string>
+  <string name="w6_the_times_could_not_be_loaded_reconnect_and_try_again" formatted="false">The times could not be loaded. Reconnect and try again.</string>
+  <string name="w6_your_accepted_terms_and_payment_stay_with_the_request_receipt" formatted="false">Your accepted terms and payment stay with the request receipt. Choosing a time cannot create a second charge.</string>
+  <string name="w6_reconnect_to_refresh_this_call_actions_are_unavailable_until_access" formatted="false">Reconnect to refresh this call. Actions are unavailable until access is confirmed.</string>
+  <string name="w6_this_action_could_not_complete_refresh_the_call_before_trying" formatted="false">This action could not complete. Refresh the call before trying again.</string>
+  <string name="w6_recording_stop_requested_awaiting_provider_confirmation" formatted="false">Recording stop requested · awaiting provider confirmation</string>
+  <string name="w6_recording_start_requested_awaiting_provider_confirmation" formatted="false">Recording start requested · awaiting provider confirmation</string>
+  <string name="w6_recording_status_needs_confirmation" formatted="false">Recording status needs confirmation</string>
+  <string name="w6_connection_lost" formatted="false">Connection lost</string>
+  <string name="w6_displayed_times_are_from_the_last_server_update" formatted="false">Displayed times are from the last server update.</string>
+  <string name="w6_media_connection_is_unavailable" formatted="false">Media connection is unavailable.</string>
+  <string name="w6_each_purpose_needs_both_people_s_permission_without_recording_permission8487ed" formatted="false">Each purpose needs both people\'s permission. Without recording permission, a summary uses only the packet and a creator-typed note.</string>
+  <string name="w6_view_requests_for_settlement" formatted="false">View Requests for settlement</string>
+  <string name="w6_open_this_call_from_its_authorized_request_link" formatted="false">Open this call from its authorized request link.</string>
+  <string name="w6_refresh_call" formatted="false">Refresh call</string>
+  <string name="w6_a_fan_ending_by_choice_counts_as_a_completed_call" formatted="false">A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement.</string>
+  <string name="w6_audio_route_changed_check_your_microphone_then_resume_or_record" formatted="false">Audio route changed. Check your microphone, then resume or record again.</string>
+  <string name="w6_microphone_recording_is_unavailable_in_this_app_build" formatted="false">Microphone recording is unavailable in this app build.</string>
+  <string name="w6_microphone_access_is_off_allow_it_in_settings_then_try" formatted="false">Microphone access is off. Allow it in Settings, then try again.</string>
+  <string name="w6_the_microphone_is_unavailable_try_again" formatted="false">The microphone is unavailable. Try again.</string>
+  <string name="w6_microphone_request_cancelled_after_an_interruption_record_when_you_return" formatted="false">Microphone request cancelled after an interruption. Record when you return.</string>
+  <string name="w6_recording_paused_after_an_interruption_resume_or_preview_what_was" formatted="false">Recording paused after an interruption. Resume or preview what was saved.</string>
+  <string name="w6_recording_could_not_resume_preview_it_or_record_again" formatted="false">Recording could not resume. Preview it or record again.</string>
+  <string name="w6_the_saved_recording_could_not_be_played_record_again" formatted="false">The saved recording could not be played. Record again.</string>
+  <string name="w6_record_and_listen_before_uploading_your_preview_stays_on_this" formatted="false">Record and listen before uploading. Your preview stays on this device.</string>
+  <string name="w6_play_private_preview" formatted="false">Play private preview</string>
+  <string name="w6_pause_preview" formatted="false">Pause preview</string>
+  <string name="w6_uploading_and_exact_media_signing_require_a_configured_account_and" formatted="false">Uploading and exact-media signing require a configured account and media service.</string>
+  <string name="w6_sign_in_again" formatted="false">Sign in again.</string>
+  <string name="w6_waiting_for_server_confirmation" formatted="false">Waiting for server confirmation</string>
+  <string name="w6_media_access_expired_or_is_unavailable" formatted="false">Media access expired or is unavailable.</string>
+  <string name="w6_audio_route_changed_check_the_microphone_before_resuming" formatted="false">Audio route changed. Check the microphone before resuming.</string>
+  <string name="w6_recording_was_interrupted_preview_it_or_record_again" formatted="false">Recording was interrupted. Preview it or record again.</string>
+  <string name="w6_recording_could_not_pause_preview_what_was_saved" formatted="false">Recording could not pause. Preview what was saved.</string>
+  <string name="w6_recording_could_not_resume_record_again" formatted="false">Recording could not resume. Record again.</string>
+  <string name="w6_no_usable_audio_was_saved_record_again" formatted="false">No usable audio was saved. Record again.</string>
+  <string name="w6_this_recording_could_not_be_played_record_again" formatted="false">This recording could not be played. Record again.</string>
+  <string name="w6_recording_paused_while_you_left_this_screen" formatted="false">Recording paused while you left this screen.</string>
+  <string name="w6_seconds_m4_a_version" formatted="false">{value1} seconds · M4A · version{value2}</string>
+  <string name="w6_s_a_i_audio" formatted="false">{value1}\'s AI audio</string>
+  <string name="w6_s_recording" formatted="false">{value1}\'s recording</string>
+  <string name="w6_s_a_i_voice_note" formatted="false">{value1}\'s AI voice note</string>
+  <string name="w6_recorded_by" formatted="false">Recorded by {value1}</string>
+  <string name="w6_a_i_voice_opens_with_s_a_i" formatted="false">AI voice · opens with “{value1}’s AI”</string>
+  <string name="w6_seek_in" formatted="false">Seek in {value1}</string>
+  <string name="w6_record_a_voice_note_as" formatted="false">Record a voice note as {value1}</string>
+  <string name="w6_recorded_seconds" formatted="false">Recorded {value1} seconds</string>
+  <string name="w6_of_seconds" formatted="false">of {value1} seconds</string>
+  <string name="w6_window" formatted="false">Window {value1}</string>
+  <string name="w6_remove_window" formatted="false">Remove window {value1}</string>
+  <string name="w6_c_a_l_l" formatted="false">CALL</string>
+  <string name="w6_you_spoke_with_for_minutes" formatted="false">You spoke with {value1} for {value2} minutes{value3}.</string>
+  <string name="w6_m_i_n_u_t_e_c_a_l_l" formatted="false">{value1}-MINUTE {value2} CALL</string>
+  <string name="w6_with" formatted="false">{value1} with {value2}</string>
+  <string name="w6_reconnecting_allowance_left" formatted="false">Reconnecting · {value1} allowance left</string>
+  <string name="w6_starts_in" formatted="false">Starts in {value1}</string>
+  <string name="w6_length" formatted="false">Length</string>
+  <string name="w6_minutes_fixed_no_overtime_charge" formatted="false">{value1} minutes, fixed · no overtime charge</string>
+  <string name="w6_shared_with" formatted="false">Shared with {value1}</string>
+  <string name="w6_attachments" formatted="false">Attachments</string>
+  <string name="w6_shared_files" formatted="false">{value1} shared files</string>
+  <string name="w6_timer_pauses_up_to_min_total" formatted="false">Timer pauses, up to {value1} min total</string>
+  <string name="w6_request" formatted="false">Request</string>
+  <string name="w6_joining_early_starts_nothing_if_doesn_t_join_within_minutes" formatted="false">Joining early starts nothing. If {value1} doesn\'t join within {value2} minutes of the appointment, the booking is sent for a full refund. A fan no-show is charged as agreed.</string>
+  <string name="w6_s_live_video" formatted="false">{value1}\'s live video</string>
+  <string name="w6_y_o_u" formatted="false">YOU</string>
+  <string name="w6_report" formatted="false">Report</string>
+  <string name="w6_connected" formatted="false">Connected</string>
+  <string name="w6_outcome" formatted="false">Outcome</string>
+  <string name="w6_settlement" formatted="false">Settlement</string>
+  <string name="w6_minute_call_accepted_request" formatted="false">{value1} · {value2}-minute {value3} call · accepted request {value4}</string>
+  <string name="w6_your_i_a_n_a_time_zone" formatted="false">Your IANA time zone</string>
+  <string name="w6_fan_s_confirmed_i_a_n_a_time_zone" formatted="false">Fan\'s confirmed IANA time zone</string>
+  <string name="w6_offer_expiry_with_u_t_c_offset" formatted="false">Offer expiry, with UTC offset</string>
+  <string name="w6_time" formatted="false">Time {value1}{value2}</string>
+  <string name="w6_for_the_fan" formatted="false">{value1} for the fan · {value2}</string>
+  <string name="w6_minutes" formatted="false">{value1} minutes · {value2}</string>
+  <string name="w6_your_time" formatted="false">Your time · {value1}</string>
+  <string name="w6_creator_s_time_zone" formatted="false">Creator\'s time zone · {value1}</string>
+  <string name="w6_offer_expirescfe463" formatted="false">Offer expires {value1}.</string>
+  <string name="w6_the_current_offer_is_check_this_saved_offer_before_sending" formatted="false">The current offer is {value1}. Check this saved offer before sending another signed act.</string>
+  <string name="w6_your_time_zonebb173f" formatted="false">Your time zone · </string>
+  <string name="w6_fan_s_time_zone" formatted="false">Fan\'s time zone · </string>
+  <string name="w6_you_spoke_with_for_minutesa8bf6c" formatted="false">You spoke with {value1} for {value2} minutes.</string>
+  <string name="w6_call_outcome" formatted="false">Call outcome: {value1}</string>
+  <string name="w6_requestfc03f5" formatted="false">Request {value1}</string>
+  <string name="w6_joining_early_starts_nothing_the_connected_timer_pauses_during_a" formatted="false">Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.</string>
+  <string name="w6_connected_of" formatted="false">Connected {value1} of {value2}</string>
+  <string name="w6_bearer" formatted="false">Bearer {value1}</string>
+  <string name="w6_seconds_recorded" formatted="false">{value1} seconds recorded</string>
+  <string name="w6_up_to_seconds" formatted="false">Up to {value1} seconds</string>
+  <string name="w6_starts" formatted="false">Starts</string>
+  <string name="w6_ends" formatted="false">Ends</string>
+  <string name="w6_off" formatted="false">Off</string>
+  <string name="w6_f_a_n" formatted="false">FAN</string>
+  <string name="w6_unmute" formatted="false">Unmute</string>
+  <string name="w6_mute" formatted="false">Mute</string>
+  <string name="w6_call" formatted="false">Call</string>
+  <string name="w6_on" formatted="false">On</string>
+  <string name="w6_control_status" formatted="false">{label} · {state}</string>
+  <string name="w6_seconds_suffix" formatted="false"> {value1} seconds</string>
+  <string name="w6_creator_ended_early" formatted="false">{value1} had to end early.</string>
+  <string name="w6_creator_did_not_join" formatted="false">{value1} did not join.</string>
+  <string name="w6_time_of_duration" formatted="false">{value1} of {value2}</string>
+  <string name="w6_shared_files_in_zone" formatted="false">{value1} shared files · {value2}</string>
+  <string name="w6_being_reconciled" formatted="false">being reconciled</string>
 </resources>

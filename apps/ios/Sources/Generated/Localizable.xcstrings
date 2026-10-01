@@ -2244,6 +2244,3020 @@
           }
         }
       }
+    },
+    "Signing is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing is unavailable."
+          }
+        }
+      }
+    },
+    "Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again."
+          }
+        }
+      }
+    },
+    "Signing was cancelled. Nothing was shared.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing was cancelled. Nothing was shared."
+          }
+        }
+      }
+    },
+    "Sign this exact recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign this exact recording"
+          }
+        }
+      }
+    },
+    "Recording fingerprint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording fingerprint"
+          }
+        }
+      }
+    },
+    "Review the processed recording before signing. A signature applies to these exact audio bytes. Adding content credentials is a separate processing step.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review the processed recording before signing. A signature applies to these exact audio bytes. Adding content credentials is a separate processing step."
+          }
+        }
+      }
+    },
+    "Signature saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature saved"
+          }
+        }
+      }
+    },
+    "Waiting for your passkey": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for your passkey"
+          }
+        }
+      }
+    },
+    "Sign recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign recording"
+          }
+        }
+      }
+    },
+    "Retry this exact signature": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this exact signature"
+          }
+        }
+      }
+    },
+    "This recording is unavailable for the current content.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording is unavailable for the current content."
+          }
+        }
+      }
+    },
+    "This recording changed or is no longer available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording changed or is no longer available."
+          }
+        }
+      }
+    },
+    "Audio access could not be confirmed. Refresh the link to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio access could not be confirmed. Refresh the link to try again."
+          }
+        }
+      }
+    },
+    "The playback link is unavailable for this recording.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The playback link is unavailable for this recording."
+          }
+        }
+      }
+    },
+    "Audio is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio is unavailable."
+          }
+        }
+      }
+    },
+    "Playback could not start. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback could not start. Try again."
+          }
+        }
+      }
+    },
+    "Loading audio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading audio"
+          }
+        }
+      }
+    },
+    "Load voice note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load voice note"
+          }
+        }
+      }
+    },
+    "The audio link expired or access changed. Refresh it to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The audio link expired or access changed. Refresh it to try again."
+          }
+        }
+      }
+    },
+    "Refresh audio link": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh audio link"
+          }
+        }
+      }
+    },
+    "Read transcript": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read transcript"
+          }
+        }
+      }
+    },
+    "Recording is awaiting its current duration limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording is awaiting its current duration limit."
+          }
+        }
+      }
+    },
+    "Processing is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processing is unavailable."
+          }
+        }
+      }
+    },
+    "The processed recording does not match this saved content. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The processed recording does not match this saved content. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "The processed recording evidence is unavailable. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The processed recording evidence is unavailable. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "Upload paused. Retry to resume from the saved position.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload paused. Retry to resume from the saved position."
+          }
+        }
+      }
+    },
+    "Upload failed. Your preview is still here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload failed. Your preview is still here."
+          }
+        }
+      }
+    },
+    "The uploaded file could not be removed. Try again before discarding.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The uploaded file could not be removed. Try again before discarding."
+          }
+        }
+      }
+    },
+    "The upload is unconfirmed. Retry it to find and remove the saved file before discarding.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The upload is unconfirmed. Retry it to find and remove the saved file before discarding."
+          }
+        }
+      }
+    },
+    "Record a voice note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record a voice note"
+          }
+        }
+      }
+    },
+    "Your own voice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your own voice"
+          }
+        }
+      }
+    },
+    "Record, listen, and sign the exact recording before it is shared.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record, listen, and sign the exact recording before it is shared."
+          }
+        }
+      }
+    },
+    "Record again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record again"
+          }
+        }
+      }
+    },
+    "Record": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
+        }
+      }
+    },
+    "Cancel permission request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel permission request"
+          }
+        }
+      }
+    },
+    "Pause": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "Resume": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
+          }
+        }
+      }
+    },
+    "Stop and preview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop and preview"
+          }
+        }
+      }
+    },
+    "Private preview · your recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Private preview · your recording"
+          }
+        }
+      }
+    },
+    "Preview your own recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview your own recording"
+          }
+        }
+      }
+    },
+    "Discard recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard recording"
+          }
+        }
+      }
+    },
+    "Audio upload progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio upload progress"
+          }
+        }
+      }
+    },
+    "Pause upload": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause upload"
+          }
+        }
+      }
+    },
+    "Retry upload": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry upload"
+          }
+        }
+      }
+    },
+    "Upload recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload recording"
+          }
+        }
+      }
+    },
+    "Processed. Review and sign the exact recording in Studio.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processed. Review and sign the exact recording in Studio."
+          }
+        }
+      }
+    },
+    "This file could not be processed. Record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This file could not be processed. Record again."
+          }
+        }
+      }
+    },
+    "Uploaded · processing before sharing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploaded · processing before sharing"
+          }
+        }
+      }
+    },
+    "Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it."
+          }
+        }
+      }
+    },
+    "This recording limit does not match the current saved content.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording limit does not match the current saved content."
+          }
+        }
+      }
+    },
+    "Media is unavailable. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media is unavailable. Try again."
+          }
+        }
+      }
+    },
+    "This upload does not belong to the current content. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This upload does not belong to the current content. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "Choose a supported file within the content's media limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a supported file within the content's media limit."
+          }
+        }
+      }
+    },
+    "The resumed upload does not match this recording. Start a new upload.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The resumed upload does not match this recording. Start a new upload."
+          }
+        }
+      }
+    },
+    "The saved upload could not be confirmed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved upload could not be confirmed."
+          }
+        }
+      }
+    },
+    "The resumed upload changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The resumed upload changed."
+          }
+        }
+      }
+    },
+    "Upload progress could not be confirmed. Resume this recording.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload progress could not be confirmed. Resume this recording."
+          }
+        }
+      }
+    },
+    "Recording is unavailable in this browser. Use a supported browser over HTTPS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording is unavailable in this browser. Use a supported browser over HTTPS."
+          }
+        }
+      }
+    },
+    "This browser cannot produce a supported recording.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This browser cannot produce a supported recording."
+          }
+        }
+      }
+    },
+    "This recording reached the file limit. Record a shorter clip.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording reached the file limit. Record a shorter clip."
+          }
+        }
+      }
+    },
+    "No audio was recorded. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No audio was recorded. Try again."
+          }
+        }
+      }
+    },
+    "Recording was interrupted. Preview what was saved or record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording was interrupted. Preview what was saved or record again."
+          }
+        }
+      }
+    },
+    "The microphone was disconnected. Preview what was saved or record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone was disconnected. Preview what was saved or record again."
+          }
+        }
+      }
+    },
+    "Microphone access is off. Allow it in your browser settings, then try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone access is off. Allow it in your browser settings, then try again."
+          }
+        }
+      }
+    },
+    "The microphone is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is unavailable."
+          }
+        }
+      }
+    },
+    "Microphone request cancelled while you left this screen. Record when you return.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone request cancelled while you left this screen. Record when you return."
+          }
+        }
+      }
+    },
+    "Recording paused while you left this screen. Resume or preview it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording paused while you left this screen. Resume or preview it."
+          }
+        }
+      }
+    },
+    "Availability could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Availability could not be loaded."
+          }
+        }
+      }
+    },
+    "Use ISO times with an explicit UTC offset for each boundary.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use ISO times with an explicit UTC offset for each boundary."
+          }
+        }
+      }
+    },
+    "Availability saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Availability saved."
+          }
+        }
+      }
+    },
+    "Availability could not be saved. Your changes are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Availability could not be saved. Your changes are kept."
+          }
+        }
+      }
+    },
+    "Call availability": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call availability"
+          }
+        }
+      }
+    },
+    "Use dated windows. Each offered call and its reconnect allowance must fit inside one window. Existing bookings keep their agreed time.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use dated windows. Each offered call and its reconnect allowance must fit inside one window. Existing bookings keep their agreed time."
+          }
+        }
+      }
+    },
+    "Your time zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your time zone"
+          }
+        }
+      }
+    },
+    "No windows saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No windows saved."
+          }
+        }
+      }
+    },
+    "Add a window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a window"
+          }
+        }
+      }
+    },
+    "Save availability": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save availability"
+          }
+        }
+      }
+    },
+    "Reload saved windows": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reload saved windows"
+          }
+        }
+      }
+    },
+    "The call is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The call is unavailable."
+          }
+        }
+      }
+    },
+    "Camera or microphone access is off or unavailable. Check your device settings and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera or microphone access is off or unavailable. Check your device settings and try again."
+          }
+        }
+      }
+    },
+    "Calling is not connected yet. Your booking is unchanged.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet. Your booking is unchanged."
+          }
+        }
+      }
+    },
+    "Connection failed. Rejoin the same call.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection failed. Rejoin the same call."
+          }
+        }
+      }
+    },
+    "Consent could not be saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consent could not be saved."
+          }
+        }
+      }
+    },
+    "The call could not be ended. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The call could not be ended. Try again."
+          }
+        }
+      }
+    },
+    "The summary could not be changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The summary could not be changed."
+          }
+        }
+      }
+    },
+    "This call is unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call is unavailable"
+          }
+        }
+      }
+    },
+    "Opening your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opening your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and participant access.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and participant access."
+          }
+        }
+      }
+    },
+    "Get help": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get help"
+          }
+        }
+      }
+    },
+    "You missed the call.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You missed the call."
+          }
+        }
+      }
+    },
+    "The call ended because of a technical problem.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The call ended because of a technical problem."
+          }
+        }
+      }
+    },
+    "This call was cancelled.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call was cancelled."
+          }
+        }
+      }
+    },
+    "Call outcome is being reconciled.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call outcome is being reconciled."
+          }
+        }
+      }
+    },
+    "Recording requested · waiting for provider confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording requested · waiting for provider confirmation"
+          }
+        }
+      }
+    },
+    "Recording is stopping · awaiting provider confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording is stopping · awaiting provider confirmation"
+          }
+        }
+      }
+    },
+    "Recording state could not be confirmed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording state could not be confirmed"
+          }
+        }
+      }
+    },
+    "Ending · confirming provider history": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ending · confirming provider history"
+          }
+        }
+      }
+    },
+    "Waiting for both participants": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for both participants"
+          }
+        }
+      }
+    },
+    "Connection lost · displayed times are from the last server update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection lost · displayed times are from the last server update."
+          }
+        }
+      }
+    },
+    "Recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        }
+      }
+    },
+    "Awaiting confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awaiting confirmation"
+          }
+        }
+      }
+    },
+    "If either of you drops": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If either of you drops"
+          }
+        }
+      }
+    },
+    "Time zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time zone"
+          }
+        }
+      }
+    },
+    "The fan's live video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The fan's live video"
+          }
+        }
+      }
+    },
+    "Reconnecting · timer paused": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconnecting · timer paused"
+          }
+        }
+      }
+    },
+    "Private device check": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Private device check"
+          }
+        }
+      }
+    },
+    "Your private camera preview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your private camera preview"
+          }
+        }
+      }
+    },
+    "Microphone change failed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone change failed."
+          }
+        }
+      }
+    },
+    "Camera change failed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera change failed."
+          }
+        }
+      }
+    },
+    "Camera": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        }
+      }
+    },
+    "Leave": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        }
+      }
+    },
+    "Both of you can get a short summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both of you can get a short summary"
+          }
+        }
+      }
+    },
+    "Separate permissions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Separate permissions"
+          }
+        }
+      }
+    },
+    "I'd like a summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I'd like a summary"
+          }
+        }
+      }
+    },
+    "Allow recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow recording"
+          }
+        }
+      }
+    },
+    "Allow content reuse": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow content reuse"
+          }
+        }
+      }
+    },
+    "Allow use as an AI source": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow use as an AI source"
+          }
+        }
+      }
+    },
+    "Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note. Either of you can delete it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note. Either of you can delete it."
+          }
+        }
+      }
+    },
+    "Your post-call note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your post-call note"
+          }
+        }
+      }
+    },
+    "Save note for summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save note for summary"
+          }
+        }
+      }
+    },
+    "Summary queued · available when its provider completes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Summary queued · available when its provider completes."
+          }
+        }
+      }
+    },
+    "Delete this summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this summary"
+          }
+        }
+      }
+    },
+    "Call receipt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call receipt"
+          }
+        }
+      }
+    },
+    "Recording occurred · check the consent history": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording occurred · check the consent history"
+          }
+        }
+      }
+    },
+    "No recording was confirmed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No recording was confirmed"
+          }
+        }
+      }
+    },
+    "View the reconciled receipt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View the reconciled receipt"
+          }
+        }
+      }
+    },
+    "Enter the waiting room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the waiting room"
+          }
+        }
+      }
+    },
+    "Check camera and microphone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check camera and microphone"
+          }
+        }
+      }
+    },
+    "End this call?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End this call?"
+          }
+        }
+      }
+    },
+    "Ending by choice counts as your completed call. A technical problem is sent for reconciliation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ending by choice counts as your completed call. A technical problem is sent for reconciliation."
+          }
+        }
+      }
+    },
+    "Ending before enough connected time sends this call for partial-delivery reconciliation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ending before enough connected time sends this call for partial-delivery reconciliation."
+          }
+        }
+      }
+    },
+    "End by choice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End by choice"
+          }
+        }
+      }
+    },
+    "End call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End call"
+          }
+        }
+      }
+    },
+    "Technical problem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Technical problem"
+          }
+        }
+      }
+    },
+    "Stay in the call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay in the call"
+          }
+        }
+      }
+    },
+    "Publication is unconfirmed. Retry this exact signed command or reload the saved offer before signing again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publication is unconfirmed. Retry this exact signed command or reload the saved offer before signing again."
+          }
+        }
+      }
+    },
+    "Review and sign the accepted call request before offering times.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review and sign the accepted call request before offering times."
+          }
+        }
+      }
+    },
+    "Each time needs an explicit UTC offset, for example 2026-10-14T16:00-07:00.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each time needs an explicit UTC offset, for example 2026-10-14T16:00-07:00."
+          }
+        }
+      }
+    },
+    "The offer could not be saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The offer could not be saved."
+          }
+        }
+      }
+    },
+    "STUDIO · CALL REQUEST": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STUDIO · CALL REQUEST"
+          }
+        }
+      }
+    },
+    "Times offered": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Times offered"
+          }
+        }
+      }
+    },
+    "Offer three times": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offer three times"
+          }
+        }
+      }
+    },
+    "Open a call request to load both time zones and its signed acceptance.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open a call request to load both time zones and its signed acceptance."
+          }
+        }
+      }
+    },
+    "The fan picks one. This request was charged on acceptance; offering times does not add another charge. Creator no-show is refunded in full. A fan no-show is charged as agreed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The fan picks one. This request was charged on acceptance; offering times does not add another charge. Creator no-show is refunded in full. A fan no-show is charged as agreed."
+          }
+        }
+      }
+    },
+    "Edit your availability": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit your availability"
+          }
+        }
+      }
+    },
+    "Review these exact offered times": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review these exact offered times"
+          }
+        }
+      }
+    },
+    "Your zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your zone"
+          }
+        }
+      }
+    },
+    "Fan's zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fan's zone"
+          }
+        }
+      }
+    },
+    "Offer expires": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offer expires"
+          }
+        }
+      }
+    },
+    "Enter three distinct future times with explicit UTC offsets, both confirmed IANA zones, and an expiry before the first time to review and sign.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter three distinct future times with explicit UTC offsets, both confirmed IANA zones, and an expiry before the first time to review and sign."
+          }
+        }
+      }
+    },
+    "Retry this exact signed offer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this exact signed offer"
+          }
+        }
+      }
+    },
+    "Reload saved offer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reload saved offer"
+          }
+        }
+      }
+    },
+    "Send signed times": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send signed times"
+          }
+        }
+      }
+    },
+    "Open an accepted request from Studio to review the exact signed offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open an accepted request from Studio to review the exact signed offer."
+          }
+        }
+      }
+    },
+    "The times could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The times could not be loaded."
+          }
+        }
+      }
+    },
+    "This time is unavailable. Reload the current offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This time is unavailable. Reload the current offer."
+          }
+        }
+      }
+    },
+    "CALL REQUEST": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CALL REQUEST"
+          }
+        }
+      }
+    },
+    "Choose a time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a time"
+          }
+        }
+      }
+    },
+    "Your request's accepted terms and payment stay with its receipt. Choosing a time cannot create a second charge.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your request's accepted terms and payment stay with its receipt. Choosing a time cannot create a second charge."
+          }
+        }
+      }
+    },
+    "Confirm this time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm this time"
+          }
+        }
+      }
+    },
+    "Open your scheduled call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open your scheduled call"
+          }
+        }
+      }
+    },
+    "This offer changed or expired. Open Requests for its current options.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This offer changed or expired. Open Requests for its current options."
+          }
+        }
+      }
+    },
+    "Checking the current offer and participant access.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the current offer and participant access."
+          }
+        }
+      }
+    },
+    "Reload current offer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reload current offer"
+          }
+        }
+      }
+    },
+    "Open Requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Requests"
+          }
+        }
+      }
+    },
+    "The captured call could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The captured call could not be loaded."
+          }
+        }
+      }
+    },
+    "Times already offered": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Times already offered"
+          }
+        }
+      }
+    },
+    "Open the scheduled call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the scheduled call"
+          }
+        }
+      }
+    },
+    "Checking the current captured request and creator access.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the current captured request and creator access."
+          }
+        }
+      }
+    },
+    "Open Studio requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Studio requests"
+          }
+        }
+      }
+    },
+    "The times could not be loaded. Reconnect and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The times could not be loaded. Reconnect and try again."
+          }
+        }
+      }
+    },
+    "Your accepted terms and payment stay with the request receipt. Choosing a time cannot create a second charge.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your accepted terms and payment stay with the request receipt. Choosing a time cannot create a second charge."
+          }
+        }
+      }
+    },
+    "Reconnect to refresh this call. Actions are unavailable until access is confirmed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconnect to refresh this call. Actions are unavailable until access is confirmed."
+          }
+        }
+      }
+    },
+    "This action could not complete. Refresh the call before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This action could not complete. Refresh the call before trying again."
+          }
+        }
+      }
+    },
+    "Recording stop requested · awaiting provider confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording stop requested · awaiting provider confirmation"
+          }
+        }
+      }
+    },
+    "Recording start requested · awaiting provider confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording start requested · awaiting provider confirmation"
+          }
+        }
+      }
+    },
+    "Recording status needs confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording status needs confirmation"
+          }
+        }
+      }
+    },
+    "Connection lost": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection lost"
+          }
+        }
+      }
+    },
+    "Displayed times are from the last server update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Displayed times are from the last server update."
+          }
+        }
+      }
+    },
+    "Media connection is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media connection is unavailable."
+          }
+        }
+      }
+    },
+    "Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note."
+          }
+        }
+      }
+    },
+    "View Requests for settlement": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Requests for settlement"
+          }
+        }
+      }
+    },
+    "Open this call from its authorized request link.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open this call from its authorized request link."
+          }
+        }
+      }
+    },
+    "Refresh call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh call"
+          }
+        }
+      }
+    },
+    "A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement."
+          }
+        }
+      }
+    },
+    "Audio route changed. Check your microphone, then resume or record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio route changed. Check your microphone, then resume or record again."
+          }
+        }
+      }
+    },
+    "Microphone recording is unavailable in this app build.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone recording is unavailable in this app build."
+          }
+        }
+      }
+    },
+    "Microphone access is off. Allow it in Settings, then try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone access is off. Allow it in Settings, then try again."
+          }
+        }
+      }
+    },
+    "The microphone is unavailable. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is unavailable. Try again."
+          }
+        }
+      }
+    },
+    "Microphone request cancelled after an interruption. Record when you return.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone request cancelled after an interruption. Record when you return."
+          }
+        }
+      }
+    },
+    "Recording paused after an interruption. Resume or preview what was saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording paused after an interruption. Resume or preview what was saved."
+          }
+        }
+      }
+    },
+    "Recording could not resume. Preview it or record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording could not resume. Preview it or record again."
+          }
+        }
+      }
+    },
+    "The saved recording could not be played. Record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved recording could not be played. Record again."
+          }
+        }
+      }
+    },
+    "Record and listen before uploading. Your preview stays on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record and listen before uploading. Your preview stays on this device."
+          }
+        }
+      }
+    },
+    "Play private preview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play private preview"
+          }
+        }
+      }
+    },
+    "Pause preview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause preview"
+          }
+        }
+      }
+    },
+    "Uploading and exact-media signing require a configured account and media service.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploading and exact-media signing require a configured account and media service."
+          }
+        }
+      }
+    },
+    "Sign in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in again."
+          }
+        }
+      }
+    },
+    "Waiting for server confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for server confirmation"
+          }
+        }
+      }
+    },
+    "Media access expired or is unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media access expired or is unavailable."
+          }
+        }
+      }
+    },
+    "Audio route changed. Check the microphone before resuming.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio route changed. Check the microphone before resuming."
+          }
+        }
+      }
+    },
+    "Recording was interrupted. Preview it or record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording was interrupted. Preview it or record again."
+          }
+        }
+      }
+    },
+    "Recording could not pause. Preview what was saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording could not pause. Preview what was saved."
+          }
+        }
+      }
+    },
+    "Recording could not resume. Record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording could not resume. Record again."
+          }
+        }
+      }
+    },
+    "No usable audio was saved. Record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No usable audio was saved. Record again."
+          }
+        }
+      }
+    },
+    "This recording could not be played. Record again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording could not be played. Record again."
+          }
+        }
+      }
+    },
+    "Recording paused while you left this screen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording paused while you left this screen."
+          }
+        }
+      }
+    },
+    "{value1} seconds · M4A · version{value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} seconds · M4A · version{value2}"
+          }
+        }
+      }
+    },
+    "{value1}'s AI audio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1}'s AI audio"
+          }
+        }
+      }
+    },
+    "{value1}'s recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1}'s recording"
+          }
+        }
+      }
+    },
+    "{value1}'s AI voice note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1}'s AI voice note"
+          }
+        }
+      }
+    },
+    "Recorded by {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorded by {value1}"
+          }
+        }
+      }
+    },
+    "AI voice · opens with “{value1}’s AI”": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI voice · opens with “{value1}’s AI”"
+          }
+        }
+      }
+    },
+    "Seek in {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seek in {value1}"
+          }
+        }
+      }
+    },
+    "Record a voice note as {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record a voice note as {value1}"
+          }
+        }
+      }
+    },
+    "Recorded {value1} seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorded {value1} seconds"
+          }
+        }
+      }
+    },
+    "of {value1} seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "of {value1} seconds"
+          }
+        }
+      }
+    },
+    "Window {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Window {value1}"
+          }
+        }
+      }
+    },
+    "Remove window {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove window {value1}"
+          }
+        }
+      }
+    },
+    "CALL": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CALL"
+          }
+        }
+      }
+    },
+    "You spoke with {value1} for {value2} minutes{value3}.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You spoke with {value1} for {value2} minutes{value3}."
+          }
+        }
+      }
+    },
+    "{value1}-MINUTE {value2} CALL": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1}-MINUTE {value2} CALL"
+          }
+        }
+      }
+    },
+    "{value1} with {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} with {value2}"
+          }
+        }
+      }
+    },
+    "Reconnecting · {value1} allowance left": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconnecting · {value1} allowance left"
+          }
+        }
+      }
+    },
+    "Starts in {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts in {value1}"
+          }
+        }
+      }
+    },
+    "Length": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Length"
+          }
+        }
+      }
+    },
+    "{value1} minutes, fixed · no overtime charge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} minutes, fixed · no overtime charge"
+          }
+        }
+      }
+    },
+    "Shared with {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared with {value1}"
+          }
+        }
+      }
+    },
+    "Attachments": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attachments"
+          }
+        }
+      }
+    },
+    "{value1} shared files": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} shared files"
+          }
+        }
+      }
+    },
+    "Timer pauses, up to {value1} min total": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timer pauses, up to {value1} min total"
+          }
+        }
+      }
+    },
+    "Request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request"
+          }
+        }
+      }
+    },
+    "Joining early starts nothing. If {value1} doesn't join within {value2} minutes of the appointment, the booking is sent for a full refund. A fan no-show is charged as agreed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joining early starts nothing. If {value1} doesn't join within {value2} minutes of the appointment, the booking is sent for a full refund. A fan no-show is charged as agreed."
+          }
+        }
+      }
+    },
+    "{value1}'s live video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1}'s live video"
+          }
+        }
+      }
+    },
+    "YOU": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YOU"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        }
+      }
+    },
+    "Outcome": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outcome"
+          }
+        }
+      }
+    },
+    "Settlement": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settlement"
+          }
+        }
+      }
+    },
+    "{value1} · {value2}-minute {value3} call · accepted request {value4}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} · {value2}-minute {value3} call · accepted request {value4}"
+          }
+        }
+      }
+    },
+    "Your IANA time zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your IANA time zone"
+          }
+        }
+      }
+    },
+    "Fan's confirmed IANA time zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fan's confirmed IANA time zone"
+          }
+        }
+      }
+    },
+    "Offer expiry, with UTC offset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offer expiry, with UTC offset"
+          }
+        }
+      }
+    },
+    "Time {value1}{value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time {value1}{value2}"
+          }
+        }
+      }
+    },
+    "{value1} for the fan · {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} for the fan · {value2}"
+          }
+        }
+      }
+    },
+    "{value1} minutes · {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} minutes · {value2}"
+          }
+        }
+      }
+    },
+    "Your time · {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your time · {value1}"
+          }
+        }
+      }
+    },
+    "Creator's time zone · {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creator's time zone · {value1}"
+          }
+        }
+      }
+    },
+    "Offer expires {value1}.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offer expires {value1}."
+          }
+        }
+      }
+    },
+    "The current offer is {value1}. Check this saved offer before sending another signed act.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current offer is {value1}. Check this saved offer before sending another signed act."
+          }
+        }
+      }
+    },
+    "Your time zone · ": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your time zone · "
+          }
+        }
+      }
+    },
+    "Fan's time zone · ": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fan's time zone · "
+          }
+        }
+      }
+    },
+    "You spoke with {value1} for {value2} minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You spoke with {value1} for {value2} minutes."
+          }
+        }
+      }
+    },
+    "Call outcome: {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call outcome: {value1}"
+          }
+        }
+      }
+    },
+    "Request {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request {value1}"
+          }
+        }
+      }
+    },
+    "Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total."
+          }
+        }
+      }
+    },
+    "Connected {value1} of {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected {value1} of {value2}"
+          }
+        }
+      }
+    },
+    "Bearer {value1}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bearer {value1}"
+          }
+        }
+      }
+    },
+    "{value1} seconds recorded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} seconds recorded"
+          }
+        }
+      }
+    },
+    "Up to {value1} seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to {value1} seconds"
+          }
+        }
+      }
+    },
+    "Starts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts"
+          }
+        }
+      }
+    },
+    "Ends": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ends"
+          }
+        }
+      }
+    },
+    "Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        }
+      }
+    },
+    "FAN": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FAN"
+          }
+        }
+      }
+    },
+    "Unmute": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute"
+          }
+        }
+      }
+    },
+    "Mute": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute"
+          }
+        }
+      }
+    },
+    "Call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Call"
+          }
+        }
+      }
+    },
+    "On": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        }
+      }
+    },
+    "{label} · {state}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{label} · {state}"
+          }
+        }
+      }
+    },
+    " {value1} seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " {value1} seconds"
+          }
+        }
+      }
+    },
+    "{value1} had to end early.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} had to end early."
+          }
+        }
+      }
+    },
+    "{value1} did not join.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} did not join."
+          }
+        }
+      }
+    },
+    "{value1} of {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} of {value2}"
+          }
+        }
+      }
+    },
+    "{value1} shared files · {value2}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{value1} shared files · {value2}"
+          }
+        }
+      }
+    },
+    "being reconciled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "being reconciled"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

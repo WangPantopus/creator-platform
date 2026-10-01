@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useRef, useState } from "react";
 import type { MediaAsset } from "../../../../packages/api/src/media";
 import type { SignedActCommand } from "@qelvora/api";
@@ -30,7 +31,7 @@ export function SignRecording({
       const failed = (await response.json().catch(() => null)) as {
         error?: { message?: string };
       } | null;
-      throw new Error(failed?.error?.message ?? "Signing is unavailable.");
+      throw new Error(failed?.error?.message ?? copy.w6SigningIsUnavailable);
     }
     return response.json() as Promise<T>;
   }
@@ -48,7 +49,7 @@ export function SignRecording({
     } catch {
       setUnknown(true);
       setError(
-        "Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again.",
+        copy.w6SignatureSubmissionIsUnconfirmedRetryThisExactActOrRefresh,
       );
     } finally {
       setBusy(false);
@@ -87,7 +88,7 @@ export function SignRecording({
       setError(
         e instanceof Error
           ? e.message
-          : "Signing was cancelled. Nothing was shared.",
+          : copy.w6SigningWasCancelledNothingWasShared,
       );
     } finally {
       setBusy(false);
@@ -95,19 +96,19 @@ export function SignRecording({
   }
   return (
     <section className="w6-card">
-      <strong>Sign this exact recording</strong>
+      <strong>{copy.w6SignThisExactRecording}</strong>
       <p>
-        {Math.round((asset.durationMs ?? 0) / 1000)} seconds · M4A · version
-        {asset.version}
+        {formatCopy("w6SecondsM4AVersion", {
+          value1: Math.round((asset.durationMs ?? 0) / 1000),
+          value2: asset.version,
+        })}
       </p>
       <details>
-        <summary>Recording fingerprint</summary>
+        <summary>{copy.w6RecordingFingerprint}</summary>
         <code style={{ overflowWrap: "anywhere" }}>{asset.sha256}</code>
       </details>
       <p className="qv-help">
-        Review the processed recording before signing. A signature applies to
-        these exact audio bytes. Adding content credentials is a separate
-        processing step.
+        {copy.w6ReviewTheProcessedRecordingBeforeSigningASignatureAppliesTo}
       </p>
       <button
         className="qv-btn qv-btn--maya"
@@ -119,10 +120,10 @@ export function SignRecording({
         }}
       >
         {asset.signedActId
-          ? "Signature saved"
+          ? copy.w6SignatureSaved
           : busy
-            ? "Waiting for your passkey"
-            : "Sign recording"}
+            ? copy.w6WaitingForYourPasskey
+            : copy.w6SignRecording}
       </button>
       {error && <p role="status">{error}</p>}
       {unknown && (
@@ -133,7 +134,7 @@ export function SignRecording({
             void publish();
           }}
         >
-          Retry this exact signature
+          {copy.w6RetryThisExactSignature}
         </button>
       )}
     </section>

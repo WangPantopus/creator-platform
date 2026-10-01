@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.media
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -20,7 +22,7 @@ data class NativeMediaAsset(val id: String, val state: String, val version: Int,
 data class NativeUploadTicket(val asset: NativeMediaAsset, val url: URL, val chunkBytes: Int)
 @Serializable
 data class NativeCreatorUploadTicket(val asset: APIMediaCreatorMediaAsset, val url: String, val expiresAt: String, val chunkBytes: Long)
-class NativeMediaRequestError(val status: Int) : Exception("Media access expired or is unavailable.")
+class NativeMediaRequestError(val status: Int) : Exception(QelvoraCopy.text("w6MediaAccessExpiredOrIsUnavailable"))
 
 /** Authentication comes from W1's secure session store, never a media-issued local identity. */
 class NativeMediaClient(private val base: URL, private val token: suspend () -> String) {
@@ -33,7 +35,7 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
         require(url.host == base.host && url.protocol == base.protocol && url.port == base.port)
         val connection = url.openConnection() as HttpURLConnection
         connection.instanceFollowRedirects = false; connection.requestMethod = method; connection.connectTimeout = 15_000; connection.readTimeout = 15_000
-        connection.setRequestProperty("Authorization", "Bearer ${token()}"); connection.setRequestProperty("Content-Type", contentType)
+        connection.setRequestProperty("Authorization", QelvoraCopy.text("w6Bearer", mapOf("value1" to (token()).toString()))); connection.setRequestProperty("Content-Type", contentType)
         offset?.let { connection.setRequestProperty("Upload-Offset", it.toString()) }
         try {
             bytes?.let { connection.doOutput = true; connection.setFixedLengthStreamingMode(it.size); connection.outputStream.use { stream -> stream.write(it) } }

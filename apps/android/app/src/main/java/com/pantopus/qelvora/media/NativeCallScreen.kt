@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.media
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -40,7 +42,7 @@ private fun callClock(milliseconds: Long): String = "${maxOf(0, milliseconds) / 
 @Composable
 fun NativeCallScreen(baseURL: String?, model: FanSession) {
     val route = remember(model.destination) { CallRoute.from(model.destination) }
-    val client = remember(baseURL, model) { baseURL?.let { NativeMediaClient(URL(it)) { model.currentToken() ?: error("Sign in again.") } } }
+    val client = remember(baseURL, model) { baseURL?.let { NativeMediaClient(URL(it)) { model.currentToken() ?: error(QelvoraCopy.text("w6SignInAgain")) } } }
     var call by remember(route) { mutableStateOf<JSONObject?>(null) }
     var notice by remember(route) { mutableStateOf<String?>(null) }
     var stale by remember(route) { mutableStateOf(true) }
@@ -69,7 +71,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         catch (error: Exception) {
             if (!active) return
             if (error is NativeMediaRequestError && error.status in listOf(401, 403, 404)) { disconnectMedia(); call = null }
-            stale = true; notice = "Reconnect to refresh this call. Actions are unavailable until access is confirmed."
+            stale = true; notice = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
         }
         finally { fetching = false }
     }
@@ -81,14 +83,14 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             call = JSONObject(api.request(currentRoute.path + "/" + name, "POST", body.toString().toByteArray()).toString(Charsets.UTF_8))
             if (name == "end") { disconnectMedia(); leaving = false }
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) { notice = "This action could not complete. Refresh the call before trying again."; stale = true }
+        catch (_: Exception) { notice = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true }
         finally { busy = false }
     }
     suspend fun join() {
         val value = call ?: return; val api = client ?: return; val currentRoute = route ?: return
         if (!active || busy || stale || role(value) == null || (transport != null && localState != "disconnected")) return
         val adapter = NativeCallTransports.create?.invoke(currentRoute.session)
-        if (adapter == null) { notice = "Calling is not connected yet. Your booking is unchanged."; return }
+        if (adapter == null) { notice = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return }
         busy = true; notice = null
         mediaEpoch++; val epoch = mediaEpoch
         try {
@@ -98,7 +100,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             adapter.connect(CallAdmission(response.getString("token"), response.getString("url"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"))) { if (active && epoch == mediaEpoch) localState = it }
             if (!active || epoch != mediaEpoch) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
-        catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = "Connection failed. Rejoin the same call." } }
+        catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
         finally { busy = false }
     }
     LaunchedEffect(route, client) { while (true) { refresh(); delay(1000) } }
@@ -106,71 +108,71 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {
-            BasicText("This call is unavailable", style = qText("display-md").copy(color = qColor("ink")))
-            BasicText(if (route == null) "Open this call from its authorized request link." else "Checking the booking and participant access.", style = qText("body").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("w6ThisCallIsUnavailable"), style = qText("display-md").copy(color = qColor("ink")))
+            BasicText(if (route == null) QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") else QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess"), style = qText("body").copy(color = qColor("ink")))
         } else {
             val state = value.getString("state"); val live = state in listOf("connected", "reconnecting", "ending"); val ended = state in listOf("ended", "cancelled")
             val creator = value.getString("creatorName"); val duration = value.getLong("durationSeconds"); val connected = value.getLong("connectedMilliseconds")
             val recording = value.getString("recordingState")
             if (live) CallChip(name = creator, time = callClock(connected), end = callClock(duration * 1000), recording = recording in listOf("on", "stopping"))
             else {
-                BasicText("${duration / 60}-MINUTE ${value.getString("mediaMode").uppercase()} CALL", style = qText("label").copy(color = qColor("ink-muted")))
-                val title = if (state == "cancelled") "This call was cancelled." else if (ended) { if (value.optString("outcome") == "completed") "You spoke with $creator for ${connected / 60_000} minutes." else "Call outcome: ${value.optString("outcome", "being reconciled").replace('_', ' ')}" } else "${runCatching { DateTimeFormatter.ofPattern("EEEE, HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(value.getString("scheduledAt"))) }.getOrDefault(value.getString("scheduledAt"))} with $creator"
+                BasicText(QelvoraCopy.text("w6MINUTECALL", mapOf("value1" to (duration / 60).toString(), "value2" to value.getString("mediaMode").uppercase())), style = qText("label").copy(color = qColor("ink-muted")))
+                val title = if (state == "cancelled") QelvoraCopy.text("w6ThisCallWasCancelled") else if (ended) { if (value.optString("outcome") == "completed") QelvoraCopy.text("w6YouSpokeWithForMinutesa8bf6c", mapOf("value1" to (creator).toString(), "value2" to (connected / 60_000).toString())) else QelvoraCopy.text("w6CallOutcome", mapOf("value1" to (value.optString("outcome", QelvoraCopy.text("w6BeingReconciled")).replace('_', ' ')).toString())) } else QelvoraCopy.text("w6With", mapOf("value1" to runCatching { DateTimeFormatter.ofPattern("EEEE, HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(value.getString("scheduledAt"))) }.getOrDefault(value.getString("scheduledAt")), "value2" to creator))
                 BasicText(title, style = qText("display-md").copy(color = qColor("ink")))
             }
             if (!ended && !(state == "connected" && localState == "connected")) {
-                val countdown = when (state) { "reconnecting" -> "Reconnecting · ${callClock(value.getLong("reconnectBudgetSeconds") * 1000 - value.getLong("reconnectUsedMilliseconds"))} allowance left"; "ending" -> "Ending · confirming provider history"; else -> runCatching { val remaining = Instant.parse(value.getString("scheduledAt")).toEpochMilli() - Instant.parse(value.getString("serverNow")).toEpochMilli(); if (remaining > 0) "Starts in ${callClock(remaining)}" else "Waiting for both participants" }.getOrDefault("Waiting for server confirmation") }
+                val countdown = when (state) { "reconnecting" -> QelvoraCopy.text("w6ReconnectingAllowanceLeft", mapOf("value1" to (callClock(value.getLong("reconnectBudgetSeconds") * 1000 - value.getLong("reconnectUsedMilliseconds"))).toString())); "ending" -> QelvoraCopy.text("w6EndingConfirmingProviderHistory"); else -> runCatching { val remaining = Instant.parse(value.getString("scheduledAt")).toEpochMilli() - Instant.parse(value.getString("serverNow")).toEpochMilli(); if (remaining > 0) QelvoraCopy.text("w6StartsIn", mapOf("value1" to (callClock(remaining)).toString())) else QelvoraCopy.text("w6WaitingForBothParticipants") }.getOrDefault(QelvoraCopy.text("w6WaitingForServerConfirmation")) }
                 Countdown(countdown, CountdownTone.SOON)
             }
-            if (stale) Notice(title = "Connection lost", children = "Displayed times are from the last server update.")
-            if (recording in listOf("starting", "stopping", "blocked")) BasicText(when (recording) { "stopping" -> "Recording stop requested · awaiting provider confirmation"; "starting" -> "Recording start requested · awaiting provider confirmation"; else -> "Recording status needs confirmation" }, style = qText("caption").copy(color = qColor("ink-muted")))
+            if (stale) Notice(title = QelvoraCopy.text("w6ConnectionLost"), children = QelvoraCopy.text("w6DisplayedTimesAreFromTheLastServerUpdate"))
+            if (recording in listOf("starting", "stopping", "blocked")) BasicText(when (recording) { "stopping" -> QelvoraCopy.text("w6RecordingStopRequestedAwaitingProviderConfirmation"); "starting" -> QelvoraCopy.text("w6RecordingStartRequestedAwaitingProviderConfirmation"); else -> QelvoraCopy.text("w6RecordingStatusNeedsConfirmation") }, style = qText("caption").copy(color = qColor("ink-muted")))
             if (!live && !ended) {
-                BasicText("${duration / 60} minutes, fixed · no overtime charge", style = qText("body").copy(color = qColor("ink")))
-                BasicText("Shared with $creator", style = qText("label").copy(color = qColor("ink-muted")))
+                BasicText(QelvoraCopy.text("w6MinutesFixedNoOvertimeCharge", mapOf("value1" to (duration / 60).toString())), style = qText("body").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("w6SharedWith", mapOf("value1" to (creator).toString())), style = qText("label").copy(color = qColor("ink-muted")))
                 BasicText(value.getJSONObject("packet").getString("summary"), style = qText("body").copy(color = qColor("ink")))
-                BasicText("${value.getJSONObject("packet").getJSONArray("attachmentIds").length()} shared files · ${ZoneId.systemDefault().id}", style = qText("caption").copy(color = qColor("ink-muted")))
-                BasicText("Request ${value.getString("commitmentId")}", style = qText("caption").copy(color = qColor("ink-muted")))
-                BasicText("Joining early starts nothing. The connected timer pauses during a drop, up to ${value.getLong("reconnectBudgetSeconds") / 60} minutes total.", style = qText("caption").copy(color = qColor("ink-muted")))
-                Button("Enter the waiting room", ButtonVariant.SECONDARY, block = true, disabled = busy || stale || role(value) == null) { scope.launch { join() } }
+                BasicText(QelvoraCopy.text("w6SharedFilesInZone", mapOf("value1" to value.getJSONObject("packet").getJSONArray("attachmentIds").length().toString(), "value2" to ZoneId.systemDefault().id)), style = qText("caption").copy(color = qColor("ink-muted")))
+                BasicText(QelvoraCopy.text("w6Requestfc03f5", mapOf("value1" to (value.getString("commitmentId")).toString())), style = qText("caption").copy(color = qColor("ink-muted")))
+                BasicText(QelvoraCopy.text("w6JoiningEarlyStartsNothingTheConnectedTimerPausesDuringA", mapOf("value1" to (value.getLong("reconnectBudgetSeconds") / 60).toString())), style = qText("caption").copy(color = qColor("ink-muted")))
+                Button(QelvoraCopy.text("w6EnterTheWaitingRoom"), ButtonVariant.SECONDARY, block = true, disabled = busy || stale || role(value) == null) { scope.launch { join() } }
             }
             if (live) {
-                transport?.Media() ?: BasicText("Media connection is unavailable.", style = qText("body").copy(color = qColor("ink")))
+                transport?.Media() ?: BasicText(QelvoraCopy.text("w6MediaConnectionIsUnavailable"), style = qText("body").copy(color = qColor("ink")))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(if (muted) "Unmute" else "Mute", ButtonVariant.SECONDARY, disabled = busy || stale || transport == null) { scope.launch { try { transport?.microphone(muted); muted = !muted } catch (_: Exception) { notice = "Microphone change failed." } } }
-                    Button("Camera", ButtonVariant.SECONDARY, disabled = busy || stale || transport == null || value.getString("mediaMode") != "video") { scope.launch { try { transport?.camera(!camera); camera = !camera } catch (_: Exception) { notice = "Camera change failed." } } }
+                    Button(if (muted) QelvoraCopy.text("w6Unmute") else QelvoraCopy.text("w6Mute"), ButtonVariant.SECONDARY, disabled = busy || stale || transport == null) { scope.launch { try { transport?.microphone(muted); muted = !muted } catch (_: Exception) { notice = QelvoraCopy.text("w6MicrophoneChangeFailed") } } }
+                    Button(QelvoraCopy.text("w6Camera"), ButtonVariant.SECONDARY, disabled = busy || stale || transport == null || value.getString("mediaMode") != "video") { scope.launch { try { transport?.camera(!camera); camera = !camera } catch (_: Exception) { notice = QelvoraCopy.text("w6CameraChangeFailed") } } }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Button("Report", ButtonVariant.SECONDARY) { model.open("/support") }; Button("Leave", ButtonVariant.SECONDARY, disabled = busy || stale || role(value) == null) { leaving = true } }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Button(QelvoraCopy.text("w6Report"), ButtonVariant.SECONDARY) { model.open("/support") }; Button(QelvoraCopy.text("w6Leave"), ButtonVariant.SECONDARY, disabled = busy || stale || role(value) == null) { leaving = true } }
             }
             if (live || ended) {
-                BasicText(if (state == "ended") "Both of you can get a short summary" else "Separate permissions", style = qText("title").copy(color = qColor("ink")))
+                BasicText(if (state == "ended") QelvoraCopy.text("w6BothOfYouCanGetAShortSummary") else QelvoraCopy.text("w6SeparatePermissions"), style = qText("title").copy(color = qColor("ink")))
                 val consents = value.getJSONArray("consents")
                 fun granted(purpose: String, participant: String?) = (0 until consents.length()).any { val c = consents.getJSONObject(it); c.getString("role") == participant && c.getString("purpose") == purpose && c.getBoolean("granted") }
                 listOf("recording", "summary", "content_reuse", "ai_source").filter { purpose ->
                     if (state == "cancelled") granted(purpose, role(value))
                     else purpose != "recording" || state !in listOf("ending", "ended") || granted(purpose, role(value))
                 }.forEach { purpose ->
-                    val label = when (purpose) { "recording" -> "Allow recording"; "summary" -> "I'd like a summary"; "content_reuse" -> "Allow content reuse"; else -> "Allow use as an AI source" }
+                    val label = when (purpose) { "recording" -> QelvoraCopy.text("w6AllowRecording"); "summary" -> QelvoraCopy.text("w6IDLikeASummary"); "content_reuse" -> QelvoraCopy.text("w6AllowContentReuse"); else -> QelvoraCopy.text("w6AllowUseAsAnAISource") }
                     val allowed = granted(purpose, role(value))
-                    Button("$label · ${if (allowed) "On" else "Off"}", ButtonVariant.SECONDARY, block = true, disabled = busy || stale || role(value) == null) { scope.launch { action("consent", JSONObject().put("purpose", purpose).put("granted", !allowed)) } }
+                    Button(QelvoraCopy.text("w6ControlStatus", mapOf("label" to label, "state" to if (allowed) QelvoraCopy.text("w6On") else QelvoraCopy.text("w6Off"))), ButtonVariant.SECONDARY, block = true, disabled = busy || stale || role(value) == null) { scope.launch { action("consent", JSONObject().put("purpose", purpose).put("granted", !allowed)) } }
                 }
-                BasicText("Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note.", style = qText("caption").copy(color = qColor("ink-muted")))
-                if (!value.isNull("summary") && listOf("creator", "fan").all { granted("summary", it) }) { BasicText(value.getString("summary"), style = qText("body").copy(color = qColor("ink"))); Button("Delete this summary", ButtonVariant.QUIET, disabled = busy || stale) { scope.launch { action("delete-summary") } } }
-                if (value.optString("summaryState") == "pending") BasicText("Summary queued · available when its provider completes.", style = qText("caption").copy(color = qColor("ink-muted")))
+                BasicText(QelvoraCopy.text("w6EachPurposeNeedsBothPeopleSPermissionWithoutRecordingPermission8487ed"), style = qText("caption").copy(color = qColor("ink-muted")))
+                if (!value.isNull("summary") && listOf("creator", "fan").all { granted("summary", it) }) { BasicText(value.getString("summary"), style = qText("body").copy(color = qColor("ink"))); Button(QelvoraCopy.text("w6DeleteThisSummary"), ButtonVariant.QUIET, disabled = busy || stale) { scope.launch { action("delete-summary") } } }
+                if (value.optString("summaryState") == "pending") BasicText(QelvoraCopy.text("w6SummaryQueuedAvailableWhenItsProviderCompletes"), style = qText("caption").copy(color = qColor("ink-muted")))
             }
             if (state == "ended") {
-                BasicText("Call receipt", style = qText("title").copy(color = qColor("ink")))
-                BasicText("Connected ${callClock(connected)} of ${callClock(duration * 1000)}", style = qText("body").copy(color = qColor("ink")))
-                BasicText(if (value.optBoolean("recordingOccurred")) "Recording occurred · check the consent history" else "No recording was confirmed", style = qText("caption").copy(color = qColor("ink-muted")))
-                Button("View Requests for settlement", ButtonVariant.SECONDARY) { model.open("/requests") }
+                BasicText(QelvoraCopy.text("w6CallReceipt"), style = qText("title").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("w6ConnectedOf", mapOf("value1" to (callClock(connected)).toString(), "value2" to (callClock(duration * 1000)).toString())), style = qText("body").copy(color = qColor("ink")))
+                BasicText(if (value.optBoolean("recordingOccurred")) QelvoraCopy.text("w6RecordingOccurredCheckTheConsentHistory") else QelvoraCopy.text("w6NoRecordingWasConfirmed"), style = qText("caption").copy(color = qColor("ink-muted")))
+                Button(QelvoraCopy.text("w6ViewRequestsForSettlement"), ButtonVariant.SECONDARY) { model.open("/requests") }
             }
             if (leaving) {
-              Dialog(title = "End this call?", confirm = if (role(value) == "fan") "End by choice" else "End call", cancel = "Stay in the call", onCancel = { leaving = false }, onConfirm = { scope.launch { action("end", if (role(value) == "fan") JSONObject().put("fanChoice", "end_by_choice") else JSONObject()) } }) {
-                BasicText("A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement.", style = qText("caption").copy(color = qColor("ink-muted")))
-                if (role(value) == "fan") Button("Technical problem", ButtonVariant.SECONDARY, disabled = busy || stale) { scope.launch { action("end", JSONObject().put("fanChoice", "technical_problem")) } }
+              Dialog(title = QelvoraCopy.text("w6EndThisCall"), confirm = if (role(value) == "fan") QelvoraCopy.text("w6EndByChoice") else QelvoraCopy.text("w6EndCall"), cancel = QelvoraCopy.text("w6StayInTheCall"), onCancel = { leaving = false }, onConfirm = { scope.launch { action("end", if (role(value) == "fan") JSONObject().put("fanChoice", "end_by_choice") else JSONObject()) } }) {
+                BasicText(QelvoraCopy.text("w6AFanEndingByChoiceCountsAsACompletedCall"), style = qText("caption").copy(color = qColor("ink-muted")))
+                if (role(value) == "fan") Button(QelvoraCopy.text("w6TechnicalProblem"), ButtonVariant.SECONDARY, disabled = busy || stale) { scope.launch { action("end", JSONObject().put("fanChoice", "technical_problem")) } }
               }
             }
         }
         notice?.let { BasicText(it, style = qText("caption").copy(color = qColor("ink-muted"))) }
-        Button("Refresh call", ButtonVariant.QUIET, disabled = busy || fetching || client == null || route == null) { scope.launch { refresh() } }
+        Button(QelvoraCopy.text("w6RefreshCall"), ButtonVariant.QUIET, disabled = busy || fetching || client == null || route == null) { scope.launch { refresh() } }
     }
 }

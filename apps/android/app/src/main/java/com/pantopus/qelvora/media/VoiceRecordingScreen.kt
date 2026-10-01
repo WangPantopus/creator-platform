@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.media
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -52,7 +54,7 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> startWhenResumed()
-                Lifecycle.Event.ON_PAUSE -> { recorder.pause("Recording paused while you left this screen."); recorder.pausePreview() }
+                Lifecycle.Event.ON_PAUSE -> { recorder.pause(QelvoraCopy.text("w6RecordingPausedWhileYouLeftThisScreen")); recorder.pausePreview() }
                 Lifecycle.Event.ON_STOP -> { requestPending = false; grantedPending = false }
                 else -> Unit
             }
@@ -61,25 +63,25 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
         onDispose { mounted = false; requestPending = false; grantedPending = false; lifecycle.removeObserver(observer); recorder.close() }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.space5)) {
-        BasicText("Your own voice", style = qText("display-md").copy(color = qColor("ink")))
-        BasicText("Record and listen before uploading. Your preview stays on this device.", style = qText("body").copy(color = qColor("ink")))
-        BasicText("${snapshot.durationMs / 60_000}:${(snapshot.durationMs / 1000 % 60).toString().padStart(2, '0')}", Modifier.semantics { contentDescription = "${snapshot.durationMs / 1000} seconds recorded" }, style = qText("data-lg").copy(color = qColor("ink")))
-        BasicText("Up to ${maxDurationMs / 1000} seconds", style = qText("caption").copy(color = qColor("ink-muted")))
+        BasicText(QelvoraCopy.text("w6YourOwnVoice"), style = qText("display-md").copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis"), style = qText("body").copy(color = qColor("ink")))
+        BasicText("${snapshot.durationMs / 60_000}:${(snapshot.durationMs / 1000 % 60).toString().padStart(2, '0')}", Modifier.semantics { contentDescription = QelvoraCopy.text("w6SecondsRecorded", mapOf("value1" to (snapshot.durationMs / 1000).toString())) }, style = qText("data-lg").copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("w6UpToSeconds", mapOf("value1" to (maxDurationMs / 1000).toString())), style = qText("caption").copy(color = qColor("ink-muted")))
         if (snapshot.state in listOf("recording", "paused")) {
-            Button(if (snapshot.state == "recording") "Pause" else "Resume", ButtonVariant.SECONDARY) { if (snapshot.state == "recording") recorder.pause() else recorder.resume() }
-            Button("Stop and preview", ButtonVariant.SECONDARY) { recorder.stop() }
-        } else if (requestPending) Button("Cancel permission request", ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false }
-        else Button(if (snapshot.state == "preview") "Record again" else "Record", ButtonVariant.SECONDARY, disabled = permissionInFlight) {
+            Button(if (snapshot.state == "recording") QelvoraCopy.text("w6Pause") else QelvoraCopy.text("w6Resume"), ButtonVariant.SECONDARY) { if (snapshot.state == "recording") recorder.pause() else recorder.resume() }
+            Button(QelvoraCopy.text("w6StopAndPreview"), ButtonVariant.SECONDARY) { recorder.stop() }
+        } else if (requestPending) Button(QelvoraCopy.text("w6CancelPermissionRequest"), ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false }
+        else Button(if (snapshot.state == "preview") QelvoraCopy.text("w6RecordAgain") else QelvoraCopy.text("w6Record"), ButtonVariant.SECONDARY, disabled = permissionInFlight) {
             if (!mounted || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@Button
             if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) recorder.start()
             else { requestPending = true; grantedPending = false; permissionInFlight = true; permission.launch(Manifest.permission.RECORD_AUDIO) }
         }
         if (snapshot.state == "preview") {
-            Button("Play private preview", ButtonVariant.SECONDARY) { recorder.playPreview() }
-            Button("Pause preview", ButtonVariant.SECONDARY) { recorder.pausePreview() }
-            Button("Discard recording", ButtonVariant.QUIET) { recorder.discard() }
+            Button(QelvoraCopy.text("w6PlayPrivatePreview"), ButtonVariant.SECONDARY) { recorder.playPreview() }
+            Button(QelvoraCopy.text("w6PausePreview"), ButtonVariant.SECONDARY) { recorder.pausePreview() }
+            Button(QelvoraCopy.text("w6DiscardRecording"), ButtonVariant.QUIET) { recorder.discard() }
         }
         snapshot.reason?.let { BasicText(it, style = qText("caption").copy(color = qColor("ink-muted"))) }
-        BasicText("Uploading and exact-media signing require a configured account and media service.", style = qText("caption").copy(color = qColor("ink-muted")))
+        BasicText(QelvoraCopy.text("w6UploadingAndExactMediaSigningRequireAConfiguredAccountAnd"), style = qText("caption").copy(color = qColor("ink-muted")))
     }
 }

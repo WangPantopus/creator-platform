@@ -39,7 +39,7 @@ public struct NativeMediaClient: Sendable {
     public func request(path: String, method: String = "GET", body: Data? = nil, contentType: String = "application/json", offset: Int? = nil) async throws -> Data {
         guard baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")), baseURL.user == nil, baseURL.password == nil, path.hasPrefix("/v1/w6/"), !path.contains(".."), let url = URL(string: path, relativeTo: baseURL), url.host == baseURL.host, url.scheme == baseURL.scheme, url.port == baseURL.port else { throw URLError(.badURL) }
         var request = URLRequest(url: url); request.httpMethod = method; request.httpBody = body; request.timeoutInterval = 15
-        request.setValue("Bearer \(try await sessionToken())", forHTTPHeaderField: "Authorization")
+        request.setValue(QelvoraCopy.text("w6Bearer", values: ["value1": String(describing: try await sessionToken())]), forHTTPHeaderField: "Authorization")
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         if let offset { request.setValue(String(offset), forHTTPHeaderField: "Upload-Offset") }
         let session = URLSession(configuration: .ephemeral, delegate: MediaRedirectGuard(), delegateQueue: nil)

@@ -44,7 +44,7 @@ private struct NativeCallOffer: Decodable, Sendable {
             let current = values.first { $0.id.lowercased() == route.sessionID.uuidString.lowercased() }
             if current?.version != offer?.version || !((current?.slots ?? []).contains { $0.id == chosen }) { chosen = nil }
             offer = current; loaded = true; stale = false; notice = nil
-        } catch { loaded = true; stale = true; notice = "The times could not be loaded. Reconnect and try again." }
+        } catch { loaded = true; stale = true; notice = QelvoraCopy.text("w6TheTimesCouldNotBeLoadedReconnectAndTryAgain") }
     }
     private func select() async {
         guard !busy, !stale, canSelect, let chosen, let offer, let client, let route, let root else { return }; busy = true; defer { busy = false }
@@ -55,26 +55,26 @@ private struct NativeCallOffer: Decodable, Sendable {
             let selected = try JSONDecoder().decode(Selection.self, from: await client.request(path: root + "/" + offer.id + "/select", method: "POST", body: JSONSerialization.data(withJSONObject: body)))
             guard let sessionID = UUID(uuidString: selected.id) else { throw URLError(.badServerResponse) }
             open("/calls/\(route.creatorID.uuidString.lowercased())/\(route.fanID.uuidString.lowercased())/\(sessionID.uuidString.lowercased())")
-        } catch { notice = "This time is unavailable. Reload the current offer." }
+        } catch { notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") }
     }
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: QelvoraTokens.space5) {
-            Text("CALL REQUEST").qText("label"); Text("Choose a time").qText("display-md")
+            Text(QelvoraCopy.text("w6CALLREQUEST")).qText("label"); Text(QelvoraCopy.text("w6ChooseATime")).qText("display-md")
             if let offer, offer.state == "offered" {
                 ForEach(offer.slots, id: \.id) { slot in
                     Button(display(slot.startsAt, zone: offer.fanTimeZone) + (chosen == slot.id ? " · Selected" : ""), variant: .secondary, block: true, disabled: busy || stale || !canSelect) { chosen = slot.id }
                 }
-                Text("Your time · \(offer.fanTimeZone)").qText("caption")
-                Text("Creator's time zone · \(offer.creatorTimeZone)").qText("caption")
-                Text("Your accepted terms and payment stay with the request receipt. Choosing a time cannot create a second charge.").qText("caption")
-                Text("Offer expires \(display(offer.expiresAt, zone: offer.fanTimeZone)).").qText("caption")
-                Button("Confirm this time", variant: .secondary, block: true, disabled: busy || stale || chosen == nil || !canSelect) { Task { await select() } }
+                Text(QelvoraCopy.text("w6YourTime", values: ["value1": String(describing: offer.fanTimeZone)])).qText("caption")
+                Text(QelvoraCopy.text("w6CreatorSTimeZone", values: ["value1": String(describing: offer.creatorTimeZone)])).qText("caption")
+                Text(QelvoraCopy.text("w6YourAcceptedTermsAndPaymentStayWithTheRequestReceipt")).qText("caption")
+                Text(QelvoraCopy.text("w6OfferExpirescfe463", values: ["value1": String(describing: display(offer.expiresAt, zone: offer.fanTimeZone))])).qText("caption")
+                Button(QelvoraCopy.text("w6ConfirmThisTime"), variant: .secondary, block: true, disabled: busy || stale || chosen == nil || !canSelect) { Task { await select() } }
             } else if let offer, offer.state == "selected", let id = offer.selectedSessionId, let sessionID = UUID(uuidString: id), let route {
-                Button("Open your scheduled call", variant: .secondary, block: true) { open("/calls/\(route.creatorID.uuidString.lowercased())/\(route.fanID.uuidString.lowercased())/\(sessionID.uuidString.lowercased())") }
-            } else { Text(loaded ? "This offer changed or expired. Open Requests for its current options." : "Checking the current offer and participant access.").qText("body") }
+                Button(QelvoraCopy.text("w6OpenYourScheduledCall"), variant: .secondary, block: true) { open("/calls/\(route.creatorID.uuidString.lowercased())/\(route.fanID.uuidString.lowercased())/\(sessionID.uuidString.lowercased())") }
+            } else { Text(loaded ? QelvoraCopy.text("w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent") : QelvoraCopy.text("w6CheckingTheCurrentOfferAndParticipantAccess")).qText("body") }
             if let notice { Text(notice).qText("caption") }
-            Button("Reload current offer", variant: .quiet, disabled: busy || client == nil || route == nil) { Task { await refresh() } }
-            Button("Open Requests", variant: .quiet) { open("/requests") }
+            Button(QelvoraCopy.text("w6ReloadCurrentOffer"), variant: .quiet, disabled: busy || client == nil || route == nil) { Task { await refresh() } }
+            Button(QelvoraCopy.text("w6OpenRequests"), variant: .quiet) { open("/requests") }
         }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading) }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme)).task {
             while !Task.isCancelled { await refresh(); do { try await Task.sleep(for: .seconds(30)) } catch { return } }
         }

@@ -1,211 +1,10 @@
-// Generated from config/copy.json.
-import Foundation
-public enum QelvoraCopy {
-  public static let strings: [String: String] = [
-    "continueWithPantopus": "Continue with Pantopus",
-    "welcomeTitle": "Her AI answers you now. She answers in person when you ask.",
-    "welcomeBody": "Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.",
-    "pantopusAccount": "One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",
-    "identityStrip": "You're talking to {name}'s AI · {name} steps in on request.",
-    "officialDisclaimer": "Official means {name} authorized this AI. It does not mean she read your message.",
-    "conversationAccess": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
-    "packetAccess": "{name} and her authorized team can separately review this AI conversation. Those accesses are logged.",
-    "chargeRule": "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.",
-    "pendingHold": "Your bank may show a pending hold for a few days.",
-    "decisionEta": "{name} usually decides in {range}",
-    "draftNotice": "{name} may answer with her AI's draft; you'll see that label.",
-    "capacity": "{name} answers {mode} within {deadline} · {n} of {cap} left this week.",
-    "auditAccess": "Opening this conversation is logged and visible to the fan.",
-    "longSession": "You've been talking with {name}'s AI for a while. It's an AI, and it will be here when you're back.",
-    "noteAudience": "{name} · to {audience}",
-    "noteReplies": "Only {name} and her team see replies to Notes.",
-    "sponsorDisclosure": "Paid partnership: {name} is paid by {brand}.",
-    "processorConsent": "Before your first message, {name}'s AI is powered by {providers}. They don't keep or train on your messages.",
-    "sensitiveMemory": "Want me to remember this? Only if you say yes.",
-    "spendLimit": "Set a monthly limit. You can change it any time; raising it takes 24 hours.",
-    "stepIn": "Ask {name} to step in",
-    "includedInRequest": "Included in your request",
-    "aiAuthor": "{name}'s AI",
-    "approvedAuthor": "Prepared by AI · approved by {name}",
-    "teamAuthor": "{name}'s team · {member}",
-    "signedBy": "Signed by {name}",
-    "takeover": "{name} is here",
-    "handback": "{name} left the conversation · you're back with {name}'s AI",
-    "reaction": "{name} reacted to your reply",
-    "callAuthor": "{name} · the person",
-    "notRecording": "Not recording",
-    "accessCan": "You can: {capabilities}",
-    "accessIncluded": "Included: {inclusion}",
-    "accessRequest": "By request: {requests}",
-    "accessChanges": "Changes: {changes}",
-    "sourceUnavailable": "No longer accessible to you",
-    "declined": "{name} passed on this one · nothing charged",
-    "expired": "{name}'s queue didn't get to this · nothing charged",
-    "paymentFailed": "Payment didn't go through · nothing was shared",
-    "deadlineMissed": "Refunded automatically · {name} may still reply",
-    "aiPaused": "{name}'s AI is paused · requests still work",
-    "seenByQueue": "Seen by {name}'s queue",
-    "interrupted": "Interrupted",
-    "notSent": "Not sent",
-    "retry": "Retry",
-    "correctionAuthor": "{name}'s note on this AI reply",
-    "preparedByAI": "Prepared by AI",
-    "approvedBy": "approved by {name}",
-    "sending": "Sending",
-    "aiWriting": "{name}'s AI is writing",
-    "thisHelped": "This helped",
-    "report": "Report",
-    "noteRemoved": "{name} removed this Note",
-    "noteReplyLabel": "Reply to {name}'s Note",
-    "writeReply": "Write a reply",
-    "removeContext": "Remove this post from your first message",
-    "openVerification": "Open the verification page",
-    "welcomeSource": "You came from Maya's page",
-    "welcomeContext": "Maya · Ceramics · Kiln Club",
-    "pantopusUnavailable": "Pantopus sign-in is not connected in this local build.",
-    "pantopusUnavailableTitle": "Pantopus sign-in is unavailable",
-    "navHome": "Home",
-    "navDiscover": "Discover",
-    "navRequests": "Requests",
-    "navYou": "You",
-    "navNotes": "Notes",
-    "navThreads": "Threads",
-    "navMyAI": "My AI",
-    "navMore": "More",
-    "navOffers": "Offers",
-    "navPublish": "Publish",
-    "navInsights": "Insights",
-    "navEarnings": "Earnings",
-    "navTeam": "Team",
-    "sections": "Sections",
-    "close": "Close",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "waiting": "{count} waiting",
-    "studioLive": "Your AI is live · {version}",
-    "thisWeek": "This week",
-    "queueAccepted": "Accepted",
-    "queueRule": "Matched your rule",
-    "queueNew": "New request",
-    "shared": "Shared: {items}",
-    "aiDraftReady": "AI draft ready",
-    "declineNoCharge": "Decline · no charge",
-    "deliver": "Deliver",
-    "open": "Open",
-    "capacityUsed": "{used} of {limit} used · {left} left",
-    "labelPreview": "The fan will see this as:",
-    "reviewAndSign": "Review and sign",
-    "acceptRequest": "Accept this request",
-    "exactSignature": "Face ID signs exactly this. Any change needs a new signature.",
-    "signFaceID": "Sign with Face ID",
-    "publicScope": "Public",
-    "approve": "Approve",
-    "restore": "Restore",
-    "revoke": "Revoke",
-    "requestUpdate": "Request update",
-    "approvedNotification": "Approved by {name}",
-    "teamNotification": "{name}'s team",
-    "shareReplied": "{name} replied to {handle}",
-    "verifyAt": "VERIFY AT {url}",
-    "agreedRecording": "Recording · both of you agreed",
-    "timerOf": "{time} of {end}",
-    "reservedAssistant": "{handle}'s assistant",
-    "reservedCall": "{name}'s AI · call",
-    "reservedVideo": "{name}'s AI · video",
-    "reservedDisabled": "Reserved · not shown until enabled",
-    "overduePrefix": "OVERDUE · {time}",
-    "instead": "Instead",
-    "insteadExplanation": "None of these charge the fan. Some need the fan's acceptance first.",
-    "boundaryTests": "Boundary tests",
-    "testPassCount": "{passed} OF {total} PASS",
-    "testFails": "Fails",
-    "testRunning": "Running",
-    "testPasses": "Passes",
-    "transcript": "Transcript · {test}",
-    "testFan": "Test fan",
-    "publishVersion": "Publish {version}",
-    "publishingWait": "Publishing waits until every test passes · failing: {tests}",
-    "publishingReady": "Every test passes. Publishing makes this version live for every fan.",
-    "versionLive": "Live",
-    "versionDraft": "Draft",
-    "rollBack": "Roll back to {version}",
-    "digestTo": "TO {handle}",
-    "digestFiled": "Filed as a test case · every future version is checked against it",
-    "neverSay": "I'd never say that",
-    "emailFrom": "From: {from}",
-    "emailSubject": "Subject: {subject}",
-    "emailRead": "Read it in {brand}",
-    "emailVia": "{sender} via {brand}",
-    "emailFooter": "You get this email because you asked {name} to step in. Manage email for each creator, set quiet hours or hide sensitive previews in You › Notifications.",
-    "back": "Back",
-    "aboutConversation": "About this conversation",
-    "officialAISubtitle": "Official AI · Kiln Club",
-    "inConversation": "In this conversation",
-    "humanStripRest": " · she's in this conversation now",
-    "teamStripLead": "{name}'s team is here",
-    "teamStripRest": " · they reply as her team, never as {name}",
-    "updatingAI": "{name}'s AI is being updated",
-    "requestsStillWork": " · requests still work",
-    "remember": "Remember",
-    "dontRemember": "Don’t remember",
-    "dontRememberThis": "Don’t remember this",
-    "remembered": "Remembered: {text}",
-    "edit": "Edit",
-    "memoryQuestion": "Memory question",
-    "source": "Source",
-    "playVoiceNote": "Play voice note",
-    "pauseVoiceNote": "Pause voice note",
-    "recordedBy": "Recorded by {name}",
-    "aiVoiceDisclosure": "AI voice · opens with “{name}’s AI”",
-    "fullyBooked": "{name} is fully booked this week · opens Monday",
-    "messageAI": "Message {name}'s AI",
-    "replyToCreator": "Reply to {name}",
-    "sendToAI": "Send to {name}'s AI",
-    "sendToCreator": "Send to {name}",
-    "attachPhoto": "Attach a photo",
-    "aiPausedBack": "{name}'s AI is paused · back {date} · requests still work",
-    "freeConversationCountdown": "FREE CONVERSATION · {left} LEFT",
-    "freeConversationEnded": "Your free conversation has ended",
-    "joinClub": "Join Kiln Club · $5 a month",
-    "endCan": "read this conversation and ask {name} to step in.",
-    "endIncluded": "your free first conversation, now complete.",
-    "endChanges": "Kiln Club includes {name}'s AI, her Notes and the right to ask for her.",
-    "accessLabelCan": "You can",
-    "accessLabelIncluded": "Included",
-    "accessLabelRequest": "By request",
-    "accessLabelChanges": "Changes",
-    "accessDefaultCan": "message {name}'s AI.",
-    "accessDefaultIncluded": "with your Kiln Club membership.",
-    "accessDefaultRequest": "a written reply, a voice note, a call · priced by {name}, charged only if she accepts.",
-    "accessDefaultChanges": "your Kiln Club membership renews Oct 14.",
-    "howAnswers": "How {name} answers",
-    "summaryQuestion": "Summary of your question",
-    "editedByYou": "Edited by you",
-    "summary": "Summary",
-    "ifAccepts": "If {name} accepts",
-    "ifDeclines": "If she declines or {deadline} pass",
-    "requestsAhead": " · {count} requests ahead of you",
-    "requestStatus": "Request status",
-    "writtenReply": "Written reply",
-    "receipt": "Receipt",
-    "receiptTitle": "A written reply from {name}",
-    "writtenBy": "Written by {name}",
-    "monthlyLimitLegend": "Monthly limit for requests and memberships",
-    "limitReminders": "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
-    "noLimit": "No limit",
-    "navChat": "Chat",
-    "navPosts": "Posts",
-    "navAccess": "Access",
-    "insteadAI": "Let my AI answer",
-    "insteadAIHelp": "No charge. The request closes and your AI answers under its own label.",
-    "insteadGroup": "Convert to group answer",
-    "insteadGroupHelp": "Offer it at your group price. The fan accepts or keeps waiting.",
-    "insteadInfo": "Ask for more info",
-    "insteadInfoHelp": "The fan replies in the request. Your deadline pauses; the card hold's does not.",
-    "insteadDeclineHelp": "Add a one-tap reason if you like. It never counts against you.",
-    "publishingPending": "Publishing waits until every test passes.",
-    "signBiometric": "Sign with biometrics",
-    "exactBiometricSignature": "Biometrics sign exactly this. Any change needs a new signature.",
+{
+  "recordedAt": "2026-10-01T01:20:47.942Z",
+  "parentRevision": "6e5bf86",
+  "lease": "W1 narrow additive w6* keys only",
+  "originalKeyCount": 204,
+  "existingKeysUnchanged": true,
+  "newKeys": {
     "w6SigningIsUnavailable": "Signing is unavailable.",
     "w6SignatureSubmissionIsUnconfirmedRetryThisExactActOrRefresh": "Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again.",
     "w6SigningWasCancelledNothingWasShared": "Signing was cancelled. Nothing was shared.",
@@ -484,17 +283,230 @@ public enum QelvoraCopy {
     "w6TimeOfDuration": "{value1} of {value2}",
     "w6SharedFilesInZone": "{value1} shared files · {value2}",
     "w6BeingReconciled": "being reconciled"
-  ]
-  private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
-  public static func text(_ key: String, values: [String: String] = [:]) -> String {
-    guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
-    let source = template as NSString
-    let result = NSMutableString(string: template)
-    for match in variables.matches(in: template, range: NSRange(location: 0, length: source.length)).reversed() {
-      if let value = values[source.substring(with: match.range(at: 1))] { result.replaceCharacters(in: match.range, with: value) }
+  },
+  "files": [
+    {
+      "path": "apps/web/features/media/SignRecording.tsx",
+      "replacements": 10
+    },
+    {
+      "path": "apps/web/features/media/VoicePlayer.tsx",
+      "replacements": 13
+    },
+    {
+      "path": "apps/web/features/media/VoiceRecorder.tsx",
+      "replacements": 28
+    },
+    {
+      "path": "apps/web/features/media/api.ts",
+      "replacements": 9
+    },
+    {
+      "path": "apps/web/features/media/recorder.ts",
+      "replacements": 10
+    },
+    {
+      "path": "apps/web/features/calls/AvailabilityEditor.tsx",
+      "replacements": 13
+    },
+    {
+      "path": "apps/web/features/calls/CallView.tsx",
+      "replacements": 62
+    },
+    {
+      "path": "apps/web/features/calls/OfferTimes.tsx",
+      "replacements": 19
+    },
+    {
+      "path": "apps/web/features/calls/SelectTime.tsx",
+      "replacements": 11
+    },
+    {
+      "path": "apps/web/features/calls/StudioCallOffer.tsx",
+      "replacements": 8
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift",
+      "replacements": 11
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift",
+      "replacements": 39
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift",
+      "replacements": 21
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt",
+      "replacements": 12
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt",
+      "replacements": 43
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt",
+      "replacements": 1
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt",
+      "replacements": 8
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt",
+      "replacements": 13
     }
-    return result as String
-  }
-  public static let brandName = "Qelvora"
-  public static let studioName = "Qelvora Studio"
+  ],
+  "dynamicTemplates": "Complete prose templates from owned web/Swift/Kotlin; original-template one-pass literal substitution in native generated formatters; no locale decision or actual translation.",
+  "newLocalesOrTranslations": 0,
+  "newTestsOrHarnesses": 0,
+  "webTemplateFiles": [
+    {
+      "path": "apps/web/features/media/SignRecording.tsx",
+      "replacements": 1
+    },
+    {
+      "path": "apps/web/features/media/VoicePlayer.tsx",
+      "replacements": 7
+    },
+    {
+      "path": "apps/web/features/media/VoiceRecorder.tsx",
+      "replacements": 3
+    },
+    {
+      "path": "apps/web/features/calls/AvailabilityEditor.tsx",
+      "replacements": 2
+    },
+    {
+      "path": "apps/web/features/calls/CallView.tsx",
+      "replacements": 20
+    },
+    {
+      "path": "apps/web/features/calls/OfferTimes.tsx",
+      "replacements": 7
+    },
+    {
+      "path": "apps/web/features/calls/SelectTime.tsx",
+      "replacements": 3
+    },
+    {
+      "path": "apps/web/features/calls/StudioCallOffer.tsx",
+      "replacements": 3
+    }
+  ],
+  "webTemplateKeysAdded": 45,
+  "nativeTemplateFiles": [
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift",
+      "replacements": 3
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift",
+      "replacements": 9
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift",
+      "replacements": 1
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift",
+      "replacements": 2
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt",
+      "replacements": 3
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt",
+      "replacements": 9
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt",
+      "replacements": 1
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt",
+      "replacements": 2
+    }
+  ],
+  "nativeTemplateKeysAdded": 8,
+  "shortControls": "10 source-reviewed visible labels plus Android complete label/state template",
+  "newKeyCount": 278,
+  "finalManualReview": "Remaining complete web/native call titles, name-led outcome phrases, duration accessibility and reconciliation fallback extracted; protocol IDs, routes, date/time formats and filenames preserved.",
+  "completedChecksAt": "2026-10-01T01:41:09.864789+00:00",
+  "formatterRevision": "a4d4108794f061ddaab25c40d22ac5752f7131e3",
+  "sourceFileCount": 19,
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt": "3f061887eda032fb30684b7c555cf224f59d4b908a7c08b9de3a7ae3085a74db",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "1466907104b4bcd2891d65562281b29cb84f4da593cfd99477f71bb08097a59b",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "1f5ef6cf38168bf89faf5b8601fd895e12ab9770fec62ab142c19ecd0e328662",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt": "6ad6f467087e2f80a7d98adc9917f0758c390117da24048a298799ce945776f5",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "3bb4ae17c118b7c6bf482f9c1f07afdd659ba2e226272cd32ace9d63a52a576d",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift": "15c42642cb1fa6d1f5a6505657364406e96a24fc33733710a20afcc6e741c9e0",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift": "0cb13fdbc82a695faa531fca7990cbf31f37e7c45278a04bc3d3e38b5e179c8d",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "432ccb90f57ccda57dab0e0e4ad0c8a4f30a32e0264f7eb7a2d6a6699e7783fd",
+    "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "e8144becf138dc36268abfff15c1555ed698839c10901cb79428c7d5c2ca3af8",
+    "apps/web/features/calls/AvailabilityEditor.tsx": "e73e8b41ff408ad54d59e9fef4372f66044e3dc16d8c2087b4a5a98b6e4cd851",
+    "apps/web/features/calls/CallView.tsx": "8576d793e8b8123d82f380ce4f74dd84239998ac1ac4328ef41a873c0138f6b7",
+    "apps/web/features/calls/OfferTimes.tsx": "b47595bb0423e48dae81776066f63d0ca37a5dca81dfc10a7164416a31190683",
+    "apps/web/features/calls/SelectTime.tsx": "aaa239efcb5627c77771b707001d548d513f557166508f446e012791e91cf51e",
+    "apps/web/features/calls/StudioCallOffer.tsx": "b1dde4d2bc290dabc774dcc7f02803b33a1a945e612744ba3d42d29cbdec635e",
+    "apps/web/features/media/SignRecording.tsx": "3362394e7ca8364406bae5a309412af547fbe5838eb4b3d7911d3332a54b4751",
+    "apps/web/features/media/VoicePlayer.tsx": "ba3ee4e7baf064c89aa9dad0bc76a098634d62e2b251bfce067785205bd253ed",
+    "apps/web/features/media/VoiceRecorder.tsx": "1ad5feb364b50ae2f363d10d776e1053ef9542fae26eb11ba798c04a46dfda76",
+    "apps/web/features/media/api.ts": "8c8db3a83ef1b72445ceaede2e8dc4fa582e3a30583b7d761c3721da86b58798",
+    "apps/web/features/media/recorder.ts": "2a9ea5b578b668cd285a94563f5ab041f7f3a366862be8f519fb09709ac45df0"
+  },
+  "resourceSha256": {
+    "config/copy.json": "f14ba098d79e3d3f87412a53a8116e860da6ac851989d95622a0c7b1ce02ce76",
+    "packages/copy/src/index.ts": "01e3ca0071651cf5e2dbca25bc5d82bbd50aae033965ef1749a6b966b38dc02b",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "88e73bf67d5cbf8d27ae57ee481eaab3cbf6127ac9fd78e46c527cc646648629",
+    "apps/ios/Sources/Generated/Localizable.xcstrings": "928e478efd93b488b49dd99b2330574232980415d583d0a32ba9dafc5f8bc6e7",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "4b5b85c89e907b0b09f1cb176f420c2fe1f26652bf748aa403988d4cb85e8b35",
+    "apps/android/app/src/main/res/values/strings.xml": "a958d943f4df61f1782c5e46cb1fa21c9405b6a4de774434f83b9b72366a8133"
+  },
+  "checks": {
+    "generatedConsistency": "12 resources and 48 operations pass",
+    "web": "TypeScript/ESLint/format pass; Next16.3.7 production compile2.9s, type21.0s,29 static pages; incidental next-env rewrite restored and final TypeScript passes",
+    "sharedExisting": "2 pass; 1712.054477ms runner; no new cases",
+    "ios": "QelvoraUI iOS Simulator library compilation passes62.70s; no current strict snapshot rerun, app install or actual microphone proof",
+    "android": "Existing testDebugUnitTest and verifyPaparazziDebug pass200s;19 existing cases/0 skipped/0 failures/0 errors;144 unchanged reference PNGs; no current APK packaged or installed",
+    "androidExistingReports": [
+      {
+        "name": "com.pantopus.qelvora.DeliveryProtocolTest",
+        "tests": "9",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-01T01:40:02",
+        "time": "0.172"
+      },
+      {
+        "name": "com.pantopus.qelvora.GeneratedContractTest",
+        "tests": "2",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-01T01:40:02",
+        "time": "0.123"
+      },
+      {
+        "name": "com.pantopus.qelvora.NativeSnapshotsTest",
+        "tests": "8",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-01T01:40:02",
+        "time": "25.579"
+      }
+    ]
+  },
+  "initialCompileFailure": "Regex literal escaping in new generator emission failed Swift/Kotlin compilation. Corrected to native raw string literals, regenerated and final native checks pass. Failed logs retained; no assertion/golden/threshold repair.",
+  "acceptanceLimits": [
+    "No new locale or translated-design approval",
+    "No actual microphone/sign/publication/audience/provider/hardware acceptance",
+    "Capability gates remain false",
+    "All local sources held from push until exact a124ad0 ios-review artifact inspection"
+  ]
 }
