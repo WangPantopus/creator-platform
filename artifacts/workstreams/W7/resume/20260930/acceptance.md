@@ -1,5 +1,7 @@
 # W7 continuation acceptance — 2026-09-30
 
+**Current founder authorization (2026-09-30):** The founder replied “Yes, use incremental code merges” to the concrete proposal: make PR2 ready for review, then merge after all current-head repository CI passes and review completes, while unfinished actual creator/provider/device/release journeys remain gated and tracked. PR2 is now ready for review. Earlier draft/full-W7-before-merge statements below are historical and superseded for code merging only; the complete assignment and every actual acceptance requirement remain binding. [Exact implementation/evidence and boundary](../../takeover/20260930/w8-streaming-integration.md).
+
 This matrix records the current branch, including committed foundation22aa088. It does not turn a successful build, synthetic diagnostic or empty screen into integrated acceptance. Primary personally implemented and operated this increment; no new test code or paid AI calls.
 
 ## Observed local outcomes

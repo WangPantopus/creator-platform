@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-01T00:52:07.806485+00:00",
+  "recordedAt": "2026-10-01T01:05:05.027075+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
     "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "72641d0081aa24baee27fa2cbd82de9db1cb2eff11c27016b8d84beee4a7b00b",
@@ -147,7 +147,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "944b2cdf29c2031cfa5f7a9e6cf24e844f7f6569f276124c96d9019ac5efefe0",
+    "README.md": "378d3680d4aa7657b8d75407d93990e2b6cc7edfa6171ed458c34665de5d677e",
     "approved-input-search.json": "edee150a6bab7cc43cf2b97795402098b9f2869c9a53dbb01448074b5c2e0e08",
     "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend-contracts.log": "00c68520c2ce4f9bdbdc93c60e9a39d2e8539abb81dbefb6c2793ae199647e4c",
@@ -190,7 +190,9 @@
     "proof-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
     "scaled-cache-swift.log": "3901bba9574c31244fa85db473b0f37d1d6c5140db27c412e9f1c51193d14bed",
     "settings-accessibility.json": "04e099044b09fd34ab4268f1d8303d25e5091f8f4602a044fd8fa30142b45de3",
+    "settings-after-stream-restart.png": "53c61aa4b61290dc9ecc051a57160d054df3a4abca72e982015983b8a345fa7a",
     "settings-phone.png": "52ede563add261f3ca7544ba61445bc0670eb37088085fc57f47ed8aabf9e9f4",
+    "stream-0ade-ci.json": "8e8c00ef1ac61251b934d611ffde85c9d9224ab375ea537162e5fadb5c0fb341",
     "stream-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
     "stream-contracts.log": "012c399349647e8592983ed086206e35b127e6a38c6625e211c4ab495caa91e8",
     "stream-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
@@ -201,7 +203,7 @@
     "w8-cookie-build.log": "571eb9ed6b25e520e9eceb619ca748bda1ee2a47f1a87b7c078e127e2f29795a",
     "w8-cookie-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "w8-cookie-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "w8-streaming-integration.md": "31418123b4ee3cdce0a2b7fac8d77e83f205d09eb61d37561b21887e963bccef",
+    "w8-streaming-integration.md": "2caa5ce1cf1e01b508e2d0683327bded2910a26658069d39fbefc93d682fe387",
     "w8-unconfigured.log": "c6271023acb1d27b3a1d980830fdb14cb2113b9378dac97fea15b058a8928648",
     "web-build.log": "3fbfe0cab59e11ec8e1727853ed44c13c2cfe28330ff9b4147d9791e1baff384",
     "web-catalog-and-mac-baselines.log": "708e23ee94a79a3e7324a22e520b14ac59225a5ee9a46ec4bf7be2152378ce39",
@@ -329,7 +331,8 @@
     "format": "passed",
     "originalContractChecks": 9,
     "actualEncryptedExportAcceptance": false,
-    "actualVerifiedTaskCreated": false
+    "actualVerifiedTaskCreated": false,
+    "implementationCommit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0"
   },
   "currentRuntime": {
     "apiProcess": 59003,
@@ -348,11 +351,77 @@
     "protectedW8HostConfigured": false
   },
   "mergeBoundary": {
-    "request": "founder asks incremental PR progress",
-    "current": "full repository and full W7 gates required by explicit takeover",
-    "proposed": "reviewed implementation after all current-head repository checks pass; external release acceptance remains tracked",
-    "founderRevisionReceived": false,
+    "current": "all current-head repository CI checks pass and review complete; actual full W7/release acceptance remains tracked and gated",
+    "founderRevisionReceived": true,
+    "founderExactReply": "Yes, use incremental code merges",
+    "scope": "current PR2 code merge; does not waive current-head checks or approve release",
     "PR": 2,
-    "duplicatePRCreated": false
+    "isDraft": false,
+    "duplicatePRCreated": false,
+    "currentImplementationHeadCI": {
+      "recordedAt": "2026-10-01T01:03:34.796935+00:00",
+      "run": 36798392122,
+      "headSha": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0",
+      "status": "queued",
+      "conclusion": "",
+      "jobs": [
+        {
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "databaseId": 110166990438,
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990438"
+        },
+        {
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": "",
+          "databaseId": 110166990555,
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990555"
+        },
+        {
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "databaseId": 110166990621,
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990621"
+        },
+        {
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "databaseId": 110166990659,
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990659"
+        },
+        {
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "databaseId": 110166990826,
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990826"
+        }
+      ]
+    }
+  },
+  "browserAfterStreamingRestart": {
+    "actor": "same canonical explicitly labeled development fan",
+    "expiredSessionRecoveredToOriginalDestination": true,
+    "quietHours": "22:00-07:00",
+    "timeZone": "America/Los_Angeles",
+    "globalOptionalChannelsEnabled": false,
+    "aiReplyPushExcluded": true,
+    "tabFromTimeZone": "Push ai reply checkbox",
+    "phoneViewport": "390x844",
+    "temporaryViewportReset": true,
+    "screenReaderNativeAcceptance": false
+  },
+  "followUp": {
+    "automationId": "w7-completion-follow-up",
+    "status": "ACTIVE",
+    "targetThreadId": "01a0f49a-120e-7241-b224-07c7bda9d8d2",
+    "frequency": "hourly; existing cadence preserved",
+    "oldOutgoingTargetReplaced": true,
+    "duplicateCreated": false,
+    "notificationIntent": "meaningful changes only"
   }
 }
