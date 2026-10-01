@@ -1,0 +1,65 @@
+{
+  "updatedAt": "2026-10-01T11:52:18.511491+00:00",
+  "owner": "W7 primary",
+  "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
+  "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
+  "branch": "codex/w7-completion-20261001",
+  "base": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "scopeComplete": false,
+  "resources": {
+    "api": {
+      "address": "127.0.0.1:4107",
+      "pid": 98373,
+      "session": 92077,
+      "identity": "explicit development",
+      "generation": "unconfigured",
+      "source": "Combined shipping bundle: strict W5 proof, bounded Home, complete sharing export; public HTTPS origin and canonical source directory remain unconfigured"
+    },
+    "web": {
+      "address": "127.0.0.1:3007",
+      "pid": 56666,
+      "session": 52803,
+      "mode": "Next development shipping source"
+    },
+    "postgres": {
+      "container": "creator-platform-w7-completion-20261001",
+      "volume": "creator-platform-w7-completion-20261001",
+      "address": "127.0.0.1:55447",
+      "database": "creator_w7_takeover_20260930",
+      "recovery": "Original encrypted takeover database restored with retained original keys; runtime LOGIN roles recovered from retained configuration and original role memberships restored."
+    },
+    "disposableChecks": {
+      "container": "creator-platform-w7-foundation-20261001",
+      "address": "127.0.0.1:55457",
+      "database": "creator_w7_foundation_test",
+      "status": "Idle retry passed all18 existing checks unchanged, including10000 pairs/30000 assertions. Earlier role mismatch and300000ms timeout preserved."
+    },
+    "ios": {
+      "udid": "8C9C41C2-EA3B-4D62-9440-91D499CFD2E4",
+      "name": "W7 Completion20261001",
+      "runtime": "iOS26.5",
+      "state": "Shutdown after signed-out unavailable share cold launch in Light/Night. Warm custom link reached an untapped system Open confirmation; macOS accessibility input is TCC-denied."
+    },
+    "android": {
+      "adbPort": 5047,
+      "consolePort": 5570,
+      "adbDevicePort": 5571,
+      "state": "Stopped normally after combined-source manual Light/Night and cold/warm negative-path operation. Repeated Home URI failed after internal navigation; boot System UI ANR and Wait recovery preserved.",
+      "avd": "W7_Completion_20261001",
+      "serial": "emulator-5570",
+      "avdPath": "/private/tmp/creator-platform-w7-completion-20261001/android-user/avd/W7_Completion_20261001.avd"
+    },
+    "temporaryRoot": "/private/tmp/creator-platform-w7-completion-20261001",
+    "privateConfigurationDirectory": "/Users/yingpengwang/.config/creator-platform/w7-completion-20261001"
+  },
+  "retainedRecovery": {
+    "directory": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001",
+    "backupSha256": "83221699a1daec1cd715bebe477913b0f7aadd476c7a2f93420d4ad6f3d1b216",
+    "androidKeySha256": "4d70a4b9d5db5589a0b66a9894c680bf6ae9fd788ed8de2ae3b357200546ecce",
+    "altered": false
+  },
+  "independentWork": "Canonical W5 proof/current-state withdrawal effects; bounded account-bound W3 Home and followed-post pages; full-text labeled sharing export/native sheet controls; rotating source scan plus encrypted conflict-checked durable checkpoint. Global thread recency, actual purpose-issued source directory, W8 proposal registration and populated acceptance remain open.",
+  "externalInputs": "Approved identity/verified creator/signing authority, APNs/FCM/email transport and public HTTPS origin not supplied; requested once. No production acceptance claimed.",
+  "reviewedMain": "817940d32fdec5c16167ff52b1b6a7e11a9d10f6",
+  "combinedSource": "883f00efed7a85842b54e0e204ef89d088b2c834"
+}

@@ -1,0 +1,52 @@
+{
+  "backend-existing-checks.log": {
+    "sha256": "85ecfac649661c880b0fa877d8f53a50988c3d674e2ba3a4a81f7b12570b97d8",
+    "gzip": "backend-existing-checks.log.gz",
+    "sanitized": true
+  },
+  "backend-existing-checks-isolated.log": {
+    "sha256": "51f5c4fbdfd4fbdaa15f713c92bc79e218209d5bde91eae596c912aaec2df6a0",
+    "gzip": "backend-existing-checks-isolated.log.gz",
+    "sanitized": true
+  },
+  "backend-existing-checks-idle-retry.log": {
+    "sha256": "c930076d879426a81693e261e738bda45dc85364eeceba328335f28eb420ca3b",
+    "gzip": "backend-existing-checks-idle-retry.log.gz",
+    "sanitized": true
+  },
+  "workspace-combined-check.log": {
+    "sha256": "6ff26612e16312384c0131a5eda158443de2874657531785283e21f9d7ca0c08",
+    "gzip": "workspace-combined-check.log.gz",
+    "sanitized": true
+  },
+  "swift-combined-checks.log": {
+    "sha256": "cc6334e26800e5fbc98b1d66e91565748ec680dd9bdd2d59ef76de923b79d59e",
+    "gzip": "swift-combined-checks.log.gz",
+    "sanitized": true
+  },
+  "ios-combined-build.log": {
+    "sha256": "285ba6924bba603dc4b3c0cb269621312622240f7ca5a3bbbf4861f8f9738d0a",
+    "gzip": "ios-combined-build.log.gz",
+    "sanitized": true
+  },
+  "android-combined-checks.log": {
+    "sha256": "2702d1ebc0fb3301bf6fd9e02ad272cffce408c59dc98880df597699e90c2d13",
+    "gzip": "android-combined-checks.log.gz",
+    "sanitized": true
+  },
+  "android-boot-events.log": {
+    "sha256": "a705c7ccfa2fe75dd22711552991a0c6be8ff4057bdeb0d34d15be618f04365c",
+    "gzip": "android-boot-events.log.gz",
+    "sanitized": true
+  },
+  "ios-combined-boot.log": {
+    "sha256": "c5220205e757829da1104aa3c27b5d66926d4291d5f45e6f5697d045a5eb9d61",
+    "gzip": "ios-combined-boot.log.gz",
+    "sanitized": true
+  },
+  "android-combined-events.log": {
+    "sha256": "23660b61be44ece9239e9b6fb272fd1267f305767f6128e0e74a27c645c794be",
+    "gzip": "android-combined-events.log.gz",
+    "sanitized": true
+  }
+}
