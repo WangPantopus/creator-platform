@@ -1,6 +1,9 @@
 import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
-import type { AccessService, ScopeRestriction } from "../access/scope.js";
+import type {
+  AccessService,
+  ScopeRestrictionInTransaction,
+} from "../access/scope.js";
 import type { ConversationService } from "../conversation/service.js";
 import { DomainError } from "../../core/errors.js";
 import { createContentStudio } from "../content/integration.js";
@@ -17,7 +20,7 @@ export async function createCommerceStudio(input: {
   owners: ConstructorParameters<typeof StudioService>[1];
   dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">>;
-  assertScopeAllowed: ScopeRestriction;
+  assertScopeAllowedInTransaction: ScopeRestrictionInTransaction;
   approvals?: {
     database: Database;
     access: AccessService;
@@ -66,7 +69,7 @@ export async function createCommerceStudio(input: {
     dependencies: {
       ...input.dependencies,
       publicPacket: createCommercePublicationPermission(
-        input.assertScopeAllowed,
+        input.assertScopeAllowedInTransaction,
       ),
     },
   });

@@ -1,7 +1,7 @@
 import type { PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import type { ScopeRestriction } from "../access/scope.js";
+import type { ScopeRestrictionInTransaction } from "../access/scope.js";
 
 /** W5 publicPacket callback: exact current fan public/group consent and creator
  * mode permission, held through the publication transaction. This projection
@@ -13,18 +13,34 @@ export async function commercePublicPacket(
   actor: Actor,
   creatorId: string,
   packetId: string,
-  assertAllowed: ScopeRestriction,
+  assertAllowed: ScopeRestrictionInTransaction,
 ): Promise<boolean> {
   if (!actor.adultEligible) return false;
   await assertCurrentSession(client, actor.accountId);
   const pointer = (
-    await client.query<{ mode_id: string; thread_id: string }>(
-      "SELECT mode_id,thread_id FROM creator.commerce_packet WHERE id=$1 AND creator_id=$2",
-      [packetId, creatorId],
+    await client.query<{
+      mode_id: string;
+      thread_id: string;
+      creator_account: string;
+      fan_account: string;
+    }>(
+      `SELECT p.mode_id,p.thread_id,cp.account_id AS creator_account,fp.account_id AS fan_account
+       FROM creator.commerce_packet p JOIN creator.creator_profile cp ON cp.id=p.creator_id
+       JOIN creator.fan_profile fp ON fp.id=p.fan_id WHERE p.id=$1 AND p.creator_id=$2 AND cp.account_id=$3`,
+      [packetId, creatorId, actor.accountId],
     )
   ).rows[0];
   if (!pointer) return false;
-  await assertAllowed(actor, creatorId, pointer.thread_id);
+  await assertAllowed(
+    actor,
+    creatorId,
+    pointer.thread_id,
+    {
+      fanAccountId: pointer.fan_account,
+      creatorAccountId: pointer.creator_account,
+    },
+    client,
+  );
   await client.query(
     "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
     [`commerce.mode:${pointer.mode_id}`],
@@ -49,7 +65,7 @@ export async function commercePublicPacket(
 }
 
 export function createCommercePublicationPermission(
-  assertAllowed: ScopeRestriction,
+  assertAllowed: ScopeRestrictionInTransaction,
 ) {
   return (
     client: PoolClient,

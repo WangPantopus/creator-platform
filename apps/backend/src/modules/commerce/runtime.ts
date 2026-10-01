@@ -40,6 +40,12 @@ export async function createCommerceRuntime(input: {
   policy: Omit<CommercePolicy, "costAllowanceIntegrated">;
   generationCostPolicy?: GenerationCostPolicy;
   generationPrivacy?: GenerationPrivacyConfiguration;
+  /** Actual prepared W3 readiness/current W2 license/source/budget authority,
+   * checked on the admission transaction. No default enables a trial. */
+  trialReadiness?: (
+    scope: import("../access/scope.js").ThreadScope,
+    client: import("pg").PoolClient,
+  ) => Promise<void>;
   groupAudience?: GroupAudienceReader;
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
@@ -79,6 +85,16 @@ export async function createCommerceRuntime(input: {
           input.generationPrivacy,
         )
       : undefined;
+  invariant(
+    !input.trialReadiness ||
+      (generationAllowance &&
+        Number.isSafeInteger(input.policy.trialAllowance) &&
+        input.policy.trialAllowance! > 0 &&
+        input.policy.trialAllowance! <= 2147483647 &&
+        input.access.threadScopeInTransactionAvailable),
+    "trial_unconfigured",
+    "Trial admission requires reviewed units, the exact prepared allowance and held current authority.",
+  );
   const service = new CommerceService(
     input.pool,
     input.database,
@@ -89,6 +105,13 @@ export async function createCommerceRuntime(input: {
     },
     input.payments,
     input.assertActorAllowed,
+    input.trialReadiness && generationAllowance
+      ? Object.freeze({
+          allowance: generationAllowance,
+          units: input.policy.trialAllowance!,
+          assertReady: input.trialReadiness.bind(input),
+        })
+      : undefined,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);
