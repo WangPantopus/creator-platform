@@ -72,7 +72,7 @@ private fun PublicVerificationScreen(baseURL: String?, signedActId: String, onHo
             try {
                 val response = client.publicSignature(signedActId)
                 currentCoroutineContext().ensureActive()
-                if (response.signedActId != signedActId) throw IllegalStateException("Verification response mismatch")
+                if (response.signedActId != signedActId || response.creatorName.isBlank() || !Regex("[a-f0-9]{64}").matches(response.contentHash)) throw IllegalStateException("Unreadable verification response")
                 signature = response
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {

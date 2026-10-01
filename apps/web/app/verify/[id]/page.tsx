@@ -104,7 +104,13 @@ export default async function Verification({
     if (!response.ok)
       return <Unavailable id={id} missing={response.status === 404} />;
     const signature = PublicSignatureSchema.parse(await response.json());
-    if (signature.signedActId !== id) return <Unavailable id={id} />;
+    if (
+      signature.signedActId !== id ||
+      signature.creatorName.trim().length === 0 ||
+      signature.contentHash.length !== 64 ||
+      !/^[a-f0-9]{64}$/u.test(signature.contentHash)
+    )
+      return <Unavailable id={id} />;
     const document = record(signature.content);
     const content = record(document?.content);
     const publicContent =

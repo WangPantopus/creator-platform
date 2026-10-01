@@ -110,7 +110,10 @@ private struct PublicVerificationScreen: View {
         do {
             let response = try await CreatorAPIClient(baseURL: baseURL, session: transport, token: { nil }).publicSignature(signedActId: signedActId)
             guard !Task.isCancelled else { return }
-            guard response.signedActId == signedActId else { throw URLError(.badServerResponse) }
+            guard response.signedActId == signedActId,
+                  !response.creatorName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  response.contentHash.utf8.count == 64,
+                  response.contentHash.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }) else { throw URLError(.badServerResponse) }
             signature = response; loading = false
         } catch {
             guard !Task.isCancelled else { return }
