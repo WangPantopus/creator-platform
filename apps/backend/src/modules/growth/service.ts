@@ -730,14 +730,24 @@ export class GrowthService {
       });
     return { unsubscribed: true };
   }
-  /** Only a signature-verified provider webhook calls this. */
-  async bounce(accountId: string) {
+  /** Only a signature-verified provider webhook calls this with its actual
+   * recipient. A delayed bounce cannot suppress a replacement email binding. */
+  async bounce(accountId: string, address: string) {
     z.uuid().parse(accountId);
+    const bouncedAddress = z.email().parse(address);
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.subjects(client, [accountId]))) return;
+      const current = (
+        await client.query(
+          "SELECT encrypted_address FROM growth.email WHERE account_id=$1",
+          [accountId],
+        )
+      ).rows[0];
+      if (!current || this.open(current.encrypted_address) !== bouncedAddress)
+        return;
       await client.query(
-        "UPDATE growth.email SET bounced_at=coalesce(bounced_at,now()) WHERE account_id=$1",
-        [accountId],
+        "UPDATE growth.email SET bounced_at=coalesce(bounced_at,now()) WHERE account_id=$1 AND encrypted_address=$2",
+        [accountId, current.encrypted_address],
       );
     });
   }
