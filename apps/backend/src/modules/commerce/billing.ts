@@ -634,7 +634,6 @@ export class MembershipBilling {
               atEnd: Boolean(r.atEnd),
               key: effect.provider_key,
             })));
-      await this.apply(actor, truth, before.version, effect);
       const confirmed =
         effect.operation === "start"
           ? truth.lines.some(
@@ -644,30 +643,13 @@ export class MembershipBilling {
                 Boolean(line.receipt),
             )
           : cancelled(truth);
-      const refundId = await this.service.account(actor, async (client) => {
-        await this.fence(client, effect);
-        let refundId: string | undefined;
-        if (
-          confirmed &&
-          effect.operation === "cancel" &&
-          Number(r.refundAmount) > 0
-        )
-          refundId = (
-            await client.query<{ id: string }>(
-              "INSERT INTO creator.commerce_billing_effect(fan_id,operation,provider_key,request) VALUES($1,'refund',$2,$3) ON CONFLICT(provider_key) DO UPDATE SET provider_key=excluded.provider_key RETURNING id",
-              [
-                effect.fan_id,
-                `${effect.provider_key}:refund`,
-                JSON.stringify({ amount: r.refundAmount, receipt: r.receipt }),
-              ],
-            )
-          ).rows[0]!.id;
-        await client.query(
-          "UPDATE creator.commerce_billing_effect SET state=$3,provider_ref=$2,lease_until=NULL,next_at=now()+interval '30 seconds',error_code=NULL WHERE id=$1",
-          [id, truth.subscriptionReference, confirmed ? "done" : "unknown"],
-        );
-        return refundId;
-      });
+      const refundId = await this.apply(
+        actor,
+        truth,
+        before.version,
+        effect,
+        confirmed,
+      );
       const refund = refundId ? await this.run(actor, refundId) : undefined;
       return {
         processing: !confirmed || Boolean(refund?.processing),
@@ -703,6 +685,7 @@ export class MembershipBilling {
     truth: BillingTruth,
     expectedVersion: number,
     effect?: BillingEffect,
+    confirmed = false,
   ) {
     invariant(
       truth.accountId === actor.accountId &&
@@ -716,7 +699,7 @@ export class MembershipBilling {
       "billing_link_conflict",
       "The subscription is linked to another account.",
     );
-    await this.service.account(actor, async (client) => {
+    return this.service.account(actor, async (client) => {
       const account = (
         await client.query(
           "SELECT b.* FROM creator.commerce_billing_account b JOIN creator.fan_profile fp ON fp.id=b.fan_id WHERE fp.account_id=$1 FOR UPDATE OF b",
@@ -725,6 +708,7 @@ export class MembershipBilling {
       ).rows[0];
       invariant(
         account &&
+          (!effect || effect.fan_id === account.fan_id) &&
           account.currency === truth.currency &&
           (!account.subscription_ref ||
             account.subscription_ref === truth.subscriptionReference ||
@@ -1039,6 +1023,45 @@ export class MembershipBilling {
             [row.grant_id, row.creator_id, account.fan_id],
           );
       }
+      // The held account and original effect lease cover access, cash and
+      // recovery together. A crash must not leave confirmed cash counted a
+      // second time as a pending start, or lose a confirmed cancellation's
+      // original refund obligation. Provider calls remain outside this lock.
+      if (!effect) return undefined;
+      let refundId: string | undefined;
+      if (
+        confirmed &&
+        effect.operation === "cancel" &&
+        Number(effect.request.refundAmount) > 0
+      )
+        refundId = (
+          await client.query<{ id: string }>(
+            "INSERT INTO creator.commerce_billing_effect(fan_id,operation,provider_key,request) VALUES($1,'refund',$2,$3) ON CONFLICT(provider_key) DO UPDATE SET provider_key=excluded.provider_key RETURNING id",
+            [
+              effect.fan_id,
+              `${effect.provider_key}:refund`,
+              JSON.stringify({
+                amount: effect.request.refundAmount,
+                receipt: effect.request.receipt,
+              }),
+            ],
+          )
+        ).rows[0]!.id;
+      const completed = await client.query(
+        "UPDATE creator.commerce_billing_effect SET state=$3,provider_ref=$2,lease_until=NULL,next_at=now()+interval '30 seconds',error_code=NULL WHERE id=$1 AND attempt=$4 AND state='processing'",
+        [
+          effect.id,
+          truth.subscriptionReference,
+          confirmed ? "done" : "unknown",
+          effect.attempt,
+        ],
+      );
+      invariant(
+        completed.rowCount === 1,
+        "effect_lease_lost",
+        "A newer billing worker owns this recovery.",
+      );
+      return refundId;
     });
   }
 }

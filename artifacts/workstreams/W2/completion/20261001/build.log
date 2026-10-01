@@ -1,0 +1,117 @@
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running build in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/copy:build: cache hit, replaying logs 0cac4356cca28abd
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/api:build: cache hit, replaying logs 7d9876fb27872c34
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/backend:build: cache miss, executing 3b492d98db16d7eb
+@qelvora/backend:build: $ tsc --noEmit && node scripts/build.mjs
+@qelvora/web:build: cache miss, executing 602700c1b801b0cc
+@qelvora/web:build: $ next build
+@qelvora/web:build: ▲ Next.js 16.3.7 (Turbopack)
+@qelvora/web:build: ✓ Running next.config.ts took 44ms
+@qelvora/web:build: 
+@qelvora/web:build:   Creating an optimized production build ...
+@qelvora/web:build: ✓ Compiled successfully in 7.7s
+@qelvora/web:build:   Running TypeScript ...
+@qelvora/web:build:   Finished TypeScript in 13.2s ...
+@qelvora/web:build:   Collecting page data using 15 workers ...
+@qelvora/web:build:   Generating static pages using 15 workers (0/31) ...
+@qelvora/web:build:   Generating static pages using 15 workers (7/31) 
+@qelvora/web:build:   Generating static pages using 15 workers (15/31) 
+@qelvora/web:build:   Generating static pages using 15 workers (23/31) 
+@qelvora/web:build: ✓ Generating static pages using 15 workers (31/31) in 676ms
+@qelvora/web:build:   Finalizing page optimization ...
+@qelvora/web:build: 
+@qelvora/web:build: Route (app)
+@qelvora/web:build: ┌ ƒ /
+@qelvora/web:build: ├ ○ /_not-found
+@qelvora/web:build: ├ ƒ /api/auth/complete
+@qelvora/web:build: ├ ƒ /api/auth/continue
+@qelvora/web:build: ├ ƒ /api/auth/restore
+@qelvora/web:build: ├ ƒ /api/commerce-approvals/[...path]
+@qelvora/web:build: ├ ƒ /api/commerce/[...path]
+@qelvora/web:build: ├ ƒ /api/content/[...path]
+@qelvora/web:build: ├ ƒ /api/conversations/[...path]
+@qelvora/web:build: ├ ƒ /api/growth-development
+@qelvora/web:build: ├ ƒ /api/growth/[...path]
+@qelvora/web:build: ├ ƒ /api/platform/[...path]
+@qelvora/web:build: ├ ƒ /api/studio/[...path]
+@qelvora/web:build: ├ ƒ /api/studio/ai/[...path]
+@qelvora/web:build: ├ ƒ /api/trust/[...path]
+@qelvora/web:build: ├ ƒ /api/w6/[...path]
+@qelvora/web:build: ├ ƒ /auth/continue
+@qelvora/web:build: ├ ƒ /auth/development
+@qelvora/web:build: ├ ƒ /calls/[creatorId]/[fanId]/[sessionId]
+@qelvora/web:build: ├ ƒ /chat/[handle]
+@qelvora/web:build: ├ ƒ /commerce/[screen]
+@qelvora/web:build: ├ ƒ /content/[creatorId]/[contentId]
+@qelvora/web:build: ├ ƒ /creators/[handle]
+@qelvora/web:build: ├ ƒ /creators/[handle]/chat
+@qelvora/web:build: ├ ƒ /creators/[handle]/posts/[id]
+@qelvora/web:build: ├ ƒ /creators/maya
+@qelvora/web:build: ├ ○ /design
+@qelvora/web:build: ├ ○ /design/components
+@qelvora/web:build: ├ ƒ /design/components/[name]
+@qelvora/web:build: ├ ○ /design/screens
+@qelvora/web:build: ├ ƒ /design/screens/[group]/[id]
+@qelvora/web:build: ├ ○ /design/studies/comprehension
+@qelvora/web:build: ├ ƒ /discover
+@qelvora/web:build: ├ ƒ /growth-development
+@qelvora/web:build: ├ ƒ /home
+@qelvora/web:build: ├ ƒ /identity/account
+@qelvora/web:build: ├ ƒ /invite/[id]
+@qelvora/web:build: ├ ○ /media/ai-voice
+@qelvora/web:build: ├ ƒ /media/voice
+@qelvora/web:build: ├ ƒ /notifications
+@qelvora/web:build: ├ ƒ /notifications/settings
+@qelvora/web:build: ├ ƒ /onboarding/handle
+@qelvora/web:build: ├ ○ /ops
+@qelvora/web:build: ├ ○ /ops/audits
+@qelvora/web:build: ├ ƒ /ops/cases/[id]
+@qelvora/web:build: ├ ○ /ops/metrics
+@qelvora/web:build: ├ ƒ /share/[id]
+@qelvora/web:build: ├ ƒ /share/[id]/image
+@qelvora/web:build: ├ ƒ /sitemap.xml
+@qelvora/web:build: ├ ○ /status
+@qelvora/web:build: ├ ƒ /studio/[creatorId]/[[...screen]]
+@qelvora/web:build: ├ ƒ /studio/activation
+@qelvora/web:build: ├ ƒ /studio/ai/[[...section]]
+@qelvora/web:build: ├ ƒ /studio/calls/[creatorId]/[fanId]/[commitmentId]
+@qelvora/web:build: ├ ƒ /studio/impact
+@qelvora/web:build: ├ ƒ /studio/insights
+@qelvora/web:build: ├ ○ /studio/launch
+@qelvora/web:build: ├ ƒ /studio/measurement
+@qelvora/web:build: ├ ƒ /studio/setup
+@qelvora/web:build: ├ ƒ /studio/workspace
+@qelvora/web:build: ├ ○ /support
+@qelvora/web:build: ├ ○ /support/access
+@qelvora/web:build: ├ ○ /support/feedback
+@qelvora/web:build: ├ ○ /support/privacy
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]/citations/[passageId]
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]/messages/[messageId]
+@qelvora/web:build: ├ ○ /trust
+@qelvora/web:build: ├ ○ /trust/crisis
+@qelvora/web:build: ├ ○ /trust/terms
+@qelvora/web:build: ├ ƒ /unsubscribe/[token]
+@qelvora/web:build: ├ ƒ /verify/[id]
+@qelvora/web:build: └ ƒ /you
+@qelvora/web:build: 
+@qelvora/web:build: 
+@qelvora/web:build: ○  (Static)   prerendered as static content
+@qelvora/web:build: ƒ  (Dynamic)  server-rendered on demand
+@qelvora/web:build: 
+
+ Tasks:    6 successful, 6 total
+Cached:    4 cached, 6 total
+  Time:    38.118s 
+

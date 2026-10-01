@@ -232,6 +232,66 @@ enum class APICommerceCommitmentState {
   @SerialName("resolved") RESOLVED
 }
 
+@Serializable
+data class APICommerceCreatorEarnings(
+  val `creatorId`: String,
+  val `observedAt`: String,
+  val `currencies`: List<APICommerceCreatorEarningsCurrenciesItem>,
+  val `ledger`: APICommerceCreatorEarningsLedger
+)
+
+@Serializable
+data class APICommerceCreatorEarningsCurrenciesItem(
+  val `currency`: String,
+  val `capturedMinor`: String,
+  val `requestMinor`: String,
+  val `membershipMinor`: String,
+  val `refundedMinor`: String,
+  @Required
+  val `transferredMinor`: String? = null,
+  @Required
+  val `reversedMinor`: String? = null,
+  val `pendingPayouts`: Long
+)
+
+@Serializable
+data class APICommerceCreatorEarningsLedger(
+  val `currency`: String,
+  val `entries`: List<APICommerceCreatorEarningsLedgerEntriesItem>,
+  @Required
+  val `nextCursor`: String? = null
+)
+
+@Serializable
+data class APICommerceCreatorEarningsLedgerEntriesItem(
+  val `id`: String,
+  @Required
+  val `packetId`: String? = null,
+  val `kind`: String,
+  val `amount`: String,
+  val `currency`: String,
+  val `createdAt`: String
+)
+
+@Serializable
+data class APICommerceCreatorLedgerPage(
+  val `currency`: String,
+  val `entries`: List<APICommerceCreatorLedgerPageEntriesItem>,
+  @Required
+  val `nextCursor`: String? = null
+)
+
+@Serializable
+data class APICommerceCreatorLedgerPageEntriesItem(
+  val `id`: String,
+  @Required
+  val `packetId`: String? = null,
+  val `kind`: String,
+  val `amount`: String,
+  val `currency`: String,
+  val `createdAt`: String
+)
+
 typealias APICommerceCurrency = String
 
 @Serializable
@@ -412,6 +472,57 @@ enum class APICommercePaymentState {
   @SerialName("refunded") REFUNDED,
   @SerialName("failed") FAILED
 }
+
+@Serializable
+data class APICommercePayoutOnboardingCommand(
+  val `version`: Long
+)
+
+@Serializable
+data class APICommercePayoutOnboardingResult(
+  val `creatorId`: String,
+  val `state`: APICommercePayoutOnboardingResultState,
+  val `detailsDue`: Boolean,
+  val `version`: Long,
+  @Required
+  val `url`: String? = null,
+  @Required
+  val `expiresAt`: String? = null
+)
+
+@Serializable
+enum class APICommercePayoutOnboardingResultState {
+  @SerialName("onboarding") ONBOARDING,
+  @SerialName("restricted") RESTRICTED,
+  @SerialName("enabled") ENABLED
+}
+
+@Serializable
+data class APICommercePoolEarnings(
+  val `creatorId`: String,
+  val `cycle`: String,
+  val `observedAt`: String,
+  val `closesAt`: String,
+  val `fanCount`: Long,
+  val `slotCount`: Long,
+  val `historyLimited`: Boolean,
+  val `postedCycles`: List<APICommercePoolEarningsPostedCyclesItem>
+)
+
+@Serializable
+data class APICommercePoolEarningsPostedCyclesItem(
+  val `cycle`: String,
+  val `currency`: String,
+  val `allocationMinor`: String,
+  @Required
+  val `transferredMinor`: String? = null,
+  @Required
+  val `reversedMinor`: String? = null,
+  val `slotSeconds`: String,
+  val `totalSlotSeconds`: String,
+  val `pendingEffects`: Long,
+  val `postedAt`: String
+)
 
 @Serializable
 data class APICommerceReauthorizePacket(
@@ -4434,6 +4545,8 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
     } finally { connection.disconnect() }
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
+  suspend fun creatorEarningsLedger(creatorId: String, currency: String, cursor: String? = null): APICommerceCreatorLedgerPage = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/earnings", "GET", authenticated = true, query = listOf("currency" to currency, "cursor" to cursor)))
+  suspend fun creatorPayoutOnboarding(creatorId: String, xCommerceAccountId: String? = null, body: APICommercePayoutOnboardingCommand): APICommercePayoutOnboardingResult = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/payout-onboarding", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-commerce-account-id" to xCommerceAccountId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
