@@ -849,10 +849,14 @@ function Compose({
   onDone: () => void;
   post?: boolean;
 }) {
+  const verificationReady = creator.verification === "verified";
   const canDraft =
-    creator.owned ||
-    creator.roles.includes("drafter") ||
-    creator.roles.includes("publisher");
+    verificationReady &&
+    (creator.owned ||
+      creator.roles.includes("drafter") ||
+      creator.roles.includes("publisher"));
+  const canPublish =
+    verificationReady && (creator.owned || creator.roles.includes("publisher"));
   const [document, setDocument] = useState<ContentBody>(
       emptyBody(post ? "post" : "note"),
     ),
@@ -1037,6 +1041,15 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {!verificationReady && (
+        <Notice title="Creator verification">
+          {creator.verification === "pending"
+            ? "Your creator verification is pending."
+            : "Your creator verification is not current."}{" "}
+          You can keep writing here. Saving, attaching media and signing are
+          unavailable until verification is approved.
+        </Notice>
+      )}
       <div className="w5-gutter">
         <span className="qv-meta">TO</span>
         <div className="qv-seg w5-audience" role="group" aria-label="Audience">
@@ -1331,6 +1344,7 @@ function Compose({
           <button
             className={`qv-btn ${creator.owned ? "qv-btn--maya" : "qv-btn--secondary"}`}
             disabled={
+              !canPublish ||
               (!creator.owned &&
                 (!creator.roles.includes("publisher") ||
                   document.kind !== "post")) ||
@@ -1342,6 +1356,10 @@ function Compose({
             }
             onClick={() =>
               void action.run(async () => {
+                if (!canPublish)
+                  throw new Error(
+                    "Current creator verification and a publishing role are required.",
+                  );
                 const result = await save();
                 if (creator.owned)
                   setReview(
