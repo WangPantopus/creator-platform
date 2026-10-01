@@ -127,6 +127,21 @@ export function createApp(
       );
     });
   if (dependencies.trustRouter) app.use(dependencies.trustRouter);
+  else
+    app.get("/health/ready", (_req, res) =>
+      res.status(503).json({
+        ready: false,
+        capabilities: [
+          {
+            name: "trust_runtime",
+            required: true,
+            state: "unavailable",
+            code: "trust_unconfigured",
+            checkedAt: new Date().toISOString(),
+          },
+        ],
+      }),
+    );
   app.get("/health", (_req, res) =>
     res.json({
       status: "ok",
