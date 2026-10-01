@@ -82,7 +82,11 @@
     "Retain main offer_pending decide-queue eligibility plus original audited conversation lineage projection.",
     "Retain original expected-account checks on reads and writes.",
     "Generated clients must preserve latest main operations plus original W5 full media/content fields using canonical generators after source reconciliation.",
-    "Applied SQL, checksums and ledger untouched. W8 immutable alias/fresh-upgrade custody remains prerequisite for the original branch merge."
+    "Applied SQL, checksums and ledger untouched. W8 immutable alias/fresh-upgrade custody remains prerequisite for the original branch merge.",
+    "W1 confirmed current configureStudioRequests account scope, abort/purge and 15s timeout must remain. Combine conversations expected-account headers and truthful404 handling into that transport; preserve sameRequestOrigin and server-owned session forwarding.",
+    "W3 accepted d2ca5d1081441b8572b31f99bd033054499280e1 canonical ConversationService.read(scope) after W5 audit/current triage authority. It replaces the superseded optional W5 projection; actual same-pool runtime lineage stays required for lineage features and is not inferred from raw reads.",
+    "Allow empty drafts to establish a real content object before media attachment, while retaining validatePublication nonempty-content and exact processed-media checks; keep duplicate-asset rejection and media_pending fields.",
+    "W3 bounded final native window currently holds further main merges; W5 has no active native devices."
   ],
   "boundary": "Read-only merge-tree writes only Git object data; no merge/index/worktree mutation or database migration."
 }
