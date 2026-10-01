@@ -1,21 +1,16 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AuthorLabel, SignedMarker } from "@qelvora/ui-web";
 import type {
   MediaAsset,
   PlaybackTicket,
+  CreatorMediaAsset,
+  CreatorMediaPlaybackTicket,
 } from "../../../../packages/api/src/media";
 import { mediaRequest } from "./api";
 import "./media.css";
 
-export function VoicePlayer({
-  asset,
-  creatorId,
-  fanId,
-  creatorName,
-  transcript,
-  time,
-}: {
+type VoicePlayerProps = {
   asset: MediaAsset;
   creatorId: string;
   fanId: string;
@@ -23,8 +18,61 @@ export function VoicePlayer({
   transcript?: string;
   /** W3/W5 supply the persisted publication time; the player never invents it. */
   time?: string;
+};
+export function VoicePlayer(props: VoicePlayerProps) {
+  const family = `threads/${props.creatorId}/${props.fanId}/media`;
+  return (
+    <Player
+      key={`${family}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      {...props}
+      family={family}
+    />
+  );
+}
+export function CreatorVoicePlayer(
+  props: Omit<VoicePlayerProps, "asset" | "fanId"> & {
+    asset: CreatorMediaAsset;
+    objectId: string;
+    /** Present only for an actual W1-authorized audience thread. */
+    fanId?: string;
+  },
+) {
+  const family = props.fanId
+    ? `threads/${props.creatorId}/${props.fanId}/creator-media`
+    : `creators/${props.creatorId}/media`;
+  if (
+    props.asset.creatorId !== props.creatorId ||
+    props.asset.objectId !== props.objectId ||
+    props.asset.purpose !== "human_note" ||
+    props.asset.state !== "ready" ||
+    props.asset.mimeType !== "audio/mp4"
+  )
+    return (
+      <p role="status">This recording is unavailable for the current Note.</p>
+    );
+  return (
+    <Player
+      key={`${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      {...props}
+      family={family}
+    />
+  );
+}
+function Player({
+  asset,
+  creatorName,
+  transcript,
+  time,
+  family,
+}: {
+  asset: MediaAsset | CreatorMediaAsset;
+  creatorName: string;
+  transcript?: string;
+  time?: string;
+  family: string;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
+  const loadRequest = useRef<AbortController | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,27 +95,89 @@ export function VoicePlayer({
   );
   const elapsed = (seconds: number) =>
     `${Math.floor(seconds / 60)}:${String(Math.floor(seconds) % 60).padStart(2, "0")}`;
+  useEffect(
+    () => () => {
+      loadRequest.current?.abort();
+    },
+    [],
+  );
+  useEffect(() => {
+    if (!src) return;
+    const abort = new AbortController();
+    let checking = false;
+    const timer = setInterval(() => {
+      if (checking) return;
+      checking = true;
+      void mediaRequest<MediaAsset | CreatorMediaAsset>(
+        `${family}/${asset.id}`,
+        { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]) },
+      )
+        .then((current) => {
+          if (
+            current.id !== asset.id ||
+            current.version !== asset.version ||
+            current.sha256 !== asset.sha256 ||
+            current.state !== "ready"
+          )
+            throw new Error(
+              "This recording changed or is no longer available.",
+            );
+        })
+        .catch(() => {
+          if (abort.signal.aborted) return;
+          audio.current?.pause();
+          setSrc(null);
+          setPlaying(false);
+          setError(
+            "Audio access could not be confirmed. Refresh the link to try again.",
+          );
+        })
+        .finally(() => {
+          checking = false;
+        });
+    }, 1000);
+    return () => {
+      abort.abort();
+      clearInterval(timer);
+    };
+  }, [src, family, asset.id, asset.version, asset.sha256]);
   async function load() {
+    if (loadRequest.current) return;
+    const abort = new AbortController();
+    loadRequest.current = abort;
     setLoading(true);
     try {
-      const ticket = await mediaRequest<PlaybackTicket>(
-        `threads/${creatorId}/${fanId}/media/${asset.id}/playback`,
-        { method: "POST", body: "{}" },
-      );
+      const ticket = await mediaRequest<
+        PlaybackTicket | CreatorMediaPlaybackTicket
+      >(`${family}/${asset.id}/playback`, {
+        method: "POST",
+        body: "{}",
+        signal: abort.signal,
+      });
       const url = new URL(ticket.url);
-      // Authenticated audio uses the same-origin HTTP-only cookie bridge, never a bearer token in a URL.
-      const path = url.pathname.replace(/^\/v1\/w6\//u, "");
+      // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.
+      const path = `${family}/${asset.id}/play`;
       if (
-        !path.startsWith(`threads/${creatorId}/${fanId}/media/${asset.id}/play`)
+        url.pathname !== `/v1/w6/${path}` ||
+        ticket.asset.id !== asset.id ||
+        ticket.asset.version !== asset.version ||
+        ticket.asset.sha256 !== asset.sha256
       )
-        throw new Error("The playback link is unavailable.");
+        throw new Error("The playback link is unavailable for this recording.");
+      if (abort.signal.aborted) return;
+      audio.current?.pause();
+      setPlaying(false);
       setSrc(`/api/w6/${path}${url.search}`);
       setPosition(0);
       setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Audio is unavailable.");
+    } catch (error) {
+      if (!abort.signal.aborted)
+        setError(
+          error instanceof Error ? error.message : "Audio is unavailable.",
+        );
     } finally {
-      setLoading(false);
+      if (!abort.signal.aborted) setLoading(false);
+      if (loadRequest.current === abort) loadRequest.current = null;
     }
   }
   async function toggle() {

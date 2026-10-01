@@ -93,6 +93,23 @@
     "webTypecheckAndLint": "passed",
     "databaseChecks": "18-case result above predates follow-up",
     "sqlApplied": false,
+    "functionalAcceptance": false,
+    "sourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a"
+  },
+  "creatorRecorderPlayerFollowup": {
+    "recordedAt": "2026-10-01T00:04:26.749740+00:00",
+    "sourceSHA256": {
+      "apps/web/features/media/VoiceRecorder.tsx": "2480e67355ec860bd0bf61bd631b2b8dbc2573a483d35f8394ce909acaf4d80c",
+      "apps/web/features/media/VoicePlayer.tsx": "5fc71f0143f5529fe1b453a550ef6b8b1e5535dbaf5a9371311013251ca35689",
+      "apps/backend/src/modules/media/router.ts": "372739afa449551a578c6a12dc50e3672af3ddef36e4e9e8a9a0dff6ad72f025"
+    },
+    "webTypecheckAndLint": "passed",
+    "backendBuild": "passed",
+    "existingContractTests": {
+      "tests": 9,
+      "failures": 0,
+      "runnerDurationMs": 657
+    },
     "functionalAcceptance": false
   }
 }

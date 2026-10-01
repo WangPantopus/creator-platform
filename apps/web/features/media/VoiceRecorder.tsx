@@ -1,32 +1,82 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Seal } from "@qelvora/ui-web";
 import {
   VoiceRecorder as BrowserRecorder,
   type RecordingSnapshot,
 } from "./recorder";
-import { mediaRequest, uploadRecording } from "./api";
+import { mediaRequest, uploadCreatorMedia, uploadRecording } from "./api";
 import type {
   MediaAsset,
   UploadTicket,
+  CreatorMediaAsset,
+  CreatorMediaUploadTicket,
+  ProcessedMediaEvidence,
 } from "../../../../packages/api/src/media";
+import { ProcessedMediaEvidenceSchema } from "../../../../packages/api/src/media";
 import "./media.css";
 import { SignRecording } from "./SignRecording";
-import { VoicePlayer } from "./VoicePlayer";
+import { CreatorVoicePlayer, VoicePlayer } from "./VoicePlayer";
 
-export function VoiceRecording({
-  creatorId,
-  fanId,
-  creatorName,
-  purpose = "human_note",
-  maxDurationMs,
-}: {
+type ThreadRecordingProps = {
   creatorId?: string;
   fanId?: string;
   creatorName?: string;
   purpose?: "human_note" | "human_reply";
   maxDurationMs: number;
-}) {
+};
+export function VoiceRecording(props: ThreadRecordingProps) {
+  return (
+    <RecordingForm
+      key={`${props.creatorId}/${props.fanId}/${props.purpose}`}
+      {...props}
+    />
+  );
+}
+export type CreatorVoiceRecordingProps = {
+  creatorId: string;
+  /** Actual saved W5 draft, issued by content authority. Never a fan/thread ID. */
+  objectId: string;
+  creatorName?: string;
+  /** Client host owns saving the attachment and signing the complete Note. */
+  onReady?: (
+    asset: CreatorMediaAsset,
+    evidence: ProcessedMediaEvidence,
+  ) => void;
+  /** Host removes any current draft attachment before the asset is revoked. */
+  beforeDiscard?: (assetId: string) => Promise<void>;
+};
+export function CreatorVoiceRecording(props: CreatorVoiceRecordingProps) {
+  return (
+    <RecordingForm
+      key={`${props.creatorId}/${props.objectId}`}
+      {...props}
+      purpose="human_note"
+      maxDurationMs={60_000}
+    />
+  );
+}
+function RecordingForm({
+  creatorId,
+  fanId,
+  objectId,
+  creatorName,
+  purpose = "human_note",
+  maxDurationMs,
+  onReady,
+  beforeDiscard,
+}: ThreadRecordingProps &
+  Omit<CreatorVoiceRecordingProps, "creatorId" | "objectId"> & {
+    objectId?: string;
+  }) {
+  const heading = useId();
+  const family =
+    creatorId && (objectId || fanId)
+      ? objectId
+        ? `creators/${creatorId}/media`
+        : `threads/${creatorId}/${fanId}/media`
+      : null;
+  const notified = useRef<string | null>(null);
   const [recording, setRecording] = useState<RecordingSnapshot>({
     state: "idle",
     durationMs: 0,
@@ -39,11 +89,15 @@ export function VoiceRecording({
   >("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [asset, setAsset] = useState<MediaAsset | null>(null);
+  const [asset, setAsset] = useState<MediaAsset | CreatorMediaAsset | null>(
+    null,
+  );
   const [available, setAvailable] = useState(false);
   const recorder = useRef<BrowserRecorder | null>(null);
   const controller = useRef<AbortController | null>(null);
-  const ticket = useRef<UploadTicket | undefined>(undefined);
+  const ticket = useRef<UploadTicket | CreatorMediaUploadTicket | undefined>(
+    undefined,
+  );
   const uploadKey = useRef<string | undefined>(undefined);
   const pendingUpload = useRef<Promise<void> | null>(null);
   const [discarding, setDiscarding] = useState(false);
@@ -71,33 +125,102 @@ export function VoiceRecording({
     return () => URL.revokeObjectURL(url);
   }, [recording.blob]);
   useEffect(() => {
-    void mediaRequest<{ mediaAvailable: boolean }>("capabilities")
-      .then((value) => setAvailable(value.mediaAvailable))
-      .catch(() => setAvailable(false));
-  }, []);
+    const abort = new AbortController();
+    void mediaRequest<{
+      mediaAvailable: boolean;
+      creatorMediaAvailable?: boolean;
+    }>("capabilities", { signal: abort.signal })
+      .then((value) => {
+        if (!abort.signal.aborted)
+          setAvailable(
+            (objectId ? value.creatorMediaAvailable : value.mediaAvailable) ===
+              true,
+          );
+      })
+      .catch(() => {
+        if (!abort.signal.aborted) setAvailable(false);
+      });
+    return () => abort.abort();
+  }, [objectId]);
   useEffect(() => {
     if (
       !asset ||
-      !creatorId ||
-      !fanId ||
+      !family ||
       !["quarantined", "processing"].includes(asset.state)
     )
       return;
-    const timer = setInterval(() => {
-      void mediaRequest<MediaAsset>(
-        `threads/${creatorId}/${fanId}/media/${asset.id}`,
-      )
-        .then(setAsset)
-        .catch((e) =>
-          setError(
-            e instanceof Error ? e.message : "Processing is unavailable.",
-          ),
+    const abort = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      try {
+        const current = await mediaRequest<MediaAsset | CreatorMediaAsset>(
+          `${family}/${asset.id}`,
+          { signal: abort.signal },
         );
+        if (!abort.signal.aborted) setAsset(current);
+      } catch (error) {
+        if (!abort.signal.aborted)
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Processing is unavailable.",
+          );
+      } finally {
+        if (!abort.signal.aborted)
+          timer = setTimeout(() => {
+            void poll();
+          }, 2000);
+      }
+    };
+    timer = setTimeout(() => {
+      void poll();
     }, 2000);
-    return () => clearInterval(timer);
-  }, [asset, creatorId, fanId]);
+    return () => {
+      abort.abort();
+      clearTimeout(timer);
+    };
+  }, [asset, family]);
+  useEffect(() => {
+    if (
+      !objectId ||
+      !asset ||
+      !("objectId" in asset) ||
+      asset.state !== "ready" ||
+      !onReady
+    )
+      return;
+    const occurrence = `${asset.id}/${asset.version}/${asset.sha256}`;
+    if (notified.current === occurrence) return;
+    if (
+      asset.creatorId !== creatorId ||
+      asset.objectId !== objectId ||
+      asset.purpose !== "human_note" ||
+      asset.mimeType !== "audio/mp4"
+    ) {
+      setError(
+        "The processed recording does not match this Note. Refresh before continuing.",
+      );
+      return;
+    }
+    const evidence = ProcessedMediaEvidenceSchema.safeParse({
+      assetId: asset.id,
+      version: asset.version,
+      sha256: asset.sha256,
+      bytes: asset.bytes,
+      mimeType: "audio/mp4",
+      durationMs: asset.durationMs,
+    });
+    if (!evidence.success || !asset.durationMs || asset.durationMs > 60_000) {
+      setError(
+        "The processed recording evidence is unavailable. Refresh before continuing.",
+      );
+      return;
+    }
+    notified.current = occurrence;
+    onReady(asset, evidence.data);
+  }, [asset, creatorId, objectId, onReady]);
   async function send() {
-    if (!recording.blob || !creatorId || !fanId || pendingUpload.current)
+    if (!recording.blob || !creatorId || !family || pendingUpload.current)
       return;
     uploadKey.current ??= crypto.randomUUID();
     const abort = new AbortController();
@@ -105,20 +228,33 @@ export function VoiceRecording({
     setUpload("uploading");
     setError(null);
     try {
-      const result = await uploadRecording({
+      const common = {
         creatorId,
-        fanId,
-        purpose,
         blob: recording.blob,
         durationMs: Math.round(recording.durationMs),
         idempotencyKey: uploadKey.current,
         signal: abort.signal,
         progress: setProgress,
-        resumed: ticket.current,
-        onTicket: (value) => {
-          ticket.current = value;
-        },
-      });
+      };
+      const result = objectId
+        ? await uploadCreatorMedia({
+            ...common,
+            objectId,
+            purpose: "human_note",
+            resumed: ticket.current as CreatorMediaUploadTicket | undefined,
+            onTicket: (value) => {
+              ticket.current = value;
+            },
+          })
+        : await uploadRecording({
+            ...common,
+            fanId: fanId!,
+            purpose,
+            resumed: ticket.current as UploadTicket | undefined,
+            onTicket: (value) => {
+              ticket.current = value;
+            },
+          });
       setAsset(result);
       setUpload("processing");
     } catch (e) {
@@ -138,12 +274,12 @@ export function VoiceRecording({
     controller.current?.abort();
     await pendingUpload.current;
     const current = ticket.current;
-    if (current && creatorId && fanId) {
+    if (current && family) {
       try {
-        await mediaRequest(
-          `threads/${creatorId}/${fanId}/media/${current.asset.id}`,
-          { method: "DELETE" },
-        );
+        await beforeDiscard?.(current.asset.id);
+        await mediaRequest(`${family}/${current.asset.id}`, {
+          method: "DELETE",
+        });
       } catch {
         setError(
           "The uploaded file could not be removed. Try again before discarding.",
@@ -159,6 +295,7 @@ export function VoiceRecording({
       setDiscarding(false);
       return false;
     }
+    notified.current = null;
     ticket.current = undefined;
     uploadKey.current = undefined;
     recorder.current?.discard();
@@ -171,7 +308,7 @@ export function VoiceRecording({
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
   return (
-    <section className="w6-recorder" aria-labelledby="voice-heading">
+    <section className="w6-recorder" aria-labelledby={heading}>
       <div className="w6-author">
         {creatorName && <Seal size={28} />}
         <span>
@@ -180,7 +317,7 @@ export function VoiceRecording({
             : "Record a voice note"}
         </span>
       </div>
-      <h1 id="voice-heading">Your own voice</h1>
+      <h1 id={heading}>Your own voice</h1>
       <p>Record, listen, and sign the exact recording before it is shared.</p>
       <div
         className="w6-data"
@@ -284,7 +421,7 @@ export function VoiceRecording({
       {preview && upload !== "uploading" && !asset && (
         <button
           className="qv-btn qv-btn--maya"
-          disabled={!available || !creatorId || !fanId || discarding}
+          disabled={!available || !family || discarding}
           onClick={() => {
             if (pendingUpload.current) return;
             const work = send();
@@ -306,23 +443,37 @@ export function VoiceRecording({
               : "Uploaded · processing before sharing"}
         </p>
       )}
-      {asset?.state === "ready" && creatorId && fanId && (
-        <>
-          <VoicePlayer
+      {asset?.state === "ready" &&
+        creatorId &&
+        objectId &&
+        "objectId" in asset && (
+          <CreatorVoicePlayer
             asset={asset}
             creatorId={creatorId}
-            fanId={fanId}
+            objectId={objectId}
             creatorName={creatorName ?? "the creator"}
           />
-          <SignRecording
-            asset={asset}
-            creatorId={creatorId}
-            fanId={fanId}
-            onSigned={setAsset}
-          />
-        </>
-      )}
-      {(!available || !creatorId || !fanId) && (
+        )}
+      {asset?.state === "ready" &&
+        creatorId &&
+        fanId &&
+        !("objectId" in asset) && (
+          <>
+            <VoicePlayer
+              asset={asset}
+              creatorId={creatorId}
+              fanId={fanId}
+              creatorName={creatorName ?? "the creator"}
+            />
+            <SignRecording
+              asset={asset}
+              creatorId={creatorId}
+              fanId={fanId}
+              onSigned={setAsset}
+            />
+          </>
+        )}
+      {(!available || !family) && (
         <p className="qv-help">
           Sign in to a configured creator account to upload and sign. Your
           preview stays on this device until you upload it.

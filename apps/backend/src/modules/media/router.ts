@@ -37,6 +37,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
   router.get("/capabilities", (_req, res) =>
     res.json({
       mediaAvailable: Boolean(dependencies.media),
+      creatorMediaAvailable: Boolean(
+        dependencies.creatorMedia && dependencies.creatorScopeFor,
+      ),
       callsAvailable: Boolean(
         dependencies.sessions &&
           dependencies.sessions.provider.name !== "unconfigured" &&
