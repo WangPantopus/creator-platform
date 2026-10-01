@@ -284,7 +284,7 @@ private struct W3AccountScreen: View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
             Text("You").qText("title")
             if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
-            Text(account?.fan.handle ?? "Your account").qText("display-md")
+            Text(account.map { "@" + $0.fan.handle } ?? "Your account").qText("display-md")
             Text(account?.fan.intro ?? "Your intro is private until you choose to share it.").qText("body")
             Button("Handle and intro", variant: .quiet) { session.open("/identity/account") }
             Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce/requests") }
@@ -292,6 +292,7 @@ private struct W3AccountScreen: View {
             Button("Notifications", variant: .quiet, block: true) { session.open("/notifications/settings") }
             Text("Me and privacy").qText("display-md")
             Text("Memory and conversation access by creator").qText("body")
+            if let account, account.threads.isEmpty { Text("No conversations yet.").qText("body") }
             ForEach(account?.threads ?? []) { thread in Button(thread.name, variant: .quiet, block: true) { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) } }
             if loading { Text("Loading your conversations…").qText("caption") }
             if let next = account?.nextCursor { Button("More conversations", variant: .quiet, disabled: loading || !failure.isEmpty) { Task { await refresh(before: next) } } }

@@ -131,8 +131,9 @@ public struct FanAppShell: View {
                 NativeHandleForm(model: model)
             } else {
                 VStack(spacing: 0) {
+                    let feature = features.first(where: { $0.matches(model.destination) })
                     if model.session?.mode == .development { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
-                    if model.destination == "/you" || model.destination == "/identity/account" {
+                    if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
                             Text("Your account").qText("display-md")
                             Text("@" + (model.session?.fan?.handle ?? "")).qText("body")
@@ -148,7 +149,7 @@ public struct FanAppShell: View {
                             #endif
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature = features.first(where: { $0.matches(model.destination) }) { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }
