@@ -252,7 +252,9 @@ export default async function Verification({
           <dd>{copy.identityVerificationNotDisclosed}</dd>
         </dl>
         <div className="verification-hash">
-          {formatCopy("identityVerificationHash", { hash: signature.contentHash })}
+          {formatCopy("identityVerificationHash", {
+            hash: signature.contentHash,
+          })}
         </div>
         <p className="qv-help">{copy.identityVerificationPublicNotice}</p>
         <Button href={`/verify/${id}`} block>
