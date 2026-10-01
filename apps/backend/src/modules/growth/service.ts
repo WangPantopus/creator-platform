@@ -941,104 +941,110 @@ export class GrowthService {
   async privacyDelete(
     accountId: string,
     ownedCreatorIds: readonly string[] = [],
+    signal?: AbortSignal,
   ) {
-    await this.db.transaction(this.db.worker, async (client) => {
-      await this.erasure.mark(client, accountId, ownedCreatorIds);
-      await client.query(
-        "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
-        [accountId],
-      );
-      for (const table of [
-        "follow",
-        "preference",
-        "device",
-        "email",
-        "notification",
-        "share",
-        "metric",
-        "feedback",
-        "prompt_choice",
-        "entry_attribution",
-      ]) {
-        if (table === "notification")
+    await this.db.transaction(
+      this.db.worker,
+      async (client) => {
+        await this.erasure.mark(client, accountId, ownedCreatorIds);
+        await client.query(
+          "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
+          [accountId],
+        );
+        for (const table of [
+          "follow",
+          "preference",
+          "device",
+          "email",
+          "notification",
+          "share",
+          "metric",
+          "feedback",
+          "prompt_choice",
+          "entry_attribution",
+        ]) {
+          if (table === "notification")
+            await client.query(
+              "DELETE FROM growth.delivery WHERE notification_id IN (SELECT id FROM growth.notification WHERE account_id=$1)",
+              [accountId],
+            );
           await client.query(
-            "DELETE FROM growth.delivery WHERE notification_id IN (SELECT id FROM growth.notification WHERE account_id=$1)",
+            `DELETE FROM growth.${table} WHERE account_id=$1`,
             [accountId],
           );
-        await client.query(`DELETE FROM growth.${table} WHERE account_id=$1`, [
+        }
+        await client.query(
+          "UPDATE growth.event_inbox SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+          [accountId],
+        );
+        await client.query(
+          "UPDATE growth.event_inbox e SET envelope='{\"erased\":true}'::jsonb WHERE NOT EXISTS(SELECT 1 FROM growth.notification n WHERE n.event_id=e.id)",
+        );
+        await client.query("DELETE FROM growth.invite WHERE created_by=$1", [
           accountId,
         ]);
-      }
-      await client.query(
-        "UPDATE growth.event_inbox SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-        [accountId],
-      );
-      await client.query(
-        "UPDATE growth.event_inbox e SET envelope='{\"erased\":true}'::jsonb WHERE NOT EXISTS(SELECT 1 FROM growth.notification n WHERE n.event_id=e.id)",
-      );
-      await client.query("DELETE FROM growth.invite WHERE created_by=$1", [
-        accountId,
-      ]);
-      await client.query(
-        "DELETE FROM growth.activation_job WHERE creator_account_id=$1",
-        [accountId],
-      );
-      await client.query(
-        "DELETE FROM growth.insight_signal WHERE subject_key=$1",
-        [this.pseudonym("privacy", accountId, "subject")],
-      );
-      await client.query(
-        "UPDATE growth.impact SET consented_thanks=coalesce((SELECT jsonb_agg(quote) FROM jsonb_array_elements(consented_thanks) quote WHERE quote->>'subjectKey'<>$1),'[]'::jsonb) WHERE consented_thanks @> jsonb_build_array(jsonb_build_object('subjectKey',$1::text))",
-        [this.privacySubjectKey(accountId)],
-      );
-      for (const table of [
-        "content_public",
-        "insight_signal",
-        "insight_snapshot",
-        "insight_window",
-        "recommendation",
-        "impact",
-        "activation_job",
-        "instagram_reply",
-        "experiment",
-        "metric",
-        "invite",
-        "follow",
-        "entry_attribution",
-      ])
         await client.query(
-          `DELETE FROM growth.${table} WHERE creator_id=ANY($1::uuid[])`,
+          "DELETE FROM growth.activation_job WHERE creator_account_id=$1",
+          [accountId],
+        );
+        await client.query(
+          "DELETE FROM growth.insight_signal WHERE subject_key=$1",
+          [this.pseudonym("privacy", accountId, "subject")],
+        );
+        await client.query(
+          "UPDATE growth.impact SET consented_thanks=coalesce((SELECT jsonb_agg(quote) FROM jsonb_array_elements(consented_thanks) quote WHERE quote->>'subjectKey'<>$1),'[]'::jsonb) WHERE consented_thanks @> jsonb_build_array(jsonb_build_object('subjectKey',$1::text))",
+          [this.privacySubjectKey(accountId)],
+        );
+        for (const table of [
+          "content_public",
+          "insight_signal",
+          "insight_snapshot",
+          "insight_window",
+          "recommendation",
+          "impact",
+          "activation_job",
+          "instagram_reply",
+          "experiment",
+          "metric",
+          "invite",
+          "follow",
+          "entry_attribution",
+        ])
+          await client.query(
+            `DELETE FROM growth.${table} WHERE creator_id=ANY($1::uuid[])`,
+            [ownedCreatorIds],
+          );
+        await client.query(
+          "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+          [accountId],
+        );
+        await client.query(
+          "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
           [ownedCreatorIds],
         );
-      await client.query(
-        "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-        [accountId],
-      );
-      await client.query(
-        "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
-        [ownedCreatorIds],
-      );
-      await client.query(
-        "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",
-        [ownedCreatorIds],
-      );
-      await client.query(
-        "DELETE FROM growth.delivery USING growth.notification n WHERE growth.delivery.notification_id=n.id AND n.creator_id=ANY($1::uuid[])",
-        [ownedCreatorIds],
-      );
-      await client.query(
-        "UPDATE growth.notification SET sender=$2,preview=$3,destination='/notifications' WHERE creator_id=ANY($1::uuid[])",
-        [ownedCreatorIds, copy.growthSystem, copy.growthUpdateUnavailable],
-      );
-      await client.query(
-        "DELETE FROM growth.share WHERE source->>'creatorId'=ANY($1::text[])",
-        [ownedCreatorIds],
-      );
-      await client.query(
-        "DELETE FROM growth.creator_public WHERE id=ANY($1::uuid[])",
-        [ownedCreatorIds],
-      );
-    });
+        await client.query(
+          "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",
+          [ownedCreatorIds],
+        );
+        await client.query(
+          "DELETE FROM growth.delivery USING growth.notification n WHERE growth.delivery.notification_id=n.id AND n.creator_id=ANY($1::uuid[])",
+          [ownedCreatorIds],
+        );
+        await client.query(
+          "UPDATE growth.notification SET sender=$2,preview=$3,destination='/notifications' WHERE creator_id=ANY($1::uuid[])",
+          [ownedCreatorIds, copy.growthSystem, copy.growthUpdateUnavailable],
+        );
+        await client.query(
+          "DELETE FROM growth.share WHERE source->>'creatorId'=ANY($1::text[])",
+          [ownedCreatorIds],
+        );
+        await client.query(
+          "DELETE FROM growth.creator_public WHERE id=ANY($1::uuid[])",
+          [ownedCreatorIds],
+        );
+      },
+      signal,
+    );
     return {
       acknowledged: true,
       retained: copy.growthRetainedClosedSnapshots,

@@ -11,7 +11,11 @@ import {
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
 import { GrowthRelay, type GrowthEventSources } from "./relay.js";
-import { growthPrivacyHook, type GrowthPrivacyScope } from "./lifecycle.js";
+import {
+  growthPrivacyHook,
+  type GrowthPrivacyScope,
+  type GrowthPrivacyTaskAuthority,
+} from "./lifecycle.js";
 import { registerGrowth } from "./integration.js";
 
 /** Same runtime mounts in W1's canonical app and supplies W8's account-job hook. */
@@ -25,6 +29,7 @@ export async function createGrowthRuntime(input: {
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
   privacyScope?: GrowthPrivacyScope;
+  privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
   installURLs?: Partial<Record<"ios" | "android", string>>;
   experimentsEnabled?: boolean;
   observe?: (
@@ -115,7 +120,11 @@ export async function createGrowthRuntime(input: {
     engagement,
     experiments,
     feature: registerGrowth(service, { retention, engagement, experiments }),
-    privacyHook: growthPrivacyHook(service, input.privacyScope),
+    privacyHook: growthPrivacyHook(
+      service,
+      input.privacyScope,
+      input.privacyTaskAuthority,
+    ),
     tick,
     start() {
       if (!stopped) return;
@@ -134,7 +143,10 @@ export async function createGrowthRuntime(input: {
       producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),
       activationSource: Boolean(input.activationSource),
-      privacyOwnership: Boolean(input.privacyScope),
+      privacyOwnership: Boolean(
+        input.privacyScope || input.privacyTaskAuthority,
+      ),
+      privacyStreaming: Boolean(input.privacyTaskAuthority),
       experimentsEnabled: input.experimentsEnabled ?? false,
     }),
   };

@@ -1,0 +1,11 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/backend
+
+ ✓ tests/contracts.test.ts (9 tests) 507ms
+   ✓ authority boundaries > local backend exposes health and honestly refuses sign-in  303ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  17:43:18
+   Duration  3.58s (transform 369ms, setup 0ms, collect 1.68s, tests 507ms, environment 0ms, prepare 444ms)
+

@@ -5,7 +5,10 @@ import { DomainError } from "../../core/errors.js";
 import { unavailableOwners, type GrowthOwners } from "./contracts.js";
 import { canonicalCreatorOwner } from "./integration.js";
 import { createGrowthRuntime } from "./runtime.js";
-import type { GrowthPrivacyScope } from "./lifecycle.js";
+import type {
+  GrowthPrivacyScope,
+  GrowthPrivacyTaskAuthority,
+} from "./lifecycle.js";
 import type { DeliveryProvider } from "./notifications.js";
 import type { GrowthEventSources } from "./relay.js";
 import type { ActivationSource, ThanksPermission } from "./retention.js";
@@ -17,6 +20,7 @@ export async function configureGrowthForBackend(
     identity: IdentityRuntime | undefined;
     owners?: Partial<GrowthOwners>;
     privacyScope?: GrowthPrivacyScope;
+    privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
     assertAllowed?: Parameters<typeof canonicalCreatorOwner>[1];
     provider?: DeliveryProvider;
     sources?: GrowthEventSources;
@@ -72,6 +76,7 @@ export async function configureGrowthForBackend(
           }),
       },
       privacyScope: input.privacyScope,
+      privacyTaskAuthority: input.privacyTaskAuthority,
       provider: input.provider,
       sources: input.sources,
       activationSource: input.activationSource,
