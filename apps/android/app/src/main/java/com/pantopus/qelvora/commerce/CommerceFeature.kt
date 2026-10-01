@@ -46,7 +46,7 @@ object CommerceFanFeature {
     var screen by remember { mutableStateOf(if (arrivalPath.startsWith("/commerce/")) arrivalPath.substringAfterLast("/") else if (arrivalPath.endsWith("/access")) "access" else "requests") }
     var category by remember { mutableStateOf("Open") }; var creator by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var failure by remember { mutableStateOf("") }; var notice by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }; var choice by remember { mutableStateOf<String?>(null) }; var reminders by remember { mutableStateOf(true) }
+    var amount by remember { mutableStateOf("") }; var choice by remember { mutableStateOf<String?>(null) }; var reminders by remember { mutableStateOf(false) }
     var summary by remember { mutableStateOf("") }; var info by remember { mutableStateOf("") }; var selectedMode by remember { mutableStateOf<String?>(null) }
     var passSelection by remember { mutableStateOf(setOf<String>()) }
     var replacement by remember { mutableStateOf("") }
