@@ -123,9 +123,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T01:18:51.606443Z",
+    "recordedAt": "2026-10-01T01:32:16.090158Z",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "9d29e8caaf08551e8fe871e7a2d06e5981229714; withdrawal policy follows, inspect HEAD",
+    "lastPushedCheckpoint": "3940d4fa4061abda4dd252b5df9f9d3d42ebf27b; native account-bound reads follow, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -133,15 +133,15 @@
         "webPort": 3005,
         "webSession": 67790,
         "apiPort": 4105,
-        "apiSession": 18430,
-        "apiPid": 63600
+        "apiSession": 19017,
+        "apiPid": 78418
       },
       "secondary": {
         "webPort": 30055,
         "webSession": 89623,
         "apiPort": 41055,
-        "apiSession": 79742,
-        "apiPid": 39940
+        "apiSession": 44223,
+        "apiPid": 78429
       },
       "developmentDatabase": {
         "container": "creator-platform-w5-local",
@@ -174,7 +174,8 @@
       "fanFinal3901280BothThemesVerified": true,
       "temporaryPostRestored": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3 archived revision5; Thanks remains withdrawnv2; unsent text never submitted",
       "postVoiceUnavailablePolicyVerified": true,
-      "countBoundaryDraftRevision": 2
+      "countBoundaryDraftRevision": 2,
+      "realSessionExpiryAndBoundReadRenewalVerified": true
     },
     "mediaMigration": "schema-media-publication.sql proposed, unallocated, unapplied; no applied SQL or checksums rewritten",
     "signing": "Human instructed keep genuine signing blocked; no UV/passkey simulation",
@@ -194,6 +195,15 @@
     "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
     "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
     "audienceMedia": "Personal current tuple/C2PA/ticket consumer on actual no-Thread W1 audience route; real media producer unmounted/unverified",
-    "mediaLifecycle": "Exact c425ae7 recorder generation and de17183 canonical form; keyed old-node preview/player cleanup plus personal player hidden-authority pause"
+    "mediaLifecycle": "Exact c425ae7 recorder generation and de17183 canonical form; keyed old-node preview/player cleanup plus personal player hidden-authority pause",
+    "nativeAuthority": "Serialized monotonic5s/scene expiry, private state keyed to route, signature closure, actual-account GET binding; compile only, native operation unverified",
+    "nativeBuildResources": {
+      "owned": "/private/tmp/creator-w5-native-authority",
+      "jdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/jdk-x64/jdk-21.0.12.1+1/Contents/Home",
+      "sdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/sdk",
+      "androidBuild": "compileDebugKotlin pass5m7s; no APK/device/SDK modification",
+      "iosBuild": "final bound-read Swift compilation pass23.24s",
+      "ownCachesPreserved": true
+    }
   }
 }

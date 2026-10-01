@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.content
 
 import android.content.Context
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.SecureSessionStorage
@@ -75,59 +79,91 @@ private fun ContentInput(label: String, value: String, max: Int, change: (String
 @Composable
 private fun ContentScreen(context: Context, baseURL: String?, model: FanSession) {
     val parts = model.destination.split('/').filter { it.isNotEmpty() }; val creatorId = parts[1]; val contentId = parts[2]
+    key(creatorId, contentId) { ContentObjectScreen(context, baseURL, model, creatorId, contentId) }
+}
+
+@Composable
+private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSession, creatorId: String, contentId: String) {
     val client = remember(baseURL) { baseURL?.let { ContentClient(context, it) } }; val scope = rememberCoroutineScope()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     var content by remember { mutableStateOf<JsonObject?>(null) }; var replies by remember { mutableStateOf<List<JsonObject>>(emptyList()) }; var cursor by remember { mutableStateOf<String?>(null) }
     var replyText by remember { mutableStateOf("") }; var thanks by remember { mutableStateOf<JsonObject?>(null) }; var thanksText by remember { mutableStateOf("") }
     var share by remember { mutableStateOf(false) }; var identity by remember { mutableStateOf(false) }; var busy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf("") }
     var signature by remember { mutableStateOf<String?>(null) }; var signatureStatus by remember { mutableStateOf("") }
     var viewerAccountId by remember{mutableStateOf<String?>(null)};var loadGeneration by remember{mutableIntStateOf(0)}
+    var currentAccess by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(false) }
+    var checkedAt by remember { mutableLongStateOf(0L) }
     var replyDepth by remember { mutableIntStateOf(1) }
     val retryKeys=remember { mutableMapOf<String,String>() }
+    fun suspendAccess() { currentAccess = false; signature = null; signatureStatus = "" }
+    fun clearAuthority() {
+        suspendAccess(); content = null; replies = emptyList(); thanks = null; cursor = null
+        viewerAccountId = null; replyText = ""; thanksText = ""; share = false; identity = false; retryKeys.clear()
+    }
     suspend fun load(resetThanks:Boolean=true) {
+        if (loading) return; loading = true
+        val cycleStartedAt = SystemClock.elapsedRealtime()
         loadGeneration++;val generation=loadGeneration
         try {
             val api=client?:error("The content service is not connected.")
             val before=api.request("$creatorId/mute").jsonObject
             var status=""
-            val view=try{api.request("$creatorId/$contentId").jsonObject}catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){status=failure.message?:"Reconnect to refresh content. Your input is kept.";null}
+            val view=try{api.request("$creatorId/$contentId", expectedAccountId=before.text("accountId")).jsonObject}catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){status=failure.message?:"Reconnect to refresh content. Your input is kept.";null}
             val depth=if(before.text("accountId")==viewerAccountId)replyDepth else 1
-            var page=api.request("$creatorId/replies").jsonObject
+            var page=api.request("$creatorId/replies", expectedAccountId=before.text("accountId")).jsonObject
             val currentReplies=page["items"]!!.jsonArray.map{it.jsonObject}.toMutableList()
             for(n in 1 until depth){
                 val next=page["nextCursor"]?.jsonPrimitive?.contentOrNull?:break
-                page=api.request("$creatorId/replies?cursor=$next").jsonObject
+                page=api.request("$creatorId/replies?cursor=$next", expectedAccountId=before.text("accountId")).jsonObject
                 currentReplies.addAll(page["items"]!!.jsonArray.map{it.jsonObject})
             }
-            val saved=api.request("$creatorId/thanks?targetKind=content&targetId=$contentId")
+            val saved=api.request("$creatorId/thanks?targetKind=content&targetId=$contentId", expectedAccountId=before.text("accountId"))
             val mine=if(saved is JsonNull)null else saved.jsonObject
-            val after=api.request("$creatorId/mute").jsonObject
+            val after=api.request("$creatorId/mute", expectedAccountId=before.text("accountId")).jsonObject
             if(generation!=loadGeneration)return
-            if(before.text("accountId")!=after.text("accountId")){content=null;replies=emptyList();thanks=null;viewerAccountId=null;replyText="";thanksText="";share=false;identity=false;retryKeys.clear();error="The signed-in account changed. Refresh before continuing.";return}
+            if(before.text("accountId")!=after.text("accountId")){clearAuthority();error="The signed-in account changed. Refresh before continuing.";return}
             val changed=viewerAccountId!=before.text("accountId")
             if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyDepth=1}
             viewerAccountId=before.text("accountId");content=view;replies=currentReplies;cursor=page["nextCursor"]?.jsonPrimitive?.contentOrNull;thanks=mine
             if(resetThanks||changed){thanksText=mine?.text("text").orEmpty();share=mine?.flag("shareWithCreatorDigest")?:false;identity=mine?.flag("showIdentity")?:false}
             error=status
+            checkedAt = cycleStartedAt; currentAccess = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && SystemClock.elapsedRealtime() - cycleStartedAt < 5000
         }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
             if(generation!=loadGeneration)return
+            suspendAccess()
             content=null;replies=emptyList();thanks=null;cursor=null
-            if(failure is ContentFailure && failure.status in 401..403){viewerAccountId=null;replyText="";thanksText="";share=false;identity=false;retryKeys.clear()}
+            if(failure is ContentFailure && failure.status in listOf(401,403)){clearAuthority()}
             error=failure.message?:"Reconnect to refresh current access. Your input is kept."
-        }
+        } finally { loading = false }
     }
     suspend fun mutate(path: String, body: JsonObject, resetThanks: Boolean = false, clearReply: Boolean = false) {
-        if (busy || viewerAccountId==null) return; busy = true
+        if (busy || !currentAccess || viewerAccountId==null) return; busy = true
         val fields=body.toMutableMap();fields.remove("idempotencyKey")
         val fingerprint=path+JsonObject(fields.toSortedMap()).toString()
         val command=if(body["idempotencyKey"]==null)body else JsonObject(fields+ ("idempotencyKey" to JsonPrimitive(retryKeys.getOrPut(fingerprint){UUID.randomUUID().toString()})))
         try { client?.request("$creatorId/$path", command, expectedAccountId=viewerAccountId) ?: error("The content service is not connected."); retryKeys.remove(fingerprint); if (clearReply) replyText = ""; load(resetThanks) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint);error = failure.message ?: "This action could not complete. Your input is kept." }
+        catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.status in listOf(401,403))clearAuthority(); error = failure.message ?: "This action could not complete. Your input is kept." }
         finally { busy = false }
     }
     LaunchedEffect(client, contentId) { load(); while (true) { delay(4000); if (!busy) load(false) } }
+    LaunchedEffect(client, contentId) { while (true) { delay(500); if (SystemClock.elapsedRealtime() - checkedAt >= 5000) suspendAccess() } }
+    DisposableEffect(lifecycle, client, contentId) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) scope.launch { load(false) }
+            else if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) suspendAccess()
+        }
+        lifecycle.addObserver(observer)
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) suspendAccess()
+        onDispose { lifecycle.removeObserver(observer); loadGeneration++; suspendAccess() }
+    }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (error.isNotEmpty()) Notice("error", "Content status", error)
+        if (!currentAccess) {
+            QText("Checking current access. Your input is kept during a connection interruption.", "body")
+            Button("Check current access", ButtonVariant.SECONDARY, disabled=busy) { scope.launch { load(false) } }
+        } else {
         val current = content
         if (current == null) {
             QText("Content unavailable", "display-md");Button("Refresh",ButtonVariant.SECONDARY,disabled=busy){scope.launch{load()}}
@@ -173,8 +209,9 @@ private fun ContentScreen(context: Context, baseURL: String?, model: FanSession)
             Button(if (thanks != null && thanks?.flag("withdrawn") == false) "Update Thanks" else "This helped", ButtonVariant.SECONDARY, disabled = busy) { sendThanks(false) }
             if (thanks != null && thanks?.flag("withdrawn") == false) Button("Withdraw Thanks", ButtonVariant.QUIET, disabled = busy) { sendThanks(true) }
         }
+        }
     }
-    if (signature != null) Dialog(onDismissRequest = { signature = null; signatureStatus = "" }) {
+    if (currentAccess && signature != null) Dialog(onDismissRequest = { signature = null; signatureStatus = "" }) {
         LaunchedEffect(signature) { try { val proof = model.api!!.publicSignature(signature!!); signatureStatus = proof.creatorName + " · " + proof.status.toString() + "\n" + proof.explanation } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch (_: Exception) { signatureStatus = "This signature is private or unavailable. Content access does not grant public verification access." } }
         Column(Modifier.background(qColor("surface")).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { QText("Signature", "display-md"); QText(signatureStatus.ifEmpty { "Checking current signature…" }, "body"); Button("Done", ButtonVariant.SECONDARY) { signature = null; signatureStatus = "" } }
     }

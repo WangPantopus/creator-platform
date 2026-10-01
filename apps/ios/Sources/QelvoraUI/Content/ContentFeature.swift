@@ -38,7 +38,7 @@ public enum ContentFanFeature {
         return parts.count == 3 && parts[0] == "content" && UUID(uuidString: String(parts[1])) != nil && UUID(uuidString: String(parts[2])) != nil
     }
     @MainActor public static func registration(baseURL: URL?) -> FanFeatureRegistration {
-        FanFeatureRegistration(matches: matches, screen: { session in AnyView(ContentFanScreen(baseURL: baseURL, session: session)) })
+        FanFeatureRegistration(matches: matches, screen: { session in AnyView(ContentFanScreen(baseURL: baseURL, session: session).id(session.destination)) })
     }
 }
 
@@ -60,6 +60,9 @@ private struct ContentFanScreen: View {
     @State private var signatureStatus = ""
     @State private var viewerAccountId:String?
     @State private var loadGeneration=0
+    @State private var currentAccess = false
+    @State private var loading = false
+    @State private var checkedAt: TimeInterval = 0
     @State private var retryKeys: [String: String] = [:]
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scene
@@ -69,6 +72,10 @@ private struct ContentFanScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if !error.isEmpty { Notice(tone: .error, title: "Content status", children: error) }
+                if !currentAccess {
+                    Text("Checking current access. Your input is kept during a connection interruption.").qText("body")
+                    Button("Check current access", variant: .secondary, disabled: busy) { Task { await load(refreshThanks: false) } }
+                } else {
                 if let content {
                     if content.document.kind == "note" {
                         Note(children: content.displayText, name: content.creatorName, audience: content.audienceLabel, time: content.publishedAt, reply: false, onVerify: { signature = content.signedActId })
@@ -118,50 +125,72 @@ private struct ContentFanScreen: View {
                     if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy) { Task { await saveThanks(withdraw:true) } } }
                     Button("Unmute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted":false]) { await load() } } }
                 }
+                }
             }.padding(16)
         }.task { await load(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if !busy { await load(refreshThanks: false) } } }
-        .onChange(of: scene) { _, value in if value == .active { Task { await load(refreshThanks: false) } } }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(500))
+                if ProcessInfo.processInfo.systemUptime - checkedAt >= 5 { suspendAccess() }
+            }
+        }
+        .onChange(of: scene) { _, value in
+            if value == .active { Task { await load(refreshThanks: false) } }
+            else { suspendAccess() }
+        }
         .sheet(isPresented: Binding(get: { signature != nil }, set: { if !$0 { signature = nil; signatureStatus = "" } })) {
             VStack(spacing: 16) { Text("Signature").qText("display-md"); Text(signatureStatus.isEmpty ? "Checking current signature…" : signatureStatus).qText("body"); Button("Done", variant: .secondary) { signature = nil; signatureStatus = "" } }.padding(24).task { await verify() }
         }
     }
     private func contentReset() { content = nil }
+    @MainActor private func suspendAccess() {
+        currentAccess = false; signature = nil; signatureStatus = ""
+    }
+    @MainActor private func clearAuthority() {
+        suspendAccess(); content = nil; replies = []; thanks = nil; nextCursor = nil
+        viewerAccountId = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
+    }
     @MainActor private func load(refreshThanks: Bool = true) async {
-        guard let baseURL else { error = "The content service is not connected."; return }
+        guard !loading else { return }; loading = true; defer { loading = false }
+        guard let baseURL else { suspendAccess(); error = "The content service is not connected."; return }
+        let creatorId = self.creatorId, contentId = self.contentId
+        let cycleStartedAt = ProcessInfo.processInfo.systemUptime
         loadGeneration+=1;let generation=loadGeneration
         let client=ContentClient(baseURL:baseURL)
         do {
             let before:ContentPreference=try await client.request(creatorId+"/mute")
             var view:ContentViewValue?;var status=""
-            do {view=try await client.request(creatorId+"/"+contentId)} catch {status=(error as? ContentFailure)?.message ?? "Reconnect to refresh content. Your input is kept."}
+            do {view=try await client.request(creatorId+"/"+contentId, expectedAccountId: before.accountId)} catch {status=(error as? ContentFailure)?.message ?? "Reconnect to refresh content. Your input is kept."}
             let depth = before.accountId == viewerAccountId ? replyDepth : 1
-            var page:ContentReplyPage=try await client.request(creatorId+"/replies")
+            var page:ContentReplyPage=try await client.request(creatorId+"/replies", expectedAccountId: before.accountId)
             var currentReplies = page.items
             if depth > 1 {
                 for _ in 1..<depth {
                     guard let cursor = page.nextCursor else { break }
-                    page = try await client.request(creatorId + "/replies?cursor=" + cursor)
+                    page = try await client.request(creatorId + "/replies?cursor=" + cursor, expectedAccountId: before.accountId)
                     currentReplies += page.items
                 }
             }
-            let mine:ContentThanks?=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId)
-            let after:ContentPreference=try await client.request(creatorId+"/mute")
+            let mine:ContentThanks?=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId, expectedAccountId: before.accountId)
+            let after:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: before.accountId)
             guard generation==loadGeneration else{return}
-            guard before.accountId==after.accountId else {content=nil;replies=[];thanks=nil;viewerAccountId=nil;replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];self.error="The signed-in account changed. Refresh before continuing.";return}
+            guard before.accountId==after.accountId else {clearAuthority();self.error="The signed-in account changed. Refresh before continuing.";return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
             viewerAccountId=before.accountId;content=view;replies=currentReplies;nextCursor=page.nextCursor;thanks=mine
             if refreshThanks || changed {thanksText=mine?.text ?? "";shareDigest=mine?.shareWithCreatorDigest ?? false;showIdentity=mine?.showIdentity ?? false}
             self.error=status
+            checkedAt = cycleStartedAt; currentAccess = scene == .active && ProcessInfo.processInfo.systemUptime - cycleStartedAt < 5
         } catch {
             guard generation==loadGeneration else{return}
+            suspendAccess()
             content=nil;replies=[];thanks=nil;nextCursor=nil
-            if (error as? ContentFailure)?.status==401 || (error as? ContentFailure)?.status==403 {viewerAccountId=nil;replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:]}
+            if (error as? ContentFailure)?.status==401 || (error as? ContentFailure)?.status==403 {clearAuthority()}
             self.error=(error as? ContentFailure)?.message ?? "Reconnect to refresh current access. Your input is kept."
         }
     }
     @MainActor private func mutate(_ path: String, _ body: [String: Any]) async -> Bool {
-        guard !busy, let baseURL,let viewerAccountId else { return false }; busy = true; defer { busy = false }
+        guard !busy, currentAccess, let baseURL,let viewerAccountId else { return false }; busy = true; defer { busy = false }
         var command=body
         var fingerprint:String?
         if command["idempotencyKey"] != nil {
@@ -169,7 +198,7 @@ private struct ContentFanScreen: View {
             if let data=try? JSONSerialization.data(withJSONObject:command,options:.sortedKeys),let json=String(data:data,encoding:.utf8) { fingerprint=path+json;command["idempotencyKey"]=retryKeys[fingerprint!] ?? UUID().uuidString;retryKeys[fingerprint!]=command["idempotencyKey"] as? String }
         }
         do { let _: ContentReceipt = try await ContentClient(baseURL: baseURL).request(creatorId + "/" + path, body: JSONSerialization.data(withJSONObject: command), expectedAccountId:viewerAccountId); if let fingerprint { retryKeys.removeValue(forKey:fingerprint) }; error = ""; return true }
-        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; self.error = (error as? ContentFailure)?.message ?? "This action could not complete. Your input is kept."; return false }
+        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if let failure = error as? ContentFailure, [401, 403].contains(failure.status) { clearAuthority() }; self.error = (error as? ContentFailure)?.message ?? "This action could not complete. Your input is kept."; return false }
     }
     @MainActor private func sendReply() async { if await mutate(contentId + "/replies", ["text": replyText, "idempotencyKey": UUID().uuidString]) { replyText = ""; await load(refreshThanks: false) } }
     @MainActor private func withdraw(_ reply:ContentReply) async { if await mutate("replies/"+reply.id+"/withdraw",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } }
@@ -178,13 +207,13 @@ private struct ContentFanScreen: View {
         if await mutate("thanks", ["targetKind": "content", "targetId": contentId, "text": withdraw ? "" : thanksText, "shareWithCreatorDigest": !withdraw && shareDigest, "showIdentity": !withdraw && showIdentity, "withdrawn": withdraw, "expectedVersion": thanks?.version ?? 0, "idempotencyKey": UUID().uuidString]) { await load() }
     }
     @MainActor private func older() async {
-        guard !busy, nextCursor != nil, replyDepth < 5 else { return }; busy = true; defer { busy = false }
+        guard !busy, currentAccess, nextCursor != nil, replyDepth < 5 else { return }; busy = true; defer { busy = false }
         replyDepth += 1
         await load(refreshThanks: false)
     }
     @MainActor private func verify() async {
-        guard let signature, let api = session.api else { return }
-        do { let proof = try await api.publicSignature(signedActId: signature); signatureStatus = proof.creatorName + " · " + proof.status.rawValue.replacingOccurrences(of: "_", with: " ") + "\n" + proof.explanation }
-        catch { signatureStatus = "This signature is private or unavailable. Current content access does not grant public verification access." }
+        guard currentAccess, let signature, let api = session.api else { return }
+        do { let proof = try await api.publicSignature(signedActId: signature); guard self.signature == signature, currentAccess else { return }; signatureStatus = proof.creatorName + " · " + proof.status.rawValue.replacingOccurrences(of: "_", with: " ") + "\n" + proof.explanation }
+        catch { guard self.signature == signature, currentAccess else { return }; signatureStatus = "This signature is private or unavailable. Current content access does not grant public verification access." }
     }
 }

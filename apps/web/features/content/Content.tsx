@@ -61,6 +61,7 @@ export function FanContent({
     if (reading.current) return;
     reading.current = true;
     try {
+      const cycleStartedAt = Date.now();
       const generation = ++loading.current;
       let before: { accountId: string; muted: boolean };
       try {
@@ -84,21 +85,32 @@ export function FanContent({
       }
 
       const results = await Promise.allSettled([
-        studioRequest<ContentView>("content", `${creatorId}/${contentId}`),
+        studioRequest<ContentView>(
+          "content",
+          `${creatorId}/${contentId}`,
+          undefined,
+          before.accountId,
+        ),
         studioRequest<Thanks | null>(
           "content",
           `${creatorId}/thanks?targetKind=content&targetId=${contentId}`,
+          undefined,
+          before.accountId,
         ),
         (async () => {
           let page: ReplyPage = await studioRequest(
             "content",
             `${creatorId}/replies`,
+            undefined,
+            before.accountId,
           );
           const items = [...page.items];
           for (let n = 1; n < depth.current && page.nextCursor; n++) {
             page = await studioRequest(
               "content",
               `${creatorId}/replies?cursor=${page.nextCursor}`,
+              undefined,
+              before.accountId,
             );
             items.push(...page.items);
           }
@@ -109,7 +121,12 @@ export function FanContent({
       try {
         results[3] = {
           status: "fulfilled",
-          value: await studioRequest("content", `${creatorId}/mute`),
+          value: await studioRequest(
+            "content",
+            `${creatorId}/mute`,
+            undefined,
+            before.accountId,
+          ),
         };
       } catch (reason) {
         results[3] = { status: "rejected", reason };
@@ -120,13 +137,16 @@ export function FanContent({
           (r, i) =>
             r.status === "rejected" &&
             r.reason instanceof StudioFailure &&
-            (r.reason.status === 401 || (i > 0 && r.reason.status === 403)),
+            (r.reason.status === 401 ||
+              r.reason.code === "content_account_changed" ||
+              (i > 0 && r.reason.status === 403)),
         )
       ) {
         setCurrent(false);
         setContent(null);
         setReplies([]);
         setThanks(null);
+        setViewer(null);
         setText("");
         setThanksText("");
         setShare(false);
@@ -179,8 +199,8 @@ export function FanContent({
       if (pref.status === "fulfilled") setMuted(pref.value.muted);
       const failure = results.find((r) => r.status === "rejected");
       setError(failure?.status === "rejected" ? failure.reason.message : "");
-      checkedAt.current = Date.now();
-      setCurrent(true);
+      checkedAt.current = cycleStartedAt;
+      setCurrent(Date.now() - cycleStartedAt < 5000);
     } finally {
       reading.current = false;
     }

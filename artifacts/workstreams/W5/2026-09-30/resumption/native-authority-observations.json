@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-10-01T01:32:16.090158Z",
+  "sourceSha256": {
+    "apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift": "2e499773271fca4b93a69c17a890cd199a2e4d9160b5df54b9a4649eb85cdc93",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentFeature.kt": "80ae1eaf54f9feca526450f6f04983837a7b875578936ced48e562be9c892510",
+    "apps/web/features/content/Content.tsx": "17854d6fe53f31edaa8c289d3190ede5a2160a0b31a6aeaf05f88b5e557525e3",
+    "apps/backend/src/modules/content/actor-guard.ts": "6437a41a331d65c92e17d61ac1c21467b3602e45b79c5e219f1e26a0b8ce7d33"
+  },
+  "swift": {
+    "finalCompileSeconds": 23.24,
+    "hardwareAcceptance": false
+  },
+  "android": {
+    "task": "compileDebugKotlin",
+    "seconds": 307,
+    "status": 0,
+    "ownRoot": "/private/tmp/creator-w5-native-authority",
+    "W6ReadOnlyLease": true,
+    "sdkDownload": false,
+    "apkBuilt": false,
+    "deviceOperated": false
+  },
+  "sourceValidation": "Web types/backend production/scoped lint/format pass",
+  "browser": "Real expiry then canonical development fan continuation; bound reads keep archived Post unavailable",
+  "testsAdded": false,
+  "strictSnapshotRepair": "Not achieved: prior completed15nonsnapshot pass/110strict snapshot failures, unchanged assertions/references"
+}
