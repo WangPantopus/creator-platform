@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-01T02:07:17.430744+00:00",
+  "sourceCommit": "eceb62e61deea7947a401976dee8999e4fa62c9f",
+  "consumedW5": "d17e148ca51186bd7e0bcf56afff46c89a353888",
+  "scope": "Only BFF/Player functional hunks, composed onto canonical277 copy/lifecycle; W1 sameRequestOrigin preserved",
+  "sourceSHA256": {
+    "apps/web/app/api/w6/[...path]/route.ts": "2e579fbbf0fa268a5ba9b9d16cd368619516b056e100b70e75d62c4537e46bcf",
+    "apps/web/features/media/VoicePlayer.tsx": "c32bee538fa6e4d2a1adafb02de24700523ca31b56b7cdf6a1decc1722180a15",
+    "apps/web/features/media/VoiceRecorder.tsx": "1ad5feb364b50ae2f363d10d776e1053ef9542fae26eb11ba798c04a46dfda76",
+    "apps/web/app/media/voice/page.tsx": "4d5fd5526dc7b17e6e6d7e050d45289f0b14484bb075815ccc8b6e1e995d99cc",
+    "apps/web/app/media/ai-voice/page.tsx": "3cba6fccb85e80963542ef55523118cf9681ac8abdd43cd562775007397e2fd1"
+  },
+  "checks": {
+    "webProductionBuild": "passed; account-consumer-web-build.log",
+    "webTypeAndChangedSourceLint": "passed",
+    "unitTestsUsedAsMergeGate": false,
+    "newCasesOrHarnesses": 0
+  },
+  "operatorHTTP": [
+    {
+      "case": "malformed selector",
+      "response": "HTTP/1.1 400 Bad Request\nvary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch\ncache-control: no-store\ncontent-type: application/json\nDate: Thu, 01 Oct 2026 02:07:17 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nTransfer-Encoding: chunked\n\n{\"error\":{\"code\":\"session_account_invalid\",\"message\":\"Reopen this content with your current account.\"}}"
+    },
+    {
+      "case": "duplicate selector",
+      "response": "HTTP/1.1 400 Bad Request\nvary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch\ncache-control: no-store\ncontent-type: application/json\nDate: Thu, 01 Oct 2026 02:07:17 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nTransfer-Encoding: chunked\n\n{\"error\":{\"code\":\"session_account_invalid\",\"message\":\"Reopen this content with your current account.\"}}"
+    },
+    {
+      "case": "conflicting selectors",
+      "response": "HTTP/1.1 400 Bad Request\nvary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch\ncache-control: no-store\ncontent-type: application/json\nDate: Thu, 01 Oct 2026 02:07:17 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nTransfer-Encoding: chunked\n\n{\"error\":{\"code\":\"session_account_invalid\",\"message\":\"Reopen this content with your current account.\"}}"
+    },
+    {
+      "case": "valid selector with unavailable actual session",
+      "response": "HTTP/1.1 404 Not Found\nvary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch\ncache-control: no-store\ncontent-type: application/json\nDate: Thu, 01 Oct 2026 02:07:17 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nTransfer-Encoding: chunked\n\n{\"error\":{\"code\":\"not_found\",\"message\":\"This endpoint is unavailable.\",\"requestId\":\"1b6c4a32-c7e1-4a5c-8c69-dae3e94afa33\"}}"
+    },
+    {
+      "case": "cross-origin action",
+      "response": "HTTP/1.1 403 Forbidden\nvary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch\ncontent-type: application/json\nDate: Thu, 01 Oct 2026 02:07:17 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nTransfer-Encoding: chunked\n\n{\"error\":{\"message\":\"Open this action from the app.\"}}"
+    }
+  ],
+  "personallyObservedBrowser": {
+    "origin": "http://127.0.0.1:3006",
+    "apiOrigin": "http://127.0.0.1:4106",
+    "identity": "unconfigured, no local actor substitute",
+    "viewports": ["1280x720", "390x844"],
+    "themes": ["Light", "Night"],
+    "observations": [
+      "Actual Record click enters pending permission",
+      "Cancel returns to Record and0:00 in both themes",
+      "Second actual microphone request remained pending; cancelled",
+      "AI voice unavailable page links to actual recorder"
+    ],
+    "microphoneCapture": false,
+    "uploadSignPublishPlayback": false,
+    "accountSwitchWithRealSession": false
+  },
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  }
+}

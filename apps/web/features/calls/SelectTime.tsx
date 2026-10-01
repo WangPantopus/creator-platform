@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import type {
   CallOfferView,
@@ -56,7 +57,7 @@ function SelectionForm({
           setNotice(
             error instanceof Error
               ? error.message
-              : "The times could not be loaded.",
+              : copy.w6TheTimesCouldNotBeLoaded,
           );
         }
       });
@@ -94,7 +95,7 @@ function SelectionForm({
       setNotice(
         error instanceof Error
           ? error.message
-          : "This time is unavailable. Reload the current offer.",
+          : copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer,
       );
     } finally {
       setBusy(false);
@@ -102,8 +103,8 @@ function SelectionForm({
   }
   return (
     <main className="w6-call w6-offer">
-      <span className="qv-meta">CALL REQUEST</span>
-      <h1>Choose a time</h1>
+      <span className="qv-meta">{copy.w6CALLREQUEST}</span>
+      <h1>{copy.w6ChooseATime}</h1>
       {offer?.state === "offered" ? (
         <>
           <div className="w6-offer-slots">
@@ -124,7 +125,7 @@ function SelectionForm({
                   </strong>
                   <br />
                   <span className="qv-help">
-                    Your time · {offer.fanTimeZone}
+                    {formatCopy("w6YourTime", { value1: offer.fanTimeZone })}
                   </span>
                 </span>
                 <input
@@ -139,20 +140,21 @@ function SelectionForm({
             ))}
           </div>
           <p className="qv-help">
-            Creator's time zone · {offer.creatorTimeZone}
+            {formatCopy("w6CreatorSTimeZone", {
+              value1: offer.creatorTimeZone,
+            })}
           </p>
           <p className="qv-help">
-            Your request's accepted terms and payment stay with its receipt.
-            Choosing a time cannot create a second charge.
+            {copy.w6YourRequestSAcceptedTermsAndPaymentStayWithIts}
           </p>
           <p className="qv-help">
-            Offer expires{" "}
-            {new Intl.DateTimeFormat(undefined, {
-              timeZone: offer.fanTimeZone,
-              dateStyle: "medium",
-              timeStyle: "short",
-            }).format(new Date(offer.expiresAt))}
-            .
+            {formatCopy("w6OfferExpirescfe463", {
+              value1: new Intl.DateTimeFormat(undefined, {
+                timeZone: offer.fanTimeZone,
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(offer.expiresAt)),
+            })}
           </p>
           <button
             className="qv-btn qv-btn--secondary"
@@ -161,7 +163,7 @@ function SelectionForm({
               void select();
             }}
           >
-            Confirm this time
+            {copy.w6ConfirmThisTime}
           </button>
         </>
       ) : offer?.state === "selected" && offer.selectedSessionId ? (
@@ -169,13 +171,13 @@ function SelectionForm({
           className="qv-btn qv-btn--secondary"
           href={`/calls/${creatorId}/${fanId}/${offer.selectedSessionId}`}
         >
-          Open your scheduled call
+          {copy.w6OpenYourScheduledCall}
         </a>
       ) : (
         <p className="w6-notice">
           {loaded
-            ? "This offer changed or expired. Open Requests for its current options."
-            : "Checking the current offer and participant access."}
+            ? copy.w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent
+            : copy.w6CheckingTheCurrentOfferAndParticipantAccess}
         </p>
       )}
       {notice && (
@@ -188,10 +190,10 @@ function SelectionForm({
         disabled={busy}
         onClick={() => setRevision(revision + 1)}
       >
-        Reload current offer
+        {copy.w6ReloadCurrentOffer}
       </button>
       <a className="qv-btn qv-btn--quiet" href="/requests">
-        Open Requests
+        {copy.w6OpenRequests}
       </a>
     </main>
   );

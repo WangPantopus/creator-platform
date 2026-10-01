@@ -9,11 +9,16 @@ public struct Notice: View {
   public var tone: NoticeTone
   public var title: String?
   public var children: String
+  public var accessibilityIdentifier: String?
   @Environment(\.colorScheme) private var scheme
-  public init(tone: NoticeTone = .neutral, title: String? = nil, children: String) {
+  public init(
+    tone: NoticeTone = .neutral, title: String? = nil, children: String,
+    accessibilityIdentifier: String? = nil
+  ) {
     self.tone = tone
     self.title = title
     self.children = children
+    self.accessibilityIdentifier = accessibilityIdentifier
   }
   public var body: some View {
     HStack(alignment: .top, spacing: QelvoraTokens.token("composer-gap")) {
@@ -43,6 +48,7 @@ public struct Notice: View {
           dash: tone == .offline ? [QelvoraTokens.token("space-1")] : []))
     }
     .accessibilityElement(children: .combine)
+    .accessibilityIdentifier(accessibilityIdentifier ?? "")
     .onAppear {
       if tone == .error { announce([title, children].compactMap { $0 }.joined(separator: ". ")) }
     }

@@ -466,6 +466,7 @@ export function Studio({
           )}
           {current === "compose" ? (
             <Compose
+              key={`${creator.viewerAccountId}:${creator.id}:${screen[1] ?? "new"}`}
               creator={creator}
               id={screen[1]}
               onDone={() => router.push(`${root}/notes`)}
@@ -597,16 +598,23 @@ function Notes({ creator }: { creator: Creator }) {
           .filter((n) => n.document.kind === "note")
           .map((n) => (
             <div key={n.id}>
-              <Note
-                name={creator.display_name}
-                audience={n.audienceLabel}
-                time={time(n.publishedAt)}
-                signedActId={n.signedActId ?? undefined}
-                audienceSize={n.audienceCount ?? undefined}
-                reply={false}
-              >
-                {n.document.text}
-              </Note>
+              {n.state === "draft" ? (
+                <article className="w5-card">
+                  <p className="qv-meta">Draft · not signed or sent</p>
+                  <p className="w5-content-text">{n.document.text}</p>
+                </article>
+              ) : (
+                <Note
+                  name={creator.display_name}
+                  audience={n.audienceLabel}
+                  time={time(n.publishedAt)}
+                  signedActId={n.signedActId ?? undefined}
+                  audienceSize={n.audienceCount ?? undefined}
+                  reply={false}
+                >
+                  {n.document.text}
+                </Note>
+              )}
               <p className="qv-help">
                 {n.state === "published" ? "Broadcast" : n.state} ·{" "}
                 {n.sourceState === "not_requested"
@@ -841,6 +849,19 @@ function Compose({
     sessionStorage.removeItem(pendingStorage);
     setPendingPublication(null);
   };
+  const draftReady = !id || saved?.id === id;
+  const loadDraft = async () => {
+    if (!id) return;
+    const value = await studioRequest<ContentView>(
+      "content",
+      `${creator.id}/${id}/studio`,
+      undefined,
+      creator.viewerAccountId,
+    );
+    setDocument({ ...value.document, scheduledAt: null });
+    setSaved({ id, version: value.version });
+    draftId.current = id;
+  };
   useEffect(() => {
     // Only opaque command references persist across a reload; no draft or fan text.
     try {
@@ -893,16 +914,7 @@ function Compose({
     void studioRequest<typeof catalog>("studio", `${creator.id}/audiences`)
       .then(setCatalog)
       .catch(() => setCatalog(null));
-    if (id)
-      void action.run(async () => {
-        const value = await studioRequest<ContentView>(
-          "content",
-          `${creator.id}/${id}/studio`,
-        );
-        setDocument({ ...value.document, scheduledAt: null });
-        setSaved({ id, version: value.version });
-        draftId.current = id;
-      });
+    if (id) void action.run(loadDraft);
     else {
       const query = new URLSearchParams(location.search);
       const packetId = query.get("packet");
@@ -927,11 +939,12 @@ function Compose({
     }
   }, [creator.id, id]);
   const edit = (update: Partial<ContentBody>) => {
-    if (pendingPublication) return;
+    if (!draftReady || pendingPublication) return;
     setDocument((d) => ({ ...d, ...update }));
     setReview(null);
   };
   const save = async () => {
+    if (!draftReady) throw new Error("Wait for the saved draft to load.");
     if (!canDraft)
       throw new Error(
         verificationReady
@@ -961,6 +974,25 @@ function Compose({
     operation.current = null;
     return result;
   };
+  if (!draftReady)
+    return (
+      <section className="w5-compose">
+        <header className="w5-compose-head">
+          <Link href={`/studio/${creator.id}/notes`}>Cancel</Link>
+          <strong>{post ? "Publish" : "Edit Note"}</strong>
+          <span />
+        </header>
+        <Feedback action={action} />
+        {!action.error && <p role="status">Loading saved draft…</p>}
+        <button
+          className="qv-btn qv-btn--secondary"
+          aria-busy={action.busy}
+          onClick={() => void action.run(loadDraft)}
+        >
+          Retry loading draft
+        </button>
+      </section>
+    );
   return (
     <section className="w5-compose">
       <header className="w5-compose-head">
@@ -1144,6 +1176,7 @@ function Compose({
         </label>
         <textarea
           id="note-text"
+          autoFocus={!!id}
           rows={5}
           maxLength={20000}
           value={document.text}
@@ -1939,6 +1972,7 @@ function Library({ creator }: { creator: Creator }) {
   if (editing !== undefined)
     return (
       <Compose
+        key={`${creator.viewerAccountId}:${creator.id}:${editing ?? "new"}`}
         creator={creator}
         id={editing ?? undefined}
         post

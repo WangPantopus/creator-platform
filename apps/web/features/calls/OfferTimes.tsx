@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useRef, useState } from "react";
 import { SignedActReview } from "../identity/signing";
 import type { CallOfferContext } from "../../../../packages/api/src/session";
@@ -122,7 +123,7 @@ export function OfferTimes({
       setSent(true);
     } catch (failure) {
       setError(
-        "Publication is unconfirmed. Retry this exact signed command or reload the saved offer before signing again.",
+        copy.w6PublicationIsUnconfirmedRetryThisExactSignedCommandOrReload,
       );
       throw failure;
     } finally {
@@ -138,9 +139,7 @@ export function OfferTimes({
       !fanTimeZone ||
       !signatureMatches
     ) {
-      setError(
-        "Review and sign the accepted call request before offering times.",
-      );
+      setError(copy.w6ReviewAndSignTheAcceptedCallRequestBeforeOfferingTimes);
       return;
     }
     try {
@@ -153,35 +152,35 @@ export function OfferTimes({
             ),
         )
       )
-        throw new Error(
-          "Each time needs an explicit UTC offset, for example 2026-10-14T16:00-07:00.",
-        );
+        throw new Error(copy.w6EachTimeNeedsAnExplicitUTCOffsetForExample2026);
       await publish(signedActId);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "The offer could not be saved.",
-      );
+      setError(e instanceof Error ? e.message : copy.w6TheOfferCouldNotBeSaved);
     }
   }
   return (
     <main className="w6-call w6-offer">
-      <span className="qv-meta">STUDIO · CALL REQUEST</span>
-      <h1>{sent ? "Times offered" : "Offer three times"}</h1>
+      <span className="qv-meta">{copy.w6STUDIOCALLREQUEST}</span>
+      <h1>{sent ? copy.w6TimesOffered : copy.w6OfferThreeTimes}</h1>
       {!context && (!creatorTimeZone || !fanTimeZone) ? (
         <p className="w6-notice" role="status">
-          Open a call request to load both time zones and its signed acceptance.
+          {copy.w6OpenACallRequestToLoadBothTimeZonesAnd}
         </p>
       ) : null}
       {context && (
         <p className="qv-help">
-          {context.creatorName} · {context.durationSeconds / 60}-minute{" "}
-          {context.mediaMode} call · accepted request {context.commitmentId}
+          {formatCopy("w6MinuteCallAcceptedRequest", {
+            value1: context.creatorName,
+            value2: context.durationSeconds / 60,
+            value3: context.mediaMode,
+            value4: context.commitmentId,
+          })}
         </p>
       )}
       {context && (
         <div className="w6-card">
           <label>
-            Your IANA time zone
+            {copy.w6YourIANATimeZone}
             <input
               type="text"
               value={creatorTimeZone}
@@ -190,7 +189,7 @@ export function OfferTimes({
             />
           </label>
           <label>
-            Fan's confirmed IANA time zone
+            {copy.w6FanSConfirmedIANATimeZone}
             <input
               type="text"
               value={fanTimeZone}
@@ -200,7 +199,7 @@ export function OfferTimes({
             />
           </label>
           <label>
-            Offer expiry, with UTC offset
+            {copy.w6OfferExpiryWithUTCOffset}
             <input
               type="text"
               value={expiresAt}
@@ -215,8 +214,10 @@ export function OfferTimes({
         {times.map((value, index) => (
           <div className="w6-offer-slot" key={index}>
             <label htmlFor={`slot-${index}`}>
-              Time {index + 1}
-              {creatorTimeZone ? ` · ${creatorTimeZone}` : ""}
+              {formatCopy("w6Time", {
+                value1: index + 1,
+                value2: creatorTimeZone ? ` · ${creatorTimeZone}` : "",
+              })}
             </label>
             <input
               id={`slot-${index}`}
@@ -234,24 +235,24 @@ export function OfferTimes({
             />
             {!Number.isNaN(Date.parse(value)) && value && zonesValid && (
               <p className="qv-help">
-                {new Intl.DateTimeFormat(undefined, {
-                  timeZone: fanTimeZone,
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                }).format(new Date(value))}{" "}
-                for the fan · {fanTimeZone}
+                {formatCopy("w6ForTheFan", {
+                  value1: new Intl.DateTimeFormat(undefined, {
+                    timeZone: fanTimeZone,
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  }).format(new Date(value)),
+                  value2: fanTimeZone,
+                })}
               </p>
             )}
           </div>
         ))}
       </div>
       <p className="qv-help">
-        The fan picks one. This request was charged on acceptance; offering
-        times does not add another charge. Creator no-show is refunded in full.
-        A fan no-show is charged as agreed.
+        {copy.w6TheFanPicksOneThisRequestWasChargedOnAcceptance}
       </p>
       <details>
-        <summary>Edit your availability</summary>
+        <summary>{copy.w6EditYourAvailability}</summary>
         <AvailabilityEditor creatorId={creatorId} fanId={fanId} />
       </details>
       {error && (
@@ -267,25 +268,26 @@ export function OfferTimes({
             command={command}
             creatorName={context.creatorName}
             text={startsAt.join("\n")}
-            title="Review these exact offered times"
+            title={copy.w6ReviewTheseExactOfferedTimes}
             rows={[
               [
-                "Call",
-                `${context.durationSeconds / 60} minutes · ${context.mediaMode}`,
+                copy.w6Call,
+                formatCopy("w6Minutes", {
+                  value1: context.durationSeconds / 60,
+                  value2: context.mediaMode,
+                }),
               ],
-              ["Your zone", creatorTimeZone],
-              ["Fan's zone", fanTimeZone],
-              ["Offer expires", expiresAt],
-              ["Request", commitmentId],
+              [copy.w6YourZone, creatorTimeZone],
+              [copy.w6FanSZone, fanTimeZone],
+              [copy.w6OfferExpires, expiresAt],
+              [copy.w6Request, commitmentId],
             ]}
             onSigned={async (id) => publish(id)}
           />
         )}
         {context && !ready && !sent && !publication.current && (
           <p className="qv-help">
-            Enter three distinct future times with explicit UTC offsets, both
-            confirmed IANA zones, and an expiry before the first time to review
-            and sign.
+            {copy.w6EnterThreeDistinctFutureTimesWithExplicitUTCOffsetsBoth}
           </p>
         )}
         {publication.current && !sent && (
@@ -298,7 +300,7 @@ export function OfferTimes({
               );
             }}
           >
-            Retry this exact signed offer
+            {copy.w6RetryThisExactSignedOffer}
           </button>
         )}
         {context && (
@@ -306,7 +308,7 @@ export function OfferTimes({
             className="qv-btn qv-btn--quiet"
             href={`/studio/calls/${creatorId}/${fanId}/${commitmentId}`}
           >
-            Reload saved offer
+            {copy.w6ReloadSavedOffer}
           </a>
         )}
         {!context && (
@@ -327,12 +329,11 @@ export function OfferTimes({
                 void send();
               }}
             >
-              Send signed times
+              {copy.w6SendSignedTimes}
             </button>
             {!signedActId && (
               <p className="qv-help">
-                Open an accepted request from Studio to review the exact signed
-                offer.
+                {copy.w6OpenAnAcceptedRequestFromStudioToReviewTheExact}
               </p>
             )}
           </>

@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-10-01T03:24:18.685455+00:00",
+  "source": "e1ce8cf7ae185a6ab2b7701cd091f4aec5580ae5",
+  "sourceFile": "apps/web/features/media/VoiceRecorder.tsx",
+  "sourceSHA256": "861d5bba30ac71ca3eba2047a6ddcf0ae76962bc2d22ae7131928609179d3cc4",
+  "change": "Internal processing reason codes remain in asset evidence; visible failures use existing recovery copy, with rejected-file state retaining distinct record-again status.",
+  "checks": "Current web typecheck/lint/format/production build pass; no new test code",
+  "actualBrowser": {
+    "origin": "http://127.0.0.1:3006/media/voice",
+    "theme": "Night",
+    "operation": "Reload current production app, keyboard Enter on Record, actual permission request reaches denial",
+    "observed": "Explicit microphone access off, enabled Record,0:00",
+    "cancelAttempt": "Pending Cancel was observed, but actual denial resolved before Enter; locator no_matches. This attempt does not prove cancellation. Earlier real pending cancellation evidence is separately dated.",
+    "processingFailure": "No genuine configured processing journey exercised; no mocked state injected"
+  },
+  "capture": "launched-apps/web-processing-notice-current.png",
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "checksSHA256": {
+    "processing-notice-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "processing-notice-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "processing-notice-web-build.log": "0581132317e4a79cc683124d4d573fca444664ebde1cb0e5dee1eea41a294ab4",
+    "processing-notice-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

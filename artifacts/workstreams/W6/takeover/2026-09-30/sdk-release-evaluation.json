@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-01T00:47:30.843786+00:00",
+  "primaryVerification": "GitHub official latest-release API plus pinned package/build source; search cache was older",
+  "releases": [
+    {
+      "sdk": "JavaScript",
+      "tag": "v2.22.3",
+      "publishedAt": "2026-09-07T11:54:20Z",
+      "url": "https://github.com/livekit/client-sdk-js/releases/tag/v2.22.3"
+    },
+    {
+      "sdk": "Swift",
+      "tag": "2.17.0",
+      "publishedAt": "2026-09-14T07:48:10Z",
+      "url": "https://github.com/livekit/client-sdk-swift/releases/tag/2.17.0",
+      "package": "https://github.com/livekit/client-sdk-swift/blob/2.17.0/Package.swift",
+      "swiftTools": "6.1",
+      "minimumXcode": "16.3",
+      "minimumIOS": "13",
+      "exactWebRTC": "150.7871.02",
+      "exactUniFFI": "0.1.9"
+    },
+    {
+      "sdk": "Android",
+      "tag": "v2.29.0",
+      "publishedAt": "2026-09-20T16:54:55Z",
+      "url": "https://github.com/livekit/client-sdk-android/releases/tag/v2.29.0",
+      "buildDefinition": "https://github.com/livekit/client-sdk-android/blob/v2.29.0/deps.gradle",
+      "minimumSDK": 21,
+      "compileSDK": 35,
+      "targetSDK": 35,
+      "sdkSourceAGP": "8.7.2",
+      "sdkSourceKotlin": "1.9.25",
+      "javaBytecode": "8"
+    }
+  ],
+  "sdkDependencyInstalled": false,
+  "providerAccountCreated": false,
+  "sdkProviderOrHardwareAcceptance": false,
+  "oneUseAdmissionStillUnqualified": true
+}

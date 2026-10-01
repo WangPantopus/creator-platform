@@ -1,0 +1,42 @@
+{
+  "recordedAt": "2026-10-01T01:51:18.050288+00:00",
+  "parentSource": "e2b646620c9e1a6fa42aec87c8a38771889f2d92",
+  "sourceSha256": {
+    "apps/backend/src/modules/media/router.ts": "77aa4bcedcb7cdbbdf8ac55d99415f23eb50880b4039ef26183f0ba707a5386b",
+    "packages/api/src/media-openapi.ts": "ec5518287fb93b5205c8d72e46dab112264dc799e78b82eb66c050a33220a950",
+    "packages/api/generated/openapi.json": "83262886941e776b6b71ae1114052406722109a7c7e6e70df8e65a772eba4970",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "6e65bddb2e8e920b50e08ca3c873e69f9056fa4cb0435d28f372e4df8fba1928",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "c7130a820c2a8dd228aedc129bda725dbf526a372c5287e5da57bdd65be5be2b",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "35aab298283fe01da65670d92652cfb666656e738adfdd546f1118185a7a0a69",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "eec70dea435b36ec3cb24ca81449779cd69ec7fa4888df7eddf9417c1a227206",
+    "config/copy.json": "25d84124c40f734dc2d80ea26e9aff8f4e448ac63dd42c5dda33d9e4918c0295"
+  },
+  "accountSelectors": {
+    "header": "x-qelvora-expected-account",
+    "query": "expectedAccountId",
+    "authority": "Only compared after actual W1 Thread/Creator/Audience issuance. No actor selection or added permission.",
+    "validation": "UUID normalizes; malformed/duplicate query rejected; conflicting selector400; actual account mismatch403; omission preserves existing callers",
+    "nativeHelpers": "Swift optional UUID/Kotlin canonical UUID String request argument emits literal protocol header",
+    "operations": "Only3 existing audience operations get optional selectors;45 operations and every schema unchanged. Existing play argument order is retained before appended defaults."
+  },
+  "protocolCorrection": {
+    "removedKey": "w6Bearer",
+    "additiveUIKeys": 277,
+    "original204Values": "unchanged",
+    "nativeAuthorization": "original Bearer interpolation restored; no translatable protocol syntax"
+  },
+  "checks": {
+    "backend": "production/ESLint/format pass;9existing contracts147ms cases/1.70s runner",
+    "web": "TypeScript pass; no new production rerun needed for optional API parameters/removed unused copy key",
+    "generation": "12 resources and48 operations consistency pass",
+    "sharedExisting": "2pass1008.101399ms runner",
+    "iosFinal": "QelvoraUI iOS Simulator library13.16s PASS after preserving play argument order; earlier header placement43.10s passed",
+    "androidFinal": "compileDebugKotlin48s PASS after preserving play argument order; earlier header placement79s passed. Compile only, no new APK/device.",
+    "existing19AndroidSnapshots": "Passed200s at64574ea before transport correction/account helper arguments;144 reference PNGs unchanged. No broad rerun or new cases."
+  },
+  "consumerComposition": "W5 narrow web BFF/CreatorVoicePlayer selector lease in its own checkout; immutable functional consumer pending, no W1 root/session/config edit",
+  "actualAccountSwitchMediaOrHardwareAcceptance": false,
+  "mediaCallsAIAudioCapabilitiesEnabled": false,
+  "newTestsCasesHarnessesGoldensOrThresholds": 0,
+  "sourcePush": "Held until exact36780139572/a124ad0 ios-review artifact personal inspection; still unavailable"
+}

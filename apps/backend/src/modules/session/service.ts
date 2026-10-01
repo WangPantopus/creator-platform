@@ -1269,7 +1269,12 @@ export class SessionService {
         ? "failure"
         : "timer");
     const outcome =
-      endDue && state.closed && provider.closed && provider.complete
+      endDue &&
+      state.closed &&
+      !state.recording &&
+      state.presentAccountIds.length === 0 &&
+      provider.closed &&
+      provider.complete
         ? determineOutcome({
             ...clocks,
             durationSeconds: doc.durationSeconds,

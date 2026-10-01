@@ -1,0 +1,293 @@
+{
+  "recordedAt": "2026-09-30T23:51:21Z",
+  "worktree": "/Users/yingpengwang/.codex/worktrees/970d/creator-platform",
+  "branch": "codex/w6-calls-media-handoff",
+  "initialRevision": "d52e449",
+  "consumedProducers": {
+    "creatorScope": "2557d46072db50419cb340cf4fe9d87e4dd4853c",
+    "creatorTransaction": "abf6543c8480a2d8cb378e2ba1a162f6293ae65c",
+    "mediaTransport": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564",
+    "audienceIdentity": "bd3677c03ccb1b8225bd0d56f033f953ce7aa7aa"
+  },
+  "sourceSHA256": {
+    "apps/backend/src/modules/media/ai-audio.ts": "b1ee612b6254dd27460612026a9832af59490e44f69fb76592a984a54811b335",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "c0d18225869c2407e3daa602af7b27cf56065d729cdca1a300a1e62e66fae872",
+    "apps/backend/src/modules/media/creator-scope.sql": "73623261f537b4df65c46bafdbfedf80f1a92f0505d5e8e9420522cfcf5e2016",
+    "apps/backend/src/modules/media/creator-service.ts": "e4d38ffc36e2253f5ba9b94463fa0d71d9ab447969c60e6ff53bf9cc5fc59f2d",
+    "apps/backend/src/modules/media/creator-worker.ts": "009111feed6958c724127d6ccab8d4adad4c9a9920be7550a97a047527dd05eb",
+    "apps/backend/src/modules/media/lifecycle.ts": "d392df9dad5644acf1ab5f141edfe937bf8ebace195cc7d0efb70dd43d6b5b68",
+    "apps/backend/src/modules/media/processor.ts": "d329433f578779e00e14fc68e4e9a0f42b2b8e5ccb335b0094a1cdffbbc0f59b",
+    "apps/backend/src/modules/media/registration.ts": "3496546ec127799dead4379e72e17e8cb20387be2e05c81e8b7966b2208e8ffa",
+    "apps/backend/src/modules/media/router.ts": "23c19b733f826974f0f989977cef79f654eded096a88d961ff0d96d99eee7243",
+    "apps/backend/src/modules/media/service.ts": "7898b1f19deb262c3c731068404acd8316cbbea536b4c8728350b8556a606424",
+    "apps/backend/src/modules/media/storage.ts": "a15e5bb964baf0eda81395f626c611ceccd0832a40ede1a9711b52f18921f15f",
+    "apps/backend/src/modules/media/worker.ts": "45a6e55f1ee67dfe2c196f0f9b8c2668ffe09c6bf4747098f2872bd0d445afbd",
+    "apps/backend/src/modules/session/availability.ts": "36c7f767d3e124ba2fb1a1d707de1d60548094ef13aa0a770e898238ffb63357",
+    "apps/backend/src/modules/session/commerce.ts": "cc14393b0f968e9f37dc83fb18c5dd3db8ffaa9f62814398e6ae7000536fc4ae",
+    "apps/backend/src/modules/session/provider.ts": "cf5fd0ba9aec952eefbc45fc7102f6ade517935c2ef08c8d1a4073d2355faec6",
+    "apps/backend/src/modules/session/worker.ts": "39ef9b1887d7b187ef1ad1a3d7875092fac2cd14980c54e80a1dca576a853c4d",
+    "packages/api/src/media-openapi.ts": "0cb3256ffa4442b5ad884e4fa264ce37c091a74c9ad7257f8b2655677ea94991",
+    "packages/api/src/media.ts": "0e3a1a34667478e8426aad430fdadf5670d596778bca17791f7b2cd50a55d8bf",
+    "packages/api/src/session.ts": "9fad71027f65b3e55e93f25106ed379d25c94607fdaecbc47e89cc1bd651bb92"
+  },
+  "existingBackendChecks": {
+    "tests": 18,
+    "failures": 0,
+    "durationSeconds": 116.7,
+    "isolationPairs": 10000,
+    "newCasesOrSuites": 0
+  },
+  "backendProductionBuild": "passed",
+  "changedSourceLint": "passed",
+  "generationConsistency": {
+    "resources": 12,
+    "operations": 31,
+    "result": "passed; W1 new path composition still pending"
+  },
+  "swiftLibrary": {
+    "target": "QelvoraUI",
+    "platform": "macOS",
+    "durationSeconds": 10.46,
+    "result": "passed; not iOS functional/hardware proof"
+  },
+  "preservedCI": {
+    "runId": 36780139572,
+    "revision": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+    "backendWeb": "success",
+    "androidRuntime": "success",
+    "androidFoundation": "success",
+    "webVisual": "failure;observedcause repaired in existingcapturecalls",
+    "iosFoundation": "failure;110 strict image differences, exact current artifact personally inspected",
+    "iosReviewAvailable": true,
+    "iosReviewArtifactId": 11138602343
+  },
+  "creatorMigration": "0047 reserved_unapplied; inactive, review pending",
+  "availabilityMigration": "0046 reserved_unapplied; inactive",
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "newTestFiles": 0,
+  "changedSnapshotThresholds": 0,
+  "freshGoldenImages": 0,
+  "paidRequests": 0,
+  "providerOrSignerCredentialsAccessed": false,
+  "openAcceptance": [
+    "real record/upload/process/sign/publish/deliver/play",
+    "provider one-use admission and complete history",
+    "real recording purge/archive and approved retention",
+    "all D16 outcomes and process-restart proof",
+    "native transport/incoming and physical iPhone/Android",
+    "W2 licensed marked later-gate audio",
+    "measured latency/cost"
+  ],
+  "sourceRevision": "4515a6a0ac16423f15f2cfb961489744ebc93033",
+  "publicationClosureFollowup": {
+    "recordedAt": "2026-10-01T00:00:35.621707+00:00",
+    "sourceSHA256": {
+      "apps/backend/src/modules/media/creator-service.ts": "f1d5ead38d14d189123b0e13dde3f79dcab48b05a9ce67bdc3822e1dff90d3bf",
+      "apps/backend/src/modules/media/creator-scope.sql": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+      "apps/backend/src/modules/session/service.ts": "188432f3337354e5da1f036b0729ab9b8e4b4b2da324a235ebcec35fba043bbc",
+      "apps/web/features/media/api.ts": "dabf63160180bf04520ee98369d56ba5e5733ec9217aa221741160068864f688",
+      "apps/web/features/calls/AvailabilityEditor.tsx": "7800433484134e9657d001a0f87337da422ea506faa348ddeaf910f7a88723bb"
+    },
+    "backendBuildAndLint": "passed",
+    "webTypecheckAndLint": "passed",
+    "databaseChecks": "18-case result above predates follow-up",
+    "sqlApplied": false,
+    "functionalAcceptance": false,
+    "sourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a"
+  },
+  "creatorRecorderPlayerFollowup": {
+    "recordedAt": "2026-10-01T00:04:26.749740+00:00",
+    "sourceSHA256": {
+      "apps/web/features/media/VoiceRecorder.tsx": "2480e67355ec860bd0bf61bd631b2b8dbc2573a483d35f8394ce909acaf4d80c",
+      "apps/web/features/media/VoicePlayer.tsx": "5fc71f0143f5529fe1b453a550ef6b8b1e5535dbaf5a9371311013251ca35689",
+      "apps/backend/src/modules/media/router.ts": "372739afa449551a578c6a12dc50e3672af3ddef36e4e9e8a9a0dff6ad72f025"
+    },
+    "webTypecheckAndLint": "passed",
+    "backendBuild": "passed",
+    "existingContractTests": {
+      "tests": 9,
+      "failures": 0,
+      "runnerDurationMs": 657
+    },
+    "functionalAcceptance": false,
+    "sourceRevision": "49e90549f2161cc7a90047b00f9370016ffb6ec4"
+  },
+  "canonicalOwnerIntegration": {
+    "recordedAt": "2026-10-01T00:08:39.319038+00:00",
+    "producer": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564",
+    "operations": 44,
+    "generationConsistency": "passed",
+    "backendProductionBuildLintFormat": "passed",
+    "webTypecheck": "passed",
+    "swiftLibraryDurationSeconds": 14.13,
+    "existingResourceTests": {
+      "tests": 2,
+      "failures": 0
+    },
+    "functionalAcceptance": false,
+    "sourceRevision": "70acd86e43a2f35dd0384ff78e5108685c075976"
+  },
+  "migrationReservations": {
+    "producer": "3e1a42fbce377614156fdb37571c0e48a81efc99",
+    "availabilityVersion": "0046_w6_call_availability",
+    "creatorMediaVersion": "0047_w6_creator_media",
+    "state": "reserved_unapplied",
+    "activeOrApplied": false,
+    "availabilitySourceSHA256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
+    "creatorMediaReviewSourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a",
+    "creatorMediaReviewSourceSHA256": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+    "latestCreatorMediaReview": {
+      "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
+      "sourceSHA256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+      "state": "reserved_unapplied; W8 review/application pending"
+    }
+  },
+  "nativeRecoveryFollowup": {
+    "evidence": "native-recovery.json",
+    "sourceSHA256": {
+      "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "5e8fb93f47d37a480aca291bb607172533847773457bbf93b65a5a1971303a82",
+      "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "a6e025ad68ee8693e9551eec60c506ea4862dbbfd13ebbbd56ee167f7feee1fb",
+      "apps/backend/src/modules/media/creator-service.ts": "e526c430e742c66889335b74e8f305c0f0ee8fd3eeebaf026edd93700c15c30e",
+      "apps/backend/src/modules/media/creator-scope.sql": "14867edda9930f31b83e0969ad80f72cc4326e421f47a681c2598c66b548f348",
+      "apps/backend/src/modules/media/lifecycle.ts": "f80f342e2a5d244d503ff23f441c6956d66c0a071dae071ada1dfb29eb38d839",
+      "apps/backend/src/modules/media/creator-lifecycle.ts": "2d9898514cb30b88c31acd33663adec82fd001bc471d0973b14ec06f89f94aec"
+    },
+    "backendContracts": {
+      "tests": 9,
+      "failures": 0,
+      "runnerDurationMs": 890
+    },
+    "androidChecks": {
+      "tests": 19,
+      "failures": 0,
+      "newCases": 0
+    },
+    "macOSLibrary": "passed15.12s",
+    "iosSimulatorLibrary": "passed28.32s",
+    "sqlApplied": false,
+    "functionalAcceptance": false,
+    "sourceRevision": "99b4d2992a3910bbb8526bfaa93caeccfafa8cc3"
+  },
+  "publicationAudienceFollowup": {
+    "evidence": "publication-audience.json",
+    "sourceSHA256": {
+      "apps/backend/src/modules/identity/audience-scope.ts": "073f9757233d528994da3872cd67fd6b479dbde2ea46f6039dafed3613004ada",
+      "apps/backend/src/modules/media/creator-service.ts": "5e197f2b7289b8a4103676e508ec526838715aa954985c2c2f20f99c90c4eb98",
+      "apps/backend/src/modules/media/creator-scope.sql": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+      "apps/backend/src/modules/media/creator-worker.ts": "e092d0574dc96abd24884256e9e5e333284a6fbdba858c4ab1e53c910c2c4e0c",
+      "apps/backend/src/modules/media/registration.ts": "dd2d430e6420587fae57efcd3b02cab6a2ad8ba940d31dba130046435e228024",
+      "apps/backend/src/modules/media/router.ts": "6d944e435d34dc4ac358786f17cfcaeac09de122e85de5d54e7d9f5e5b24afc4",
+      "apps/backend/src/modules/media/storage.ts": "e6c0bc3c178eb976df53bb72637c35f92a5ee3819cebc0e189b1d1c9952e2e9c",
+      "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "ae8156ebfa0048190e7f04c7a28d7b9b1f830b8517b94126b5a3c2790ea9c18a",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "fbc9db61869dc06226cb9c56d45663550336b4c569d5932bbaca93ace877af60",
+      "apps/web/features/media/VoiceRecorder.tsx": "6c285f1302ce3591059bcebeba08f6cd793989117c95c8d76ca97c062a1cbfd7",
+      "apps/web/features/media/VoicePlayer.tsx": "5405632c7ec2b61af4e2e56e42f68f8e5306bcb07b8ff07ae2b248bf9c08eee3",
+      "apps/web/features/media/recorder.ts": "12ed47e43663fd227bf1bc13a4935dbf5b34ee0490843039d39175d19abdea03",
+      "packages/api/src/media.ts": "f632033eedd480a9a25ec75cce0eeab059ac678c3953d60a15e4253d1c38ebe9",
+      "packages/api/src/media-openapi.ts": "a6a5d5fb691da5ef9136f55ec152df67c0b6cdfa230bc2d75fb67198bfded03a",
+      "packages/api/generated/openapi.json": "46b960baae1250fcb34632d2dba75c177858f60c8557d1c8c25b18e13809fdbe",
+      "apps/ios/Sources/Generated/QelvoraAPI.swift": "96a7ef015391058a78c9656d0fe8c6546f700dcc37e07641f3c1655e86ceddb9",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "c145eda4fcf517e2582761919c7ffffb5b8b56503248c26fa4dc557507c0f00f"
+    },
+    "sourceBaseRevision": "a4d63f95d56d169726f655b7147a857a6afe661b",
+    "operations": 47,
+    "sqlActiveOrApplied": false,
+    "actualMediaCallHardwareAcceptance": false,
+    "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
+    "finalAndroidAPK": "passed345s;47 operations"
+  },
+  "savedObjectPolicyFollowup": {
+    "evidence": "policy-projection.json",
+    "policyRevision": "d15a4519b1c335ff86c6bfe4ed620b192944558e",
+    "generatorRevision": "1ada9369fa85fa72fccc7a98182559929bea2ab9",
+    "recordingRevision": "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+    "operations": 48,
+    "iosSimulatorLibrary": "passed50.33s",
+    "androidKotlin": "passed177s; compile only, last actualAPK47",
+    "functionalAcceptance": false
+  },
+  "recordingLifecycleFollowup": {
+    "evidence": "recorder-lifecycle.json",
+    "nativeRevision": "20fb92330429ba84ed1a85d3dbe92b348f6cc7f4",
+    "webRevision": "de17183743a0c2aa3c6fb4ed8e4b0308708b3422",
+    "webProduction": "passed",
+    "iosSimulatorLibrary": "passed13.17s",
+    "androidKotlin": "passed141s;compile only",
+    "actualPermissionHardwareAcceptance": false
+  },
+  "latestContinuation": {
+    "recordedAt": "2026-10-01T02:59:39.746861+00:00",
+    "sourceCommit": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+    "accountPins": "bbe1b309943ca2b31aa0715c7129d7bb4b3c7cdc",
+    "accountConsumer": "eceb62e61deea7947a401976dee8999e4fa62c9f",
+    "existingCaptureRepair": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
+    "mergeGate": "Actual launched affected app/emulator/simulator journeys; not unit/compilation",
+    "iosReviewAvailable": false,
+    "webVisual": "Original run failed diagnosed screenshot caret/hydration race; affected existing current Light/Night rerun passes",
+    "capabilities": {
+      "media": false,
+      "calls": false,
+      "aiAudio": false
+    },
+    "pushed": false,
+    "mergedPRs": [],
+    "newTestCasesOrHarnesses": 0,
+    "nativeJourney": "iOS same2 existing UI journeys passed0failures54.693s afterdec1050; Android actual recorder behindSystemUIANR and existingshipping sign-in processcrashed",
+    "servedFileProofSource": "682766cdec3318a70aa949eda93a9834845f5f05",
+    "archiveExpectationSource": "9b4540ecd20b580768e49836a15df5804d9e154e",
+    "heldSigningReceipt": "held-signing-entry.json",
+    "playbackProofReceipt": "playback-file-proof.json",
+    "nativeJourneyReceipts": [
+      "ios-launched-signin-repair.json",
+      "android-launched-apps.json"
+    ],
+    "producerLeases": "All narrow W1 leases released including playback generation; no runtime enablement",
+    "webMicrophone": "Actual keyboard request denied; enabledRecord/0:00 withexplicitreason; userpermissionpending",
+    "mergeReadinessRecheck": {
+      "prs": [1, 2, 4, 5, 6, 7, 8, 9],
+      "ready": [],
+      "basis": "Owner actualjourney gates/currentheadCI open; none eligible",
+      "pr4DescriptionUpdated": true,
+      "pr4PublishedHead": "d52e449cd4690cb8509283fb47a19dbbf40fb077"
+    },
+    "additionalAccessibility": {
+      "ios": "Actual shipping Recorder idle layout at accessibility-large in Light/Night fits; original large restored; owned Simulator shut down",
+      "receipt": "ios-recorder-accessibility.json",
+      "web": "Actual visible Tab focus; zoom attempt unchanged and unproved; viewport reset",
+      "voiceOverTalkBackCaptureAnd200Percent": "not established"
+    },
+    "currentApiLaunch": {
+      "source": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+      "port": 4106,
+      "identity": "unconfigured",
+      "actualCapabilities": {
+        "mediaAvailable": false,
+        "creatorMediaAvailable": false,
+        "creatorMediaAudienceAvailable": false,
+        "callsAvailable": false,
+        "aiAudioAvailable": false,
+        "reason": "media_unconfigured"
+      },
+      "singleRequestTiming": "status=200 seconds=0.002597",
+      "qualified": "one busy-host capability request; no latency distribution/media/provider target"
+    }
+  },
+  "androidApi34DefaultDiscovery": "android-api34-runtime.json",
+  "processingNotice": "processing-notice.json",
+  "sourceCiIosReview": "source-ci-ios-review/review.json",
+  "latestRuntimeSource": "c57a5e840748bb015c09742f61bffac3e494a123",
+  "nativeCaptureRepair": "source-ci-ios-review/layer-repair.json",
+  "mergeContinuation": {
+    "sourceRevision": "86fc07468629bdaacd4765eded7c4506e984d59f",
+    "receipt": "merge-readiness/receipt.json",
+    "phase": "guarded-shipping-entry-verified",
+    "allCapabilitiesFalse": true,
+    "newTests": 0,
+    "thresholdChanges": 0,
+    "freshGoldens": 0
+  }
+}

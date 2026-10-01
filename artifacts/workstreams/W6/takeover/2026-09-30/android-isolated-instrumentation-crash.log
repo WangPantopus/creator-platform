@@ -1,0 +1,83 @@
+I/DomainSelectionResolver(  952): DomainSelectionResolver created: componentName=[]
+I/bluetooth(  916): system/gd/stack_manager.cc:55 StartUp: init_status == 1
+F/bluetooth(  916): system/gd/stack_manager.cc:57 StartUp: Can't start stack, last instance: starting HciHal
+--------- beginning of crash
+F/libc    (  916): Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 1043 (bt_stack_manage), pid 916 (droid.bluetooth)
+W/system_server(  561): ApkAssets: Deleting an ApkAssets object '<empty> and /system_ext/app/AccessibilityMenu/AccessibilityMenu.apk' with 1 weak references
+W/system_server(  561): ApkAssets: Deleting an ApkAssets object '/product/overlay/AccessibilityMenu__sdk_gphone64_x86_64__auto_generated_rro_product.apk' with 1 weak references
+I/ndroid.systemui(  802): Compiler allocated 4296KB to compile java.lang.Object com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get13()
+D/EGL_emulation(  957): app_time_stats: avg=21.46ms min=2.48ms max=142.01ms count=34
+W/ContextImpl( 1055): Failed to ensure /data/user/0/com.google.android.gms/cache: mkdir failed: errno 126 (Required key not available)
+W/ContextImpl( 1055): Failed to update user.inode_cache: stat failed: ENOENT (No such file or directory)
+D/ConnectivityService(  561): requestNetwork for uid/pid:1001/952 activeRequest: null callbackRequest: 34 [NetworkRequest [ TRACK_SYSTEM_DEFAULT id=34, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED RequestorUid: 1001 RequestorPkg: com.android.phone UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false
+D/ConnectivityService(  561): NetReassign [no changes] [c 0] [a 0] [i 1]
+D/ConnectivityService(  561): requestNetwork for uid/pid:1001/952 activeRequest: null callbackRequest: 35 [NetworkRequest [ TRACK_SYSTEM_DEFAULT id=35, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED RequestorUid: 1001 RequestorPkg: com.android.phone UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false
+D/ConnectivityService(  561): NetReassign [no changes] [c 2] [a 0] [i 0]
+V/GraphicsEnvironment( 1055): Currently set values for:
+V/GraphicsEnvironment( 1055):   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment( 1055):   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment( 1055): Global.Settings values are invalid: number of packages: 0, number of values: 0
+V/GraphicsEnvironment( 1055): Neither updatable production driver nor prerelease driver is supported.
+I/LoadedApk( 1055): No resource references to update in package com.google.android.gms
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.data.IRadioData/slot1 in device VINTF manifest.
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.data.IRadioData/slot1 in device VINTF manifest.
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.messaging.IRadioMessaging/slot1 in device VINTF manifest.
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.modem.IRadioModem/slot1 in device VINTF manifest.
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.network.IRadioNetwork/slot1 in device VINTF manifest.
+I/servicemanager(    0): Caller(pid=952,uid=1001,sid=u:r:radio:s0) Found android.hardware.radio.sim.IRadioSim/slot1 in device VINTF manifest.
+--
+V/AconfigFlags( 1383): Read Aconfig default flag value android.app.admin.flags.allow_screen_brightness_control_on_cope = true
+W/ActivityManager(  561): Slow operation: 64ms so far, now at attachApplicationLocked: immediately before bindApplication
+I/bluetooth( 1706): system/gd/stack_manager.cc:55 StartUp: init_status == 1
+F/bluetooth( 1706): system/gd/stack_manager.cc:57 StartUp: Can't start stack, last instance: starting HciHal
+F/libc    ( 1706): Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 1852 (bt_stack_manage), pid 1706 (droid.bluetooth)
+D/EGL_emulation( 1031): app_time_stats: avg=785.24ms min=20.44ms max=5627.07ms count=8
+D/StrictMode( 1444): StrictMode policy violation: android.os.strictmode.CustomViolation: gcore.dynamite
+D/StrictMode( 1444): 	at android.os.StrictMode$AndroidBlockGuardPolicy.onCustomSlowCall(StrictMode.java:1650)
+D/StrictMode( 1444): 	at android.os.StrictMode.noteSlowCall(StrictMode.java:2785)
+D/StrictMode( 1444): 	at anlp.a(:com.google.android.gms@242335041@24.23.35 (190800-646585959):3)
+D/StrictMode( 1444): 	at com.google.android.gms.chimera.container.GmsModuleChimeraProvider.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):135)
+D/StrictMode( 1444): 	at ajjb.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):3)
+D/StrictMode( 1444): 	at android.content.ContentProvider.query(ContentProvider.java:1620)
+D/StrictMode( 1444): 	at pgr.superQuery(:com.google.android.gms@242335041@24.23.35 (190800-646585959):2)
+D/StrictMode( 1444): 	at com.google.android.chimera.ContentProvider.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):2)
+D/StrictMode( 1444): 	at ajjb.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):13)
+D/StrictMode( 1444): 	at android.content.ContentProvider.query(ContentProvider.java:1716)
+D/StrictMode( 1444): 	at pgr.superQuery(:com.google.android.gms@242335041@24.23.35 (190800-646585959):1)
+D/StrictMode( 1444): 	at com.google.android.chimera.ContentProvider.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):1)
+D/StrictMode( 1444): 	at pgr.query(:com.google.android.gms@242335041@24.23.35 (190800-646585959):2)
+D/StrictMode( 1444): 	at android.content.ContentProvider$Transport.query(ContentProvider.java:295)
+D/StrictMode( 1444): 	at android.content.ContentProviderNative.onTransact(ContentProviderNative.java:107)
+D/StrictMode( 1444): 	at android.os.Binder.execTransactInternal(Binder.java:1500)
+D/StrictMode( 1444): 	at android.os.Binder.execTransact(Binder.java:1444)
+D/StrictMode( 1444): # via Binder call with stack:
+D/StrictMode( 1444): 	at android.os.StrictMode.readAndHandleBinderCallViolations(StrictMode.java:2588)
+D/StrictMode( 1444): 	at android.os.Parcel.readExceptionCode(Parcel.java:3187)
+--
+I/PackageParsing( 1383): Parse times for '/data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/DynamiteModulesA.apk': parse=224ms, update_cache=0 ms
+I/HWUI    (  802): Davey! duration=1144ms; Flags=0, FrameTimelineVsyncId=16192, IntendedVsync=172180758595, Vsync=172897425233, InputEventId=0, HandleInputStart=172971860431, AnimationStart=172971862221, PerformTraversalsStart=172972807423, DrawStart=172982843712, FrameDeadline=172197425261, FrameInterval=172904603848, FrameStartTime=16666666, SyncQueued=172982932378, SyncStart=173048570390, IssueDrawCommandsStart=173048664478, SwapBuffers=173374397563, FrameCompleted=173390756415, DequeueBufferDuration=9287, QueueBufferDuration=1188865, GpuCompleted=173390119436, SwapBuffersCompleted=173390756415, DisplayPresentTime=0, CommandSubmissionCompleted=173374397563, 
+I/bluetooth( 2418): system/gd/stack_manager.cc:55 StartUp: init_status == 1
+F/bluetooth( 2418): system/gd/stack_manager.cc:57 StartUp: Can't start stack, last instance: starting HciHal
+F/libc    ( 2418): Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 2510 (bt_stack_manage), pid 2418 (droid.bluetooth)
+E/AiAiEcho( 1168): EchoSearch: SettingsFetcherImpl: DB already exists.
+D/ConnectivityService(  561): register offer from providerId 11 : NetworkOffer [ Provider Id (11) Score(Policies : EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0) Caps [ Transports: CELLULAR|SATELLITE Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&IA&RCS&XCAP&EIMS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&MCX&NOT_VCN_MANAGED&ENTERPRISE&MMTEL&PRIORITIZE_LATENCY&PRIORITIZE_BANDWIDTH&NOT_BANDWIDTH_CONSTRAINED Specifier: <TelephonyNetworkSpecifier [mSubId = -1]> EnterpriseId: 1&2&3&4&5 UnderlyingNetworks: Null] Needed by []]
+D/ConnectivityService(  561): unregister offer from providerId 11 : NetworkOffer [ Provider Id (11) Score(Policies : EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0) Caps [ Transports: CELLULAR|SATELLITE Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&IA&RCS&XCAP&EIMS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&MCX&NOT_VCN_MANAGED&ENTERPRISE&MMTEL&PRIORITIZE_LATENCY&PRIORITIZE_BANDWIDTH&NOT_BANDWIDTH_CONSTRAINED Specifier: <TelephonyNetworkSpecifier [mSubId = -1]> EnterpriseId: 1&2&3&4&5 UnderlyingNetworks: Null] Needed by [2]]
+D/ConnectivityService(  561): update offer from providerId 11 new : NetworkOffer [ Provider Id (11) Score(Policies : EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0) Caps [ Transports: CELLULAR|SATELLITE Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&IA&RCS&XCAP&EIMS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&MCX&NOT_VCN_MANAGED&ENTERPRISE&MMTEL&PRIORITIZE_LATENCY&PRIORITIZE_BANDWIDTH&NOT_BANDWIDTH_CONSTRAINED Specifier: <TelephonyNetworkSpecifier [mSubId = -1]> EnterpriseId: 1&2&3&4&5 UnderlyingNetworks: Null] Needed by [2]]
+D/CarrierConfigLoader( 2068): EVENT_CHECK_SYSTEM_UPDATE phoneId: 0
+D/TelephonyDebugService( 2068): TelephonyDebugService()
+D/ConnectivityService(  561): unregister offer from providerId 11 : NetworkOffer [ Provider Id (11) Score(Policies : EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0) Caps [ Transports: CELLULAR|SATELLITE Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&IA&RCS&XCAP&EIMS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&MCX&NOT_VCN_MANAGED&ENTERPRISE&MMTEL&PRIORITIZE_LATENCY&PRIORITIZE_BANDWIDTH&NOT_BANDWIDTH_CONSTRAINED Specifier: <TelephonyNetworkSpecifier [mSubId = -1]> EnterpriseId: 1&2&3&4&5 UnderlyingNetworks: Null] Needed by [2]]
+D/ConnectivityService(  561): update offer from providerId 11 new : NetworkOffer [ Provider Id (11) Score(Policies : EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0) Caps [ Transports: CELLULAR|SATELLITE Capabilities: MMS&SUPL&DUN&FOTA&IMS&CBS&IA&RCS&XCAP&EIMS&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&MCX&NOT_VCN_MANAGED&ENTERPRISE&MMTEL&PRIORITIZE_LATENCY&PRIORITIZE_BANDWIDTH&NOT_BANDWIDTH_CONSTRAINED Specifier: <TelephonyNetworkSpecifier [mSubId = -1]> EnterpriseId: 1&2&3&4&5 UnderlyingNetworks: Null] Needed by [2]]
+V/ClearcutMetricXmitter( 1444): Transmission is done.
+W/Role    (  561): Default holder doesn't have required signing certificate: com.google.android.apps.work.clouddpc:23962F4B43B9857638EA66F4D419518EAE282491ACDA4B94707BD59003C45E58
+W/JobInfo ( 1444): Job 'com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService#-237' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+I/antopus.qelvora( 2330): Compiler allocated 6152KB to compile void com.pantopus.qelvora.identity.FanShellKt.FanAppShell(android.content.Context, java.lang.String, java.lang.String, java.util.List, androidx.compose.runtime.Composer, int, int)
+W/JobInfo (  561): Job 'com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService#-237' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+D/CompatChangeReporter(  561): Compat change id reported: 311208629; UID 1001; state: ENABLED
+D/PackageManager(  561): Instant App installer not found with android.intent.action.INSTALL_INSTANT_APP_PACKAGE
+D/PackageManager(  561): Clear ephemeral installer activity
+E/native  ( 1383): E0000 00:00:1790823466.054780    2097 document-store.cc:1359] Failed to update per-doc-data with usage report
+I/AppsFilter(  561): interaction: PackageSetting{bba526e com.android.microdroid.empty_payload/10206} -> PackageSetting{286cd0f com.google.android.googlequicksearchbox/10144} BLOCKED
+I/AppsFilter(  561): interaction: PackageSetting{e7a119c com.pantopus.qelvora/10209} -> PackageSetting{286cd0f com.google.android.googlequicksearchbox/10144} BLOCKED
+I/AppsFilter(  561): interaction: PackageSetting{5ff37a5 com.pantopus.qelvora.test/10210} -> PackageSetting{286cd0f com.google.android.googlequicksearchbox/10144} BLOCKED
+D/CarrierSvcBindHelper( 2068): mHandler: 0
+D/CarrierSvcBindHelper( 2068): Rebinding if necessary for phoneId: 0

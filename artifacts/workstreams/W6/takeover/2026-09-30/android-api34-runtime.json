@@ -1,0 +1,79 @@
+{
+  "recordedAt": "2026-10-01T03:10:03.735190+00:00",
+  "officialSource": "https://dl.google.com/android/repository/sys-img/google_apis/x86_64-34_r14.zip",
+  "install": "Official vendor SDK manager exit0, only owned SDK/user/TMPDIR; existing accepted SDK license bytes",
+  "image": "Google APIs/API34/x86_64/r14",
+  "emulator": "37.1.11",
+  "metadataSHA256": {
+    "package.xml": "214f88f2639afd1c1d4fca11acd22a6bea9881dc0325e1699c6c458e662740f8",
+    "source.properties": "bd7597e0dfa855335194fbafaf63bde93aa86bc3b56cea73cd54635715e77abc",
+    "kernel-ranchu": "b1e5cd842220175a4c07be9a2bcf5beb7b336794b00cf9b7b53abf35557b24df"
+  },
+  "ownedAvd": "CreatorPlatformW6Api3420261001",
+  "adbPort": 5046,
+  "consolePort": 5566,
+  "netsimInstance": 1,
+  "grpc": "127.0.0.1:8566 JWT",
+  "profile": "2CPU/2048MiB/hostGPU",
+  "purpose": "Existing shipping app acceptance retry after preserved API35 failures",
+  "runtimeAcceptance": "Existing actual shipping unconfigured sign-in passes; clean Recorder/Welcome launches observed, limited qualification",
+  "newTests": false,
+  "readOnlySharedWith": "W5 may copy/read completed image into own SDK/data; no W6 SDK writes",
+  "actualLaunch": {
+    "shippingInstall": "Success",
+    "instrumentationInstall": "Success",
+    "status": "ok",
+    "coldMilliseconds": 3748,
+    "actualScreen": "Recorder behind Bluetooth keeps stopping dialog"
+  },
+  "existingShippingJourney": {
+    "method": "NativeAcceptanceTest#unavailableSignInNeverPretendsToAuthenticate",
+    "result": "OK (1 test)",
+    "seconds": 4.622,
+    "newOrChangedCases": false
+  },
+  "cleanRuntimeAcceptance": false,
+  "qualification": "Limited observed app launch/sign-in acceptance; Google Play Services boot ANR remains. No actual microphone, upload/process/sign/publish/play, calls or physical-device acceptance.",
+  "matchedInstanceRetry": "NETSIM_INSTANCE=6 plus daemon CLIinstance6 still reports unable packet-streamer/netsim Wi-Fi connection",
+  "currentRetry": "Default discovery completed; failed numbered-instance retries preserved",
+  "primarySources": [
+    "https://developer.android.com/studio/run/emulator-networking-advanced",
+    "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/rust/common/src/util/os_utils.rs",
+    "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/src/util/os_utils.cc"
+  ],
+  "netsimHciPort": 15606,
+  "discoveryDirectory": "/tmp/qelvora-w6-runtime-20261001/netsim-default-discovery",
+  "configuration": "unset NETSIM_INSTANCE; no --instance CLI; identical own ANDROID_TMP and TMPDIR; custom HCI15606; no feature/security disable or dialog dismissal",
+  "correctedRuntime": {
+    "bootMilliseconds": 44062,
+    "wifi": "Successfully initialized netsim WiFi",
+    "bluetooth": "Activated packet streamer for bluetooth emulation",
+    "actualRecorderLight": "Personally inspected; no SystemUI/Bluetooth dialog",
+    "actualRecorderNight": "Personally inspected; no SystemUI/Bluetooth dialog",
+    "actualWelcomeLight": "Personally inspected fresh shipping launch; no crash dialog",
+    "existingShippingJourney": {
+      "method": "NativeAcceptanceTest#unavailableSignInNeverPretendsToAuthenticate",
+      "result": "OK (1 test)",
+      "seconds": 6.939,
+      "unchanged": true
+    },
+    "events": "One actual Google Play Services persistent SIM_STATE_CHANGED broadcast ANR at boot. No captured SystemUI/Bluetooth/Qelvora ANR/crash entries. Earlier failures remain preserved separately.",
+    "actualWelcomeNight": "Personally inspected fresh shipping launch; no crash dialog"
+  },
+  "correctedEvidence": {
+    "android-api34-connected-welcome-night-launch.log": "1ec37c16271eea0431490a1cb6b7e8307db29013ede8867b9ce40d505b2190a7",
+    "android-api34-connected-welcome-light-launch.log": "15c8b819fe6cd810e9e661ec00f2bb6f5ccd0c2e48c1bd2949fc6f2f998ebd7a",
+    "android-api34-connected-recorder-night-launch.log": "4ba293850c1a8f35cb1e239c72fcfeeb4ae0c4619e8d06e3ed1e28dddbecf6be",
+    "android-api34-connected-shipping-signin.log": "260d6c71f9e92711aa2ffc34a8d2bf312af62cdefafdbb0d74be1735e436ba25",
+    "android-api34-connected-process-events.log": "1abd5fb8a6080e332b45f402c6b3c047c92025afbd4a1666408321c4907faaf6",
+    "android-api34-connected-recorder-launch.log": "d68319e89568794dfe35aeab63fd731c3bb10988f66a890b27423c5d7eafbb4a",
+    "android-api34-default-discovery.log": "ce2cd60207a8bd0c5b3083d45fa7a799726f77f8fe7ad45368516689c1f8b53c",
+    "android-api34-matched-discovery.log": "f16528077a401346028595d6fcdb024f00769a386baba96aa454035cd6592737",
+    "android-api34-connected-recorder.png": "b4e3475149b508a275fe543f54aeec20e4eabfa3bf5aec9650d388b8e6f1fd07",
+    "android-api34-connected-recorder-night.png": "ca9018233ef85f7fef19f0640cb9743c10fedf2ecf8fd9a66b905ecdf763c212",
+    "android-api34-connected-welcome-light.png": "6c67a5888d9d122564b8ee63fc7ef4885d9cd7685bbcb1e17796fdc650b46ba9",
+    "android-api34-connected-welcome-night.png": "f8c57c740c61051485cd2d307653ef2c17d73167373ec678cbd2df02db3a8b82",
+    "android-api34-connected-process-events-final.log": "669a2d66ddc37de228b8527ab0fccb664de6ac734e80e19ecd6938f3a23ed6c8"
+  },
+  "ownedEmulatorShutdown": "Normal emu kill on verified W6 avd/5046/5566 after screenshots/events retained; data preserved"
+}

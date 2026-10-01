@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { CallChip, Countdown } from "@qelvora/ui-web";
 import type {
@@ -98,7 +99,7 @@ export function CallView({
           }
           setStale(true);
           setFetchError(
-            e instanceof Error ? e.message : "The call is unavailable.",
+            e instanceof Error ? e.message : copy.w6TheCallIsUnavailable,
           );
         }
       } finally {
@@ -148,9 +149,7 @@ export function CallView({
       if (video.current) video.current.srcObject = current;
     } catch {
       if (epoch !== mediaEpoch.current) return;
-      setError(
-        "Camera or microphone access is off or unavailable. Check your device settings and try again.",
-      );
+      setError(copy.w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour);
     }
   }
   useEffect(() => {
@@ -163,7 +162,7 @@ export function CallView({
     setError(null);
     const adapter = webCallTransport();
     if (!adapter) {
-      setError("Calling is not connected yet. Your booking is unchanged.");
+      setError(copy.w6CallingIsNotConnectedYetYourBookingIsUnchanged);
       return;
     }
     setBusy(true);
@@ -195,7 +194,7 @@ export function CallView({
       setError(
         e instanceof Error
           ? e.message
-          : "Connection failed. Rejoin the same call.",
+          : copy.w6ConnectionFailedRejoinTheSameCall,
       );
     } finally {
       setBusy(false);
@@ -218,7 +217,7 @@ export function CallView({
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Consent could not be saved.");
+      setError(e instanceof Error ? e.message : copy.w6ConsentCouldNotBeSaved);
     } finally {
       setBusy(false);
     }
@@ -242,9 +241,7 @@ export function CallView({
       setLeaving(false);
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : "The call could not be ended. Try again.",
+        e instanceof Error ? e.message : copy.w6TheCallCouldNotBeEndedTryAgain,
       );
     } finally {
       setBusy(false);
@@ -267,7 +264,7 @@ export function CallView({
       );
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "The summary could not be changed.",
+        e instanceof Error ? e.message : copy.w6TheSummaryCouldNotBeChanged,
       );
     } finally {
       setBusy(false);
@@ -276,28 +273,41 @@ export function CallView({
   if (!session)
     return (
       <main className="w6-call">
-        <span className="qv-meta">CALL</span>
-        <h1>{fetchError ? "This call is unavailable" : "Opening your call"}</h1>
+        <span className="qv-meta">{copy.w6CALL}</span>
+        <h1>
+          {fetchError ? copy.w6ThisCallIsUnavailable : copy.w6OpeningYourCall}
+        </h1>
         <p className="w6-notice" role="status">
-          {fetchError ?? "Checking the booking and participant access."}
+          {fetchError ?? copy.w6CheckingTheBookingAndParticipantAccess}
         </p>
         <a
           className="qv-btn qv-btn--secondary"
           href={`/api/auth/continue?returnTo=${encodeURIComponent(`/calls/${creatorId}/${fanId}/${sessionId}`)}`}
         >
-          Continue with Pantopus
+          {copy.w6ContinueWithPantopus}
         </a>
-        <a href="/support">Get help</a>
+        <a href="/support">{copy.w6GetHelp}</a>
       </main>
     );
   const ended = session.state === "ended" || session.state === "cancelled";
   const live = ["connected", "reconnecting", "ending"].includes(session.state);
   const outcomeCopy = {
-    completed: `You spoke with ${session.creatorName} for ${Math.floor(session.connectedMilliseconds / 60_000)} minutes${Math.floor(session.connectedMilliseconds / 1000) % 60 ? ` ${Math.floor(session.connectedMilliseconds / 1000) % 60} seconds` : ""}.`,
-    partial: `${session.creatorName} had to end early.`,
-    creator_no_show: `${session.creatorName} did not join.`,
-    fan_no_show: "You missed the call.",
-    technical_failure: "The call ended because of a technical problem.",
+    completed: formatCopy("w6YouSpokeWithForMinutes", {
+      value1: session.creatorName,
+      value2: Math.floor(session.connectedMilliseconds / 60_000),
+      value3:
+        Math.floor(session.connectedMilliseconds / 1000) % 60
+          ? formatCopy("w6SecondsSuffix", {
+              value1: Math.floor(session.connectedMilliseconds / 1000) % 60,
+            })
+          : "",
+    }),
+    partial: formatCopy("w6CreatorEndedEarly", { value1: session.creatorName }),
+    creator_no_show: formatCopy("w6CreatorDidNotJoin", {
+      value1: session.creatorName,
+    }),
+    fan_no_show: copy.w6YouMissedTheCall,
+    technical_failure: copy.w6TheCallEndedBecauseOfATechnicalProblem,
   };
   return (
     <main
@@ -305,28 +315,32 @@ export function CallView({
     >
       {!live && (
         <span className="qv-meta">
-          {session.durationSeconds / 60}-MINUTE{" "}
-          {session.mediaMode.toUpperCase()} CALL
+          {formatCopy("w6MINUTECALL", {
+            value1: session.durationSeconds / 60,
+            value2: session.mediaMode.toUpperCase(),
+          })}
         </span>
       )}
       {ended ? (
         <>
           <h1>
             {session.state === "cancelled"
-              ? "This call was cancelled."
+              ? copy.w6ThisCallWasCancelled
               : session.outcome
                 ? outcomeCopy[session.outcome]
-                : "Call outcome is being reconciled."}
+                : copy.w6CallOutcomeIsBeingReconciled}
           </h1>
         </>
       ) : !live ? (
         <h1>
-          {new Intl.DateTimeFormat(undefined, {
-            weekday: "long",
-            hour: "2-digit",
-            minute: "2-digit",
-          }).format(new Date(session.scheduledAt))}{" "}
-          with {session.creatorName}
+          {formatCopy("w6With", {
+            value1: new Intl.DateTimeFormat(undefined, {
+              weekday: "long",
+              hour: "2-digit",
+              minute: "2-digit",
+            }).format(new Date(session.scheduledAt)),
+            value2: session.creatorName,
+          })}
         </h1>
       ) : null}
       {live && (
@@ -340,26 +354,39 @@ export function CallView({
       {["starting", "stopping", "blocked"].includes(session.recordingState) && (
         <p className="w6-notice" role="status">
           {session.recordingState === "starting"
-            ? "Recording requested · waiting for provider confirmation"
+            ? copy.w6RecordingRequestedWaitingForProviderConfirmation
             : session.recordingState === "stopping"
-              ? "Recording is stopping · awaiting provider confirmation"
-              : "Recording state could not be confirmed"}
+              ? copy.w6RecordingIsStoppingAwaitingProviderConfirmation
+              : copy.w6RecordingStateCouldNotBeConfirmed}
         </p>
       )}
       {!connected && !ended && (
         <Countdown tone="soon">
           {session.state === "reconnecting"
-            ? `Reconnecting · ${clock(Math.max(0, session.reconnectBudgetSeconds * 1000 - session.reconnectUsedMilliseconds))} allowance left`
+            ? formatCopy("w6ReconnectingAllowanceLeft", {
+                value1: clock(
+                  Math.max(
+                    0,
+                    session.reconnectBudgetSeconds * 1000 -
+                      session.reconnectUsedMilliseconds,
+                  ),
+                ),
+              })
             : Date.parse(session.serverNow) < Date.parse(session.scheduledAt)
-              ? `Starts in ${clock(Date.parse(session.scheduledAt) - Date.parse(session.serverNow))}`
+              ? formatCopy("w6StartsIn", {
+                  value1: clock(
+                    Date.parse(session.scheduledAt) -
+                      Date.parse(session.serverNow),
+                  ),
+                })
               : session.state === "ending"
-                ? "Ending · confirming provider history"
-                : "Waiting for both participants"}
+                ? copy.w6EndingConfirmingProviderHistory
+                : copy.w6WaitingForBothParticipants}
         </Countdown>
       )}
       {stale && (
         <p className="w6-notice" role="status">
-          Connection lost · displayed times are from the last server update.
+          {copy.w6ConnectionLostDisplayedTimesAreFromTheLastServerUpdate}
         </p>
       )}
       {error && (
@@ -371,39 +398,50 @@ export function CallView({
         <>
           <section className="w6-card w6-call-facts">
             <dl>
-              <dt>Length</dt>
+              <dt>{copy.w6Length}</dt>
               <dd>
-                {session.durationSeconds / 60} minutes, fixed · no overtime
-                charge
+                {formatCopy("w6MinutesFixedNoOvertimeCharge", {
+                  value1: session.durationSeconds / 60,
+                })}
               </dd>
-              <dt>Shared with {session.creatorName}</dt>
+              <dt>
+                {formatCopy("w6SharedWith", { value1: session.creatorName })}
+              </dt>
               <dd>{session.packet.summary}</dd>
-              <dt>Attachments</dt>
-              <dd>{session.packet.attachmentIds.length} shared files</dd>
-              <dt>Recording</dt>
+              <dt>{copy.w6Attachments}</dt>
+              <dd>
+                {formatCopy("w6SharedFiles", {
+                  value1: session.packet.attachmentIds.length,
+                })}
+              </dd>
+              <dt>{copy.w6Recording}</dt>
               <dd>
                 {["on", "stopping"].includes(session.recordingState)
-                  ? "Recording"
+                  ? copy.w6Recording
                   : session.recordingState === "off"
-                    ? "Off"
-                    : "Awaiting confirmation"}
+                    ? copy.w6Off
+                    : copy.w6AwaitingConfirmation}
               </dd>
-              <dt>If either of you drops</dt>
+              <dt>{copy.w6IfEitherOfYouDrops}</dt>
               <dd>
-                Timer pauses, up to {session.reconnectBudgetSeconds / 60} min
-                total
+                {formatCopy("w6TimerPausesUpToMinTotal", {
+                  value1: session.reconnectBudgetSeconds / 60,
+                })}
               </dd>
-              <dt>Time zone</dt>
+              <dt>{copy.w6TimeZone}</dt>
               <dd>{Intl.DateTimeFormat().resolvedOptions().timeZone}</dd>
-              <dt>Request</dt>
+              <dt>{copy.w6Request}</dt>
               <dd className="qv-mono">{session.commitmentId}</dd>
             </dl>
           </section>
           <p className="qv-help">
-            Joining early starts nothing. If {session.creatorName} doesn&apos;t
-            join within {session.graceSeconds / 60} minutes of the appointment,
-            the booking is sent for a full refund. A fan no-show is charged as
-            agreed.
+            {formatCopy(
+              "w6JoiningEarlyStartsNothingIfDoesnTJoinWithinMinutes",
+              {
+                value1: session.creatorName,
+                value2: session.graceSeconds / 60,
+              },
+            )}
           </p>
         </>
       )}
@@ -417,20 +455,22 @@ export function CallView({
               playsInline
               aria-label={
                 role === "creator"
-                  ? "The fan's live video"
-                  : `${session.creatorName}'s live video`
+                  ? copy.w6TheFanSLiveVideo
+                  : formatCopy("w6SLiveVideo", { value1: session.creatorName })
               }
             />
           ) : (
             <span>
               {session.state === "reconnecting"
-                ? "Reconnecting · timer paused"
-                : "Private device check"}
+                ? copy.w6ReconnectingTimerPaused
+                : copy.w6PrivateDeviceCheck}
             </span>
           )}
           <span className="w6-video-label">
             {session.mediaMode.toUpperCase()} ·{" "}
-            {role === "creator" ? "FAN" : session.creatorName.toUpperCase()}
+            {role === "creator"
+              ? copy.w6FAN
+              : session.creatorName.toUpperCase()}
           </span>
           <div className="w6-self-video">
             <video
@@ -438,16 +478,16 @@ export function CallView({
               autoPlay
               muted
               playsInline
-              aria-label="Your private camera preview"
+              aria-label={copy.w6YourPrivateCameraPreview}
               hidden={!previewing}
             />
-            <span>YOU</span>
+            <span>{copy.w6YOU}</span>
           </div>
           {live && !connected && (
             <p className="w6-video-status" role="status">
               {session.state === "reconnecting"
-                ? "Reconnecting · timer paused"
-                : "Ending · confirming provider history"}
+                ? copy.w6ReconnectingTimerPaused
+                : copy.w6EndingConfirmingProviderHistory}
             </p>
           )}
         </div>
@@ -461,10 +501,10 @@ export function CallView({
               void transport.current
                 ?.microphone(muted)
                 .then(() => setMuted(!muted))
-                .catch(() => setError("Microphone change failed."));
+                .catch(() => setError(copy.w6MicrophoneChangeFailed));
             }}
           >
-            {muted ? "Unmute" : "Mute"}
+            {muted ? copy.w6Unmute : copy.w6Mute}
           </button>
           <button
             className="qv-btn qv-btn--secondary"
@@ -478,45 +518,58 @@ export function CallView({
               void transport.current
                 ?.camera(!camera)
                 .then(() => setCamera(!camera))
-                .catch(() => setError("Camera change failed."));
+                .catch(() => setError(copy.w6CameraChangeFailed));
             }}
           >
-            Camera
+            {copy.w6Camera}
           </button>
           <a
             className="qv-btn qv-btn--secondary"
             href={`/support?sessionId=${session.id}`}
           >
-            Report
+            {copy.w6Report}
           </a>
           <button
             className="qv-btn qv-btn--secondary"
             disabled={busy || stale || !role}
             onClick={() => setLeaving(true)}
           >
-            Leave
+            {copy.w6Leave}
           </button>
         </div>
       )}
-      {(live || session.state === "ended") && (
+      {(live || ended) && (
         <section className="w6-card">
           <strong>
-            {ended
-              ? "Both of you can get a short summary"
-              : "Separate permissions"}
+            {session.state === "ended"
+              ? copy.w6BothOfYouCanGetAShortSummary
+              : copy.w6SeparatePermissions}
           </strong>
           {(["recording", "summary", "content_reuse", "ai_source"] as const)
-            .filter((p) => !ended || p !== "recording")
+            .filter((purpose) => {
+              const granted = session.consents.some(
+                (value) =>
+                  value.role === role &&
+                  value.purpose === purpose &&
+                  value.granted,
+              );
+              if (session.state === "cancelled") return granted;
+              return (
+                purpose !== "recording" ||
+                !["ending", "ended"].includes(session.state) ||
+                granted
+              );
+            })
             .map((purpose) => (
               <label key={purpose}>
                 <span>
                   {purpose === "summary"
-                    ? "I'd like a summary"
+                    ? copy.w6IDLikeASummary
                     : purpose === "recording"
-                      ? "Allow recording"
+                      ? copy.w6AllowRecording
                       : purpose === "content_reuse"
-                        ? "Allow content reuse"
-                        : "Allow use as an AI source"}
+                        ? copy.w6AllowContentReuse
+                        : copy.w6AllowUseAsAnAISource}
                 </span>
                 <input
                   type="checkbox"
@@ -534,11 +587,19 @@ export function CallView({
               </label>
             ))}
           <p className="qv-help">
-            Each purpose needs both people&apos;s permission. Without recording
-            permission, a summary uses only the packet and a creator-typed note.
-            Either of you can delete it.
+            {
+              copy.w6EachPurposeNeedsBothPeopleSPermissionWithoutRecordingPermission
+            }
           </p>
-          {session.summary && <p>{session.summary}</p>}
+          {session.summary &&
+            ["creator", "fan"].every((participant) =>
+              session.consents.some(
+                (value) =>
+                  value.role === participant &&
+                  value.purpose === "summary" &&
+                  value.granted,
+              ),
+            ) && <p>{session.summary}</p>}
           {ended &&
             role === "creator" &&
             ["creator", "fan"].every((r) =>
@@ -548,7 +609,7 @@ export function CallView({
             ) && (
               <>
                 <label htmlFor="creator-summary-note">
-                  Your post-call note
+                  {copy.w6YourPostCallNote}
                 </label>
                 <textarea
                   id="creator-summary-note"
@@ -563,13 +624,13 @@ export function CallView({
                     void summaryAction("summary-note");
                   }}
                 >
-                  Save note for summary
+                  {copy.w6SaveNoteForSummary}
                 </button>
               </>
             )}
           {session.summaryState === "pending" && (
             <p role="status">
-              Summary queued · available when its provider completes.
+              {copy.w6SummaryQueuedAvailableWhenItsProviderCompletes}
             </p>
           )}
           {session.summary && (
@@ -580,34 +641,36 @@ export function CallView({
                 void summaryAction("delete-summary");
               }}
             >
-              Delete this summary
+              {copy.w6DeleteThisSummary}
             </button>
           )}
         </section>
       )}
       {session.state === "ended" && (
         <section className="w6-card">
-          <strong>Call receipt</strong>
+          <strong>{copy.w6CallReceipt}</strong>
           <dl>
-            <dt>Connected</dt>
+            <dt>{copy.w6Connected}</dt>
             <dd>
-              {clock(session.connectedMilliseconds)} of{" "}
-              {clock(session.durationSeconds * 1000)}
+              {formatCopy("w6TimeOfDuration", {
+                value1: clock(session.connectedMilliseconds),
+                value2: clock(session.durationSeconds * 1000),
+              })}
             </dd>
-            <dt>Outcome</dt>
+            <dt>{copy.w6Outcome}</dt>
             <dd>{session.outcome?.replaceAll("_", " ")}</dd>
-            <dt>Recording</dt>
+            <dt>{copy.w6Recording}</dt>
             <dd>
               {session.recordingOccurred
-                ? "Recording occurred · check the consent history"
-                : "No recording was confirmed"}
+                ? copy.w6RecordingOccurredCheckTheConsentHistory
+                : copy.w6NoRecordingWasConfirmed}
             </dd>
-            <dt>Settlement</dt>
+            <dt>{copy.w6Settlement}</dt>
             <dd>
               <a
                 href={`/commerce/receipt?commitmentId=${session.commitmentId}`}
               >
-                View the reconciled receipt
+                {copy.w6ViewTheReconciledReceipt}
               </a>
             </dd>
           </dl>
@@ -627,7 +690,7 @@ export function CallView({
               void join();
             }}
           >
-            Enter the waiting room
+            {copy.w6EnterTheWaitingRoom}
           </button>
           <button
             className="qv-btn qv-btn--quiet"
@@ -636,7 +699,7 @@ export function CallView({
               void preflight();
             }}
           >
-            Check camera and microphone
+            {copy.w6CheckCameraAndMicrophone}
           </button>
         </div>
       )}
@@ -653,11 +716,11 @@ export function CallView({
             aria-modal="true"
             aria-labelledby="leave-title"
           >
-            <h2 id="leave-title">End this call?</h2>
+            <h2 id="leave-title">{copy.w6EndThisCall}</h2>
             <p>
               {role === "fan"
-                ? "Ending by choice counts as your completed call. A technical problem is sent for reconciliation."
-                : "Ending before enough connected time sends this call for partial-delivery reconciliation."}
+                ? copy.w6EndingByChoiceCountsAsYourCompletedCallATechnical
+                : copy.w6EndingBeforeEnoughConnectedTimeSendsThisCallForPartial}
             </p>
             <button
               className="qv-btn qv-btn--secondary"
@@ -666,7 +729,7 @@ export function CallView({
                 void end("end_by_choice");
               }}
             >
-              {role === "fan" ? "End by choice" : "End call"}
+              {role === "fan" ? copy.w6EndByChoice : copy.w6EndCall}
             </button>
             {role === "fan" && (
               <button
@@ -676,14 +739,14 @@ export function CallView({
                   void end("technical_problem");
                 }}
               >
-                Technical problem
+                {copy.w6TechnicalProblem}
               </button>
             )}
             <button
               className="qv-btn qv-btn--quiet"
               onClick={() => setLeaving(false)}
             >
-              Stay in the call
+              {copy.w6StayInTheCall}
             </button>
           </section>
         </dialog>
