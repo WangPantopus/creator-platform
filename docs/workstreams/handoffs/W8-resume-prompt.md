@@ -25,12 +25,14 @@ https://github.com/WangPantopus/creator-platform/pull/17
 
 - Branch: `codex/w8-post-cleanup-recovery`.
 - Observed head: `bc809085e22d997cf868071c5cedab2992187005`.
-- Checkout: `/Users/yingpengwang/.codex/worktrees/f25f/creator-platform`.
+- Previous checkout: `/Users/yingpengwang/.codex/worktrees/f25f/creator-platform`. The human requested retirement of all four W8 checkouts after source publication; do not assume this directory exists. Recreate a checkout from the published PR17 branch when resuming.
 - It was open/draft. It implements restored-database traffic closure, paused-worker role checking, and disabled privacy submission when verification is unavailable.
 - Read its entire diff, actual recovery/browser evidence and current checks; reconcile current main, finish affected acceptance, mark ready and merge when ready. Do not duplicate or abandon this implementation just because it is a draft. Preserve this updated handoff authority when resolving its older documentation changes.
 - Evidence/procedure in that branch: `artifacts/workstreams/W8/recovery/20261001/{README.md,receipt.json}` and `docs/operations/W8-post-cleanup-recovery.md`. These are not necessarily present on main until PR17 merges; read them directly from the published branch when needed.
 
-The historical W8 implementation/evidence checkout is `/Users/yingpengwang/.codex/worktrees/28ed/creator-platform`, branch `codex/w8-trust-handoff`, last clean/pushed checkpoint `b77ad263ac5fd63ab48766c9659363328d57fdcb`. Preserve it. Its product work was merged through PR7 and PR15; its later branch-only changes include postmerge evidence. It is not the latest combined product tree. The old detached `99fa` checkout is not an implementation starting point.
+The historical W8 source remains on published branch `codex/w8-trust-handoff`, checkpoint `b77ad263ac5fd63ab48766c9659363328d57fdcb`. Its product work merged through PR7 and PR15; the two final evidence commits are now integrated with this retirement update. Keep the remote history. The old `28ed`, `f25f`, detached `99fa` and `w8-current-handoff` directories are being removed at the human's request. Their [pre-removal audit](../../../artifacts/workstreams/W8/handoff/20261001/worktree-audit.json) records remote custody and PR coverage. Private recovery data stays under `/Users/yingpengwang/.config/creator-platform/`.
+
+From the primary repository `/Users/yingpengwang/creator-platform`, fetch origin and inspect its status without resetting it. Create a fresh W8 worktree from `origin/codex/w8-post-cleanup-recovery` (reuse the existing local branch if appropriate, otherwise create a `codex/` continuation branch), then reconcile current main. Read this current prompt from main as well as PR17's historical recovery procedure. No retired absolute path is required to recover committed work.
 
 Completed earlier merges include PR7 (`7052159`), PR15 (`ad369bd`), PR8 (`ebb24c7`), PR9 (`ad56fc7`) and PR2 (`2f0319d`). Do not recreate them. Later work has produced many new PRs; the previous “zero open PRs” observation is historical. Refresh the queue, identify W8 dependencies, and finish ready increments through merge. Relevant observed dependencies include W3 PR36 and W2 PR40; check their current heads and status instead of assuming completion.
 
@@ -40,7 +42,7 @@ Inspect checkout status and active ownership before writing. Reuse an appropriat
 
 Read applicable `AGENTS.md` and `CLAUDE.md`, then:
 
-1. This prompt, `docs/workstreams/handoffs/W8.md`, current `docs/workstreams/status/W8.md`, `docs/workstreams/coordination/W8-contracts.md`, `W8-next-allocations.md`, the current PR17 records, and `artifacts/workstreams/W8/takeover/20260930/README.md`. Read postmerge receipts from the historical W8 branch where not merged.
+1. This prompt, `docs/workstreams/handoffs/W8.md`, current `docs/workstreams/status/W8.md`, `docs/workstreams/coordination/W8-contracts.md`, `W8-next-allocations.md`, the current PR17 records, and `artifacts/workstreams/W8/takeover/20260930/README.md`. The historical postmerge receipts `pr15-merged.json` and `pr8-merge-wrap.json` are included in this retirement update with their original observations intact.
 2. `docs/workstreams/W8-trust-release.md` and `docs/workstreams/prompts/W8-trust-release.md`: all ten original packages, exact artboards, demonstrations and delivery standard. The latest human direction above supersedes their older execution restrictions.
 3. `docs/operations/W8-{runbook,security,release,pilot,required-inputs,privacy-streaming,migration-adoption}.md`, PR17's post-cleanup recovery procedure, and their linked implementation and operator evidence.
 4. `docs/workstreams/{README,STANDARDS,CONTRACTS,VERIFICATION,COVERAGE,DECISIONS,OPPORTUNITIES}.md`, current W1–W7 contracts/status and merged source. Research inventories are historical; inspect actual code before repeating missing-source claims.

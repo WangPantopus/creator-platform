@@ -1,0 +1,195 @@
+{
+  "observedAt": "2026-10-01T06:52:38.373069+00:00",
+  "pullRequest": {
+    "headRefOid": "3bd918e1a9b047d986ba245d5e44a1cf006bd282",
+    "mergeCommit": {
+      "oid": "ebb24c7e640d972933ca907a673bb879b8190a56"
+    },
+    "mergedAt": "2026-10-01T06:47:29Z",
+    "number": 8,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/8"
+  },
+  "mergedBy": "W3 owner; W8 independently reviewed published evidence, source equality and actual merge after observing the completed GitHub merge",
+  "firstParent": "ad369bd5a0935c09da2687bf69a6a2d0f0a6da18",
+  "actualMergeTree": "76cc8249d9053b5e8ecdcbaa6050c126f3669420",
+  "matchesReviewedProspectiveTree": true,
+  "unchangedMainTrees": {
+    "apps/backend/src/modules/trust": true,
+    "apps/backend/src/db": true,
+    "apps/backend/src/operations": true,
+    "apps/backend/src/realtime": true,
+    "apps/backend/src/modules/identity": true,
+    "apps/backend/scripts": true,
+    "infra": true,
+    "tests": true,
+    "apps/backend/tests": true,
+    ".github": true,
+    "apps/ios/Tests": true,
+    "apps/android/app/src/androidTest": true
+  },
+  "ownerAcceptedSourceEquality": [
+    {
+      "acceptedSource": "238f5ed5be5ca95e6be75286c536084462fb7416",
+      "path": "apps",
+      "acceptedObject": "59197e184ee26464d0ea3260d5c0486355f1ab25",
+      "headObject": "59197e184ee26464d0ea3260d5c0486355f1ab25",
+      "equal": true
+    },
+    {
+      "acceptedSource": "d2ca5d1081441b8572b31f99bd033054499280e1",
+      "path": "apps/backend/src",
+      "acceptedObject": "e4bbb425dd3f2f5dc350aa6698fbdc923e2309eb",
+      "headObject": "e4bbb425dd3f2f5dc350aa6698fbdc923e2309eb",
+      "equal": true
+    },
+    {
+      "acceptedSource": "d2ca5d1081441b8572b31f99bd033054499280e1",
+      "path": "apps/ios/Sources",
+      "acceptedObject": "5a4747738415f1111651fef7e772549bbfabe713",
+      "headObject": "5a4747738415f1111651fef7e772549bbfabe713",
+      "equal": true
+    },
+    {
+      "acceptedSource": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+      "path": "apps/android/app/src/main",
+      "acceptedObject": "22414d6be4f5479199230a8ef622fea17721772e",
+      "headObject": "22414d6be4f5479199230a8ef622fea17721772e",
+      "equal": true
+    },
+    {
+      "acceptedSource": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+      "path": "packages/api",
+      "acceptedObject": "eef344241ced5958196f04185191462b3f1de72d",
+      "headObject": "eef344241ced5958196f04185191462b3f1de72d",
+      "equal": true
+    }
+  ],
+  "actualAppAcceptance": {
+    "operator": "W3 owner, not W8",
+    "record": "artifacts/workstreams/W3/merge-verification/20261001/run.md at 3bd918e1a9b047d986ba245d5e44a1cf006bd282",
+    "scope": "Launched browser, signed iOS Simulator and signed Android emulator; canonical synthetic account sign-in, Light/Night, distinct saved profiles, refresh, current/all-device sign-out, signed-out cold launch and saved-account restoration.",
+    "iosBinarySha256": "f9273b99619917c44081828cab28bb93fa71024a8a6375c51d8fba1fcc8585ad",
+    "androidApkSha256": "9eee87deb4c6d048c18964bd16ae2c42851ed1dfd1ba86fec651a7719d16274b",
+    "limits": [
+      "Original failed Android restore notice remains recorded; later normal authentication and saved cold restore passed.",
+      "Actual iOS dependency graph is disclosed; generated Package.resolved drift was excluded, so committed-lock equality is not claimed.",
+      "No licensed generation, memory, payment, signing, provider, physical-device or complete production acceptance."
+    ]
+  },
+  "checks": [
+    {
+      "name": "web-and-backend",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825922032/job/110251507912"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825917299/job/110251513532"
+    },
+    {
+      "name": "web-visual",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825922032/job/110251507550"
+    },
+    {
+      "name": "web-visual",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825917299/job/110251513466"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825922032/job/110251507926"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825917299/job/110251513507"
+    },
+    {
+      "name": "android-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825922032/job/110251507778"
+    },
+    {
+      "name": "android-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825917299/job/110251513068"
+    },
+    {
+      "name": "android-runtime",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825922032/job/110251507911"
+    },
+    {
+      "name": "android-runtime",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825917299/job/110251513418"
+    }
+  ],
+  "requiredChecks": {
+    "mainProtected": false,
+    "rulesets": [],
+    "statement": "No configured required checks at this observation; queued macOS jobs are not passes. Exact PR8 head web/backend and Android runtime jobs completed successfully."
+  },
+  "pr15HistoricalBranchFailure": {
+    "job": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626380",
+    "personallyRead": true,
+    "failure": "T11 observed30000 scoped statements versus historical branch expectation50000; 17/18 original backend cases pass.",
+    "mergedSource": "The accepted main/PR8 tree already retains the current30000 expectation and300000ms budget. W8 compared the exact file and performed no test/assertion/timeout edit; PR8 preserves the entire main backend/tests tree."
+  },
+  "openPullRequests": [
+    {
+      "headRefOid": "3639136ea5b312a555d7f3d94a9a4191c52b811f",
+      "isDraft": false,
+      "mergeStateStatus": "DIRTY",
+      "mergeable": "CONFLICTING",
+      "number": 2,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/2"
+    },
+    {
+      "headRefOid": "39f55d91b058738a2deaddfab8ad84e461d4e7f8",
+      "isDraft": true,
+      "mergeStateStatus": "DIRTY",
+      "mergeable": "CONFLICTING",
+      "number": 9,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/9"
+    }
+  ],
+  "wrap": {
+    "branch": "codex/w8-trust-handoff",
+    "sourceCommitBeforeReceipt": "d1e8318a987ef938c4dff65645ea81e5cdfa4aaf",
+    "applicationAndOperatorChanges": "Merged through PR7 and PR15; PR8 actual merge preserves W8 guards and operator. Subsequent branch-only changes are factual evidence/status records.",
+    "activeOwners": "Continue Workstream 7 integration and Complete W5 studio content were active in the read-only task inventory. Their checkouts/resources were not edited.",
+    "runtime": "Preserved W8 API4108 on a3e15ac/web3008/Postgres55438, database/private env/backups/jobs and native device data remain untouched in this final review.",
+    "remainingGates": "Full original R1\u2013R10 release, missing historical Growth encryption key, provider/retention/signing/hardware/pilot inputs and PR2/PR9 combined acceptance remain open.",
+    "paidCalls": 0,
+    "operatorObjectsAlreadyOnMain": {
+      "apps/backend/scripts/adopt-w5-migrations.ts": true,
+      "apps/backend/scripts/migration-custody.ts": true,
+      "apps/backend/scripts/migrate-trust.ts": true,
+      "infra/migrations/adoptions/w5-20260930.json": true,
+      "infra/migrations/history/0045_w5_reply_review.sql": true
+    },
+    "postMergeBranchOnlyRecords": "d1e8318 adds the PR15 merge receipt and documentation links; this continuation adds PR8 review/status. The runbook differs from merged main only by its PR15 merge-receipt paragraph."
+  },
+  "w5OwnerReportedFollowup": {
+    "attribution": "W5 owner message after this receipt; W8 did not operate or independently inspect the original upgrade",
+    "result": "Original adoption succeeded using published5d1adc8: all35 original ledger rows and281 rows across136 tables preserved,48 ledger rows total,40 canonical Already applied with no replay; fresh closed-traffic backup and independent restore retained privately.",
+    "next": "Original traffic remains closed while W5 reconciles PR9 against merged PR8/current main."
+  }
+}
