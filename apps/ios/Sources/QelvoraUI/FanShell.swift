@@ -111,6 +111,7 @@ public struct FanFeatureRegistration {
 
 public struct FanAppShell: View {
     @StateObject private var model: FanSession
+    @State private var destinationDelivery = UUID()
     private let features: [FanFeatureRegistration]
     @Environment(\.colorScheme) private var scheme
     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
@@ -126,7 +127,7 @@ public struct FanAppShell: View {
                     Button("Cancel", variant: .quiet) { model.choosingDevelopmentActor = false }
                 }.padding(16)
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
-                feature.screen(model)
+                feature.screen(model).id(model.destination + destinationDelivery.uuidString)
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil {
@@ -151,20 +152,21 @@ public struct FanAppShell: View {
                             #endif
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }
             }
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
             .task { await model.refresh(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if model.session != nil { await model.refresh() } } }
-            .task(id: model.destination) { await model.loadArrival() }
+            .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
                 guard (components.scheme == "qelvora" && components.host == "app") || (components.scheme == "https" && associationHost != nil && components.host == associationHost) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
                 model.open(target)
+                if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
     private var tab: FanTab { FanTab.allCases.first(where: { model.destination == "/" + $0.rawValue.lowercased() }) ?? .home }

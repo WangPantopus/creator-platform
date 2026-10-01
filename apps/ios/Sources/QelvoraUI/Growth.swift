@@ -175,6 +175,7 @@ public struct GrowthFanFeature: View {
   private let client: GrowthClient?
   private let destination: String
   private let signIn: (String) -> Void
+  private let navigate: ((String) -> Void)?
   @State private var route: String
   @State private var query = ""
   @State private var category = "For you"
@@ -204,12 +205,14 @@ public struct GrowthFanFeature: View {
   public init(
     baseURL: URL?, destination: String = "/discover",
     token: @escaping @Sendable () async throws -> String? = { try SecureSessionStorage().read() },
-    onSignIn: @escaping (String) -> Void = { _ in }
+    onSignIn: @escaping (String) -> Void = { _ in },
+    onNavigate: ((String) -> Void)? = nil
   ) {
     client = baseURL.map { GrowthClient(baseURL: $0, token: token) }
     self.destination = destination
     _route = State(initialValue: destination)
     signIn = onSignIn
+    navigate = onNavigate
   }
   public static func registration(baseURL: URL?) -> FanFeatureRegistration {
     FanFeatureRegistration(
@@ -225,7 +228,7 @@ public struct GrowthFanFeature: View {
             onSignIn: { target in
               session.open(target)
               Task { await session.beginSignIn() }
-            }
+            }, onNavigate: session.open
           ).id(session.destination))
       })
   }
@@ -254,7 +257,7 @@ public struct GrowthFanFeature: View {
             }
             ForEach(creators) { value in
               SwiftUI.Button {
-                route = "/creators/" + value.handle
+                open("/creators/" + value.handle)
               } label: {
                 creatorCard(value)
               }.buttonStyle(.plain)
@@ -264,7 +267,7 @@ public struct GrowthFanFeature: View {
             }
           } else if route == "/notifications" {
             Text(QelvoraCopy.text("growthNotifications")).qText("display-lg")
-            Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { route = "/notifications/settings" }
+            Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { open("/notifications/settings") }
             if notifications.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoUpdatesYet"), body: QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
             }
@@ -282,12 +285,12 @@ public struct GrowthFanFeature: View {
             HStack {
               Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($homeHeadingFocused)
               Spacer()
-              Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { route = "/notifications" }
+              Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { open("/notifications") }
             }
-            GrowthPostValuePrompt(client: client) { route = $0 }
+            GrowthPostValuePrompt(client: client) { open($0) }
             ForEach(home.entries) { entry in
               SwiftUI.Button {
-                route = entry.destination
+                open(entry.destination)
               } label: {
                 VStack(alignment: .leading, spacing: 8) {
                   Text(entry.creatorName).qText("title")
@@ -303,7 +306,7 @@ public struct GrowthFanFeature: View {
             }
             ForEach(home.posts, id: \.post.id) { update in
               SwiftUI.Button {
-                route = "/creators/" + update.creator.handle + "/posts/" + update.post.id
+                open("/creators/" + update.creator.handle + "/posts/" + update.post.id)
               } label: {
                 VStack(alignment: .leading, spacing: 8) {
                   Text(update.post.authorLabel).qText("label")
@@ -326,14 +329,14 @@ public struct GrowthFanFeature: View {
             if home.entries.isEmpty && home.posts.isEmpty {
               EmptyState(
                 title: QelvoraCopy.text(home.followingCount == 0 && homePostsCursor == nil && homeThreadsCursor == nil && home.nextThreadsCursor == nil ? "growthPickACreatorToStart" : "growthNoUpdatesYet"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
-              ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { route = "/discover" } }
+              ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { open("/discover") } }
             }
           } else if route.hasPrefix("/invite/"), let invitation {
             Seal(initial: String(invitation.creator.name.prefix(1)), size: 56)
             Text(QelvoraCopy.text("growthInvitedYouIn", values: ["name": invitation.creator.name])).qText("display-lg")
             Text(QelvoraCopy.text("growthAFirstConversationOfAbout24HoursNoCardNeeded")).qText("body")
             Button(QelvoraCopy.text("growthAcceptInvitation"), variant: .ai, block: true) {
-              route = invitation.destination
+              open(invitation.destination)
             }
           } else if route.hasPrefix("/share/"), let shared {
             if shared.state == "valid", let source = shared.source {
@@ -369,7 +372,7 @@ public struct GrowthFanFeature: View {
               ).qText("body")
               if let context = posts.first {
                 ContextCard(source: QelvoraCopy.text("growthFromAPost"), title: context.title) {
-                  route = "/creators/" + creator.handle + "/chat"
+                  open("/creators/" + creator.handle + "/chat")
                 }
               }
               Notice(
@@ -379,7 +382,7 @@ public struct GrowthFanFeature: View {
             } else if route.contains("/posts/") {
               HStack(spacing: 10) {
                 SwiftUI.Button {
-                  route = "/creators/" + creator.handle
+                  open("/creators/" + creator.handle)
                 } label: {
                   QelvoraGlyph(name: "back", color: qColor("ink", scheme))
                     .frame(width: 44, height: 44)
@@ -401,7 +404,7 @@ public struct GrowthFanFeature: View {
                     Text(QelvoraCopy.text("growthAskAboutThisPostTheContextStaysWithYourConversation"))
                       .qText("body").foregroundStyle(qColor("ink", scheme))
                     Button(QelvoraCopy.text("growthAskSAiAboutThis2", values: ["name": creator.name]), variant: .ai, block: true) {
-                      route = "/creators/" + creator.handle + "/chat?context=" + post.id
+                      open("/creators/" + creator.handle + "/chat?context=" + post.id)
                     }
                   }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                     .background(
@@ -421,7 +424,7 @@ public struct GrowthFanFeature: View {
               Button(
                 QelvoraCopy.text("messageAI", values: ["name": creator.name]), block: true,
                 disabled: creator.state != "published"
-              ) { route = "/creators/" + creator.handle + "/chat" }
+              ) { open("/creators/" + creator.handle + "/chat") }
               Button(
                 following ? QelvoraCopy.text("growthFollowingUnfollow") : QelvoraCopy.text("growthFollow"), variant: .secondary, block: true
               ) { Task { await follow(creator) } }
@@ -437,7 +440,7 @@ public struct GrowthFanFeature: View {
                 Text(QelvoraCopy.text("growthFrom3", values: ["name": creator.name])).qText("title")
                 ForEach(posts) { post in
                   SwiftUI.Button {
-                    route = "/creators/" + creator.handle + "/posts/" + post.id
+                    open("/creators/" + creator.handle + "/posts/" + post.id)
                   } label: {
                     VStack(alignment: .leading, spacing: 8) {
                       Text(post.authorLabel).qText("label")
@@ -482,7 +485,7 @@ public struct GrowthFanFeature: View {
       if !hasSession {
         TabBar(active: route == "/discover" ? .discover : .home) { tab in
           if tab == .home || tab == .discover {
-            route = "/" + tab.rawValue.lowercased()
+            open("/" + tab.rawValue.lowercased())
           } else {
             signIn("/" + tab.rawValue.lowercased())
           }
@@ -496,6 +499,9 @@ public struct GrowthFanFeature: View {
     #if os(iOS)
     .sheet(item: $replyExport) { artifact in GrowthReplyShareSheet(artifact: artifact) }
     #endif
+  }
+  private func open(_ target: String) {
+    if let navigate { navigate(target) } else { route = target }
   }
   private func creatorCard(_ value: GrowthCreator) -> some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -668,7 +674,7 @@ public struct GrowthFanFeature: View {
       struct Ack: Decodable { let read: Bool }
       let _: Ack = try await client.request(
         "notifications/" + item.id + "/read", method: "PUT", body: Data("{}".utf8))
-      route = item.destination
+      open(item.destination)
     } catch { if !Task.isCancelled { record(error) } }
   }
 }

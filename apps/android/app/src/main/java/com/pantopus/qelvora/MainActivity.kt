@@ -16,6 +16,7 @@ import com.pantopus.qelvora.identity.fanFeatures
 
 class MainActivity : ComponentActivity() {
     private val destination = mutableStateOf("/home")
+    private val destinationDelivery = mutableStateOf(0L)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         destination.value = returnTarget(intent)
@@ -31,11 +32,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
             QelvoraTheme(night = night) {
-                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured))
+                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value)
             }
         }
     }
-    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); destination.value = returnTarget(intent) }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent); setIntent(intent)
+        // A launcher return keeps the user's current screen. Every explicit
+        // link is a new delivery, even when its target equals the last link.
+        val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
+        if (!launcherResume) {
+            destination.value = returnTarget(intent)
+            destinationDelivery.value++
+        }
+    }
     private fun returnTarget(intent: Intent): String {
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"
