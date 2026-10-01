@@ -222,6 +222,19 @@ export class ContentService {
     creatorId: string,
     permitted: string[] = [],
   ) {
+    // Current W5 role locks match W1 invitation/removal order and survive the
+    // domain commit. Holding a team grant never confers creator authority.
+    await client.query(
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+      [creatorId, actor.accountId],
+    );
+    await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      `team:${creatorId}:${actor.accountId}`,
+    ]);
+    await client.query(
+      "SELECT roles FROM creator.team_membership WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL FOR SHARE",
+      [creatorId, actor.accountId],
+    );
     const row = (
       await client.query<{
         display_name: string;

@@ -100,6 +100,15 @@ export function studioFeature(service: StudioService): FeatureRegistration {
           await service.team(await actorFor(req), id(req.params.creatorId)),
         ),
       );
+      router.get("/:creatorId/threads", async (req, res) =>
+        res.json(
+          await service.threadEntries(
+            await actorFor(req),
+            id(req.params.creatorId),
+            req.query,
+          ),
+        ),
+      );
       router.get("/:creatorId/threads/:fanId", async (req, res) =>
         res.json(
           await service.thread(

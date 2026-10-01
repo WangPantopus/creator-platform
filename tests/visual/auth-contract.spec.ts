@@ -1,6 +1,7 @@
+import { visualWebURL } from "../../playwright.config";
 import { expect, test } from "@playwright/test";
 
-const origin = "http://localhost:3000";
+const origin = visualWebURL;
 const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",
@@ -10,6 +11,7 @@ const invalidPaths = [
   "/creators/maya/nested\tdraft",
   "/creators/maya/nested\r\ndraft",
   "/" + "x".repeat(2048),
+  "/creators/maya/requests?draft=" + "x".repeat(1200),
 ];
 
 function authURL(path: string, returnTo: string) {

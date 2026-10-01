@@ -12,6 +12,7 @@ import {
   AuthorLabel,
   Button,
   CitationChip,
+  Correction,
   IdentityStrip,
   Message,
   Notice,
@@ -22,7 +23,7 @@ import type {
   ConversationMessage,
   ConversationPage,
 } from "../../../../packages/api/src/conversation/contracts";
-import { conversationRequest, ConversationError } from "./api";
+import { useConversationRequest, ConversationError } from "./api";
 import { formatCopy } from "@qelvora/copy";
 import "./conversation.css";
 
@@ -34,6 +35,7 @@ type Pending = {
   state: "pending" | "uncertain" | "rejected";
 };
 function author(message: ConversationMessage, name: string) {
+  if (message.correction) return formatCopy("correctionAuthor", { name });
   switch (message.authorKind) {
     case "fan":
       return "You";
@@ -65,10 +67,11 @@ export function ConversationScreen({
   fanId: string;
   accountId: string;
 }) {
+  const request = useConversationRequest();
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = useState(false);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
@@ -85,7 +88,7 @@ export function ConversationScreen({
   const refresh = useCallback(async () => {
     const revision = lifecycle.current;
     try {
-      const fresh = await conversationRequest<ConversationPage>(root);
+      const fresh = await request<ConversationPage>(root);
       if (!mounted.current || lifecycle.current !== revision) return;
       // A delayed HTTP response cannot put an earlier author boundary back on screen.
       if (current.current && fresh.cursor < current.current.cursor) return;
@@ -97,6 +100,7 @@ export function ConversationScreen({
         fresh.generationSequences,
       );
       setPage(fresh);
+      setOnline(navigator.onLine);
       setFailure(null);
       setBefore((value) => value ?? fresh.before);
       sessionStorage.setItem(
@@ -105,8 +109,9 @@ export function ConversationScreen({
       );
       const item = latestPending.current;
       if (item) {
-        const result = await conversationRequest<{ accepted: boolean }>(
-          `${root}/messages/status/${item.key}`,
+        const result = await request<{ accepted: boolean }>(
+          `${root}/messages/status`,
+          { idempotencyKey: item.key },
         );
         if (
           result.accepted &&
@@ -120,6 +125,7 @@ export function ConversationScreen({
       }
     } catch (error) {
       if (!mounted.current || lifecycle.current !== revision) return;
+      setOnline(false);
       if (
         error instanceof ConversationError &&
         [401, 403, 404].includes(error.status)
@@ -138,7 +144,7 @@ export function ConversationScreen({
           : "This conversation is unavailable.",
       );
     }
-  }, [root, cursorKey]);
+  }, [root, cursorKey, request]);
 
   useEffect(() => {
     mounted.current = true;
@@ -200,16 +206,21 @@ export function ConversationScreen({
       if (disposed || connecting || !navigator.onLine) return;
       connecting = true;
       clearTimeout(reconnect);
+      reconnect = undefined;
       const previous = socket;
       socket = undefined;
       previous?.close();
       await orderedRefresh();
       if (disposed || !current.current) {
         connecting = false;
+        if (!disposed) {
+          reconnect = setTimeout(() => void connect(), delay);
+          delay = Math.min(delay * 2, 15000);
+        }
         return;
       }
       try {
-        const ticket = await conversationRequest<{
+        const ticket = await request<{
           ticket: string;
           url: string;
         }>("realtime-ticket", {});
@@ -221,7 +232,6 @@ export function ConversationScreen({
         socket = liveSocket;
         socket.onopen = () => {
           delay = 1000;
-          setOnline(true);
           socket?.send(
             JSON.stringify({
               kind: "subscribe",
@@ -252,7 +262,7 @@ export function ConversationScreen({
         };
         socket.onclose = () => {
           if (disposed || socket !== liveSocket) return;
-          setOnline(navigator.onLine);
+          setOnline(false);
           reconnect = setTimeout(() => void connect(), delay);
           delay = Math.min(delay * 2, 15000);
         };
@@ -271,19 +281,27 @@ export function ConversationScreen({
       socket?.close();
     };
     const resume = () => {
-      setOnline(true);
+      setOnline(false);
       clearTimeout(reconnect);
       socket?.close();
       void connect();
     };
     window.addEventListener("offline", offline);
     window.addEventListener("online", resume);
+    const visible = () => {
+      if (document.visibilityState === "visible" && navigator.onLine) {
+        if (!socket || socket.readyState === WebSocket.CLOSED) void connect();
+        else void orderedRefresh();
+      }
+    };
+    document.addEventListener("visibilitychange", visible);
+    window.addEventListener("focus", visible);
     // Polling recovers gaps and non-stream metadata. Only a freshly scoped snapshot is rendered.
     const poll = setInterval(() => {
       if (navigator.onLine && document.visibilityState === "visible")
         void orderedRefresh();
     }, 5000);
-    setOnline(navigator.onLine);
+    setOnline(false);
     void connect();
     return () => {
       disposed = true;
@@ -294,15 +312,17 @@ export function ConversationScreen({
       clearInterval(poll);
       window.removeEventListener("offline", offline);
       window.removeEventListener("online", resume);
+      document.removeEventListener("visibilitychange", visible);
+      window.removeEventListener("focus", visible);
       current.current = null;
       gate.current = null;
     };
-  }, [accountId, creatorId, fanId, cursorKey, refresh]);
+  }, [accountId, creatorId, fanId, cursorKey, refresh, request]);
   useEffect(() => {
     const clientId = crypto.randomUUID();
     const pulse = () => {
       if (current.current)
-        void conversationRequest(`${root}/presence`, {
+        void request(`${root}/presence`, {
           clientId,
           active: navigator.onLine && document.visibilityState === "visible",
         }).catch(() => undefined);
@@ -316,16 +336,16 @@ export function ConversationScreen({
       document.removeEventListener("visibilitychange", pulse);
       window.removeEventListener("online", pulse);
       if (navigator.onLine)
-        void conversationRequest(`${root}/presence`, {
+        void request(`${root}/presence`, {
           clientId,
           active: false,
         }).catch(() => undefined);
     };
-  }, [root, accountId, page?.threadId]);
+  }, [root, accountId, page?.threadId, request]);
 
   const send = async (retry?: Pending) => {
     const revision = lifecycle.current;
-    if (!navigator.onLine || busy || !page) return;
+    if (!navigator.onLine || !online || busy || !page) return;
     const text = retry?.text ?? draft.trim();
     if (!text) return;
     const item: Pending = retry ?? {
@@ -339,10 +359,11 @@ export function ConversationScreen({
     setBusy(true);
     setFailure(null);
     try {
-      await conversationRequest<AcceptedMessage>(
-        `${root}/${item.destination}`,
-        { text, idempotencyKey: item.key, clientSequence: item.clientSequence },
-      );
+      await request<AcceptedMessage>(`${root}/${item.destination}`, {
+        text,
+        idempotencyKey: item.key,
+        clientSequence: item.clientSequence,
+      });
       if (!mounted.current || lifecycle.current !== revision) return;
       setPending(null);
       if (!retry) setDraft("");
@@ -370,7 +391,7 @@ export function ConversationScreen({
     const height = document.documentElement.scrollHeight;
     setBusy(true);
     try {
-      const previous = await conversationRequest<ConversationPage>(
+      const previous = await request<ConversationPage>(
         `${root}?before=${before}`,
       );
       if (!mounted.current || lifecycle.current !== revision) return;
@@ -400,10 +421,9 @@ export function ConversationScreen({
     const revision = lifecycle.current;
     setBusy(true);
     try {
-      await conversationRequest(
-        `${root}/messages/${message.id}/dont-remember`,
-        { expectedRevision: page.revision },
-      );
+      await request(`${root}/messages/${message.id}/dont-remember`, {
+        expectedRevision: page.revision,
+      });
       if (mounted.current && lifecycle.current === revision) await refresh();
     } catch (error) {
       if (mounted.current && lifecycle.current === revision)
@@ -411,6 +431,51 @@ export function ConversationScreen({
           error instanceof Error
             ? error.message
             : "This memory change is unavailable.",
+        );
+    } finally {
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
+    }
+  };
+  const feedback = async (
+    message: ConversationMessage,
+    rating: "helpful" | "not_helpful" | null,
+  ) => {
+    if (
+      busy ||
+      !online ||
+      !message.agentVersion ||
+      (rating !== null && !page?.feedbackPolicy)
+    )
+      return;
+    const revision = lifecycle.current;
+    setBusy(true);
+    try {
+      const result = await request<{
+        rating: "helpful" | "not_helpful" | null;
+      }>(`${root}/messages/${message.id}/feedback`, {
+        messageVersion: message.version,
+        agentVersion: message.agentVersion,
+        rating,
+        ...(rating !== null
+          ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
+          : {}),
+      });
+      if (mounted.current && lifecycle.current === revision) {
+        setOlder((items) =>
+          items.map((item) =>
+            item.id === message.id && item.version === message.version
+              ? { ...item, feedback: result.rating }
+              : item,
+          ),
+        );
+        await refresh();
+      }
+    } catch (error) {
+      if (mounted.current && lifecycle.current === revision)
+        setFailure(
+          error instanceof Error
+            ? error.message
+            : "Your response could not be saved. Try again.",
         );
     } finally {
       if (mounted.current && lifecycle.current === revision) setBusy(false);
@@ -466,7 +531,7 @@ export function ConversationScreen({
           </div>
           <a
             className="qv-icon-btn"
-            href={`/you?creator=${creatorId}&fan=${fanId}`}
+            href={`/you?creatorId=${creatorId}&fanId=${fanId}`}
             aria-label="Conversation privacy"
           >
             ⋯
@@ -523,6 +588,25 @@ export function ConversationScreen({
           >
             {message.authorKind === "system" ? (
               <SystemLine>{message.text}</SystemLine>
+            ) : message.correction &&
+              all.some(
+                (original) =>
+                  original.id === message.correction?.originalMessageId &&
+                  original.version === message.correction.originalVersion &&
+                  original.authorKind === "ai",
+              ) ? (
+              <Correction
+                name={page.creatorName}
+                aiText={
+                  all.find(
+                    (original) =>
+                      original.id === message.correction?.originalMessageId,
+                  )!.text
+                }
+                signedActId={message.signedActId ?? undefined}
+              >
+                {message.text}
+              </Correction>
             ) : [
                 "fan",
                 "ai",
@@ -544,6 +628,7 @@ export function ConversationScreen({
                 signedActId={message.signedActId ?? undefined}
                 actions={false}
                 live={
+                  !message.correction &&
                   message.authorKind === "human_creator" &&
                   page.control === "human_active"
                 }
@@ -570,6 +655,21 @@ export function ConversationScreen({
                 }
               >
                 <span style={{ whiteSpace: "pre-wrap" }}>{message.text}</span>
+                {message.correction && (
+                  <div>
+                    <span>
+                      {formatCopy("correctionAuthor", {
+                        name: page.creatorName,
+                      })}
+                    </span>
+                    <a
+                      href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
+                    >
+                      Original AI reply · version{" "}
+                      {message.correction.originalVersion}
+                    </a>
+                  </div>
+                )}
                 {message.deliveryState === "failed" && (
                   <span className="qv-tag">
                     Reply unavailable · your allowance was released
@@ -578,18 +678,21 @@ export function ConversationScreen({
               </Message>
             ) : (
               <div className="qv qv-msg">
-                <AuthorLabel
-                  kind={
-                    message.authorKind === "human_broadcast"
-                      ? "human_broadcast"
-                      : message.authorKind === "human_reaction"
-                        ? "human_reaction"
-                        : "human_creator"
-                  }
-                  name={page.creatorName}
-                  member={message.member ?? "Authorized team member"}
-                  audience="Audience details unavailable"
-                />
+                {message.authorKind === "human_call" ? (
+                  <span className="qv-author">
+                    {formatCopy("callAuthor", { name: page.creatorName })}
+                  </span>
+                ) : (
+                  <AuthorLabel
+                    kind={
+                      message.authorKind === "human_broadcast"
+                        ? "human_broadcast"
+                        : "human_reaction"
+                    }
+                    name={page.creatorName}
+                    audience="Audience details unavailable"
+                  />
+                )}
                 <p className="qv-voice" style={{ whiteSpace: "pre-wrap" }}>
                   {message.text}
                 </p>
@@ -613,6 +716,56 @@ export function ConversationScreen({
                   Don’t remember this
                 </button>
               ))}
+            {message.authorKind === "ai" &&
+              message.agentVersion &&
+              ["delivered", "interrupted"].includes(message.deliveryState) &&
+              page.feedbackPolicy && (
+                <details className="conversation-feedback">
+                  <summary>{formatCopy("thisHelped", {})}</summary>
+                  <p className="qv-help">{page.feedbackPolicy.notice}</p>
+                  <div className="conversation-actions">
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "helpful"}
+                      onClick={() => void feedback(message, "helpful")}
+                    >
+                      {formatCopy("thisHelped", {})}
+                    </button>
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "not_helpful"}
+                      onClick={() => void feedback(message, "not_helpful")}
+                    >
+                      Not helpful
+                    </button>
+                    {message.feedback && (
+                      <button
+                        className="qv-link-btn"
+                        disabled={busy || !online}
+                        onClick={() => void feedback(message, null)}
+                      >
+                        Remove my response
+                      </button>
+                    )}
+                  </div>
+                  {message.feedback && (
+                    <p className="qv-help" role="status">
+                      Your response is saved.
+                    </p>
+                  )}
+                </details>
+              )}
+            {message.feedback && !page.feedbackPolicy && (
+              <button
+                className="qv-link-btn"
+                disabled={busy || !online}
+                onClick={() => void feedback(message, null)}
+              >
+                Remove my response
+              </button>
+            )}
             {message.authorKind !== "fan" &&
               message.authorKind !== "system" && (
                 <div className="conversation-actions">
@@ -624,7 +777,7 @@ export function ConversationScreen({
                   </a>
                   <a
                     className="qv-link-btn"
-                    href={`/you?creator=${creatorId}&fan=${fanId}#memory`}
+                    href={`/you?creatorId=${creatorId}&fanId=${fanId}#memory`}
                   >
                     What it remembers
                   </a>
@@ -741,7 +894,9 @@ export function ConversationScreen({
           Ask {page.creatorName} to step in
         </Button>
         <div className="conversation-actions">
-          <a href={`/you?creator=${creatorId}&fan=${fanId}`}>Me and privacy</a>
+          <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>
+            Me and privacy
+          </a>
           <a href="/trust/crisis">Get support</a>
         </div>
       </footer>

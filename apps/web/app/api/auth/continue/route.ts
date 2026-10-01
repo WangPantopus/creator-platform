@@ -17,7 +17,25 @@ export async function GET(request: NextRequest) {
     query.getAll("returnTo").length <= 1 &&
     ![...query.keys()].some((key) => key !== "returnTo");
   const returnTo = valid && context.success ? context.data.returnTo : "/home";
-  const target = new URL("/auth/continue", applicationOrigin(request));
+  let target: URL;
+  try {
+    if (
+      process.env.NODE_ENV === "production" &&
+      !(process.env.QELVORA_PUBLIC_ORIGIN ?? process.env.WEB_ORIGIN)
+    )
+      throw new Error("Application origin is not configured");
+    target = new URL("/auth/continue", applicationOrigin(request));
+  } catch {
+    return NextResponse.json(
+      {
+        error: {
+          code: "identity_unconfigured",
+          message: "Pantopus sign-in is temporarily unavailable. Try again.",
+        },
+      },
+      { status: 503 },
+    );
+  }
   target.searchParams.set("returnTo", returnTo);
   if (!valid) {
     target.searchParams.set("error", "invalid_return");

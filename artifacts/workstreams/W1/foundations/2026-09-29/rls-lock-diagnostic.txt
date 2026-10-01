@@ -1,0 +1,9 @@
+2026-09-29 W1 operational RLS diagnostic; isolated creator_w1, rollback-only transaction.
+Synthetic diagnostic profiles/triage/thread were inserted only inside that transaction. These are SQL diagnostics, not creator proof/provider or app-journey acceptance.
+Non-owner creator_runtime with unchanged FORCE RLS:
+Original fan joined FOR SHARE OF t,c,f:0 rows.
+Repaired thread-only join lock:1 row. Owned fan lock:1 row.
+Explicit current verified creator owner-scope lock:1 row.
+Request account restored before triage membership lock: true; triage membership:1 row.
+ROLLBACK completed; remaining diagnostic creator profiles:0.
+No content read, grants widened, policies changed or migration applied. Full W8 denial/race and real client role journeys remain unverified.

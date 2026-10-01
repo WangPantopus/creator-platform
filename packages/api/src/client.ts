@@ -5,7 +5,6 @@ import {
   HumanReplySchema,
   MessageSchema,
   SendMessageSchema,
-  ThreadTimelineSchema,
   IdentityCapabilitiesSchema,
   IdentityContinueSchema,
   IdentityRedirectSchema,
@@ -17,7 +16,6 @@ import {
   type Frame,
   type Health,
   type Message,
-  type ThreadTimeline,
 } from "./schemas.ts";
 import type { z } from "zod";
 import {
@@ -36,6 +34,12 @@ import {
   PasskeyRevocationSchema,
   PublicSignatureSchema,
 } from "./identity.ts";
+import {
+  ConversationTimelineSchema,
+  ConversationRecordingInputSchema,
+  ConversationRecordingResultSchema,
+  type ConversationTimeline,
+} from "./conversation/contracts.ts";
 
 export class CreatorApiClient {
   constructor(
@@ -170,8 +174,11 @@ export class CreatorApiClient {
       false,
     );
   }
-  readThread(creatorId: string, fanId: string): Promise<ThreadTimeline> {
-    return this.request(this.thread(creatorId, fanId), ThreadTimelineSchema);
+  readThread(creatorId: string, fanId: string): Promise<ConversationTimeline> {
+    return this.request(
+      this.thread(creatorId, fanId),
+      ConversationTimelineSchema,
+    );
   }
   sendMessage(
     creatorId: string,
@@ -215,6 +222,17 @@ export class CreatorApiClient {
       `${this.thread(creatorId, fanId)}/human-replies`,
       MessageSchema,
       HumanReplySchema.parse(body),
+    );
+  }
+  deliverConversationRecording(
+    creatorId: string,
+    fanId: string,
+    body: z.input<typeof ConversationRecordingInputSchema>,
+  ) {
+    return this.request(
+      `/v1/conversations/${encodeURIComponent(creatorId)}/${encodeURIComponent(fanId)}/recordings`,
+      ConversationRecordingResultSchema,
+      ConversationRecordingInputSchema.parse(body),
     );
   }
   private thread(creatorId: string, fanId: string): string {

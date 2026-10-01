@@ -37,13 +37,10 @@ export function approvedConversationGenerator(input: {
                 return true;
               },
               async requestConsentOnce(_scope, item) {
-                // W2's current sensitive proposal contract lacks semanticKey/kind.
-                // Preserve exact item consent; conservative exclusion handling still
-                // prevents re-extraction until W2 provides canonical semantic metadata.
                 proposals.push({
-                  kind: "fact",
+                  kind: item.kind,
                   text: item.text,
-                  semanticKey: item.itemHash,
+                  semanticKey: item.semanticKey,
                   provenanceMessageId: item.provenanceMessageId,
                   expectedRevision: item.expectedRevision,
                   sensitiveCategory: item.category,

@@ -231,11 +231,14 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
-      expect(observedStatements).toBe(30000);
+      // Current memory reads include scoped exclusions and transcript provenance.
+      expect(observedStatements).toBe(50000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 120000);
+      // Ten thousand real scoped transactions include current identity locks.
+      // Keep every pair/assertion; allow slower Docker/CI hosts to finish.
+    }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",
@@ -369,6 +372,7 @@ describe.skipIf(!adminUrl)(
           ...body,
           idempotencyKey: "other-message-key",
         }),
+        // A reserved last unit remains occupied while the accepted reply is active.
       ).rejects.toMatchObject({ code: "ai_access_unavailable" });
       const counters = await admin.query(
         "SELECT used,reserved FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2",

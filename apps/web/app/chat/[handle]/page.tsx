@@ -1,21 +1,21 @@
 import { Notice } from "@qelvora/ui-web";
-import { currentSession } from "../../../lib/session";
-import { IdentityWelcome } from "../../../features/identity/welcome";
-import { growthRequest } from "../../../features/growth/server";
-import type { Creator } from "../../../features/growth/types";
-import { ConsentScreen } from "../../../features/conversation/ConsentScreen";
+import { ReturnTargetSchema } from "@qelvora/api";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 
-/** W3-owned entry; W7 can compose ConsentScreen in its contextual destination. */
+/** Older links retain every arrival input at the canonical session boundary. */
 export default async function ConversationEntry({
   params,
+  searchParams,
 }: {
   params: Promise<{ handle: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { handle } = await params;
-  if (!/^[a-zA-Z0-9_-]{1,100}$/u.test(handle))
+  const destination = `/creators/${handle}/chat`;
+  if (!ReturnTargetSchema.safeParse(destination).success)
     return (
       <main>
         <Notice title="Creator unavailable">
@@ -23,29 +23,13 @@ export default async function ConversationEntry({
         </Notice>
       </main>
     );
-  const session = await currentSession();
-  if (!session)
-    return <IdentityWelcome returnTo={`/chat/${handle}`} arrival={null} />;
-  try {
-    const { creator } = await growthRequest<{ creator: Creator }>(
-      `public/creators/${encodeURIComponent(handle)}`,
-    );
-    return (
-      <ConsentScreen
-        key={`${session.accountId}:${creator.id}`}
-        creatorId={creator.id}
-        name={creator.name}
-        backHref={`/creators/${encodeURIComponent(handle)}`}
-      />
-    );
-  } catch {
-    return (
-      <main className="conversation-consent">
-        <Notice title="Creator unavailable">
-          Reconnect to open the creator's current profile.
-        </Notice>
-        <a href="/discover">Discover</a>
-      </main>
-    );
-  }
+  const query = new URLSearchParams();
+  for (const [name, values] of Object.entries(await searchParams))
+    for (const value of values === undefined
+      ? []
+      : Array.isArray(values)
+        ? values
+        : [values])
+      query.append(name, value);
+  redirect(`${destination}${query.size ? `?${query}` : ""}`);
 }

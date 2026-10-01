@@ -26,14 +26,15 @@ import {
   Sidebar,
   StudioTabBar,
 } from "@qelvora/ui-web";
-import type { SignedActCommand } from "@qelvora/api";
+import { validReturnTarget, type SignedActCommand } from "@qelvora/api";
 import type {
   ContentBody,
   ContentView,
   PrivateNoteReply,
 } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
-import { studioRequest } from "./api";
+import { configureStudioRequests, StudioFailure, studioRequest } from "./api";
+import { useIdentityRequest } from "../identity/session-boundary";
 import "./studio.css";
 
 type Creator = {
@@ -153,6 +154,21 @@ export function Studio({
   creatorId?: string;
   screen?: string[];
 }) {
+  const { session, signal } = useIdentityRequest();
+  useEffect(
+    () => configureStudioRequests({ accountId: session.accountId, signal }),
+    [session.accountId, signal],
+  );
+  const requestedPath = creatorId
+    ? `/studio/${creatorId}/${screen.join("/") || "notes"}`
+    : "/studio/workspace";
+  const [returnTo, setReturnTo] = useState(
+    validReturnTarget(requestedPath) ? requestedPath : "/studio/workspace",
+  );
+  useEffect(() => {
+    const current = location.pathname + location.search;
+    setReturnTo(validReturnTarget(current) ? current : "/studio/workspace");
+  }, [requestedPath]);
   const [creators, setCreators] = useState<Creator[]>([]),
     [creator, setCreator] = useState<Creator | null>(null),
     [invitations, setInvitations] = useState<
@@ -165,9 +181,19 @@ export function Studio({
       }[]
     >([]),
     [error, setError] = useState(""),
+    [suspended, setSuspended] = useState(false),
+    [freshUntil, setFreshUntil] = useState(0),
     [loading, setLoading] = useState(true);
   const generation = useRef(0),
+    reconnectButton = useRef<HTMLButtonElement>(null),
+    previousFocus = useRef<HTMLElement | null>(null),
     router = useRouter();
+  const conceal = useCallback(() => {
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && focused.closest(".w5-studio"))
+      previousFocus.current = focused;
+    setSuspended(true);
+  }, []);
   const refresh = useCallback(async () => {
     const current = ++generation.current;
     setLoading(true);
@@ -181,18 +207,45 @@ export function Studio({
       setCreators(result.creators);
       setInvitations(result.invitations);
       setCreator(result.creators.find((c) => c.id === creatorId) ?? null);
+      setFreshUntil(Date.now() + 5000);
+      setSuspended(false);
     } catch (failure) {
       if (current !== generation.current) return;
       setCreators([]);
       setInvitations([]);
-      setCreator(null);
+      const unavailable =
+        failure instanceof StudioFailure && failure.status >= 500;
+      // A transport outage cannot prove role removal. Keep the mounted view's
+      // input in memory, but conceal it and disable interaction until the same
+      // account's current authority is confirmed. Explicit denial clears it.
+      if (unavailable) {
+        conceal();
+      } else {
+        setCreator(null);
+        setFreshUntil(0);
+        previousFocus.current = null;
+      }
+      setSuspended(unavailable);
       setError(
         failure instanceof Error ? failure.message : "Studio is unavailable.",
       );
     } finally {
       if (current === generation.current) setLoading(false);
     }
-  }, [creatorId]);
+  }, [conceal, creatorId]);
+  useEffect(() => {
+    if (!creator || !freshUntil) return;
+    // A slow role request cannot extend the last successful authority check.
+    const timer = setTimeout(conceal, Math.max(0, freshUntil - Date.now()));
+    return () => clearTimeout(timer);
+  }, [conceal, creator, freshUntil]);
+  useEffect(() => {
+    if (suspended) reconnectButton.current?.focus();
+    else if (previousFocus.current?.isConnected) {
+      previousFocus.current.focus();
+      previousFocus.current = null;
+    }
+  }, [suspended]);
   useEffect(() => {
     void refresh();
     return () => {
@@ -245,7 +298,7 @@ export function Studio({
         )}
         {loading ? (
           <p role="status">Loading your current roles…</p>
-        ) : creators.length ? (
+        ) : error ? null : creators.length ? (
           creators.map((c) => (
             <Link key={c.id} className="w5-card" href={`/studio/${c.id}/notes`}>
               {c.display_name}
@@ -291,7 +344,7 @@ export function Studio({
             </button>
           </article>
         ))}
-        <Link href="/auth/continue?returnTo=%2Fhome">
+        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
           Continue with Pantopus
         </Link>
         <Link href="/studio/setup">Creator setup</Link>
@@ -310,86 +363,110 @@ export function Studio({
           {error || "Your current account has no role in this Studio."}
         </Notice>
         <Link href="/studio/workspace">Choose your Studio</Link>
-        <Link href="/auth/continue?returnTo=%2Fhome">
+        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
           Continue with Pantopus
         </Link>
       </main>
     );
   return (
-    <div
-      key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
-      className="qv w5-studio"
-    >
-      <aside className="w5-sidebar">
-        {navigationTree(
-          Sidebar({
-            name: creator.display_name,
-            active,
-            status: creator.owned
-              ? "Creator workspace"
-              : `Team · ${creator.roles.join(", ")}`,
-          }),
-          href,
-        )}
-      </aside>
-      <div className="w5-main">
-        <div className="w5-account">
-          <Link href="/studio/workspace">{brand.studioName}</Link>
-          <span>
-            {creator.owned
-              ? creator.display_name
-              : `Team · ${creator.roles.join(", ")}`}
-          </span>
+    <>
+      {suspended && (
+        <main className="qv w5-entry">
+          <Notice tone="error" title="Reconnect to Studio">
+            Your input is kept in this tab. Studio is hidden until your current
+            account and roles can be checked again.
+          </Notice>
           <button
+            ref={reconnectButton}
             type="button"
-            className="qv-link-btn"
+            disabled={loading}
             onClick={() => void refresh()}
           >
-            Refresh role
+            Check connection and roles
           </button>
-        </div>
-        {error && (
-          <Notice tone="error" title="Connection status">
-            {error}
-          </Notice>
-        )}
-        {current === "compose" ? (
-          <Compose
-            creator={creator}
-            id={screen[1]}
-            onDone={() => router.push(`${root}/notes`)}
-          />
-        ) : current === "notes" ? (
-          <Notes creator={creator} />
-        ) : current === "requests" ? (
-          <Requests creator={creator} />
-        ) : current === "packets" && screen[1] ? (
-          <PacketDetail creator={creator} id={screen[1]} />
-        ) : current === "publish" ? (
-          <Library creator={creator} />
-        ) : current === "team" ? (
-          <Team creator={creator} />
-        ) : current === "threads" ? (
-          <Threads creator={creator} fanId={screen[1]} />
-        ) : current === "thanks" ? (
-          <ThanksFeed creator={creator} />
-        ) : (
-          <More creator={creator} />
-        )}
-      </div>
-      <div className="w5-tabs">
-        {navigationTree(
-          StudioTabBar({
-            active: ["Notes", "Requests", "Threads", "My AI", "More"].includes(
+        </main>
+      )}
+      <div
+        key={`${creator.id}:${creator.viewerAccountId}:${creator.roles.join()}`}
+        className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
+        hidden={suspended}
+        inert={suspended}
+      >
+        <aside className="w5-sidebar">
+          {navigationTree(
+            Sidebar({
+              name: creator.display_name,
               active,
-            )
-              ? (active as "Notes")
-              : "More",
-          }),
-          href,
-        )}
+              status: creator.owned
+                ? "Creator workspace"
+                : `Team · ${creator.roles.join(", ")}`,
+            }),
+            href,
+          )}
+        </aside>
+        <main className="w5-main">
+          <div className="w5-account">
+            <Link href="/studio/workspace">{brand.studioName}</Link>
+            <span>
+              {creator.owned
+                ? creator.display_name
+                : `Team · ${creator.roles.join(", ")}`}
+            </span>
+            <button
+              type="button"
+              className="qv-link-btn"
+              onClick={() => void refresh()}
+            >
+              Refresh role
+            </button>
+          </div>
+          {error && (
+            <Notice tone="error" title="Connection status">
+              {error}
+            </Notice>
+          )}
+          {current === "compose" ? (
+            <Compose
+              creator={creator}
+              id={screen[1]}
+              onDone={() => router.push(`${root}/notes`)}
+            />
+          ) : current === "notes" ? (
+            <Notes creator={creator} />
+          ) : current === "requests" ? (
+            <Requests creator={creator} />
+          ) : current === "packets" && screen[1] ? (
+            <PacketDetail creator={creator} id={screen[1]} />
+          ) : current === "publish" ? (
+            <Library creator={creator} />
+          ) : current === "team" ? (
+            <Team creator={creator} />
+          ) : current === "threads" ? (
+            <Threads creator={creator} fanId={screen[1]} />
+          ) : current === "thanks" ? (
+            <ThanksFeed creator={creator} />
+          ) : (
+            <More creator={creator} />
+          )}
+        </main>
+        <div className="w5-tabs">
+          {navigationTree(
+            StudioTabBar({
+              active: [
+                "Notes",
+                "Requests",
+                "Threads",
+                "My AI",
+                "More",
+              ].includes(active)
+                ? (active as "Notes")
+                : "More",
+            }),
+            href,
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 function useAction() {
@@ -420,7 +497,7 @@ function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
   return (
     <>
       {action.error && (
-        <div role="alert">
+        <div>
           <Notice tone="error" title="Action status">
             {action.error}
           </Notice>
@@ -503,7 +580,8 @@ function Notes({ creator }: { creator: Creator }) {
             </div>
           ))}
         {!notes.items.some((n) => n.document.kind === "note") &&
-          !action.busy && (
+          !action.busy &&
+          !action.error && (
             <EmptyState
               title="Your first Note"
               body="Write one Note for your audience. Each fan's reply stays private."
@@ -513,7 +591,12 @@ function Notes({ creator }: { creator: Creator }) {
       <div className="w5-replies">
         <div className="w5-replies-title">
           <span className="qv-meta">
-            REPLIES · {replies.items.length}
+            REPLIES ·{" "}
+            {action.busy
+              ? "loading"
+              : action.error
+                ? "unavailable"
+                : replies.items.length}
             {replies.nextCursor ? "+" : ""}
           </span>
           <span className="qv-help">
@@ -574,7 +657,7 @@ function Notes({ creator }: { creator: Creator }) {
             More replies
           </button>
         )}
-        {!replies.items.length && !action.busy && (
+        {!replies.items.length && !action.busy && !action.error && (
           <p className="qv-help">
             Private replies appear here when fans reply to a published Note.
           </p>
@@ -707,6 +790,14 @@ function Compose({
     draftId = useRef<string | null>(null),
     operation = useRef<{ body: string; key: string } | null>(null);
   const pendingStorage = `w5.pendingPublication:${creator.viewerAccountId}:${creator.id}`;
+  const verificationReady = creator.verification === "verified";
+  const canDraft =
+    verificationReady &&
+    (creator.owned ||
+      creator.roles.includes("drafter") ||
+      creator.roles.includes("publisher"));
+  const canPublish =
+    verificationReady && (creator.owned || creator.roles.includes("publisher"));
   const clearPending = () => {
     sessionStorage.removeItem(pendingStorage);
     setPendingPublication(null);
@@ -802,6 +893,12 @@ function Compose({
     setReview(null);
   };
   const save = async () => {
+    if (!canDraft)
+      throw new Error(
+        verificationReady
+          ? "Your current role does not allow saving this draft."
+          : "Creator verification must be approved before saving or signing. You can keep writing here.",
+      );
     if (pendingPublication)
       throw new Error(
         "Check the pending publication before saving another revision.",
@@ -833,6 +930,15 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {!verificationReady && (
+        <Notice title="Creator verification">
+          {creator.verification === "pending"
+            ? "Your creator verification is pending."
+            : "Your creator verification is not current."}{" "}
+          You can keep writing here. Saving, attaching media and signing are
+          unavailable until verification is approved.
+        </Notice>
+      )}
       <div className="w5-gutter">
         <span className="qv-meta">TO</span>
         <div className="qv-segmented" role="group" aria-label="Audience">
@@ -1006,12 +1112,19 @@ function Compose({
           placeholder="Write in your own words"
         />
         <div className="w5-actions">
-          <Link className="qv-btn qv-btn--quiet" href="/media/voice">
-            Voice · up to 60 s
-          </Link>
+          {canDraft && creator.owned ? (
+            <Link className="qv-btn qv-btn--quiet" href="/media/voice">
+              Voice · up to 60 s
+            </Link>
+          ) : (
+            <button className="qv-btn qv-btn--quiet" type="button" disabled>
+              Voice · up to 60 s
+            </button>
+          )}
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
+            disabled={!canDraft || !creator.owned}
             onClick={() =>
               action.setNotice(
                 "A processed creator-owned media revision is required. The media producer currently needs a thread scope; content-scoped photo uploads are awaiting its adapter.",
@@ -1089,6 +1202,7 @@ function Compose({
           <button
             className="qv-btn qv-btn--secondary"
             disabled={
+              !canDraft ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1108,6 +1222,7 @@ function Compose({
           <button
             className={`qv-btn ${creator.owned ? "qv-btn--maya" : "qv-btn--secondary"}`}
             disabled={
+              !canPublish ||
               action.busy ||
               !!pendingPublication ||
               !document.text.trim() ||
@@ -1115,6 +1230,10 @@ function Compose({
             }
             onClick={() =>
               void action.run(async () => {
+                if (!canPublish)
+                  throw new Error(
+                    "Current creator verification and a publishing role are required.",
+                  );
                 const result = await save();
                 if (creator.owned)
                   setReview(
@@ -1140,7 +1259,7 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
-      {review && (
+      {review && canPublish && (
         <Modal
           title={
             document.scheduledAt
@@ -1931,8 +2050,9 @@ function Team({ creator }: { creator: Creator }) {
   useEffect(() => {
     void action.run(load);
   }, [load]);
+  const { request: identityRequest } = useIdentityRequest();
   const identity = async (path: string, body: unknown) => {
-    const response = await fetch(`/api/platform/identity/${path}`, {
+    const response = await identityRequest(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

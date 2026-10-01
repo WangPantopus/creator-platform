@@ -156,7 +156,7 @@ private fun HandleForm(model: FanSession) {
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.open("/you") }.semantics { contentDescription = "Back" }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
-                    BasicText("SIGNED IN WITH PANTOPUS", style = qText("meta").copy(color = qColor("ink-muted")))
+                    BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) "DEVELOPMENT SIGN-IN" else "SIGNED IN WITH PANTOPUS", style = qText("meta").copy(color = qColor("ink-muted")))
                 }
                 BasicText("How creators will know you", Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

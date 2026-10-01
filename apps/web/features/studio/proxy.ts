@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { platformFetch } from "../../lib/session";
+import { sameRequestOrigin } from "../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const allow = {
@@ -8,7 +9,7 @@ const allow = {
     "u",
   ),
   studio: new RegExp(
-    `^(?:session|invitations/${uuid}/accept|${uuid}/(?:queue|audiences|team(?:/invite)?|corrections|packets/${uuid}(?:/(?:decide|deliveries|deliver))?|threads/${uuid}(?:/(?:takeover|handback|pause|reply|draft|send-draft))?))$`,
+    `^(?:session|invitations/${uuid}/accept|${uuid}/(?:queue|audiences|team(?:/invite)?|corrections|packets/${uuid}(?:/(?:decide|deliveries|deliver))?|threads(?:/${uuid}(?:/(?:takeover|handback|pause|reply|draft|send-draft))?)?))$`,
     "u",
   ),
 };
@@ -24,10 +25,7 @@ export function studioProxy(domain: "studio" | "content") {
         { error: { message: "This endpoint is unavailable." } },
         { status: 404 },
       );
-    if (
-      request.method !== "GET" &&
-      request.headers.get("origin") !== request.nextUrl.origin
-    )
+    if (request.method !== "GET" && !sameRequestOrigin(request))
       return Response.json(
         { error: { message: "Use this app to perform the action." } },
         { status: 403 },

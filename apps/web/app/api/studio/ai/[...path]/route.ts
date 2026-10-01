@@ -1,10 +1,13 @@
 import { cookies } from "next/headers";
-import { currentSession, sessionCookie } from "../../../../../lib/session";
+import type { NextRequest } from "next/server";
+import { SessionSchema } from "@qelvora/api";
+import { platformFetch, sessionCookie } from "../../../../../lib/session";
+import { sameRequestOrigin } from "../../../../../lib/request-origin";
 export const runtime = "nodejs";
 const allowed =
   /^(?:state|draft|interview|status|sources(?:\/[0-9a-f-]{36})?|sponsors|license|corrections|style-card|preview|comparisons|evaluations(?:\/cancel)?|publish|pause|versions(?:\/[0-9a-f-]{36}\/rollback)?|export)$/u;
 async function bridge(
-  request: Request,
+  request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await context.params).path.join("/");
@@ -18,8 +21,7 @@ async function bridge(
       },
       { status: 404 },
     );
-  const origin = `${new URL(request.url).protocol}//${request.headers.get("host") ?? new URL(request.url).host}`;
-  if (request.method !== "GET" && request.headers.get("origin") !== origin)
+  if (request.method !== "GET" && !sameRequestOrigin(request))
     return Response.json(
       {
         error: {
@@ -51,7 +53,34 @@ async function bridge(
       },
       { status: 401 },
     );
-  const session = development ? null : await currentSession();
+  let session: ReturnType<typeof SessionSchema.parse> | null = null;
+  if (!development) {
+    try {
+      const response = await platformFetch("/v1/identity/session");
+      if (response.status === 401 || response.status === 403)
+        return Response.json(
+          {
+            error: {
+              code: "session_required",
+              message: "Continue with Pantopus to configure your AI.",
+            },
+          },
+          { status: 401 },
+        );
+      if (!response.ok) throw new Error("Session authority unavailable");
+      session = SessionSchema.parse(await response.json());
+    } catch {
+      return Response.json(
+        {
+          error: {
+            code: "identity_unavailable",
+            message: "Pantopus sign-in is temporarily unavailable. Try again.",
+          },
+        },
+        { status: 503 },
+      );
+    }
+  }
   const creatorId = development
     ? process.env.W2_CREATOR_ID
     : session?.creator?.id;
@@ -69,6 +98,17 @@ async function bridge(
     ? token.replace(/^development:/u, "")
     : session?.accountId;
   const expectedActor = request.headers.get("X-Studio-Actor");
+  const expectedAccount = request.headers.get("X-Expected-Account-Id");
+  if (expectedAccount && expectedAccount !== accountId)
+    return Response.json(
+      {
+        error: {
+          code: "session_account_changed",
+          message: "Your account changed. Continue with Pantopus again.",
+        },
+      },
+      { status: 409 },
+    );
   if (
     (request.method !== "GET" || expectedActor) &&
     expectedActor !== `${accountId}:${creatorId}`
@@ -152,6 +192,7 @@ async function bridge(
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          ...(accountId ? { "X-Expected-Account-Id": accountId } : {}),
           ...(request.headers.get("Idempotency-Key")
             ? { "Idempotency-Key": request.headers.get("Idempotency-Key")! }
             : {}),

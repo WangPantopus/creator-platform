@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { IdSchema } from "@qelvora/api";
+import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { currentSession } from "../../../../lib/session";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
 import { ConversationScreen } from "../../../../features/conversation/ConversationScreen";
+import { MediaSession } from "../../../../features/media/session";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function ThreadPage({
@@ -16,7 +18,8 @@ export default async function ThreadPage({
     !IdSchema.safeParse(fanId).success
   )
     notFound();
-  const session = await currentSession();
+  const returnTo = `/threads/${creatorId}/${fanId}`;
+  const session = await currentSession(returnTo);
   if (!session)
     return (
       <IdentityWelcome
@@ -25,11 +28,18 @@ export default async function ThreadPage({
       />
     );
   return (
-    <ConversationScreen
+    <IdentitySessionBoundary
       key={`${session.accountId}:${creatorId}:${fanId}`}
-      creatorId={creatorId}
-      fanId={fanId}
-      accountId={session.accountId}
-    />
+      initial={session}
+      returnTo={`/threads/${creatorId}/${fanId}`}
+    >
+      <MediaSession>
+        <ConversationScreen
+          creatorId={creatorId}
+          fanId={fanId}
+          accountId={session.accountId}
+        />
+      </MediaSession>
+    </IdentitySessionBoundary>
   );
 }

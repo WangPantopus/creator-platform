@@ -9,6 +9,9 @@ import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { createConversationRuntime } from "./modules/conversation/runtime.js";
 import { createContentStudio } from "./modules/content/integration.js";
+import { mediaFeature } from "./modules/media/registration.js";
+import { createAgentDomain } from "./modules/agent/integration.js";
+import { agentFeature } from "./modules/agent/feature.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -47,24 +50,29 @@ const configured =
             ? createCommerceRuntime({ ...runtime, ...commerceConfiguration })
             : undefined;
           const conversation = createConversationRuntime(runtime);
-          const content = commerce
-            ? createContentStudio({
-                pool: runtime.pool,
-                owners: {
-                  commerce: commerce.service,
-                  conversation: runtime.conversation,
-                  access: runtime.access,
-                  profiles: runtime.identity?.profiles,
-                },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
-              })
-            : undefined;
-          if (content)
-            runtime.configureSignedSubjects([content.signedSubjects]);
+          runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+          const agent = createAgentDomain({ pool: runtime.pool, model: null });
+          const content = createContentStudio({
+            pool: runtime.pool,
+            owners: {
+              commerce: commerce?.service,
+              conversation: runtime.conversation,
+              access: runtime.access,
+              profiles: runtime.identity?.profiles,
+            },
+            dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+          });
+          runtime.configureSignedSubjects([content.signedSubjects]);
           return [
             conversation.registration,
+            agentFeature({
+              domain: agent,
+              pool: runtime.pool,
+              development: config.identityAdapter === "development",
+            }),
+            mediaFeature({}),
             ...(commerce ? [commerce.feature] : []),
-            ...(content?.features ?? []),
+            ...content.features,
             ...(features.growth ? [features.growth.feature] : []),
           ];
         },
@@ -72,10 +80,15 @@ const configured =
     : undefined;
 features.growth?.start();
 const server = configured?.server ?? createServer(createApp(config));
-server.listen(config.port, () =>
-  process.stdout.write(
-    `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
-  ),
+server.listen(
+  {
+    port: config.port,
+    ...(config.identityAdapter === "development" ? { host: "127.0.0.1" } : {}),
+  },
+  () =>
+    process.stdout.write(
+      `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
+    ),
 );
 const shutdown = () => {
   void (async () => {

@@ -18,7 +18,7 @@ import type { ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
-import type { CallProvider } from "./provider.js";
+import { validateProviderState, type CallProvider } from "./provider.js";
 import { calculateClocks, determineOutcome } from "./clocks.js";
 import type { AvailabilityService } from "./availability.js";
 import { withDeadline } from "../media/deadline.js";
@@ -74,6 +74,7 @@ type SessionRow = {
   revoked_at: Date | null;
   worker_lease_until: Date | null;
 };
+const providerTimestamp = z.iso.datetime({ offset: true });
 export function validateZone(zone: string) {
   try {
     return new Intl.DateTimeFormat("en", { timeZone: zone }).resolvedOptions()
@@ -556,6 +557,36 @@ export class SessionService {
       serverNow: new Date().toISOString(),
     }));
   }
+  private async closeDeniedJoin(
+    scope: ThreadScope,
+    id: string,
+    error: unknown,
+  ) {
+    if (
+      !(error instanceof DomainError) ||
+      ![
+        "call_ended",
+        "call_unavailable",
+        "call_authorization_revoked",
+      ].includes(error.code)
+    )
+      return;
+    await this.db.withThread(scope, async (client) => {
+      const current = await this.lifecycleRow(scope, client, id, true);
+      if (!current) return;
+      if (error.code !== "call_ended")
+        await client.query(
+          "UPDATE creator.call_session SET revoked_at=COALESCE(revoked_at,now()) WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+          [id, scope.creatorId, scope.fanId],
+        );
+      // A provider creation/token response can arrive after the first cancellation
+      // cleanup. Renew the intent and fence any older cleanup acknowledgment.
+      await client.query(
+        "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'close_room',$4,'{}') ON CONFLICT(key) DO UPDATE SET completed_at=NULL,lease_until=NULL,failure_code=NULL,available_at=now()",
+        [id, scope.creatorId, scope.fanId, `${id}:denied-join-close`],
+      );
+    });
+  }
   async join(scope: ThreadScope, id: string) {
     const role = participant(scope);
     const row = await this.db.withThread(scope, async (client) => {
@@ -616,40 +647,47 @@ export class SessionService {
       });
       throw error;
     }
-    const admission = await this.db.withThread(scope, async (client) => {
-      const current = await this.row(scope, client, id, true);
-      invariant(
-        !current.ended_by &&
-          !["ending", "ended", "cancelled"].includes(current.document.state) &&
-          Date.now() < Date.parse(current.document.hardEndAt),
-        "call_ended",
-        "This call has ended.",
-      );
-      const nonce = randomUUID();
-      const expiresAt = new Date(Date.now() + 30_000).toISOString();
-      await client.query(
-        "INSERT INTO creator.call_admission(id,session_id,creator_id,fan_id,account_id,expires_at) VALUES($1,$2,$3,$4,$5,$6)",
-        [
+    const admission = await this.db
+      .withThread(scope, async (client) => {
+        const current = await this.row(scope, client, id, true);
+        invariant(
+          !current.ended_by &&
+            !["ending", "ended", "cancelled"].includes(
+              current.document.state,
+            ) &&
+            Date.now() < Date.parse(current.document.hardEndAt),
+          "call_ended",
+          "This call has ended.",
+        );
+        const nonce = randomUUID();
+        const expiresAt = new Date(Date.now() + 30_000).toISOString();
+        await client.query(
+          "INSERT INTO creator.call_admission(id,session_id,creator_id,fan_id,account_id,expires_at) VALUES($1,$2,$3,$4,$5,$6)",
+          [
+            nonce,
+            id,
+            scope.creatorId,
+            scope.fanId,
+            scope.actorAccountId,
+            expiresAt,
+          ],
+        );
+        if (current.document.state === "scheduled")
+          await this.persist(scope, client, {
+            ...current.document,
+            state: "waiting",
+          });
+        return {
           nonce,
-          id,
-          scope.creatorId,
-          scope.fanId,
-          scope.actorAccountId,
           expiresAt,
-        ],
-      );
-      if (current.document.state === "scheduled")
-        await this.persist(scope, client, {
-          ...current.document,
-          state: "waiting",
-        });
-      return {
-        nonce,
-        expiresAt,
-        roomId: current.room_id,
-        camera: current.document.mediaMode === "video",
-      };
-    });
+          roomId: current.room_id,
+          camera: current.document.mediaMode === "video",
+        };
+      })
+      .catch(async (error) => {
+        await this.closeDeniedJoin(scope, id, error);
+        throw error;
+      });
     try {
       // Mint outside the interactive database transaction; reauthorize after the provider responds.
       const token = await withDeadline(
@@ -702,6 +740,7 @@ export class SessionService {
           [admission.nonce, id, scope.creatorId, scope.fanId],
         );
       });
+      await this.closeDeniedJoin(scope, id, error);
       throw error;
     }
   }
@@ -953,6 +992,12 @@ export class SessionService {
             "This appointment cannot be cancelled here. Open its current resolution options.",
           );
           await this.authority.cancel(scope, row.document.commitmentId, client);
+          // An in-flight early join may already have created the waiting room.
+          // Terminal sessions are not polled, so retain a durable closure intent.
+          await client.query(
+            "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'close_room',$4,'{}') ON CONFLICT(key) DO NOTHING",
+            [id, scope.creatorId, scope.fanId, `${id}:cancelled-close`],
+          );
           await client.query(
             "UPDATE creator.call_slot SET active=false WHERE creator_id=$1 AND fan_id=$2 AND offer_id IN(SELECT id FROM creator.call_offer WHERE commitment_id=$3 AND creator_id=$1 AND fan_id=$2)",
             [scope.creatorId, scope.fanId, row.document.commitmentId],
@@ -970,6 +1015,9 @@ export class SessionService {
           return this.persist(scope, client, {
             ...row.document,
             state: "cancelled",
+            recordingState:
+              row.document.recordingState === "off" ? "off" : "stopping",
+            present: [],
           });
         },
       ),
@@ -1063,9 +1111,8 @@ export class SessionService {
         ),
         5000,
       );
-      const truth = await withDeadline(
-        this.provider.state(revoked.room_id),
-        5000,
+      const truth = validateProviderState(
+        await withDeadline(this.provider.state(revoked.room_id), 5000),
       );
       invariant(
         truth.closed && !truth.recording,
@@ -1092,11 +1139,68 @@ export class SessionService {
     }
     const doc = row.document;
     if (["ended", "cancelled"].includes(doc.state)) return doc;
+    const closureRequired = Boolean(
+      row.ended_by ||
+        doc.state === "ending" ||
+        Date.now() >= Date.parse(doc.hardEndAt),
+    );
+    // Persist the request phase before an external close/history outage; never report closure as confirmed.
+    if (
+      closureRequired &&
+      (doc.state !== "ending" ||
+        !["off", "stopping"].includes(doc.recordingState))
+    ) {
+      const ending = await this.db.withThread(scope, async (client) => {
+        const current = await this.row(scope, client, id, true);
+        if (
+          current.document.version !== doc.version ||
+          (lease && current.worker_lease_until?.toISOString() !== lease)
+        )
+          return current.document;
+        return this.persist(scope, client, {
+          ...current.document,
+          state: "ending",
+          recordingState:
+            current.document.recordingState === "off" ? "off" : "stopping",
+        });
+      });
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
+      return ending;
+    }
+    // Closing known ending/deadline paths does not depend on a healthy history API.
+    // Evidence and settlement still wait for confirmed closure and complete history below.
+    if (closureRequired)
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
     const provider = await withDeadline(
       this.provider.history(row.room_id),
       5000,
     );
-    const state = await withDeadline(this.provider.state(row.room_id), 5000);
+    invariant(
+      typeof provider.complete === "boolean" &&
+        typeof provider.closed === "boolean" &&
+        typeof provider.reference === "string" &&
+        (!provider.complete || provider.reference.trim().length > 0) &&
+        Array.isArray(provider.participants) &&
+        provider.participants.every(
+          (participant) =>
+            typeof participant.accountId === "string" &&
+            participant.accountId.length > 0 &&
+            Array.isArray(participant.intervals) &&
+            participant.intervals.every(
+              (interval) =>
+                providerTimestamp.safeParse(interval.start).success &&
+                providerTimestamp.safeParse(interval.end).success &&
+                Number.isFinite(Date.parse(interval.start)) &&
+                Number.isFinite(Date.parse(interval.end)) &&
+                Date.parse(interval.end) >= Date.parse(interval.start),
+            ),
+        ),
+      "call_history_invalid",
+      "Call history is awaiting valid provider evidence.",
+    );
+    const state = validateProviderState(
+      await withDeadline(this.provider.state(row.room_id), 5000),
+    );
     const now = new Date().toISOString();
     const creator = provider.participants
       .filter((p) => p.accountId === doc.creatorAccountId)

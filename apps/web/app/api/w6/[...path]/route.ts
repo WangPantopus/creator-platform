@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
+import { IdSchema, SessionSchema } from "@qelvora/api";
 import { platformFetch } from "../../../../lib/session";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 export const dynamic = "force-dynamic";
 /** Same-origin cookie bridge: target paths are fixed to W6 and ticket URLs never redirect. */
 async function proxy(
@@ -16,10 +18,7 @@ async function proxy(
       { error: { message: "This media route is unavailable." } },
       { status: 400 },
     );
-  if (
-    !["GET", "HEAD"].includes(request.method) &&
-    request.headers.get("origin") !== request.nextUrl.origin
-  )
+  if (!["GET", "HEAD"].includes(request.method) && !sameRequestOrigin(request))
     return Response.json(
       { error: { message: "Open this action from the app." } },
       { status: 403 },
@@ -36,6 +35,40 @@ async function proxy(
     if (value) headers[key] = value;
   }
   try {
+    const expected = request.headers.get("x-qelvora-expected-account");
+    if (expected) {
+      if (!IdSchema.safeParse(expected).success)
+        return Response.json(
+          {
+            error: {
+              code: "account_precondition_invalid",
+              message: "Reload this page before continuing.",
+            },
+          },
+          { status: 400 },
+        );
+      const current = await platformFetch("/v1/identity/session");
+      if (!current.ok)
+        return new Response(current.body, {
+          status: current.status,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "private, no-store",
+          },
+        });
+      if (SessionSchema.parse(await current.json()).accountId !== expected)
+        return Response.json(
+          {
+            error: {
+              code: "session_account_changed",
+              message:
+                "Your account changed. Reload this page before continuing.",
+            },
+          },
+          { status: 409, headers: { "Cache-Control": "private, no-store" } },
+        );
+      headers["x-qelvora-expected-account"] = expected;
+    }
     const data = ["GET", "HEAD"].includes(request.method)
       ? undefined
       : await request.arrayBuffer();

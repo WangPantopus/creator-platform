@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { MediaAssetSchema } from "../media.ts";
 import {
   AuthorKindSchema,
   IdSchema,
   MessageSchema,
   ThreadControlSchema,
+  ThreadTimelineSchema,
 } from "../schemas.ts";
 
 export const ProviderPolicySchema = z.strictObject({
@@ -61,14 +63,121 @@ export const MemoryItemSchema = z.strictObject({
   createdAt: z.string(),
 });
 export type MemoryItem = z.infer<typeof MemoryItemSchema>;
+export const AgentReplyVersionSchema = z.strictObject({
+  id: IdSchema,
+  hash: z.string().regex(/^[0-9a-f]{64}$/u),
+});
+export const ReplyFeedbackRatingSchema = z.enum(["helpful", "not_helpful"]);
+export const ReplyFeedbackPolicySchema = z.strictObject({
+  version: z.string().min(1).max(120),
+  notice: z.string().min(1).max(2000),
+});
+export type ReplyFeedbackPolicy = z.infer<typeof ReplyFeedbackPolicySchema>;
+export const ReplyFeedbackInputSchema = z
+  .strictObject({
+    messageVersion: z.number().int().positive(),
+    agentVersion: AgentReplyVersionSchema,
+    rating: ReplyFeedbackRatingSchema.nullable(),
+    consent: z.literal(true).optional(),
+    policyVersion: z.string().min(1).max(120).optional(),
+  })
+  .refine(
+    (body) =>
+      body.rating === null ||
+      (body.consent === true && body.policyVersion !== undefined),
+    {
+      message: "Review the current feedback notice before sending a response.",
+    },
+  );
+export type ReplyFeedbackInput = z.infer<typeof ReplyFeedbackInputSchema>;
+export const ConversationCorrectionCommandSchema = z.strictObject({
+  actType: z.literal("correction"),
+  subjectId: IdSchema,
+  content: z.strictObject({
+    kind: z.literal("conversation_correction"),
+    creatorId: IdSchema,
+    threadId: IdSchema,
+    fanId: IdSchema,
+    messageVersion: z.number().int().positive(),
+    text: z
+      .string()
+      .min(1)
+      .max(10000)
+      .refine((text) => text.trim().length > 0),
+  }),
+});
+export const ConversationCorrectionInputSchema = z.strictObject({
+  command: ConversationCorrectionCommandSchema,
+  signedActId: IdSchema,
+  idempotencyKey: z.string().min(8).max(128),
+});
+/** The command signs only W6's exact processed recording; no additional prose. */
+export const ConversationRecordingCommandSchema = z.strictObject({
+  actType: z.literal("reply"),
+  subjectId: IdSchema,
+  content: z.strictObject({
+    mediaAssetId: IdSchema,
+    version: z.number().int().positive(),
+    sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+    mimeType: z.literal("audio/mp4"),
+    durationMs: z.number().int().positive().max(3_600_000),
+    bytes: z.number().int().positive().max(268_435_456),
+  }),
+});
+export const ConversationRecordingInputSchema = z.strictObject({
+  evidence: z.strictObject({
+    assetId: IdSchema,
+    version: z.number().int().positive(),
+    sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+    mimeType: z.literal("audio/mp4"),
+    durationMs: z.number().int().positive().max(3_600_000),
+    bytes: z.number().int().positive().max(268_435_456),
+  }),
+  signedActId: IdSchema,
+  idempotencyKey: z.string().min(8).max(128),
+});
+export const ConversationRecordingViewSchema = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("available"),
+    asset: MediaAssetSchema,
+  }),
+  z.strictObject({ state: z.literal("unavailable") }),
+]);
+export const ConversationRecordingResultSchema = z.strictObject({
+  messageId: IdSchema,
+  threadId: IdSchema,
+  signedActId: IdSchema,
+});
+export type ConversationRecordingInput = z.infer<
+  typeof ConversationRecordingInputSchema
+>;
+export type ConversationRecordingResult = z.infer<
+  typeof ConversationRecordingResultSchema
+>;
 export const ConversationMessageSchema = MessageSchema.extend({
   citations: z.array(IdSchema),
   createdAt: z.string(),
   member: z.string().nullable(),
   offTheRecord: z.boolean(),
   version: z.number().int().positive(),
+  agentVersion: AgentReplyVersionSchema.nullable().optional(),
+  feedback: ReplyFeedbackRatingSchema.nullable().optional(),
+  recording: ConversationRecordingViewSchema.nullable().optional(),
+  correction: z
+    .strictObject({
+      originalMessageId: IdSchema,
+      originalVersion: z.number().int().positive(),
+    })
+    .nullable()
+    .optional(),
 });
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
+/** Audited Studio reads share the actual bounded W3 message projection.
+ * Lineage is optional until its registered migration has been prepared. */
+export const ConversationTimelineSchema = ThreadTimelineSchema.extend({
+  messages: z.array(ConversationMessageSchema).max(100),
+});
+export type ConversationTimeline = z.infer<typeof ConversationTimelineSchema>;
 export const ConversationPageSchema = z.strictObject({
   threadId: IdSchema,
   creatorId: IdSchema,
@@ -87,8 +196,30 @@ export const ConversationPageSchema = z.strictObject({
   consentCurrent: z.boolean(),
   canSend: z.boolean(),
   unavailableReason: z.string().nullable(),
+  feedbackPolicy: ReplyFeedbackPolicySchema.nullable().optional(),
 });
 export type ConversationPage = z.infer<typeof ConversationPageSchema>;
+export const ConversationAccountPageSchema = z.strictObject({
+  fan: z.strictObject({
+    id: IdSchema,
+    handle: z.string(),
+    intro: z.string().nullable(),
+  }),
+  threads: z
+    .array(
+      z.strictObject({
+        id: IdSchema,
+        creatorId: IdSchema,
+        fanId: IdSchema,
+        name: z.string(),
+      }),
+    )
+    .max(50),
+  nextCursor: IdSchema.nullable(),
+});
+export type ConversationAccountPage = z.infer<
+  typeof ConversationAccountPageSchema
+>;
 export const TeamReplySchema = z.strictObject({
   text: z.string().trim().min(1).max(10000),
   idempotencyKey: z.string().min(8).max(128),

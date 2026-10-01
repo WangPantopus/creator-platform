@@ -1,5 +1,26 @@
 import { z } from "zod";
 
+export const AvailabilityCommandSchema = z.strictObject({
+  timeZone: z.string().min(1).max(80),
+  windows: z
+    .array(
+      z.strictObject({
+        startsAt: z.iso.datetime({ offset: true }),
+        endsAt: z.iso.datetime({ offset: true }),
+      }),
+    )
+    .max(64),
+  expectedVersion: z.number().int().nonnegative(),
+  idempotencyKey: z.string().min(8).max(128),
+});
+export const AvailabilitySchema = z.strictObject({
+  creatorId: z.uuid(),
+  version: z.number().int().positive(),
+  timeZone: z.string().min(1).max(80),
+  windows: AvailabilityCommandSchema.shape.windows,
+});
+export const AvailabilityViewSchema = AvailabilitySchema.nullable();
+
 export const SessionStateSchema = z.enum([
   "scheduled",
   "waiting",

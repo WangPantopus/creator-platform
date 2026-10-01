@@ -1,0 +1,6 @@
+Updated 353 text files/paths. Run pnpm install && pnpm generate && pnpm check.
+Review the external-service checklist in docs/NAMING.md before store submission.
+Generated 12 shared web, Swift and Kotlin resources.
+Generated Swift/Kotlin API models and 31 operations from OpenAPI.
+Verified 12 shared web, Swift and Kotlin resources.
+Verified Swift/Kotlin API models and 31 operations from OpenAPI.

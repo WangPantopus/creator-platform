@@ -6,7 +6,7 @@ import type {
   ConversationPage,
   ProviderPolicy,
 } from "../../../../packages/api/src/conversation/contracts";
-import { conversationRequest } from "./api";
+import { useConversationRequest } from "./api";
 import "./conversation.css";
 type Capabilities = {
   providers: ProviderPolicy | null;
@@ -23,6 +23,7 @@ export function ConsentScreen({
   name: string;
   backHref: string;
 }) {
+  const request = useConversationRequest();
   const router = useRouter();
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,7 @@ export function ConsentScreen({
   );
   useEffect(() => {
     let active = true;
-    void conversationRequest<Capabilities>("capabilities")
+    void request<Capabilities>("capabilities")
       .then((value) => {
         if (active) setCapabilities(value);
       })
@@ -42,13 +43,19 @@ export function ConsentScreen({
     return () => {
       active = false;
     };
-  }, []);
+  }, [request]);
   const begin = async () => {
-    if (!capabilities?.providers?.verified || busy) return;
+    if (
+      !capabilities?.providers?.verified ||
+      !capabilities.consentAvailable ||
+      !capabilities.generationAvailable ||
+      busy
+    )
+      return;
     setBusy(true);
     setError(null);
     try {
-      const page = await conversationRequest<ConversationPage>("begin", {
+      const page = await request<ConversationPage>("begin", {
         creatorId,
         policyVersion: capabilities.providers.version,
         accessNoticeAccepted: true,

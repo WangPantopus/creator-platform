@@ -16,7 +16,7 @@ export function IdentityWelcome({
   const [context, setContext] = useState(arrival);
   const [destination, setDestination] = useState(returnTo);
   return (
-    <main className="identity-welcome">
+    <main className="identity-welcome qv">
       <span className="identity-wordmark">{brand.name}</span>
       <div className="identity-welcome-body">
         <svg

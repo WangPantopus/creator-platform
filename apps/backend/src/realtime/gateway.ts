@@ -1,7 +1,7 @@
 import { conversationSocketTickets } from "../modules/conversation/realtime-tickets.js";
 import type { IncomingMessage, Server } from "node:http";
 import { WebSocketServer, WebSocket } from "ws";
-import { SubscribeSchema } from "@qelvora/api";
+import { IdSchema, SubscribeSchema } from "@qelvora/api";
 import {
   resolveActor,
   type PantopusIdentityAdapter,
@@ -260,6 +260,9 @@ export function attachRealtime(
     const current = authority.resolveSession
       ? await authority.resolveSession(token)
       : { actor: await resolveActor(identity, token), sessionId: undefined };
+    const expected = request.headers["x-expected-account-id"];
+    if (expected && current.actor.accountId !== IdSchema.parse(expected))
+      throw new Error("Account changed");
     await authority.assertActorAllowed?.(current.actor);
     return current;
   }

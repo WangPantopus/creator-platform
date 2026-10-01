@@ -22,6 +22,7 @@ const policy = process.env.W3_PROVIDER_POLICY_FILE
       JSON.parse(await readFile(process.env.W3_PROVIDER_POLICY_FILE, "utf8")),
     )
   : undefined;
+let conversations: ReturnType<typeof createConversationRuntime> | undefined;
 const backend = await createConfiguredBackend({
   config,
   identity: new DevelopmentIdentityAdapter(config.allowedOrigin, "development"),
@@ -30,15 +31,22 @@ const backend = await createConfiguredBackend({
       throw new Error("AI generation is unconfigured.");
     },
   },
-  registerFeatures: async (runtime) => [
-    createConversationRuntime({ ...runtime, ...(policy ? { policy } : {}) })
-      .registration,
-  ],
+  registerFeatures: async (runtime) => {
+    conversations = createConversationRuntime({
+      ...runtime,
+      ...(policy ? { policy } : {}),
+    });
+    return [conversations.registration];
+  },
 });
 backend.server.listen(config.port, "127.0.0.1", () =>
   process.stdout.write(
     `W3 API on ${config.port}; development identity; AI generation unavailable.\n`,
   ),
 );
-process.on("SIGTERM", () => void backend.close().then(() => process.exit(0)));
-process.on("SIGINT", () => void backend.close().then(() => process.exit(0)));
+const close = () => {
+  conversations?.close();
+  void backend.close().then(() => process.exit(0));
+};
+process.on("SIGTERM", close);
+process.on("SIGINT", close);

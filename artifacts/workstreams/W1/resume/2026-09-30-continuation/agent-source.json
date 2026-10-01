@@ -1,0 +1,176 @@
+{
+  "parent": "c6490a05e3bda71bf0273e57ba201a889fecdc52",
+  "w2RegistrationSource": "119d26ab5fcb8752eb787a9a69c5faabd3441cf4",
+  "w2CompletionSource": "497d17f9df09af30f26c39d121a60985fe2de023",
+  "sources": [
+    {
+      "canonical": "apps/backend/src/modules/agent/feature.ts",
+      "sourceSha256": "0fc1a841c80d4cb6d708761cc9ad5778da4d3c01ef300a245169f0c2fce2a414",
+      "renamed": "apps/backend/src/modules/agent/feature.ts",
+      "renamedSha256": "0fc1a841c80d4cb6d708761cc9ad5778da4d3c01ef300a245169f0c2fce2a414"
+    },
+    {
+      "canonical": "apps/backend/src/modules/agent/repository.ts",
+      "sourceSha256": "20838eb10e5019b9230c3ab9f5a54f825f5e29b5998c139f4ee191e305406cb0",
+      "renamed": "apps/backend/src/modules/agent/repository.ts",
+      "renamedSha256": "20838eb10e5019b9230c3ab9f5a54f825f5e29b5998c139f4ee191e305406cb0"
+    },
+    {
+      "canonical": "apps/backend/src/server.ts",
+      "sourceSha256": "672706804c474d6b4e81b251d580780074af8c3ecd6fbb668e55e79144795d55",
+      "renamed": "apps/backend/src/server.ts",
+      "renamedSha256": "672706804c474d6b4e81b251d580780074af8c3ecd6fbb668e55e79144795d55"
+    },
+    {
+      "canonical": "apps/web/app/studio/ai/[[...section]]/page.tsx",
+      "sourceSha256": "9ac46e7cdba09533944ac591dc8472f6911812d5e6d27a5715f1bf3562c46528",
+      "renamed": "apps/web/app/studio/ai/[[...section]]/page.tsx",
+      "renamedSha256": "445c039c2d667f236540aad34ac07117e57c71335e9fb7ec68f027e2bf7d0cf3"
+    },
+    {
+      "canonical": "apps/web/app/api/studio/ai/[...path]/route.ts",
+      "sourceSha256": "280b1f9d018a467dcd39902dd44f826ea29a49eb2d819acaa929c91665153091",
+      "renamed": "apps/web/app/api/studio/ai/[...path]/route.ts",
+      "renamedSha256": "76148c8a9626df42bf9832da2b97ca3ba20292c23127d52708c22cb97cd4fab2"
+    },
+    {
+      "canonical": "apps/web/features/creator-ai/CreatorAI.tsx",
+      "sourceSha256": "21eb3eecbeb68dedf005b936896195b92d7b4488e50d4bd411385d63a7df1511",
+      "renamed": "apps/web/features/creator-ai/CreatorAI.tsx",
+      "renamedSha256": "97c530d49503369efe9d307aeddef0817d1f91fae9136caad0832f96707e7d0c"
+    },
+    {
+      "canonical": "apps/web/features/creator-ai/session.tsx",
+      "sourceSha256": "f800cd1984f2dec8d512d12d30b123a421a8d7f3c7497ee0bd9d8a7c03d5c4a0",
+      "renamed": "apps/web/features/creator-ai/session.tsx",
+      "renamedSha256": "f800cd1984f2dec8d512d12d30b123a421a8d7f3c7497ee0bd9d8a7c03d5c4a0"
+    },
+    {
+      "canonical": "apps/web/features/identity/session-boundary.tsx",
+      "sourceSha256": "00dcdf5c8305ccba9fbf7362a873a2d6e95ad423e0ffa97357ef6cedee5af812",
+      "renamed": "apps/web/features/identity/session-boundary.tsx",
+      "renamedSha256": "98c71cc8c65a89843241997f5b8f04eff8ced3408e2bd5d166f8daa5ec9d8393"
+    },
+    {
+      "canonical": "config/navigation.json",
+      "sourceSha256": "de508a1e8460dfc694ab7086a028ca6cca6d244a61dd137a9783ab8636dbb05d",
+      "renamed": "config/navigation.json",
+      "renamedSha256": "de508a1e8460dfc694ab7086a028ca6cca6d244a61dd137a9783ab8636dbb05d"
+    },
+    {
+      "canonical": "scripts/generate-native-api.mjs",
+      "sourceSha256": "4ad50b46fe0a778f7e2b1a6955923d85e95fd61a212d3845a285ecbac81b4915",
+      "renamed": "scripts/generate-native-api.mjs",
+      "renamedSha256": "1ec31f1dd1d094f1e983fe0bb459b4669f261a6d957f2263b18102fb7f7bf8b9"
+    },
+    {
+      "canonical": "apps/backend/src/modules/agent/provider-usage.ts",
+      "sourceSha256": "1a49cb27e23fa112f915778ccabe8222da3e2206f596bb7d138926a7f31d9d91",
+      "renamed": "apps/backend/src/modules/agent/provider-usage.ts",
+      "renamedSha256": "1a49cb27e23fa112f915778ccabe8222da3e2206f596bb7d138926a7f31d9d91"
+    },
+    {
+      "canonical": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sourceSha256": "2acd792360cee29ca32dd22f91edc8c72d629f6dba659fdd0c11712671b667ca",
+      "generated": true
+    },
+    {
+      "canonical": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sourceSha256": "9bd422e8cd6dd20092945a9b8953257a40467c3d726563d207efe622bb953b96",
+      "generated": true
+    }
+  ],
+  "consumption": "W1 registration/current-session transaction guard; legacy-only private provider usage completion; owner-lease CreatorAI optional identity/nav. W2 journal/generation graph unconsumed.",
+  "browserFinalDurable": {
+    "verification": "pending",
+    "revision": 3,
+    "savedStoryMatches": true,
+    "savedBoundariesMatch": true,
+    "liveVersionId": null,
+    "versions": 0,
+    "licenses": 0,
+    "sources": 0
+  },
+  "generation": {
+    "operations": 49,
+    "sharedResources": 12,
+    "openapiChangedFromParent": false,
+    "nullable": "required nullable keys retain JSON null and reject absence; optional keys remain optional; nullable refs resolved",
+    "newMalformedPayloadRuntimeTests": false
+  },
+  "android": {
+    "device": "CreatorPlatformW1E2E20260930",
+    "serial": "emulator-5574",
+    "adbPort": 5051,
+    "consolePort": 5574,
+    "grpcPort": 8671,
+    "authenticatedGrpc": true,
+    "gpu": "host",
+    "memoryMB": 2560,
+    "cores": 4,
+    "uiCases": "NativeAcceptanceTest,DialogRuntimeTest",
+    "passed": 4,
+    "failed": 0,
+    "seconds": 23.623,
+    "firstWrongClassInvocation": "initialization error; not product acceptance",
+    "installMismatch": "Initial APK signed with default rather than existing isolated key was rejected. Same current source rebuilt with existing isolated key and installed without removing app data. Initial older-binary launch not acceptance.",
+    "keySha256": "f00510a97b77c8ab5ce9b56a9a4fb1f12401764452a24e22fdde5e30ba3474df",
+    "postUITestShippingFrames": [
+      "agent-android-light.png",
+      "agent-android-night.png"
+    ],
+    "visibleSystemUIANR": false,
+    "normalShutdown": true,
+    "apkSha256": "1a8f8083c90c63ff60c04a9d777d0b91a9d52b0f2a640b0124ac59630e52e5a6"
+  },
+  "ios": {
+    "device": "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+    "os": "iOS26.5",
+    "model": "iPhone17",
+    "normalSignatureVerified": true,
+    "firstRun": "catalog pass; Welcome Night original wait/hittable two assertions failed; 94.677s. No changed assertions.",
+    "abortedRetry": "Cancelled before UI case start because first result still closing; not acceptance.",
+    "serialRetry": {
+      "passed": 2,
+      "failed": 0,
+      "seconds": 60.833,
+      "command": "test-without-building -parallel-testing-enabled NO; original FoundationFlowTests; normal signing",
+      "frames": [
+        "agent-ios-light.png",
+        "agent-ios-night.png",
+        "agent-ios-catalog.png"
+      ],
+      "result": "Passed",
+      "resultBundle": "/private/tmp/creator-w1-continuation-agent-ui-20260930-serial.xcresult"
+    },
+    "executableSha256": "bca73435febce0a2477e30efb657bf4ff038a26dc2b2cf83e5885f44ab0ec503",
+    "normalShutdown": true
+  },
+  "builds": {
+    "main": [
+      "backend pass",
+      "web pass",
+      "signed iOS pass",
+      "signed Android pass"
+    ],
+    "FolioPreview": [
+      "backend pass",
+      "web pass",
+      "signed iOS pass",
+      "signed Android pass"
+    ],
+    "canonicalGenerateCheck": "pass",
+    "affectedLintFormat": "pass",
+    "FolioPreviewAndroidApkSha256": "3102c59ca4582224b3481dfb3f1858f5ea61c04edc135533ffefec1c514ec424"
+  },
+  "gates": {
+    "identity": "explicit development synthetic pending profiles only",
+    "providerModel": null,
+    "publication": false,
+    "fanGeneration": false,
+    "sourceApproval": false,
+    "realPantopusPasskey": false,
+    "releaseAcceptance": false
+  },
+  "noNewTestsOrScripts": true
+}

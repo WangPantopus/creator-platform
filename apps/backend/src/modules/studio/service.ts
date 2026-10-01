@@ -1,48 +1,73 @@
-import { TeamRoleSchema } from "@qelvora/api";
+import {
+  StudioInvite,
+  StudioQueueQuery,
+  StudioSaveReplyDraft,
+  StudioSendReplyDraft,
+  StudioCorrection,
+} from "../../../../../packages/api/src/studio.js";
 import type { IdentityProfiles } from "../identity/profiles.js";
-import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import type { ContentService } from "../content/service.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationService } from "../conversation/service.js";
 import type { AccessService } from "../access/scope.js";
 import type { AgentService } from "../agent/service.js";
+import { ContentPage } from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { identityTransaction } from "../identity/transaction.js";
 
 export class StudioService {
   constructor(
     readonly content: ContentService,
     readonly owners: {
-      commerce: CommerceService;
+      commerce?: CommerceService;
       conversation: ConversationService;
       access: AccessService;
       agent?: AgentService;
       profiles?: IdentityProfiles;
     },
   ) {}
+  private commerce() {
+    if (!this.owners.commerce)
+      throw new DomainError(
+        "commerce_unconfigured",
+        "Requests and paid offers are unavailable until commerce is configured.",
+        503,
+      );
+    return this.owners.commerce;
+  }
   async session(actor: Actor) {
-    return this.owners.commerce.account(actor, async (client) => {
-      const creators = (
-        await client.query(
-          "SELECT cp.id,cp.display_name,cp.handle,cp.verification,cp.account_id=$1 AS owned,coalesce(tm.roles,'{}') AS roles,f.handle AS \"memberHandle\" FROM creator.creator_profile cp LEFT JOIN creator.team_membership tm ON tm.creator_id=cp.id AND tm.account_id=$1 AND tm.revoked_at IS NULL LEFT JOIN creator.fan_profile f ON f.account_id=$1 WHERE cp.account_id=$1 OR tm.account_id=$1 ORDER BY cp.handle LIMIT 50",
-          [actor.accountId],
-        )
-      ).rows;
-      const invitations = (
-        await client.query(
-          'SELECT i.id,i.creator_id AS "creatorId",c.display_name AS "creatorName",i.roles,i.expires_at AS "expiresAt" FROM creator.team_invitation i JOIN creator.creator_profile c ON c.id=i.creator_id WHERE i.account_id=$1 AND i.accepted_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>now() ORDER BY i.expires_at,i.id LIMIT 50',
-          [actor.accountId],
-        )
-      ).rows;
-      return {
-        creators: creators.map((row) => ({
-          ...row,
-          viewerAccountId: actor.accountId,
-        })),
-        invitations,
-        serverTime: new Date().toISOString(),
-      };
-    });
+    invariant(
+      actor.adultEligible,
+      "adult_eligibility_required",
+      "Adult eligibility is required.",
+    );
+    return identityTransaction(
+      this.content.pool,
+      actor.accountId,
+      async (client) => {
+        const creators = (
+          await client.query(
+            "SELECT cp.id,cp.display_name,cp.handle,cp.verification,cp.account_id=$1 AS owned,coalesce(tm.roles,'{}') AS roles,f.handle AS \"memberHandle\" FROM creator.creator_profile cp LEFT JOIN creator.team_membership tm ON tm.creator_id=cp.id AND tm.account_id=$1 AND tm.revoked_at IS NULL LEFT JOIN creator.fan_profile f ON f.account_id=$1 WHERE cp.account_id=$1 OR tm.account_id=$1 ORDER BY cp.handle LIMIT 50",
+            [actor.accountId],
+          )
+        ).rows;
+        const invitations = (
+          await client.query(
+            'SELECT i.id,i.creator_id AS "creatorId",c.display_name AS "creatorName",i.roles,i.expires_at AS "expiresAt" FROM creator.team_invitation i JOIN creator.creator_profile c ON c.id=i.creator_id WHERE i.account_id=$1 AND i.accepted_at IS NULL AND i.revoked_at IS NULL AND i.expires_at>now() ORDER BY i.expires_at,i.id LIMIT 50',
+            [actor.accountId],
+          )
+        ).rows;
+        return {
+          creators: creators.map((row) => ({
+            ...row,
+            viewerAccountId: actor.accountId,
+          })),
+          invitations,
+          serverTime: new Date().toISOString(),
+        };
+      },
+    );
   }
   async acceptInvitation(actor: Actor, id: string) {
     if (!this.owners.profiles)
@@ -54,16 +79,10 @@ export class StudioService {
     return this.owners.profiles.acceptInvite(actor, id);
   }
   async inviteByHandle(actor: Actor, creatorId: string, raw: unknown) {
-    const input = z
-      .strictObject({
-        handle: z
-          .string()
-          .trim()
-          .transform((s) => s.replace(/^@/, "").toLowerCase())
-          .pipe(z.string().regex(/^[a-z0-9_]{3,30}$/)),
-        roles: z.array(TeamRoleSchema).min(1).max(4),
-      })
-      .parse(raw);
+    const input = {
+      ...StudioInvite.parse(raw),
+      handle: StudioInvite.parse(raw).handle.replace(/^@/, "").toLowerCase(),
+    };
     if (!this.owners.profiles)
       throw new DomainError(
         "identity_team_unconfigured",
@@ -133,6 +152,8 @@ export class StudioService {
         "drafter",
         "publisher",
       ]);
+      if (!this.owners.commerce)
+        return { audienceCountsAvailable: false, tiers: [], groups: [] };
       const tiers = (
         await client.query(
           "SELECT id,name,catalog FROM creator.commerce_tier WHERE creator_id=$1 ORDER BY name,id LIMIT 100",
@@ -154,13 +175,8 @@ export class StudioService {
     });
   }
   async queue(actor: Actor, creatorId: string, raw: unknown) {
-    const input = z
-      .strictObject({
-        cursor: z.uuid().optional(),
-        filter: z.enum(["all", "due", "decide", "more_info"]).default("all"),
-        limit: z.coerce.number().int().min(1).max(50).default(20),
-      })
-      .parse(raw);
+    this.commerce();
+    const input = StudioQueueQuery.parse(raw);
     return this.content.transaction(actor, creatorId, async (client) => {
       const role = await this.content.role(client, actor, creatorId, [
         "triage",
@@ -177,15 +193,21 @@ export class StudioService {
           `WITH queue AS (
         SELECT p.id,p.fan_id,f.handle,p.version,p.state,p.payment_state,p.snapshot,p.disclosure,p.decision_at,p.hold_expires_at,p.submitted_at,
          c.id AS commitment_id,c.state AS commitment_state,c.version AS commitment_version,c.due_at,
-         CASE WHEN c.state IN('due','in_progress') THEN 0 ELSE 1 END AS priority,
-         CASE WHEN c.state IN('due','in_progress') THEN c.due_at ELSE p.decision_at END AS deadline
+         CASE WHEN c.state IN('due','in_progress') THEN 0 WHEN p.state='submitted' THEN 1 ELSE 2 END AS priority,
+         CASE WHEN c.state IN('due','in_progress') THEN c.due_at WHEN p.state='submitted' THEN p.decision_at ELSE p.hold_expires_at END AS deadline
         FROM creator.commerce_packet p JOIN creator.fan_profile f ON f.id=p.fan_id LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id
         WHERE p.creator_id=$1 AND (c.state IN('due','in_progress') OR p.state IN('submitted','more_info','offer_pending'))
-        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state IN('submitted','offer_pending')) OR ($2='more_info' AND p.state='more_info'))
-      ) SELECT * FROM queue WHERE $3::uuid IS NULL OR (priority,deadline,id)>(SELECT priority,deadline,id FROM queue WHERE id=$3) ORDER BY priority,deadline,id LIMIT $4`,
+        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state='submitted') OR ($2='more_info' AND p.state='more_info'))
+      ) SELECT * FROM queue WHERE $3::uuid IS NULL OR (priority,coalesce(deadline,'infinity'::timestamptz),id)>(SELECT priority,coalesce(deadline,'infinity'::timestamptz),id FROM queue WHERE id=$3) ORDER BY priority,deadline NULLS LAST,id LIMIT $4`,
           [creatorId, input.filter, input.cursor ?? null, input.limit + 1],
         )
       ).rows;
+      if (input.cursor && !rows.length)
+        throw new DomainError(
+          "queue_changed",
+          "The request queue changed. Refresh requests to continue from current state.",
+          409,
+        );
       const capacity = (
         await client.query(
           "SELECT m.id,m.title,m.kind,m.weekly_limit,coalesce(c.used,0) AS used,coalesce(c.reserved,0) AS reserved,m.version FROM creator.commerce_mode m LEFT JOIN creator.commerce_capacity c ON c.mode_id=m.id AND c.window_start=date_trunc('week',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' WHERE m.creator_id=$1 AND m.state='offered' ORDER BY m.title LIMIT 100",
@@ -205,13 +227,13 @@ export class StudioService {
     await this.content.transaction(actor, creatorId, (client) =>
       this.content.role(client, actor, creatorId),
     );
-    const result = await this.owners.commerce.packet(actor, id);
+    const result = await this.commerce().packet(actor, id);
     invariant(
       result.packet.creator_id === creatorId,
       "request_unavailable",
       "This request is unavailable.",
     );
-    const groupModes = await this.owners.commerce.account(
+    const groupModes = await this.commerce().account(
       actor,
       async (client) =>
         (
@@ -229,7 +251,7 @@ export class StudioService {
   }
   async decide(actor: Actor, creatorId: string, id: string, raw: unknown) {
     await this.packet(actor, creatorId, id);
-    return this.owners.commerce.decide(actor, id, raw);
+    return this.commerce().decide(actor, id, raw);
   }
   async deliveries(actor: Actor, creatorId: string, packetId: string) {
     const packet = await this.packet(actor, creatorId, packetId);
@@ -257,7 +279,7 @@ export class StudioService {
     raw: unknown,
   ) {
     await this.packet(actor, creatorId, packetId);
-    return this.owners.commerce.deliver(actor, packetId, raw);
+    return this.commerce().deliver(actor, packetId, raw);
   }
   async replyDraft(actor: Actor, creatorId: string, fanId: string) {
     await this.owners.access.openThread(actor, creatorId, fanId, false);
@@ -285,13 +307,7 @@ export class StudioService {
       fanId,
       false,
     );
-    const input = z
-      .strictObject({
-        text: z.string().max(20000),
-        expectedVersion: z.int().nonnegative(),
-        idempotencyKey: z.string().min(8).max(128),
-      })
-      .parse(raw);
+    const input = StudioSaveReplyDraft.parse(raw);
     return this.content.transaction(actor, creatorId, (client) =>
       this.content.command(
         client,
@@ -338,13 +354,7 @@ export class StudioService {
     fanId: string,
     raw: unknown,
   ) {
-    const input = z
-      .strictObject({
-        version: z.int().positive(),
-        signedActId: z.uuid(),
-        idempotencyKey: z.string().min(8).max(128),
-      })
-      .parse(raw);
+    const input = StudioSendReplyDraft.parse(raw);
     const scope = await this.owners.access.openThread(
       actor,
       creatorId,
@@ -428,6 +438,68 @@ export class StudioService {
       fanId,
     };
   }
+  async threadEntries(actor: Actor, creatorId: string, raw: unknown) {
+    const page = ContentPage.pick({ cursor: true, limit: true }).parse(raw);
+    const rows = await this.content.transaction(
+      actor,
+      creatorId,
+      async (client) => {
+        await this.content.role(client, actor, creatorId, ["triage"]);
+        // Read current references under each producer's RLS. Team queue authority
+        // is never escalated, and no private conversation text is assembled here.
+        return (
+          await client.query<{
+            fan_id: string;
+            handle: string;
+            sources: string[];
+            updated_at: Date;
+          }>(
+            `
+        WITH links AS (
+          SELECT fan_id,'note_reply' AS source,max(created_at) AS updated_at FROM creator.content_reply
+          WHERE creator_id=$1 AND withdrawn_at IS NULL GROUP BY fan_id
+          UNION ALL
+          SELECT fan_id,'request' AS source,max(submitted_at) AS updated_at FROM creator.commerce_packet
+          WHERE creator_id=$1 AND submitted_at IS NOT NULL GROUP BY fan_id
+        ), entries AS (
+          SELECT f.id AS fan_id,f.handle,array_agg(DISTINCT l.source) AS sources,max(l.updated_at) AS updated_at
+          FROM links l JOIN creator.fan_profile f ON f.id=l.fan_id GROUP BY f.id,f.handle
+        ) SELECT * FROM entries WHERE $2::uuid IS NULL OR (updated_at,fan_id)<(SELECT updated_at,fan_id FROM entries WHERE fan_id=$2)
+        ORDER BY updated_at DESC,fan_id DESC LIMIT $3`,
+            [creatorId, page.cursor ?? null, page.limit + 1],
+          )
+        ).rows;
+      },
+    );
+    const items = [];
+    for (const row of rows.slice(0, page.limit)) {
+      try {
+        await this.owners.access.openThread(
+          actor,
+          creatorId,
+          row.fan_id,
+          false,
+        );
+        items.push({
+          fanId: row.fan_id,
+          handle: row.handle,
+          sources: row.sources,
+          updatedAt: row.updated_at.toISOString(),
+        });
+      } catch (error) {
+        if (
+          !(error instanceof DomainError && error.code === "thread_unavailable")
+        )
+          throw error;
+      }
+    }
+    return {
+      items,
+      nextCursor:
+        rows.length > page.limit ? rows[page.limit - 1]!.fan_id : null,
+      coverage: "notes_and_requests" as const,
+    };
+  }
   async control(
     actor: Actor,
     creatorId: string,
@@ -475,15 +547,7 @@ export class StudioService {
         "The AI rule and regression producer is not connected yet.",
         503,
       );
-    const input = z
-      .strictObject({
-        idempotencyKey: z.string().min(8).max(128),
-        expectedRevision: z.int().nonnegative(),
-        paraphrasedPrompt: z.string().min(5).max(1000),
-        rule: z.string().min(5).max(500),
-        unacceptableAnswer: z.string().max(3000),
-      })
-      .parse(body);
+    const input = StudioCorrection.parse(body);
     return this.owners.agent.correction(
       { creatorId, accountId: actor.accountId, development: false },
       input.idempotencyKey,

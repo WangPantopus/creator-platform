@@ -6,6 +6,11 @@ import type {
 import { SessionService } from "./service.js";
 import { withDeadline } from "../media/deadline.js";
 import { DomainError } from "../../core/errors.js";
+import {
+  validateProviderState,
+  validateRecordingDeletion,
+  validateRecordingState,
+} from "./provider.js";
 
 export interface CallEffects {
   summarize(input: {
@@ -94,8 +99,11 @@ export class SessionWorker {
       return next ? { ...next, lease } : null;
     });
     if (!effect) return;
+    let externalUnconfirmed = false;
+    let recordingDeletionReference: string | null = null;
     try {
       const cleanup = [
+        "close_room",
         "purge_consent_assets",
         "sync_recording",
         "settle_evidence",
@@ -115,6 +123,7 @@ export class SessionWorker {
           row.revoked_at
         )
           throw new Error("room_creation_denied");
+        externalUnconfirmed = true;
         await withDeadline(
           this.sessions.provider.ensureRoom({
             roomId: row.room_id,
@@ -123,6 +132,7 @@ export class SessionWorker {
           }),
           5000,
         );
+        externalUnconfirmed = false;
         try {
           const current = await this.sessions.db.withThread(scope, (client) =>
             this.sessions.row(scope, client, effect.session_id),
@@ -136,6 +146,47 @@ export class SessionWorker {
           );
           throw error;
         }
+      } else if (effect.kind === "close_room") {
+        if (
+          !row.revoked_at &&
+          !["ending", "ended", "cancelled"].includes(row.document.state)
+        )
+          throw new Error("room_closure_denied");
+        await withDeadline(this.sessions.provider.closeRoom(row.room_id), 5000);
+        const recording = validateRecordingState(
+          await withDeadline(
+            this.sessions.provider.setRecording(
+              row.room_id,
+              false,
+              `${effect.key}:off`,
+            ),
+            5000,
+          ),
+        );
+        const truth = validateProviderState(
+          await withDeadline(this.sessions.provider.state(row.room_id), 5000),
+        );
+        if (recording.recording || !truth.closed || truth.recording)
+          throw new Error("room_closure_unconfirmed");
+        await this.sessions.db.withThread(scope, async (client) => {
+          const current = await this.sessions.lifecycleRow(
+            scope,
+            client,
+            effect.session_id,
+            true,
+          );
+          if (!current) throw new Error("session_unavailable");
+          if (
+            !current.revoked_at &&
+            !["ending", "ended", "cancelled"].includes(current.document.state)
+          )
+            throw new Error("room_closure_changed");
+          await this.sessions.persist(scope, client, {
+            ...current.document,
+            recordingState: "off",
+            present: [],
+          });
+        });
       } else if (effect.kind === "sync_recording") {
         // Read current consent rather than event order, then recheck after the external effect.
         const both = ["creator", "fan"].every((role) =>
@@ -151,14 +202,18 @@ export class SessionWorker {
           await this.sessions.db.withThread(scope, (client) =>
             this.sessions.row(scope, client, effect.session_id),
           );
-        const truth = await withDeadline(
-          this.sessions.provider.setRecording(
-            row.room_id,
-            enabled,
-            `${effect.key}:${enabled ? "on" : "off"}`,
+        externalUnconfirmed = true;
+        const truth = validateRecordingState(
+          await withDeadline(
+            this.sessions.provider.setRecording(
+              row.room_id,
+              enabled,
+              `${effect.key}:${enabled ? "on" : "off"}`,
+            ),
+            5000,
           ),
-          5000,
         );
+        externalUnconfirmed = false;
         const recordingResult = await this.sessions.db
           .withThread(scope, async (client) => {
             const current = await this.sessions.lifecycleRow(
@@ -222,13 +277,15 @@ export class SessionWorker {
             throw error;
           });
         if (recordingResult.denied) {
-          const stopped = await withDeadline(
-            this.sessions.provider.setRecording(
-              row.room_id,
-              false,
-              `${effect.key}:revoke`,
+          const stopped = validateRecordingState(
+            await withDeadline(
+              this.sessions.provider.setRecording(
+                row.room_id,
+                false,
+                `${effect.key}:revoke`,
+              ),
+              5000,
             ),
-            5000,
           );
           if (stopped.recording) throw new Error("recording_stop_unconfirmed");
           await this.sessions.db.withThread(scope, async (client) => {
@@ -287,6 +344,7 @@ export class SessionWorker {
           if (!this.effects.summarize)
             throw new Error("summary_provider_unconfigured");
           const revision = row.document.summaryRevision ?? 0;
+          externalUnconfirmed = true;
           const summary = await withDeadline(
             this.effects.summarize({
               packet: row.document.packet,
@@ -295,6 +353,7 @@ export class SessionWorker {
             }),
             30_000,
           );
+          externalUnconfirmed = false;
           if (!summary.trim() || summary.length > 16000)
             throw new Error("summary_output_invalid");
           await this.sessions.db.withThread(scope, async (client) => {
@@ -331,10 +390,12 @@ export class SessionWorker {
         if (!effect.payload.purpose || !this.effects.purgeConsentAssets)
           throw new Error("consent_purge_adapter_unconfigured");
         if (effect.payload.purpose === "recording")
-          await withDeadline(
-            this.sessions.provider.deleteRecording(row.room_id, effect.key),
-            5000,
-          );
+          recordingDeletionReference = validateRecordingDeletion(
+            await withDeadline(
+              this.sessions.provider.deleteRecording(row.room_id, effect.key),
+              5000,
+            ),
+          ).reference;
         await this.effects.purgeConsentAssets(
           scope,
           effect.session_id,
@@ -344,8 +405,14 @@ export class SessionWorker {
       } else throw new Error("call_effect_unavailable");
       await this.sessions.db.withThread(scope, async (client) => {
         await client.query(
-          "UPDATE creator.call_effect SET completed_at=now(),lease_until=NULL,failure_code=NULL WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND lease_until=$4",
-          [effect.id, scope.creatorId, scope.fanId, effect.lease],
+          "UPDATE creator.call_effect SET completed_at=now(),lease_until=NULL,failure_code=NULL,payload=CASE WHEN $5::text IS NULL THEN payload ELSE payload||jsonb_build_object('recordingDeletionReference',$5::text) END WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND lease_until=$4",
+          [
+            effect.id,
+            scope.creatorId,
+            scope.fanId,
+            effect.lease,
+            recordingDeletionReference,
+          ],
         );
       });
     } catch (error) {
@@ -357,8 +424,11 @@ export class SessionWorker {
             scope.creatorId,
             scope.fanId,
             effect.lease,
-            error instanceof Error &&
-              error.message === "external_operation_unconfirmed",
+            externalUnconfirmed ||
+              (error instanceof Error &&
+                error.message === "external_operation_unconfirmed") ||
+              (error instanceof DomainError &&
+                error.code === "call_provider_recording_invalid"),
           ],
         );
       });

@@ -7,6 +7,7 @@ import { Database } from "./db/database.js";
 import {
   AccessService,
   type ScopeRestriction,
+  type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
 import { ConversationService } from "./modules/conversation/service.js";
 import type { GuardrailProvider } from "./modules/agent/providers.js";
@@ -21,6 +22,10 @@ import { createTrustRuntime } from "./operations/runtime.js";
 import { resolveActor } from "./modules/identity/adapter.js";
 import { DomainError } from "./core/errors.js";
 import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
+import {
+  AudienceIdentityAuthority,
+  type AudienceRestriction,
+} from "./modules/identity/audience-scope.js";
 
 export type BackendRuntime = {
   pool: pg.Pool;
@@ -28,6 +33,7 @@ export type BackendRuntime = {
   access: AccessService;
   conversation: ConversationService;
   identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
+  audienceIdentity?: AudienceIdentityAuthority;
   assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -60,6 +66,10 @@ export async function createConfiguredBackend(input: {
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  /** Genuine current denial on the caller-held non-owner core transaction. */
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  /** Held-client, purpose-specific content denial; never substitute a thread. */
+  assertAudienceAllowed?: AudienceRestriction;
   assertCreatorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
     creatorId: string,
@@ -108,7 +118,12 @@ export async function createConfiguredBackend(input: {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, assertScopeAllowed);
+  const access = new AccessService(
+    pool,
+    undefined,
+    assertScopeAllowed,
+    input.assertScopeAllowedInTransaction,
+  );
   const conversation = new ConversationService(
     database,
     access,
@@ -149,6 +164,14 @@ export async function createConfiguredBackend(input: {
     access,
     conversation,
     identity: platformIdentity,
+    ...(input.assertAudienceAllowed && platformIdentity
+      ? {
+          audienceIdentity: new AudienceIdentityAuthority(pool, {
+            mode: platformIdentity.sessions.mode,
+            assertAllowed: input.assertAudienceAllowed,
+          }),
+        }
+      : {}),
     assertActorAllowed,
     assertScopeAllowed,
     assertCreatorAllowed: async (actor, creatorId) => {

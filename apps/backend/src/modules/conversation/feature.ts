@@ -15,13 +15,18 @@ import {
   ThreadPreferencesSchema,
   ProviderPolicySchema,
   ConversationMessageSchema,
+  ConversationAccountPageSchema,
   type ProviderPolicy,
   type ConversationPage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
-import { IdSchema } from "@qelvora/api";
+import { IdSchema, SendMessageSchema } from "@qelvora/api";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
+import type { CommerceService } from "../commerce/service.js";
+import type { ConversationLineage } from "./lineage.js";
+import type { ConversationCorrections } from "./corrections.js";
+import type { ConversationRecordings } from "./recordings.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -38,6 +43,10 @@ export class ConversationFeature {
     readonly tickets?: ConversationSocketTickets,
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
     readonly wellbeing?: ConversationWellbeing,
+    readonly firstConversation?: Pick<CommerceService, "openTrial">,
+    readonly lineage?: ConversationLineage,
+    readonly corrections?: ConversationCorrections,
+    readonly recordings?: ConversationRecordings,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -47,6 +56,12 @@ export class ConversationFeature {
       consentAvailable: Boolean(this.policy?.verified),
       generationAvailable:
         this.generationAvailable && Boolean(this.policy?.verified),
+      firstConversationAvailable:
+        Boolean(this.firstConversation) &&
+        this.generationAvailable &&
+        Boolean(this.policy?.verified),
+      correctionsAvailable: Boolean(this.corrections),
+      recordingDeliveryAvailable: Boolean(this.recordings),
       accessDisclosure,
     };
   }
@@ -61,6 +76,11 @@ export class ConversationFeature {
       this.policy?.verified && body.policyVersion === this.policy.version,
       "providers_unconfigured",
       "AI providers and their verified terms are not configured yet.",
+    );
+    invariant(
+      this.generationAvailable,
+      "generation_unavailable",
+      "AI conversations are not available yet. No first conversation has started.",
     );
     const client = await this.db.pool.connect();
     let fanId: string;
@@ -147,6 +167,16 @@ export class ConversationFeature {
       fanId!,
       false,
     );
+    if (this.firstConversation) {
+      const access = await this.db.withThread(scope, (client) =>
+        capabilitySnapshot(client, scope),
+      );
+      // W4 decides the actual one-time trial and configured units. Current paid
+      // AI access needs no extra trial grant; exhausted access cannot be topped
+      // up by starting another conversation.
+      if (!access.capabilities.includes("ai_message"))
+        await this.firstConversation.openTrial(actor, body.creatorId, fanId!);
+    }
     return this.page(scope);
   }
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
@@ -162,12 +192,18 @@ export class ConversationFeature {
         invariant(t, "thread_unavailable", "This conversation is unavailable.");
         const rows = (
           await client.query(
-            `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
+            `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
             [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
           )
         ).rows;
         const hasOlder = rows.length > 50;
-        const messages = rows.slice(0, 50).reverse();
+        const selected = rows
+          .slice(0, 50)
+          .reverse()
+          .map((row) => ConversationMessageSchema.parse(row));
+        const messages = this.lineage
+          ? await this.lineage.enrich(scope, client, selected)
+          : selected;
         const generations = (
           await client.query<{ id: string; last_sequence: number }>(
             "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
@@ -218,6 +254,9 @@ export class ConversationFeature {
                   : !hasAccess
                     ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
                     : null,
+          feedbackPolicy: this.lineage
+            ? await this.lineage.policy(scope, client)
+            : null,
         };
       },
       "read",
@@ -305,7 +344,8 @@ export class ConversationFeature {
     );
     return this.page(scope);
   }
-  async account(actor: Actor) {
+  async account(actor: Actor, cursor?: string) {
+    const before = IdSchema.optional().parse(cursor);
     const client = await this.db.pool.connect();
     try {
       await client.query("BEGIN");
@@ -324,16 +364,36 @@ export class ConversationFeature {
         "fan_profile_required",
         "Choose your handle before opening You.",
       );
-      // Never widen RLS to list private messages. Scope each visible relationship using
-      // a bounded fan-owned thread directory function supplied by the migration.
+      // Only fan-owned relationship metadata is listed. Private messages remain
+      // behind the individual thread scope, including when a cursor is supplied.
+      if (before) {
+        const known = await client.query(
+          "SELECT thread_id FROM creator.conversation_relationship WHERE account_id=$1 AND fan_id=$2 AND thread_id=$3",
+          [actor.accountId, fan.id, before],
+        );
+        if (!known.rowCount)
+          throw new DomainError(
+            "account_cursor_unavailable",
+            "Refresh your conversations before paging.",
+            404,
+          );
+      }
       const threads = (
         await client.query(
-          'SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id WHERE r.account_id=$1 AND r.fan_id=$2 ORDER BY cp.display_name,r.thread_id LIMIT 100',
-          [actor.accountId, fan.id],
+          'SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id WHERE r.account_id=$1 AND r.fan_id=$2' +
+            (before ? " AND r.thread_id<$3" : "") +
+            " ORDER BY r.thread_id DESC LIMIT 51",
+          before
+            ? [actor.accountId, fan.id, before]
+            : [actor.accountId, fan.id],
         )
       ).rows;
       await client.query("COMMIT");
-      return { fan, threads };
+      return ConversationAccountPageSchema.parse({
+        fan,
+        threads: threads.slice(0, 50),
+        nextCursor: threads.length > 50 ? threads[49]!.id : null,
+      });
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;
@@ -350,6 +410,20 @@ export function conversationFeature(
     path: "/",
     router: ({ actorFor }) => {
       const router = Router();
+      router.use("/v1/conversations", async (req, _res, next) => {
+        const expected = req.header("X-Expected-Account-Id");
+        if (expected) {
+          const accountId = IdSchema.parse(expected);
+          const actor = await actorFor(req);
+          if (actor.accountId !== accountId)
+            throw new DomainError(
+              "session_account_changed",
+              "Your account changed. Reopen this page to continue.",
+              409,
+            );
+        }
+        next();
+      });
       router.get("/v1/conversations/capabilities", (_req, res) =>
         res.json(feature.capabilities()),
       );
@@ -370,14 +444,20 @@ export function conversationFeature(
           res.json(await feature.begin(await actorFor(req), req.body)),
       );
       router.get("/v1/conversations/account", async (req, res) =>
-        res.json(await feature.account(await actorFor(req))),
+        res.json(
+          await feature.account(
+            await actorFor(req),
+            IdSchema.optional().parse(req.query.cursor),
+          ),
+        ),
       );
       const scopeFor = async (req: import("express").Request) =>
         feature.access.openThread(
           await actorFor(req),
           IdSchema.parse(req.params.creatorId),
           IdSchema.parse(req.params.fanId),
-          req.method === "GET" && !req.path.endsWith("/events"),
+          req.path.endsWith("/team-replies") ||
+            (req.method === "GET" && !req.path.endsWith("/events")),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
       router.post(root + "/presence", async (req, res) => {
@@ -441,18 +521,70 @@ export function conversationFeature(
         );
         res.json(await feature.page(scope));
       });
+      router.post(root + "/messages/:id/feedback", async (req, res) => {
+        const scope = await scopeFor(req);
+        invariant(
+          feature.lineage,
+          "feedback_unavailable",
+          "Feedback is not available yet.",
+        );
+        res.json(
+          await feature.lineage.feedback(
+            scope,
+            IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/messages/:id/corrections", async (req, res) => {
+        invariant(
+          feature.corrections,
+          "corrections_unavailable",
+          "Signed corrections are not available yet.",
+        );
+        res.json(
+          await feature.corrections.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
+            IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/recordings", async (req, res) => {
+        invariant(
+          feature.recordings,
+          "recording_unavailable",
+          "Signed recording delivery is not connected yet.",
+        );
+        res.json(
+          await feature.recordings.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
+            req.body,
+          ),
+        );
+      });
       router.get(root + "/messages/:id", async (req, res) => {
         const scope = await scopeFor(req);
         const id = IdSchema.parse(req.params.id);
         const row = await feature.db.withThread(
           scope,
-          async (client) =>
-            (
+          async (client) => {
+            const source = (
               await client.query(
-                `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
+                `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
                 [scope.threadId, scope.creatorId, scope.fanId, id],
               )
-            ).rows[0],
+            ).rows[0];
+            if (!source) return undefined;
+            const message = ConversationMessageSchema.parse(source);
+            return feature.lineage
+              ? (await feature.lineage.enrich(scope, client, [message]))[0]
+              : message;
+          },
           "read",
         );
         invariant(
@@ -538,14 +670,24 @@ export function conversationFeature(
           await feature.conversations.fanReply(await scopeFor(req), req.body),
         ),
       );
-      router.get(root + "/messages/status/:key", async (req, res) => {
+      const messageStatus = async (
+        req: import("express").Request,
+        res: import("express").Response,
+      ) => {
         const scope = await scopeFor(req);
         invariant(
           scope.authority === "fan",
           "fan_required",
           "Only the sender can check their message.",
         );
-        const key = IdSchema.parse(req.params.key);
+        const key =
+          req.method === "POST"
+            ? z
+                .strictObject({
+                  idempotencyKey: SendMessageSchema.shape.idempotencyKey,
+                })
+                .parse(req.body).idempotencyKey
+            : SendMessageSchema.shape.idempotencyKey.parse(req.params.key);
         res.json(
           await feature.db.withThread(
             scope,
@@ -573,7 +715,10 @@ export function conversationFeature(
             "read",
           ),
         );
-      });
+      };
+      router.get(root + "/messages/status/:key", messageStatus);
+      // Keys remain in JSON when they cannot be represented as one path segment.
+      router.post(root + "/messages/status", messageStatus);
       router.post(root + "/takeover", async (req, res) =>
         res.json(
           await feature.conversations.changeControl(
@@ -604,6 +749,11 @@ export function conversationFeature(
       router.post(root + "/human-replies", async (req, res) =>
         res.json(
           await feature.conversations.humanReply(await scopeFor(req), req.body),
+        ),
+      );
+      router.post(root + "/team-replies", async (req, res) =>
+        res.json(
+          await feature.conversations.teamReply(await scopeFor(req), req.body),
         ),
       );
       router.get(root + "/audit", async (req, res) => {

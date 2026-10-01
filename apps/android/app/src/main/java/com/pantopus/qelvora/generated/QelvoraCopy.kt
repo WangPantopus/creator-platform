@@ -594,7 +594,8 @@ object QelvoraCopy {
     "growthUnsubscribed" to "Unsubscribed",
     "growthEmailServiceUnavailable" to "Email service unavailable"
   )
-  fun text(key: String, values: Map<String, String> = emptyMap()): String = values.entries.fold(strings.getValue(key)) { text, (key, value) -> text.replace("{$key}", value) }
+  private val variables = Regex("""\{([^}]+)\}""")
+  fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
   const val brandName = "Qelvora"
   const val studioName = "Qelvora Studio"
 }

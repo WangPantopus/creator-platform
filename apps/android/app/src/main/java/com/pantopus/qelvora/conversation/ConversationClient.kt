@@ -3,6 +3,7 @@ package com.pantopus.qelvora.conversation
 import com.pantopus.qelvora.generated.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
@@ -13,9 +14,14 @@ import java.util.UUID
     val id: String, val threadId: String, val authorKind: APIMessageAuthorKind, val text: String,
     val deliveryState: APIMessageDeliveryState, val controlEpoch: Long, val sequence: Long,
     val signedActId: String? = null, val citations: List<String>, val createdAt: String,
-    val member: String? = null, val offTheRecord: Boolean, val version: Long
+    val member: String? = null, val offTheRecord: Boolean, val version: Long,
+    val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null,
+    val correction: ConversationCorrection? = null
 )
-fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
+@Serializable data class ConversationCorrection(val originalMessageId: String, val originalVersion: Long)
+@Serializable data class ConversationAgentVersion(val id: String, val hash: String)
+@Serializable data class ConversationFeedbackPolicy(val version: String, val notice: String)
+fun ConversationMessage.authorLabel(name: String): String = if (correction != null) QelvoraCopy.text("correctionAuthor",mapOf("name" to name)) else when(authorKind) {
     APIMessageAuthorKind.FAN -> "You"
     APIMessageAuthorKind.AI -> QelvoraCopy.text("aiAuthor",mapOf("name" to name))
     APIMessageAuthorKind.APPROVED_DRAFT -> QelvoraCopy.text("approvedAuthor",mapOf("name" to name))
@@ -31,7 +37,7 @@ fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
     val control: APIThreadControl, val epoch: Long, val cursor: Long, val revision: Long,
     val generationSequences: Map<String, Long>, val messages: List<ConversationMessage>, val before: Long? = null,
     val offTheRecord: Boolean, val introShared: Boolean, val consentCurrent: Boolean, val canSend: Boolean,
-    val unavailableReason: String? = null
+    val unavailableReason: String? = null, val feedbackPolicy: ConversationFeedbackPolicy? = null
 )
 @Serializable data class ConversationProvider(val name: String, val termsUrl: String, val noTraining: Boolean, val noRetention: Boolean)
 @Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean)
@@ -44,9 +50,10 @@ fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
 class ConversationFailure(val status: Int, override val message: String) : Exception(message)
 
 /** Uses W1's encrypted credential supplier and disables HTTP response caching. */
-class ConversationClient(private val baseURL: String, private val token: () -> String?) {
+class ConversationClient(private val baseURL: String, private val token: () -> String?, private val expectedAccountId: String?) {
     val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false): JsonElement = withContext(Dispatchers.IO) {
+        if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, "Reopen this page with your current account.")
         val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
         val connection = URL(baseURL.trimEnd('/') + "/v1/conversations/" + path).openConnection() as HttpURLConnection
         try {
@@ -55,6 +62,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
             connection.setRequestProperty("Accept", "application/json")
             connection.setRequestProperty("X-Correlation-Id", UUID.randomUUID().toString())
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
+            if (!publicRead) connection.setRequestProperty("X-Expected-Account-Id", expectedAccountId)
             if (body != null) {
                 connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json")
                 connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
@@ -65,12 +73,18 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                 while(true) { val count=stream.read(buffer);if(count<0) break;if(output.size()+count>1_000_000) throw ConversationFailure(503,"This conversation response is too large. Refresh to try again.");output.write(buffer,0,count) }
                 output.toString("UTF-8")
             }.orEmpty()
+            coroutineContext.ensureActive()
             if (!publicRead && token() != credential) throw ConversationFailure(401,"Your account changed. Open this conversation again.")
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
-            if (status !in 200..299) throw ConversationFailure(status, value?.jsonObject?.get("error")?.jsonObject?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
+            if (status !in 200..299) {
+                val error = value?.jsonObject?.get("error")?.jsonObject
+                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
+            }
             value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
         } finally { connection.disconnect() }
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))
     suspend fun replay(path: String, cursor: Long): List<APIFrame> = json.decodeFromJsonElement(request("$path/events?cursor=$cursor"))
+    fun frames(page: ConversationPage, cursor: Long) = ConversationRealtime.frames(
+        baseURL, expectedAccountId ?: throw ConversationFailure(401, "Reopen this page with your current account."), token, page, cursor)
 }

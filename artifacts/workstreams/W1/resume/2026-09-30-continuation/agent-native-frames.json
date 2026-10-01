@@ -1,0 +1,27 @@
+[
+  {
+    "file": "agent-android-light.png",
+    "original": "/private/tmp/creator-w1-continuation-android-fourth-after-ui-light.png",
+    "sha256": "628659756fb0271c2562137618d46460002b7098ec6ea0067a5a5d2c86465560"
+  },
+  {
+    "file": "agent-android-night.png",
+    "original": "/private/tmp/creator-w1-continuation-android-fourth-after-ui-night-later.png",
+    "sha256": "636a04febc0cde07ad4ad42fc0cc8f7d51eb5721152e2f43fc92ffa337001127"
+  },
+  {
+    "file": "agent-android-ui.log",
+    "original": "/private/tmp/creator-w1-continuation-agent-android-ui-current.log",
+    "sha256": "07d6db2a6c3a5bdeb731cc11e557009ff05cce934240d01debcc8455dbb864a8"
+  },
+  {
+    "file": "agent-ios-first-attachments.json",
+    "original": "/private/tmp/creator-w1-continuation-agent-ios-first-attachments/manifest.json",
+    "sha256": "c47b63c6562c71c939b10cd73279dde0e4e70330a945525f37f9cce5355f7c5d"
+  },
+  {
+    "file": "agent-ios-first-night-failure.png",
+    "original": "/private/tmp/creator-w1-continuation-agent-ios-first-attachments/264B270B-F77B-411C-AD29-C8E7E18428A7.png",
+    "sha256": "4fed47525febffbfce7659ed1cc7271c5899ad71ef4d45bf41eeb6e157f431f0"
+  }
+]
