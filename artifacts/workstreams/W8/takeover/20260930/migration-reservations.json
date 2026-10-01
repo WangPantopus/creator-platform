@@ -106,6 +106,22 @@
       "state": "reserved_unapplied",
       "sourceCommit": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
       "sourceSha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    },
+    {
+      "id": "0057",
+      "owner": "W3",
+      "version": "0057_w3_feedback_consent",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
+      "sourceSha256": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11"
+    },
+    {
+      "id": "0058",
+      "owner": "W3",
+      "version": "0058_w3_correction_signature",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "state": "reserved_unapplied"
     }
   ],
   "sqlApplied": false,
@@ -115,7 +131,8 @@
     "0049",
     "0051",
     "0056",
-    "0048"
+    "0048",
+    "0057"
   ],
   "activeEntriesAndBytesComparedWith": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4"
 }
