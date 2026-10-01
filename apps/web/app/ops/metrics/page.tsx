@@ -17,7 +17,7 @@ export default function MetricsPage() {
   const { data, error, loading, refresh } =
     useTrust<Metrics>("operations/metrics");
   return (
-    <main className="trust-page" id="ops-main" tabIndex={-1}>
+    <main className="trust-page trust-metrics" id="ops-main" tabIndex={-1}>
       <Link href="/ops">Back to cases</Link>
       <h1>Trust service metrics</h1>
       <p>

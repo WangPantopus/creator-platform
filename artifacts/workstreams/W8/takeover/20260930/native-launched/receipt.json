@@ -9,7 +9,7 @@
   "peerDevicesChanged": false,
   "derivedData": "/private/tmp/creator-w8-native-resume-20260930/ios/derived",
   "purpose": "Personally build/launch current W8 app; interaction/accessibility not inferred from creation or compilation.",
-  "recordedAt": "2026-10-01T03:10:38.643240+00:00",
+  "recordedAt": "2026-10-01T03:57:48.493283+00:00",
   "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
   "iosBuild": "BUILD SUCCEEDED",
   "iosBinarySha256": "1b97c475bb4ab865bf34988ab46119bd4ccb8b8bbfbe86efd7dbfb69cb3149e5",
@@ -229,11 +229,11 @@
       "metricsDisabled": true,
       "crashReportsDisabled": true
     },
-    "status": "Actual boot/install and Help render; system modal/launch timeout then original UI instrumentation aborts with startup ANR; no passing native journey.",
+    "status": "Host graphics/owned temp-directory retry cold-launches Statusok7375ms, loaded unobstructed public Help personally inspected. Original unchanged four on-device UI flows pass13.36s. Earlier ANR/crash evidence retained; authenticated native/system-save/Bluetooth/private Report still open.",
     "peerOrSharedNetsimStopped": false,
     "appInstalledOrLaunched": true,
     "nativeInteractionVerified": false,
-    "acceptancePassed": false,
+    "acceptancePassed": "Only the four existing runtime UI flows and actual public Help; not entire enabled scope",
     "actualBootCompletedMs": 179831,
     "firstShippingLaunch": {
       "recordedAt": "2026-10-01T03:01:55.292168+00:00",
@@ -387,6 +387,339 @@
     "networkDocs": [
       "https://developer.android.com/studio/run/emulator-networking-advanced",
       "https://developer.android.com/studio/run/emulator-troubleshooting"
+    ],
+    "recoveryRun": {
+      "process": {
+        "startedAt": "2026-10-01T02:38:09.528071+00:00",
+        "pid": 26652,
+        "args": [
+          "/private/tmp/creator-w8-native-resume-20260930/android/sdk/emulator/emulator",
+          "-avd",
+          "CreatorPlatform_W8_Resume_20260930",
+          "-port",
+          "5568",
+          "-memory",
+          "2048",
+          "-cores",
+          "2",
+          "-gpu",
+          "host",
+          "-netsim-args",
+          "--instance 8 --no-web-ui --no-cli-ui",
+          "-no-metrics",
+          "-crash-report-mode",
+          "never",
+          "-no-snapshot",
+          "-no-audio",
+          "-no-boot-anim",
+          "-no-window"
+        ],
+        "ports": {
+          "emulator": 5568,
+          "adbServer": 5048
+        },
+        "root": "/private/tmp/creator-w8-native-resume-20260930/android",
+        "freshAvd": true,
+        "peerOrHistoricalDeviceReused": false,
+        "engineOrPeerServerRestarted": false,
+        "iosExistingUiRunFinishedBeforeLaunch": true,
+        "retriedAt": "2026-10-01T03:11:33.736857+00:00",
+        "priorPid": 12182,
+        "log": "/private/tmp/creator-w8-native-resume-20260930/android/emulator-host-own-tmp.log",
+        "netsimInstance": 8,
+        "previousOutcome": "Process absent/no5568/5569listener, packet-stream Wifi gone in log. No boot/app/runtime success claimed.",
+        "sharedNetsimKilledOrRestarted": false,
+        "attempts": [
+          {
+            "pid": 16517,
+            "args": [
+              "/private/tmp/creator-w8-native-resume-20260930/android/sdk/emulator/emulator",
+              "-avd",
+              "CreatorPlatform_W8_Resume_20260930",
+              "-port",
+              "5568",
+              "-memory",
+              "2048",
+              "-cores",
+              "2",
+              "-gpu",
+              "software",
+              "-netsim_args",
+              "--instance 8 --no-web-ui --no-cli-ui",
+              "-no-snapshot",
+              "-no-audio",
+              "-no-boot-anim",
+              "-no-window"
+            ],
+            "log": "/private/tmp/creator-w8-native-resume-20260930/android/emulator-instance8.log",
+            "result": "Exited before boot: unknown option -netsim_args; top-level help spells -netsim-args",
+            "observedAt": "2026-10-01T02:56:03.293561+00:00"
+          },
+          {
+            "pid": 19294,
+            "args": [
+              "/private/tmp/creator-w8-native-resume-20260930/android/sdk/emulator/emulator",
+              "-avd",
+              "CreatorPlatform_W8_Resume_20260930",
+              "-port",
+              "5568",
+              "-memory",
+              "2048",
+              "-cores",
+              "2",
+              "-gpu",
+              "software",
+              "-netsim-args",
+              "--instance 8 --no-web-ui --no-cli-ui",
+              "-no-metrics",
+              "-crash-report-mode",
+              "never",
+              "-no-snapshot",
+              "-no-audio",
+              "-no-boot-anim",
+              "-no-window"
+            ],
+            "log": "/private/tmp/creator-w8-native-resume-20260930/android/emulator-instance8-validflag.log",
+            "result": "Boot179831ms, install success/Help rendered but system ANR; existing UI run aborted before tests with startup ANR reason6. Gracefully stopped only ownedAVD, userdata preserved."
+          }
+        ],
+        "attemptStartedAt": "2026-10-01T03:11:33.736857+00:00",
+        "metricsDisabled": true,
+        "crashReportsDisabled": true,
+        "gpu": "host",
+        "ownTemporaryNamespace": {
+          "TMPDIR": "/private/tmp/creator-w8-native-resume-20260930/android/tmp",
+          "ANDROID_TMP": "/private/tmp/creator-w8-native-resume-20260930/android/network-tmp"
+        },
+        "sameAvdUserdataPreserved": true,
+        "networkIsolationProven": false
+      },
+      "bootCompletedMs": 73235,
+      "shippingColdLaunch": {
+        "startedAt": "2026-10-01T03:14:47.261660+00:00",
+        "finishedAt": "2026-10-01T03:14:55.179862+00:00",
+        "args": [
+          "shell",
+          "am",
+          "start",
+          "-S",
+          "-W",
+          "-n",
+          "com.pantopus.qelvora/.MainActivity",
+          "--es",
+          "api_url",
+          "http://10.0.2.2:4108",
+          "--es",
+          "return_to",
+          "/trust",
+          "--es",
+          "appearance",
+          "light"
+        ],
+        "exit": 0,
+        "stdout": "Stopping: com.pantopus.qelvora\nStarting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: ok\nLaunchState: COLD\nActivity: com.pantopus.qelvora/.MainActivity\nTotalTime: 7375\nWaitTime: 7389\nComplete",
+        "stderr": "",
+        "samePreservedAvd": true,
+        "gpu": "host",
+        "backend": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a"
+      },
+      "frames": [
+        {
+          "path": "android-help-host-light.png",
+          "sha256": "e3ec59a3fd231aae4959cfc48c4a464002b6235c63435885d62ea2ac3e95a43c",
+          "pixelDimensions": [
+            1080,
+            2400
+          ],
+          "logicalDpWidth": 411.42857142857144,
+          "personallyInspectedPixels": true
+        },
+        {
+          "path": "android-help-host-loaded-light.png",
+          "sha256": "b617461cfe01115764bd58461eb5110435a6bc9be75a8278beec5d144cd0e43e",
+          "pixelDimensions": [
+            1080,
+            2400
+          ],
+          "logicalDpWidth": 411.42857142857144,
+          "personallyInspectedPixels": true
+        }
+      ],
+      "actualLoadedHelp": "Unobstructed Crisis help protocol, public API returns regional resources unconfigured; Refresh enabled after loading",
+      "existingOnDeviceUi": {
+        "startedAt": "2026-10-01T03:18:10.804561+00:00",
+        "finishedAt": "2026-10-01T03:18:32.072078+00:00",
+        "exit": 0,
+        "log": "/private/tmp/creator-w8-native-resume-20260930/android/existing-runtime-ui-host-retry.log",
+        "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+        "currentBackendSource": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a",
+        "ownAvd": "CreatorPlatform_W8_Resume_20260930",
+        "testsChanged": false,
+        "result": "OK (4 tests)",
+        "testDurationSeconds": 13.36,
+        "allFourPassed": true,
+        "classResults": [
+          "catalogSelectsRealInteractiveModeList",
+          "unavailableSignInNeverPretendsToAuthenticate",
+          "arrivalContextCanBeRemoved",
+          "dialogActionsFitAndSafeActionReceivesClicks"
+        ],
+        "runtimeLogSha256": "cdbf1a062b1169215e675cef290255e6fcc4a2a2772e8a084ac3aefa69f52223",
+        "originalInstrumentationLog": "android-existing-ui-host-retry.txt"
+      },
+      "network": "Netsim gRPC initialization fails, actual log reports fallback to old network stack. Public HTTP succeeds; Bluetooth/network-instance isolation not established.",
+      "noNativeAuthenticatedOrProviderClaim": true
+    },
+    "additionalSdkLaunches": [
+      {
+        "route": "/trust/crisis",
+        "appearance": "night",
+        "launch": {
+          "startedAt": "2026-10-01T03:23:04.950166+00:00",
+          "finishedAt": "2026-10-01T03:23:07.131401+00:00",
+          "args": [
+            "am",
+            "start",
+            "-S",
+            "-W",
+            "-n",
+            "com.pantopus.qelvora/.MainActivity",
+            "--es",
+            "api_url",
+            "http://10.0.2.2:4108",
+            "--es",
+            "return_to",
+            "/trust/crisis",
+            "--es",
+            "appearance",
+            "night"
+          ],
+          "exit": 0,
+          "stdout": "Stopping: com.pantopus.qelvora\nStarting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: ok\nLaunchState: COLD\nActivity: com.pantopus.qelvora/.MainActivity\nTotalTime: 1811\nWaitTime: 1826\nComplete",
+          "stderr": ""
+        },
+        "frame": {
+          "path": "android-crisis-host-night.png",
+          "sha256": "55a1b364cd45a669cd19137411455494f0c6622dc62bd4f43b5bac6d1e295b0d"
+        },
+        "visible": "Unobstructed public Crisis help protocol, regional resources unconfigured, enabled Refresh",
+        "personallyInspectedPixels": true
+      },
+      {
+        "route": "qelvora://app/support?creatorId=20000000-0000-4000-8000-000000000001&messageId=50000000-0000-4000-8000-000000000002",
+        "appearance": "light",
+        "launch": {
+          "startedAt": "2026-10-01T03:25:37.544809+00:00",
+          "finishedAt": "2026-10-01T03:25:40.869028+00:00",
+          "args": [
+            "am",
+            "start",
+            "-S",
+            "-W",
+            "-a",
+            "android.intent.action.VIEW",
+            "-n",
+            "com.pantopus.qelvora/.MainActivity",
+            "-d",
+            "qelvora://app/support?creatorId=20000000-0000-4000-8000-000000000001&messageId=50000000-0000-4000-8000-000000000002",
+            "--es",
+            "api_url",
+            "http://10.0.2.2:4108",
+            "--es",
+            "appearance",
+            "light"
+          ],
+          "exit": 0,
+          "stdout": "Stopping: com.pantopus.qelvora\nStarting: Intent { act=android.intent.action.VIEW dat=qelvora://app/... cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: ok\nLaunchState: COLD\nActivity: com.pantopus.qelvora/.MainActivity\nTotalTime: 2788\nWaitTime: 2795\nComplete",
+          "stderr": "",
+          "actualCanonicalReportClick": false
+        },
+        "frame": {
+          "path": "android-report-arrival-host-light.png",
+          "sha256": "ed9ff38d55111b19ee0a40802280426d3c7727c1a00b5523d68cea0ce6afc4fa"
+        },
+        "visible": "Welcome/Continue with Pantopus, no private Report form or history",
+        "personallyInspectedPixels": true,
+        "actualCanonicalReportClick": false,
+        "nativeAuthenticated": false
+      }
     ]
+  },
+  "existingIosUiAuthorizedSelectorCorrection": {
+    "humanAuthorization": "Authorize the exact selector correction; received2026-10-01 before changing line16",
+    "sourceParent": "2a765bb2180b6c2c24de167239588029974952cb",
+    "testSourceSha256": "0ec81c7dae8869f6f12879005d66c369ce6bd4ed8eac25409814677e80fe2c82",
+    "exactOneLineDiffVerified": true,
+    "sameOriginalAssertionsWaitThemesGoldensTolerances": true,
+    "samePreservedSimulator": true,
+    "startedAt": "2026-10-01T03:51:20.067761+00:00",
+    "completedAt": "2026-10-01T03:53:30.548498+00:00",
+    "result": "TEST SUCCEEDED",
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "caseDurationSeconds": 65.074,
+    "xcodeTestOperationSeconds": 78.921,
+    "cases": [
+      "testCreatorAndAIRemainLabeledInNativeCatalog",
+      "testWelcomeSignInFailsClosedInBothThemes"
+    ],
+    "screenshots": [
+      {
+        "path": "ios-selector-authorized-message-identities.png",
+        "sha256": "30319371667b6dff1885d269be2a8ba0b1a6477147f00e4bc8c487e19b009f5a",
+        "test": "FoundationFlowTests/testCreatorAndAIRemainLabeledInNativeCatalog()",
+        "capturedAt": "2026-10-01T03:52:37.669000+00:00"
+      },
+      {
+        "path": "ios-selector-authorized-signin-night.png",
+        "sha256": "fd5c0bbaff8c09692064dbc391d57b2452683827825dd422deb8646119527e86",
+        "test": "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+        "capturedAt": "2026-10-01T03:53:18.587000+00:00"
+      },
+      {
+        "path": "ios-selector-authorized-welcome-night.png",
+        "sha256": "3d0abe77c8cfa4f0dc601b45268e4f57253a1064ef1dad5fdd4a933369f23dcb",
+        "test": "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+        "capturedAt": "2026-10-01T03:53:16.577000+00:00"
+      },
+      {
+        "path": "ios-selector-authorized-signin-light.png",
+        "sha256": "5d806600d77bb98bcb85acd4acec096ae22d531ef63c9f0cf25dd5f69ae70a85",
+        "test": "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+        "capturedAt": "2026-10-01T03:53:02.534000+00:00"
+      },
+      {
+        "path": "ios-selector-authorized-welcome-light.png",
+        "sha256": "b26b2cefdbfd082e05020a3ff1f9f9777a032d41566d175a4fb3f5880b302507",
+        "test": "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+        "capturedAt": "2026-10-01T03:53:00.031000+00:00"
+      }
+    ],
+    "dependencyResolution": {
+      "xcodeAutogeneratedResolutionChanged": true,
+      "retainedOriginalSourceRestored": true,
+      "originalSha256": "84c4303864908906c37a4047cc420c4b3afd71454b5c14a7a95a84dd08139c3e",
+      "duringBuildSha256": "c37940d3f8353123c7fe565f20d6d1503092aec755f8c29b6e0c81525c686fdf",
+      "unchangedPackages": [
+        "swift-custom-dump",
+        "swift-snapshot-testing",
+        "swift-syntax"
+      ],
+      "removedByXcode": [
+        "swift-issue-reporting"
+      ],
+      "addedByXcode": [
+        "xctest-dynamic-overlay"
+      ],
+      "testSourceDelta": "One human-authorized selector only; no existing wait/assertion/golden/tolerance change"
+    },
+    "scope": "Actual on-device existing authored identity catalog and shipping unconfigured sign-in Light/Night; public Help/Report SDK arrivals documented separately. Authenticated Report/system save/provider/hardware/reference completeness not inferred.",
+    "personallyInspectedPassingPixels": [
+      "ios-selector-authorized-signin-light.png",
+      "ios-selector-authorized-signin-night.png",
+      "ios-selector-authorized-message-identities.png"
+    ],
+    "rebuiltBinarySha256": "1b97c475bb4ab865bf34988ab46119bd4ccb8b8bbfbe86efd7dbfb69cb3149e5"
   }
 }
