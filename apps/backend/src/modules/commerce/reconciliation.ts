@@ -12,7 +12,7 @@ export interface VerifiedMoneyStatement {
   fetchedAt: Date;
   entries: readonly {
     reference: string;
-    kind: "fee" | "reserve" | "reserve_release";
+    kind: "fee" | "fee_refund" | "reserve" | "reserve_release";
     amount: number;
   }[];
 }
@@ -38,10 +38,10 @@ export class MoneyReconciliation {
       truth.paymentReference === before.packet.intent_ref &&
         truth.currency === before.packet.snapshot.currency &&
         Math.abs(Date.now() - truth.fetchedAt.getTime()) < 60000 &&
+        Number.isSafeInteger(truth.netMinor) &&
         [
           truth.capturedMinor,
           truth.refundedMinor,
-          truth.netMinor,
           ...truth.entries.map((row) => row.amount),
         ].every((n) => Number.isSafeInteger(n) && n >= 0),
       "money_statement_invalid",
@@ -87,13 +87,13 @@ export class MoneyReconciliation {
         "Capture and refund causes must reconcile before accounting adjustments.",
       );
       for (const entry of truth.entries) {
+        const credit = ["reserve_release", "fee_refund"].includes(entry.kind);
         invariant(
           entry.reference.length > 0 && entry.reference.length <= 200,
           "money_reference_invalid",
           "The provider accounting reference is invalid.",
         );
-        const kind =
-          entry.kind === "reserve_release" ? "adjustment" : entry.kind;
+        const kind = credit ? "adjustment" : entry.kind;
         const cause = `money:${packetId}:${entry.kind}:${entry.reference}`;
         const prior = (
           await client.query(
@@ -105,8 +105,7 @@ export class MoneyReconciliation {
           !prior ||
             (BigInt(prior.amount) === BigInt(entry.amount) &&
               prior.currency === truth.currency &&
-              prior.refs.direction ===
-                (entry.kind === "reserve_release" ? "credit" : "debit")),
+              prior.refs.direction === (credit ? "credit" : "debit")),
           "money_entry_changed",
           "A posted provider entry changed; a new cause-linked adjustment is required.",
         );
@@ -123,7 +122,7 @@ export class MoneyReconciliation {
             cause,
             entry.reference,
             JSON.stringify({
-              direction: entry.kind === "reserve_release" ? "credit" : "debit",
+              direction: credit ? "credit" : "debit",
               sourcePayment: truth.paymentReference,
               entryKind: entry.kind,
             }),

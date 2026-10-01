@@ -1,23 +1,34 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { Notice } from "@qelvora/ui-web";
-
-export default async function YourAccount({
+import { IdSchema } from "@qelvora/api";
+import { currentSession } from "../../lib/session";
+import { IdentityWelcome } from "../../features/identity/welcome";
+import { AccountScreen } from "../../features/conversation/AccountScreen";
+import { IdentitySessionBoundary } from "../../features/identity/session-boundary";
+export const dynamic = "force-dynamic";
+export const metadata = { robots: { index: false, follow: false } };
+export default async function YouPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<{ creatorId?: string; fanId?: string }>;
 }) {
-  const context = await searchParams;
-  if (Object.keys(context).length === 0) redirect("/identity/account");
+  const query = await searchParams;
+  const validPair =
+    IdSchema.safeParse(query.creatorId).success &&
+    IdSchema.safeParse(query.fanId).success;
+  const returnTo = validPair
+    ? `/you?creatorId=${query.creatorId}&fanId=${query.fanId}`
+    : "/you";
+  const session = await currentSession(returnTo);
+  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
   return (
-    <main className="qv" style={{ maxWidth: 640, margin: "auto", padding: 16 }}>
-      <Notice title="Account link unavailable">
-        This link needs the current account view, which is not connected in this
-        workspace. The original context is kept in this URL.
-      </Notice>
-      <Link className="qv-btn qv-btn--secondary" href="/identity/account">
-        Open general account
-      </Link>
-    </main>
+    <IdentitySessionBoundary
+      key={`${session.accountId}:${returnTo}`}
+      initial={session}
+      returnTo={returnTo}
+    >
+      <AccountScreen
+        creatorId={validPair ? query.creatorId : undefined}
+        fanId={validPair ? query.fanId : undefined}
+      />
+    </IdentitySessionBoundary>
   );
 }

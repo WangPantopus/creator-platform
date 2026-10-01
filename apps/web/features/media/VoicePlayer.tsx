@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { AuthorLabel, SignedMarker } from "@qelvora/ui-web";
 import type {
@@ -58,7 +59,7 @@ export function CreatorVoicePlayer(
   )
     return (
       <p role="status">
-        This recording is unavailable for the current content.
+        {copy.w6ThisRecordingIsUnavailableForTheCurrentContent}
       </p>
     );
   return (
@@ -98,7 +99,9 @@ function Player({
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState((asset.durationMs ?? 0) / 1000);
   const ai = asset.purpose === "ai_audio";
-  const label = ai ? `${creatorName}'s AI audio` : `${creatorName}'s recording`;
+  const label = ai
+    ? formatCopy("w6SAIAudio", { value1: creatorName })
+    : formatCopy("w6SRecording", { value1: creatorName });
   const peaks = Array.from(
     { length: Math.min(26, asset.waveform.length) },
     (_, index) => {
@@ -125,7 +128,7 @@ function Player({
     const proof = playbackFile.current;
     const visibility = () => {
       let hidden = document.hidden;
-      for (let node = surface.current; node; node = node.parentElement)
+      for (let node = surface.current; node; node = node.parentElement) {
         if (
           node.hidden ||
           node.inert ||
@@ -135,14 +138,16 @@ function Player({
           hidden = true;
           break;
         }
+      }
       if (hidden) element?.pause();
     };
     const observer = new MutationObserver(visibility);
-    for (let node = surface.current; node; node = node.parentElement)
+    for (let node = surface.current; node; node = node.parentElement) {
       observer.observe(node, {
         attributes: true,
         attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
       });
+    }
     visibility();
     document.addEventListener("visibilitychange", visibility);
     const abort = new AbortController();
@@ -176,18 +181,14 @@ function Player({
                 current.provenance.fileSha256 !== proof.sha256 ||
                 current.provenance.fileBytes !== proof.bytes)
           )
-            throw new Error(
-              "This recording changed or is no longer available.",
-            );
+            throw new Error(copy.w6ThisRecordingChangedOrIsNoLongerAvailable);
         })
         .catch(() => {
           if (abort.signal.aborted) return;
           audio.current?.pause();
           setSrc(null);
           setPlaying(false);
-          setError(
-            "Audio access could not be confirmed. Refresh the link to try again.",
-          );
+          setError(copy.w6AudioAccessCouldNotBeConfirmedRefreshTheLinkTo);
         })
         .finally(() => {
           checking = false;
@@ -285,7 +286,7 @@ function Player({
       try {
         await element.play();
       } catch {
-        setError("Playback could not start. Try again.");
+        setError(copy.w6PlaybackCouldNotStartTryAgain);
       }
   }
   return (
@@ -293,7 +294,9 @@ function Player({
       ref={surface}
       className="qv w6-voice-player"
       aria-label={
-        ai ? `${creatorName}'s AI voice note` : `Recorded by ${creatorName}`
+        ai
+          ? formatCopy("w6SAIVoiceNote", { value1: creatorName })
+          : formatCopy("w6RecordedBy", { value1: creatorName })
       }
     >
       {ai && <AuthorLabel kind="ai" name={creatorName} time={time} />}
@@ -302,7 +305,7 @@ function Player({
       >
         {ai ? (
           <span className="qv-tag w6-ai-voice-label">
-            AI voice · opens with “{creatorName}’s AI”
+            {formatCopy("w6AIVoiceOpensWithSAI", { value1: creatorName })}
           </span>
         ) : (
           <AuthorLabel
@@ -318,12 +321,12 @@ function Player({
             disabled={loading}
             aria-label={
               loading
-                ? "Loading audio"
+                ? copy.w6LoadingAudio
                 : !src
-                  ? "Load voice note"
+                  ? copy.w6LoadVoiceNote
                   : playing
-                    ? "Pause voice note"
-                    : "Play voice note"
+                    ? copy.w6PauseVoiceNote
+                    : copy.w6PlayVoiceNote
             }
             onClick={() => {
               void toggle();
@@ -363,14 +366,19 @@ function Player({
         </div>
         {src && duration > 0 && (
           <label className="w6-audio-seek">
-            <span className="w6-sr-only">Seek in {label}</span>
+            <span className="w6-sr-only">
+              {formatCopy("w6SeekIn", { value1: label })}
+            </span>
             <input
               type="range"
               min="0"
               max={duration}
               step="0.1"
               value={Math.min(position, duration)}
-              aria-valuetext={`${elapsed(position)} of ${elapsed(duration)}`}
+              aria-valuetext={formatCopy("w6TimeOfDuration", {
+                value1: elapsed(position),
+                value2: elapsed(duration),
+              })}
               onChange={(event) => {
                 const next = Number(event.target.value);
                 if (audio.current) audio.current.currentTime = next;
@@ -396,9 +404,7 @@ function Player({
             onPause={() => setPlaying(false)}
             onEnded={() => setPlaying(false)}
             onError={() =>
-              setError(
-                "The audio link expired or access changed. Refresh it to try again.",
-              )
+              setError(copy.w6TheAudioLinkExpiredOrAccessChangedRefreshItTo)
             }
           />
         )}
@@ -414,20 +420,20 @@ function Player({
                 void load();
               }}
             >
-              Refresh audio link
+              {copy.w6RefreshAudioLink}
             </button>
           </>
         )}
         {transcript ? (
           <details className="qv-voicenote__transcript">
-            <summary>Read transcript</summary>
+            <summary>{copy.w6ReadTranscript}</summary>
             <p>{transcript}</p>
           </details>
         ) : null}
         {!ai && asset.signedActId && (
           <SignedMarker
             name={creatorName}
-            extra={`Recorded by ${creatorName}`}
+            extra={formatCopy("w6RecordedBy", { value1: creatorName })}
             href={`/verify/${asset.signedActId}`}
           />
         )}

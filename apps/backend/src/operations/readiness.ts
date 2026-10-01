@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type Capability = {
   state: "available" | "unavailable" | "development";
   code: string;
@@ -19,15 +21,17 @@ export class Readiness {
       this.probes.map(async (probe) => {
         let timer: ReturnType<typeof setTimeout> | undefined;
         try {
-          const value = await Promise.race([
-            probe.run(),
-            new Promise<never>((_resolve, reject) => {
-              timer = setTimeout(
-                () => reject(new Error("probe_timeout")),
-                2000,
-              );
-            }),
-          ]);
+          const value = ProbeResult.parse(
+            await Promise.race([
+              probe.run(),
+              new Promise<never>((_resolve, reject) => {
+                timer = setTimeout(
+                  () => reject(new Error("probe_timeout")),
+                  2000,
+                );
+              }),
+            ]),
+          );
           return {
             name: probe.name,
             required: probe.required,
@@ -55,3 +59,7 @@ export class Readiness {
     };
   }
 }
+const ProbeResult = z.strictObject({
+  state: z.enum(["available", "unavailable", "development"]),
+  code: z.string().regex(/^[a-z0-9_]{1,80}$/),
+});

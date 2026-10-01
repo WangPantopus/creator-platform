@@ -12,7 +12,12 @@ import {
   type DecisionCommand,
   type PrivacyCommand,
   type QueueName,
+  type PrivacyDomain,
 } from "./contracts.js";
+import {
+  PrivacyArtifact,
+  type PrivacyArtifactStore,
+} from "./privacy-export.js";
 
 type CaseRow = CaseSummary & {
   reporter_account_id: string;
@@ -55,6 +60,10 @@ const effectTypes: Partial<Record<DecisionCommand["resolution"], string>> = {
   reject_verification: "identity.reject_verification",
 };
 export type TrustDependencies = {
+  privacyVerificationMethod?: "current_session" | "external_receipt";
+  verifyExport?: (
+    actor: Actor,
+  ) => Promise<{ verifiedAt: Date; reference: string }>;
   evidence?: (
     actor: Actor,
     input: ReportCommand,
@@ -82,6 +91,7 @@ export class TrustService {
   constructor(
     readonly store: TrustStore,
     readonly dependencies: TrustDependencies = {},
+    readonly artifacts?: PrivacyArtifactStore,
   ) {}
   private async capturePrivacyOwnership(actor: Actor) {
     if (!this.dependencies.privacyOwnership) return null;
@@ -136,8 +146,8 @@ export class TrustService {
       ? await this.dependencies.evidence(actor, input)
       : { items: [] };
     if (
-      Buffer.byteLength(JSON.stringify(evidence.items.slice(0, 12))) >
-      512 * 1024
+      evidence.items.length > 12 ||
+      Buffer.byteLength(JSON.stringify(evidence.items)) > 512 * 1024
     )
       throw new DomainError(
         "evidence_too_large",
@@ -178,7 +188,7 @@ export class TrustService {
               ],
             );
             const result = created.rows[0]!;
-            for (const item of evidence.items.slice(0, 12))
+            for (const item of evidence.items)
               await client.query(
                 "INSERT INTO creator_trust.case_evidence(case_id,category,snapshot,expires_at) VALUES($1,$2,$3,now()+interval '12 months')",
                 [result.id, item.category, JSON.stringify(item)],
@@ -708,7 +718,19 @@ export class TrustService {
         "Reconnect your account before requesting data changes.",
         503,
       );
-    const verified = await this.dependencies.verifyPrivacy(actor, input);
+    const verification = z
+      .strictObject({
+        verifiedAt: z.date(),
+        reference: z.string().trim().min(8).max(200),
+      })
+      .safeParse(await this.dependencies.verifyPrivacy(actor, input));
+    if (!verification.success)
+      throw new DomainError(
+        "fresh_verification_required",
+        "Verify your account again.",
+        401,
+      );
+    const verified = verification.data;
     if (
       verified.verifiedAt.getTime() < Date.now() - 5 * 60_000 ||
       verified.verifiedAt.getTime() > Date.now() + 30_000
@@ -718,6 +740,20 @@ export class TrustService {
         "Verify your account again.",
         401,
       );
+    const { proof, ...immutable } = input;
+    void proof;
+    // Successful deletion can remove the original authority objects. A fresh,
+    // same-account replay returns only its original minimal job acknowledgment.
+    const prior = await this.store.actor(actor, (client) =>
+      priorCommand<{
+        id: string;
+        kind: PrivacyCommand["kind"];
+        state: string;
+        immediateDeny: boolean;
+        domainIntegration: string;
+      }>(client, actor, "privacy", input.idempotencyKey, immutable),
+    );
+    if (prior) return prior;
     if (input.scope !== "account") {
       if (!this.dependencies.authorizePrivacyScope)
         throw new DomainError(
@@ -727,8 +763,6 @@ export class TrustService {
         );
       await this.dependencies.authorizePrivacyScope(actor, input);
     }
-    const { proof, ...immutable } = input;
-    void proof;
     return this.store.actor(actor, (client) =>
       command(
         client,
@@ -905,6 +939,7 @@ export class TrustService {
         job.creator_id ?? undefined,
         job.thread_id ?? undefined,
       );
+      await this.verifyFreshExport(actor);
       return {
         schemaVersion: 1,
         jobId: id,
@@ -916,6 +951,101 @@ export class TrustService {
         ).rows,
       };
     });
+  }
+  /** This check is repeated during streaming; progress remains readable after
+   * deletion, while payload download still needs current permitted authority. */
+  async authorizeExport(actor: Actor, id: string) {
+    await this.verifyFreshExport(actor);
+    await this.store.actor(actor, async (client) => {
+      const job = (
+        await client.query(
+          "SELECT creator_id,thread_id FROM creator_trust.privacy_job WHERE id=$1 AND account_id=$2 AND kind='export' AND state='complete' AND completed_at>now()-interval '7 days'",
+          [id, actor.accountId],
+        )
+      ).rows[0];
+      if (!job)
+        throw new DomainError(
+          "export_artifact_unavailable",
+          "This export artifact is unavailable.",
+          404,
+        );
+      await this.assertAllowedInTransaction(
+        client,
+        actor,
+        job.creator_id ?? undefined,
+        job.thread_id ?? undefined,
+      );
+    });
+  }
+  private async verifyFreshExport(actor: Actor) {
+    if (!this.dependencies.verifyExport)
+      throw new DomainError(
+        "export_verification_unavailable",
+        "Reconnect your account before downloading personal data.",
+        503,
+      );
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const value = await (async () => {
+      try {
+        return await Promise.race([
+          this.dependencies.verifyExport!(actor),
+          new Promise<never>((_resolve, reject) => {
+            timer = setTimeout(
+              () =>
+                reject(
+                  new DomainError(
+                    "export_verification_unavailable",
+                    "Account verification is unavailable. Reconnect and retry.",
+                    503,
+                  ),
+                ),
+              2000,
+            );
+            timer.unref();
+          }),
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    })();
+    const proof = z
+      .strictObject({
+        verifiedAt: z.date(),
+        reference: z.string().trim().min(8).max(200),
+      })
+      .safeParse(value);
+    const age = proof.success
+      ? Date.now() - proof.data.verifiedAt.getTime()
+      : Infinity;
+    if (!proof.success || age < -30_000 || age >= 300_000)
+      throw new DomainError(
+        "fresh_verification_required",
+        "Continue with Pantopus again before downloading personal data.",
+        401,
+      );
+  }
+  async exportArtifact(
+    actor: Actor,
+    id: string,
+    domain: PrivacyDomain,
+    signal: AbortSignal,
+  ) {
+    const data = await this.exportData(actor, id);
+    const part = data.domains.find((entry) => entry.domain === domain);
+    const parsed = PrivacyArtifact.safeParse(part?.data);
+    if (!parsed.success || !this.artifacts)
+      throw new DomainError(
+        "export_artifact_unavailable",
+        "This protected export artifact is unavailable.",
+        503,
+      );
+    const binding = { jobId: id, accountId: actor.accountId, domain };
+    await this.artifacts.verify(parsed.data, binding, signal);
+    await this.authorizeExport(actor, id);
+    return {
+      artifact: parsed.data,
+      chunks: this.artifacts.read(parsed.data, binding, signal),
+    };
   }
   async inbox(actor: Actor) {
     return this.store.actor(actor, async (client) => ({

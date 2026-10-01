@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-01T02:10:47.666535+00:00",
+  "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+  "runtime": {
+    "startedAt": "2026-10-01T02:08:15.128055+00:00",
+    "pid": 97395,
+    "revision": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+    "log": "/Users/yingpengwang/.config/creator-platform/w8-local/api-3685c0acacb4-reconnected.jsonl",
+    "cwd": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform",
+    "retainedEnvironmentLoaded": true,
+    "keyValuesPrinted": false
+  },
+  "actualBrowser": "Supported in-app browser, same retained canonical session/tab and seeded history; automatic ticket/reconnect, no reload or token injection.",
+  "viewport": [
+    1280,
+    720
+  ],
+  "theme": "Light",
+  "shutdownRecords": [
+    {
+      "timestamp": "2026-10-01T02:07:15.783Z",
+      "event": "trust_local_shutdown_started",
+      "environment": "local-development",
+      "release": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+      "activeSockets": 1
+    },
+    {
+      "timestamp": "2026-10-01T02:07:15.800Z",
+      "event": "trust_local_shutdown_completed",
+      "environment": "local-development",
+      "release": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+      "durationMs": 16.68,
+      "activeSockets": 0,
+      "forcedSockets": 0,
+      "stages": {
+        "httpMs": 4.18,
+        "socketsMs": 4.67,
+        "workerMs": 2.22,
+        "poolsMs": 16.63
+      }
+    }
+  ],
+  "ticketsAcceptedAfterShutdownStart": 0,
+  "reconnectTickets": [
+    {
+      "timestamp": "2026-10-01T02:08:29.395Z",
+      "status": 200,
+      "correlationId": "ad296c66-17c8-43c5-91b3-44eed0e8b350",
+      "durationMs": 128.24
+    }
+  ],
+  "actualUi": {
+    "retainedOwnHistoryAndExactReportReferences": true,
+    "reconnectNoticeCleared": true,
+    "providerUnavailableSendDisabled": true
+  },
+  "health": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "correlationId": "9eac37f0-7803-4b89-8414-774e699c9e5e",
+      "release": null,
+      "ready": null
+    },
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "correlationId": "a26e5227-1a57-45b8-ac84-2c520382bda0",
+      "release": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+      "ready": false
+    }
+  ],
+  "preservation": {
+    "database": {
+      "cases": [
+        {
+          "id": "030868cc-e778-4fca-8731-02a4c817fcfa",
+          "state": "resolved",
+          "version": 2
+        },
+        {
+          "id": "27fbf5f9-7e9e-456e-8594-153a3ebcabfd",
+          "state": "open",
+          "version": 1
+        },
+        {
+          "id": "a19ec4ae-aae4-41cf-bae0-a4625aa64e70",
+          "state": "resolved",
+          "version": 4
+        },
+        {
+          "id": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+          "state": "resolved",
+          "version": 2
+        }
+      ],
+      "blocks": 1,
+      "tombstones": 1,
+      "privacyJobs": [
+        {
+          "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+          "kind": "export",
+          "scope": "account",
+          "state": "blocked"
+        },
+        {
+          "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+          "kind": "export",
+          "scope": "account",
+          "state": "blocked"
+        },
+        {
+          "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+          "kind": "delete",
+          "scope": "account",
+          "state": "blocked"
+        }
+      ],
+      "pendingDeletionTasks": 7
+    },
+    "all40ChecksumsMatch": true,
+    "matchesFirstDrainReceipt": true,
+    "sourceSqlAndRegistryUnchangedSince61e": true,
+    "envKeysBackupsCiphertextUnchanged": true,
+    "noResetReseedJobRetryOrSqlRoleGrantChange": true,
+    "paidCalls": 0
+  },
+  "screenshots": [
+    {
+      "path": "realtime-corrected-drain-recovered-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "realtime-corrected-drain-metrics-light.jpg",
+      "sha256": "d430ad622d1d1d9bd697f4dac197a12b5845ae3957564857bab97df47d87fc55"
+    }
+  ],
+  "limitations": [
+    "One local development functional drain sample; no p95/p99, five-second denial distribution, load or production/provider acceptance.",
+    "No in-flight generation/effect/stream job was active; protected worker lease completion remains source behavior, not timeout-after-success acceptance.",
+    "HTTP close/socket close/worker completion measured from same shutdown start; stages overlap and are not additive.",
+    "Native interactive, real frame/client-visible/settlement and provider drain remain open.",
+    "Post-restart supervisor counters verify one accepted subscription and1397 replay batches; actual actor switch revokes only its canonical session and closes the socket. Seeded history/replay does not prove model generation or visible delivery."
+  ],
+  "actualSupervisorCounters": {
+    "connectionsOpened": 1,
+    "subscriptionsAccepted": 1,
+    "batchesCompleted": 1397,
+    "batchesRefusedAfterCurrentSessionLogout": 1,
+    "connectionsClosed": 1,
+    "connectionsActive": 0,
+    "subscriptionsActive": 0,
+    "subscriptionsPending": 0,
+    "processUptimeSeconds": 203
+  },
+  "counterSnapshot": "realtime-corrected-drain-metrics-light.txt"
+}

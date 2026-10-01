@@ -1,0 +1,158 @@
+{
+  "workstream": "W3",
+  "increment": 24,
+  "predecessor": "25d459213b8ac6f69370d0f5f009be282c7596d7",
+  "sourceFiles": [
+    {
+      "path": "packages/api/src/client.ts",
+      "sha256": "3d221e582185bdaa9b54fc13ee97644919f44f1ca37bd9c9d2a748c5553ef7a3",
+      "gitBlob": "aad7e047a9b760a36bde537b86fb5f1cdcdcbd19"
+    },
+    {
+      "path": "packages/api/src/openapi.ts",
+      "sha256": "1e51161ee5031512ad20303353cf63549259ef2afae2c33dd4782df1e2afa3b6",
+      "gitBlob": "9f1628b4bb9333b9564b49fd7e2eb99a2df52037"
+    },
+    {
+      "path": "packages/api/src/media.ts",
+      "sha256": "ada8ad2928205fb448e9d266eaee72fe8229013ebd24adf692271ecb587c5598",
+      "gitBlob": "11ce4b8c14b32d84891a4949924ce98cde9842d1"
+    },
+    {
+      "path": "packages/api/src/conversation/contracts.ts",
+      "sha256": "a2bc5881be3c12458dcfda781747370bb93f678178d4b112be6ee9df03b4395e",
+      "gitBlob": "2badf3b55cd28ec9ddd5607c95b14069f937cd06"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "d838fbbdc5f1b1690f7f886c6bce168191123deb310f399047cee06f3f6e76ee",
+      "gitBlob": "35d2d5bc264ba90d02844a8c9226d4654156b7b1"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256": "7e3719f257fe352435908c7544841fe59ad671b29b82255ac03409faa795bf16",
+      "gitBlob": "83987a652d0ff16f564a5f1b8b4ae55fcdc31ca9"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256": "500d08049e8f0c905cb17e523163728fb8052407c7294a9c8d9a0bef3ff07034",
+      "gitBlob": "058548f486bc14fe9f5a0f29b1735e4d0ea1f942"
+    },
+    {
+      "path": "apps/web/features/media/VoicePlayer.tsx",
+      "sha256": "bd3b74f268668654f30677e0fb1593d2d2cfe32725b18b97f540dfcee727776c",
+      "gitBlob": "ab0a2811b471bfc5d2a3247abec4c882f0c4f063"
+    },
+    {
+      "path": "apps/web/features/media/api.ts",
+      "sha256": "38ff42e0e8e6a72913a6fc134598583b67d2c8420d06c8b41b3a133d18487eb0",
+      "gitBlob": "1bd52d6c16a5a707ed75fa22361e327bf0f183d8"
+    },
+    {
+      "path": "apps/web/features/media/session.tsx",
+      "sha256": "8eabaca15b68b185ab0c1503fc7cb5a9880056f27d005558465d39ad36b3e7bf",
+      "gitBlob": "88da28561db3589fc2b3d53ec99708d072a03899"
+    },
+    {
+      "path": "apps/web/app/threads/[creatorId]/[fanId]/page.tsx",
+      "sha256": "d33ed8fc5fa215a3cd1fb21aa0c62dff84d25020689a76bd034f1e8e9086c813",
+      "gitBlob": "1d9a3c99af9913a687c39ec08675040f4a7e7d3a"
+    },
+    {
+      "path": "apps/web/app/api/w6/[...path]/route.ts",
+      "sha256": "2e27c7dd5ec412d7cc3de2f6f73cecd78241b3d59f2df02c67adfe40a256cc0f",
+      "gitBlob": "517dcefe7a50ed4c69cb0dfcc08df024781f7349"
+    },
+    {
+      "path": "apps/web/features/conversation/ConversationScreen.tsx",
+      "sha256": "5937bad704b55846a994128a2bfff142d9fa5f77025f4019e5719d7f42163775",
+      "gitBlob": "c3506c6ba65f7706713d91ddc6a69dcc6bbcee64"
+    },
+    {
+      "path": "apps/backend/src/modules/media/router.ts",
+      "sha256": "816e406aaf36699bb619ee538fa1e5ef73e8ba50ad70d06bb7d0059ed45f4821",
+      "gitBlob": "6bf905d97e58087e7ccf0e121f661b71aa5d04af"
+    },
+    {
+      "path": "apps/backend/src/modules/media/service.ts",
+      "sha256": "9b2a49fc51e7e0700c86579ee290a809749406679f68c2587816d5a92368c988",
+      "gitBlob": "dd824a77e820d346353d87c48dfc9ace6a60317a"
+    },
+    {
+      "path": "apps/backend/src/modules/media/storage.ts",
+      "sha256": "c5479d78294e3ebf8de3f503d1481ad17de4d94d48e51b0fadc3bd120ae968a8",
+      "gitBlob": "3392f85a1a574e37ebf975ca34e8c16ce544dde3"
+    },
+    {
+      "path": "apps/backend/src/modules/media/worker.ts",
+      "sha256": "ef205e494342440aecdec7ed1d4011c02fdd404d2692ad79e4541e4b7c464475",
+      "gitBlob": "99808b5c3753e6d5059aecc1c48f0520799348c3"
+    },
+    {
+      "path": "apps/backend/src/modules/media/ai-audio.ts",
+      "sha256": "54f34259cc12a83ba0800894712df60bd43e8e00743ee739f9300ef10b5dc979",
+      "gitBlob": "7e125f16d276b5a55fcaf726c5da1872c3adf9df"
+    }
+  ],
+  "W1Producer": "c6490a05e3bda71bf0273e57ba201a889fecdc52",
+  "W6Producer": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+  "consumption": "Personal narrow reviewed recording result/operation/client, playbackFile, original thread MediaTickets/storage/service/manifest/current-stream regions; no unrelated content/studio/creator graph or processor refactor",
+  "W6ExactFiles": [
+    "apps/backend/src/modules/media/service.ts",
+    "apps/backend/src/modules/media/ai-audio.ts"
+  ],
+  "canonicalAPI": {
+    "previousOperations": 31,
+    "currentOperations": 32,
+    "added": "deliverConversationRecording",
+    "allOldIdsPathsMethodsPreserved": true,
+    "generated": "pnpm generate; unchanged pnpm generate:check PASS"
+  },
+  "checks": {
+    "backendBuild": {
+      "path": "tmp/w3-runtime-20260930/increment24-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "result": "PASS"
+    },
+    "webBuild": {
+      "path": "tmp/w3-runtime-20260930/increment24-web-build.log",
+      "sha256": "6e82ec9ff486d445209ec03e359fd5fd6d76097a60c343ae5915c850bcd75ff1",
+      "result": "PASS"
+    },
+    "webTypecheck": {
+      "path": "tmp/w3-runtime-20260930/increment24-web-typecheck.log",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "result": "PASS"
+    },
+    "sourceLint": {
+      "path": "tmp/w3-runtime-20260930/increment24-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS"
+    },
+    "generateCheck": {
+      "path": "tmp/w3-runtime-20260930/increment24-generate-check.log",
+      "sha256": "f7c6e0949e3c28375f9b21af2f2d6e52b8377338e25d8cf275c073f2e03e303d",
+      "result": "PASS"
+    }
+  },
+  "actualBrowser": {
+    "journey": "Expired session\u2192Continue with Pantopus\u2192Development actor one\u2192persisted w3_dev_actor1/intro/emptyaccount",
+    "screenshot": {
+      "path": "artifacts/workstreams/W3/increment-24/20260930-recording-playback/actual-browser-account.png",
+      "sha256": "879fdd96dd476e1ea610bfeaea9dc31be6da5970ffec8891416a70d7485c1a32"
+    },
+    "actualRecordingPlayback": false
+  },
+  "authority": "Actual stored signed message/thread/asset/signature; genuine current account; original processed signing tuple plus mandatory separate final served-file tuple; never duplicate signature consumption",
+  "native": "Signed simulator shipping build predecessor20 PASS; current24 generated native builds not yet run; actual22Androidlaunch visiblySystemUIANR, no clean native E2E",
+  "deployment": {
+    "recordingProposal": "unallocated_unapplied",
+    "privateFanPublicationAuthority": "missing",
+    "defaultHostMedia": "unconfigured",
+    "rightsOrPricingApproved": false
+  },
+  "implementationDelegated": false,
+  "newTestsOrAssertionsReferences": false,
+  "allClientAcceptance": false,
+  "mergeReady": false
+}

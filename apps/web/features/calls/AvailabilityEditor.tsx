@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useState } from "react";
 import { mediaRequest } from "../media/api";
 import "../media/media.css";
@@ -13,11 +14,11 @@ export function AvailabilityEditor({
   fanId,
 }: {
   creatorId: string;
-  fanId: string;
+  fanId?: string;
 }) {
   return (
     <AvailabilityForm
-      key={`${creatorId}/${fanId}`}
+      key={`${creatorId}/${fanId ?? "creator"}`}
       creatorId={creatorId}
       fanId={fanId}
     />
@@ -28,9 +29,11 @@ function AvailabilityForm({
   fanId,
 }: {
   creatorId: string;
-  fanId: string;
+  fanId?: string;
 }) {
-  const root = `threads/${creatorId}/${fanId}/call-availability`;
+  const root = fanId
+    ? `threads/${creatorId}/${fanId}/call-availability`
+    : `creators/${creatorId}/call-availability`;
   const [current, setCurrent] = useState<Availability | null>(null);
   const [zone, setZone] = useState("");
   const [windows, setWindows] = useState<Availability["windows"]>([]);
@@ -52,7 +55,7 @@ function AvailabilityForm({
       setNotice(
         error instanceof Error
           ? error.message
-          : "Availability could not be loaded.",
+          : copy.w6AvailabilityCouldNotBeLoaded,
       );
     } finally {
       setBusy(false);
@@ -76,7 +79,7 @@ function AvailabilityForm({
           setNotice(
             error instanceof Error
               ? error.message
-              : "Availability could not be loaded.",
+              : copy.w6AvailabilityCouldNotBeLoaded,
           );
       });
     return () => {
@@ -96,9 +99,7 @@ function AvailabilityForm({
           (w) => !explicit.test(w.startsAt) || !explicit.test(w.endsAt),
         )
       )
-        throw new Error(
-          "Use ISO times with an explicit UTC offset for each boundary.",
-        );
+        throw new Error(copy.w6UseISOTimesWithAnExplicitUTCOffsetForEach);
       const value = await mediaRequest<Availability>(root, {
         method: "PUT",
         body: JSON.stringify({
@@ -111,25 +112,24 @@ function AvailabilityForm({
       setCurrent(value);
       setZone(value.timeZone);
       setWindows(value.windows);
-      setNotice("Availability saved.");
+      setNotice(copy.w6AvailabilitySaved);
     } catch (error) {
       setNotice(
         error instanceof Error
           ? error.message
-          : "Availability could not be saved. Your changes are kept.",
+          : copy.w6AvailabilityCouldNotBeSavedYourChangesAreKept,
       );
     } finally {
       setBusy(false);
     }
   }
   return (
-    <section className="w6-card" aria-label="Call availability">
-      <h2>Call availability</h2>
+    <section className="w6-card" aria-label={copy.w6CallAvailability}>
+      <h2>{copy.w6CallAvailability}</h2>
       <p className="qv-help">
-        Use dated windows. Each offered call and its reconnect allowance must
-        fit inside one window. Existing bookings keep their agreed time.
+        {copy.w6UseDatedWindowsEachOfferedCallAndItsReconnectAllowance}
       </p>
-      <label htmlFor="call-availability-zone">Your time zone</label>
+      <label htmlFor="call-availability-zone">{copy.w6YourTimeZone}</label>
       <input
         id="call-availability-zone"
         type="text"
@@ -139,10 +139,10 @@ function AvailabilityForm({
       />
       {windows.map((window, index) => (
         <fieldset key={index} className="w6-offer-slot">
-          <legend>Window {index + 1}</legend>
+          <legend>{formatCopy("w6Window", { value1: index + 1 })}</legend>
           {(["startsAt", "endsAt"] as const).map((key) => (
             <label key={key}>
-              {key === "startsAt" ? "Starts" : "Ends"}
+              {key === "startsAt" ? copy.w6Starts : copy.w6Ends}
               <input
                 type="text"
                 placeholder="YYYY-MM-DDTHH:mm±HH:mm"
@@ -163,19 +163,19 @@ function AvailabilityForm({
             disabled={busy}
             onClick={() => setWindows(windows.filter((_, i) => i !== index))}
           >
-            Remove window {index + 1}
+            {formatCopy("w6RemoveWindow", { value1: index + 1 })}
           </button>
         </fieldset>
       ))}
       {loaded && !windows.length && (
-        <p className="qv-help">No windows saved.</p>
+        <p className="qv-help">{copy.w6NoWindowsSaved}</p>
       )}
       <button
         className="qv-btn qv-btn--secondary"
         disabled={!loaded || busy || windows.length >= 64}
         onClick={() => setWindows([...windows, { startsAt: "", endsAt: "" }])}
       >
-        Add a window
+        {copy.w6AddAWindow}
       </button>
       <button
         className="qv-btn qv-btn--secondary"
@@ -184,7 +184,7 @@ function AvailabilityForm({
           void save();
         }}
       >
-        Save availability
+        {copy.w6SaveAvailability}
       </button>
       <button
         className="qv-btn qv-btn--quiet"
@@ -193,7 +193,7 @@ function AvailabilityForm({
           void refresh();
         }}
       >
-        Reload saved windows
+        {copy.w6ReloadSavedWindows}
       </button>
       {notice && <p role="status">{notice}</p>}
     </section>

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import { invariant } from "../../core/errors.js";
+import type { PoolClient } from "pg";
 export async function reserveCreatorCost(
   repository: AgentRepository,
   scope: CreatorScope,
@@ -14,9 +15,21 @@ export async function reserveCreatorCost(
     "pricing_required",
     "Verified provider rates are required before live generation.",
   );
+  await repository.transaction(scope, async (client) => {
+    // An expired hold can be an orphaned provider call after a crash. Its cost is
+    // uncertain, so expiry alone must not silently restore the daily budget.
+    const bound = Boolean(repository.usageJournal);
+    await client.query(
+      `WITH expired AS (UPDATE creator.ai_cost_hold SET state='settled'
+       WHERE creator_id=$1 AND state='held' AND expires_at<=now() RETURNING id)
+       INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms${bound ? ",creator_hold_id" : ""})
+       SELECT $1,id::text,'unreconciled','expired-cost-hold',0,0,NULL,'provider_unknown',0${bound ? ",id" : ""} FROM expired`,
+      [scope.creatorId],
+    );
+  });
   return repository.transaction(scope, async (client) => {
     const usage = await client.query<{ total: string; unknown: string }>(
-      "SELECT coalesce(sum(cost_micros),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','provider_unknown') AND created_at>=date_trunc('day',now())",
+      "SELECT coalesce(sum(cost_micros) FILTER(WHERE created_at>=date_trunc('day',now())),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','memory','provider_unknown')",
       [scope.creatorId],
     );
     const holds = await client.query<{ total: string }>(
@@ -50,15 +63,49 @@ export async function settleCreatorCost(
   model: string,
   versionHash: string,
 ) {
-  return repository.transaction(scope, async (client) => {
-    const settled = await client.query(
-      "UPDATE creator.ai_cost_hold SET state=$3 WHERE id=$1 AND creator_id=$2 AND state='held' RETURNING id",
-      [id, scope.creatorId, completed ? "settled" : "released"],
+  return repository.transaction(scope, (client) =>
+    settleCreatorCostInTransaction(
+      client,
+      scope,
+      id,
+      completed,
+      provider,
+      model,
+      versionHash,
+      Boolean(repository.usageJournal),
+    ),
+  );
+}
+/** W3 supplies its existing final admission transaction after memory work. */
+export async function settleCreatorCostInTransaction(
+  client: PoolClient,
+  scope: CreatorScope,
+  id: string,
+  completed: boolean,
+  provider: string,
+  model: string,
+  versionHash: string,
+  bindJournalHold = false,
+) {
+  // Serialize with reserveCreatorCost's workspace lock: a reservation must
+  // observe either the still-held ceiling or all usage before its release.
+  await client.query(
+    "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+    [scope.creatorId],
+  );
+  const settled = await client.query(
+    "UPDATE creator.ai_cost_hold SET state=$3 WHERE id=$1 AND creator_id=$2 AND state='held' RETURNING id",
+    [id, scope.creatorId, completed ? "settled" : "released"],
+  );
+  if (settled.rowCount && !completed)
+    await client.query(
+      `INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms${bindJournalHold ? ",creator_hold_id" : ""}) VALUES($1,$2,$3,$4,0,0,NULL,'provider_unknown',0${bindJournalHold ? ",$5" : ""})`,
+      [
+        scope.creatorId,
+        versionHash,
+        provider,
+        model,
+        ...(bindJournalHold ? [id] : []),
+      ],
     );
-    if (settled.rowCount && !completed)
-      await client.query(
-        "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,0,0,NULL,'provider_unknown',0)",
-        [scope.creatorId, versionHash, provider, model],
-      );
-  });
 }

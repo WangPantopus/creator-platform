@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-10-01T07:00:38.032553+00:00",
+  "main": "ebb24c7e640d972933ca907a673bb879b8190a56",
+  "originalHead": "39f55d91b058738a2deaddfab8ad84e461d4e7f8",
+  "migration": {
+    "operatorCommit": "5d1adc831eac7501d322a93e9ce8f2901d3d6973",
+    "database": "creator_w5",
+    "state": "committed",
+    "originalMigrationRowsPreserved": 35,
+    "totalMigrationRows": 48,
+    "originalTables": 136,
+    "originalDataRows": 281,
+    "originalColumnValuesAndRowMultiplicitiesPreserved": true,
+    "aliasedSqlReplayed": false,
+    "canonicalAlreadyApplied": 40,
+    "trafficReopened": false,
+    "closedBackupRestoredIndependently": true
+  },
+  "validation": {
+    "generatedOperations": 96,
+    "generatedCheck": "pass",
+    "backendTypecheck": "pass",
+    "backendBuild": "pass",
+    "webTypecheck": "pass",
+    "webProductionBuild": "pass",
+    "scopedEslint": "pass",
+    "mergeMarkersRemaining": 0,
+    "iosShippingBuild": "running",
+    "androidShippingBuild": "running",
+    "combinedAppAcceptance": "pending"
+  },
+  "gates": {
+    "genuineCreatorSigning": "blocked by user choice; never simulated",
+    "reservedFutureMigrations": "not applied",
+    "providerDependentMediaApprovalDelivery": "unavailable unless canonical producer authority is configured"
+  },
+  "review": "W1 personally reviewed reconciled identity/session/BFF/shared boundaries, no source blocker; not blanket acceptance."
+}

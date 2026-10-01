@@ -18,7 +18,7 @@ import type { ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
-import type { CallProvider } from "./provider.js";
+import { validateProviderState, type CallProvider } from "./provider.js";
 import { calculateClocks, determineOutcome } from "./clocks.js";
 import type { AvailabilityService } from "./availability.js";
 import { withDeadline } from "../media/deadline.js";
@@ -74,6 +74,7 @@ type SessionRow = {
   revoked_at: Date | null;
   worker_lease_until: Date | null;
 };
+const providerTimestamp = z.iso.datetime({ offset: true });
 export function validateZone(zone: string) {
   try {
     return new Intl.DateTimeFormat("en", { timeZone: zone }).resolvedOptions()
@@ -118,11 +119,12 @@ export class SessionService {
     scope: ThreadScope,
     client: PoolClient,
     id: string,
+    lock = false,
   ): Promise<SessionRow | null> {
     return (
       (
         await client.query<SessionRow>(
-          "SELECT * FROM creator.call_session WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4",
+          `SELECT * FROM creator.call_session WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4 ${lock ? "FOR UPDATE" : ""}`,
           [id, scope.creatorId, scope.fanId, scope.threadId],
         )
       ).rows[0] ?? null
@@ -555,6 +557,36 @@ export class SessionService {
       serverNow: new Date().toISOString(),
     }));
   }
+  private async closeDeniedJoin(
+    scope: ThreadScope,
+    id: string,
+    error: unknown,
+  ) {
+    if (
+      !(error instanceof DomainError) ||
+      ![
+        "call_ended",
+        "call_unavailable",
+        "call_authorization_revoked",
+      ].includes(error.code)
+    )
+      return;
+    await this.db.withThread(scope, async (client) => {
+      const current = await this.lifecycleRow(scope, client, id, true);
+      if (!current) return;
+      if (error.code !== "call_ended")
+        await client.query(
+          "UPDATE creator.call_session SET revoked_at=COALESCE(revoked_at,now()) WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+          [id, scope.creatorId, scope.fanId],
+        );
+      // A provider creation/token response can arrive after the first cancellation
+      // cleanup. Renew the intent and fence any older cleanup acknowledgment.
+      await client.query(
+        "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'close_room',$4,'{}') ON CONFLICT(key) DO UPDATE SET completed_at=NULL,lease_until=NULL,failure_code=NULL,available_at=now()",
+        [id, scope.creatorId, scope.fanId, `${id}:denied-join-close`],
+      );
+    });
+  }
   async join(scope: ThreadScope, id: string) {
     const role = participant(scope);
     const row = await this.db.withThread(scope, async (client) => {
@@ -615,40 +647,47 @@ export class SessionService {
       });
       throw error;
     }
-    const admission = await this.db.withThread(scope, async (client) => {
-      const current = await this.row(scope, client, id, true);
-      invariant(
-        !current.ended_by &&
-          !["ending", "ended", "cancelled"].includes(current.document.state) &&
-          Date.now() < Date.parse(current.document.hardEndAt),
-        "call_ended",
-        "This call has ended.",
-      );
-      const nonce = randomUUID();
-      const expiresAt = new Date(Date.now() + 30_000).toISOString();
-      await client.query(
-        "INSERT INTO creator.call_admission(id,session_id,creator_id,fan_id,account_id,expires_at) VALUES($1,$2,$3,$4,$5,$6)",
-        [
+    const admission = await this.db
+      .withThread(scope, async (client) => {
+        const current = await this.row(scope, client, id, true);
+        invariant(
+          !current.ended_by &&
+            !["ending", "ended", "cancelled"].includes(
+              current.document.state,
+            ) &&
+            Date.now() < Date.parse(current.document.hardEndAt),
+          "call_ended",
+          "This call has ended.",
+        );
+        const nonce = randomUUID();
+        const expiresAt = new Date(Date.now() + 30_000).toISOString();
+        await client.query(
+          "INSERT INTO creator.call_admission(id,session_id,creator_id,fan_id,account_id,expires_at) VALUES($1,$2,$3,$4,$5,$6)",
+          [
+            nonce,
+            id,
+            scope.creatorId,
+            scope.fanId,
+            scope.actorAccountId,
+            expiresAt,
+          ],
+        );
+        if (current.document.state === "scheduled")
+          await this.persist(scope, client, {
+            ...current.document,
+            state: "waiting",
+          });
+        return {
           nonce,
-          id,
-          scope.creatorId,
-          scope.fanId,
-          scope.actorAccountId,
           expiresAt,
-        ],
-      );
-      if (current.document.state === "scheduled")
-        await this.persist(scope, client, {
-          ...current.document,
-          state: "waiting",
-        });
-      return {
-        nonce,
-        expiresAt,
-        roomId: current.room_id,
-        camera: current.document.mediaMode === "video",
-      };
-    });
+          roomId: current.room_id,
+          camera: current.document.mediaMode === "video",
+        };
+      })
+      .catch(async (error) => {
+        await this.closeDeniedJoin(scope, id, error);
+        throw error;
+      });
     try {
       // Mint outside the interactive database transaction; reauthorize after the provider responds.
       const token = await withDeadline(
@@ -701,6 +740,7 @@ export class SessionService {
           [admission.nonce, id, scope.creatorId, scope.fanId],
         );
       });
+      await this.closeDeniedJoin(scope, id, error);
       throw error;
     }
   }
@@ -743,6 +783,14 @@ export class SessionService {
             "call_stale",
             "The call changed. Refresh before changing consent.",
           );
+          invariant(
+            !body.granted ||
+              (row.document.state !== "cancelled" &&
+                (body.purpose !== "recording" ||
+                  !["ending", "ended"].includes(row.document.state))),
+            "call_consent_unavailable",
+            "Recording permission can only be granted before the call ends.",
+          );
           const consent = {
             id: randomUUID(),
             actorAccountId: scope.actorAccountId,
@@ -779,11 +827,14 @@ export class SessionService {
                 (c) => c.role === r && c.purpose === "recording" && c.granted,
               ),
             );
-            document.recordingState = both
-              ? "starting"
-              : document.recordingState === "on"
-                ? "stopping"
-                : "off";
+            document.recordingState =
+              both && !["ending", "ended", "cancelled"].includes(document.state)
+                ? "starting"
+                : ["on", "starting", "stopping"].includes(
+                      document.recordingState,
+                    )
+                  ? "stopping"
+                  : "off";
             await client.query(
               "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'sync_recording',$4,'{}')",
               [id, scope.creatorId, scope.fanId, consent.id],
@@ -941,6 +992,12 @@ export class SessionService {
             "This appointment cannot be cancelled here. Open its current resolution options.",
           );
           await this.authority.cancel(scope, row.document.commitmentId, client);
+          // An in-flight early join may already have created the waiting room.
+          // Terminal sessions are not polled, so retain a durable closure intent.
+          await client.query(
+            "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'close_room',$4,'{}') ON CONFLICT(key) DO NOTHING",
+            [id, scope.creatorId, scope.fanId, `${id}:cancelled-close`],
+          );
           await client.query(
             "UPDATE creator.call_slot SET active=false WHERE creator_id=$1 AND fan_id=$2 AND offer_id IN(SELECT id FROM creator.call_offer WHERE commitment_id=$3 AND creator_id=$1 AND fan_id=$2)",
             [scope.creatorId, scope.fanId, row.document.commitmentId],
@@ -958,6 +1015,9 @@ export class SessionService {
           return this.persist(scope, client, {
             ...row.document,
             state: "cancelled",
+            recordingState:
+              row.document.recordingState === "off" ? "off" : "stopping",
+            present: [],
           });
         },
       ),
@@ -1010,16 +1070,137 @@ export class SessionService {
   }
   /** Provider history only. This is called by the durable session worker, never a client callback. */
   async reconcile(scope: ThreadScope, id: string, lease?: string) {
-    const row = await this.db.withThread(scope, (client) =>
-      this.row(scope, client, id),
-    );
+    let row: SessionRow;
+    try {
+      row = await this.db.withThread(scope, (client) =>
+        this.row(scope, client, id),
+      );
+    } catch (error) {
+      // Losing join authority must not strand an already-running room until its hard end.
+      if (
+        !(error instanceof DomainError) ||
+        !["call_unavailable", "call_authorization_revoked"].includes(error.code)
+      )
+        throw error;
+      const revoked = await this.db.withThread(scope, async (client) => {
+        const current = await this.lifecycleRow(scope, client, id, true);
+        if (
+          !current ||
+          (lease && current.worker_lease_until?.toISOString() !== lease)
+        )
+          return null;
+        await client.query(
+          "UPDATE creator.call_session SET revoked_at=COALESCE(revoked_at,now()) WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+          [id, scope.creatorId, scope.fanId],
+        );
+        await this.persist(scope, client, {
+          ...current.document,
+          state: "ending",
+          recordingState:
+            current.document.recordingState === "off" ? "off" : "stopping",
+        });
+        return current;
+      });
+      if (!revoked) throw error;
+      await withDeadline(this.provider.closeRoom(revoked.room_id), 5000);
+      await withDeadline(
+        this.provider.setRecording(
+          revoked.room_id,
+          false,
+          `${id}:authorization-revoked`,
+        ),
+        5000,
+      );
+      const truth = validateProviderState(
+        await withDeadline(this.provider.state(revoked.room_id), 5000),
+      );
+      invariant(
+        truth.closed && !truth.recording,
+        "call_revocation_unconfirmed",
+        "Call closure is awaiting provider confirmation.",
+      );
+      return this.db.withThread(scope, async (client) => {
+        const current = await this.lifecycleRow(scope, client, id, true);
+        invariant(
+          current?.revoked_at,
+          "call_revocation_changed",
+          "Call cleanup changed.",
+        );
+        if (lease && current.worker_lease_until?.toISOString() !== lease)
+          return current.document;
+        // This closes media only; it creates no fulfillment evidence or monetary outcome.
+        return this.persist(scope, client, {
+          ...current.document,
+          state: "cancelled",
+          recordingState: "off",
+          present: [],
+        });
+      });
+    }
     const doc = row.document;
     if (["ended", "cancelled"].includes(doc.state)) return doc;
+    const closureRequired = Boolean(
+      row.ended_by ||
+        doc.state === "ending" ||
+        Date.now() >= Date.parse(doc.hardEndAt),
+    );
+    // Persist the request phase before an external close/history outage; never report closure as confirmed.
+    if (
+      closureRequired &&
+      (doc.state !== "ending" ||
+        !["off", "stopping"].includes(doc.recordingState))
+    ) {
+      const ending = await this.db.withThread(scope, async (client) => {
+        const current = await this.row(scope, client, id, true);
+        if (
+          current.document.version !== doc.version ||
+          (lease && current.worker_lease_until?.toISOString() !== lease)
+        )
+          return current.document;
+        return this.persist(scope, client, {
+          ...current.document,
+          state: "ending",
+          recordingState:
+            current.document.recordingState === "off" ? "off" : "stopping",
+        });
+      });
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
+      return ending;
+    }
+    // Closing known ending/deadline paths does not depend on a healthy history API.
+    // Evidence and settlement still wait for confirmed closure and complete history below.
+    if (closureRequired)
+      await withDeadline(this.provider.closeRoom(row.room_id), 5000);
     const provider = await withDeadline(
       this.provider.history(row.room_id),
       5000,
     );
-    const state = await withDeadline(this.provider.state(row.room_id), 5000);
+    invariant(
+      typeof provider.complete === "boolean" &&
+        typeof provider.closed === "boolean" &&
+        typeof provider.reference === "string" &&
+        (!provider.complete || provider.reference.trim().length > 0) &&
+        Array.isArray(provider.participants) &&
+        provider.participants.every(
+          (participant) =>
+            typeof participant.accountId === "string" &&
+            participant.accountId.length > 0 &&
+            Array.isArray(participant.intervals) &&
+            participant.intervals.every(
+              (interval) =>
+                providerTimestamp.safeParse(interval.start).success &&
+                providerTimestamp.safeParse(interval.end).success &&
+                Number.isFinite(Date.parse(interval.start)) &&
+                Number.isFinite(Date.parse(interval.end)) &&
+                Date.parse(interval.end) >= Date.parse(interval.start),
+            ),
+        ),
+      "call_history_invalid",
+      "Call history is awaiting valid provider evidence.",
+    );
+    const state = validateProviderState(
+      await withDeadline(this.provider.state(row.room_id), 5000),
+    );
     const now = new Date().toISOString();
     const creator = provider.participants
       .filter((p) => p.accountId === doc.creatorAccountId)
@@ -1027,33 +1208,54 @@ export class SessionService {
     const fan = provider.participants
       .filter((p) => p.accountId === doc.fanAccountId)
       .flatMap((p) => p.intervals);
-    const clocks = calculateClocks({
-      creator,
-      fan,
-      scheduledAt: doc.scheduledAt,
-      measuredUntil: row.end_requested_at?.toISOString() ?? now,
-      durationSeconds: doc.durationSeconds,
-      hardEndAt: doc.hardEndAt,
-      reconnectBudgetSeconds: doc.reconnectBudgetSeconds,
-    });
     const graceAt = Date.parse(doc.scheduledAt) + doc.graceSeconds * 1000;
     const creatorJoinedByGrace = creator.some(
       (i) =>
         Date.parse(i.start) < graceAt &&
-        Date.parse(i.end) >= Date.parse(doc.scheduledAt),
+        Date.parse(i.end) > Date.parse(doc.scheduledAt),
     );
     const fanJoinedByGrace = fan.some(
       (i) =>
         Date.parse(i.start) < graceAt &&
-        Date.parse(i.end) >= Date.parse(doc.scheduledAt),
+        Date.parse(i.end) > Date.parse(doc.scheduledAt),
     );
+    // Missing intervals cannot establish absence. Only complete history may close a no-show early.
     const noShow =
-      Date.now() >= graceAt &&
-      !clocks.connectedMilliseconds &&
+      provider.complete &&
+      Date.parse(now) >= graceAt &&
+      (!row.end_requested_at || row.end_requested_at.getTime() >= graceAt) &&
       (!creatorJoinedByGrace || !fanJoinedByGrace);
+    const measuredUntil = Math.min(
+      Date.parse(now),
+      row.end_requested_at?.getTime() ?? Infinity,
+      noShow ? graceAt : Infinity,
+    );
+    const measuredClocks = calculateClocks({
+      creator,
+      fan,
+      scheduledAt: doc.scheduledAt,
+      measuredUntil: new Date(measuredUntil).toISOString(),
+      durationSeconds: doc.durationSeconds,
+      hardEndAt: doc.hardEndAt,
+      reconnectBudgetSeconds: doc.reconnectBudgetSeconds,
+    });
+    // Incomplete history cannot establish a drop or roll back previously confirmed time.
+    const clocks = provider.complete
+      ? measuredClocks
+      : {
+          connectedMilliseconds: doc.connectedMilliseconds,
+          reconnectUsedMilliseconds: doc.reconnectUsedMilliseconds,
+          connectedIntervals: [],
+        };
+    const unexpectedClosure =
+      state.closed &&
+      provider.closed &&
+      clocks.connectedMilliseconds > 0 &&
+      clocks.connectedMilliseconds < doc.durationSeconds * 1000;
     const endDue =
       row.ended_by ||
       noShow ||
+      unexpectedClosure ||
       Date.now() >= Date.parse(doc.hardEndAt) ||
       clocks.connectedMilliseconds >= doc.durationSeconds * 1000 ||
       clocks.reconnectUsedMilliseconds >= doc.reconnectBudgetSeconds * 1000;
@@ -1062,11 +1264,17 @@ export class SessionService {
     // A subsequent polling pass must observe provider closure plus complete history.
     const endedBy =
       row.ended_by ??
-      (clocks.reconnectUsedMilliseconds >= doc.reconnectBudgetSeconds * 1000
+      (unexpectedClosure ||
+      clocks.reconnectUsedMilliseconds >= doc.reconnectBudgetSeconds * 1000
         ? "failure"
         : "timer");
     const outcome =
-      endDue && state.closed && provider.closed && provider.complete
+      endDue &&
+      state.closed &&
+      !state.recording &&
+      state.presentAccountIds.length === 0 &&
+      provider.closed &&
+      provider.complete
         ? determineOutcome({
             ...clocks,
             durationSeconds: doc.durationSeconds,
@@ -1074,7 +1282,7 @@ export class SessionService {
             fanEndedByChoice: row.fan_ended_by_choice,
             creatorJoinedByGrace,
             fanJoinedByGrace,
-            graceElapsed: Date.now() >= graceAt,
+            graceElapsed: measuredUntil >= graceAt,
           })
         : null;
     return this.db.withThread(scope, async (client) => {
@@ -1091,6 +1299,12 @@ export class SessionService {
         present.push("creator");
       if (state.presentAccountIds.includes(doc.fanAccountId))
         present.push("fan");
+      const recordingPermitted =
+        ["creator", "fan"].every((role) =>
+          doc.consents.some(
+            (c) => c.role === role && c.purpose === "recording" && c.granted,
+          ),
+        ) && !endDue;
       const next: CallSession = {
         ...doc,
         ...clocks,
@@ -1106,10 +1320,43 @@ export class SessionService {
                 : "waiting",
         outcome,
         reconciliation: outcome ? "complete" : endDue ? "blocked" : "pending",
-        recordingState: state.recording ? "on" : "off",
+        recordingState: state.recording
+          ? recordingPermitted
+            ? "on"
+            : "stopping"
+          : "off",
         recordingOccurred: Boolean(doc.recordingOccurred || state.recording),
       };
+      if (state.recording && !recordingPermitted)
+        await client.query(
+          "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'sync_recording',$4,'{}') ON CONFLICT(key) DO NOTHING",
+          [
+            id,
+            scope.creatorId,
+            scope.fanId,
+            `${id}:recording-denied:${doc.version}`,
+          ],
+        );
       if (outcome) {
+        if (
+          !["ready", "deleted"].includes(doc.summaryState ?? "absent") &&
+          ["creator", "fan"].every((role) =>
+            doc.consents.some(
+              (c) => c.role === role && c.purpose === "summary" && c.granted,
+            ),
+          )
+        ) {
+          next.summaryState = "pending";
+          await client.query(
+            "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'generate_summary',$4,'{}') ON CONFLICT(key) DO NOTHING",
+            [
+              id,
+              scope.creatorId,
+              scope.fanId,
+              `${id}:ended-summary:${doc.summaryRevision ?? 0}`,
+            ],
+          );
+        }
         const evidence: SessionEvidence = {
           schemaVersion: 1,
           sessionId: id,
@@ -1158,6 +1405,7 @@ export class SessionService {
         next.state !== doc.state ||
         next.outcome !== doc.outcome ||
         next.recordingState !== doc.recordingState ||
+        next.summaryState !== doc.summaryState ||
         JSON.stringify(next.present) !== JSON.stringify(doc.present);
       return this.persist(scope, client, next, !structural);
     });

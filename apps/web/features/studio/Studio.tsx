@@ -40,8 +40,9 @@ import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
-import { StudioFailure, studioRequest } from "./api";
+import { configureStudioRequests, StudioFailure, studioRequest } from "./api";
 import "./studio.css";
+import { useIdentityRequest } from "../identity/session-boundary";
 
 type Creator = {
   id: string;
@@ -162,8 +163,13 @@ export function Studio({
   creatorId?: string;
   screen?: string[];
 }) {
+  const { session, signal } = useIdentityRequest();
+  useEffect(
+    () => configureStudioRequests({ accountId: session.accountId, signal }),
+    [session.accountId, signal],
+  );
   const requestedPath = creatorId
-    ? `/studio/${creatorId}/${screen.join("/")}`
+    ? `/studio/${creatorId}/${screen.join("/") || "notes"}`
     : "/studio/workspace";
   const [returnTo, setReturnTo] = useState(
     validReturnTarget(requestedPath) ? requestedPath : "/studio/workspace",
@@ -269,8 +275,9 @@ export function Studio({
     return () => clearTimeout(timer);
   }, [conceal, creator, freshUntil]);
   useEffect(() => {
-    if (suspended) reconnectButton.current?.focus();
-    else if (previousFocus.current?.isConnected) {
+    if (suspended) {
+      if (!document.hidden) reconnectButton.current?.focus();
+    } else if (previousFocus.current?.isConnected) {
       previousFocus.current.focus();
       previousFocus.current = null;
     }
@@ -343,7 +350,7 @@ export function Studio({
         )}
         {loading ? (
           <p role="status">Loading your current roles…</p>
-        ) : creators.length ? (
+        ) : error ? null : creators.length ? (
           creators.map((c) => (
             <Link key={c.id} className="w5-card" href={`/studio/${c.id}/notes`}>
               {c.display_name}
@@ -2536,8 +2543,9 @@ function Team({ creator }: { creator: Creator }) {
   useEffect(() => {
     void action.run(load);
   }, [load]);
+  const { request: identityRequest } = useIdentityRequest();
   const identity = async (path: string, body: unknown) => {
-    const response = await fetch(`/api/platform/identity/${path}`, {
+    const response = await identityRequest(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

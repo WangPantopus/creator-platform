@@ -1,0 +1,12 @@
+Monitoring boot status for Creator Platform W6 Media 20261001 (A737F284-71A6-4F21-AAE9-B0FB98D933CD).
+[2026-10-01 03:03:14 +0000] Status=1, isTerminal=NO, Elapsed=00:15.
+	Waiting on BackBoard
+
+[2026-10-01 03:03:34 +0000] Status=2, isTerminal=NO, Elapsed=00:35.
+	Waiting on Data Migration
+		Reason:(null)
+		Migration Elapsed:00:01 seconds
+
+[2026-10-01 03:03:51 +0000] Status=3, isTerminal=YES, Elapsed=00:52.
+	Data Migration Failed
+

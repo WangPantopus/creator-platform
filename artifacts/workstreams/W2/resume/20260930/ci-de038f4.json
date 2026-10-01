@@ -1,0 +1,151 @@
+{
+  "observedAt": "2026-10-01T01:24:55.743923+00:00",
+  "head": "de038f460f967f877c42ae4f5274f359afe8f572",
+  "requiredContexts": 11,
+  "runs": [
+    {
+      "id": 36800749024,
+      "name": "Foundation checks",
+      "event": "pull_request",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "de038f460f967f877c42ae4f5274f359afe8f572",
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024",
+      "jobs": [
+        {
+          "id": 110174290529,
+          "name": "web-and-backend",
+          "status": "in_progress",
+          "conclusion": null,
+          "runner_id": 1000033853,
+          "started_at": "2026-10-01T01:24:26Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024/job/110174290529"
+        },
+        {
+          "id": 110174290658,
+          "name": "android-runtime",
+          "status": "in_progress",
+          "conclusion": null,
+          "runner_id": 1000033855,
+          "started_at": "2026-10-01T01:24:08Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024/job/110174290658"
+        },
+        {
+          "id": 110174290670,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:22:00Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024/job/110174290670"
+        },
+        {
+          "id": 110174290742,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:22:00Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024/job/110174290742"
+        },
+        {
+          "id": 110174290812,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:22:00Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749024/job/110174290812"
+        }
+      ]
+    },
+    {
+      "id": 36800744479,
+      "name": "Foundation checks",
+      "event": "push",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "de038f460f967f877c42ae4f5274f359afe8f572",
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479",
+      "jobs": [
+        {
+          "id": 110174275497,
+          "name": "web-and-backend",
+          "status": "in_progress",
+          "conclusion": null,
+          "runner_id": 1000033850,
+          "started_at": "2026-10-01T01:23:39Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479/job/110174275497"
+        },
+        {
+          "id": 110174275677,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:21:56Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479/job/110174275677"
+        },
+        {
+          "id": 110174275693,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:21:56Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479/job/110174275693"
+        },
+        {
+          "id": 110174275733,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0,
+          "started_at": "2026-10-01T01:21:56Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479/job/110174275733"
+        },
+        {
+          "id": 110174275818,
+          "name": "android-runtime",
+          "status": "in_progress",
+          "conclusion": null,
+          "runner_id": 1000033852,
+          "started_at": "2026-10-01T01:23:40Z",
+          "completed_at": null,
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800744479/job/110174275818"
+        }
+      ]
+    },
+    {
+      "id": 36800749005,
+      "name": "Trust release compilation",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "de038f460f967f877c42ae4f5274f359afe8f572",
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749005",
+      "jobs": [
+        {
+          "id": 110174287451,
+          "name": "compile",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033851,
+          "started_at": "2026-10-01T01:23:40Z",
+          "completed_at": "2026-10-01T01:24:27Z",
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36800749005/job/110174287451"
+        }
+      ]
+    }
+  ],
+  "merge": "Not permitted until complete required exact-head checks pass"
+}

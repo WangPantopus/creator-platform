@@ -15,7 +15,6 @@ import type { AgentService } from "../agent/service.js";
 import { ContentPage } from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { identityTransaction } from "../identity/transaction.js";
-import type { ConversationLineageProjection } from "../conversation/lineage-projection.js";
 
 export class StudioService {
   constructor(
@@ -26,7 +25,6 @@ export class StudioService {
       access: AccessService;
       agent?: AgentService;
       profiles?: IdentityProfiles;
-      conversationLineageProjection?: ConversationLineageProjection;
     },
   ) {}
   private commerce() {
@@ -199,7 +197,7 @@ export class StudioService {
          CASE WHEN c.state IN('due','in_progress') THEN c.due_at WHEN p.state='submitted' THEN p.decision_at ELSE p.hold_expires_at END AS deadline
         FROM creator.commerce_packet p JOIN creator.fan_profile f ON f.id=p.fan_id LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id
         WHERE p.creator_id=$1 AND (c.state IN('due','in_progress') OR p.state IN('submitted','more_info','offer_pending'))
-        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state='submitted') OR ($2='more_info' AND p.state='more_info'))
+        AND ($2='all' OR ($2='due' AND c.state IN('due','in_progress')) OR ($2='decide' AND p.state IN('submitted','offer_pending')) OR ($2='more_info' AND p.state='more_info'))
       ) SELECT * FROM queue WHERE $3::uuid IS NULL OR (priority,coalesce(deadline,'infinity'::timestamptz),id)>(SELECT priority,coalesce(deadline,'infinity'::timestamptz),id FROM queue WHERE id=$3) ORDER BY priority,deadline NULLS LAST,id LIMIT $4`,
           [creatorId, input.filter, input.cursor ?? null, input.limit + 1],
         )
@@ -432,10 +430,7 @@ export class StudioService {
       "studio_role_required",
       "Open your fan conversation from the fan app.",
     );
-    const timeline = await this.owners.conversation.read(
-      scope,
-      audit ? this.owners.conversationLineageProjection : undefined,
-    );
+    const timeline = await this.owners.conversation.read(scope);
     return {
       timeline,
       authority: scope.authority,

@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import type {
   MediaAsset,
   UploadTicket,
@@ -31,7 +32,7 @@ export async function readCreatorMediaPolicy(input: {
     result.purpose !== input.purpose
   )
     throw new Error(
-      "This recording limit does not match the current saved content.",
+      copy.w6ThisRecordingLimitDoesNotMatchTheCurrentSavedContent,
     );
   return result;
 }
@@ -46,33 +47,74 @@ export class MediaRequestError extends Error {
   }
 }
 
+type MediaIdentity = {
+  accountId: string;
+  signal: AbortSignal;
+  end: () => void;
+};
+let identity: MediaIdentity | undefined;
+/** W1 attaches the current account boundary before mounting private media. */
+export function configureMediaRequests(current: MediaIdentity) {
+  identity = current;
+  return () => {
+    if (identity === current) identity = undefined;
+  };
+}
+
 export async function mediaRequest<T>(
   path: string,
   init: RequestInit & { expectedAccountId?: string } = {},
 ): Promise<T> {
+  const current = identity;
   const { expectedAccountId, ...request } = init;
+  if (
+    current &&
+    expectedAccountId !== undefined &&
+    expectedAccountId !== current.accountId
+  )
+    throw new MediaRequestError(
+      "Your account changed. Reopen this content to continue.",
+      409,
+      "session_account_changed",
+    );
   const headers = new Headers(request.headers);
   if (!headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
-  if (expectedAccountId !== undefined)
-    headers.set("x-qelvora-expected-account", expectedAccountId);
+  const account = expectedAccountId ?? current?.accountId;
+  if (account !== undefined) headers.set("x-qelvora-expected-account", account);
+  const signal = current
+    ? AbortSignal.any([
+        current.signal,
+        ...(request.signal ? [request.signal] : []),
+      ])
+    : request.signal;
+  signal?.throwIfAborted();
   const response = await fetch(`/api/w6/${path}`, {
     ...request,
     credentials: "same-origin",
     cache: "no-store",
     headers,
+    signal,
   });
+  signal?.throwIfAborted();
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
+    if (
+      response.status === 409 &&
+      error?.error?.code === "session_account_changed"
+    )
+      current?.end();
     throw new MediaRequestError(
-      error?.error?.message ?? "Media is unavailable. Try again.",
+      error?.error?.message ?? copy.w6MediaIsUnavailableTryAgain,
       response.status,
       error?.error?.code,
     );
   }
-  return response.json() as Promise<T>;
+  const result = (await response.json()) as T;
+  signal?.throwIfAborted();
+  return result;
 }
 export type RecordingUploadInput = {
   creatorId: string;
@@ -117,9 +159,7 @@ export function uploadCreatorMedia(
       (input.expectedAccountId !== undefined &&
         ticket.asset.ownerAccountId !== input.expectedAccountId)
     )
-      throw new Error(
-        "This upload does not belong to the current content. Refresh before continuing.",
-      );
+      throw new Error(copy.w6ThisUploadDoesNotBelongToTheCurrentContentRefresh);
     input.onTicket(ticket);
   };
   return uploadBinary<CreatorMediaAsset>({
@@ -165,9 +205,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
         input.durationMs <= 0 ||
         input.durationMs > 3_600_000))
   )
-    throw new Error(
-      "Choose a supported file within the content's media limit.",
-    );
+    throw new Error(copy.w6ChooseASupportedFileWithinTheContentSMediaLimit);
   input.signal.throwIfAborted();
   const digest = Array.from(
     new Uint8Array(
@@ -203,9 +241,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
       ticket.chunkBytes < 1 ||
       ticket.chunkBytes > 1_048_576
     )
-      throw new Error(
-        "The resumed upload does not match this recording. Start a new upload.",
-      );
+      throw new Error(copy.w6TheResumedUploadDoesNotMatchThisRecordingStartA);
   };
   validateTicket();
   const assetId = ticket.asset.id;
@@ -215,7 +251,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     signal: input.signal,
   });
   if (current.id !== assetId)
-    throw new Error("The saved upload could not be confirmed.");
+    throw new Error(copy.w6TheSavedUploadCouldNotBeConfirmed);
   if (
     ["quarantined", "processing", "ready", "rejected"].includes(current.state)
   )
@@ -230,7 +266,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   );
   validateTicket();
   if (ticket.asset.id !== assetId)
-    throw new Error("The resumed upload changed.");
+    throw new Error(copy.w6TheResumedUploadChanged);
   input.onTicket(ticket);
   let offset = ticket.asset.uploadedBytes;
   input.progress(offset / input.blob.size);
@@ -242,7 +278,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
       );
       validateTicket();
       if (ticket.asset.id !== assetId)
-        throw new Error("The resumed upload changed.");
+        throw new Error(copy.w6TheResumedUploadChanged);
       offset = ticket.asset.uploadedBytes;
       input.onTicket(ticket);
     }
@@ -262,7 +298,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     );
     if (asset.id !== assetId || asset.uploadedBytes !== next)
       throw new Error(
-        "Upload progress could not be confirmed. Resume this recording.",
+        copy.w6UploadProgressCouldNotBeConfirmedResumeThisRecording,
       );
     offset = asset.uploadedBytes;
     input.progress(offset / input.blob.size);

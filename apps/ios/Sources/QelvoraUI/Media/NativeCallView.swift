@@ -44,6 +44,8 @@ private struct NativeCallDocument: Decodable, Sendable {
     @State private var camera = false
     @State private var localState = "disconnected"
     @State private var transport: (any NativeCallScreenTransport)?
+    @State private var mediaEpoch = 0
+    @State private var active = true
     public init(baseURL: URL?, destination: String, actorAccountID: String?, open: @escaping (String) -> Void = { _ in }) {
         route = NativeCallRoute(destination: destination); self.actorAccountID = actorAccountID; self.open = open
         client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
@@ -53,19 +55,29 @@ private struct NativeCallDocument: Decodable, Sendable {
     private func bothSummary(_ value: NativeCallDocument) -> Bool { ["creator", "fan"].allSatisfy { r in value.consents.contains { $0.role == r && $0.purpose == "summary" && $0.granted } } }
     private func date(_ value: String) -> Date? { let formatter = ISO8601DateFormatter(); formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]; return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value) }
     private func countdown(_ value: NativeCallDocument) -> String {
-        if value.state == "reconnecting" { return "Reconnecting · \(clock(value.reconnectBudgetSeconds * 1000 - value.reconnectUsedMilliseconds)) allowance left" }
-        if value.state == "ending" { return "Ending · confirming provider history" }
-        if let now = date(value.serverNow), let scheduled = date(value.scheduledAt), now < scheduled { return "Starts in \(clock(Int(scheduled.timeIntervalSince(now) * 1000)))" }
-        return "Waiting for both participants"
+        if value.state == "reconnecting" { return QelvoraCopy.text("w6ReconnectingAllowanceLeft", values: ["value1": String(describing: clock(value.reconnectBudgetSeconds * 1000 - value.reconnectUsedMilliseconds))]) }
+        if value.state == "ending" { return QelvoraCopy.text("w6EndingConfirmingProviderHistory") }
+        if let now = date(value.serverNow), let scheduled = date(value.scheduledAt), now < scheduled { return QelvoraCopy.text("w6StartsIn", values: ["value1": String(describing: clock(Int(scheduled.timeIntervalSince(now) * 1000)))]) }
+        return QelvoraCopy.text("w6WaitingForBothParticipants")
     }
     private func refresh() async {
         guard !fetching, !busy, let client, let route else { return }; fetching = true; defer { fetching = false }
         do {
             let value = try JSONDecoder().decode(NativeCallDocument.self, from: await client.request(path: route.path))
+            try Task.checkCancellation()
+            guard active else { return }
             if value.version >= (call?.version ?? 0) { call = value }; stale = false
-            if ["ending", "ended", "cancelled"].contains(value.state) { await transport?.disconnect(); localState = "disconnected" }
+            if ["ending", "ended", "cancelled"].contains(value.state) { await disconnectMedia() }
         } catch is CancellationError { }
-        catch { stale = true; self.error = "Reconnect to refresh this call. Actions are unavailable until access is confirmed." }
+        catch {
+            guard active else { return }
+            if let failure = error as? NativeMediaRequestError, [401, 403, 404].contains(failure.status) { await disconnectMedia(); call = nil }
+            stale = true; self.error = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
+        }
+    }
+    private func disconnectMedia() async {
+        mediaEpoch += 1; let current = transport; transport = nil; localState = "disconnected"
+        await current?.disconnect()
     }
     private func action(_ name: String, values: [String: Any] = [:]) async {
         guard !busy, !stale, let call, role(call) != nil, let client, let route else { return }; busy = true; error = nil; defer { busy = false }
@@ -73,18 +85,26 @@ private struct NativeCallDocument: Decodable, Sendable {
             var body = values; body["expectedVersion"] = call.version; body["idempotencyKey"] = UUID().uuidString
             let result = try await client.request(path: route.path + "/" + name, method: "POST", body: JSONSerialization.data(withJSONObject: body))
             self.call = try JSONDecoder().decode(NativeCallDocument.self, from: result)
-            if name == "end" { await transport?.disconnect(); localState = "disconnected"; leaving = false }
-        } catch { self.error = "This action could not complete. Refresh the call before trying again."; stale = true }
+            if name == "end" { await disconnectMedia(); leaving = false }
+        } catch { self.error = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true }
     }
     private func join() async {
-        guard !busy, !stale, let call, role(call) != nil, let client, let route else { return }
-        guard let adapter = NativeCallTransports.create?(route.sessionID) else { error = "Calling is not connected yet. Your booking is unchanged."; return }
+        guard active, !busy, !stale, transport == nil || localState == "disconnected", let call, role(call) != nil, let client, let route else { return }
+        guard let adapter = NativeCallTransports.create?(route.sessionID) else { error = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return }
         busy = true; error = nil; defer { busy = false }
+        mediaEpoch += 1; let epoch = mediaEpoch
         do {
             let admission = try JSONDecoder().decode(NativeCallAdmission.self, from: await client.request(path: route.path + "/join", method: "POST", body: Data("{}".utf8)))
+            try Task.checkCancellation()
+            guard active, epoch == mediaEpoch else { return }
             transport = adapter; camera = call.mediaMode == "video"
-            try await adapter.connect(admission: admission, onState: { localState = $0 })
-        } catch { await adapter.disconnect(); self.error = "Connection failed. Rejoin the same call." }
+            try await adapter.connect(admission: admission, onState: { if active && epoch == mediaEpoch { localState = $0 } })
+            if !active || epoch != mediaEpoch { await adapter.disconnect() }
+        } catch {
+            await adapter.disconnect()
+            guard active, epoch == mediaEpoch else { return }
+            transport = nil; localState = "disconnected"; self.error = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall")
+        }
     }
     public var body: some View {
         ScrollView {
@@ -92,57 +112,63 @@ private struct NativeCallDocument: Decodable, Sendable {
                 if let call {
                     let live = ["connected", "reconnecting", "ending"].contains(call.state)
                     let ended = ["ended", "cancelled"].contains(call.state)
-                    if live { CallChip(name: call.creatorName, time: clock(call.connectedMilliseconds), end: clock(call.durationSeconds * 1000), recording: call.recordingState == "on") }
+                    if live { CallChip(name: call.creatorName, time: clock(call.connectedMilliseconds), end: clock(call.durationSeconds * 1000), recording: ["on", "stopping"].contains(call.recordingState)) }
+                    if ["starting", "stopping", "blocked"].contains(call.recordingState) { Text(call.recordingState == "stopping" ? QelvoraCopy.text("w6RecordingStopRequestedAwaitingProviderConfirmation") : call.recordingState == "starting" ? QelvoraCopy.text("w6RecordingStartRequestedAwaitingProviderConfirmation") : QelvoraCopy.text("w6RecordingStatusNeedsConfirmation")).qText("caption") }
                     else {
-                        Text("\(call.durationSeconds / 60)-MINUTE \(call.mediaMode.uppercased()) CALL").qText("label")
-                        Text(ended ? (call.state == "cancelled" ? "This call was cancelled." : call.outcome == "completed" ? "You spoke with \(call.creatorName) for \(call.connectedMilliseconds / 60000) minutes." : "Call outcome: \(call.outcome?.replacingOccurrences(of: "_", with: " ") ?? "being reconciled")") : "\(date(call.scheduledAt)?.formatted(date: .complete, time: .shortened) ?? call.scheduledAt) with \(call.creatorName)").qText("display-md")
+                        Text(QelvoraCopy.text("w6MINUTECALL", values: ["value1": String(call.durationSeconds / 60), "value2": call.mediaMode.uppercased()])).qText("label")
+                        Text(ended ? (call.state == "cancelled" ? QelvoraCopy.text("w6ThisCallWasCancelled") : call.outcome == "completed" ? QelvoraCopy.text("w6YouSpokeWithForMinutesa8bf6c", values: ["value1": String(describing: call.creatorName), "value2": String(describing: call.connectedMilliseconds / 60000)]) : QelvoraCopy.text("w6CallOutcome", values: ["value1": String(describing: call.outcome?.replacingOccurrences(of: "_", with: " ") ?? QelvoraCopy.text("w6BeingReconciled"))])) : QelvoraCopy.text("w6With", values: ["value1": date(call.scheduledAt)?.formatted(date: .complete, time: .shortened) ?? call.scheduledAt, "value2": call.creatorName])).qText("display-md")
                     }
                     if !ended && !(call.state == "connected" && localState == "connected") { Countdown(tone: .soon, children: countdown(call)) }
-                    if stale { Notice(tone: .error, title: "Connection lost", children: "Displayed times are from the last server update.") }
+                    if stale { Notice(tone: .error, title: QelvoraCopy.text("w6ConnectionLost"), children: QelvoraCopy.text("w6DisplayedTimesAreFromTheLastServerUpdate")) }
                     if !live && !ended {
-                        Text("\(call.durationSeconds / 60) minutes, fixed · no overtime charge").qText("body")
-                        Text("Shared with \(call.creatorName)").qText("label"); Text(call.packet.summary).qText("body")
-                        Text("\(call.packet.attachmentIds.count) shared files · \(TimeZone.current.identifier)").qText("caption")
-                        Text("Request \(call.commitmentId)").qText("caption")
-                        Text("Joining early starts nothing. The connected timer pauses during a drop, up to \(call.reconnectBudgetSeconds / 60) minutes total.").qText("caption")
-                        Button("Enter the waiting room", variant: .secondary, block: true, disabled: busy || stale || role(call) == nil) { Task { await join() } }
+                        Text(QelvoraCopy.text("w6MinutesFixedNoOvertimeCharge", values: ["value1": String(describing: call.durationSeconds / 60)])).qText("body")
+                        Text(QelvoraCopy.text("w6SharedWith", values: ["value1": String(describing: call.creatorName)])).qText("label"); Text(call.packet.summary).qText("body")
+                        Text(QelvoraCopy.text("w6SharedFilesInZone", values: ["value1": String(call.packet.attachmentIds.count), "value2": TimeZone.current.identifier])).qText("caption")
+                        Text(QelvoraCopy.text("w6Requestfc03f5", values: ["value1": String(describing: call.commitmentId)])).qText("caption")
+                        Text(QelvoraCopy.text("w6JoiningEarlyStartsNothingTheConnectedTimerPausesDuringA", values: ["value1": String(describing: call.reconnectBudgetSeconds / 60)])).qText("caption")
+                        Button(QelvoraCopy.text("w6EnterTheWaitingRoom"), variant: .secondary, block: true, disabled: busy || stale || role(call) == nil) { Task { await join() } }
                     }
                     if live {
                         if let transport { transport.mediaView.frame(minHeight: 260).background(qColor("maya-surface", scheme)).clipShape(RoundedRectangle(cornerRadius: 24)) }
-                        else { Text("Media connection is unavailable.").qText("body") }
+                        else { Text(QelvoraCopy.text("w6MediaConnectionIsUnavailable")).qText("body") }
                         HStack {
-                            Button(muted ? "Unmute" : "Mute", variant: .secondary, disabled: busy || stale || transport == nil) { Task { do { try await transport?.microphone(enabled: muted); muted.toggle() } catch { self.error = "Microphone change failed." } } }
-                            Button("Camera", variant: .secondary, disabled: busy || stale || transport == nil || call.mediaMode != "video") { Task { do { try await transport?.camera(enabled: !camera); camera.toggle() } catch { self.error = "Camera change failed." } } }
+                            Button(muted ? QelvoraCopy.text("w6Unmute") : QelvoraCopy.text("w6Mute"), variant: .secondary, disabled: busy || stale || transport == nil) { Task { do { try await transport?.microphone(enabled: muted); muted.toggle() } catch { self.error = QelvoraCopy.text("w6MicrophoneChangeFailed") } } }
+                            Button(QelvoraCopy.text("w6Camera"), variant: .secondary, disabled: busy || stale || transport == nil || call.mediaMode != "video") { Task { do { try await transport?.camera(enabled: !camera); camera.toggle() } catch { self.error = QelvoraCopy.text("w6CameraChangeFailed") } } }
                         }
-                        HStack { Button("Report", variant: .secondary) { open("/support") }; Button("Leave", variant: .secondary, disabled: busy || stale || role(call) == nil) { leaving = true } }
+                        HStack { Button(QelvoraCopy.text("w6Report"), variant: .secondary) { open("/support") }; Button(QelvoraCopy.text("w6Leave"), variant: .secondary, disabled: busy || stale || role(call) == nil) { leaving = true } }
                     }
-                    if live || call.state == "ended" {
-                        Text(call.state == "ended" ? "Both of you can get a short summary" : "Separate permissions").qText("title")
-                        ForEach(["recording", "summary", "content_reuse", "ai_source"].filter { call.state != "ended" || $0 != "recording" }, id: \.self) { purpose in
-                            Toggle(purpose == "summary" ? "I'd like a summary" : purpose == "recording" ? "Allow recording" : purpose == "content_reuse" ? "Allow content reuse" : "Allow use as an AI source", isOn: Binding(get: { call.consents.contains { $0.role == role(call) && $0.purpose == purpose && $0.granted } }, set: { granted in Task { await action("consent", values: ["purpose": purpose, "granted": granted]) } })).disabled(busy || stale || role(call) == nil)
+                    if live || ended {
+                        Text(call.state == "ended" ? QelvoraCopy.text("w6BothOfYouCanGetAShortSummary") : QelvoraCopy.text("w6SeparatePermissions")).qText("title")
+                        ForEach(["recording", "summary", "content_reuse", "ai_source"].filter { purpose in
+                            let granted = call.consents.contains { $0.role == role(call) && $0.purpose == purpose && $0.granted }
+                            if call.state == "cancelled" { return granted }
+                            return purpose != "recording" || !["ending", "ended"].contains(call.state) || granted
+                        }, id: \.self) { purpose in
+                            Toggle(purpose == "summary" ? QelvoraCopy.text("w6IDLikeASummary") : purpose == "recording" ? QelvoraCopy.text("w6AllowRecording") : purpose == "content_reuse" ? QelvoraCopy.text("w6AllowContentReuse") : QelvoraCopy.text("w6AllowUseAsAnAISource"), isOn: Binding(get: { call.consents.contains { $0.role == role(call) && $0.purpose == purpose && $0.granted } }, set: { granted in Task { await action("consent", values: ["purpose": purpose, "granted": granted]) } })).disabled(busy || stale || role(call) == nil)
                         }
-                        Text("Each purpose needs both people's permission. Without recording permission, a summary uses only the packet and a creator-typed note.").qText("caption")
-                        if let summary = call.summary, bothSummary(call) { Text(summary).qText("body"); Button("Delete this summary", variant: .quiet, disabled: busy || stale) { Task { await action("delete-summary") } } }
-                        if call.summaryState == "pending" { Text("Summary queued · available when its provider completes.").qText("caption") }
+                        Text(QelvoraCopy.text("w6EachPurposeNeedsBothPeopleSPermissionWithoutRecordingPermission8487ed")).qText("caption")
+                        if let summary = call.summary, bothSummary(call) { Text(summary).qText("body"); Button(QelvoraCopy.text("w6DeleteThisSummary"), variant: .quiet, disabled: busy || stale) { Task { await action("delete-summary") } } }
+                        if call.summaryState == "pending" { Text(QelvoraCopy.text("w6SummaryQueuedAvailableWhenItsProviderCompletes")).qText("caption") }
                     }
                     if call.state == "ended" {
-                        Text("Call receipt").qText("title"); Text("Connected \(clock(call.connectedMilliseconds)) of \(clock(call.durationSeconds * 1000))").qText("body")
-                        Text(call.recordingOccurred == true ? "Recorded with consent" : "No recording was confirmed").qText("caption")
-                        Button("View Requests for settlement", variant: .secondary) { open("/requests") }
+                        Text(QelvoraCopy.text("w6CallReceipt")).qText("title"); Text(QelvoraCopy.text("w6ConnectedOf", values: ["value1": String(describing: clock(call.connectedMilliseconds)), "value2": String(describing: clock(call.durationSeconds * 1000))])).qText("body")
+                        Text(call.recordingOccurred == true ? QelvoraCopy.text("w6RecordingOccurredCheckTheConsentHistory") : QelvoraCopy.text("w6NoRecordingWasConfirmed")).qText("caption")
+                        Button(QelvoraCopy.text("w6ViewRequestsForSettlement"), variant: .secondary) { open("/requests") }
                     }
                 } else {
-                    Text("This call is unavailable").qText("display-md")
-                    Text(route == nil ? "Open this call from its authorized request link." : "Checking the booking and participant access.").qText("body")
+                    Text(QelvoraCopy.text("w6ThisCallIsUnavailable")).qText("display-md")
+                    Text(route == nil ? QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") : QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess")).qText("body")
                 }
                 if let error { Text(error).qText("caption") }
-                Button("Refresh call", variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { Task { await refresh() } }
+                Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { Task { await refresh() } }
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
             .task { while !Task.isCancelled { await refresh(); do { try await Task.sleep(for: .seconds(1)) } catch { return } } }
-            .onDisappear { let current = transport; Task { await current?.disconnect() } }
-            .confirmationDialog("End this call?", isPresented: $leaving, titleVisibility: .visible) {
-                SwiftUI.Button("End by choice") { if let call { Task { await action("end", values: role(call) == "fan" ? ["fanChoice": "end_by_choice"] : [:]) } } }
-                if let call, role(call) == "fan" { SwiftUI.Button("Technical problem") { Task { await action("end", values: ["fanChoice": "technical_problem"]) } } }
-            } message: { Text("A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement.") }
+            .onAppear { active = true }
+            .onDisappear { active = false; mediaEpoch += 1; let current = transport; transport = nil; localState = "disconnected"; Task { await current?.disconnect() } }
+            .confirmationDialog(QelvoraCopy.text("w6EndThisCall"), isPresented: $leaving, titleVisibility: .visible) {
+                SwiftUI.Button(QelvoraCopy.text("w6EndByChoice")) { if let call { Task { await action("end", values: role(call) == "fan" ? ["fanChoice": "end_by_choice"] : [:]) } } }
+                if let call, role(call) == "fan" { SwiftUI.Button(QelvoraCopy.text("w6TechnicalProblem")) { Task { await action("end", values: ["fanChoice": "technical_problem"]) } } }
+            } message: { Text(QelvoraCopy.text("w6AFanEndingByChoiceCountsAsACompletedCall")) }
     }
 }

@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.media
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -24,12 +26,13 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
     val snapshot: StateFlow<RecordingSnapshot> = mutable
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
+    private var closed = false
     private var accumulated = 0L
     private var activeAt = 0L
     private val handler = Handler(Looper.getMainLooper())
     private val manager = context.getSystemService(AudioManager::class.java)
     private val routeCallback = object : AudioDeviceCallback() {
-        override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) { if (mutable.value.state == "recording") pause("Audio route changed. Check the microphone before resuming.") }
+        override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) { if (mutable.value.state == "recording") pause(QelvoraCopy.text("w6AudioRouteChangedCheckTheMicrophoneBeforeResuming")) }
     }
     private val tick = object : Runnable {
         override fun run() {
@@ -42,6 +45,7 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
     init { require(maxDurationMs > 0); manager.registerAudioDeviceCallback(routeCallback, handler) }
     @Suppress("DEPRECATION")
     fun start() {
+        if (closed) return
         discard()
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) { deny(); return }
         val file = File(context.cacheDir, "voice-${UUID.randomUUID()}.m4a")
@@ -52,37 +56,37 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
             value.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             value.setAudioSamplingRate(48000); value.setAudioEncodingBitRate(96000); value.setAudioChannels(1)
             value.setMaxDuration(maxDurationMs.toInt()); value.setOutputFile(file.absolutePath)
-            value.setOnInfoListener { _, what, _ -> if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) stop() }
-            value.setOnErrorListener { _, _, _ -> pause("Recording was interrupted. Preview it or record again.") }
+            value.setOnInfoListener { source, what, _ -> if (source === recorder && what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) stop() }
+            value.setOnErrorListener { source, _, _ -> if (source === recorder) pause(QelvoraCopy.text("w6RecordingWasInterruptedPreviewItOrRecordAgain")) }
             recorder = value; value.prepare(); value.start(); activeAt = android.os.SystemClock.elapsedRealtime()
             mutable.value = RecordingSnapshot("recording", file = file); handler.post(tick)
-        } catch (_: Exception) { recorder?.release(); recorder = null; file.delete(); mutable.value = RecordingSnapshot("failed", reason = "The microphone is unavailable. Try again.") }
+        } catch (_: Exception) { recorder?.release(); recorder = null; file.delete(); mutable.value = RecordingSnapshot("failed", reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain")) }
     }
-    fun deny() { mutable.value = RecordingSnapshot("denied", reason = "Microphone access is off. Allow it in Settings, then try again.") }
+    fun deny() { mutable.value = RecordingSnapshot("denied", reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry")) }
     fun pause(reason: String? = null) {
         if (mutable.value.state != "recording") return
         accumulated += android.os.SystemClock.elapsedRealtime() - activeAt
         try { recorder?.pause(); handler.removeCallbacks(tick); mutable.value = mutable.value.copy(state = "paused", durationMs = accumulated, reason = reason) }
-        catch (_: Exception) { stop(); mutable.value = mutable.value.copy(reason = "Recording could not pause. Preview what was saved.") }
+        catch (_: Exception) { stop(); mutable.value = mutable.value.copy(reason = QelvoraCopy.text("w6RecordingCouldNotPausePreviewWhatWasSaved")) }
     }
     fun resume() {
         if (mutable.value.state != "paused") return
         try { recorder?.resume(); activeAt = android.os.SystemClock.elapsedRealtime(); mutable.value = mutable.value.copy(state = "recording", reason = null); handler.post(tick) }
-        catch (_: Exception) { mutable.value = mutable.value.copy(reason = "Recording could not resume. Record again.") }
+        catch (_: Exception) { mutable.value = mutable.value.copy(reason = QelvoraCopy.text("w6RecordingCouldNotResumeRecordAgain")) }
     }
     fun stop() {
         if (mutable.value.state !in listOf("recording", "paused")) return
         val duration = if (mutable.value.state == "recording") accumulated + android.os.SystemClock.elapsedRealtime() - activeAt else accumulated
         handler.removeCallbacks(tick)
         try { recorder?.stop(); mutable.value = mutable.value.copy(state = "preview", durationMs = duration.coerceAtMost(maxDurationMs)) }
-        catch (_: Exception) { mutable.value.file?.delete(); mutable.value = RecordingSnapshot("failed", reason = "No usable audio was saved. Record again.") }
+        catch (_: Exception) { mutable.value.file?.delete(); mutable.value = RecordingSnapshot("failed", reason = QelvoraCopy.text("w6NoUsableAudioWasSavedRecordAgain")) }
         finally { recorder?.release(); recorder = null }
     }
     fun playPreview() {
         val file = mutable.value.file ?: return
         if (mutable.value.state != "preview") return
         try { player?.release(); player = MediaPlayer().apply { setDataSource(file.absolutePath); prepare(); start() } }
-        catch (_: Exception) { mutable.value = mutable.value.copy(reason = "This recording could not be played. Record again.") }
+        catch (_: Exception) { mutable.value = mutable.value.copy(reason = QelvoraCopy.text("w6ThisRecordingCouldNotBePlayedRecordAgain")) }
     }
     fun seekTo(milliseconds: Int) { player?.seekTo(milliseconds.coerceIn(0, mutable.value.durationMs.toInt())) }
     fun pausePreview() { if (player?.isPlaying == true) player?.pause() }
@@ -91,5 +95,5 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
         recorder?.release(); recorder = null; player?.release(); player = null; mutable.value.file?.delete(); accumulated = 0
         mutable.value = RecordingSnapshot()
     }
-    fun close() { discard(); manager.unregisterAudioDeviceCallback(routeCallback) }
+    fun close() { closed = true; discard(); manager.unregisterAudioDeviceCallback(routeCallback) }
 }

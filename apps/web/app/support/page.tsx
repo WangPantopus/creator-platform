@@ -7,6 +7,7 @@ import {
   TrustError,
   TrustSession,
   useTrust,
+  useTrustSession,
   trustApi,
   caseLabel,
   dateLabel,
@@ -30,12 +31,26 @@ export default function SupportPage() {
   const key = useRef<string | null>(null);
   const [appealId, setAppealId] = useState<string | null>(null);
   const [appealReason, setAppealReason] = useState("");
+  const epoch = useTrustSession(() => {
+    setKind("support");
+    setCreatorId("");
+    setMessageId("");
+    setRequestId("");
+    setReason("");
+    setAppealReason("");
+    setAppealId(null);
+    setMessage("");
+    setBusy(false);
+    setActionError(null);
+    key.current = null;
+  });
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const creator = params.get("creatorId"),
       reportedMessage = params.get("messageId");
     const uuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (creator && uuid.test(creator)) setCreatorId(creator);
     if (
       creator &&
       reportedMessage &&
@@ -46,16 +61,12 @@ export default function SupportPage() {
       setCreatorId(creator);
       setMessageId(reportedMessage);
     }
-    const clear = () => {
-      setReason("");
-      setAppealReason("");
-      setAppealId(null);
-      setMessage("");
-      setActionError(null);
-      key.current = null;
-    };
-    window.addEventListener("trust-session", clear);
-    return () => window.removeEventListener("trust-session", clear);
+    const request = params.get("requestId");
+    if (request && uuid.test(request)) {
+      setKind("dispute");
+      setRequestId(request);
+      if (creator && uuid.test(creator)) setCreatorId(creator);
+    }
   }, []);
   return (
     <main className="trust-page">
@@ -77,6 +88,7 @@ export default function SupportPage() {
         className="trust-panel"
         onSubmit={async (event) => {
           event.preventDefault();
+          const current = epoch.current;
           setBusy(true);
           setActionError(null);
           key.current ??= crypto.randomUUID();
@@ -87,6 +99,7 @@ export default function SupportPage() {
                 reason,
                 idempotencyKey: key.current,
               });
+              if (epoch.current !== current) return;
               setMessage(
                 "Your block is saved. Enforcement in connected domains follows their current denial checks.",
               );
@@ -103,6 +116,7 @@ export default function SupportPage() {
               ...(kind === "dispute" && requestId ? { requestId } : {}),
               idempotencyKey: key.current,
             });
+            if (epoch.current !== current) return;
             setMessage(
               `${caseLabel(result.number)} is saved. Return here for its decision.`,
             );
@@ -110,6 +124,7 @@ export default function SupportPage() {
             setReason("");
             await refresh();
           } catch (error) {
+            if (epoch.current !== current) return;
             setActionError(
               error instanceof TrustError
                 ? error
@@ -119,7 +134,7 @@ export default function SupportPage() {
                   ),
             );
           } finally {
-            setBusy(false);
+            if (epoch.current === current) setBusy(false);
           }
         }}
       >
@@ -230,6 +245,7 @@ export default function SupportPage() {
               <form
                 onSubmit={async (event) => {
                   event.preventDefault();
+                  const current = epoch.current;
                   setBusy(true);
                   key.current ??= crypto.randomUUID();
                   try {
@@ -238,10 +254,12 @@ export default function SupportPage() {
                       reason: appealReason,
                       idempotencyKey: key.current,
                     });
+                    if (epoch.current !== current) return;
                     setAppealId(null);
                     key.current = null;
                     await refresh();
                   } catch (error) {
+                    if (epoch.current !== current) return;
                     setActionError(
                       error instanceof TrustError
                         ? error
@@ -251,7 +269,7 @@ export default function SupportPage() {
                           ),
                     );
                   } finally {
-                    setBusy(false);
+                    if (epoch.current === current) setBusy(false);
                   }
                 }}
               >

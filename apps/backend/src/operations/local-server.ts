@@ -6,9 +6,22 @@ import { z } from "zod";
 import { TrustService } from "../modules/trust/service.js";
 import { TrustStore } from "../modules/trust/store.js";
 import { TrustWorker } from "../modules/trust/worker.js";
-import { trustPrivacyHook } from "../modules/trust/own-privacy-hook.js";
+import { createPrivacyConsumers } from "../modules/trust/privacy-consumers.js";
+import { ConversationService } from "../modules/conversation/service.js";
+import { createConversationRuntime } from "../modules/conversation/runtime.js";
+import { AgentRepository } from "../modules/agent/repository.js";
+import { AgentService } from "../modules/agent/service.js";
+import { AgentPipeline } from "../modules/agent/pipeline.js";
+import { AgentLifecycle } from "../modules/agent/lifecycle.js";
+import { createApp } from "../app.js";
+import { SignedActService } from "../modules/identity/signed-acts.js";
+import { PasskeyService } from "../modules/identity/passkeys.js";
+import { createCommerceRuntime } from "../modules/commerce/runtime.js";
+import { readCommerceEnvironment } from "../modules/commerce/environment.js";
+import { commerceSignedSubjects } from "../modules/commerce/registration.js";
+import { createContentStudio } from "../modules/content/integration.js";
 import { createTrustRouter } from "../modules/trust/router.js";
-import { TrustTelemetry } from "./telemetry.js";
+import { TrustTelemetry, failureClass } from "./telemetry.js";
 import { Readiness } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { AccessService } from "../modules/access/scope.js";
@@ -16,7 +29,18 @@ import { Database } from "../db/database.js";
 import { SessionService } from "../modules/identity/sessions.js";
 import { DevelopmentIdentityAdapter } from "../modules/identity/development.js";
 import { IdentityProfiles } from "../modules/identity/profiles.js";
-import { IdentityContinueSchema, SessionSchema } from "@qelvora/api";
+import {
+  IdentityContinueSchema,
+  IdentityCompletionSchema,
+  SessionSchema,
+} from "@qelvora/api";
+import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
+import { PrivacyDomains } from "../modules/trust/contracts.js";
+import { GrowthDatabase } from "../modules/growth/database.js";
+import { GrowthService } from "../modules/growth/service.js";
+import { unavailableOwners } from "../modules/growth/contracts.js";
+import { attachRealtime } from "../realtime/gateway.js";
+import { PostgresWalObserver } from "./wal.js";
 
 // Explicit local harness, never imported by production bootstrap. No production identity fallback.
 if (
@@ -65,25 +89,72 @@ const conversationPool = new pg.Pool({
   max: 4,
   connectionTimeoutMillis: 2000,
 });
+// Privacy-only producer connections. No growth HTTP route, sender or scheduler
+// is enabled by an export, and neither role gains new grants.
+const growthPools: pg.Pool[] = [];
+let growthService: GrowthService | undefined;
+if (
+  process.env.W8_GROWTH_WORKER_DATABASE_URL &&
+  process.env.W8_GROWTH_ENCRYPTION_KEY
+) {
+  const workerAddress = new URL(process.env.W8_GROWTH_WORKER_DATABASE_URL);
+  if (
+    !["localhost", "127.0.0.1"].includes(workerAddress.hostname) ||
+    workerAddress.pathname !== "/creator_w8" ||
+    workerAddress.username !== "growth_worker"
+  )
+    throw new Error(
+      "Growth privacy requires the isolated non-owner growth worker.",
+    );
+  const runtimeAddress = new URL(workerAddress);
+  runtimeAddress.username = "growth_runtime";
+  const growthRuntimePool = new pg.Pool({
+    connectionString: runtimeAddress.toString(),
+    max: 1,
+    connectionTimeoutMillis: 2000,
+    statement_timeout: 5000,
+  });
+  const growthWorkerPool = new pg.Pool({
+    connectionString: workerAddress.toString(),
+    max: 2,
+    connectionTimeoutMillis: 2000,
+    statement_timeout: 5000,
+  });
+  growthPools.push(growthRuntimePool, growthWorkerPool);
+  const growthDatabase = new GrowthDatabase(
+    growthRuntimePool,
+    growthWorkerPool,
+  );
+  await growthDatabase.ready();
+  growthService = new GrowthService(
+    growthDatabase,
+    unavailableOwners,
+    Buffer.from(
+      z
+        .string()
+        .regex(/^[a-f0-9]{64}$/i)
+        .parse(process.env.W8_GROWTH_ENCRYPTION_KEY),
+      "hex",
+    ),
+  );
+}
 const store = new TrustStore(pool);
 await store.assertRole();
-const db: Database = new Database(
-  conversationPool,
-  undefined,
-  (actor, creatorId, threadId) =>
-    service.assertAllowed(actor, creatorId, threadId),
+const db: Database = new Database(conversationPool, undefined, (...scope) =>
+  trustScopeRestriction(service, workerPool)(...scope),
 );
 await db.assertRuntimeRole();
 const access: AccessService = new AccessService(
   conversationPool,
   undefined,
-  (actor, creatorId, threadId) =>
-    service.assertAllowed(actor, creatorId, threadId),
+  (...scope) => trustScopeRestriction(service, workerPool)(...scope),
 );
 const nativeIdentity = new SessionService(
   conversationPool,
   new DevelopmentIdentityAdapter(origin, "development"),
-  randomBytes(32),
+  process.env.W8_LOCAL_SESSION_KEY
+    ? Buffer.from(process.env.W8_LOCAL_SESSION_KEY, "hex")
+    : randomBytes(32),
 );
 const nativeProfiles = new IdentityProfiles(conversationPool);
 const sessions = new Map<
@@ -228,12 +299,66 @@ const service: TrustService = new TrustService(store, {
       );
   },
 });
+const conversation = new ConversationService(db, access, {
+  checkSentence: async () => {
+    throw new DomainError(
+      "model_unconfigured",
+      "The model provider is not connected.",
+      503,
+    );
+  },
+});
+const conversationRuntime = createConversationRuntime({
+  database: db,
+  access,
+  conversation,
+});
+const agentRepository = new AgentRepository(conversationPool);
+const agentService = new AgentService(
+  agentRepository,
+  new AgentPipeline(agentRepository, null),
+);
+const commerceConfiguration = readCommerceEnvironment(conversationPool);
+const commerceRuntime = commerceConfiguration
+  ? await createCommerceRuntime({
+      pool: conversationPool,
+      database: db,
+      access,
+      ...commerceConfiguration,
+    })
+  : undefined;
+const contentRuntime = commerceRuntime
+  ? createContentStudio({
+      pool: conversationPool,
+      owners: {
+        commerce: commerceRuntime.service,
+        conversation,
+        access,
+        agent: agentService,
+        profiles: nativeProfiles,
+      },
+      dependencies: {
+        assertAllowed: (actor, creatorId) =>
+          service.assertAllowed(actor, creatorId),
+      },
+    })
+  : undefined;
+const privacyHooks = createPrivacyConsumers({
+  runtimePool: conversationPool,
+  coordinatorPool: workerPool,
+  agent: {
+    service: agentService,
+    lifecycle: new AgentLifecycle(agentRepository, null),
+  },
+  commerce: commerceRuntime?.service,
+  growth: growthService,
+});
 const telemetry = new TrustTelemetry(
   "local-development",
   process.env.RELEASE_REVISION ?? "uncommitted-w8",
 );
 const poolError = () => telemetry.increment("database_connection_errors");
-for (const current of [pool, workerPool, conversationPool])
+for (const current of [pool, workerPool, conversationPool, ...growthPools])
   current.on("error", poolError);
 const readiness = new Readiness(
   [
@@ -253,19 +378,22 @@ const readiness = new Readiness(
         code: "synthetic_local_accounts",
       }),
     },
-    ...[
-      "model",
-      "payments",
-      "calls",
-      "voice",
-      "push",
-      "domain_privacy_hooks",
-    ].map((name) => ({
+    ...["model", "payments", "calls", "voice", "push"].map((name) => ({
       name,
       required: true,
       run: async () => ({
         state: "unavailable" as const,
         code: "adapter_unconfigured",
+      }),
+    })),
+    ...PrivacyDomains.map((domain) => ({
+      name: `privacy_${domain}`,
+      required: true,
+      run: async () => ({
+        state: "unavailable" as const,
+        code: privacyHooks.some((hook) => hook.domain === domain)
+          ? "export_hook_registered_retention_gated"
+          : "owner_hook_unconfigured",
       }),
     })),
   ],
@@ -326,7 +454,18 @@ const nativeView = async (token: string) => {
 };
 app.post("/v1/identity/complete", async (req, res) => {
   const result = await nativeIdentity.complete(req.body);
-  res.json({ ...result, session: await nativeView(result.token) });
+  try {
+    res.json(
+      IdentityCompletionSchema.parse({
+        token: result.token,
+        returnTo: result.returnTo,
+        session: await nativeView(result.token),
+      }),
+    );
+  } catch (error) {
+    await nativeIdentity.logout(result.token);
+    throw error;
+  }
 });
 app.get("/v1/identity/session", async (req, res) =>
   res.json(await nativeView(nativeToken(req))),
@@ -412,6 +551,53 @@ app.use(
     },
   }),
 );
+// The actual W3 feature uses W1's same session and W8's current pair denial.
+// Provider consent/generation remain unavailable without approved configuration.
+const signing = new SignedActService(
+  conversationPool,
+  "localhost",
+  origin,
+  undefined,
+  [
+    commerceSignedSubjects,
+    ...(contentRuntime ? [contentRuntime.signedSubjects] : []),
+  ],
+);
+app.use(
+  createApp(
+    {
+      port,
+      featureEnabled: true,
+      databaseUrl: conversationUrl,
+      allowedOrigin: origin,
+      rpId: "localhost",
+    },
+    {
+      identity: nativeIdentity,
+      telemetry,
+      platformIdentity: {
+        sessions: nativeIdentity,
+        profiles: nativeProfiles,
+        signing,
+        passkeys: new PasskeyService(
+          conversationPool,
+          "localhost",
+          [origin],
+          "Creator Platform",
+        ),
+      },
+      signing,
+      access,
+      conversation,
+      features: [
+        conversationRuntime.registration,
+        ...(commerceRuntime ? [commerceRuntime.feature] : []),
+        ...(contentRuntime?.features ?? []),
+      ],
+      assertActorAllowed: (actor) => service.assertAllowed(actor),
+    },
+  ),
+);
 app.use(
   (
     error: unknown,
@@ -428,6 +614,8 @@ app.use(
             "This local account action could not complete.",
             503,
           );
+    res.locals.errorCode = value.code;
+    res.locals.failureClass = failureClass(error);
     res.status(value.status).json({
       error: {
         code: value.code,
@@ -437,33 +625,98 @@ app.use(
     });
   },
 );
-const worker = new TrustWorker(
-  workerPool,
-  [trustPrivacyHook(workerPool)],
-  [],
-  (signal, value) =>
-    ["worker_errors", "privacy_retry"].includes(signal)
-      ? telemetry.increment(signal, value)
-      : telemetry.observe(signal, value),
+const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
+  ["worker_errors", "privacy_retry"].includes(signal)
+    ? telemetry.increment(signal, value)
+    : telemetry.observe(signal, value),
 );
 await worker.start();
+const wal = new PostgresWalObserver(workerPool, telemetry);
+await wal.start();
 const server = createServer(app);
+const sockets = attachRealtime(
+  server,
+  nativeIdentity,
+  access,
+  conversation,
+  origin,
+  {
+    assertActorAllowed: (actor) => service.assertAllowed(actor),
+    resolveSession: (token) => nativeIdentity.resolve(token),
+    telemetry,
+  },
+);
 server.requestTimeout = 15_000;
 server.headersTimeout = 10_000;
 server.keepAliveTimeout = 5000;
 server.listen(port, "127.0.0.1", () =>
   process.stdout.write(
-    `W8 synthetic local trust API on ${port}; providers and cross-domain privacy are unavailable.\n`,
+    `W8 synthetic local API on ${port}; ${privacyHooks.length} privacy consumers registered, external providers and retention remain gated.\n`,
   ),
 );
 let stopping = false;
 const stop = async () => {
   if (stopping) return;
   stopping = true;
-  await worker.stop();
-  await new Promise<void>((resolve) => server.close(() => resolve()));
+  const started = performance.now();
+  let forcedSockets = 0;
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_started",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      activeSockets: sockets.clients.size,
+    }),
+  );
+  for (const connection of sockets.clients)
+    connection.close(1001, "Server shutdown");
+  const drain = setTimeout(() => {
+    forcedSockets = sockets.clients.size;
+    if (forcedSockets)
+      telemetry.increment("realtime_shutdown_forced", forcedSockets);
+    for (const connection of sockets.clients) connection.terminate();
+  }, 5000);
+  drain.unref();
+  const elapsed = () => Number((performance.now() - started).toFixed(2));
+  const stages = { httpMs: 0, socketsMs: 0, workerMs: 0, walMs: 0, poolsMs: 0 };
+  // Stop intake before waiting for the current fenced worker task. Otherwise
+  // polling clients can keep obtaining tickets while shutdown is already active.
+  await Promise.all([
+    new Promise<void>((resolve) => server.close(() => resolve())).then(() => {
+      stages.httpMs = elapsed();
+    }),
+    new Promise<void>((resolve) => sockets.close(() => resolve())).then(() => {
+      stages.socketsMs = elapsed();
+    }),
+    worker.stop().then(() => {
+      stages.workerMs = elapsed();
+    }),
+    wal.stop().then(() => {
+      stages.walMs = elapsed();
+    }),
+  ]);
+  clearTimeout(drain);
   telemetry.close();
-  await Promise.all([pool.end(), workerPool.end(), conversationPool.end()]);
+  await Promise.all([
+    pool.end(),
+    workerPool.end(),
+    conversationPool.end(),
+    ...growthPools.map((current) => current.end()),
+  ]);
+  stages.poolsMs = elapsed();
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_completed",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      durationMs: elapsed(),
+      activeSockets: sockets.clients.size,
+      forcedSockets,
+      stages,
+    }),
+  );
 };
 process.on("SIGTERM", () => void stop());
 process.on("SIGINT", () => void stop());

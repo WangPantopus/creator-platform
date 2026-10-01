@@ -1,4 +1,5 @@
 "use client";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useState } from "react";
 export function DevelopmentControls() {
   const [message, setMessage] = useState("");
@@ -18,34 +19,34 @@ export function DevelopmentControls() {
       setMessage(
         response.ok
           ? JSON.stringify(result)
-          : (result.error?.message ?? "Action unavailable."),
+          : (result.error?.message ?? growthCopy.growthActionUnavailable),
       );
     } catch {
-      setMessage("The development server is unavailable.");
+      setMessage(growthCopy.growthTheDevelopmentServerIsUnavailable);
     }
   }
   return (
     <section className="growth-stack">
-      <h1>W7 development controls</h1>
+      <h1>{growthCopy.growthW7DevelopmentControls}</h1>
       <p>
         Synthetic actors and producer projections. These actions exercise W7
         persistence; they do not prove canonical AI/content/signature/provider
         integrations.
       </p>
       <fieldset>
-        <legend>Development actor</legend>
+        <legend>{growthCopy.growthDevelopmentActor}</legend>
         {["signed_out", "fan", "creator"].map((actor) => (
           <button
             key={actor}
             className="qv-btn qv-btn--secondary"
             onClick={() => void action({ action: "actor", actor })}
           >
-            Use {actor.replaceAll("_", " ")}
+            {growthFormat("growthUse", { value1: actor.replaceAll("_", " ") })}
           </button>
         ))}
       </fieldset>
       <fieldset>
-        <legend>Public creator projection</legend>
+        <legend>{growthCopy.growthPublicCreatorProjection}</legend>
         {["published", "paused", "unpublished", "revoked"].map((state) => (
           <button
             key={state}
@@ -59,13 +60,13 @@ export function DevelopmentControls() {
           className="qv-btn qv-btn--secondary"
           onClick={() => void action({ action: "post" })}
         >
-          Publish synthetic public Note
+          {growthCopy.growthPublishSyntheticPublicNote}
         </button>
       </fieldset>
       <fieldset>
-        <legend>Distinct-fan insight signal</legend>
+        <legend>{growthCopy.growthDistinctFanInsightSignal}</legend>
         <label>
-          Synthetic evidence week
+          {growthCopy.growthSyntheticEvidenceWeek}
           <select
             className="qv-input"
             value={window}
@@ -77,18 +78,20 @@ export function DevelopmentControls() {
           </select>
         </label>
         <label>
-          Topic
+          {growthCopy.growthTopic}
           <select
             className="qv-input"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           >
-            <option value="bisque-temperature">Bisque temperature</option>
-            <option value="first-kiln">First kiln</option>
+            <option value="bisque-temperature">
+              {growthCopy.growthBisqueTemperature}
+            </option>
+            <option value="first-kiln">{growthCopy.growthFirstKiln}</option>
           </select>
         </label>
         <label>
-          Fan number
+          {growthCopy.growthFanNumber}
           <input
             className="qv-input"
             type="number"
@@ -99,7 +102,7 @@ export function DevelopmentControls() {
           />
         </label>
         <label>
-          Source version
+          {growthCopy.growthSourceVersion}
           <input
             className="qv-input"
             type="number"
@@ -114,7 +117,7 @@ export function DevelopmentControls() {
             checked={unresolved}
             onChange={(e) => setUnresolved(e.target.checked)}
           />{" "}
-          Still unresolved
+          {growthCopy.growthStillUnresolved}
         </label>
         <button
           className="qv-btn qv-btn--secondary"
@@ -125,7 +128,7 @@ export function DevelopmentControls() {
             })
           }
         >
-          Record synthetic categorical signal
+          {growthCopy.growthRecordSyntheticCategoricalSignal}
         </button>
         <button
           className="qv-btn qv-btn--secondary"
@@ -133,14 +136,14 @@ export function DevelopmentControls() {
             void action({ action: "close-insights", input: { window } })
           }
         >
-          Close the synthetic evidence window
+          {growthCopy.growthCloseTheSyntheticEvidenceWindow}
         </button>
       </fieldset>
       <p role="status">{message}</p>
-      <a href="/discover">Open Discover</a>
-      <a href="/home">Open Home</a>
-      <a href="/notifications">Open Notifications</a>
-      <a href="/studio/insights">Open Insights</a>
+      <a href="/discover">{growthCopy.growthOpenDiscover}</a>
+      <a href="/home">{growthCopy.growthOpenHome}</a>
+      <a href="/notifications">{growthCopy.growthOpenNotifications}</a>
+      <a href="/studio/insights">{growthCopy.growthOpenInsights}</a>
     </section>
   );
 }

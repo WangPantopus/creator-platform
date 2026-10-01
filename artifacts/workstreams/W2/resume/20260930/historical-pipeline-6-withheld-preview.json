@@ -1,0 +1,63 @@
+{
+  "synthetic": true,
+  "productionPublication": false,
+  "result": {
+    "compiledHash": "6560af54c7926a4d82829e6e27c6b4c4b4249ad98b0c3d66dfe9971eaf128609",
+    "sentences": [
+      {
+        "text": "I’m W2 development creator’s AI. I can’t answer that from the approved sources. You can ask W2 development creator directly.",
+        "citations": []
+      }
+    ],
+    "blocked": true,
+    "category": "privacy",
+    "passages": [
+      {
+        "id": "5ae0946c-5f06-45df-836d-754cc2f90179",
+        "sourceId": "11e53ba0-0ede-40ee-93ad-58f1a972474c",
+        "sourceRevision": 2,
+        "title": "W2 resume source",
+        "text": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+        "start": 0,
+        "end": 134,
+        "audience": {
+          "kind": "public"
+        }
+      }
+    ],
+    "contextHash": "f2240fc0439c063ac93da23a55761b9bd800899266d764a0d7c7da3655865bf7",
+    "usage": [
+      {
+        "inputTokens": 126,
+        "outputTokens": 24,
+        "costMicros": 89,
+        "model": "gpt-4.1-mini-2025-04-14",
+        "provider": "OpenAI"
+      },
+      {
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "inputTokens": 10,
+        "outputTokens": 0,
+        "costMicros": 1
+      },
+      {
+        "inputTokens": 351,
+        "outputTokens": 19,
+        "costMicros": 171,
+        "model": "gpt-4.1-mini-2025-04-14",
+        "provider": "OpenAI"
+      },
+      {
+        "provider": "configured",
+        "model": "unreconciled-response",
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "costMicros": null
+      }
+    ],
+    "durationMs": 2716,
+    "firstApprovedMs": null,
+    "route": "large"
+  }
+}

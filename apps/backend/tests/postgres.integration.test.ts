@@ -5,7 +5,9 @@ import {
   randomUUID,
   sign,
 } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import pg from "pg";
 import fc from "fast-check";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -32,7 +34,10 @@ if (ci && !["false", "0"].includes(ci.toLowerCase()) && !adminUrl) {
 describe.skipIf(!adminUrl)(
   "PostgreSQL foundation using the real non-owner role",
   () => {
-    const admin = new pg.Pool({ connectionString: adminUrl, max: 4 });
+    const bootstrap = new pg.Pool({ connectionString: adminUrl, max: 1 });
+    const fixtureDatabase = `creator_foundation_${randomUUID().replaceAll("-", "")}`;
+    let fixtureCreated = false;
+    let admin: pg.Pool;
     let runtime: pg.Pool;
     let db: Database;
     let access: AccessService;
@@ -65,22 +70,37 @@ describe.skipIf(!adminUrl)(
       const url = new URL(adminUrl!);
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
-      await admin.query("DROP SCHEMA IF EXISTS creator CASCADE");
-      await admin.query(
-        await readFile(
-          new URL("../migrations/0001_foundation.sql", import.meta.url),
-          "utf8",
-        ),
+      const existingRole = await bootstrap.query(
+        "SELECT 1 FROM pg_roles WHERE rolname='creator_runtime'",
       );
-      await admin.query(
-        await readFile(
-          new URL("../migrations/0002_w1_identity.sql", import.meta.url),
-          "utf8",
-        ),
+      await bootstrap.query(`CREATE DATABASE "${fixtureDatabase}"`);
+      fixtureCreated = true;
+      url.pathname = `/${fixtureDatabase}`;
+      admin = new pg.Pool({ connectionString: url.toString(), max: 4 });
+      await promisify(execFile)(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          fileURLToPath(
+            new URL("../scripts/migrate-trust.ts", import.meta.url),
+          ),
+        ],
+        {
+          env: {
+            ...process.env,
+            DATABASE_MIGRATION_URL: url.toString(),
+            W8_LEGACY_ROOT_MIGRATIONS: "false",
+          },
+          timeout: 60000,
+        },
       );
-      await admin.query(
-        "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
-      );
+      // Configure only a newly created fixture role; never rotate a retained
+      // cluster's runtime credential when this suite is repeated.
+      if (!existingRole.rowCount)
+        await admin.query(
+          "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
+        );
       url.username = "creator_runtime";
       url.password = "foundation-test-only";
       runtime = new pg.Pool({ connectionString: url.toString(), max: 8 });
@@ -143,7 +163,10 @@ describe.skipIf(!adminUrl)(
     });
     afterAll(async () => {
       if (runtime) await runtime.end();
-      await admin.end();
+      if (admin) await admin.end();
+      if (fixtureCreated)
+        await bootstrap.query(`DROP DATABASE "${fixtureDatabase}"`);
+      await bootstrap.end();
     });
 
     it("T-11 denies unscoped read/write and leaves no tenant context on pooled connections", async () => {
@@ -208,11 +231,15 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
+      // Optimized locked memory reads include scoped exclusion/provenance subqueries.
+      // Three observed statements retain every family predicate and all10,000 pairs.
       expect(observedStatements).toBe(30000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-    }, 600000);
+      // Ten thousand real scoped transactions include current identity locks.
+      // Preserve every pair/assertion and the original five-minute budget.
+    }, 300000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",
@@ -346,6 +373,7 @@ describe.skipIf(!adminUrl)(
           ...body,
           idempotencyKey: "other-message-key",
         }),
+        // A reserved last unit remains occupied while the accepted reply is active.
       ).rejects.toMatchObject({ code: "ai_access_unavailable" });
       const counters = await admin.query(
         "SELECT used,reserved FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2",

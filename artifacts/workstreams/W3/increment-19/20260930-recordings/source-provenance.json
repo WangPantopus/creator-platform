@@ -1,0 +1,67 @@
+{
+  "workstream": "W3",
+  "increment": 19,
+  "predecessor": "52451096089a20ab68bc8cbce40f55965f15bc0c",
+  "implementation": "personal; no delegation/new tests/applied SQL edits",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/conversation/recordings.ts",
+      "sha256": "317f5b7a9065a4e4854bb405d681ace951a20ddee408bad5193518a5a175dbde",
+      "gitBlob": "d5b8bfa4fd39d7a08083d26e7b73e5676e93601b"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "sha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+      "gitBlob": "42e4e83dc2d81ddb5a7542b7fd83f86943ef51f3"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage.ts",
+      "sha256": "778e3074a64ec77dfa20cc3d03c790cbeb794664e05157ab0326bed6da2cb99a",
+      "gitBlob": "e68129defb3173bc27a96a05a94edbe4a0d8e679"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "sha256": "fddefaeb58cb4652c08e59a9a26c68bda50bd9108a26ea620d1f9e7aa21ca761",
+      "gitBlob": "3b78ac4a8bf8ce5298fb8cbfec4086a2f870c002"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "sha256": "c91bb489e63860572c32cc32e7f2138eeb94ba52ff029b64bf593f80843cba33",
+      "gitBlob": "e1c4a6b379261d51b772573e92b8ab91c513d5d2"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/privacy.ts",
+      "sha256": "ba4ce9d2922db1268f1aa9097e0c5b53c347f8d9f4fcbaa8f070308b7d9b6f13",
+      "gitBlob": "97d90c34a83c216060da7a28581a15ff26ac3722"
+    },
+    {
+      "path": "apps/backend/src/modules/media/service.ts",
+      "sha256": "91aa84e344c025d93ded06b4900408da2d3edc5841b113348f8c1f56eb4bdc8c",
+      "gitBlob": "977d3c1429c85fabb807b307aeb9b01d72d262a0"
+    },
+    {
+      "path": "packages/api/src/conversation/contracts.ts",
+      "sha256": "c5d9a157aaf8478c580bb21cfb3748292ea3f356b194fba0c7aa21e252f2cb64",
+      "gitBlob": "c58cd531f51b004380552910b292b32e1d51ab14"
+    },
+    {
+      "path": "packages/api/src/media.ts",
+      "sha256": "ffb654ab21dd017b216aa06f0a4137cd1ae33b394ae8f3301603d9db7ef8bee7",
+      "gitBlob": "7253b9fc5883aba4706dbb945ec384d4c7ea62f2"
+    }
+  ],
+  "W6Producer": {
+    "commit": "0ad54abab9a3affec6c8e32590f4971331cf6042",
+    "publication": "immutable local shared Git source; pushed publication not yet asserted",
+    "scope": "byte-identical MediaService and exact narrow ProcessedMediaEvidenceSchema/type only; no full W6 worker/router/creator graph",
+    "exactEvidenceSchemaRegionSha256": "272352a9d3b849a84b7bd08bb682987bea40afff38697b4fa8d4664019c2e533"
+  },
+  "proposal": {
+    "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+    "sha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+    "state": "unallocated_unapplied; runtime requires exact real registration and same-client authority"
+  },
+  "firstSignatureAvailable": false,
+  "mediaPlaybackE2EComplete": false,
+  "nativeInteractiveAcceptance": false
+}

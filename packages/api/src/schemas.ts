@@ -159,7 +159,8 @@ export const MessageSchema = z.strictObject({
 });
 export const AcceptedMessageSchema = z.strictObject({
   message: MessageSchema,
-  generationId: IdSchema,
+  // A durable grant-free platform safety response creates no generation job.
+  generationId: IdSchema.nullable(),
 });
 export const FrameSchema = z.strictObject({
   threadId: IdSchema,

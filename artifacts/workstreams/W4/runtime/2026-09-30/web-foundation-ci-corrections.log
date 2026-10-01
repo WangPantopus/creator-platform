@@ -1,0 +1,80 @@
+$ playwright test tests/visual/auth-contract.spec.ts tests/visual/foundation.spec.ts
+[WebServer] (node:19277) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:19281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/visual/auth-contract.spec.ts:23:5 › auth seam rejects external, nested backslash and control-character contexts (855ms)
+  ✓  2 tests/visual/auth-contract.spec.ts:42:5 › welcome and auth seam preserve an opaque context without draft content (1.4s)
+  ✘  3 tests/visual/foundation.spec.ts:33:9 › welcome foundation fixture matches approved design in light (942ms)
+(node:19318) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 tests/visual/foundation.spec.ts:33:9 › creator-home foundation fixture matches approved design in light (5.0s)
+  ✘  5 tests/visual/foundation.spec.ts:33:9 › handle-preview foundation fixture matches approved design in light (743ms)
+(node:19365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 tests/visual/foundation.spec.ts:33:9 › welcome foundation fixture matches approved design in night (2.0s)
+  ✓  7 tests/visual/foundation.spec.ts:33:9 › creator-home foundation fixture matches approved design in night (2.6s)
+  ✓  8 tests/visual/foundation.spec.ts:33:9 › handle-preview foundation fixture matches approved design in night (1.4s)
+  ✓  9 tests/visual/foundation.spec.ts:94:5 › unconfigured Pantopus sign-in does not create a local identity or arrival and preserves destination (4.5s)
+
+
+  1) tests/visual/foundation.spec.ts:33:9 › welcome foundation fixture matches approved design in light
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: welcome.light.png
+
+
+      59 |         caret: "initial",
+      60 |       });
+    > 61 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      62 |         maxDiffPixels: 0,
+      63 |       });
+      64 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/fa22/creator-platform/tests/visual/foundation.spec.ts:61:24
+
+    attachment #1: welcome-light (image/png) ───────────────────────────────────────────────────────
+    Expected: tests/visual/baselines/welcome-light.png
+    Received: test-results/foundation-welcome-foundat-1f82b-es-approved-design-in-light/welcome-light-actual.png
+    Diff:     test-results/foundation-welcome-foundat-1f82b-es-approved-design-in-light/welcome-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-welcome-foundat-1f82b-es-approved-design-in-light/error-context.md
+
+  2) tests/visual/foundation.spec.ts:33:9 › handle-preview foundation fixture matches approved design in light
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: handle-preview.light.png
+
+
+      59 |         caret: "initial",
+      60 |       });
+    > 61 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      62 |         maxDiffPixels: 0,
+      63 |       });
+      64 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/fa22/creator-platform/tests/visual/foundation.spec.ts:61:24
+
+    attachment #1: handle-preview-light (image/png) ────────────────────────────────────────────────
+    Expected: tests/visual/baselines/handle-preview-light.png
+    Received: test-results/foundation-handle-preview--73255-es-approved-design-in-light/handle-preview-light-actual.png
+    Diff:     test-results/foundation-handle-preview--73255-es-approved-design-in-light/handle-preview-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-handle-preview--73255-es-approved-design-in-light/error-context.md
+
+  2 failed
+    tests/visual/foundation.spec.ts:33:9 › welcome foundation fixture matches approved design in light
+    tests/visual/foundation.spec.ts:33:9 › handle-preview foundation fixture matches approved design in light
+  7 passed (29.4s)
+[ELIFECYCLE] Command failed with exit code 1.

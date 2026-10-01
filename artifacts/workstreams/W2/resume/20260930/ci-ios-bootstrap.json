@@ -1,0 +1,71 @@
+{
+  "head": "f7eed1a717f48772f23c96c16207e46010158bc1",
+  "runId": 36767616367,
+  "jobId": 110065636088,
+  "artifactId": 11123773779,
+  "image": "xcode-27-arm64 20260921.0210.1",
+  "packageTests": {
+    "passed": 18,
+    "referenceImages": 110
+  },
+  "simulatorSummary": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "A1AA148C-E35C-4442-BF7A-002B2704BC63",
+          "deviceName": "iPhone 18 Pro",
+          "modelName": "iPhone 18 Pro",
+          "osBuildNumber": "24A434",
+          "osVersion": "27.0",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 1,
+        "passedTests": 0,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "QelvoraApp \u00b7 Built with macOS 27.0",
+    "expectedFailures": 0,
+    "failedTests": 1,
+    "finishTime": 1790800110.409,
+    "passedTests": 0,
+    "result": "Failed",
+    "skippedTests": 0,
+    "startTime": 1790799048.383,
+    "statistics": [],
+    "testFailures": [
+      {
+        "failureText": "Early unexpected exit, operation never finished bootstrapping - no restart will be attempted. (Underlying Error: The test runner crashed while preparing to run tests: QelvoraUITests-Runner at -[XCTWaiter(StallHandling) handleStalledWait:])",
+        "targetName": "QelvoraUITests",
+        "testIdentifier": 1,
+        "testIdentifierString": "QelvoraUITests-Runner (22800) encountered an error",
+        "testName": "QelvoraUITests-Runner (22800) encountered an error"
+      }
+    ],
+    "title": "Test - QelvoraApp",
+    "topInsights": [],
+    "totalTestCount": 1
+  },
+  "bootstrapTrace": [
+    "Creating future for enabling automation mode with timeout 60.00",
+    "Creating future for loading Accessibility with timeout 70.00",
+    "XCTWaiter watchdog first trigger before any test suite started"
+  ],
+  "fix": {
+    "runner": "macos-26",
+    "developerDirectory": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "simulator": "Newest available iOS 26 iPhone, exact UUID",
+    "boot": "simctl bootstatus UUID -b",
+    "parallelTesting": false
+  },
+  "assertionsChangedForBootstrap": false,
+  "timeoutsIncreased": false,
+  "retriesAdded": false,
+  "remaining": "Full corrected-head CI must establish both UI tests pass; current source assertion was not exercised by this failed bootstrap"
+}

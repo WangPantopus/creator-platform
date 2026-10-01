@@ -1,0 +1,464 @@
+{
+  "observedAt": "2026-10-01T03:56:25.058194+00:00",
+  "run": {
+    "id": 36791937984,
+    "name": "Foundation checks",
+    "head_sha": "439c33695dc4c9a45404bedbdd70b59ecf00c8e6",
+    "head_branch": "codex/w8-trust-handoff",
+    "status": "completed",
+    "conclusion": "failure",
+    "created_at": "2026-09-30T23:36:16Z",
+    "updated_at": "2026-10-01T03:55:13Z",
+    "event": "push",
+    "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36791937984"
+  },
+  "jobs": [
+    {
+      "id": 110146601703,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-30T23:36:20Z",
+      "completed_at": "2026-09-30T23:41:22Z",
+      "runner_name": "GitHub Actions 1000033187",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:20Z",
+          "completed_at": "2026-09-30T23:36:22Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:22Z",
+          "completed_at": "2026-09-30T23:36:23Z"
+        },
+        {
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:23Z",
+          "completed_at": "2026-09-30T23:36:24Z"
+        },
+        {
+          "name": "Enable KVM",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:24Z",
+          "completed_at": "2026-09-30T23:36:24Z"
+        },
+        {
+          "name": "Run reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:24Z",
+          "completed_at": "2026-09-30T23:41:18Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:41:18Z",
+          "completed_at": "2026-09-30T23:41:19Z"
+        },
+        {
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:41:19Z",
+          "completed_at": "2026-09-30T23:41:19Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:41:19Z",
+          "completed_at": "2026-09-30T23:41:20Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:41:20Z",
+          "completed_at": "2026-09-30T23:41:20Z"
+        }
+      ]
+    },
+    {
+      "id": 110146601789,
+      "name": "ios-foundation",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-10-01T03:51:13Z",
+      "completed_at": "2026-10-01T03:52:35Z",
+      "runner_name": "GitHub Actions 1000034718",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "xcode-27"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:13Z",
+          "completed_at": "2026-10-01T03:51:14Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:14Z",
+          "completed_at": "2026-10-01T03:51:16Z"
+        },
+        {
+          "name": "Run swift test --package-path apps/ios",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-01T03:51:16Z",
+          "completed_at": "2026-10-01T03:52:31Z"
+        },
+        {
+          "name": "Run brew install xcodegen",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Run xcodegen generate --spec apps/ios/project.yml",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Select an available iPhone simulator",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Run xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=' -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=NO",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:32Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:52:32Z",
+          "completed_at": "2026-10-01T03:52:33Z"
+        }
+      ]
+    },
+    {
+      "id": 110146601851,
+      "name": "android-foundation",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-10-01T02:03:34Z",
+      "completed_at": "2026-10-01T02:07:23Z",
+      "runner_name": "GitHub Actions 1000034048",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "macos-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:03:35Z",
+          "completed_at": "2026-10-01T02:03:37Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:03:37Z",
+          "completed_at": "2026-10-01T02:03:39Z"
+        },
+        {
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:03:39Z",
+          "completed_at": "2026-10-01T02:03:39Z"
+        },
+        {
+          "name": "Run android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:03:39Z",
+          "completed_at": "2026-10-01T02:03:42Z"
+        },
+        {
+          "name": "Run sdkmanager 'platforms;android-35' 'build-tools;35.0.0'",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:03:42Z",
+          "completed_at": "2026-10-01T02:03:44Z"
+        },
+        {
+          "name": "Run ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-01T02:03:44Z",
+          "completed_at": "2026-10-01T02:07:16Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:07:16Z",
+          "completed_at": "2026-10-01T02:07:18Z"
+        },
+        {
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:07:18Z",
+          "completed_at": "2026-10-01T02:07:18Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:07:18Z",
+          "completed_at": "2026-10-01T02:07:19Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T02:07:19Z",
+          "completed_at": "2026-10-01T02:07:21Z"
+        }
+      ]
+    },
+    {
+      "id": 110146601886,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-09-30T23:36:54Z",
+      "completed_at": "2026-09-30T23:38:41Z",
+      "runner_name": "GitHub Actions 1000033188",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:55Z",
+          "completed_at": "2026-09-30T23:36:56Z"
+        },
+        {
+          "name": "Initialize containers",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:36:56Z",
+          "completed_at": "2026-09-30T23:37:08Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:37:08Z",
+          "completed_at": "2026-09-30T23:37:09Z"
+        },
+        {
+          "name": "Run pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:37:09Z",
+          "completed_at": "2026-09-30T23:37:12Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:37:12Z",
+          "completed_at": "2026-09-30T23:37:13Z"
+        },
+        {
+          "name": "Run pnpm install --frozen-lockfile",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:37:13Z",
+          "completed_at": "2026-09-30T23:37:16Z"
+        },
+        {
+          "name": "Run pnpm check",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-09-30T23:37:16Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-09-30T23:38:39Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        },
+        {
+          "name": "Post Run pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:38:39Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:38:39Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        },
+        {
+          "name": "Stop containers",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:38:39Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T23:38:39Z",
+          "completed_at": "2026-09-30T23:38:39Z"
+        }
+      ]
+    },
+    {
+      "id": 110146601960,
+      "name": "web-visual",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-10-01T03:51:29Z",
+      "completed_at": "2026-10-01T03:55:12Z",
+      "runner_name": "GitHub Actions 1000034720",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "xcode-27"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:30Z",
+          "completed_at": "2026-10-01T03:51:32Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:32Z",
+          "completed_at": "2026-10-01T03:51:35Z"
+        },
+        {
+          "name": "Run pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:35Z",
+          "completed_at": "2026-10-01T03:51:38Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:38Z",
+          "completed_at": "2026-10-01T03:51:39Z"
+        },
+        {
+          "name": "Run pnpm install --frozen-lockfile",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:39Z",
+          "completed_at": "2026-10-01T03:51:47Z"
+        },
+        {
+          "name": "Run pnpm exec playwright install chromium",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:51:47Z",
+          "completed_at": "2026-10-01T03:52:01Z"
+        },
+        {
+          "name": "Run pnpm test:visual",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-01T03:52:01Z",
+          "completed_at": "2026-10-01T03:55:08Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:55:08Z",
+          "completed_at": "2026-10-01T03:55:09Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-01T03:55:09Z",
+          "completed_at": "2026-10-01T03:55:09Z"
+        },
+        {
+          "name": "Post Run pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:55:09Z",
+          "completed_at": "2026-10-01T03:55:10Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:55:10Z",
+          "completed_at": "2026-10-01T03:55:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-01T03:55:10Z",
+          "completed_at": "2026-10-01T03:55:11Z"
+        }
+      ]
+    }
+  ],
+  "actionTaken": "Read-only; workflow in_progress is not evidence a macOS job is allocated or hung."
+}

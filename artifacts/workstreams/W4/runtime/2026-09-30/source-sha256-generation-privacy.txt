@@ -1,0 +1,5 @@
+58d6614c7534b277f8e933a19e980eb1af4c1007a11dc605474882df1e2458b3  apps/backend/src/modules/access/commerce.ts
+83045cd42c17c44c214790b821a54bb36492ba5e92388b86530cd23810607f86  apps/backend/src/modules/commerce/attributed-cost-policy.ts
+83e1fce16cf598baddf93a99c4451028dd3d400931e97fd8f4f7f47d9d6b3a7d  apps/backend/src/modules/commerce/generation-allowance.ts
+9273606eb367143157c21c17927fda720692c85299a09987af099993fc25f8a7  apps/backend/src/modules/commerce/generation-privacy.ts
+d741b72af1f6d7c92a60d7e39bb2b1ffdfa246a598791130e72d6492dc67caa8  apps/backend/src/modules/commerce/runtime.ts

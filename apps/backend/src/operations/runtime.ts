@@ -20,6 +20,9 @@ import {
 import { Readiness, type Probe } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { TrustTelemetry } from "./telemetry.js";
+import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
+import type { ScopeRestriction } from "../modules/access/scope.js";
+import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
 
 /** W1 mounts this runtime in the canonical backend; no development identity fallback. */
 export async function createTrustRuntime(options: {
@@ -31,6 +34,7 @@ export async function createTrustRuntime(options: {
   actor: (request: Request) => Promise<Actor>;
   dependencies: TrustDependencies;
   privacyHooks: PrivacyHook[];
+  privacyArtifacts?: PrivacyArtifactStore;
   effectHooks: EffectHook[];
   probes: Probe[];
   restoreReady: () => Promise<boolean>;
@@ -92,11 +96,64 @@ export async function createTrustRuntime(options: {
           }),
         };
   });
+  const privacyProbeNames = PrivacyDomains.map((domain) => `privacy_${domain}`);
+  const exportProbe = options.probes.find(
+    (probe) => probe.name === "privacy_exports",
+  );
+  const exportReadiness: Probe =
+    options.privacyArtifacts && options.dependencies.verifyExport && exportProbe
+      ? { ...exportProbe, required: true }
+      : {
+          name: "privacy_exports",
+          required: true,
+          run: async () => ({
+            state: "unavailable",
+            code: "protected_storage_fresh_auth_and_owner_probe_required",
+          }),
+        };
+  const privacyProbes: Probe[] = PrivacyDomains.map((domain) => {
+    const name = `privacy_${domain}`;
+    const supplied = options.probes.find((probe) => probe.name === name);
+    if (options.privacyHooks.some((hook) => hook.domain === domain) && supplied)
+      return { ...supplied, required: true };
+    return {
+      name,
+      required: true,
+      run: async () => ({
+        state: "unavailable",
+        code: supplied
+          ? "domain_hook_unavailable"
+          : "owner_readiness_unconfigured",
+      }),
+    };
+  });
   const store = new TrustStore(options.apiPool);
   await store.assertRole();
   await new TrustStore(options.workerPool).assertRole(true);
-  const service = new TrustService(store, options.dependencies);
+  const service = new TrustService(
+    store,
+    options.dependencies,
+    options.privacyArtifacts,
+  );
   const telemetry = new TrustTelemetry(options.environment, options.release);
+  const restored = async () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return (
+        (await Promise.race([
+          options.restoreReady(),
+          new Promise<false>((resolve) => {
+            timer = setTimeout(() => resolve(false), 2000);
+            timer.unref();
+          }),
+        ])) === true
+      );
+    } catch {
+      return false;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  };
   const poolError = () => telemetry.increment("database_connection_errors");
   options.apiPool.on("error", poolError);
   options.workerPool.on("error", poolError);
@@ -114,7 +171,7 @@ export async function createTrustRuntime(options: {
         name: "restoration_denial",
         required: true,
         run: async () => ({
-          state: (await options.restoreReady()) ? "available" : "unavailable",
+          state: (await restored()) ? "available" : "unavailable",
           code: "tombstone_replay_gate",
         }),
       },
@@ -144,13 +201,20 @@ export async function createTrustRuntime(options: {
         }),
       },
       ...providerProbes,
-      ...options.probes.filter((probe) => !providerNames.includes(probe.name)),
+      ...privacyProbes,
+      exportReadiness,
+      ...options.probes.filter(
+        (probe) =>
+          !providerNames.includes(probe.name) &&
+          probe.name !== "privacy_exports" &&
+          !privacyProbeNames.includes(probe.name),
+      ),
     ],
     options.environment,
     options.release,
   );
-  // Registered hooks establish availability only; probes must check the actual
-  // owner/provider readiness. A registration alone never proves completion.
+  // Each required domain probe checks actual role/authority/provider/policy
+  // configuration without running an export or purge. Registration is separate.
   const worker = new TrustWorker(
     options.workerPool,
     options.privacyHooks,
@@ -159,12 +223,13 @@ export async function createTrustRuntime(options: {
       ["worker_errors", "privacy_retry"].includes(name)
         ? telemetry.increment(name, value)
         : telemetry.observe(name, value),
+    options.privacyArtifacts,
   );
   const router = createTrustRouter({
     service,
     origin: origin.origin,
     actor: async (request) => {
-      if (!(await options.restoreReady()))
+      if (!(await restored()))
         throw new DomainError(
           "restoration_pending",
           "Restored data remains unavailable until deletion controls have been reapplied.",
@@ -180,7 +245,7 @@ export async function createTrustRuntime(options: {
   // Pass these into W1's configured backend. Restoration denial must cover
   // conversation/realtime entrypoints as well as the trust router.
   const assertActorAllowed = async (actor: Actor) => {
-    if (!(await options.restoreReady()))
+    if (!(await restored()))
       throw new DomainError(
         "restoration_pending",
         "Restored data remains unavailable until deletion controls have been reapplied.",
@@ -188,18 +253,20 @@ export async function createTrustRuntime(options: {
       );
     await service.assertAllowed(actor);
   };
-  const assertScopeAllowed = async (
-    actor: Actor,
-    creatorId: string,
-    threadId: string,
+  const restrictScope = trustScopeRestriction(service, options.workerPool);
+  const assertScopeAllowed: ScopeRestriction = async (
+    actor,
+    creatorId,
+    threadId,
+    participants,
   ) => {
-    if (!(await options.restoreReady()))
+    if (!(await restored()))
       throw new DomainError(
         "restoration_pending",
         "Restored data remains unavailable until deletion controls have been reapplied.",
         503,
       );
-    await service.assertAllowed(actor, creatorId, threadId);
+    await restrictScope(actor, creatorId, threadId, participants);
   };
   return {
     router,

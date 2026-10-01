@@ -23,6 +23,8 @@ export interface PaidMembershipLine {
     paidMinor: number;
     currency: string;
   };
+  /** Confirmed cash allocated by the provider to this exact invoice line. */
+  refunds?: readonly { reference: string; cause: string; amount: number }[];
 }
 export interface BillingTruth {
   accountId: string;
@@ -45,6 +47,9 @@ export interface MembershipBillingProvider {
     paymentMethodId: string;
     key: string;
   }): Promise<BillingTruth>;
+  recoverStart?(
+    input: Parameters<MembershipBillingProvider["start"]>[0],
+  ): Promise<BillingTruth | undefined>;
   current(subscriptionReference: string): Promise<BillingTruth>;
   cancel(input: {
     subscriptionReference: string;
@@ -59,8 +64,14 @@ export interface MembershipBillingProvider {
     amount: number;
     key: string;
   }): Promise<{ id: string; state: "pending" | "succeeded" | "failed" }>;
+  recoverRefund?(
+    input: Parameters<MembershipBillingProvider["refund"]>[0],
+  ): Promise<
+    { id: string; state: "pending" | "succeeded" | "failed" } | undefined
+  >;
   currentRefund(
     reference: string,
+    expected?: Omit<Parameters<MembershipBillingProvider["refund"]>[0], "key">,
   ): Promise<{ id: string; state: "pending" | "succeeded" | "failed" }>;
 }
 const Start = VersionCommand.extend({
@@ -321,6 +332,41 @@ export class MembershipBilling {
             "billing_processing",
             "Wait for the current billing change to finish first.",
           );
+          if (body.refundNow && membership.grant_id) {
+            // Membership precedes grant. An unresolved generation cannot be
+            // priced as unused, then deliver while cancellation is in flight.
+            await client.query(
+              "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+              [membership.creator_id, membership.fan_id],
+            );
+            const grant = (
+              await client.query<{ reserved: number }>(
+                "SELECT reserved FROM creator.access_grant WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership' FOR UPDATE",
+                [membership.grant_id, membership.creator_id, membership.fan_id],
+              )
+            ).rows[0];
+            invariant(
+              grant && grant.reserved === 0,
+              "membership_usage_processing",
+              "Your AI usage is still processing. Try again when it finishes.",
+            );
+            await client.query(
+              "UPDATE creator.access_grant SET state='revoked' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership'",
+              [membership.grant_id, membership.creator_id, membership.fan_id],
+            );
+          }
+          if (body.refundNow) {
+            // Fence stale provider reads and later original-period restoration.
+            // Cash remains processing until the original effect is confirmed.
+            await client.query(
+              "UPDATE creator.commerce_membership SET state='revoked',version=version+1 WHERE id=$1",
+              [membership.id],
+            );
+            await client.query(
+              "UPDATE creator.commerce_billing_account SET version=version+1 WHERE fan_id=$1",
+              [membership.fan_id],
+            );
+          }
           return (
             await client.query<{ id: string }>(
               "INSERT INTO creator.commerce_billing_effect(fan_id,operation,provider_key,request) VALUES($1,'cancel',$2,$3) RETURNING id",
@@ -414,13 +460,48 @@ export class MembershipBilling {
         };
       });
     try {
+      const r = effect.request;
+      const recovered =
+        !effect.provider_ref &&
+        effect.operation === "start" &&
+        effect.attempt > 1
+          ? await this.provider.recoverStart?.({
+              ...(effect.request as unknown as Parameters<
+                MembershipBillingProvider["start"]
+              >[0]),
+              key: effect.provider_key,
+            })
+          : undefined;
+      const cancellation =
+        !effect.provider_ref &&
+        effect.operation === "cancel" &&
+        effect.attempt > 1
+          ? await this.provider.current(String(r.subscriptionReference))
+          : undefined;
+      const cancelled = (truth: BillingTruth) => {
+        const line = truth.lines.find(
+          (l) => l.itemReference === r.itemReference,
+        );
+        return (
+          !line ||
+          (r.atEnd === true
+            ? line.cancelAtEnd ||
+              (truth.subscriptionState === "cancelled" &&
+                !["active", "grace", "cancelled"].includes(line.state))
+            : !["active", "grace", "cancelled"].includes(line.state))
+        );
+      };
+      const recoveredCancellation =
+        cancellation && cancelled(cancellation) ? cancellation : undefined;
       invariant(
-        effect.provider_ref ||
+        effect.operation === "refund" ||
+          effect.provider_ref ||
+          recovered ||
+          recoveredCancellation ||
           Date.now() - effect.created_at.getTime() < 23 * 3600000,
         "operator_reconciliation_required",
         "This original billing change needs provider reconciliation.",
       );
-      const r = effect.request;
       if (effect.operation === "refund") {
         const receipt = r.receipt as {
           invoice_ref: string;
@@ -429,16 +510,30 @@ export class MembershipBilling {
           currency: string;
           creator_id: string;
           membership_id: string;
+          period_start: string;
+          period_end: string;
         };
+        const refundInput = {
+          invoiceReference: receipt.invoice_ref,
+          lineReference: receipt.line_ref,
+          paymentReference: receipt.payment_ref,
+          amount: Number(r.amount),
+          key: effect.provider_key,
+        };
+        const recoveredRefund =
+          !effect.provider_ref && effect.attempt > 1
+            ? await this.provider.recoverRefund?.(refundInput)
+            : undefined;
+        invariant(
+          effect.provider_ref ||
+            recoveredRefund ||
+            Date.now() - effect.created_at.getTime() < 23 * 3600000,
+          "operator_reconciliation_required",
+          "This original billing refund needs provider reconciliation.",
+        );
         const result = effect.provider_ref
-          ? await this.provider.currentRefund(effect.provider_ref)
-          : await this.provider.refund({
-              invoiceReference: receipt.invoice_ref,
-              lineReference: receipt.line_ref,
-              paymentReference: receipt.payment_ref,
-              amount: Number(r.amount),
-              key: effect.provider_key,
-            });
+          ? await this.provider.currentRefund(effect.provider_ref, refundInput)
+          : (recoveredRefund ?? (await this.provider.refund(refundInput)));
         await this.service.account(actor, async (client) => {
           // Keep the account -> membership order used by cancellation and
           // reconciliation, and advance the aggregate before changing a grant.
@@ -459,7 +554,7 @@ export class MembershipBilling {
                 effect.fan_id,
                 r.amount,
                 receipt.currency,
-                effect.provider_key,
+                `credit_note:${result.id}:${receipt.line_ref}`,
                 result.id,
                 JSON.stringify({
                   membershipId: receipt.membership_id,
@@ -467,10 +562,30 @@ export class MembershipBilling {
                 }),
               ],
             );
-            await client.query(
-              "UPDATE creator.commerce_membership SET state='refunded',version=version+1 WHERE id=$1",
-              [receipt.membership_id],
-            );
+            // A delayed original refund can finish after renewal. Retain that
+            // receipt/ledger result without revoking a different paid period.
+            const refunded = (
+              await client.query<{ grant_id: string | null }>(
+                "UPDATE creator.commerce_membership SET state='refunded',version=version+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND period_start=$4 AND period_end=$5 RETURNING grant_id",
+                [
+                  receipt.membership_id,
+                  receipt.creator_id,
+                  effect.fan_id,
+                  receipt.period_start,
+                  receipt.period_end,
+                ],
+              )
+            ).rows[0];
+            if (refunded?.grant_id) {
+              await client.query(
+                "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+                [receipt.creator_id, effect.fan_id],
+              );
+              await client.query(
+                "UPDATE creator.access_grant SET state='revoked' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND source='membership'",
+                [refunded.grant_id, receipt.creator_id, effect.fan_id],
+              );
+            }
           }
           await client.query(
             "UPDATE creator.commerce_billing_effect SET state=$2,provider_ref=$3,lease_until=NULL,next_at=now()+interval '30 seconds' WHERE id=$1",
@@ -505,18 +620,20 @@ export class MembershipBilling {
       const truth = effect.provider_ref
         ? await this.provider.current(effect.provider_ref)
         : effect.operation === "start"
-          ? await this.provider.start({
+          ? (recovered ??
+            (await this.provider.start({
               ...(r as unknown as Parameters<
                 MembershipBillingProvider["start"]
               >[0]),
               key: effect.provider_key,
-            })
-          : await this.provider.cancel({
+            })))
+          : (recoveredCancellation ??
+            (await this.provider.cancel({
               subscriptionReference: String(r.subscriptionReference),
               itemReference: String(r.itemReference),
               atEnd: Boolean(r.atEnd),
               key: effect.provider_key,
-            });
+            })));
       await this.apply(actor, truth, before.version, effect);
       const confirmed =
         effect.operation === "start"
@@ -526,16 +643,7 @@ export class MembershipBilling {
                 ["active", "grace", "cancelled"].includes(line.state) &&
                 Boolean(line.receipt),
             )
-          : r.atEnd === true
-            ? truth.lines.some(
-                (line) =>
-                  line.itemReference === r.itemReference && line.cancelAtEnd,
-              )
-            : !truth.lines.some(
-                (line) =>
-                  line.itemReference === r.itemReference &&
-                  ["active", "grace", "cancelled"].includes(line.state),
-              );
+          : cancelled(truth);
       const refundId = await this.service.account(actor, async (client) => {
         await this.fence(client, effect);
         let refundId: string | undefined;
@@ -682,9 +790,13 @@ export class MembershipBilling {
           "billing_period_invalid",
           "The paid billing period is invalid.",
         );
+        await client.query(
+          "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+          [`commerce.tier:${line.tierId}`],
+        );
         const tier = (
           await client.query(
-            "SELECT * FROM creator.commerce_tier WHERE id=$1 AND creator_id=$2",
+            "SELECT t.*,cp.verification,cp.recovery_required FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2",
             [line.tierId, line.creatorId],
           )
         ).rows[0];
@@ -709,11 +821,46 @@ export class MembershipBilling {
           "billing_link_conflict",
           "The paid item changed its account or tier binding.",
         );
+        // A durable immediate-cancellation request ends local access to its
+        // exact original period. Old provider truth cannot restore it while
+        // cancellation/refund is unknown, or after confirmation.
+        const immediateCancellation = prior
+          ? Boolean(
+              (
+                await client.query(
+                  `SELECT id FROM creator.commerce_billing_effect
+                 WHERE fan_id=$1 AND operation='cancel'
+                   AND state IN('pending','processing','unknown','done')
+                   AND request->>'membershipId'=$2 AND request->>'atEnd'='false'
+                   AND (request->'receipt'->>'period_start')::timestamptz=$3
+                   AND (request->'receipt'->>'period_end')::timestamptz=$4 LIMIT 1`,
+                  [account.fan_id, prior.id, line.startsAt, line.endsAt],
+                )
+              ).rows[0],
+            )
+          : false;
         const active =
+          !immediateCancellation &&
           ["active", "grace", "cancelled"].includes(line.state) &&
           line.startsAt <= new Date() &&
           line.endsAt > new Date();
         if (active) {
+          invariant(
+            tier.verification === "verified" && !tier.recovery_required,
+            "creator_unavailable",
+            "Current creator authority is required before restoring paid access.",
+          );
+          const storedReceipt = prior
+            ? await client.query(
+                "SELECT id FROM creator.commerce_membership_receipt WHERE membership_id=$1 AND period_start=$2 AND period_end=$3 LIMIT 1",
+                [prior.id, line.startsAt, line.endsAt],
+              )
+            : undefined;
+          invariant(
+            line.receipt || storedReceipt?.rowCount,
+            "paid_period_unverified",
+            "A confirmed receipt for this paid period is required before granting access.",
+          );
           invariant(
             !tier.ai_allowance || this.service.policy.costAllowanceIntegrated,
             "allowance_integration_unavailable",
@@ -790,7 +937,12 @@ export class MembershipBilling {
               account.fan_id,
               line.tierId,
               reference,
-              line.state,
+              prior?.state === "refunded" &&
+              prior.period_start.getTime() === line.startsAt.getTime()
+                ? "refunded"
+                : immediateCancellation
+                  ? "revoked"
+                  : line.state,
               line.startsAt,
               line.endsAt,
               line.cancelAtEnd,
@@ -838,6 +990,36 @@ export class MembershipBilling {
               }),
             ],
           );
+          const refunds = line.refunds ?? [];
+          invariant(
+            refunds.every(
+              (refund) =>
+                Number.isSafeInteger(refund.amount) && refund.amount > 0,
+            ) &&
+              refunds.reduce(
+                (sum, refund) => sum + BigInt(refund.amount),
+                0n,
+              ) <= BigInt(receipt.paidMinor),
+            "billing_refund_invalid",
+            "Confirmed refunds must reconcile with the actual paid line.",
+          );
+          for (const refund of refunds) {
+            await client.query(
+              "INSERT INTO creator.commerce_ledger(creator_id,fan_id,kind,amount,currency,cause,provider_ref,refs) VALUES($1,$2,'refund',$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING",
+              [
+                line.creatorId,
+                account.fan_id,
+                refund.amount,
+                receipt.currency,
+                refund.cause,
+                refund.reference,
+                JSON.stringify({
+                  membershipId: member.id,
+                  invoiceId: receipt.invoiceReference,
+                }),
+              ],
+            );
+          }
         }
       }
       const removed = (

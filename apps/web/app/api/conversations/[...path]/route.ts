@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 import { IdSchema, SessionSchema } from "@qelvora/api";
 import { platformFetch } from "../../../../lib/session";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const permitted = new RegExp(
-  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|citations/${uuid}|messages/${uuid}(?:/(?:dont-remember|corrections))?|messages/status/${uuid}))?)$`,
+  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
   "u",
 );
 async function proxy(
@@ -18,7 +19,7 @@ async function proxy(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (req.method !== "GET" && req.headers.get("origin") !== req.nextUrl.origin)
+  if (req.method !== "GET" && !sameRequestOrigin(req))
     return Response.json(
       { error: { message: "Use this app to perform this action." } },
       { status: 403 },
@@ -73,10 +74,23 @@ async function proxy(
       `/v1/conversations${joined === "begin" ? "" : "/" + joined}${req.nextUrl.search}`,
       {
         method: req.method,
+        headers: {
+          "X-Correlation-Id":
+            req.headers.get("x-correlation-id") ?? crypto.randomUUID(),
+          ...(joined !== "capabilities"
+            ? {
+                "X-Expected-Account-Id": req.headers.get(
+                  "X-Expected-Account-Id",
+                )!,
+              }
+            : {}),
+          ...(req.method === "GET"
+            ? {}
+            : { "Content-Type": "application/json" }),
+        },
         ...(req.method === "GET"
           ? {}
           : {
-              headers: { "Content-Type": "application/json" },
               body: await req.text(),
             }),
       },
@@ -101,7 +115,12 @@ async function proxy(
     }
     return Response.json(data, {
       status: upstream.status,
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Cache-Control": "no-store",
+        ...(upstream.headers.get("x-correlation-id")
+          ? { "X-Correlation-Id": upstream.headers.get("x-correlation-id")! }
+          : {}),
+      },
     });
   } catch {
     return Response.json(

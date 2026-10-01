@@ -33,7 +33,6 @@
     "apps/web/app/studio/ai/[[...section]]/page.tsx",
     "apps/web/features/creator-ai/CreatorAI.tsx",
     "apps/web/features/creator-ai/creator-ai.css",
-    "artifacts/workstreams/W2/build/agent-development.mjs",
     "artifacts/workstreams/W2/handoff/20260929/commit-scope.json",
     "artifacts/workstreams/W2/handoff/20260929/migration-registry.reference.json",
     "artifacts/workstreams/W2/handoff/20260929/shared-dependencies-sha256.txt",
@@ -52,9 +51,12 @@
     "docs/workstreams/handoffs/W2-creator-ai-resume.md",
     "docs/workstreams/handoffs/W2-creator-ai.md",
     "docs/workstreams/status/W2.md",
-    "packages/api/src/agent/contracts.ts"
+    "packages/api/src/agent/contracts.ts",
+    "artifacts/workstreams/W2/handoff/20260929/resource-cleanup.md",
+    "artifacts/workstreams/W2/handoff/20260929/resource-cleanup.json"
   ],
   "referenceDocuments": [
+    "AGENTS.md",
     "apps/web/AGENTS.md",
     "docs/BUILD_LOG.md",
     "docs/implementation/FOUNDATION.md",
@@ -87,11 +89,9 @@
     "docs/workstreams/prompts/ALL_WORKSTREAM_PROMPTS.md",
     "docs/workstreams/prompts/README.md",
     "docs/workstreams/prompts/W1-platform-identity.md",
-    "docs/workstreams/prompts/W1-resume-handoff.md",
     "docs/workstreams/prompts/W2-creator-ai.md",
     "docs/workstreams/prompts/W3-conversations.md",
     "docs/workstreams/prompts/W4-commerce-requests.md",
-    "docs/workstreams/prompts/W5-resume.md",
     "docs/workstreams/prompts/W5-studio-content.md",
     "docs/workstreams/prompts/W6-calls-media.md",
     "docs/workstreams/prompts/W7-growth-insights.md",
@@ -101,5 +101,8 @@
     "docs/workstreams/research/platform-inventory.md",
     "docs/workstreams/status/W8.md"
   ],
-  "excluded": "Unrelated peer app implementation, shared manifests/generated resources/registry, runtime databases/dependencies/temp copies/provider secrets. Obtain owner-reviewed shared foundation for a fresh build."
+  "excluded": "Unrelated peer app implementation, shared manifests/generated resources/registry, runtime databases/dependencies/temp copies/provider secrets. Obtain owner-reviewed shared foundation for a fresh build.",
+  "excludedGeneratedFiles": [
+    "artifacts/workstreams/W2/build/agent-development.mjs"
+  ]
 }

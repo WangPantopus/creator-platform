@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useId, useRef, useState } from "react";
 import { Seal } from "@qelvora/ui-web";
 import {
@@ -70,7 +71,7 @@ export function CreatorPostVoiceRecording(
     props.maxDurationMs > 3_600_000
   )
     return (
-      <p role="status">Recording is awaiting its current duration limit.</p>
+      <p role="status">{copy.w6RecordingIsAwaitingItsCurrentDurationLimit}</p>
     );
   return (
     <RecordingForm
@@ -239,7 +240,7 @@ function RecordingForm({
           setError(
             error instanceof Error
               ? error.message
-              : "Processing is unavailable.",
+              : copy.w6ProcessingIsUnavailable,
           );
       } finally {
         if (!abort.signal.aborted)
@@ -275,9 +276,7 @@ function RecordingForm({
         asset.ownerAccountId !== expectedAccountId) ||
       asset.mimeType !== "audio/mp4"
     ) {
-      setError(
-        "The processed recording does not match this saved content. Refresh before continuing.",
-      );
+      setError(copy.w6TheProcessedRecordingDoesNotMatchThisSavedContentRefresh);
       return;
     }
     const evidence = ProcessedMediaEvidenceSchema.safeParse({
@@ -294,7 +293,7 @@ function RecordingForm({
       asset.durationMs > maxDurationMs
     ) {
       setError(
-        "The processed recording evidence is unavailable. Refresh before continuing.",
+        copy.w6TheProcessedRecordingEvidenceIsUnavailableRefreshBeforeContinuing,
       );
       return;
     }
@@ -352,10 +351,10 @@ function RecordingForm({
       setUpload("failed");
       setError(
         abort.signal.aborted
-          ? "Upload paused. Retry to resume from the saved position."
+          ? copy.w6UploadPausedRetryToResumeFromTheSavedPosition
           : e instanceof Error
             ? e.message
-            : "Upload failed. Your preview is still here.",
+            : copy.w6UploadFailedYourPreviewIsStillHere,
       );
     }
   }
@@ -373,17 +372,13 @@ function RecordingForm({
           expectedAccountId,
         });
       } catch {
-        setError(
-          "The uploaded file could not be removed. Try again before discarding.",
-        );
+        setError(copy.w6TheUploadedFileCouldNotBeRemovedTryAgainBefore);
         setDiscarding(false);
         return false;
       }
     }
     if (uploadKey.current && !current) {
-      setError(
-        "The upload is unconfirmed. Retry it to find and remove the saved file before discarding.",
-      );
+      setError(copy.w6TheUploadIsUnconfirmedRetryItToFindAndRemove);
       setDiscarding(false);
       return false;
     }
@@ -405,19 +400,23 @@ function RecordingForm({
         {creatorName && <Seal size={28} />}
         <span>
           {creatorName
-            ? `Record a voice note as ${creatorName}`
-            : "Record a voice note"}
+            ? formatCopy("w6RecordAVoiceNoteAs", { value1: creatorName })
+            : copy.w6RecordAVoiceNote}
         </span>
       </div>
-      <h1 id={heading}>Your own voice</h1>
-      <p>Record, listen, and sign the exact recording before it is shared.</p>
+      <h1 id={heading}>{copy.w6YourOwnVoice}</h1>
+      <p>{copy.w6RecordListenAndSignTheExactRecordingBeforeItIs}</p>
       <div
         className="w6-data"
-        aria-label={`Recorded ${Math.floor(recording.durationMs / 1000)} seconds`}
+        aria-label={formatCopy("w6RecordedSeconds", {
+          value1: Math.floor(recording.durationMs / 1000),
+        })}
       >
         {time}{" "}
         <span className="qv-help">
-          of {Math.floor(maxDurationMs / 1000)} seconds
+          {formatCopy("w6OfSeconds", {
+            value1: Math.floor(maxDurationMs / 1000),
+          })}
         </span>
       </div>
       <div className="w6-actions">
@@ -439,14 +438,14 @@ function RecordingForm({
           }}
         >
           {recording.state === "requesting"
-            ? "Cancel permission request"
+            ? copy.w6CancelPermissionRequest
             : recording.state === "recording"
-              ? "Pause"
+              ? copy.w6Pause
               : recording.state === "paused"
-                ? "Resume"
+                ? copy.w6Resume
                 : preview
-                  ? "Record again"
-                  : "Record"}
+                  ? copy.w6RecordAgain
+                  : copy.w6Record}
         </button>
         {active && (
           <button
@@ -457,20 +456,20 @@ function RecordingForm({
               recorder.current?.stop();
             }}
           >
-            Stop and preview
+            {copy.w6StopAndPreview}
           </button>
         )}
       </div>
       {preview && (
         <div className="w6-plate">
-          <span>Private preview · your recording</span>
+          <span>{copy.w6PrivatePreviewYourRecording}</span>
           <audio
             key={preview}
             ref={previewAudio}
             controls
             preload="metadata"
             src={preview}
-            aria-label="Preview your own recording"
+            aria-label={copy.w6PreviewYourOwnRecording}
           />
           <button
             className="qv-btn qv-btn--quiet"
@@ -481,7 +480,7 @@ function RecordingForm({
               void discard();
             }}
           >
-            Discard recording
+            {copy.w6DiscardRecording}
           </button>
         </div>
       )}
@@ -489,7 +488,7 @@ function RecordingForm({
         error ||
         (asset?.failureCode && asset.state !== "rejected")) && (
         <p className="w6-notice" role="status">
-          {error ?? recording.reason ?? "Processing is unavailable."}
+          {error ?? recording.reason ?? copy.w6ProcessingIsUnavailable}
         </p>
       )}
       {upload === "uploading" && (
@@ -497,13 +496,13 @@ function RecordingForm({
           <progress
             max={1}
             value={progress}
-            aria-label="Audio upload progress"
+            aria-label={copy.w6AudioUploadProgress}
           />
           <button
             className="qv-btn qv-btn--secondary"
             onClick={() => controller.current?.abort()}
           >
-            Pause upload
+            {copy.w6PauseUpload}
           </button>
         </>
       )}
@@ -520,16 +519,16 @@ function RecordingForm({
             });
           }}
         >
-          {upload === "failed" ? "Retry upload" : "Upload recording"}
+          {upload === "failed" ? copy.w6RetryUpload : copy.w6UploadRecording}
         </button>
       )}
       {asset && (
         <p role="status">
           {asset.state === "ready"
-            ? "Processed. Review and sign the exact recording in Studio."
+            ? copy.w6ProcessedReviewAndSignTheExactRecordingInStudio
             : asset.state === "rejected"
-              ? "This file could not be processed. Record again."
-              : "Uploaded · processing before sharing"}
+              ? copy.w6ThisFileCouldNotBeProcessedRecordAgain
+              : copy.w6UploadedProcessingBeforeSharing}
         </p>
       )}
       {asset?.state === "ready" &&
@@ -567,8 +566,7 @@ function RecordingForm({
         )}
       {(!available || !family) && (
         <p className="qv-help">
-          Sign in to a configured creator account to upload and sign. Your
-          preview stays on this device until you upload it.
+          {copy.w6SignInToAConfiguredCreatorAccountToUploadAnd}
         </p>
       )}
     </section>

@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-10-01T01:17:58.463644+00:00",
+  "purpose": "Actual read-only expanded creator export through owned synthetic loopback API; not a W8 privacy job",
+  "actor": "Existing synthetic benchmark owner; development true",
+  "source": "Current source-hashed stream/lifecycle follow-up",
+  "status": 200,
+  "bytes": 72355946,
+  "sha256": "6786b021ca9918ea9a45d5c8f5ce545a368850760175ef3b3f55cf3610b6ae08",
+  "curlWallSeconds": 1.153017,
+  "schemaVersion": 2,
+  "state": "configured",
+  "arrays": {
+    "sources": 122,
+    "versions": 105,
+    "sponsors": 0,
+    "regressions": 0,
+    "usage": 3,
+    "ai_evaluation": 1,
+    "ai_shadow_sample": 0,
+    "ai_shadow_evaluation": 0,
+    "ai_ingestion": 2,
+    "ai_event": 6,
+    "ai_cost_hold": 0,
+    "ai_chunk": 10,
+    "ai_command": 4,
+    "ai_style_embedding": 0
+  },
+  "workspaceRevision": 6,
+  "completeJSON": true,
+  "configurationPreserved": true,
+  "identity": "existing non-owner forced-RLS role",
+  "migration": "0048 remains reserved/unapplied; same bytes16dddc80",
+  "notEstablished": [
+    "protected W8 store/job/lease/fresh-download registration",
+    "fan-family privacy/Q16/original W4 financial disposition",
+    "journal runtime after migration installation",
+    "p95/native/accessibility/release readiness"
+  ]
+}

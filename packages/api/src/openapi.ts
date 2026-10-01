@@ -1,5 +1,26 @@
 import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
+import * as conversation from "./conversation/contracts.ts";
+import * as contentContracts from "./content.ts";
+import * as studioContracts from "./studio.ts";
+import { mediaPaths } from "./media-openapi.ts";
+
+// Aggregate owner contracts here after the core module initializes; conversation
+// itself imports core schemas and cannot be imported back into that module.
+const domainSchemas = Object.fromEntries(
+  [
+    ["Conversation", conversation],
+    ["Content", contentContracts],
+    ["Studio", studioContracts],
+  ].flatMap(([prefix, values]) =>
+    Object.entries(values as Record<string, unknown>)
+      .filter(([, schema]) => schema instanceof z.ZodType)
+      .map(([name, schema]) => [
+        String(prefix) + name.replace(/Schema$/u, ""),
+        schema as z.ZodType,
+      ]),
+  ),
+);
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const json = (name: string) => ({ "application/json": { schema: ref(name) } });
@@ -467,7 +488,7 @@ export function createOpenApi() {
       },
       "/v1/threads/{creatorId}/{fanId}": {
         parameters: pair,
-        get: operation("readThread", "ThreadTimeline"),
+        get: operation("readThread", "ConversationConversationTimeline"),
       },
       "/v1/threads/{creatorId}/{fanId}/messages": {
         parameters: pair,
@@ -485,6 +506,15 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      "/v1/conversations/{creatorId}/{fanId}/recordings": {
+        parameters: pair,
+        post: operation(
+          "deliverConversationRecording",
+          "ConversationConversationRecordingResult",
+          "ConversationConversationRecordingInput",
+        ),
+      },
+      ...mediaPaths,
     },
     components: {
       securitySchemes: {
@@ -496,10 +526,12 @@ export function createOpenApi() {
         },
       },
       schemas: Object.fromEntries(
-        Object.entries(publicSchemas).map(([name, schema]) => [
-          name,
-          z.toJSONSchema(schema, { target: "draft-2020-12" }),
-        ]),
+        Object.entries({ ...publicSchemas, ...domainSchemas }).map(
+          ([name, schema]) => [
+            name,
+            z.toJSONSchema(schema, { target: "draft-2020-12" }),
+          ],
+        ),
       ),
     },
   };

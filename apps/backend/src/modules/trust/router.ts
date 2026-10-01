@@ -6,6 +6,8 @@ import express, {
 import { z, ZodError } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import {
   ClaimInput,
   DecisionInput,
@@ -15,10 +17,14 @@ import {
   EffectRetryInput,
   BlockInput,
   Queue,
+  PrivacyDomains,
 } from "./contracts.js";
 import type { TrustService } from "./service.js";
 import type { Readiness } from "../../operations/readiness.js";
-import type { TrustTelemetry } from "../../operations/telemetry.js";
+import {
+  failureClass,
+  type TrustTelemetry,
+} from "../../operations/telemetry.js";
 
 export type TrustRouterOptions = {
   service: TrustService;
@@ -72,7 +78,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
       res.setHeader("Vary", "Origin");
       res.setHeader(
         "Access-Control-Allow-Headers",
-        "Authorization, Content-Type, X-Correlation-Id",
+        "Authorization, Content-Type, X-Correlation-Id, X-Expected-Account-Id",
       );
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
@@ -81,7 +87,26 @@ export function createTrustRouter(options: TrustRouterOptions) {
   });
   router.use(express.json({ limit: "64kb" }));
   const id = (req: Request) => z.uuid().parse(req.params.id);
-  const actor = (req: Request) => options.actor(req);
+  const actor = async (req: Request) => {
+    const current = await options.actor(req);
+    const expected = req.get("X-Expected-Account-Id");
+    if (expected && z.uuid().parse(expected) !== current.accountId)
+      throw new DomainError(
+        "session_account_changed",
+        "Your account changed. Reopen this page before taking this action.",
+        409,
+      );
+    // Preserve personal support/appeals/privacy progress after a denial while
+    // preventing a suspended operations account from reading or deciding cases.
+    if (
+      req.path.startsWith("/v1/trust/operations/") ||
+      req.path === "/v1/trust/cases" ||
+      (/^\/v1\/trust\/cases\/[^/]+(?:\/|$)/u.test(req.path) &&
+        !req.path.endsWith("/appeals"))
+    )
+      await options.service.assertAllowed(current);
+    return current;
+  };
   router.get("/health/live", (_req, res) => res.json({ alive: true }));
   router.get("/health/ready", async (_req, res) => {
     const state = await options.readiness.inspect();
@@ -96,6 +121,10 @@ export function createTrustRouter(options: TrustRouterOptions) {
       actorVerification: options.service.dependencies.verifyPrivacy
         ? "configured"
         : "unavailable",
+      verificationMethod: options.localDevelopment
+        ? "local_confirmation"
+        : (options.service.dependencies.privacyVerificationMethod ??
+          "external_receipt"),
       privacyDomains: [
         "identity",
         "conversation",
@@ -257,6 +286,57 @@ export function createTrustRouter(options: TrustRouterOptions) {
     );
     res.json(await options.service.exportData(await actor(req), id(req)));
   });
+  router.get(
+    "/v1/trust/privacy/jobs/:id/download/:domain",
+    async (req, res) => {
+      const domain = z.enum(PrivacyDomains).parse(req.params.domain);
+      const controller = new AbortController();
+      const closed = () => controller.abort();
+      res.once("close", closed);
+      try {
+        const current = await actor(req);
+        const jobId = id(req);
+        const result = await options.service.exportArtifact(
+          current,
+          jobId,
+          domain,
+          controller.signal,
+        );
+        const extension =
+          result.artifact.contentType === "application/x-ndjson"
+            ? "jsonl"
+            : result.artifact.contentType === "application/zip"
+              ? "zip"
+              : "bin";
+        res.setHeader("Content-Type", result.artifact.contentType);
+        res.setHeader("Content-Length", String(result.artifact.bytes));
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="creator-data-${domain}.${extension}"`,
+        );
+        async function* authorized() {
+          for await (const chunk of result.chunks) {
+            controller.signal.throwIfAborted();
+            const latest = await actor(req);
+            if (latest.accountId !== current.accountId)
+              throw new DomainError(
+                "session_account_changed",
+                "Your account changed. Reconnect before downloading.",
+                409,
+              );
+            await options.service.authorizeExport(latest, jobId);
+            yield chunk;
+          }
+        }
+        await pipeline(Readable.from(authorized()), res, {
+          signal: controller.signal,
+        });
+      } finally {
+        res.off("close", closed);
+        controller.abort();
+      }
+    },
+  );
   router.get("/v1/trust/operations/metrics", async (req, res) => {
     const current = await actor(req);
     await options.service.store.actor(current, async (client) => {
@@ -302,23 +382,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
   router.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
       void _next;
-      const databaseCodes: Record<string, string> = {
-        "57014": "database_timeout",
-        "55P03": "database_lock_timeout",
-        "40P01": "database_deadlock",
-        "53300": "database_capacity",
-        "57P01": "database_interruption",
-        "42501": "database_authority",
-      };
-      const code =
-        error && typeof error === "object" && "code" in error
-          ? String(error.code)
-          : "";
-      res.locals.failureClass =
-        databaseCodes[code] ??
-        (error instanceof DomainError || error instanceof ZodError
-          ? null
-          : "unexpected_failure");
+      res.locals.failureClass = failureClass(error);
       const value =
         error instanceof DomainError
           ? error
@@ -334,6 +398,11 @@ export function createTrustRouter(options: TrustRouterOptions) {
                 503,
               );
       res.locals.errorCode = value.code;
+      if (res.headersSent) {
+        options.telemetry.increment("privacy_download_interrupted");
+        res.destroy();
+        return;
+      }
       res.status(value.status).json({
         error: {
           code: value.code,

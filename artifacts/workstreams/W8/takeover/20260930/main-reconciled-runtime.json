@@ -1,0 +1,153 @@
+{
+  "observedAt": "2026-10-01T04:21:53.202203+00:00",
+  "oldProcess": {
+    "startedAt": "2026-10-01T02:39:02.389168+00:00",
+    "pid": 12506,
+    "revision": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a",
+    "log": "/Users/yingpengwang/.config/creator-platform/w8-local/api-f64f165350a4.jsonl",
+    "cwd": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform",
+    "retainedEnvironmentLoaded": true,
+    "keyValuesPrinted": false
+  },
+  "newProcess": {
+    "startedAt": "2026-10-01T04:21:43.244422+00:00",
+    "pid": 64593,
+    "revision": "61ad21482a465c27431778814c1ebe7d8841e911",
+    "log": "/Users/yingpengwang/.config/creator-platform/w8-local/api-61ad21482a46.jsonl",
+    "cwd": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform",
+    "retainedEnvironmentLoaded": true,
+    "keyValuesPrinted": false
+  },
+  "environmentBytesPreserved": true,
+  "openAiKeyLoaded": false,
+  "health": [
+    {
+      "probe": "live",
+      "status": 200,
+      "correlationId": "a5c6257a-c11c-4e95-be9c-774019d66572",
+      "body": {
+        "alive": true
+      }
+    },
+    {
+      "probe": "ready",
+      "status": 503,
+      "correlationId": "0430fe62-4816-4c95-9e7e-bc0f889c3306",
+      "body": {
+        "ready": false,
+        "environment": "local-development",
+        "release": "61ad21482a465c27431778814c1ebe7d8841e911",
+        "capabilities": [
+          {
+            "name": "database",
+            "required": true,
+            "state": "available",
+            "code": "non_owner_rls_verified",
+            "checkedAt": "2026-10-01T04:21:53.200Z"
+          },
+          {
+            "name": "identity",
+            "required": true,
+            "state": "development",
+            "code": "synthetic_local_accounts",
+            "checkedAt": "2026-10-01T04:21:53.196Z"
+          },
+          {
+            "name": "model",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.196Z"
+          },
+          {
+            "name": "payments",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.196Z"
+          },
+          {
+            "name": "calls",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "voice",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "push",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_identity",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_conversation",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_agent",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_commerce",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_content",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_media",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_growth",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          },
+          {
+            "name": "privacy_trust",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T04:21:53.197Z"
+          }
+        ]
+      }
+    }
+  ],
+  "databaseReseedResetOrMigrationApplied": false,
+  "oldShutdownListenerReleaseMs": 10898,
+  "timingLimit": "Elapsed includes new process/probes; stage drain timings remain in private old JSONL"
+}

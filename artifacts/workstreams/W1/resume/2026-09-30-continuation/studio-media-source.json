@@ -1,0 +1,80 @@
+{
+  "parent": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564",
+  "producers": {
+    "W5": "10405ebbaa3138e1a7d777bb717e5be37bea70b3",
+    "W6": "49e90549f2161cc7a90047b00f9370016ffb6ec4"
+  },
+  "sourceHashes": {
+    "apps/backend/src/modules/studio/service.ts": "f1a08ee705cb0076487dca20bac49b9ed372cf15c80eda5c28489ce79cc3816a",
+    "apps/backend/src/modules/studio/registration.ts": "6d33f78097e721a9fd3e74c0107822251fea9a74be125cf6f9b75a7936844eab",
+    "packages/api/src/studio.ts": "6091503b736c50f88bccef7c5a7bf0852b72f0fb183eeff5d60b077b6543dd40",
+    "apps/backend/src/modules/media/creator-service.ts": "f1d5ead38d14d189123b0e13dde3f79dcab48b05a9ce67bdc3822e1dff90d3bf",
+    "apps/backend/src/modules/media/creator-scope.sql": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+    "apps/backend/src/modules/media/router.ts": "372739afa449551a578c6a12dc50e3672af3ddef36e4e9e8a9a0dff6ad72f025",
+    "apps/web/features/media/VoiceRecorder.tsx": "2480e67355ec860bd0bf61bd631b2b8dbc2573a483d35f8394ce909acaf4d80c",
+    "apps/web/features/media/VoicePlayer.tsx": "f3c1dcf8d45b5c2780e392bf12decdd179a1c7cdc01869630b6dcd9f15b1a05d",
+    "apps/web/features/media/api.ts": "4d7acb18837774bc929c179e828d3a87bb019127e8242a25c34dcb7bd8866023",
+    "apps/web/features/calls/AvailabilityEditor.tsx": "7800433484134e9657d001a0f87337da422ea506faa348ddeaf910f7a88723bb"
+  },
+  "producerHashes": {
+    "apps/backend/src/modules/studio/service.ts": "f1a08ee705cb0076487dca20bac49b9ed372cf15c80eda5c28489ce79cc3816a",
+    "apps/backend/src/modules/studio/registration.ts": "6d33f78097e721a9fd3e74c0107822251fea9a74be125cf6f9b75a7936844eab",
+    "packages/api/src/studio.ts": "6091503b736c50f88bccef7c5a7bf0852b72f0fb183eeff5d60b077b6543dd40",
+    "apps/backend/src/modules/media/creator-service.ts": "f1d5ead38d14d189123b0e13dde3f79dcab48b05a9ce67bdc3822e1dff90d3bf",
+    "apps/backend/src/modules/media/creator-scope.sql": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+    "apps/backend/src/modules/media/router.ts": "372739afa449551a578c6a12dc50e3672af3ddef36e4e9e8a9a0dff6ad72f025",
+    "apps/web/features/media/VoiceRecorder.tsx": "2480e67355ec860bd0bf61bd631b2b8dbc2573a483d35f8394ce909acaf4d80c",
+    "apps/web/features/media/VoicePlayer.tsx": "5fc71f0143f5529fe1b453a550ef6b8b1e5535dbaf5a9371311013251ca35689",
+    "apps/web/features/media/api.ts": "dabf63160180bf04520ee98369d56ba5e5733ec9217aa221741160068864f688",
+    "apps/web/features/calls/AvailabilityEditor.tsx": "7800433484134e9657d001a0f87337da422ea506faa348ddeaf910f7a88723bb"
+  },
+  "openapi": {
+    "operations": 44,
+    "existingPathsAndSchemasUnchanged": true,
+    "newStudioSchemaNames": [
+      "StudioContentVersionCommand",
+      "StudioStudioAudiences",
+      "StudioStudioCommerceProjection",
+      "StudioStudioControlCommand",
+      "StudioStudioCorrection",
+      "StudioStudioDraftVersion",
+      "StudioStudioInvitation",
+      "StudioStudioInvite",
+      "StudioStudioQueueQuery",
+      "StudioStudioReplyDraft",
+      "StudioStudioRevision",
+      "StudioStudioSaveReplyDraft",
+      "StudioStudioSendReplyDraft",
+      "StudioStudioSession",
+      "StudioStudioTeam",
+      "StudioStudioThreadEntries"
+    ]
+  },
+  "logs": {
+    "/private/tmp/creator-w1-continuation-studio-web-build.log": "651f6cbe9f5bfd32ae49e81f75d726d418d8b87d20edcfb7630266785c5b8c14",
+    "/private/tmp/creator-w1-continuation-studio-swift-build.log": "ac93eb15cf2d798eb830449efaae0d03d9773be8a212ca8c6d587584b664468d",
+    "/private/tmp/creator-w1-continuation-ios-studio-build.log": "aa1ae8136ae50f819106be02240a11f8f471ef3506b61af7a684e711643b31d5"
+  },
+  "runtime": {
+    "apiPort": 4101,
+    "webPort": 3001,
+    "identityMode": "development",
+    "registeredFeatures": ["conversation", "media", "content", "studio"],
+    "productReady": false,
+    "creatorMediaAvailable": false
+  },
+  "browser": {
+    "viewport": [390, 844],
+    "theme": "light",
+    "actor": "W1 Resume Creator Two",
+    "profileVerification": "pending",
+    "acceptedContentOrTeamMutation": false,
+    "offlineObservedUpperBoundMs": 10351,
+    "timingQualification": "From the pre-interruption observation to the first hidden-state observation; not a five-second latency measurement, independent client or p95."
+  },
+  "migration": {
+    "creatorMediaScope": "unallocated/unapplied",
+    "existingImmutableSqlChanged": false
+  },
+  "releaseReady": false
+}

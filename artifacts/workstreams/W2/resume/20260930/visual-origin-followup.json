@@ -1,0 +1,47 @@
+{
+  "observedAt": "2026-10-01T00:44:43.068113+00:00",
+  "sourceBase": "954b53a471eeca0be27f6cf8693bd742c91e477f",
+  "routeSha256": "8e761ee6326b919cc336e4576d1ad32c82da61e914518f2134ccbc42e8bd99a5",
+  "hostArchitecture": "x86_64",
+  "suite": "unchanged existing tests/visual",
+  "ports": {
+    "app": 3012,
+    "reference": 3112
+  },
+  "fullRun": {
+    "passed": 10,
+    "failed": 3,
+    "durationSeconds": 570,
+    "catalogScreens": 64,
+    "catalogComponents": 53,
+    "themes": [
+      "light",
+      "night"
+    ],
+    "referenceComparison": "exact current independent reference passed for screens and components in both themes",
+    "failures": [
+      "auth-contract.spec.ts:35 expected127.0.0.1:3012,receivedlocalhost:3012",
+      "foundation.spec.ts:64 welcome.light stored reference mismatch:1 reported pixel",
+      "foundation.spec.ts:64 handle-preview.light stored reference mismatch:1 reported pixel"
+    ]
+  },
+  "targetedFollowup": {
+    "tests": 9,
+    "passed": 7,
+    "failed": 2,
+    "durationSeconds": 32.5,
+    "authContract": "both passed after configured-origin repair",
+    "unconfiguredSignIn": "passed; no local identity fabricated",
+    "remainingFailures": [
+      "welcome.light stored reference mismatch:1 reported pixel",
+      "handle-preview.light stored reference mismatch:1 reported pixel"
+    ]
+  },
+  "referencesAssertionsTolerancesChanged": false,
+  "notEstablished": [
+    "full visual suite passing",
+    "full R12 populated/native/accessibility acceptance",
+    "cause of local stored-reference raster mismatch"
+  ],
+  "temporaryServices": "Stopped own3012; Playwright released3112; review3002/4102/55442 preserved; generated next-env drift restored"
+}

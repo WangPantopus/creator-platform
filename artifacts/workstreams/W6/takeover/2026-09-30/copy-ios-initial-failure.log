@@ -1,0 +1,270 @@
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+[0/1] Planning build
+Building for debugging...
+[0/3] Copying Localizable.xcstrings
+[1/3] Write sources
+[2/4] Copying Glyphs.json
+[3/4] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Compiling QelvoraUI QelvoraCopy.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:34: warning: no calls to throwing functions occur within 'try' expression
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                  `- warning: no calls to throwing functions occur within 'try' expression
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+[6/12] Compiling QelvoraUI NativeVoiceRecorder.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+[7/12] Compiling QelvoraUI NativeMediaClient.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+[8/12] Compiling QelvoraUI NativeCallOffers.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+[9/12] Compiling QelvoraUI QelvoraAPI.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[10/12] Compiling QelvoraUI QelvoraTokens.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+[11/12] Emitting module QelvoraUI
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:34: warning: no calls to throwing functions occur within 'try' expression
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                  `- warning: no calls to throwing functions occur within 'try' expression
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[12/12] Compiling QelvoraUI NativeCallView.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:70: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                      `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }
+
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/Generated/QelvoraCopy.swift:488:79: error: invalid escape sequence in literal
+486 |     "w6BeingReconciled": "being reconciled"
+487 |   ]
+488 |   private static let variables = try! NSRegularExpression(pattern: "\{([^}]+)\}")
+    |                                                                               `- error: invalid escape sequence in literal
+489 |   public static func text(_ key: String, values: [String: String] = [:]) -> String {
+490 |     guard let template = strings[key] else { preconditionFailure("Unknown copy key: \(key)") }

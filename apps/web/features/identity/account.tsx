@@ -1,82 +1,49 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Notice } from "@qelvora/ui-web";
-import { SessionSchema, type Session } from "@qelvora/api";
+import { announceSessionEnd, useIdentityRequest } from "./session-boundary";
 
-export function AccountPanel({ initial }: { initial: Session }) {
-  const [session, setSession] = useState(initial);
+export function AccountPanel() {
+  const identity = useIdentityRequest();
+  const session = identity.session;
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const returnTo = "/identity/account";
+  const actionFocus = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
-    let active = true;
-    let checking = false;
-    const check = async () => {
-      if (checking) return;
-      checking = true;
-      try {
-        const response = await fetch("/api/platform/identity/session", {
-          cache: "no-store",
-          signal: AbortSignal.timeout(10000),
-        });
-        if (response.status === 401) {
-          setSession({ ...initial, fan: null, creator: null, teams: [] });
-          location.replace(
-            `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
-          );
-          return;
-        }
-        if (!response.ok)
-          throw new Error(
-            "Reconnect to refresh your account. Privileged actions remain checked by the server.",
-          );
-        const value = SessionSchema.parse(await response.json());
-        if (value.accountId !== initial.accountId) {
-          setSession({ ...initial, fan: null, creator: null, teams: [] });
-          location.replace(
-            `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
-          );
-          return;
-        }
-        if (active) {
-          setSession(value);
-          setError("");
-        }
-      } catch (error) {
-        if (active)
-          setError(
-            error instanceof Error
-              ? error.message
-              : "Reconnect to refresh your account.",
-          );
-      } finally {
-        checking = false;
-      }
-    };
-    const timer = setInterval(check, 4000);
-    return () => {
-      active = false;
-      clearInterval(timer);
-    };
-  }, [initial]);
-  const act = async (path: string) => {
     if (busy) return;
+    const button = actionFocus.current;
+    actionFocus.current = null;
+    if (
+      button?.isConnected &&
+      !identity.signal.aborted &&
+      !document.hidden &&
+      document.activeElement === document.body
+    )
+      button.focus();
+  }, [busy, identity.signal]);
+  const act = async (path: string, button: HTMLButtonElement) => {
+    if (busy) return;
+    actionFocus.current = document.activeElement === button ? button : null;
     setBusy(true);
     setError("");
+    setMessage("");
     try {
-      const response = await fetch(`/api/platform/identity/${path}`, {
+      const response = await identity.request(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: "{}",
         signal: AbortSignal.timeout(10000),
       });
-      if (!response.ok && response.status !== 401) {
+      if (!response.ok) {
         setError("Could not complete this action. Reconnect and try again.");
         return;
       }
-      if (path !== "refresh" || response.status === 401) {
-        setSession({ ...initial, fan: null, creator: null, teams: [] });
-        location.replace("/auth/continue");
+      if (path === "refresh") {
+        setMessage("Session refreshed.");
+      } else {
+        announceSessionEnd();
+        identity.end();
       }
     } catch {
       setError(
@@ -87,7 +54,7 @@ export function AccountPanel({ initial }: { initial: Session }) {
     }
   };
   return (
-    <section className="account-panel">
+    <section className="account-panel" aria-busy={busy}>
       <h1>Your account</h1>
       {session.mode === "development" && (
         <Notice title="Development identity">
@@ -133,31 +100,29 @@ export function AccountPanel({ initial }: { initial: Session }) {
           ))}
         </section>
       )}
-      {error && (
-        <div role="alert">
-          <Notice title="Account status" tone="error">
-            {error}
-          </Notice>
-        </div>
+      {(error || message) && (
+        <Notice title="Account status" tone={error ? "error" : undefined}>
+          {error || message}
+        </Notice>
       )}
       <button
         className="qv-btn qv-btn--secondary"
         disabled={busy}
-        onClick={() => act("refresh")}
+        onClick={(event) => act("refresh", event.currentTarget)}
       >
         Refresh session
       </button>
       <button
         className="qv-btn qv-btn--secondary"
         disabled={busy}
-        onClick={() => act("logout")}
+        onClick={(event) => act("logout", event.currentTarget)}
       >
         Sign out
       </button>
       <button
         className="qv-btn qv-btn--quiet"
         disabled={busy}
-        onClick={() => act("revoke-sessions")}
+        onClick={(event) => act("revoke-sessions", event.currentTarget)}
       >
         Sign out on all devices
       </button>

@@ -1,0 +1,286 @@
+{
+  "sourceMain": "c70c3ae14cbae72cec2c7981eb6519d733850c26",
+  "reason": "Final PR diff exposed historical checkpoint deletions of peer evidence. Restore all absent current-main evidence byte-identically; no source, references, generated files or working files replaced.",
+  "retainedFiles": [
+    {
+      "path": "artifacts/native/ios/device-final/1BC14721-55E6-43F7-9E82-1BE8CE73036D.png",
+      "sha256": "8c16701e5b33d65f3364dd5749f5c34e93592f53e93d39bf2053734953918cac",
+      "mainBlob": "108a264cf0fd3a89f97965860b91cec7afb9d095"
+    },
+    {
+      "path": "artifacts/native/ios/device-final/42A7C47B-E035-4E44-9457-0AA8AAC0FDFE.png",
+      "sha256": "e96ad90c49fde73a72cc709fcd01eb9e8fb606fd5177f836ac16d09192b0a528",
+      "mainBlob": "4746c4ea91d29b1a9505ad9aafbae7ac848fbe99"
+    },
+    {
+      "path": "artifacts/native/ios/device-final/747FBDCD-95BC-44B0-9F4C-FF5B16931EEE.png",
+      "sha256": "b7eda5ca6c4e259899e03b83e17960dad811f42c4a7bec47d939f9a3357aad0f",
+      "mainBlob": "da710f3740023d4d6625c0b413a54c6a487ba4e7"
+    },
+    {
+      "path": "artifacts/native/ios/device-final/98C8C56F-5AA1-4698-9FE9-B0A64F2D02C0.png",
+      "sha256": "d956fe35b4936af4751dccd7940aee7bba5a60bfdbd779a4b22d356a885adaaa",
+      "mainBlob": "8daf419bb77298a9282beef03834e9891b412aeb"
+    },
+    {
+      "path": "artifacts/native/ios/device-final/B1720765-42CD-4CCF-9418-5E85C4CF750A.png",
+      "sha256": "42c45498c49d9b6735755c494310d5ccd2edb1e6aa2c9cd18a4b31fea0b5ae64",
+      "mainBlob": "030b2810818afccc550c58a3215549280e3508c1"
+    },
+    {
+      "path": "artifacts/native/ios/device-final/manifest.json",
+      "sha256": "ff6e326ed4a4691472c49c47ab7515ff03760447112d23b19c9ca689b23a18ce",
+      "mainBlob": "19fe53f2141146219486c3ceac5d7ea11c212544"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/47244F3B-4186-4D86-987D-C6DF4FFDF162.png",
+      "sha256": "0fa8c6f92a986191f04d45f2df521864317b004e42cc34b4d2aeba1a0ec10e80",
+      "mainBlob": "485be7c489eb3e68a1819372d54127a5853fb284"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/54F6C60E-20B6-4C4A-B4CC-A389611F426E.png",
+      "sha256": "86bf1098c3b5c505fb743b77178a78fd87da8a47ab1ec1d61382e59b339e6909",
+      "mainBlob": "4610536ecb24bc7e27b5e0f72da8c94eef41490d"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/9CFA7594-AD31-44C9-9168-F3EF340DA497.png",
+      "sha256": "897f1536beb2840fb0adab2538577440f9a3a32c2f2349c70e07c1c2103b04ef",
+      "mainBlob": "abd94b66c7eedaf3992836020be827e65c09d522"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/A7A04C6C-4130-4ECC-BB40-30172F1B5BD3.png",
+      "sha256": "5477ebe57ce3d3e1aee6b5e76d820f2b354ae5ff3674e739d3d1d5cb2b0e4e2e",
+      "mainBlob": "820534f4bb9ebc71802d2c887735b26a49e4cc8b"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/F091A3C0-2CDE-4FEB-B025-81ABFAA932BE.png",
+      "sha256": "5c47ab8e66273cebe653a41e1f53dcb5383be4c0d0760542f2cbfc8d19d4dc77",
+      "mainBlob": "b904d3aa73b37fd7cc9c032cb2b1847bb89f9749"
+    },
+    {
+      "path": "artifacts/native/ios/device-themes/manifest.json",
+      "sha256": "b2445f9aacbfdc789072c867e03c8594054af5af6236631b68145b0fce1fa5d9",
+      "mainBlob": "c1435d0e0c7bde9044e9448d7b2dad98ce626474"
+    },
+    {
+      "path": "artifacts/workstreams/W2/handoff/20260929/migration-registry.reference.json",
+      "sha256": "4b8011fcea21745460cd3a2e1056fe2bf3cf1851afd8e73b52a7b95ca188ec39",
+      "mainBlob": "7b0dbc74e35da38c746836f371d1c0c7a430d4d0"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/applied-isolated-migrations/0003_w2_agent_extensions.sql",
+      "sha256": "7fc5995956d2e407475f815a2a707737c225cce0346643b8fd6b345d972fe59c",
+      "mainBlob": "cfe08eceff02cce3d3a148089036e5b510901f68"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/applied-isolated-migrations/0013_w2_shadow_jobs.sql",
+      "sha256": "1f8e6e5ef1aa11859e3d972fb87273bec9fe233b4b406f51bc02df922d75158b",
+      "mainBlob": "9a40919d4fb960d6350f077a1e20ab03bb0ad645"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/applied-isolated-migrations/0014_w2_purge_tombstone.sql",
+      "sha256": "d11eb8168e09c1fb919c087f3e3ba2484faa625151e05f451230fe4b193d839e",
+      "mainBlob": "3361946f4f8cf28b4df66db9835bb8e85656ce5a"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/creator-ai-export.synthetic.json",
+      "sha256": "ff31d4b17dd4e56dc83a2d9194ef81bd14167ed47f93831138a9de2f67909b6c",
+      "mainBlob": "2bc3f49252cf1c117eda444a33aee859b330b691"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/my-ai-phone-night.jpg",
+      "sha256": "49641f71c4c32ca61f8d8a9dcb85c15fe6ea383c23b5d8134b7e4f3cd8d03e4e",
+      "mainBlob": "85d9d4e78289aeadccfd42d5209242ad8d0f0942"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/run-metadata.json",
+      "sha256": "238b75b1939b4a70a6cbf439527296b0d2dab371dcc26426783d325950be35ef",
+      "mainBlob": "376e85b40c33e47675ff31c2d5a014a80e1da5a5"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/source-sha256.txt",
+      "sha256": "96733ad36cdc734f981796ba2046c748489e597464719c73d184ead06dce9f19",
+      "mainBlob": "072f4d8c57c837d3289faaf496c07da49b761983"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/sources-revoked-check-in-light.jpg",
+      "sha256": "18a3654d594bc5bc3ba437df5d3d24a46b306913f60fd9cc31a95d4e54a8cd27",
+      "mainBlob": "b67435aa57a542289a51cdf7ae7d1f346d8d733f"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/test-phone-safety-night.jpg",
+      "sha256": "1d97b3a3f7537c20febc2535c725ad19e8a952d212a29e1c30cc22c393693190",
+      "mainBlob": "3ce154ebc7a0770a82e22f8c7810f2fb2a88f714"
+    },
+    {
+      "path": "artifacts/workstreams/W2/source-version/20260929/test-provider-unavailable-light.jpg",
+      "sha256": "a8dc10625f9e64692b8b44f34414cd0f831c048cb85cf6ad2e6f23c6aa413572",
+      "mainBlob": "34ba53456d6503eba037f6e5ad7adb858f5d0ec6"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/README.md",
+      "sha256": "4b198e0a9940d053cf3f4683cea9bb6fba762effa0aae95401b2628d0f32e7c8",
+      "mainBlob": "da830b32f64013022942759ec452af80b3db57b2"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-build.log",
+      "sha256": "c096c4a93a291bb88bda47c9af2321a3ab6cfbe67502b25da612138744aed42d",
+      "mainBlob": "b66bd2028e2b2c4d2fa991ca5b115f37fc8c0093"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-discover-final.png",
+      "sha256": "e23cf8e647558bdaec1c1921c7d6306ac5db31c774a6883ca1da3dd81f962d6e",
+      "mainBlob": "95ed1a59412020764328d668497d664d4b66fd8a"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-discover-full.png",
+      "sha256": "26e1a1a50a35d032d0a99d56ae284a8f211a1728f9a6a6d2987feec8bb4ae9b6",
+      "mainBlob": "19bb753e514b9b1f200b0c8769964f021fbad40d"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-discover.png",
+      "sha256": "604f8148aef2584e60e551539c395cf1b1e89524e6bfad52dbbe3bcae95e2a0f",
+      "mainBlob": "9005560a43e396a4e979ca80ff9042d15daa52e8"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-post-build.log",
+      "sha256": "68beab7bc4a431fafe15f6aff75326022f986d9d6166d9bc83922166e9c3f0a7",
+      "mainBlob": "a36fdd0fcbc22687058b79ddf028e6638a9361d6"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-post-corrected.png",
+      "sha256": "ec8ae1550cfc480eed5e0e6588b2279d405902d67d65be2283fc7e6ab108c4e7",
+      "mainBlob": "19556e9135bfe39fd8a23dcab3019355b5272a52"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-post-final.png",
+      "sha256": "73357eaf5a033f3615613593ee766a48392b0856509255483d0d546cda5839d8",
+      "mainBlob": "312080710de25924671839b3326b146104754543"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/android-public-build.log",
+      "sha256": "25015e00cf9393526dc0715ce0be4d2deeeb679774b64e24335467efaa31c355",
+      "mainBlob": "5895ef9407e6eb9f0f2de79f5e46f81b0e2ea7e2"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/discover-light.jpg",
+      "sha256": "186fce7fb2c0a462947692802a952fc5f0393dedd44b614932401424a808d2c2",
+      "mainBlob": "78936dee7afcf03a7b4882ce73991cbf01ebe3eb"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/inbox-light.jpg",
+      "sha256": "0f8f8b66d0c5320cea05ea7a437d2f4174a4b7314d99d9e72f7690d1d7a9af73",
+      "mainBlob": "eb7e08d5c1adee8c4f4a480f77c0bee9502b3e61"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/insights-below-five.jpg",
+      "sha256": "298a9d8b0f52252c0809682d1416ec6f78c3796c955f002dace266e5d353d33e",
+      "mainBlob": "ba4f510583f06258e094408ceed879c736eeca36"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/insights-five-light.jpg",
+      "sha256": "0153ac18638271509715179e9c769b5e06ec2e689aa79b8a94b5b292df9cd81a",
+      "mainBlob": "3605bee1dce7ad1e77cab773c059fc17fb3a6119"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-build.log",
+      "sha256": "bda39ac9f096eff06bde0fd5ea7fecb1ca5c278fe3cf46371337f8f85f1e7795",
+      "mainBlob": "6945efc409a694fd582fcebd867bb32121a66e7b"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-discover-corrected.png",
+      "sha256": "faee37b901f517f5536818a83f6672fa19681aca872d7c3f0a61514f7f6f37fa",
+      "mainBlob": "a61537a7161bd9a08ba443e8cd015ef15b29245b"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-discover-final.png",
+      "sha256": "404cc9eab8e0084041cefb947b18a5a2cac0f800a58b4843ab94f79c59ea5efa",
+      "mainBlob": "8a9341f8c3f8dc2f4821ec02300b15176bcf4c31"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-discover-full.png",
+      "sha256": "899031b2c5007da22f303b9d83b8db27886d266ea7f0133ccff909d2a9c132bf",
+      "mainBlob": "2ee5532c9e03832ebb3f22cdc237368221e59bd5"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-discover-latest.png",
+      "sha256": "7c33bb591ab652ed9a8d131e752978047a0f3c57c2b2cfda23a85e5140c81333",
+      "mainBlob": "5eca8cd713266285285f1ec79604d5b3d65eb71e"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-discover.png",
+      "sha256": "7b9022f87d590fd69370f36e043eaa1a1aad50670f245a7170b3b3aa68bcdc33",
+      "mainBlob": "cce4441c14b2819738701f5283e52c3c951f7d54"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-invalid-post-signed.png",
+      "sha256": "77a70df826135e3b15f7505f110897d1ac7bb2036732cae02356125ac2ecfc81",
+      "mainBlob": "9eedde8b832d59036aeb8af46a8cde63c0b31926"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-invalid-post-unsigned.png",
+      "sha256": "e51169058c7dd4c6abd0e832d779775fa287f1a5147483b2505e67288aa63b1e",
+      "mainBlob": "beba3d101c8fa1b88899afa277afba93d73aa024"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-build.log",
+      "sha256": "a2cd09525eed6ee2932029f94d8eaa40f64930d1e05dbe539e841676853164ff",
+      "mainBlob": "1b73d168ff9d055bb77bb923e57e0c8d09608c62"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-corrected-night.png",
+      "sha256": "1165af2a9143c3e490fbe06524c3fb6a06bdb94935ad41bc6098776a23925734",
+      "mainBlob": "0106e01092c1ee456213693f14bec1cc1c5cc2d6"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-final.png",
+      "sha256": "6f42cc68fddeb5c24dc50ea92d5cf3d0fb71ae616597abd63abce60e85435f0e",
+      "mainBlob": "ffcd34f7102a73007998ab9a41705fa837ef0e4c"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-full.png",
+      "sha256": "ceffae374d97d92e177c9efe51af2ba70ec1926a5f24a66d51d31f0f2eb654fc",
+      "mainBlob": "e45f7f17df2a1f941b65079c754405422dbd84a8"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-night-cold-launch.png",
+      "sha256": "9adb37f7b353f3a0695839ab54f55f6c5f6626a6b5d45d94d2c25189c29014ce",
+      "mainBlob": "ff500fa461297255c0bf61c48555f16ff3ca07f2"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-night-restarted.png",
+      "sha256": "79d8064a0d49ec75e09a30de6823926660fcaa120cac12485c11c5c7ac0e1d14",
+      "mainBlob": "414c03c1541022a527216418d79ecb08a2e902ab"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-signed-light.png",
+      "sha256": "6f673b339cec40d4e17d2cfbf6472df6133e02f6999c144e039951e21c54452d",
+      "mainBlob": "f1ca86658e0fab21aabaf3d7c2953a9d64c13f30"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-post-signed-night.png",
+      "sha256": "78ed80e0dfd96b0651ce1e3623d023d4f68c35516099c65d89afabbf10e93880",
+      "mainBlob": "d0aa954d7e63b61935ae7513cb21c3fe3690b616"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/ios-signed-build.log",
+      "sha256": "db1d0b9d88921ef2de3544d7072a99a2a748ab199b9e893720b9b360e35c8254",
+      "mainBlob": "0d34f331f7caef5d52bcd5a5209d2f8f80498cae"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/native-build-sha256.txt",
+      "sha256": "20f0a8083b6d96192336cd7191d99407ce26b6a0aac4e96cc11b68764e383355",
+      "mainBlob": "6599c2ebd7d39af6be23d6f70a88f100af3f1d61"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/preferences.jpg",
+      "sha256": "178d565c2fc43c14425482f7d2f8ee11d450cde05a2be1a859f34dc32851e613",
+      "mainBlob": "ca899b3061e8b066463b6ce66df0564ff99416d6"
+    },
+    {
+      "path": "artifacts/workstreams/W7/first/20260929/source-sha256.txt",
+      "sha256": "fa160f46b3cc347342d4a4a0eab1e2dafc07632b9b662c96d0f35185a4207a15",
+      "mainBlob": "0ada55a6e701c5ecb81ec53dd5a74a869870445a"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T01:57:17.435148+00:00",
+  "sourceParent": "8e3ae716c4f2c735fd450d0754a13398dd13e559",
+  "source": {
+    "path": "apps/backend/src/operations/local-server.ts",
+    "sha256": "b1520dcf42abb11f0c387aa1e9cc7ae480a55c54bf2706a6396755cc9f9cb258"
+  },
+  "change": "Begin server/socket close before awaiting the current fenced worker so shutdown stops new HTTP/ticket intake; preserve five-second socket termination and worker lease completion. Fixed aggregate shutdown stage timings distinguish HTTP/socket/worker/pool delay.",
+  "fields": [
+    "timestamp",
+    "event",
+    "environment",
+    "release",
+    "activeSockets",
+    "durationMs",
+    "forcedSockets",
+    "stages"
+  ],
+  "verification": {
+    "backendBuild": "pass",
+    "changedSourceLint": "pass",
+    "changedSourceFormat": "pass",
+    "newTestsWritten": false,
+    "existingTestsChanged": false
+  },
+  "acceptance": "First actual restart retained history but observed24.7418-second drain/four late tickets; corrected-source launched-app repeat remains pending.",
+  "preservation": {
+    "sqlRolesRlsGrantsChanged": false,
+    "runtimeCredentialsChanged": false,
+    "paidCalls": 0
+  },
+  "continuedAt": "2026-10-01T02:04:53.846939+00:00",
+  "continuationSourceParent": "3746829cee8911f62284576193ad6f157d7178c5",
+  "observedDefectReceipt": "realtime-first-drain.json"
+}

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { test, expect } from "@playwright/test";
 import { compareCatalog } from "./compare";
-const webOrigin = process.env.VISUAL_WEB_ORIGIN ?? "http://localhost:3000";
+const origin = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
 const referenceOrigin =
   process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
 const design = path.join(process.cwd(), "design");
@@ -47,9 +47,12 @@ for (const theme of ["light", "night"] as const) {
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await page.goto(
-        `${webOrigin}/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
+        `${origin}/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
       );
       await page.locator(".preview-board > div").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -57,7 +60,10 @@ for (const theme of ["light", "night"] as const) {
         errors,
         `${screen.file} must render without client errors`,
       ).toEqual([]);
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       const comparison = compareCatalog(actual, expected);
       if (comparison.pixels !== 0) {
         await test.info().attach(`${screen.file}-implementation`, {
@@ -133,15 +139,17 @@ for (const theme of ["light", "night"] as const) {
       await reference.evaluate(() => document.fonts.ready);
       const expected = await reference.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       await page.goto(
-        `${webOrigin}/design/components/${name}?raw=1&theme=${theme}`,
+        `${origin}/design/components/${name}?raw=1&theme=${theme}`,
       );
       await page.locator("main > div > *").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
       const actual = await page.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       const comparison = compareCatalog(actual, expected);

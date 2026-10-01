@@ -1,3 +1,4 @@
+import { copy as growthCopy } from "@qelvora/copy";
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
 import {
@@ -17,7 +18,7 @@ export default async function Settings() {
     return (
       <GrowthShell>
         <header className="growth-header">
-          <h1>Notification settings</h1>
+          <h1>{growthCopy.growthNotificationSettings}</h1>
         </header>
         <PreferenceForm initial={preferences} creators={directory.creators} />
         <FeedbackForm />

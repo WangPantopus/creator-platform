@@ -1,0 +1,206 @@
+{
+  "observedAt": "2026-10-01T02:16:44.024518+00:00",
+  "sourceBase": "3f426241186f0e6a549c95fbf10b12ba7d58f47b",
+  "verification": "Actual owned browser/product API operations; no new test code",
+  "phone": {
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        568
+      ]
+    ],
+    "horizontalOverflow": false,
+    "segmentsBeforeHeight": 36,
+    "segmentsAfterMinimumHeight": 44,
+    "exampleCheckboxClickableLabelsHeight": 44,
+    "sourceRightsLabelHeightAt320": 52,
+    "disclosureKeyboard": "Tab reached own-reply field; Enter/Tab evaluation evidence retained",
+    "nightLicenseDialog": "opened actual Pause dialog; Escape closed it and focus returned to Pause my AI; no pause submitted",
+    "text200Percent": "Not established; narrow reflow is separate from actual text scaling",
+    "reducedMotion": "Existing scoped CSS rule retained; no system-preference operation claimed"
+  },
+  "preview": {
+    "message": "How do the approved public notes describe clay drying and bisque firing?",
+    "pipelineMs": 5152,
+    "firstApprovedMs": 5138,
+    "costMicros": 2231,
+    "authorizedPassageOpened": true,
+    "usage": [
+      {
+        "id": "9ba3f9b6-b3cf-4efc-8508-6880068d46d3",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "input_tokens": 591,
+        "output_tokens": 19,
+        "cost_micros": 267,
+        "duration_ms": 992,
+        "created_at": "2026-10-01T01:57:11.45226+00:00"
+      },
+      {
+        "id": "e73a1bcf-2a13-45d8-9c0b-4cad31be1764",
+        "model": "gpt-4.1-2025-04-14",
+        "input_tokens": 656,
+        "output_tokens": 70,
+        "cost_micros": 1872,
+        "duration_ms": 2216,
+        "created_at": "2026-10-01T01:57:10.241086+00:00"
+      },
+      {
+        "id": "9dee83ca-7420-4081-8d24-e0f01eff9e97",
+        "model": "text-embedding-3-small",
+        "input_tokens": 14,
+        "output_tokens": 0,
+        "cost_micros": 1,
+        "duration_ms": 709,
+        "created_at": "2026-10-01T01:57:09.519789+00:00"
+      },
+      {
+        "id": "e3822ae9-c8e3-431e-97e9-7e0a42e56c9f",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "input_tokens": 131,
+        "output_tokens": 24,
+        "cost_micros": 91,
+        "duration_ms": 2209,
+        "created_at": "2026-10-01T01:57:07.308255+00:00"
+      }
+    ],
+    "costMatchesUsage": true,
+    "performanceAcceptance": false,
+    "profile": "Owned development web/API, x86_64 macOS, real OpenAI, concurrent peer/native builds; single functional sample"
+  },
+  "postRestart": {
+    "apiPID": 97035,
+    "apiSession": 74107,
+    "feature": "creator-ai /v1/agent on same runtime pool",
+    "identity": "W1 synthetic loopback; no production account/session proof",
+    "revision": 18,
+    "mode": "companion",
+    "sourceCount": 1,
+    "evaluationCurrent": true,
+    "evaluationId": "4173b485-8ff1-4943-ab01-cc3b27153824",
+    "evaluationCaseStates": [
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "gates": [
+      "Creator verification is pending.",
+      "An active, reviewed replica license is required.",
+      "Set a positive daily AI cost cap before publishing."
+    ],
+    "capabilities": {
+      "model": true,
+      "embeddings": true,
+      "licensing": false,
+      "audioInterview": false,
+      "aiVoice": false
+    },
+    "databaseCounts": {
+      "sources": 123,
+      "versions": 105,
+      "canonicalLedgerEntries": 28
+    }
+  },
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/feature.ts": "0fc1a841c80d4cb6d708761cc9ad5778da4d3c01ef300a245169f0c2fce2a414",
+    "apps/backend/src/modules/agent/development-server.ts": "b3b115e70d83a223b28ecd3e30d66bd06302644319d282a5863ab0157526fcae",
+    "apps/web/features/creator-ai/creator-ai.css": "c3e79b15c995ad1342469fd831acb0cee82799285b48dab803bc1e29248b7dfc",
+    "apps/backend/src/modules/agent/conversation-adapter.ts": "b66a709506524e24629a8c4f76ef08ef56b55c8cdf4ef4eb17554be878ff5255",
+    "apps/backend/src/modules/agent/runtime.ts": "c6d34331aee8d32f6f212cfc87cc97f021c4ddd9d9a9c3db820b6f2693f03c64"
+  },
+  "screenshots": [
+    "studio-phone-runtime-followup.jpg",
+    "studio-license-night-runtime-followup.jpg",
+    "ios-welcome-launched.png",
+    "ios-signin-night-operated.png",
+    "android-systemui-failure.png",
+    "android-systemui-after-ui.png"
+  ],
+  "native": {
+    "ios": {
+      "simulator": "09FA41B1-C300-4970-9F09-26F7CB884425",
+      "os": "iOS26.5",
+      "xcode": "26.5",
+      "appLaunchPID": 8436,
+      "signedInstall": "pass",
+      "actualVisibleLaunch": true,
+      "existingUITests": {
+        "target": "QelvoraUITests/FoundationFlowTests",
+        "cases": 2,
+        "failures": 0,
+        "durationSeconds": 44.25,
+        "signInThemes": [
+          "Light",
+          "Night"
+        ],
+        "catalogCase": "Fixture labels only; not licensed fan delivery"
+      },
+      "initialAttempt": "Wrong only-testing target name QelvoraAppUITests; no tests executed. Corrected against project.yml, without source/test edits.",
+      "resultBundle": "tmp/w2-native-20260930/evidence/ios-foundation-ui-corrected.xcresult",
+      "resourceState": "Completed W2 simulator shut down, app/data retained"
+    },
+    "android": {
+      "emulator": "37.1.11",
+      "serial": "emulator-5562",
+      "adbPort": 5042,
+      "systemImage": "android-34/google_apis/x86_64",
+      "appBuild": "pass",
+      "instrumentationBuild": "pass",
+      "actualLaunch": "MainActivity COLD statusok; TotalTime9507ms WaitTime9933ms",
+      "screen": "SystemUIANR over rendered Welcome; not a clean operated journey",
+      "emulatorFailures": [
+        {
+          "pid": 4430,
+          "time": "2026-09-30T19:31:18-07:00"
+        },
+        {
+          "pid": 10352,
+          "time": "2026-09-30T19:39:45-07:00"
+        }
+      ],
+      "failureSignature": "SIGABRT std::__throw_bad_function_call, grpc CallbackWithSuccessTag, packet-stream Socketclosed; same on both GPU modes. Host load753.58/676.30/657.54 also observed, causation not established.",
+      "currentRecovery": "Fourth own recovery: hostGPU, -feature -WiFiPacketStream and -feature -Vulkan; unchanged own AVD/data, results pending",
+      "existingUITests": {
+        "cases": 4,
+        "failures": 0,
+        "durationSeconds": 144.28,
+        "classes": [
+          "NativeAcceptanceTest",
+          "DialogRuntimeTest"
+        ],
+        "scope": "Real unavailable sign-in, synthetic component arrival removal/catalog mode selection and actual dialog Light/Night; no licensed fan journey"
+      },
+      "postRunLaunch": {
+        "status": "timeout",
+        "launchState": "UNKNOWN(-1)",
+        "waitMs": 14892,
+        "screen": "SystemUIANR; inspected actual screenshot"
+      },
+      "hostGPURecovery": {
+        "bootMs": 89206,
+        "launchStatus": "ok",
+        "launchState": "COLD",
+        "launchMs": 11363,
+        "screen": "SystemUIANR still present; recovery not clean",
+        "unchangedData": true
+      }
+    },
+    "canonicalLicensedFanAcceptance": false
+  },
+  "scope": "All nine original packages and R01\u2013R14 retained; missing actual licensing/retention/feed/provider/worker authorities remain closed.",
+  "generatorConstruction": {
+    "source": "apps/backend/src/modules/agent/conversation-adapter.ts",
+    "status": "compiled; not activated",
+    "sameExecution": "Actual per-attempt W3 context, same LiveAgentRuntime and ProviderExecution through generation/memory/seal",
+    "memoryCommit": "Actual W3 producer600bfb01413b06be095f88ae994f022b7d7cf8ca reviewed; exact commitMemory(unknown[],assertAuthority) signature and held batch/deadline/custody checks; actual host composition still required",
+    "runtimeVerification": "No authentic licensed fan/settlement acceptance;0048 remains reserved/unapplied",
+    "citation": "Requires actual W3 scoped PoolClient/current authority through same transaction; requested chunk/source locked; creator preview remains separate"
+  }
+}

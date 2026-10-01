@@ -2,6 +2,12 @@ import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import { streamResponses, type StreamProposal } from "./streaming.js";
 import { contentHash } from "../../core/canonical.js";
+import {
+  ModelRateSchema,
+  ProviderResponseError,
+  responseUsage,
+  type ModelRate,
+} from "./response-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 
 export const ReplySchema = z.strictObject({
@@ -25,13 +31,34 @@ export const InputVerdict = z.strictObject({
   category: z.string(),
 });
 export const OutputVerdict = z.strictObject({
-  allowed: z.boolean(),
+  allowed: z
+    .boolean()
+    .describe(
+      "Whether the proposed output is allowed, not whether the quoted input request is allowed.",
+    ),
   category: z.string(),
-  supported: z.boolean(),
+  requiresEvidence: z
+    .boolean()
+    .describe(
+      "True for factual knowledge, creator or sponsor claims. False for AI self-disclosure, refusal or a safe alternative routing instruction.",
+    ),
+  supported: z
+    .boolean()
+    .describe(
+      "Whether factual claims are supported by the authorized cited evidence. Non-factual refusals and AI disclosure are supported by platform policy.",
+    ),
 });
 export const JudgeVerdict = z.strictObject({
-  passed: z.boolean(),
-  reason: z.string(),
+  passed: z
+    .boolean()
+    .describe(
+      "True when the delivered response satisfies platform/creator rules and the expected safe behavior. Refusing a malicious request is success, not failure. False if an unsafe proposed output triggered the delivery guardrail.",
+    ),
+  reason: z
+    .string()
+    .describe(
+      "Explain the actual policy and quality outcome consistently with passed.",
+    ),
   usefulness: z.number(),
   style: z.number(),
 });
@@ -63,10 +90,7 @@ export type ModelConfiguration = {
   smallModel: string;
   largeModel: string;
   embeddingModel: string;
-  rates?: Record<
-    string,
-    { inputMicrosPerMillion: number; outputMicrosPerMillion: number }
-  >;
+  rates?: Record<string, ModelRate>;
   policyReference: string;
 };
 /** No model defaults, credentials, rate assumptions or provider training guarantees. */
@@ -74,19 +98,40 @@ export class OpenAIResponsesModel implements AgentModel {
   readonly fingerprint: string;
   readonly embeddingModel: string;
   get pricingConfigured() {
-    return [
-      this.configuration.smallModel,
-      this.configuration.largeModel,
-      this.configuration.embeddingModel,
-    ].every((model) => Boolean(this.configuration.rates?.[model]));
+    return (
+      [
+        this.configuration.smallModel,
+        this.configuration.largeModel,
+        this.configuration.embeddingModel,
+      ].every((model) => Boolean(this.configuration.rates?.[model])) &&
+      [this.configuration.smallModel, this.configuration.largeModel].every(
+        (model) => {
+          const rate = this.configuration.rates?.[model];
+          return (
+            rate?.cachedInputMicrosPerMillion !== undefined &&
+            rate.cacheWriteMicrosPerMillion !== undefined
+          );
+        },
+      )
+    );
   }
   maximumRunCostMicros(prefixBytes: number) {
     if (!this.pricingConfigured) return null;
     const rates = Object.values(this.configuration.rates!);
-    const input = Math.max(...rates.map((r) => r.inputMicrosPerMillion));
+    const input = Math.max(
+      ...rates.flatMap((r) => [
+        r.inputMicrosPerMillion,
+        r.cachedInputMicrosPerMillion ?? 0,
+        r.cacheWriteMicrosPerMillion ?? 0,
+      ]),
+    );
     const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
+    // Input classification, embedding, reply, at most12 sentence guards,
+    // One memory extraction, at most5 sensitivity calls and one complete
+    // exclusion comparison:22 admissions. Embedding has no output; the21
+    // model calls each cap output at2000. Exclusion input is bounded to64KB.
     return Math.ceil(
-      ((prefixBytes + 80_000) * 20 * input + 40_000 * output) / 1_000_000,
+      ((prefixBytes + 80_000) * 22 * input + 42_000 * output) / 1_000_000,
     );
   }
   async *reply(
@@ -129,7 +174,7 @@ export class OpenAIResponsesModel implements AgentModel {
     const { apiKey: _apiKey, ...publicConfiguration } = configuration;
     void _apiKey;
     this.fingerprint = contentHash({
-      adapter: "responses-v1",
+      adapter: "responses-v3-cache-routing",
       ...publicConfiguration,
     });
   }
@@ -196,52 +241,61 @@ export class OpenAIResponsesModel implements AgentModel {
       { model: this.embeddingModel, input: texts },
       signal,
     );
-    const rows = z
-      .array(
-        z.object({
-          index: z.number().int().nonnegative(),
-          embedding: z.array(z.number().finite()).min(16).max(4096),
-        }),
-      )
-      .parse(result.data);
-    if (rows.length !== texts.length)
-      throw new DomainError(
-        "embedding_invalid",
-        "The embedding response is incomplete.",
-        503,
-      );
-    const sorted = rows.sort((a, b) => a.index - b.index);
-    if (
-      sorted.some(
-        (row, index) =>
-          row.index !== index ||
-          row.embedding.length !== sorted[0]?.embedding.length,
-      )
-    )
-      throw new DomainError(
-        "embedding_invalid",
-        "The embedding response is inconsistent.",
-        503,
-      );
     const tokenUsage = z
       .object({ total_tokens: z.number().int().nonnegative() })
       .parse(result.usage);
     const rate = this.configuration.rates?.[this.embeddingModel];
-    return {
-      vectors: sorted.map((row) => row.embedding),
-      usage: {
-        provider: "OpenAI",
-        model: this.embeddingModel,
-        inputTokens: tokenUsage.total_tokens,
-        outputTokens: 0,
-        costMicros: rate
-          ? Math.ceil(
-              (tokenUsage.total_tokens * rate.inputMicrosPerMillion) /
-                1_000_000,
-            )
-          : null,
-      },
+    const cost = rate
+      ? Math.ceil(
+          (tokenUsage.total_tokens * rate.inputMicrosPerMillion) / 1_000_000,
+        )
+      : null;
+    const usage: Usage = {
+      provider: "OpenAI",
+      model: this.embeddingModel,
+      inputTokens: tokenUsage.total_tokens,
+      outputTokens: 0,
+      costMicros: cost !== null && Number.isSafeInteger(cost) ? cost : null,
     };
+    try {
+      const rows = z
+        .array(
+          z.object({
+            index: z.number().int().nonnegative(),
+            embedding: z.array(z.number().finite()).min(16).max(4096),
+          }),
+        )
+        .parse(result.data);
+      if (rows.length !== texts.length)
+        throw new DomainError(
+          "embedding_invalid",
+          "The embedding response is incomplete.",
+          503,
+        );
+      const sorted = rows.sort((a, b) => a.index - b.index);
+      if (
+        sorted.some(
+          (row, index) =>
+            row.index !== index ||
+            row.embedding.length !== sorted[0]?.embedding.length,
+        )
+      )
+        throw new DomainError(
+          "embedding_invalid",
+          "The embedding response is inconsistent.",
+          503,
+        );
+      return {
+        vectors: sorted.map((row) => row.embedding),
+        usage,
+      };
+    } catch {
+      throw new ProviderResponseError(
+        "embedding_invalid",
+        "The embedding response is incomplete or inconsistent.",
+        usage,
+      );
+    }
   }
   async structured<T>(
     instructions: string,
@@ -262,6 +316,11 @@ export class OpenAIResponsesModel implements AgentModel {
         store: false,
         max_output_tokens: 2000,
         instructions,
+        prompt_cache_key: contentHash({
+          model,
+          instructions,
+          schema: jsonSchema,
+        }),
         input: [{ role: "user", content: context.join("\n\n") }],
         text: {
           format: {
@@ -274,50 +333,48 @@ export class OpenAIResponsesModel implements AgentModel {
       },
       signal,
     );
-    if (result.status !== "completed")
-      throw new DomainError(
-        "provider_incomplete",
-        "The model response did not complete.",
-        503,
+    const usage = responseUsage(
+      result.usage,
+      model,
+      this.configuration.rates?.[model],
+    );
+    try {
+      if (result.status !== "completed")
+        throw new DomainError(
+          "provider_incomplete",
+          "The model response did not complete.",
+          503,
+        );
+      const outputs = z
+        .array(
+          z.object({
+            type: z.string(),
+            content: z
+              .array(
+                z.object({ type: z.string(), text: z.string().optional() }),
+              )
+              .optional(),
+          }),
+        )
+        .parse(result.output);
+      const text = outputs
+        .flatMap((item) => item.content ?? [])
+        .filter((item) => item.type === "output_text")
+        .map((item) => item.text ?? "")
+        .join("");
+      return {
+        value: schema.parse(JSON.parse(text)),
+        usage,
+      };
+    } catch (error) {
+      throw new ProviderResponseError(
+        error instanceof DomainError ? error.code : "provider_output_invalid",
+        error instanceof DomainError
+          ? error.message
+          : "The model response could not be safely validated.",
+        usage,
       );
-    const outputs = z
-      .array(
-        z.object({
-          type: z.string(),
-          content: z
-            .array(z.object({ type: z.string(), text: z.string().optional() }))
-            .optional(),
-        }),
-      )
-      .parse(result.output);
-    const text = outputs
-      .flatMap((item) => item.content ?? [])
-      .filter((item) => item.type === "output_text")
-      .map((item) => item.text ?? "")
-      .join("");
-    const usage = z
-      .object({
-        input_tokens: z.number().int().nonnegative(),
-        output_tokens: z.number().int().nonnegative(),
-      })
-      .parse(result.usage);
-    const rate = this.configuration.rates?.[model];
-    return {
-      value: schema.parse(JSON.parse(text)),
-      usage: {
-        inputTokens: usage.input_tokens,
-        outputTokens: usage.output_tokens,
-        costMicros: rate
-          ? Math.ceil(
-              (usage.input_tokens * rate.inputMicrosPerMillion +
-                usage.output_tokens * rate.outputMicrosPerMillion) /
-                1_000_000,
-            )
-          : null,
-        model,
-        provider: "OpenAI",
-      },
-    };
+    }
   }
 }
 export function modelFromEnvironment(
@@ -334,13 +391,7 @@ export function modelFromEnvironment(
   let rates: ModelConfiguration["rates"];
   if (env.W2_MODEL_RATES_JSON)
     rates = z
-      .record(
-        z.string(),
-        z.strictObject({
-          inputMicrosPerMillion: z.number().nonnegative(),
-          outputMicrosPerMillion: z.number().nonnegative(),
-        }),
-      )
+      .record(z.string(), ModelRateSchema)
       .parse(JSON.parse(env.W2_MODEL_RATES_JSON));
   return new OpenAIResponsesModel({
     apiKey: env.OPENAI_API_KEY,

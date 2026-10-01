@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "workstream": "W3",
+  "parent": "bb2c7f84c6fcd5e184f6cbe819f72b6b687fc8d9",
+  "purpose": "Provenance only; not product acceptance",
+  "consumedW2": {
+    "commit": "eb0f6a043c96459e34d85cbef4637402b068449b",
+    "canonicalFiles": [
+      "apps/backend/src/modules/agent/budget.ts",
+      "apps/backend/src/modules/agent/model.ts",
+      "apps/backend/src/modules/agent/pipeline.ts",
+      "apps/backend/src/modules/agent/provider-usage.ts",
+      "apps/backend/src/modules/agent/response-usage.ts",
+      "apps/backend/src/modules/agent/repository.ts",
+      "apps/backend/src/modules/agent/router.ts",
+      "apps/backend/src/modules/agent/runtime.ts",
+      "apps/backend/src/modules/agent/service.ts",
+      "apps/backend/src/modules/agent/streaming.ts",
+      "apps/backend/src/modules/agent/style-index.ts",
+      "apps/backend/src/modules/ingestion/worker.ts",
+      "packages/api/src/agent/contracts.ts"
+    ],
+    "narrowAdditionalChanges": [
+      "memory-proposals.ts kind+semanticKey",
+      "CreatorAI.tsx sibling paragraph/details and unknown-usage copy"
+    ]
+  },
+  "narrowOwnerCommits": {
+    "W1cookies": "cf851a5d89a5d412dc70ecb7ed3bc97986b8868d",
+    "W1recovery": "e9769876a5d1da78c3e376df61dfea50e4dd02c3",
+    "W1CI": "e129fede3e96a3e809a077bfe8136934184b6d32",
+    "W2CI": "1e897375042df6001c559ae4f0e805b1aee51ca5"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e2aa662ff71c6feb900c20e368da89d20c692ecf332cb5bbea8bd18b0b054e46"
+    },
+    {
+      "path": "apps/android/app/build.gradle.kts",
+      "sha256": "9bcfebfbe1bdfbcaec875f82bd9f49a7770d98fdc18011404009f14b8936c07d"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+      "sha256": "01322b6a8fb6c2ab5888b5d5ca92a0308dbaee55a2c7129774b28076b87968aa"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRealtime.kt",
+      "sha256": "3b85a34411c2700db919f9bbed4335e644ffedd7758407ed39d89475515c4dba"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "sha256": "8c3bc79b65a623cb2b4f0adf5d24f6c3d44e7651294881e227f4617ea0633310"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/budget.ts",
+      "sha256": "d5f03173bd315b036db34bae862cab2f432d91a1b8ea98df21a98292f3443b8d"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/memory-proposals.ts",
+      "sha256": "afdd4b00e9b1016e252a6a66824e21977edc2663f5aaa2e77d09651246119386"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/model.ts",
+      "sha256": "b5a3eb062f17f2471a080e653cc4beb1d9a835b4c71d4bc486a73448dc72a987"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/pipeline.ts",
+      "sha256": "b238681f657ac64c5e1c2e7b4cc453a5ebd887184d1b5d3d9f12c961f2934c44"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/provider-usage.ts",
+      "sha256": "d5a5e2c815edc8150b9d8ac8cc234d3ae380827a73587bc46651a4869b340a91"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/repository.ts",
+      "sha256": "2247d37c795325276cedf3574169dc9dc0bd402d57a37954df4087e669819a39"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/response-usage.ts",
+      "sha256": "7f44d5e38b1e925113bdc13540be70fa47bf040e36ed43f316e4452965caaa50"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/router.ts",
+      "sha256": "b58046a24848bab07da53080f0fb15b6cade10425ab59218f0a5501454813775"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "sha256": "039b509d890f111d6a35ece2775d2e0de55661ff0d592b58d25a64e58ea731e7"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/service.ts",
+      "sha256": "7df07635321b60a3e93e577f624cb16e1f8cfe9d57584091747817b2647cf751"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/streaming.ts",
+      "sha256": "517f4eceb9e2c0b270454a26e219f23a303889da0d0dbb023484072c7c82be1a"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/style-index.ts",
+      "sha256": "71db683f1930fa31d4a83eeb44f605e5f11cabed81f838fa7ebbbcbb09a19c45"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/approved-generator.ts",
+      "sha256": "80c12cbaa2b10d9c25a03de2621d63e59f44a67a38c4964a0279b3020ec67b66"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/development-preview.ts",
+      "sha256": "5b9405d085212df19f218d355cb43eb6f08546e793ee16d83ded71999c20ed5c"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/development-server.ts",
+      "sha256": "fbe4f8a4adcc38b9f7c758bae3ad9b435a95e5193ca1e298f3dd99ec3d8cb77c"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/generation.ts",
+      "sha256": "e9ad9708cd9f20e473859c31b553079925fcd7ea9572e10fcabcad633d9df9bd"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "sha256": "9d5f212232e1d622c2a5aac7d59db1421779c45c4796e66590bffe3b50058e7c"
+    },
+    {
+      "path": "apps/backend/src/modules/ingestion/worker.ts",
+      "sha256": "b76e7babe21a7a73d627d9fecbc8899b0ddff395146025f462e3f4ca29755879"
+    },
+    {
+      "path": "apps/web/app/auth/development/page.tsx",
+      "sha256": "ad62b1840e72d7dad1a7e9359fb83f9df6e6bc0f9ef5b923e4dc045694c631ed"
+    },
+    {
+      "path": "apps/web/features/creator-ai/CreatorAI.tsx",
+      "sha256": "44c4ecbed95499057784c3b33502e56ce21f068f7234d34e8ff1fa55902f5497"
+    },
+    {
+      "path": "apps/web/lib/session.ts",
+      "sha256": "6a761e979b4463ae12b821131deca3d4da851210a5cc2ead74a3c45948ffbc91"
+    },
+    {
+      "path": "packages/api/src/agent/contracts.ts",
+      "sha256": "7aa1cfdacba4273f22b74c552dfcbaea776f6e927cd00ba08317f284e3efa0c7"
+    }
+  ]
+}

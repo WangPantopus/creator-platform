@@ -13,7 +13,12 @@ final class FoundationFlowTests: XCTestCase {
             XCTAssertTrue(button.isHittable)
             capture(app, name: "Welcome-\(theme)")
             button.tap()
-            XCTAssertTrue(app.staticTexts["Pantopus sign-in is not connected in this local build."].waitForExistence(timeout: 5))
+            // FanAppShell presents the failure through its combined Notice,
+            // rather than Welcome's standalone-provider error identifier.
+            let unavailable = app.staticTexts[
+                "Account status, Pantopus sign-in is not connected in this local build."
+            ]
+            XCTAssertTrue(unavailable.waitForExistence(timeout: 5))
             XCTAssertTrue(button.isEnabled)
             XCTAssertFalse(app.textFields["handle"].exists)
             capture(app, name: "SignIn-unconfigured-\(theme)")

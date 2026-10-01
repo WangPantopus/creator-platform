@@ -1,7 +1,14 @@
 import { randomUUID } from "node:crypto";
 import type { Pool } from "pg";
+import { z } from "zod";
 import type { PrivacyHook, EffectHook, PrivacyDomain } from "./contracts.js";
 import { TrustStore } from "./store.js";
+import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  consumePrivacyExport,
+  type PrivacyArtifactStore,
+} from "./privacy-export.js";
+import { DomainError } from "../../core/errors.js";
 
 type Task = {
   job_id: string;
@@ -38,6 +45,7 @@ export class TrustWorker {
     readonly privacyHooks: PrivacyHook[],
     readonly effectHooks: EffectHook[],
     readonly observe: (signal: string, value: number) => void = () => {},
+    readonly artifacts?: PrivacyArtifactStore,
   ) {}
   async start() {
     await new TrustStore(this.pool).assertRole(true);
@@ -62,6 +70,7 @@ export class TrustWorker {
     this.stopped = true;
     if (this.timer) clearTimeout(this.timer);
     await this.running;
+    await this.artifacts?.close?.();
   }
   async tick() {
     // Start every claimed lease immediately. Slow purges must not expire a later
@@ -144,9 +153,10 @@ export class TrustWorker {
       return;
     }
     try {
-      // Hook must honor a 45s deadline or split into bounded durable subjobs; a timeout is ambiguous, safely retried with the same key.
-      const result = await deadline(
-        hook.run({
+      // Owner work, stream exhaustion, durable seal and verification share one
+      // deadline. An aborted predecessor cannot finish through the new lease.
+      const result = await deadline(async (signal) => {
+        const job = {
           jobId: task.job_id,
           kind: task.kind,
           accountId: task.account_id,
@@ -154,16 +164,43 @@ export class TrustWorker {
           creatorId: task.creator_id,
           threadId: task.thread_id,
           idempotencyKey: `${task.job_id}:${task.domain}`,
-        }),
-        45_000,
-      );
+          leaseToken: task.lease_token,
+          signal,
+        };
+        const result = await hook.run(job);
+        signal.throwIfAborted();
+        receipt(result.receipt);
+        if (result.stream && result.data !== undefined)
+          throw new Error("export_stream_invalid");
+        const data = result.stream
+          ? await consumePrivacyExport({
+              job,
+              domain: task.domain,
+              stream: result.stream,
+              store: this.artifacts,
+              signal,
+              verifyLease: () => privacyTaskAuthority(this.pool)(job),
+            })
+          : result.data;
+        signal.throwIfAborted();
+        return {
+          receipt: result.stream
+            ? { ...result.receipt, artifact: data }
+            : result.receipt,
+          data,
+          retained: result.retained,
+        };
+      }, 45_000);
+      receipt(result.receipt);
+      if (task.kind === "export" && result.data === undefined)
+        throw new Error("export_artifact_missing");
       const size = Buffer.byteLength(JSON.stringify(result));
       if (size > 4 * 1024 * 1024) throw new Error("artifact_too_large");
       const client = await this.pool.connect();
       try {
         await client.query("BEGIN");
         const fenced = await client.query(
-          "SELECT 1 FROM creator_trust.privacy_task WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running' FOR UPDATE",
+          "SELECT 1 FROM creator_trust.privacy_task WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running' AND lease_until>clock_timestamp() FOR UPDATE",
           [task.job_id, task.domain, task.lease_token],
         );
         if (fenced.rowCount) {
@@ -199,10 +236,25 @@ export class TrustWorker {
         client.release();
       }
     } catch (error) {
+      const message =
+        error instanceof DomainError
+          ? error.code
+          : error instanceof Error
+            ? error.message
+            : "";
       const code =
         error instanceof Error &&
-        ["hook_timeout", "artifact_too_large"].includes(error.message)
-          ? error.message
+        [
+          "hook_timeout",
+          "artifact_too_large",
+          "receipt_invalid",
+          "export_artifact_missing",
+          "export_stream_invalid",
+          "export_stream_incomplete",
+          "export_artifact_invalid",
+          "privacy_artifact_unconfigured",
+        ].includes(message)
+          ? message
           : "domain_hook_error";
       await this.pool.query(
         "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3",
@@ -210,12 +262,17 @@ export class TrustWorker {
           task.job_id,
           task.domain,
           task.lease_token,
-          task.attempts >= 8 ? "dead_letter" : "retry",
+          code === "privacy_artifact_unconfigured"
+            ? "blocked"
+            : task.attempts >= 8
+              ? "dead_letter"
+              : "retry",
           code,
           Math.min(3600, 2 ** task.attempts * 5),
         ],
       );
-      this.observe("privacy_retry", 1);
+      if (code !== "privacy_artifact_unconfigured")
+        this.observe("privacy_retry", 1);
     }
   }
   private async claimEffects(): Promise<Effect[]> {
@@ -240,20 +297,23 @@ export class TrustWorker {
     }
     try {
       const result = await deadline(
-        hook.run({
-          effectId: effect.id,
-          caseId: effect.case_id,
-          actorAccountId: effect.actor_account_id,
-          ...effect.input,
-          idempotencyKey: effect.id,
-        }),
+        () =>
+          hook.run({
+            effectId: effect.id,
+            caseId: effect.case_id,
+            actorAccountId: effect.actor_account_id,
+            ...effect.input,
+            idempotencyKey: effect.id,
+            leaseToken: effect.lease_token,
+          }),
         45_000,
       );
+      receipt(result.receipt);
       const client = await this.pool.connect();
       try {
         await client.query("BEGIN");
         const done = await client.query(
-          "UPDATE creator_trust.effect SET state='complete',receipt=$3,lease_until=NULL,error_code=NULL WHERE id=$1 AND lease_token=$2 AND state='running' RETURNING case_id",
+          "UPDATE creator_trust.effect SET state='complete',receipt=$3,lease_until=NULL,error_code=NULL WHERE id=$1 AND lease_token=$2 AND state='running' AND lease_until>clock_timestamp() RETURNING case_id",
           [effect.id, effect.lease_token, JSON.stringify(result.receipt)],
         );
         if (done.rowCount) {
@@ -290,19 +350,26 @@ export class TrustWorker {
       } finally {
         client.release();
       }
-    } catch {
+    } catch (error) {
+      const code =
+        error instanceof Error &&
+        ["hook_timeout", "receipt_invalid"].includes(error.message)
+          ? error.message
+          : "effect_hook_error";
       await this.pool.query(
-        "UPDATE creator_trust.effect SET state=$3,error_code='effect_hook_error',lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
+        "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
         [
           effect.id,
           effect.lease_token,
           effect.attempts >= 8 ? "dead_letter" : "retry",
           Math.min(3600, 2 ** effect.attempts * 5),
+          code,
         ],
       );
     }
   }
   async sweep() {
+    await this.artifacts?.sweep?.();
     await this.pool.query(
       "DELETE FROM creator_trust.case_evidence WHERE id IN (SELECT id FROM creator_trust.case_evidence WHERE expires_at<=now() ORDER BY expires_at LIMIT 100)",
     );
@@ -315,17 +382,39 @@ export class TrustWorker {
     );
   }
 }
-async function deadline<T>(promise: Promise<T>, ms: number) {
+/** A missing, empty or explicitly incomplete owner acknowledgment cannot complete a task. */
+function receipt(value: unknown) {
+  const parsed = z.record(z.string(), z.unknown()).safeParse(value);
+  if (
+    !parsed.success ||
+    Object.keys(parsed.data).length === 0 ||
+    parsed.data.complete === false ||
+    parsed.data.done === false ||
+    Buffer.byteLength(JSON.stringify(parsed.data)) > 64 * 1024
+  )
+    throw new Error("receipt_invalid");
+}
+async function deadline<T>(
+  work: (signal: AbortSignal) => Promise<T>,
+  ms: number,
+) {
   let timer: ReturnType<typeof setTimeout> | undefined;
+  const controller = new AbortController();
+  let completed = false;
   try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_resolve, reject) => {
-        timer = setTimeout(() => reject(new Error("hook_timeout")), ms);
-        timer.unref();
-      }),
-    ]);
+    const timeout = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        const error = new Error("hook_timeout");
+        controller.abort(error);
+        reject(error);
+      }, ms);
+      timer.unref();
+    });
+    const result = await Promise.race([work(controller.signal), timeout]);
+    completed = true;
+    return result;
   } finally {
     if (timer) clearTimeout(timer);
+    if (!completed) controller.abort();
   }
 }

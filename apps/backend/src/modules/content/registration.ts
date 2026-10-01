@@ -26,6 +26,7 @@ export function contentSignedSubjects(
         await service.authorizeMedia(client, actor, creatorId);
       await service.role(client, actor, creatorId);
       if (content.data.kind === "content_reaction") {
+        await service.assertReplyReviewInstalled(client);
         const input = z
           .object({
             replyVersion: z.int().positive(),

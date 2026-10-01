@@ -12,9 +12,14 @@ import type {
   ContentView,
   PrivateNoteReply,
 } from "../../../../packages/api/src/content";
-import { studioRequest, StudioFailure } from "../studio/api";
+import {
+  configureStudioRequests,
+  studioRequest,
+  StudioFailure,
+} from "../studio/api";
 import { ContentAttachments } from "./MediaAttachments";
 import "../studio/studio.css";
+import { useIdentityRequest } from "../identity/session-boundary";
 type Thanks = {
   version: number;
   text: string;
@@ -30,6 +35,11 @@ export function FanContent({
   creatorId: string;
   contentId: string;
 }) {
+  const { session, signal } = useIdentityRequest();
+  useEffect(
+    () => configureStudioRequests({ accountId: session.accountId, signal }),
+    [session.accountId, signal],
+  );
   const [content, setContent] = useState<ContentView | null>(null),
     [current, setCurrent] = useState(false),
     [replies, setReplies] = useState<PrivateNoteReply[]>([]),

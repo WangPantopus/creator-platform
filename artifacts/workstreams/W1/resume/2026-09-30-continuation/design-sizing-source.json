@@ -1,0 +1,3731 @@
+{
+  "sourceParent": "e81d3e9b8293d022f50e6a71fa504ca652c4a8ec",
+  "recordedAt": "2026-10-01T01:17:28.080449+00:00",
+  "environment": {
+    "browser": "Codex in-app browser",
+    "implementation": "localhost:3001",
+    "independentOriginalReference": "127.0.0.1:3191",
+    "checksPort": 3091,
+    "DPR": 1,
+    "identity": "retained local synthetic pending creator"
+  },
+  "before": {
+    "LightDifferentPixels": 6240,
+    "NightDifferentPixels": 6232,
+    "maximumChannelDelta": 216,
+    "unchangedPixelLimit": 64,
+    "unchangedChannelLimit": 2
+  },
+  "checks": {
+    "components": "2 passed (2.7m), all53 both themes",
+    "fullWeb": "13 passed (4.3m),64screens/53components both themes",
+    "productionWeb": "passed",
+    "lintFormat": "passed",
+    "canonicalFolioPreviewWeb": "passed; other consumer source unchanged"
+  },
+  "components": [
+    {
+      "name": "AuditBanner",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "AuthorLabel",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Avatar",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Button",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "CallChip",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "CapacityHeader",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "CitationChip",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Composer",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ContextCard",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Correction",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Countdown",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Dialog",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "DigestItem",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "EmailFrame",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "EmptyState",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "EtaLine",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "IdentityStrip",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "IncludeList",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "InsteadMenu",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "LabelPreview",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Mark",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "MemoryChip",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Message",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ModeList",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Note",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Notice",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "NotificationRow",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "QueueCard",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ReactionChip",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Receipt",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "RequestStatus",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ReservedLabel",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Seal",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Segmented",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ShareCard",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Sheet",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Sidebar",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "SignedMarker",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "SigningSheet",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Skeleton",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "SourceRow",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "SpendLimit",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "StepIn",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "StudioTabBar",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "SystemLine",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "TabBar",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "TermsBlock",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "TestConsole",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "ThreadHeader",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "Toast",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "VersionList",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "VoiceNote",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    },
+    {
+      "name": "AccessLines",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "AuditBanner",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "AuthorLabel",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Avatar",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Button",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "CallChip",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "CapacityHeader",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "CitationChip",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Composer",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ContextCard",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Correction",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Countdown",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Dialog",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "DigestItem",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "EmailFrame",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "EmptyState",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "EtaLine",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "IdentityStrip",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "IncludeList",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "InsteadMenu",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "LabelPreview",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Mark",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "MemoryChip",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Message",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ModeList",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Note",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Notice",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "NotificationRow",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "QueueCard",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ReactionChip",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Receipt",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "RequestStatus",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ReservedLabel",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Seal",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Segmented",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ShareCard",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Sheet",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Sidebar",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "SignedMarker",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "SigningSheet",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Skeleton",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "SourceRow",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "SpendLimit",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "StepIn",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "StudioTabBar",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "SystemLine",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "TabBar",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "TermsBlock",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "TestConsole",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "ThreadHeader",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "Toast",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "VersionList",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "VoiceNote",
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "night",
+        "width": 920
+      }
+    },
+    {
+      "name": "AccessLines",
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1800,
+        "theme": "light",
+        "width": 920
+      }
+    }
+  ],
+  "assignedArtboards": [
+    {
+      "group": "phase4a-fan-core",
+      "name": "Welcome",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: Qelvora\n  - heading \"Her AI answers you now. She answers in person when you ask.\" [level=1]\n  - paragraph: \"Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.\"\n  - generic: You came from Maya's page\n  - generic: Maya \u00b7 Ceramics \u00b7 Kiln Club\n  - button \"Remove this post from your first message\":\n  - button \"Continue with Pantopus\"\n  - paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",
+      "referenceAX": "- generic: Qelvora\n- heading \"Her AI answers you now. She answers in person when you ask.\" [level=1]\n- paragraph: \"Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.\"\n- generic: You came from Maya's page\n- generic: Maya \u00b7 Ceramics \u00b7 Kiln Club\n- button \"Remove this post from your first message\":\n- button \"Continue with Pantopus\"\n- paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step."
+    },
+    {
+      "group": "phase4a-fan-core",
+      "name": "Welcome",
+      "width": 390,
+      "height": 844,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: Qelvora\n  - heading \"Her AI answers you now. She answers in person when you ask.\" [level=1]\n  - paragraph: \"Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.\"\n  - generic: You came from Maya's page\n  - generic: Maya \u00b7 Ceramics \u00b7 Kiln Club\n  - button \"Remove this post from your first message\":\n  - button \"Continue with Pantopus\"\n  - paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",
+      "referenceAX": "- generic: Qelvora\n- heading \"Her AI answers you now. She answers in person when you ask.\" [level=1]\n- paragraph: \"Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.\"\n- generic: You came from Maya's page\n- generic: Maya \u00b7 Ceramics \u00b7 Kiln Club\n- button \"Remove this post from your first message\":\n- button \"Continue with Pantopus\"\n- paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step."
+    },
+    {
+      "group": "phase4a-fan-core",
+      "name": "Handle",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - link \"Back\":\n    - /url: Welcome.dc.html\n  - generic: SIGNED IN WITH PANTOPUS\n  - heading \"How creators will know you\" [level=1]\n  - generic: Handle\n  - textbox \"Handle\": \"@kilnfire\"\n  - generic: Creators and their teams see your handle, never your name or city unless you share them in a request.\n  - generic: A LINE ABOUT YOU \u00b7 OPTIONAL\n  - generic: A line about you\n  - textbox \"A line about you\": Hobby potter, garage studio, cone 6 electric.\n  - generic: You choose, per creator, whether their AI may use this.\n  - link \"Continue\":\n    - /url: Consent.dc.html",
+      "referenceAX": "- link \"Back\":\n  - /url: Welcome.dc.html\n- generic: SIGNED IN WITH PANTOPUS\n- heading \"How creators will know you\" [level=1]\n- generic: Handle\n- textbox \"Handle\": \"@kilnfire\"\n- generic: Creators and their teams see your handle, never your name or city unless you share them in a request.\n- generic: A LINE ABOUT YOU \u00b7 OPTIONAL\n- generic: A line about you\n- textbox \"A line about you\": Hobby potter, garage studio, cone 6 electric.\n- generic: You choose, per creator, whether their AI may use this.\n- link \"Continue\":\n  - /url: Consent.dc.html"
+    },
+    {
+      "group": "phase4a-fan-core",
+      "name": "Handle",
+      "width": 390,
+      "height": 844,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - link \"Back\":\n    - /url: Welcome.dc.html\n  - generic: SIGNED IN WITH PANTOPUS\n  - heading \"How creators will know you\" [level=1]\n  - generic: Handle\n  - textbox \"Handle\": \"@kilnfire\"\n  - generic: Creators and their teams see your handle, never your name or city unless you share them in a request.\n  - generic: A LINE ABOUT YOU \u00b7 OPTIONAL\n  - generic: A line about you\n  - textbox \"A line about you\": Hobby potter, garage studio, cone 6 electric.\n  - generic: You choose, per creator, whether their AI may use this.\n  - link \"Continue\":\n    - /url: Consent.dc.html",
+      "referenceAX": "- link \"Back\":\n  - /url: Welcome.dc.html\n- generic: SIGNED IN WITH PANTOPUS\n- heading \"How creators will know you\" [level=1]\n- generic: Handle\n- textbox \"Handle\": \"@kilnfire\"\n- generic: Creators and their teams see your handle, never your name or city unless you share them in a request.\n- generic: A LINE ABOUT YOU \u00b7 OPTIONAL\n- generic: A line about you\n- textbox \"A line about you\": Hobby potter, garage studio, cone 6 electric.\n- generic: You choose, per creator, whether their AI may use this.\n- link \"Continue\":\n  - /url: Consent.dc.html"
+    },
+    {
+      "group": "phase4b-fan-account",
+      "name": "Verify",
+      "width": 390,
+      "height": 1000,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 1000,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1000,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: QELVORA.APP/V/8KD2Q4\n  - heading \"Signed by Maya\" [level=1]\n  - paragraph: This reply was written by Maya herself and signed with her passkey on Oct 5, 18:40. It has not been changed since.\n  - article \"Maya replied to @kilnfire\":\n    - generic: M\n    - generic: Maya\n    - paragraph: Single dip, count to three, let it drip off, then sponge the top.\n    - generic: Maya replied to @kilnfire\n    - generic \"Signed by Maya at OCT 5\":\n      - generic: Signed by Maya\n      - generic: \u00b7 OCT 5\n    - generic: VERIFY AT QELVORA.APP/V/8KD2Q4\n  - generic: Author\n  - generic: Maya \u00b7 verified creator\n  - generic: Written by\n  - generic: Maya, not her AI\n  - generic: Signed\n  - generic: OCT 5 \u00b7 18:40\n  - generic: Shared by\n  - generic: \"@kilnfire\"\n  - paragraph: Anyone can open this page. It shows the words, who wrote them and when, and nothing else from the conversation.",
+      "referenceAX": "- generic: QELVORA.APP/V/8KD2Q4\n- heading \"Signed by Maya\" [level=1]\n- paragraph: This reply was written by Maya herself and signed with her passkey on Oct 5, 18:40. It has not been changed since.\n- article \"Maya replied to @kilnfire\":\n  - generic: M\n  - generic: Maya\n  - paragraph: Single dip, count to three, let it drip off, then sponge the top.\n  - generic: Maya replied to @kilnfire\n  - link \"Signed by Maya at OCT 5. Open the verification page\":\n    - /url: \"#\"\n    - generic: Signed by Maya\n    - generic: \u00b7 OCT 5\n  - generic: VERIFY AT QELVORA.APP/V/8KD2Q4\n- generic: Author\n- generic: Maya \u00b7 verified creator\n- generic: Written by\n- generic: Maya, not her AI\n- generic: Signed\n- generic: OCT 5 \u00b7 18:40\n- generic: Shared by\n- generic: \"@kilnfire\"\n- paragraph: Anyone can open this page. It shows the words, who wrote them and when, and nothing else from the conversation."
+    },
+    {
+      "group": "phase4b-fan-account",
+      "name": "Verify",
+      "width": 390,
+      "height": 1000,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 1000,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 1000,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: QELVORA.APP/V/8KD2Q4\n  - heading \"Signed by Maya\" [level=1]\n  - paragraph: This reply was written by Maya herself and signed with her passkey on Oct 5, 18:40. It has not been changed since.\n  - article \"Maya replied to @kilnfire\":\n    - generic: M\n    - generic: Maya\n    - paragraph: Single dip, count to three, let it drip off, then sponge the top.\n    - generic: Maya replied to @kilnfire\n    - generic \"Signed by Maya at OCT 5\":\n      - generic: Signed by Maya\n      - generic: \u00b7 OCT 5\n    - generic: VERIFY AT QELVORA.APP/V/8KD2Q4\n  - generic: Author\n  - generic: Maya \u00b7 verified creator\n  - generic: Written by\n  - generic: Maya, not her AI\n  - generic: Signed\n  - generic: OCT 5 \u00b7 18:40\n  - generic: Shared by\n  - generic: \"@kilnfire\"\n  - paragraph: Anyone can open this page. It shows the words, who wrote them and when, and nothing else from the conversation.",
+      "referenceAX": "- generic: QELVORA.APP/V/8KD2Q4\n- heading \"Signed by Maya\" [level=1]\n- paragraph: This reply was written by Maya herself and signed with her passkey on Oct 5, 18:40. It has not been changed since.\n- article \"Maya replied to @kilnfire\":\n  - generic: M\n  - generic: Maya\n  - paragraph: Single dip, count to three, let it drip off, then sponge the top.\n  - generic: Maya replied to @kilnfire\n  - link \"Signed by Maya at OCT 5. Open the verification page\":\n    - /url: \"#\"\n    - generic: Signed by Maya\n    - generic: \u00b7 OCT 5\n  - generic: VERIFY AT QELVORA.APP/V/8KD2Q4\n- generic: Author\n- generic: Maya \u00b7 verified creator\n- generic: Written by\n- generic: Maya, not her AI\n- generic: Signed\n- generic: OCT 5 \u00b7 18:40\n- generic: Shared by\n- generic: \"@kilnfire\"\n- paragraph: Anyone can open this page. It shows the words, who wrote them and when, and nothing else from the conversation."
+    },
+    {
+      "group": "phase4c-studio-phone",
+      "name": "Sign",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: M\n  - generic: Maya\n  - generic: \u00b7 DRAFT\n  - paragraph: Single dip, count to three, let it drip off, then sponge the top. Fire slow on the way down. Send me the next tile.\n  - generic \"Signed by Maya\":\n    - generic: Signed by Maya\n  - region \"Review and sign\":\n    - generic: Review and sign\n    - heading \"Accept and send\" [level=3]\n    - term: Request\n    - definition: REQ-0412 \u00b7 @kilnfire\n    - term: Answer as\n    - definition: Written by Maya\n    - term: Fan is charged\n    - definition: $25.00 now\n    - term: Delivered\n    - definition: Right after you sign\n    - generic: Face ID signs exactly this. Any change needs a new signature.\n    - button \"Sign with Face ID\":\n      - text: Sign with Face ID",
+      "referenceAX": "- generic: M\n- generic: Maya\n- generic: \u00b7 DRAFT\n- paragraph: Single dip, count to three, let it drip off, then sponge the top. Fire slow on the way down. Send me the next tile.\n- link \"Signed by Maya. Open the verification page\":\n  - /url: \"#\"\n  - generic: Signed by Maya\n- region \"Review and sign\":\n  - generic: Review and sign\n  - heading \"Accept and send\" [level=3]\n  - term: Request\n  - definition: REQ-0412 \u00b7 @kilnfire\n  - term: Answer as\n  - definition: Written by Maya\n  - term: Fan is charged\n  - definition: $25.00 now\n  - term: Delivered\n  - definition: Right after you sign\n  - generic: Face ID signs exactly this. Any change needs a new signature.\n  - button \"Sign with Face ID\":\n    - text: Sign with Face ID"
+    },
+    {
+      "group": "phase4c-studio-phone",
+      "name": "Sign",
+      "width": 390,
+      "height": 844,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: M\n  - generic: Maya\n  - generic: \u00b7 DRAFT\n  - paragraph: Single dip, count to three, let it drip off, then sponge the top. Fire slow on the way down. Send me the next tile.\n  - generic \"Signed by Maya\":\n    - generic: Signed by Maya\n  - region \"Review and sign\":\n    - generic: Review and sign\n    - heading \"Accept and send\" [level=3]\n    - term: Request\n    - definition: REQ-0412 \u00b7 @kilnfire\n    - term: Answer as\n    - definition: Written by Maya\n    - term: Fan is charged\n    - definition: $25.00 now\n    - term: Delivered\n    - definition: Right after you sign\n    - generic: Face ID signs exactly this. Any change needs a new signature.\n    - button \"Sign with Face ID\":\n      - text: Sign with Face ID",
+      "referenceAX": "- generic: M\n- generic: Maya\n- generic: \u00b7 DRAFT\n- paragraph: Single dip, count to three, let it drip off, then sponge the top. Fire slow on the way down. Send me the next tile.\n- link \"Signed by Maya. Open the verification page\":\n  - /url: \"#\"\n  - generic: Signed by Maya\n- region \"Review and sign\":\n  - generic: Review and sign\n  - heading \"Accept and send\" [level=3]\n  - term: Request\n  - definition: REQ-0412 \u00b7 @kilnfire\n  - term: Answer as\n  - definition: Written by Maya\n  - term: Fan is charged\n  - definition: $25.00 now\n  - term: Delivered\n  - definition: Right after you sign\n  - generic: Face ID signs exactly this. Any change needs a new signature.\n  - button \"Sign with Face ID\":\n    - text: Sign with Face ID"
+    },
+    {
+      "group": "phase4d-studio-desktop",
+      "name": "Main",
+      "width": 1280,
+      "height": 900,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 900,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 1280
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 900,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 1280
+      },
+      "implementationAX": "- main:\n  - generic: Qelvora Studio\n  - heading \"An AI that speaks for you only as far as you allow.\" [level=1]\n  - paragraph: It learns from what you've published, answers under its own label, and hands fans to you when they need you. Nothing goes live until you've read its tests.\n  - list:\n    - generic: \"1\"\n    - generic: Continue with Pantopus\n    - generic: \"2\"\n    - generic: Prove it\u2019s you\n    - generic: \"3\"\n    - generic: A passkey for signing\n    - generic: \"4\"\n    - generic: Your license to your AI\n    - generic: \"5\"\n    - generic: A 15-minute interview in your voice\n    - generic: \"6\"\n    - generic: Sources, style, rules, tests\n  - generic: STEP 2 OF 6 \u00b7 PROVE IT'S YOU\n  - heading \"Post this code from your Instagram\" [level=2]\n  - paragraph: Your Pantopus account proves you're a person. This proves you're the Maya your fans already follow. Post the code in a story or a caption; you can delete it once we've seen it.\n  - generic: QV-7K2M\n  - button \"Copy code\"\n  - generic: Your account\n  - textbox \"Your account\": instagram.com/[YOUR HANDLE]\n  - status:\n    - generic: We look once, then forget the code\n    - generic: We check that the post exists and comes from that account. We don't read your other posts or messages.\n  - button \"I've posted it \u00b7 check now\"\n  - button \"Use YouTube instead\"",
+      "referenceAX": "- generic: Qelvora Studio\n- heading \"An AI that speaks for you only as far as you allow.\" [level=1]\n- paragraph: It learns from what you've published, answers under its own label, and hands fans to you when they need you. Nothing goes live until you've read its tests.\n- list:\n  - generic: \"1\"\n  - generic: Continue with Pantopus\n  - generic: \"2\"\n  - generic: Prove it\u2019s you\n  - generic: \"3\"\n  - generic: A passkey for signing\n  - generic: \"4\"\n  - generic: Your license to your AI\n  - generic: \"5\"\n  - generic: A 15-minute interview in your voice\n  - generic: \"6\"\n  - generic: Sources, style, rules, tests\n- generic: STEP 2 OF 6 \u00b7 PROVE IT'S YOU\n- heading \"Post this code from your Instagram\" [level=2]\n- paragraph: Your Pantopus account proves you're a person. This proves you're the Maya your fans already follow. Post the code in a story or a caption; you can delete it once we've seen it.\n- generic: QV-7K2M\n- button \"Copy code\"\n- generic: Your account\n- textbox \"Your account\": instagram.com/[YOUR HANDLE]\n- status:\n  - generic: We look once, then forget the code\n  - generic: We check that the post exists and comes from that account. We don't read your other posts or messages.\n- button \"I've posted it \u00b7 check now\"\n- button \"Use YouTube instead\""
+    },
+    {
+      "group": "phase4d-studio-desktop",
+      "name": "Main",
+      "width": 1280,
+      "height": 900,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 900,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 1280
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 900,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 1280
+      },
+      "implementationAX": "- main:\n  - generic: Qelvora Studio\n  - heading \"An AI that speaks for you only as far as you allow.\" [level=1]\n  - paragraph: It learns from what you've published, answers under its own label, and hands fans to you when they need you. Nothing goes live until you've read its tests.\n  - list:\n    - generic: \"1\"\n    - generic: Continue with Pantopus\n    - generic: \"2\"\n    - generic: Prove it\u2019s you\n    - generic: \"3\"\n    - generic: A passkey for signing\n    - generic: \"4\"\n    - generic: Your license to your AI\n    - generic: \"5\"\n    - generic: A 15-minute interview in your voice\n    - generic: \"6\"\n    - generic: Sources, style, rules, tests\n  - generic: STEP 2 OF 6 \u00b7 PROVE IT'S YOU\n  - heading \"Post this code from your Instagram\" [level=2]\n  - paragraph: Your Pantopus account proves you're a person. This proves you're the Maya your fans already follow. Post the code in a story or a caption; you can delete it once we've seen it.\n  - generic: QV-7K2M\n  - button \"Copy code\"\n  - generic: Your account\n  - textbox \"Your account\": instagram.com/[YOUR HANDLE]\n  - status:\n    - generic: We look once, then forget the code\n    - generic: We check that the post exists and comes from that account. We don't read your other posts or messages.\n  - button \"I've posted it \u00b7 check now\"\n  - button \"Use YouTube instead\"",
+      "referenceAX": "- generic: Qelvora Studio\n- heading \"An AI that speaks for you only as far as you allow.\" [level=1]\n- paragraph: It learns from what you've published, answers under its own label, and hands fans to you when they need you. Nothing goes live until you've read its tests.\n- list:\n  - generic: \"1\"\n  - generic: Continue with Pantopus\n  - generic: \"2\"\n  - generic: Prove it\u2019s you\n  - generic: \"3\"\n  - generic: A passkey for signing\n  - generic: \"4\"\n  - generic: Your license to your AI\n  - generic: \"5\"\n  - generic: A 15-minute interview in your voice\n  - generic: \"6\"\n  - generic: Sources, style, rules, tests\n- generic: STEP 2 OF 6 \u00b7 PROVE IT'S YOU\n- heading \"Post this code from your Instagram\" [level=2]\n- paragraph: Your Pantopus account proves you're a person. This proves you're the Maya your fans already follow. Post the code in a story or a caption; you can delete it once we've seen it.\n- generic: QV-7K2M\n- button \"Copy code\"\n- generic: Your account\n- textbox \"Your account\": instagram.com/[YOUR HANDLE]\n- status:\n  - generic: We look once, then forget the code\n  - generic: We check that the post exists and comes from that account. We don't read your other posts or messages.\n- button \"I've posted it \u00b7 check now\"\n- button \"Use YouTube instead\""
+    },
+    {
+      "group": "phase5-prototypes",
+      "name": "Comprehension",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "light",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: T-21 \u00b7 CARD 1 OF 4 \u00b7 0 RIGHT\n  - button \"Restart\"\n  - heading \"Who wrote this message?\" [level=1]\n  - paragraph: Answer within a second. The pass bar is the one set for T-21 in the source docs.\n  - generic: Maya's AI\n  - generic: Crawling usually means the coat is too thick.\n  - button \"Maya's AI\"\n  - button \"AI, approved by Maya\"\n  - button \"Maya herself\"\n  - button \"Maya's team\"",
+      "referenceAX": "- generic: T-21 \u00b7 CARD 1 OF 4 \u00b7 0 RIGHT\n- button \"Restart\"\n- heading \"Who wrote this message?\" [level=1]\n- paragraph: Answer within a second. The pass bar is the one set for T-21 in the source docs.\n- generic: Maya's AI\n- generic: Crawling usually means the coat is too thick.\n- button \"Maya's AI\"\n- button \"AI, approved by Maya\"\n- button \"Maya herself\"\n- button \"Maya's team\""
+    },
+    {
+      "group": "phase5-prototypes",
+      "name": "Comprehension",
+      "width": 390,
+      "height": 844,
+      "theme": "night",
+      "implementation": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "reference": {
+        "dpr": 1,
+        "height": 844,
+        "scrollX": 0,
+        "scrollY": 0,
+        "theme": "night",
+        "width": 390
+      },
+      "implementationAX": "- main:\n  - generic: T-21 \u00b7 CARD 1 OF 4 \u00b7 0 RIGHT\n  - button \"Restart\"\n  - heading \"Who wrote this message?\" [level=1]\n  - paragraph: Answer within a second. The pass bar is the one set for T-21 in the source docs.\n  - generic: Maya's AI\n  - generic: Crawling usually means the coat is too thick.\n  - button \"Maya's AI\"\n  - button \"AI, approved by Maya\"\n  - button \"Maya herself\"\n  - button \"Maya's team\"",
+      "referenceAX": "- generic: T-21 \u00b7 CARD 1 OF 4 \u00b7 0 RIGHT\n- button \"Restart\"\n- heading \"Who wrote this message?\" [level=1]\n- paragraph: Answer within a second. The pass bar is the one set for T-21 in the source docs.\n- generic: Maya's AI\n- generic: Crawling usually means the coat is too thick.\n- button \"Maya's AI\"\n- button \"AI, approved by Maya\"\n- button \"Maya herself\"\n- button \"Maya's team\""
+    }
+  ],
+  "actualPhone": {
+    "width": 390,
+    "height": 844,
+    "DPR": 1,
+    "themes": ["light", "night"],
+    "documentWidth": 390,
+    "keyboard": "Your account Tab -> Create proof code; visible focus ring",
+    "durableState": "Pending setup retained; no reset/approval/signature"
+  },
+  "limits": [
+    "Source previews, not all real owner workflows",
+    "200% text/reduced motion/physical safe areas/VoiceOver/TalkBack/native input unverified",
+    "Production identity/RP/provider/participant unavailable",
+    "Initial mismatched tab viewport excluded; all six boards rerun with measured matching dimensions"
+  ],
+  "intentionalAXDifferences": [
+    "Approval before words",
+    "Recording status/non-live timer",
+    "Signed marker without real act has no target"
+  ],
+  "sourceSha256": {
+    "apps/web/app/layout.tsx": "d53f6458eea58d485aa71a1349d4f00362704384ad172c0ede757a0773b6bb83",
+    "apps/web/app/globals.css": "c24738bd0efc746defcf52a125291b55f4f6c29c7cb798af9edc7f9d89adb224",
+    "apps/web/features/identity/welcome.tsx": "ccc16bd146613ac3b49d1c820f9947234ca4455056bdbd8e0e198bdd82cd0bbd",
+    "apps/web/features/identity/setup.tsx": "9017b243c1ac9d1f5347e5c9aa99ecf8bc08b64bc093e9726a008645898429b2",
+    "scripts/visual-reference.mjs": "d84043da84dd81dd0348af89e060d45ca9be7bb7d4a385edf02571a5ef8f715d",
+    "tests/visual/catalog.spec.ts": "437c5eb660ca6a209848cb6b839524dfae2ba44a7406205d54e2ba664fe4f838",
+    "tests/visual/foundation.spec.ts": "c7285a9a57a622a6c5a1cf5c8c7488f5fe4ff9bdad12ad47cebc1180b9e3b5ee",
+    "tests/visual/auth-contract.spec.ts": "abb4c89a12dd230a148cf5bf081ed570cf610c35c6030f595cd7fc2c2a19d165"
+  },
+  "originalReferenceSha256": {
+    "design/design-system/project/components/AccessLines/preview.html": "d534856afb23b15a557cafe758f5575ee20c6c28a8d9cf115cabede61e71d19d",
+    "design/design-system/project/components/AuditBanner/preview.html": "32e439d9d6f86d60ccca3324060f4b515a9bb1207ac6dc2571cae2757a701be5",
+    "design/design-system/project/components/AuthorLabel/preview.html": "94ac8943edb1c05904351735d5a6bbceddb6419de820d8f2a18f3a0b6fffa38f",
+    "design/design-system/project/components/Avatar/preview.html": "9e44c37c7a4cb9630aca3836933f138abd0fa5885b1f43c3cbb43382015e6b01",
+    "design/design-system/project/components/Button/preview.html": "c3838d21387c94fd2c6e9a2d9fc33104bb94fe628f91c0dd2e70d061e6cd4ad9",
+    "design/design-system/project/components/CallChip/preview.html": "17c2f16eb26c6c1c4c35eb4c05a00d1f3566cddc0e7206eff3a467d3a697e694",
+    "design/design-system/project/components/CapacityHeader/preview.html": "9c4411b8f599bc1710239c72582cd82f2f0bc79d4ad860669148d23a5272a4df",
+    "design/design-system/project/components/CitationChip/preview.html": "975500500d340d8872caed80513a0f4e8a2ae6c6522da1835eed9355d8989a06",
+    "design/design-system/project/components/Composer/preview.html": "3324d9b45f2d4010637b9185ab3814b2e80199f3e61612601136f2cf91b501e9",
+    "design/design-system/project/components/ContextCard/preview.html": "fa7dc6e4bb4aabc8b251cb01ef1f12382f790f0ff8be0c949a74d91662a4947b",
+    "design/design-system/project/components/Correction/preview.html": "3110ed9083a0a6cf9df6712439ae7267416cba6e9e401142c760f6e3c921d510",
+    "design/design-system/project/components/Countdown/preview.html": "7becfbffc583390aa876a6f4c48822e46df557e7e337512da09a1e81de81042b",
+    "design/design-system/project/components/Cover/preview.html": "752a1e9cf9f374596cafe9020be39bc3d2e2bf8819ec3e5e54ef4fb0ff01b893",
+    "design/design-system/project/components/Dialog/preview.html": "4762c5dba91db5fe2819e573af4cb1e246a3ece722c22107d07bce4e291bc8cb",
+    "design/design-system/project/components/DigestItem/preview.html": "47c35e3080a4557d42d1e2c2f8cb40f1d4658f838610fa74c0a58160d1add384",
+    "design/design-system/project/components/EmailFrame/preview.html": "4dd558837f9790686be93f99c89b3fa5cf1bd09d6cda2732b80584c83ff54301",
+    "design/design-system/project/components/EmptyState/preview.html": "910ee26c3473d82572b7c9c572efe80d830f353d1d6b87bbf40d863aa5a01bb5",
+    "design/design-system/project/components/EtaLine/preview.html": "069490126b75145f032898ce510dcd1ac400dc4c21e18260146deccd215c35eb",
+    "design/design-system/project/components/IdentityStrip/preview.html": "b72cc36fec93f9832e3452d79edcc1116356b024264cc8f7c01a37c9b8d1bf56",
+    "design/design-system/project/components/IncludeList/preview.html": "ea609688334bd30a6771f504abe16ff5c0823034fd055df087acdc39c81a3e3b",
+    "design/design-system/project/components/InsteadMenu/preview.html": "8f6e458baebc9ba5df2f55c3f0451eedfb912211356e29492f4c3a2bcd9b988d",
+    "design/design-system/project/components/LabelPreview/preview.html": "dc819d9ac71d76f9ade9b3a8faf45abf53baf43040f1a20b0ca010495282616a",
+    "design/design-system/project/components/Mark/preview.html": "e6c075a56b88879e82703ec2b7b49f5b42856e3ada176d6f2ffd92b010786d49",
+    "design/design-system/project/components/MemoryChip/preview.html": "079620411ef435268efbb9ec84efb73e856a27a1ecd801ddadf9660f1ee4c961",
+    "design/design-system/project/components/Message/preview.html": "1d844fd5a583e53415fcb2466e832b1691ea845e25b0b0f03aeb938c7da1293e",
+    "design/design-system/project/components/ModeList/preview.html": "56a063026597b4bc76b2d166702074e026b55ccf62decab4824dede45dcb2fc3",
+    "design/design-system/project/components/Note/preview.html": "4e8875da36f7ea8888dea4b6d7175e8b9407f5e49ba7d1c205f1fcfc2a66d990",
+    "design/design-system/project/components/Notice/preview.html": "169b3e508738985ea8d1173e9524bfd3fda1d422b7dd4c43d6f63a4e02ee3901",
+    "design/design-system/project/components/NotificationRow/preview.html": "bb9ec8fcd504ee09a1983fcf27cd7e9b5a16d56175c90dc0f208eb4112949f66",
+    "design/design-system/project/components/QueueCard/preview.html": "b3a5cdd5056e650b9fd96b56b78b0256c764184bf29d95eef03c76152d6f740e",
+    "design/design-system/project/components/ReactionChip/preview.html": "2fdebb9434c4c6ad363b112ff68afd7918101130babb7b96f67b7a8ef8f315ea",
+    "design/design-system/project/components/Receipt/preview.html": "611c5c85fefa52c7de436713d58b584145d4866043fe16897a7e9f3659578330",
+    "design/design-system/project/components/RequestStatus/preview.html": "69f5904ff6a314eb66ef13bee84c367996f52237055852eb8db5316124de0ae9",
+    "design/design-system/project/components/ReservedLabel/preview.html": "a5f1d51c8857c4e747e3b235827dd163d3781bbff4ce375eacd7c94a42f7e82c",
+    "design/design-system/project/components/Seal/preview.html": "6043efa2683de76de1d65029d3b510af300ded6827d375a49bf2aaeef51f0b9e",
+    "design/design-system/project/components/Segmented/preview.html": "03a5a3697084f351246110f978c4a2d766d20e9d89218f369a83684ac45a9d10",
+    "design/design-system/project/components/ShareCard/preview.html": "f9074226dc0ee660b17a41f2ed8b9a6e47973bfbc1581b12f6ad0f02d5eb1175",
+    "design/design-system/project/components/Sheet/preview.html": "ec21360320cef3dcc4813b83102ab3d9afc26854481f50a64354062395599d21",
+    "design/design-system/project/components/Sidebar/preview.html": "8ec757e7e207a307d85d86da056c726221d03c1e3b3479353349b84cdcd774d0",
+    "design/design-system/project/components/SignedMarker/preview.html": "e6ed9593f14f25aa332b31ebdd4ab73ac4336ae329bba1b9fd535cc04e7e6443",
+    "design/design-system/project/components/SigningSheet/preview.html": "4129e89a6e77a414d593735608faad290d6d85bae8ad8567faf63de94f4d3656",
+    "design/design-system/project/components/Skeleton/preview.html": "9b1c690141666539eba7ce0b4c2a2249ce6dc3845989584483db6a8c32b3078d",
+    "design/design-system/project/components/SourceRow/preview.html": "6fb08eb5b3c9f1a7d2f9c4e525fd5347d196aa5af1ef37b16b180d26aed44453",
+    "design/design-system/project/components/SpendLimit/preview.html": "fef894eeb694251a197345ece8e66baf2cd6c81c9e8d05bd6e830211b48ec3f9",
+    "design/design-system/project/components/StepIn/preview.html": "76915130ae948de5807c38ab83b7fea7e64fec0324c17fb313aa644e13b2e651",
+    "design/design-system/project/components/StudioTabBar/preview.html": "a9b4d4dd63f7a1fa7c071153fc157b9a14e18d24b61043a2ece2ce5aaba18963",
+    "design/design-system/project/components/SystemLine/preview.html": "1d8aedba25136ec02be514824074274797fd60db2bac413681304c3e4ddefbd4",
+    "design/design-system/project/components/TabBar/preview.html": "dafd8c5bf77953111b771cb3a8c8b8a3ccafac02c85fa46deacfaf902e5849c1",
+    "design/design-system/project/components/TermsBlock/preview.html": "01ba3f21d5f617be8829483ffcf67061bef9116a83b80d314b92ab879e1915ff",
+    "design/design-system/project/components/TestConsole/preview.html": "4475ab55a2835c8323f86a7abcdab6dd0abbb8d3f45932fab917e34fe8e312f4",
+    "design/design-system/project/components/ThreadHeader/preview.html": "da15a5b51bdec15ec75b11fc50ea2ae131289418a443d00e192c5bf438254bb8",
+    "design/design-system/project/components/Toast/preview.html": "7aec5de1212a9eb6ced8ee7732897a1e612eacdb03d4cf3c8fa27d1a714f4dd4",
+    "design/design-system/project/components/VersionList/preview.html": "44d69707a1a039b611e2a0b990d15f72e11f9d363d04fa1fb9cb5e2b88eceeb5",
+    "design/design-system/project/components/VoiceNote/preview.html": "04bf3a5beb75cb791d6395c1a11d008b414e923588145d43d0f6e9461c2f8b65",
+    "design/design-system/project/components/bundle.css": "aa06fbfa9919477a6d5273cf812b33c665b708ab68f66e9b2153d7bb7d1e78fd",
+    "design/design-system/project/design-system.json": "1c674eb698b9c2844c4485ef7d44eb3727710af6099195f53a4f865cbcdcbf4f",
+    "design/design-system/project/tokens.json": "5c9a7bffd866d6e62b3376b6c9dc9da212608cb64e92d4bbc608742bff81f71d",
+    "design/handoff/tokens.css": "be955216c0cea78a139cefdd20e1d7990b91953dd45636e1df3f8f6220152aeb",
+    "design/handoff/tokens.json": "665bf1d28db57435503d39769402c0292a2bd675399e2873ff5e37fa20eac1fd",
+    "design/phase2-directions/AHome.dc.html": "b30fb9de09379ef5281fa7f173423abe311bd6d6768ab9d9a0b0ed559fe0b02c",
+    "design/phase2-directions/AKit.dc.html": "84813fecc5b5ec502a8dd39860fe3237f947d701af41733a92a863d8621c3362",
+    "design/phase2-directions/APacket.dc.html": "a1d002c22524118b8016f3f3f658402201fb6f2396c6fce8bc311b68a09896e9",
+    "design/phase2-directions/AStepIn.dc.html": "eb4388dfdae46c88a3586315f9839dfddb84b9127a246b75832ee48654273bb3",
+    "design/phase2-directions/BHome.dc.html": "861d5af8a3f40cf4033cd4697025428b0a3ebb8d38a64167adce8d3bb0c6d9b2",
+    "design/phase2-directions/BKit.dc.html": "a8c6f03374cca6db5babbd4dfda90eba90f757655f9114b25fa1e41b4784c3f3",
+    "design/phase2-directions/BPacket.dc.html": "be643af92d5222674102c0383fbfc72950466f8455604079f4de857e84c71834",
+    "design/phase2-directions/BStepIn.dc.html": "a8c5aafc20fbc00c78e7c55ac70aa942f10d6f82c4402a0a22ae29bda70bcca8",
+    "design/phase2-directions/BThread.dc.html": "5afb7dc118909305ff9886dee00aa8caa985aff584cdd1c8576dd3cda5e0c9a1",
+    "design/phase2-directions/CHome.dc.html": "fc3fe5a527ae45c24066fb78064ba15d4b09fd842dfd7c01375644ec6c7a7236",
+    "design/phase2-directions/CKit.dc.html": "b304326cbde23d1979c5d3c06ad871bed91bd4d73d4a05052904484c7e18e1a8",
+    "design/phase2-directions/CPacket.dc.html": "13b1edc8e8739839ca0b1e00e3477986be7871e5cbf0091c0400f3216dd9c191",
+    "design/phase2-directions/CStepIn.dc.html": "4def17160205b7f979967f2f3ca2d9a327ae9c6fdfd2fd3bda4ec4161752331e",
+    "design/phase2-directions/CThread.dc.html": "4afb6994b6ba455ca3d4954561016a1c4ecf0f9168ce32cd73d0a3194a719ec3",
+    "design/phase2-directions/DHome.dc.html": "274b9404b7a0e13855b43284231af2f7ed546dc1e44426564852d9999f812835",
+    "design/phase2-directions/DKit.dc.html": "862fa380923cae516c120737c312d5aeef33ce9bf8dbd8ebcd868a377988fd32",
+    "design/phase2-directions/DPacket.dc.html": "b51c8b3c27fd5825989ac54c043ca3e11d63afe42f14b65cc63d4148cef0caa0",
+    "design/phase2-directions/DStepIn.dc.html": "c4f08ed41c83cd77a0cc637f7ede30ab9ed9516cc5fdedd1b291892dcc7f5946",
+    "design/phase2-directions/DStepInDark.dc.html": "fa44bcd0f38b7db58da5fbbc79be5202b1b107266807e736cc11c663334cb04e",
+    "design/phase2-directions/DThread.dc.html": "3c8608d38b7c9e190cfb4ed46c371322564c96984e955231c454ef58a1977567",
+    "design/phase2-directions/Main.dc.html": "658f75ca35b86bb972363b8a8772f6b0d3d623d03a47c2417b2aec953bc4f7cd",
+    "design/phase2-directions/canvas.json": "85913c8af120fd2bc975239f209cba62395c077d3431556279d2d485ebcde06c",
+    "design/phase4a-fan-core/Checkout.dc.html": "ad5c300b7553bfe05a1b70b00c20336dcb2902464ccbf923bd8fb73aab200f1e",
+    "design/phase4a-fan-core/Consent.dc.html": "36e9817e54845c50b0213469d6bada1155c0a0b1edc86ca832b21e6238701428",
+    "design/phase4a-fan-core/Ended.dc.html": "d31b0851e8d67a62f7448bbc1bcc2967f650f322b9d6ba9cf2e4d3da7d36a533",
+    "design/phase4a-fan-core/Handle.dc.html": "5727dde3d46a191cf75e4a9f7281dc3e301703b22ef841af4eedd7b6665dccc8",
+    "design/phase4a-fan-core/Invite.dc.html": "b1ca9212560819ac48b66d1d1686e0f26254ea05cb8b8b7e66ce5cf305fe3ef8",
+    "design/phase4a-fan-core/Limit.dc.html": "8501156c235f65e2949f2a54356985367d9e076302efa2c76933c1616ff3191a",
+    "design/phase4a-fan-core/Main.dc.html": "65a20557ed785256823be393226e000a40c12c3221df65f3c2d1975905d5bd3b",
+    "design/phase4a-fan-core/NoteThread.dc.html": "fe88dd2279a5486e9dfec7d176f6e7d629e5a928885f0a1db07d4431d837f099",
+    "design/phase4a-fan-core/Notifications.dc.html": "0721af04c1cd4a5a24d10704888601ed9d0f6c778e859167f077d9bb4b5edcf8",
+    "design/phase4a-fan-core/Packet.dc.html": "70c9ec1ae5c04fa755745c8e45a4fd03fa29bd377fa60a58b42e9059b6880e26",
+    "design/phase4a-fan-core/Post.dc.html": "cff55adb33dcdb50f3bf3e29fcf897baea38e63291470cb10a4ac051ad5c3cd6",
+    "design/phase4a-fan-core/States.dc.html": "96e3fa0e4562ff86d97a40a8e97a1552581e2d650ef00505d23678ef1d10a58f",
+    "design/phase4a-fan-core/Status.dc.html": "7269abb4a1aa30d31e3f6e972497e0702f69d07a322f935c77d35b40ad106bbd",
+    "design/phase4a-fan-core/Thread.dc.html": "3c42f01287901cc692c39c52c22078759c13203b9b58066ad174d5dd831117b0",
+    "design/phase4a-fan-core/ThreadLive.dc.html": "5957dd77848b032530aa02c80e0e02d66b649b2f42ba1b1718c31f4e5e53d340",
+    "design/phase4a-fan-core/Welcome.dc.html": "cc47d7d32038f1f542c04d612053769ca17b85f899f6305f61b45310ea6d5517",
+    "design/phase4a-fan-core/canvas.json": "aa87b068fe85eb2cc09e2454d9cc1513ac278835de40013212ccbbf2c89879f9",
+    "design/phase4b-fan-account/Access.dc.html": "6bf8495385c20c5c9dbde09a106a80c72b8f7f8a17245dc4eebe744b914f049f",
+    "design/phase4b-fan-account/Discover.dc.html": "84f132f82b4a5723382b45fd592a7f3d65ac6223b51c30f5cd2919f622c69f60",
+    "design/phase4b-fan-account/Main.dc.html": "c91521a502a1552138179c5b5f6a2f2d47ec86e489040926869f5b3ea56111aa",
+    "design/phase4b-fan-account/Privacy.dc.html": "44f00c03661ec67e030889b3053fb92a0cdbbbbf63f35b20c16ed478732321d6",
+    "design/phase4b-fan-account/Requests.dc.html": "f7acd107591ee1388923b41e91246bed4a4777f72756c530ce6d9b686a7bb840",
+    "design/phase4b-fan-account/Spending.dc.html": "377908acb8b313fa0819a55489ac0627fb778510393358a0eb40367fc9e49884",
+    "design/phase4b-fan-account/Verify.dc.html": "97b25c165953c99e0ad6e1a8531f597eb34087d7693368f859838f60996f4a13",
+    "design/phase4b-fan-account/You.dc.html": "630d7149f4ad4b92cd391060d280023056e3e63117e06db189eae818704ee0e4",
+    "design/phase4b-fan-account/canvas.json": "000b58605ee2016f2382496d593a476320b84bfae23b827e2810b03637cd80fe",
+    "design/phase4c-studio-phone/Impact.dc.html": "79fd7fbfac89d9b92dcf89302dd3703e75d413c722f40ff9b3c3ba815830e9fa",
+    "design/phase4c-studio-phone/Main.dc.html": "58dd1b99240f242f37cb06eb18bd3a19d765823393fa53244559ea2815160230",
+    "design/phase4c-studio-phone/More.dc.html": "b05b70a396ed3a4c8a020603720bb37f20c61a251e05fcfb13bcb71eaf8a1117",
+    "design/phase4c-studio-phone/MyAI.dc.html": "387797f14df75a33fdaf7da200ed24c02aeafdb897089afc6d6d0e10aa05c23a",
+    "design/phase4c-studio-phone/NoteCompose.dc.html": "5516e0e77a118bdbc86586f6506e9fc81a31df6dd4c3a9786cad5306f588a4df",
+    "design/phase4c-studio-phone/PacketDetail.dc.html": "442b0de604dbf8599a3aaa3530731ba4efa360eb37c4e1b7de8226bc03be4ada",
+    "design/phase4c-studio-phone/Replies.dc.html": "e040352081e1015bbc3b091f5fa47685caa00810fbbebbbbd1ba505cf1d9627c",
+    "design/phase4c-studio-phone/Sign.dc.html": "da04100ea898b05b8185622e6591c2f5d6217800bef2d5ea94eb32c72c6015d2",
+    "design/phase4c-studio-phone/ThreadView.dc.html": "3923cbf8773f0880fa2f6a357ba81545dbc2ff7baead4259446f2b85e024c06f",
+    "design/phase4c-studio-phone/Threads.dc.html": "758dfafb78fd13c0af3c65d2c94cb2afe46fdfa308f4205f9fd1a6e09c1c5fb3",
+    "design/phase4c-studio-phone/canvas.json": "2461c9a74dfc57aaf16788894481b911a0afd8f00a7b56403af7dddd65e3d9a9",
+    "design/phase4d-studio-desktop/Earnings.dc.html": "4303ae228f9e354b72396ceed86c67820777117605e362193c911a5fd7f2b17c",
+    "design/phase4d-studio-desktop/License.dc.html": "b33c905b264040649ba6033b4d9dda67edb215c6dc16ab86efac5a1d54936835",
+    "design/phase4d-studio-desktop/Main.dc.html": "a6e0da273c043339a224227dd7d480944161ec567225f12279f9f59aeb60ce9b",
+    "design/phase4d-studio-desktop/Offers.dc.html": "d8bfac86b9ae66419dca0a39fb35fdd775b29bb37441f34cbff4772147c53b86",
+    "design/phase4d-studio-desktop/Sources.dc.html": "c2f24845688958fe46f79ac35b72c9f3d916fb44cabc8533a4f8e6c500d3cde5",
+    "design/phase4d-studio-desktop/Style.dc.html": "98a249610e19fe44680234980969c6bf6331834cd0b9d68ae040cce72216c7ff",
+    "design/phase4d-studio-desktop/Team.dc.html": "d72f1ed5874fc9c2fceb47df08cff73035d2395a823e1e1ad6733323973f76e3",
+    "design/phase4d-studio-desktop/Test.dc.html": "9a6b79be97911555c197f3294ec5a052a776b58a4f134117b60ada3fe4b4a338",
+    "design/phase4d-studio-desktop/canvas.json": "13525237f41ecfd051e0c9f0f26fd8c64b8131a3125723f1b27078e419407903",
+    "design/phase4e-4i/AIVoice.dc.html": "1da4fe925f7ddb27298d04e9ae6478fa95d915402504ec1eaec6689061a00f88",
+    "design/phase4e-4i/CallAfter.dc.html": "e7f86e983f552e6c06d607db86ede456fb984cad0370bd7267b5e6fb5d454e03",
+    "design/phase4e-4i/CallLive.dc.html": "0868f1b74a49cb6e40c6416949dc01c3d77e3a84989e2c946324e6009fe63fee",
+    "design/phase4e-4i/DiscoverPass.dc.html": "e9e11086fc712a595ee58c466094df80834982e9b2aacaac0d7cddc1ff22d4a3",
+    "design/phase4e-4i/Email.dc.html": "973481a8b775657ca5b0c7d802819155fbec347b239d7963933af7e7610b5b2d",
+    "design/phase4e-4i/IAP.dc.html": "39ddc5379f8c7d42766c6d3aabdf630b8e485aca65ace0ffa7d5f0987de49d0c",
+    "design/phase4e-4i/Insights.dc.html": "7f6ffde8c12fe624d94a4fd7cc8d02eeffd0a00bccc0d3bd6b52927bde5d29f3",
+    "design/phase4e-4i/Main.dc.html": "b329b7ebb32a2fed231a45866b00637804489c6527b851dd0e8f8b84747f034b",
+    "design/phase4e-4i/NotifMatrix.dc.html": "c5712121725b75afd03a1205f5cd63d244eba7a670aad15e73fe28717f4d78b3",
+    "design/phase4e-4i/OfferTimes.dc.html": "d209f1bc993ec87fe85778e1ee3cd1599ea68ac687153ca5ee57a7d6dcdc23c4",
+    "design/phase4e-4i/OpsCase.dc.html": "0b30d089a066fd64e07574b04c95f25e492607ee86663cd219b8d973914a45c9",
+    "design/phase4e-4i/OpsQueue.dc.html": "9dc11061d4c703cf0d29124144a2e69aca136b794b50e9ecd52039c5ed116b0c",
+    "design/phase4e-4i/PassYou.dc.html": "0a1ce85b9f66cd60b21d184cc2ffc6f4ff5e9db2027fc6f7a8b69dfe287284cb",
+    "design/phase4e-4i/Pool.dc.html": "58bc56a92a08974800fe3ff64bb697c492edc5de3e10b4a0542b8fa21bfd0a81",
+    "design/phase4e-4i/PublicAnswer.dc.html": "6fa076349d30f3ef991d237d46376cdc2f1a3a9fe9137ade61ee93b2d80aab35",
+    "design/phase4e-4i/Push.dc.html": "c8abed1ecbec3b706528590c52ba9194d2203b59d14708dfcfce88a0a8588874",
+    "design/phase4e-4i/ShareSheet.dc.html": "3c1befd8029557d358e32d8a5dc4af09c3964137c690cf0ceca44e6c5576568a",
+    "design/phase4e-4i/canvas.json": "42acceab620da8260107379d0564e55492ae661e2c3fa2735b99fe8e4eb06492",
+    "design/phase5-prototypes/Comprehension.dc.html": "04623fbb4f39288dd0354e49885f4e8e0588b8b15dd2683ff8e0c7082f370766",
+    "design/phase5-prototypes/Daily.dc.html": "14243521345b5273240531d7f7d02eeda98acf52210993e8f2e6a753854202bc",
+    "design/phase5-prototypes/Main.dc.html": "d45b23205653a0e878e460856dd8b9eeb35baf50136e61fe3dc494c69159369b",
+    "design/phase5-prototypes/Onboard.dc.html": "bd0980886b5ca03bc252b3caac69cb69bafd8b341133843e313b8d1f4d84e282",
+    "design/phase5-prototypes/StepIn.dc.html": "e3151b03b0b020444b33ac307982fcd18bf28377370b968dcc959a034a5de1a9",
+    "design/phase5-prototypes/canvas.json": "fe0c7a648678bcd66bfd5231fc75c3c8b827451adb00dbbb24b138c0e8326e7c"
+  },
+  "logs": {
+    "/private/tmp/creator-w1-continuation-accesslines-before.log": "7913ca0df32c0af04ab07041ff07c878d2f1e9c9eb240e350683ffb558e50ca0",
+    "/private/tmp/creator-w1-continuation-component-sizing.log": "938bf056d5d2d794cea7396c8a922bd67c7912d219b0aca453d6dd5de21ed4bd",
+    "/private/tmp/creator-w1-continuation-component-sizing-all-web.log": "b486b46dee8a0c7f562c90d1e93fc5fb112231aeb792a474d88033744f425432",
+    "/private/tmp/creator-w1-continuation-component-sizing-build.log": "18a9ccbbf10f2d4de36e73b8ea7d267e921fa3f8445919905b4afcd8080d1797",
+    "/private/tmp/creator-w1-continuation-component-sizing-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/creator-w1-continuation-component-sizing-rename.log": "f0b71443e279b39cb18d8556ab1ad7638984ff1d108fd9b278b9dfd6f0e7f862",
+    "/private/tmp/creator-w1-continuation-component-sizing-rename-web.log": "01e7202abd54c8d8b765818d7382b37585e06a1d0aad6dfef33f72b2520a396f"
+  },
+  "screenshots": [
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AccessLines-light-implementation.png",
+      "sha256": "fe3df4b2baf0d5fb4ac4ba4813f857a79dc1b655399eff8b4d68f71bcace562a",
+      "bytes": 22912,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-AccessLines-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AccessLines-light-reference.png",
+      "sha256": "fe3df4b2baf0d5fb4ac4ba4813f857a79dc1b655399eff8b4d68f71bcace562a",
+      "bytes": 22912,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-AccessLines-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AccessLines-night-implementation.png",
+      "sha256": "e66d86d1c6e781fd83a278a40448be0b3762c6cd9c8dd0e5164e204359eb189c",
+      "bytes": 23117,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AccessLines-night-reference.png",
+      "sha256": "e66d86d1c6e781fd83a278a40448be0b3762c6cd9c8dd0e5164e204359eb189c",
+      "bytes": 23117,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuditBanner-light-implementation.png",
+      "sha256": "57f60f83c49a2a609d686b9132f8009846e329cdab9c519f196e79febca41895",
+      "bytes": 16547,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuditBanner-light-reference.png",
+      "sha256": "57f60f83c49a2a609d686b9132f8009846e329cdab9c519f196e79febca41895",
+      "bytes": 16547,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuditBanner-night-implementation.png",
+      "sha256": "c155c51c3e2055c1508bd69089c2afe4a6b6ba67071c35ff420d6cd352be30a2",
+      "bytes": 16770,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuditBanner-night-reference.png",
+      "sha256": "c155c51c3e2055c1508bd69089c2afe4a6b6ba67071c35ff420d6cd352be30a2",
+      "bytes": 16770,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuthorLabel-light-implementation.png",
+      "sha256": "851ef25a04b4cd9ee2f851175933d2c190270250b55839cad2f974c5f2bb32be",
+      "bytes": 29168,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuthorLabel-light-reference.png",
+      "sha256": "851ef25a04b4cd9ee2f851175933d2c190270250b55839cad2f974c5f2bb32be",
+      "bytes": 29168,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuthorLabel-night-implementation.png",
+      "sha256": "5943ec0990ad5f9f243de7b98daff145bd5697e3020ff5f5e5f2034085aaa539",
+      "bytes": 28989,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/AuthorLabel-night-reference.png",
+      "sha256": "5943ec0990ad5f9f243de7b98daff145bd5697e3020ff5f5e5f2034085aaa539",
+      "bytes": 28989,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Avatar-light-implementation.png",
+      "sha256": "27be7506a3ad7fc79d0fa2b3e2a0d41d44cb9423883d3ab1ffe06364fa0d0391",
+      "bytes": 13706,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Avatar-light-reference.png",
+      "sha256": "27be7506a3ad7fc79d0fa2b3e2a0d41d44cb9423883d3ab1ffe06364fa0d0391",
+      "bytes": 13706,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Avatar-night-implementation.png",
+      "sha256": "82d3fc25b38634677bcd236f3f7dab2ecd813ac339cc553e9764ad27003a93b6",
+      "bytes": 13613,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Avatar-night-reference.png",
+      "sha256": "82d3fc25b38634677bcd236f3f7dab2ecd813ac339cc553e9764ad27003a93b6",
+      "bytes": 13613,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Button-light-implementation.png",
+      "sha256": "a0ea4e7d130c4a57a4fe56db1558062306253d862c52fa28fe969532fcfd73e3",
+      "bytes": 24891,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Button-light-reference.png",
+      "sha256": "a0ea4e7d130c4a57a4fe56db1558062306253d862c52fa28fe969532fcfd73e3",
+      "bytes": 24891,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Button-night-implementation.png",
+      "sha256": "a0fb995865487635afe9925e3ce4de25fbfe826705af9ba3b07158d6e93469aa",
+      "bytes": 25916,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Button-night-reference.png",
+      "sha256": "a0fb995865487635afe9925e3ce4de25fbfe826705af9ba3b07158d6e93469aa",
+      "bytes": 25916,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CallChip-light-implementation.png",
+      "sha256": "59e21cbf6044bb56652676787caf2362d8c1d51ea9d8968ee1ce1c8e3c0c626a",
+      "bytes": 20542,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CallChip-light-reference.png",
+      "sha256": "59e21cbf6044bb56652676787caf2362d8c1d51ea9d8968ee1ce1c8e3c0c626a",
+      "bytes": 20542,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CallChip-night-implementation.png",
+      "sha256": "93241536714f46923945d9d8cfced47a49470e04712100dc55ef02aa0acd1703",
+      "bytes": 20236,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CallChip-night-reference.png",
+      "sha256": "93241536714f46923945d9d8cfced47a49470e04712100dc55ef02aa0acd1703",
+      "bytes": 20236,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CapacityHeader-light-implementation.png",
+      "sha256": "90afe7c230b84f5221de41a37353d561e046921ffed4dfc98f618ca096f80cae",
+      "bytes": 20834,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CapacityHeader-light-reference.png",
+      "sha256": "90afe7c230b84f5221de41a37353d561e046921ffed4dfc98f618ca096f80cae",
+      "bytes": 20834,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CapacityHeader-night-implementation.png",
+      "sha256": "6206a31d6f997b46cfd6c297221afa2508b4a900dba47001b17d87a7a0e5c9d1",
+      "bytes": 20547,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CapacityHeader-night-reference.png",
+      "sha256": "6206a31d6f997b46cfd6c297221afa2508b4a900dba47001b17d87a7a0e5c9d1",
+      "bytes": 20547,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CitationChip-light-implementation.png",
+      "sha256": "8ea2257a3ad17e7e740d7c4331404bdabd9c37b8691a994fe7a9c97af1a09340",
+      "bytes": 21061,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CitationChip-light-reference.png",
+      "sha256": "8ea2257a3ad17e7e740d7c4331404bdabd9c37b8691a994fe7a9c97af1a09340",
+      "bytes": 21061,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CitationChip-night-implementation.png",
+      "sha256": "f062102939761338b38b1f578e6550a7f60ca0be558c4ee045aaa4a465eff7cc",
+      "bytes": 21242,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/CitationChip-night-reference.png",
+      "sha256": "f062102939761338b38b1f578e6550a7f60ca0be558c4ee045aaa4a465eff7cc",
+      "bytes": 21242,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Composer-light-implementation.png",
+      "sha256": "97fefcce317b86471567699d8a278df37929fc799dde64c0c2e9700d67265585",
+      "bytes": 73617,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Composer-light-reference.png",
+      "sha256": "97fefcce317b86471567699d8a278df37929fc799dde64c0c2e9700d67265585",
+      "bytes": 73617,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Composer-night-implementation.png",
+      "sha256": "f89b3ae64da14929679b03b2d4ee5cdba44504a6e7b5c0409784cf8985ecc8b5",
+      "bytes": 71320,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Composer-night-reference.png",
+      "sha256": "f89b3ae64da14929679b03b2d4ee5cdba44504a6e7b5c0409784cf8985ecc8b5",
+      "bytes": 71320,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ContextCard-light-implementation.png",
+      "sha256": "dc45cd143f189a0f1df0d85e6865c2c5caef0501943b3e1e54250ccd09a238b4",
+      "bytes": 19086,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ContextCard-light-reference.png",
+      "sha256": "dc45cd143f189a0f1df0d85e6865c2c5caef0501943b3e1e54250ccd09a238b4",
+      "bytes": 19086,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ContextCard-night-implementation.png",
+      "sha256": "bb5e12e750cc33cac52a65a6932dab59c0154ab286598b8e6f9f3947ed145b57",
+      "bytes": 18487,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ContextCard-night-reference.png",
+      "sha256": "bb5e12e750cc33cac52a65a6932dab59c0154ab286598b8e6f9f3947ed145b57",
+      "bytes": 18487,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Correction-light-implementation.png",
+      "sha256": "c5c92dced93fd8f9495ce1733db0af034462b662d3f9ca51f40cdf8798e98634",
+      "bytes": 24652,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Correction-light-reference.png",
+      "sha256": "c5c92dced93fd8f9495ce1733db0af034462b662d3f9ca51f40cdf8798e98634",
+      "bytes": 24652,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Correction-night-implementation.png",
+      "sha256": "37a1b2aed61f7646490c3d5c276197666df8ef9af0cec296a9556c406b87b1b8",
+      "bytes": 24164,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Correction-night-reference.png",
+      "sha256": "37a1b2aed61f7646490c3d5c276197666df8ef9af0cec296a9556c406b87b1b8",
+      "bytes": 24164,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Countdown-light-implementation.png",
+      "sha256": "0c64a9a25127b533fd87e986a824c36ca3bb7f250f4120dc2a7018ba5eb03052",
+      "bytes": 18956,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Countdown-light-reference.png",
+      "sha256": "0c64a9a25127b533fd87e986a824c36ca3bb7f250f4120dc2a7018ba5eb03052",
+      "bytes": 18956,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Countdown-night-implementation.png",
+      "sha256": "d783be9792c3a0ec642ff0a9dd5639d581825bd6c927b6275ae5a11501d36d60",
+      "bytes": 18336,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Countdown-night-reference.png",
+      "sha256": "d783be9792c3a0ec642ff0a9dd5639d581825bd6c927b6275ae5a11501d36d60",
+      "bytes": 18336,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Dialog-light-implementation.png",
+      "sha256": "9afc0e9d032ee4409456ad32b98e4dfa9fc5ac7fcc678500958cc6be20735573",
+      "bytes": 27945,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Dialog-light-reference.png",
+      "sha256": "9afc0e9d032ee4409456ad32b98e4dfa9fc5ac7fcc678500958cc6be20735573",
+      "bytes": 27945,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Dialog-night-implementation.png",
+      "sha256": "42ced4d66bc1229d2cc8753547ed5e392474273400940d98f3d1ada8bc219edd",
+      "bytes": 26904,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Dialog-night-reference.png",
+      "sha256": "42ced4d66bc1229d2cc8753547ed5e392474273400940d98f3d1ada8bc219edd",
+      "bytes": 26904,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/DigestItem-light-implementation.png",
+      "sha256": "76d79c7a41c23e69b560d34b1a58c584055e8fd8695c2629f676a2c3f6de329d",
+      "bytes": 30251,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/DigestItem-light-reference.png",
+      "sha256": "76d79c7a41c23e69b560d34b1a58c584055e8fd8695c2629f676a2c3f6de329d",
+      "bytes": 30251,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/DigestItem-night-implementation.png",
+      "sha256": "8a71f77d5f474df74853eb2fe493887ffcb9e1ce697f1d5dd55f56dc6800b6e8",
+      "bytes": 29407,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/DigestItem-night-reference.png",
+      "sha256": "8a71f77d5f474df74853eb2fe493887ffcb9e1ce697f1d5dd55f56dc6800b6e8",
+      "bytes": 29407,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmailFrame-light-implementation.png",
+      "sha256": "375432678e053377322eb3a088d8d5c7679d2b31c45c05e0bd2e426fa9d13970",
+      "bytes": 61630,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmailFrame-light-reference.png",
+      "sha256": "375432678e053377322eb3a088d8d5c7679d2b31c45c05e0bd2e426fa9d13970",
+      "bytes": 61630,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmailFrame-night-implementation.png",
+      "sha256": "b3af58793f67998227abb46911982bed16eeaf54e4a83740598e7886984a54c9",
+      "bytes": 58145,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmailFrame-night-reference.png",
+      "sha256": "b3af58793f67998227abb46911982bed16eeaf54e4a83740598e7886984a54c9",
+      "bytes": 58145,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmptyState-light-implementation.png",
+      "sha256": "85524ad578b9b7b8de2363f4f5f0728f3ae184d1a44c2f55d848b6a946a52ba4",
+      "bytes": 24342,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmptyState-light-reference.png",
+      "sha256": "85524ad578b9b7b8de2363f4f5f0728f3ae184d1a44c2f55d848b6a946a52ba4",
+      "bytes": 24342,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmptyState-night-implementation.png",
+      "sha256": "5df3d6f84e84724eeb4b59ba71629db3027b511c77deb49671739eb2583ecece",
+      "bytes": 24210,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EmptyState-night-reference.png",
+      "sha256": "5df3d6f84e84724eeb4b59ba71629db3027b511c77deb49671739eb2583ecece",
+      "bytes": 24210,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EtaLine-light-implementation.png",
+      "sha256": "16a57d83e5dde6ce75768d00f73cf0e9bfeefc752ce057dcfb04c00c730c0983",
+      "bytes": 14638,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EtaLine-light-reference.png",
+      "sha256": "16a57d83e5dde6ce75768d00f73cf0e9bfeefc752ce057dcfb04c00c730c0983",
+      "bytes": 14638,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EtaLine-night-implementation.png",
+      "sha256": "1a8bb3debddef1d580e001a03b53e30b36b0564bb6c88445e8da95338ebe485a",
+      "bytes": 14438,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/EtaLine-night-reference.png",
+      "sha256": "1a8bb3debddef1d580e001a03b53e30b36b0564bb6c88445e8da95338ebe485a",
+      "bytes": 14438,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IdentityStrip-light-implementation.png",
+      "sha256": "6938803dbb8bc325c82c62de2b789e1b28780b45a4e04e0a50257b74ad717cd6",
+      "bytes": 29806,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IdentityStrip-light-reference.png",
+      "sha256": "6938803dbb8bc325c82c62de2b789e1b28780b45a4e04e0a50257b74ad717cd6",
+      "bytes": 29806,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IdentityStrip-night-implementation.png",
+      "sha256": "7ae17e6b956ffb155915ac48052a7cf7b4110c134a8fdd56f1348c514415172e",
+      "bytes": 29536,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IdentityStrip-night-reference.png",
+      "sha256": "7ae17e6b956ffb155915ac48052a7cf7b4110c134a8fdd56f1348c514415172e",
+      "bytes": 29536,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IncludeList-light-implementation.png",
+      "sha256": "e31adb7acbf77c240ef53857475e220416d10d4c01d19649c317fadc7a21130a",
+      "bytes": 42962,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IncludeList-light-reference.png",
+      "sha256": "e31adb7acbf77c240ef53857475e220416d10d4c01d19649c317fadc7a21130a",
+      "bytes": 42962,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IncludeList-night-implementation.png",
+      "sha256": "3339fe5ca9665719c1898220344b17514b351f05f40434b6dfb7d6d75d90ca5a",
+      "bytes": 41639,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/IncludeList-night-reference.png",
+      "sha256": "3339fe5ca9665719c1898220344b17514b351f05f40434b6dfb7d6d75d90ca5a",
+      "bytes": 41639,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/InsteadMenu-light-implementation.png",
+      "sha256": "ec29ad12859197f85cfb56fbdaa049261ca72d253f662af5de5879c3ef9400e0",
+      "bytes": 32721,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/InsteadMenu-light-reference.png",
+      "sha256": "ec29ad12859197f85cfb56fbdaa049261ca72d253f662af5de5879c3ef9400e0",
+      "bytes": 32721,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/InsteadMenu-night-implementation.png",
+      "sha256": "fac31a99c4a6d5317b29382e8f105743989ddeb16062bb404f8435b73bbaf18f",
+      "bytes": 31015,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/InsteadMenu-night-reference.png",
+      "sha256": "fac31a99c4a6d5317b29382e8f105743989ddeb16062bb404f8435b73bbaf18f",
+      "bytes": 31015,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/LabelPreview-light-implementation.png",
+      "sha256": "211e9ed71202d5c75be66e82f2d24d4e636b14a4efc9cf933ecea11c911e30f5",
+      "bytes": 20976,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/LabelPreview-light-reference.png",
+      "sha256": "211e9ed71202d5c75be66e82f2d24d4e636b14a4efc9cf933ecea11c911e30f5",
+      "bytes": 20976,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/LabelPreview-night-implementation.png",
+      "sha256": "9a706ccc1e953f14304250f0d0650001dcefcda4e6cd68ab6f47ad1cf9dc84ee",
+      "bytes": 20267,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/LabelPreview-night-reference.png",
+      "sha256": "9a706ccc1e953f14304250f0d0650001dcefcda4e6cd68ab6f47ad1cf9dc84ee",
+      "bytes": 20267,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Mark-light-implementation.png",
+      "sha256": "e5cc5006acaaed160a59e81997308c319914db54b1b1eeb1a1949f7cc1b0194a",
+      "bytes": 20191,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Mark-light-reference.png",
+      "sha256": "e5cc5006acaaed160a59e81997308c319914db54b1b1eeb1a1949f7cc1b0194a",
+      "bytes": 20191,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Mark-night-implementation.png",
+      "sha256": "35987806ec8678be32abdbef602046bfec3aae83b74af8030580986ad5f17897",
+      "bytes": 20193,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Mark-night-reference.png",
+      "sha256": "35987806ec8678be32abdbef602046bfec3aae83b74af8030580986ad5f17897",
+      "bytes": 20193,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/MemoryChip-light-implementation.png",
+      "sha256": "0d9d8326ed267697806664402b5321c6c870018a9feb8bff16d81492d5bbb2e1",
+      "bytes": 26267,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/MemoryChip-light-reference.png",
+      "sha256": "0d9d8326ed267697806664402b5321c6c870018a9feb8bff16d81492d5bbb2e1",
+      "bytes": 26267,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/MemoryChip-night-implementation.png",
+      "sha256": "ec35db2d5b8a700edecbf244486ddb675b22872f5dab7fde832208dd6e382d04",
+      "bytes": 25713,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/MemoryChip-night-reference.png",
+      "sha256": "ec35db2d5b8a700edecbf244486ddb675b22872f5dab7fde832208dd6e382d04",
+      "bytes": 25713,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Message-light-implementation.png",
+      "sha256": "2b9120a37232169735bee436bdf3b61043d1d86a6e6be9c472d2a96153fc4787",
+      "bytes": 115138,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Message-night-implementation.png",
+      "sha256": "c73cbf49906005ce69aba0f77bb15d7f4c5b5c8eda2c0c802a805b18689d8b3d",
+      "bytes": 114039,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Message-night-reference.png",
+      "sha256": "a6513ec79efc3cbd377548aa3c06ac47a6228b45e63bd829abcebb82f1dae9a0",
+      "bytes": 114057,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ModeList-light-implementation.png",
+      "sha256": "8a103010d855ddf60a03b564ea3885f7785c2116a031917f8f20bd3b17d95c9d",
+      "bytes": 32641,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ModeList-light-reference.png",
+      "sha256": "8a103010d855ddf60a03b564ea3885f7785c2116a031917f8f20bd3b17d95c9d",
+      "bytes": 32641,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ModeList-night-implementation.png",
+      "sha256": "aea75deff0c4cbcd53624533840aaf3bd71402dfbdc022ad2ff668f6c843d7a0",
+      "bytes": 31301,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ModeList-night-reference.png",
+      "sha256": "aea75deff0c4cbcd53624533840aaf3bd71402dfbdc022ad2ff668f6c843d7a0",
+      "bytes": 31301,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Note-light-implementation.png",
+      "sha256": "a74f1cd842d4fbe772391c9ddebc6eff44646982adf1ecf4fa76347e64b31fdd",
+      "bytes": 52325,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Note-light-reference.png",
+      "sha256": "a74f1cd842d4fbe772391c9ddebc6eff44646982adf1ecf4fa76347e64b31fdd",
+      "bytes": 52325,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Note-night-implementation.png",
+      "sha256": "ff1fe3cda66b8e6be5bc75be81cb4df97450b00b300da46496c30a67a4553721",
+      "bytes": 47958,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Note-night-reference.png",
+      "sha256": "ff1fe3cda66b8e6be5bc75be81cb4df97450b00b300da46496c30a67a4553721",
+      "bytes": 47958,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Notice-light-implementation.png",
+      "sha256": "a7a742dbe77e120fba8daf4de23fe6773131923c9146126ffcce7dbb22065908",
+      "bytes": 38339,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Notice-light-reference.png",
+      "sha256": "a7a742dbe77e120fba8daf4de23fe6773131923c9146126ffcce7dbb22065908",
+      "bytes": 38339,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Notice-night-implementation.png",
+      "sha256": "617709400f1601de5f89094dcec0b0d98d51ca4b004b5ee20a14db565fdd320c",
+      "bytes": 38055,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Notice-night-reference.png",
+      "sha256": "617709400f1601de5f89094dcec0b0d98d51ca4b004b5ee20a14db565fdd320c",
+      "bytes": 38055,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/NotificationRow-light-implementation.png",
+      "sha256": "0a6ca84ad9725eb5cfaca2c8c55c582b9f7843b4d82691fa9ea5ec5618d746a6",
+      "bytes": 46878,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/NotificationRow-light-reference.png",
+      "sha256": "0a6ca84ad9725eb5cfaca2c8c55c582b9f7843b4d82691fa9ea5ec5618d746a6",
+      "bytes": 46878,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/NotificationRow-night-implementation.png",
+      "sha256": "e344da191c06d9adb60bd4a3fa008139db5655b3ca31da4cd421ec4a860ccc72",
+      "bytes": 47194,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/NotificationRow-night-reference.png",
+      "sha256": "e344da191c06d9adb60bd4a3fa008139db5655b3ca31da4cd421ec4a860ccc72",
+      "bytes": 47194,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/QueueCard-light-implementation.png",
+      "sha256": "f46690cae0cfcfd5ce8f4931d0e4df1ea98f53edd025be83ead8d7a5c2465dbd",
+      "bytes": 43906,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/QueueCard-light-reference.png",
+      "sha256": "f46690cae0cfcfd5ce8f4931d0e4df1ea98f53edd025be83ead8d7a5c2465dbd",
+      "bytes": 43906,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/QueueCard-night-implementation.png",
+      "sha256": "ec9bd969ae67ec9b09410e336072a7b5cfb0c933238704f2ab301508b14ba1e2",
+      "bytes": 42416,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/QueueCard-night-reference.png",
+      "sha256": "ec9bd969ae67ec9b09410e336072a7b5cfb0c933238704f2ab301508b14ba1e2",
+      "bytes": 42416,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReactionChip-light-implementation.png",
+      "sha256": "f6db01c563c75c13290e61434bbfc943bd3f5e8c2526408dd2484c802756b332",
+      "bytes": 17094,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReactionChip-light-reference.png",
+      "sha256": "f6db01c563c75c13290e61434bbfc943bd3f5e8c2526408dd2484c802756b332",
+      "bytes": 17094,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReactionChip-night-implementation.png",
+      "sha256": "566df8a0ff5345cac3b60e58ff6b5519d800533e927a1dcc2acebfae1311c384",
+      "bytes": 16993,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReactionChip-night-reference.png",
+      "sha256": "566df8a0ff5345cac3b60e58ff6b5519d800533e927a1dcc2acebfae1311c384",
+      "bytes": 16993,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Receipt-light-implementation.png",
+      "sha256": "20e8877549ad7d518d2a76f6534471ed99583a18b65737ec3ddfafd170380715",
+      "bytes": 30522,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Receipt-light-reference.png",
+      "sha256": "20e8877549ad7d518d2a76f6534471ed99583a18b65737ec3ddfafd170380715",
+      "bytes": 30522,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Receipt-night-implementation.png",
+      "sha256": "653bcecbdb66dd09be2ab5148805b6143808d784a59526749391988e052798f7",
+      "bytes": 27271,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Receipt-night-reference.png",
+      "sha256": "653bcecbdb66dd09be2ab5148805b6143808d784a59526749391988e052798f7",
+      "bytes": 27271,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/RequestStatus-light-implementation.png",
+      "sha256": "5bf717aefd51a9833dc43876db739e6ebe6103c931d597504e8ad50c84ab519a",
+      "bytes": 28768,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/RequestStatus-light-reference.png",
+      "sha256": "5bf717aefd51a9833dc43876db739e6ebe6103c931d597504e8ad50c84ab519a",
+      "bytes": 28768,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/RequestStatus-night-implementation.png",
+      "sha256": "474de2a26a9275f927baadbe96809200c92069ae3333f9a3337148faa1ef8f0e",
+      "bytes": 27669,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/RequestStatus-night-reference.png",
+      "sha256": "474de2a26a9275f927baadbe96809200c92069ae3333f9a3337148faa1ef8f0e",
+      "bytes": 27669,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReservedLabel-light-implementation.png",
+      "sha256": "6602f306f220d54a54862b13d7e523c081a0c2d1c0711bc8bbe3a938ce1c1948",
+      "bytes": 28500,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReservedLabel-light-reference.png",
+      "sha256": "6602f306f220d54a54862b13d7e523c081a0c2d1c0711bc8bbe3a938ce1c1948",
+      "bytes": 28500,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReservedLabel-night-implementation.png",
+      "sha256": "8df429899b6b1f812a5f7de253085edfe4b1f8e4030c9417abe339b01fd94039",
+      "bytes": 27306,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ReservedLabel-night-reference.png",
+      "sha256": "8df429899b6b1f812a5f7de253085edfe4b1f8e4030c9417abe339b01fd94039",
+      "bytes": 27306,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Seal-light-implementation.png",
+      "sha256": "3bc6968f85c068fb6478786d0fe9a1bb2b38c34b0a5d2e2689c1a0861ce3b891",
+      "bytes": 15286,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Seal-light-reference.png",
+      "sha256": "3bc6968f85c068fb6478786d0fe9a1bb2b38c34b0a5d2e2689c1a0861ce3b891",
+      "bytes": 15286,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Seal-night-implementation.png",
+      "sha256": "2839f7c1dc57b0765a577cee3efd00fd6c1c4c150990a63c8a9e904bfb61e2fe",
+      "bytes": 15545,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Seal-night-reference.png",
+      "sha256": "2839f7c1dc57b0765a577cee3efd00fd6c1c4c150990a63c8a9e904bfb61e2fe",
+      "bytes": 15545,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Segmented-light-implementation.png",
+      "sha256": "c94511098ecfae24048108a30338edb38564e75b288d78d8f7da0c3d10e8db42",
+      "bytes": 14052,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Segmented-light-reference.png",
+      "sha256": "c94511098ecfae24048108a30338edb38564e75b288d78d8f7da0c3d10e8db42",
+      "bytes": 14052,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Segmented-night-implementation.png",
+      "sha256": "674ca797d34bc34198a7875cb5c44ea5dff865bfabf2ca39eb32e8fdd8f74cbc",
+      "bytes": 13799,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Segmented-night-reference.png",
+      "sha256": "674ca797d34bc34198a7875cb5c44ea5dff865bfabf2ca39eb32e8fdd8f74cbc",
+      "bytes": 13799,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ShareCard-light-implementation.png",
+      "sha256": "e5560080a30a1cc4ed8f421478bb7a005a2039ebfb546c023133241bd576d3cf",
+      "bytes": 24626,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ShareCard-light-reference.png",
+      "sha256": "e5560080a30a1cc4ed8f421478bb7a005a2039ebfb546c023133241bd576d3cf",
+      "bytes": 24626,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ShareCard-night-implementation.png",
+      "sha256": "bb8098be36c50b61cb73c991f94e678223418b98a2b4b9ef2406848ddfa3f6de",
+      "bytes": 23584,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ShareCard-night-reference.png",
+      "sha256": "bb8098be36c50b61cb73c991f94e678223418b98a2b4b9ef2406848ddfa3f6de",
+      "bytes": 23584,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sheet-light-implementation.png",
+      "sha256": "17f7c2bfea32ef09f146c3c6bd085c44bc9251f82c6942ed9a07580ef5edfb8c",
+      "bytes": 46960,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sheet-light-reference.png",
+      "sha256": "17f7c2bfea32ef09f146c3c6bd085c44bc9251f82c6942ed9a07580ef5edfb8c",
+      "bytes": 46960,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sheet-night-implementation.png",
+      "sha256": "d66de9625438be028f2c9e8e235da5ba8363341c850414445c2b861524b01d9d",
+      "bytes": 43573,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sheet-night-reference.png",
+      "sha256": "d66de9625438be028f2c9e8e235da5ba8363341c850414445c2b861524b01d9d",
+      "bytes": 43573,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sidebar-light-implementation.png",
+      "sha256": "50fdf4c0595a5be22561b2411f214e6bf0d5a213ecad4c0323da687872c929d9",
+      "bytes": 21379,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sidebar-light-reference.png",
+      "sha256": "50fdf4c0595a5be22561b2411f214e6bf0d5a213ecad4c0323da687872c929d9",
+      "bytes": 21379,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sidebar-night-implementation.png",
+      "sha256": "7e6f66e9d285ea55889a37b1a6504966ec5d2d851ee9c24912a5b321d7861f23",
+      "bytes": 20155,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Sidebar-night-reference.png",
+      "sha256": "7e6f66e9d285ea55889a37b1a6504966ec5d2d851ee9c24912a5b321d7861f23",
+      "bytes": 20155,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SignedMarker-light-implementation.png",
+      "sha256": "5f97175c1c9d4498653e38771cdaf68ca438776143d143905ff3edac3037ee46",
+      "bytes": 16789,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SignedMarker-light-reference.png",
+      "sha256": "5f97175c1c9d4498653e38771cdaf68ca438776143d143905ff3edac3037ee46",
+      "bytes": 16789,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SignedMarker-night-implementation.png",
+      "sha256": "ac00114d038327f8a50e3a3f0c350f65e192ebffeb2735b6b554889fc2183d87",
+      "bytes": 16730,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SignedMarker-night-reference.png",
+      "sha256": "ac00114d038327f8a50e3a3f0c350f65e192ebffeb2735b6b554889fc2183d87",
+      "bytes": 16730,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SigningSheet-light-implementation.png",
+      "sha256": "3320741008e3a43a93eff72d8cc3a102b778606b9eed4fad71d10676ffce1d33",
+      "bytes": 31739,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SigningSheet-light-reference.png",
+      "sha256": "3320741008e3a43a93eff72d8cc3a102b778606b9eed4fad71d10676ffce1d33",
+      "bytes": 31739,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SigningSheet-night-implementation.png",
+      "sha256": "9e965191ca3c1ea628cb24e750a45d51b5647b53939779cfe70658f299edf020",
+      "bytes": 29769,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SigningSheet-night-reference.png",
+      "sha256": "9e965191ca3c1ea628cb24e750a45d51b5647b53939779cfe70658f299edf020",
+      "bytes": 29769,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Skeleton-light-implementation.png",
+      "sha256": "f54d3793ef44210485901840bc0dcaf9da4cda9cd93f16f74a868b9c981425c5",
+      "bytes": 12491,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Skeleton-light-reference.png",
+      "sha256": "b15b0fd07afcdab30a9618080d99990439394d57c3fb37275e58b57dca274b30",
+      "bytes": 12493,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Skeleton-night-implementation.png",
+      "sha256": "c6a5081459fdc806ba012ca2af6cf7609cdf7aa55cbca5fd8e2d48fec410308a",
+      "bytes": 12658,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Skeleton-night-reference.png",
+      "sha256": "ba54312404cafe84e902ae98445c2b3d578ba57c8eed274a842474b842a7ce0d",
+      "bytes": 12655,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SourceRow-light-implementation.png",
+      "sha256": "809c97bbc8d62045ea01165dd6f17fab03e1d16e9a684e2160f2db3de29112ef",
+      "bytes": 30113,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SourceRow-light-reference.png",
+      "sha256": "809c97bbc8d62045ea01165dd6f17fab03e1d16e9a684e2160f2db3de29112ef",
+      "bytes": 30113,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SourceRow-night-implementation.png",
+      "sha256": "7b6094ac6dc50a4b2189813a4f478b1a01ded9e7210dd751831d631c4f4d5d8b",
+      "bytes": 28871,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SourceRow-night-reference.png",
+      "sha256": "7b6094ac6dc50a4b2189813a4f478b1a01ded9e7210dd751831d631c4f4d5d8b",
+      "bytes": 28871,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SpendLimit-light-implementation.png",
+      "sha256": "c12cdde684d3701b3b8229e1bd31d21cdbbce6eb1ca3d60755da23ab9a77eae1",
+      "bytes": 23833,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SpendLimit-light-reference.png",
+      "sha256": "c12cdde684d3701b3b8229e1bd31d21cdbbce6eb1ca3d60755da23ab9a77eae1",
+      "bytes": 23833,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SpendLimit-night-implementation.png",
+      "sha256": "62d3ab511e65f7596d049f03bddcfa1b24a8dedcd0eff8d109e0d1b4b1dcdb58",
+      "bytes": 23483,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SpendLimit-night-reference.png",
+      "sha256": "62d3ab511e65f7596d049f03bddcfa1b24a8dedcd0eff8d109e0d1b4b1dcdb58",
+      "bytes": 23483,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StepIn-light-implementation.png",
+      "sha256": "2193a8bdf6e4ea0cd5c912033cddd023ba937e71965190102000d4bc9df5fd9d",
+      "bytes": 16790,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StepIn-light-reference.png",
+      "sha256": "2193a8bdf6e4ea0cd5c912033cddd023ba937e71965190102000d4bc9df5fd9d",
+      "bytes": 16790,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StepIn-night-implementation.png",
+      "sha256": "4bf007c9e6483ef3fb398fde5543a24bc96d33d49c086a64a3fc1bee25eb15c6",
+      "bytes": 16891,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StepIn-night-reference.png",
+      "sha256": "4bf007c9e6483ef3fb398fde5543a24bc96d33d49c086a64a3fc1bee25eb15c6",
+      "bytes": 16891,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StudioTabBar-light-implementation.png",
+      "sha256": "e749e0a5a8fd9a7fce88be22bc3346e36903b296724f8d1455aa74c15f66dd28",
+      "bytes": 16573,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StudioTabBar-light-reference.png",
+      "sha256": "e749e0a5a8fd9a7fce88be22bc3346e36903b296724f8d1455aa74c15f66dd28",
+      "bytes": 16573,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StudioTabBar-night-implementation.png",
+      "sha256": "de98836af3918acbfd3610719a2abcfc935af50a5a6233b76dc4631fcd58f8f2",
+      "bytes": 16012,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/StudioTabBar-night-reference.png",
+      "sha256": "de98836af3918acbfd3610719a2abcfc935af50a5a6233b76dc4631fcd58f8f2",
+      "bytes": 16012,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SystemLine-light-implementation.png",
+      "sha256": "5fb2e50c1437f85d9c680e3a5c5062c6f9c9c30c449c8b882e87f016c0639c20",
+      "bytes": 17745,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SystemLine-light-reference.png",
+      "sha256": "5fb2e50c1437f85d9c680e3a5c5062c6f9c9c30c449c8b882e87f016c0639c20",
+      "bytes": 17745,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SystemLine-night-implementation.png",
+      "sha256": "c960d382c1f709c8fa91536ceda100e2533bc717f17a58afff90de7d0158c53f",
+      "bytes": 17480,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/SystemLine-night-reference.png",
+      "sha256": "c960d382c1f709c8fa91536ceda100e2533bc717f17a58afff90de7d0158c53f",
+      "bytes": 17480,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TabBar-light-implementation.png",
+      "sha256": "9432e307c77fe2ebedddd4d82740d4063c7ce34a58c819e4f5752c651ca35cea",
+      "bytes": 15349,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TabBar-light-reference.png",
+      "sha256": "9432e307c77fe2ebedddd4d82740d4063c7ce34a58c819e4f5752c651ca35cea",
+      "bytes": 15349,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TabBar-night-implementation.png",
+      "sha256": "af8c66807d26a275ec6a8d1497891844693939081a605996089357cbd1f6f9f6",
+      "bytes": 14879,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TabBar-night-reference.png",
+      "sha256": "af8c66807d26a275ec6a8d1497891844693939081a605996089357cbd1f6f9f6",
+      "bytes": 14879,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TermsBlock-light-implementation.png",
+      "sha256": "fa91baf65dc5a7dad257d1131fd73ed0dd278ed349f5b53f067611ecdf7bc7d9",
+      "bytes": 27286,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TermsBlock-light-reference.png",
+      "sha256": "fa91baf65dc5a7dad257d1131fd73ed0dd278ed349f5b53f067611ecdf7bc7d9",
+      "bytes": 27286,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TermsBlock-night-implementation.png",
+      "sha256": "9dc738cbe07f97e52e7f5e58783eb10c97a632e50fb72ea2d5e64abebaf25bd0",
+      "bytes": 25531,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TermsBlock-night-reference.png",
+      "sha256": "9dc738cbe07f97e52e7f5e58783eb10c97a632e50fb72ea2d5e64abebaf25bd0",
+      "bytes": 25531,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TestConsole-light-implementation.png",
+      "sha256": "3572e1477322ed0b28e2cdc99c0422501a00821d0d97b9d7ddae57c20341b6b6",
+      "bytes": 50825,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TestConsole-light-reference.png",
+      "sha256": "3572e1477322ed0b28e2cdc99c0422501a00821d0d97b9d7ddae57c20341b6b6",
+      "bytes": 50825,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TestConsole-night-implementation.png",
+      "sha256": "c9990357317854488f2b39c2050f403dfd3dabfb07445573a3af95601571d6e6",
+      "bytes": 49102,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/TestConsole-night-reference.png",
+      "sha256": "c9990357317854488f2b39c2050f403dfd3dabfb07445573a3af95601571d6e6",
+      "bytes": 49102,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ThreadHeader-light-implementation.png",
+      "sha256": "4fb9586b419b19b44dddbe895ca52d2237fac69787e63e715663114acf4fb4f1",
+      "bytes": 19964,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ThreadHeader-light-reference.png",
+      "sha256": "4fb9586b419b19b44dddbe895ca52d2237fac69787e63e715663114acf4fb4f1",
+      "bytes": 19964,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ThreadHeader-night-implementation.png",
+      "sha256": "74662ea9fdedadfad6b91f2954ab33b8871737d158f91e8a9aee9f88e658429a",
+      "bytes": 19839,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/ThreadHeader-night-reference.png",
+      "sha256": "74662ea9fdedadfad6b91f2954ab33b8871737d158f91e8a9aee9f88e658429a",
+      "bytes": 19839,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Toast-light-implementation.png",
+      "sha256": "b67d87bc1779b70ac83462c469bac44d6dcaf2fae8c265b9ee46876d95f8a97b",
+      "bytes": 20808,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Toast-light-reference.png",
+      "sha256": "b67d87bc1779b70ac83462c469bac44d6dcaf2fae8c265b9ee46876d95f8a97b",
+      "bytes": 20808,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Toast-night-implementation.png",
+      "sha256": "40045e838e81fd9543b0cce329510813eef9284c378a7706caf4d2812fe27bbd",
+      "bytes": 20347,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/Toast-night-reference.png",
+      "sha256": "40045e838e81fd9543b0cce329510813eef9284c378a7706caf4d2812fe27bbd",
+      "bytes": 20347,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VersionList-light-implementation.png",
+      "sha256": "1deda5e7f56fc2e12dc2b16fec0bfa8068fa196808df56dbff8bc2f09b0fc760",
+      "bytes": 29545,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VersionList-light-reference.png",
+      "sha256": "1deda5e7f56fc2e12dc2b16fec0bfa8068fa196808df56dbff8bc2f09b0fc760",
+      "bytes": 29545,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VersionList-night-implementation.png",
+      "sha256": "a4bc11bda9959bf9b691d9f08b16a87326d72c98678cff52e9996ac48fce8d1c",
+      "bytes": 28514,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VersionList-night-reference.png",
+      "sha256": "a4bc11bda9959bf9b691d9f08b16a87326d72c98678cff52e9996ac48fce8d1c",
+      "bytes": 28514,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VoiceNote-light-implementation.png",
+      "sha256": "b12108e274affffef0dc16d8d02c13ed3a13177fbbb7e9d6838941b4b588ce16",
+      "bytes": 31785,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VoiceNote-light-reference.png",
+      "sha256": "b12108e274affffef0dc16d8d02c13ed3a13177fbbb7e9d6838941b4b588ce16",
+      "bytes": 31785,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VoiceNote-night-implementation.png",
+      "sha256": "7efa2cf2bac3180503c693a01184a0b3289eef2581fba7154ae76422cf34fac8",
+      "bytes": 31159,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/VoiceNote-night-reference.png",
+      "sha256": "7efa2cf2bac3180503c693a01184a0b3289eef2581fba7154ae76422cf34fac8",
+      "bytes": 31159,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/account-night-desktop.png",
+      "sha256": "46e077ab9b8f43c5b5df89fbc663a52f685ed1168589ce27529f05eba60fea8a",
+      "bytes": 34480,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/account-night-mobile.png",
+      "sha256": "a0e8fac1ab8b00d711bf42eee5970ea9a1731b35976000c33badabf7c2dbedeb",
+      "bytes": 34018,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actor-two-isolated-profile-mobile.png",
+      "sha256": "4a45704af4fd1566736cf318d2dd5d3de68e4ce4a0171a18fe1c24424552b0cd",
+      "bytes": 23511,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actual-setup-keyboard-focus-light.png",
+      "sha256": "289258946ab0b75c0e1b3edd47b98f6ce1d402d56e4534da7678dc7b567994cc",
+      "bytes": 69748,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-actual-setup-keyboard-focus-light.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actual-setup-scoped-sizing-light.png",
+      "sha256": "7d68f6fceaa8e76a94df55f0ffe5388d79d43b502a09f82ac9c0dcdda411dd4d",
+      "bytes": 68347,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actual-setup-scoped-sizing-night.png",
+      "sha256": "14ae9242e01ae807a82deb5242010acc0de825ad6f4d8a3df2385810f83b403d",
+      "bytes": 66594,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actual-welcome-scoped-sizing-light.png",
+      "sha256": "f6c71b70c8fb4bdae143c4156b1573f9ad461fa78b8f91bea72ac859410203a2",
+      "bytes": 30576,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-actual-welcome-scoped-sizing-light.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/actual-welcome-scoped-sizing-night.png",
+      "sha256": "43c98fe01e1b9e9969f70b748b54d029ded0456570bb22cbbf44f67f0e064b4d",
+      "bytes": 30844,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-actual-welcome-scoped-sizing-night.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/handle-mobile-after.png",
+      "sha256": "1d287ca1be38bdf707325eb0e636c1763870f81c4045ef6fd0028be7ab9f8855",
+      "bytes": 20630,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/handle-mobile-before.png",
+      "sha256": "70b7d7654905b3e62af3875888adc413d37fbd35b6ead75b0112a652af40bee0",
+      "bytes": 22789,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/message-light-reference.png",
+      "sha256": "5ea0c22ada4698939630d6a729b561a8a7730cfe8e3130816af6eeea3aeb077c",
+      "bytes": 115128,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Handle-light-implementation.png",
+      "sha256": "56cc19641150a3a1af34f0f97418593e1d18bb5477c920afcfc974354e54bcf4",
+      "bytes": 23119,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Handle-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Handle-light-reference.png",
+      "sha256": "56cc19641150a3a1af34f0f97418593e1d18bb5477c920afcfc974354e54bcf4",
+      "bytes": 23119,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Handle-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Handle-night-implementation.png",
+      "sha256": "e517e03be4757ab131002f094e9965ec940bd065a7a73ccf37a5913965a49580",
+      "bytes": 22678,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Handle-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Handle-night-reference.png",
+      "sha256": "e517e03be4757ab131002f094e9965ec940bd065a7a73ccf37a5913965a49580",
+      "bytes": 22678,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Handle-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Welcome-light-implementation.png",
+      "sha256": "7ec6087898098b748dcd5cdded0aa6aed41849f6685d268aedfb27f749ca703b",
+      "bytes": 34062,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Welcome-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Welcome-light-reference.png",
+      "sha256": "7ec6087898098b748dcd5cdded0aa6aed41849f6685d268aedfb27f749ca703b",
+      "bytes": 34062,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Welcome-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Welcome-night-implementation.png",
+      "sha256": "403f071788cfe81fd468dd7551446dcbba149fa431e6f33feae621cacb65c252",
+      "bytes": 34141,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Welcome-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4a-fan-core-Welcome-night-reference.png",
+      "sha256": "403f071788cfe81fd468dd7551446dcbba149fa431e6f33feae621cacb65c252",
+      "bytes": 34141,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4a-fan-core-Welcome-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4b-fan-account-Verify-light-implementation.png",
+      "sha256": "9359bf1f0c42dc5b0e5f49517433bb5103c0b12e660b9dc52536c7c8012ee960",
+      "bytes": 39488,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4b-fan-account-Verify-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4b-fan-account-Verify-light-reference.png",
+      "sha256": "9359bf1f0c42dc5b0e5f49517433bb5103c0b12e660b9dc52536c7c8012ee960",
+      "bytes": 39488,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4b-fan-account-Verify-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4b-fan-account-Verify-night-implementation.png",
+      "sha256": "b4817c0450bd02e38cf563505a4c6c0b49595445626aed8a9af7bffacb51dfde",
+      "bytes": 38520,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4b-fan-account-Verify-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4b-fan-account-Verify-night-reference.png",
+      "sha256": "b4817c0450bd02e38cf563505a4c6c0b49595445626aed8a9af7bffacb51dfde",
+      "bytes": 38520,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4b-fan-account-Verify-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4c-studio-phone-Sign-light-implementation.png",
+      "sha256": "8043c9dd66fed9c57da43836775c29e99ad552a0d9a38e9c450eee4b5d3a87e1",
+      "bytes": 31892,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4c-studio-phone-Sign-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4c-studio-phone-Sign-light-reference.png",
+      "sha256": "8043c9dd66fed9c57da43836775c29e99ad552a0d9a38e9c450eee4b5d3a87e1",
+      "bytes": 31892,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4c-studio-phone-Sign-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4c-studio-phone-Sign-night-implementation.png",
+      "sha256": "d8ae840827bc933b9d119a87f3b9e0ba95e0c790a73ac295f3c7cd15798d661f",
+      "bytes": 30623,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4c-studio-phone-Sign-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4c-studio-phone-Sign-night-reference.png",
+      "sha256": "d8ae840827bc933b9d119a87f3b9e0ba95e0c790a73ac295f3c7cd15798d661f",
+      "bytes": 30623,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4c-studio-phone-Sign-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4d-studio-desktop-Main-light-implementation.png",
+      "sha256": "bbaa9abcd4a7bbb0fa0065728f47dd67a1032b335c23442a4b107b239eb2512a",
+      "bytes": 83119,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4d-studio-desktop-Main-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4d-studio-desktop-Main-light-reference.png",
+      "sha256": "bbaa9abcd4a7bbb0fa0065728f47dd67a1032b335c23442a4b107b239eb2512a",
+      "bytes": 83119,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4d-studio-desktop-Main-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4d-studio-desktop-Main-night-implementation.png",
+      "sha256": "ec800343d0dfcf35fd4d09cb22300dd7aa5b961609604c8d9a74d48aee78dd1f",
+      "bytes": 81413,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4d-studio-desktop-Main-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase4d-studio-desktop-Main-night-reference.png",
+      "sha256": "ec800343d0dfcf35fd4d09cb22300dd7aa5b961609604c8d9a74d48aee78dd1f",
+      "bytes": 81413,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase4d-studio-desktop-Main-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase5-prototypes-Comprehension-light-implementation.png",
+      "sha256": "6b52be5ff9583b39f72a51d4cd54ad6776c1c7e48b87d7af9d3541458b7a1624",
+      "bytes": 22357,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase5-prototypes-Comprehension-light-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase5-prototypes-Comprehension-light-reference.png",
+      "sha256": "6b52be5ff9583b39f72a51d4cd54ad6776c1c7e48b87d7af9d3541458b7a1624",
+      "bytes": 22357,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase5-prototypes-Comprehension-light-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase5-prototypes-Comprehension-night-implementation.png",
+      "sha256": "6d23991c3b5d8d6a07bd2eb07ad83b6b13426f90386085e977662b6ed62e9525",
+      "bytes": 22240,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase5-prototypes-Comprehension-night-implementation.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/phase5-prototypes-Comprehension-night-reference.png",
+      "sha256": "6d23991c3b5d8d6a07bd2eb07ad83b6b13426f90386085e977662b6ed62e9525",
+      "bytes": 22240,
+      "committedCopy": "artifacts/workstreams/W1/resume/2026-09-30-continuation/design-phase5-prototypes-Comprehension-night-reference.png"
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/profile-persisted-mobile.png",
+      "sha256": "9efe5261cc67058a73b5828dc242de29ad5aa89a54d9d436ef8460e3f5c40019",
+      "bytes": 23591,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/session-ended-draft-purged-mobile.png",
+      "sha256": "2ab435b5153cbfe54c825a3870e59abc3e65ff9c47631002f152c68099799e9a",
+      "bytes": 36909,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/studio-offline-hidden.png",
+      "sha256": "737d2c558cb338b9070e55a5d540412fda178664e09cf82f744cfe4528e0c08f",
+      "bytes": 20062,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/studio-pending-denial.png",
+      "sha256": "988dbed47e176a56bd9af67a75b44de4c1e8b7c69b898b9f4fbb9e74f8eb289f",
+      "bytes": 19672,
+      "committedCopy": null
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-evidence-20260930/welcome-mobile-light-after.png",
+      "sha256": "f6c71b70c8fb4bdae143c4156b1573f9ad461fa78b8f91bea72ac859410203a2",
+      "bytes": 30576,
+      "committedCopy": null
+    }
+  ],
+  "progressSha256": {
+    "/private/tmp/creator-w1-continuation-evidence-20260930/component-review-progress.json": "4844395c6f2cd6c3543a333338986c55455ced02797ae232019bff18956c074c",
+    "/private/tmp/creator-w1-continuation-evidence-20260930/assigned-artboard-review-progress.json": "f9caf5801cccd2e131af3f613f2fcfd18e6659953cb5eb74aec0377a4c88ab8b",
+    "/private/tmp/creator-w1-continuation-evidence-20260930/assigned-artboard-viewport-mismatch.json": "24deb94bf7d3ac5fc18857fee9be27673a5c7e41c7e829b9115d2294a014039d"
+  }
+}

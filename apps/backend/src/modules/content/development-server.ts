@@ -20,6 +20,7 @@ import { SourceService } from "../sources/service.js";
 import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { ContentSources } from "./sources.js";
+import { createConversationRuntime } from "../conversation/runtime.js";
 
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3005",
   url = process.env.DATABASE_URL,
@@ -112,6 +113,8 @@ const backend = await createConfiguredBackend({
     },
   ],
   registerFeatures: async (runtime) => {
+    const conversation = createConversationRuntime(runtime);
+    runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
     const repository = new AgentRepository(runtime.pool),
       agent = new AgentService(
         repository,
@@ -119,6 +122,7 @@ const backend = await createConfiguredBackend({
       ),
       sources = new SourceService(repository);
     content = new ContentService(runtime.pool, {
+      assertAllowed: runtime.assertCreatorAllowed,
       follows: async (client, accountId, creatorId) =>
         Boolean(
           (
@@ -194,6 +198,7 @@ const backend = await createConfiguredBackend({
       profiles: runtime.identity?.profiles,
     });
     return [
+      conversation.registration,
       contentFeature(content),
       studioFeature(studio),
       commerceFeature(commerce),

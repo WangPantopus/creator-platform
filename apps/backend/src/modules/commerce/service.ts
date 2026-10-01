@@ -17,8 +17,13 @@ import { contentHash } from "../../core/canonical.js";
 import type { Actor } from "../identity/adapter.js";
 import { consumeSignedAct } from "../identity/signed-acts.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import type { AccessService } from "../access/scope.js";
+import type {
+  AccessService,
+  GenerationAllowance,
+  ThreadScope,
+} from "../access/scope.js";
 import { capabilitySnapshot } from "../access/commerce.js";
+import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
@@ -92,6 +97,14 @@ type EffectRow = {
   updated_at: Date;
   created_at: Date;
 };
+export type CommerceTrialAdmission = Readonly<{
+  allowance: GenerationAllowance;
+  units: number;
+  /** Actual fully prepared W3 generator/current W2 license, source and budget
+   * readiness. Durable reads/locks on this client, never provider I/O or a
+   * successful default. This must reject before the one-time window starts. */
+  assertReady(scope: ThreadScope, client: PoolClient): Promise<void>;
+}>;
 const ModeCommand = z
   .strictObject({
     title: z.string().trim().min(1).max(100),
@@ -134,24 +147,44 @@ export class CommerceService {
     private readonly access: AccessService,
     readonly policy: CommercePolicy,
     readonly provider?: PaymentProvider,
+    private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
+    private readonly trialAdmission?: CommerceTrialAdmission,
   ) {}
+  get firstConversationAvailable() {
+    return Boolean(
+      this.trialAdmission &&
+        this.access.isGenerationAllowance(this.trialAdmission.allowance) &&
+        this.access.threadScopeInTransactionAvailable &&
+        Number.isSafeInteger(this.trialAdmission.units) &&
+        this.trialAdmission.units > 0 &&
+        this.trialAdmission.units <= 2147483647 &&
+        typeof this.trialAdmission.assertReady === "function",
+    );
+  }
   async account<T>(
     actor: Actor,
     work: (client: PoolClient) => Promise<T>,
+    options?: { isolation: "repeatable read" },
   ): Promise<T> {
     invariant(
       actor.adultEligible,
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
+    await this.assertActorAllowed?.(actor);
     const client = await this.pool.connect();
     try {
-      await client.query("BEGIN");
+      await client.query(
+        options?.isolation === "repeatable read"
+          ? "BEGIN ISOLATION LEVEL REPEATABLE READ"
+          : "BEGIN",
+      );
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         actor.accountId,
       ]);
       await assertCurrentSession(client, actor.accountId);
       const value = await work(client);
+      await this.assertActorAllowed?.(actor);
       await client.query("COMMIT");
       return value;
     } catch (e) {
@@ -172,6 +205,31 @@ export class CommerceService {
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `${actor.accountId}:${operation}:${key}`,
     ]);
+    const cached = await this.cachedCommand<T>(
+      client,
+      actor,
+      operation,
+      key,
+      body,
+    );
+    if (cached.found) return cached.response;
+    const hash = contentHash({ operation, body });
+    const result = await work();
+    await client.query(
+      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
+      [actor.accountId, operation, key, hash, JSON.stringify(result)],
+    );
+    return result;
+  }
+  /** Read a completed command before provider I/O. Call within current actor
+   * authority; command() still serializes and rechecks after that I/O. */
+  async cachedCommand<T>(
+    client: PoolClient,
+    actor: Actor,
+    operation: string,
+    key: string,
+    body: unknown,
+  ): Promise<{ found: false } | { found: true; response: T }> {
     const hash = contentHash({ operation, body });
     const prior = (
       await client.query<{ request_hash: string; response: T }>(
@@ -185,14 +243,9 @@ export class CommerceService {
         "idempotency_conflict",
         "This retry key was used for another action.",
       );
-      return prior.response;
+      return { found: true, response: prior.response };
     }
-    const result = await work();
-    await client.query(
-      "INSERT INTO creator.idempotency_key(actor_account_id,operation,key,request_hash,response) VALUES($1,$2,$3,$4,$5)",
-      [actor.accountId, operation, key, hash, JSON.stringify(result)],
-    );
-    return result;
+    return { found: false };
   }
   private async fan(client: PoolClient, actor: Actor) {
     const fan = (
@@ -207,7 +260,7 @@ export class CommerceService {
   private async creator(client: PoolClient, actor: Actor, creatorId: string) {
     const row = (
       await client.query<{ id: string; display_name: string }>(
-        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified'",
+        "SELECT id,display_name FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required",
         [creatorId, actor.accountId],
       )
     ).rows[0];
@@ -228,6 +281,18 @@ export class CommerceService {
       "INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
       [p.creator_id, p.fan_id, p.id, p.version, type, JSON.stringify(payload)],
     );
+    if (type === "packet_submitted")
+      // Distinct durable cause for the creator's New packet notification. Only
+      // the first actual successful submission qualifies; reauthorization or
+      // a historical provider read must not manufacture another new request.
+      await client.query(
+        `INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload)
+         SELECT $1,$2,$3,$4,'packet_submitted_creator','{}'::jsonb
+         WHERE EXISTS(SELECT 1 FROM creator.commerce_packet WHERE id=$3 AND creator_id=$1 AND fan_id=$2 AND version=$4 AND state='submitted')
+         AND NOT EXISTS(SELECT 1 FROM creator.commerce_event WHERE aggregate_id=$3 AND creator_id=$1 AND fan_id=$2 AND type='packet_submitted' AND aggregate_version<$4)
+         ON CONFLICT DO NOTHING`,
+        [p.creator_id, p.fan_id, p.id, p.version],
+      );
   }
   private async ledger(
     client: PoolClient,
@@ -292,8 +357,8 @@ export class CommerceService {
       if (fan) await this.effectiveLimit(client, fan.id, this.policy.currency);
       const tiers = (
         await client.query(
-          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.state='active' AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
-          [creatorId ?? null],
+          "SELECT t.id,t.creator_id,t.name,t.capabilities,t.ai_allowance,t.catalog,t.state,t.version FROM creator.commerce_tier t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE (t.state='active' OR cp.account_id=$2) AND cp.verification='verified' AND NOT cp.recovery_required AND ($1::uuid IS NULL OR t.creator_id=$1) ORDER BY t.name,t.id LIMIT 100",
+          [creatorId ?? null, actor.accountId],
         )
       ).rows;
       const limits = fan
@@ -325,7 +390,7 @@ export class CommerceService {
       const pass = fan
         ? (
             await client.query(
-              "SELECT * FROM creator.commerce_pass WHERE fan_id=$1",
+              "SELECT *,cycle_start::text AS cycle_start,cycle_end::text AS cycle_end FROM creator.commerce_pass WHERE fan_id=$1",
               [fan.id],
             )
           ).rows
@@ -333,7 +398,7 @@ export class CommerceService {
       const slots = fan
         ? (
             await client.query(
-              "SELECT s.*,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY cycle_start DESC,position LIMIT 100",
+              "SELECT s.*,s.cycle_start::text AS cycle_start,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY s.cycle_start DESC,position LIMIT 100",
               [fan.id],
             )
           ).rows
@@ -390,7 +455,27 @@ export class CommerceService {
         [fanId, currency],
       )
     ).rows[0]!;
-    const heldTotal = BigInt(held.amount) + BigInt(billing.amount);
+    const passSchema = (
+      await client.query<{ count: string }>(
+        "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+      )
+    ).rows[0]!;
+    invariant(
+      passSchema.count === "0" || passSchema.count === "4",
+      "pass_schema_incomplete",
+      "Pass billing needs complete schema reconciliation before spending can continue.",
+    );
+    const passPending =
+      passSchema.count === "4"
+        ? (
+            await client.query<{ amount: string }>(
+              "SELECT coalesce(sum(q.amount),0)::text AS amount FROM creator.commerce_pass_billing_effect e JOIN creator.commerce_pass_quote q ON q.id=e.quote_id AND q.fan_id=e.fan_id WHERE e.fan_id=$1 AND q.currency=$2 AND e.operation='start' AND e.state IN('pending','processing','unknown') AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.fan_id=e.fan_id AND l.kind='capture' AND l.refs->>'effectId'=e.id::text)",
+              [fanId, currency],
+            )
+          ).rows[0]!.amount
+        : "0";
+    const heldTotal =
+      BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
       total <= BigInt(Number.MAX_SAFE_INTEGER),
@@ -675,6 +760,15 @@ export class CommerceService {
       capabilitySnapshot(client, scope),
     );
   }
+  /** Current W2/W3 audience on an already-issued canonical thread scope. */
+  async sourceAudienceFor(
+    scope: import("../access/scope.js").ThreadScope,
+    groups?: VerifiedGroupAudience,
+  ) {
+    return this.db.withThread(scope, (client) =>
+      commerceAudience(client, scope, groups),
+    );
+  }
   async packetDisclosure(actor: Actor, creatorId: string, fanId: string) {
     const scope = await this.access.openThread(actor, creatorId, fanId, false);
     invariant(
@@ -697,41 +791,70 @@ export class CommerceService {
     });
   }
   async openTrial(actor: Actor, creatorId: string, fanId: string) {
-    const scope = await this.access.openThread(actor, creatorId, fanId, false);
+    return this.account(actor, (client) =>
+      this.openTrialInTransaction(client, actor, creatorId, fanId),
+    );
+  }
+  /** W3 joins this before its consent/intro/admission transaction commits.
+   * W1 issues the current canonical fan scope on that exact held client. */
+  async openTrialInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+  ) {
+    invariant(
+      this.firstConversationAvailable,
+      "trial_unconfigured",
+      "The first conversation needs actual prepared generation and current admission authority.",
+    );
+    const scope = await this.access.openThreadInTransaction(
+      client,
+      actor,
+      creatorId,
+      fanId,
+      false,
+      "write",
+    );
     invariant(
       scope.authority === "fan",
       "fan_required",
       "Only the fan can open a first conversation.",
     );
-    const allowance = this.policy.trialAllowance;
-    invariant(
-      allowance !== undefined && this.policy.costAllowanceIntegrated === true,
-      "trial_unconfigured",
-      "The first conversation allowance is not configured.",
+    await this.trialAdmission!.assertReady(scope, client);
+    // Included or exhausted paid AI access must never be topped up by a new
+    // trial. The old one-time grant remains history even after its expiry.
+    const current = await capabilitySnapshot(client, scope);
+    if (current.capabilities.includes("ai_message")) return current;
+    await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      `trial:${creatorId}:${fanId}`,
+    ]);
+    const prior = await client.query(
+      "SELECT grant_id FROM creator.commerce_trial WHERE creator_id=$1 AND fan_id=$2",
+      [creatorId, fanId],
     );
-    return this.db.withThread(scope, async (client) => {
+    if (!prior.rowCount) {
+      const earlier = await client.query(
+        "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1",
+        [scope.threadId, creatorId, fanId],
+      );
+      invariant(
+        !earlier.rowCount,
+        "first_conversation_elapsed",
+        "A prior AI conversation cannot start another first-conversation allowance.",
+      );
+      const grant = (
+        await client.query<{ id: string }>(
+          `INSERT INTO creator.access_grant(creator_id,fan_id,capabilities,source,state,valid_from,valid_until,allowance) VALUES($1,$2,ARRAY['ai_message'],'trial','active',now(),now()+interval '24 hours',$3) RETURNING id`,
+          [creatorId, fanId, this.trialAdmission!.units],
+        )
+      ).rows[0]!;
       await client.query(
-        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
-        [`trial:${creatorId}:${fanId}`],
+        "INSERT INTO creator.commerce_trial(creator_id,fan_id,grant_id) VALUES($1,$2,$3)",
+        [creatorId, fanId, grant.id],
       );
-      const prior = await client.query(
-        "SELECT grant_id FROM creator.commerce_trial WHERE creator_id=$1 AND fan_id=$2",
-        [creatorId, fanId],
-      );
-      if (!prior.rowCount) {
-        const grant = (
-          await client.query<{ id: string }>(
-            `INSERT INTO creator.access_grant(creator_id,fan_id,capabilities,source,state,valid_from,valid_until,allowance) VALUES($1,$2,ARRAY['ai_message'],'trial','active',now(),now()+interval '24 hours',$3) RETURNING id`,
-            [creatorId, fanId, allowance],
-          )
-        ).rows[0]!;
-        await client.query(
-          "INSERT INTO creator.commerce_trial(creator_id,fan_id,grant_id) VALUES($1,$2,$3)",
-          [creatorId, fanId, grant.id],
-        );
-      }
-      return capabilitySnapshot(client, scope);
-    });
+    }
+    return capabilitySnapshot(client, scope);
   }
   async submit(actor: Actor, input: unknown) {
     const body = SubmitPacket.parse(input);
@@ -1159,17 +1282,22 @@ export class CommerceService {
               "signed_act_required",
               "Sign the exact changed offer first.",
             );
-            await consumeSignedAct(client, scope, body.signedActId, {
-              actType: "accept",
-              subjectId: scope.threadId,
-              content: {
-                packetId: p.id,
-                packetVersion: p.version,
-                snapshot: p.snapshot,
-                action: "group_offer",
-                proposedMode: mode,
+            const signedContentHash = await consumeSignedAct(
+              client,
+              scope,
+              body.signedActId,
+              {
+                actType: "accept",
+                subjectId: scope.threadId,
+                content: {
+                  packetId: p.id,
+                  packetVersion: p.version,
+                  snapshot: p.snapshot,
+                  action: "group_offer",
+                  proposedMode: mode,
+                },
               },
-            });
+            );
             await client.query(
               "UPDATE creator.commerce_packet SET state='offer_pending',proposed_mode=$2,version=version+1,updated_at=now() WHERE id=$1",
               [id, JSON.stringify(mode)],
@@ -1178,6 +1306,7 @@ export class CommerceService {
               client,
               { ...p, version: p.version + 1 },
               "packet_offer",
+              { signedActId: body.signedActId, signedContentHash },
             );
             return { effectId: null };
           }
@@ -1624,6 +1753,53 @@ export class CommerceService {
             "A delivered exact creator-signed reply is required.",
           );
           await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`commerce.delivery:${message.id}`],
+          );
+          const reused = await client.query(
+            "SELECT id FROM creator.commerce_commitment WHERE delivered_message_id=$1 AND id<>$2 LIMIT 1",
+            [message.id, c.id],
+          );
+          invariant(
+            reused.rowCount === 0,
+            "delivery_already_used",
+            "This reply already fulfilled another paid commitment. Deliver the promised reply for this request.",
+          );
+          if (message.author_kind === "approved_draft") {
+            const available = (
+              await client.query<{ relation: string | null }>(
+                "SELECT to_regclass('creator.commerce_approval')::text AS relation",
+              )
+            ).rows[0]?.relation;
+            invariant(
+              available,
+              "approval_unconfigured",
+              "Exact-version personal Approval must be connected before an approved draft fulfills this request.",
+            );
+            const approval = await client.query(
+              `SELECT a.id FROM creator.commerce_approval a JOIN creator.message m ON m.approval_id=a.id
+               JOIN creator.commerce_reply_draft d ON d.id=a.draft_id
+               JOIN creator.creator_profile cp ON cp.id=a.creator_id
+               JOIN creator.signed_act sa ON sa.id=a.signed_act_id JOIN creator.passkey_credential pc ON pc.id=sa.credential_id
+               WHERE m.id=$1 AND a.delivered_message_id=m.id AND a.thread_id=$2 AND a.creator_id=$3 AND a.fan_id=$4
+               AND a.approver_account_id=$5 AND a.text=m.text AND a.signed_act_id=m.signed_act_id
+               AND a.content_hash=m.signed_content_hash AND a.invalidated_at IS NULL
+               AND a.creator_epoch=cp.commerce_approval_epoch AND a.key_epoch=pc.commerce_approval_epoch`,
+              [
+                message.id,
+                scope.threadId,
+                scope.creatorId,
+                scope.fanId,
+                scope.creatorAccountId,
+              ],
+            );
+            invariant(
+              approval.rowCount === 1,
+              "approval_invalidated",
+              "This reply needs its exact personal Approval before fulfilling the request.",
+            );
+          }
+          await client.query(
             `UPDATE creator.commerce_commitment SET state='delivered',delivered_at=now(),delivered_message_id=$2,evidence=$3,payout_release_at=now()+interval '7 days',version=version+1 WHERE id=$1`,
             [
               c.id,
@@ -1689,13 +1865,21 @@ export class CommerceService {
             "The request mode changed. Refresh before choosing sharing.",
           );
           const c = (
-            await client.query<{ id: string; state: string }>(
-              "SELECT id,state FROM creator.commerce_commitment WHERE packet_id=$1",
+            await client.query<{
+              id: string;
+              state: string;
+              delivered_at: Date | null;
+            }>(
+              "SELECT id,state,delivered_at FROM creator.commerce_commitment WHERE packet_id=$1",
               [id],
             )
           ).rows[0];
           invariant(
-            c?.state === "delivered",
+            c &&
+              (body.enabled
+                ? c.state === "delivered"
+                : c.delivered_at !== null &&
+                  ["delivered", "refunded", "resolved"].includes(c.state)),
             "delivery_required",
             "Sharing needs a delivered reply.",
           );
@@ -1878,21 +2062,34 @@ export class CommerceService {
           );
           return;
         }
+        const recovered =
+          !packet.intent_ref && effect.attempt > 1
+            ? await this.provider.recoverAuthorization?.({
+                packetId: effect.packet_id,
+                amount: effect.request.amount,
+                currency: effect.request.currency,
+                paymentMethodId: effect.request.paymentMethodId!,
+                key: effect.provider_key,
+              })
+            : undefined;
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
-          Date.now() - effect.created_at.getTime() < 23 * 3600000,
+          packet.intent_ref !== null ||
+            recovered ||
+            Date.now() - effect.created_at.getTime() < 23 * 3600000,
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
         const intent = packet.intent_ref
           ? await this.provider.fetchIntent(packet.intent_ref)
-          : await this.provider.authorize({
+          : (recovered ??
+            (await this.provider.authorize({
               packetId: effect.packet_id,
               amount: effect.request.amount,
               currency: effect.request.currency,
               paymentMethodId: effect.request.paymentMethodId!,
               key: effect.provider_key,
-            });
+            })));
         await this.applyIntent(actor, effect, intent);
       } else {
         let intentId = effect.request.intentId;
@@ -1919,19 +2116,28 @@ export class CommerceService {
               : await this.provider.release(intentId, effect.provider_key);
           await this.applyIntent(actor, effect, intent);
         } else if (effect.operation === "refund") {
+          const recovered = !effect.provider_ref
+            ? await this.provider.recoverRefund?.({
+                intentId,
+                amount: effect.request.amount,
+                key: effect.provider_key,
+              })
+            : undefined;
           invariant(
             effect.provider_ref ||
+              recovered ||
               Date.now() - effect.created_at.getTime() < 23 * 3600000,
             "operator_reconciliation_required",
             "The original refund needs provider reconciliation; no second refund is attempted.",
           );
           const refund = effect.provider_ref
             ? await this.provider.fetchRefund(effect.provider_ref)
-            : await this.provider.refund(
+            : (recovered ??
+              (await this.provider.refund(
                 intentId,
                 effect.request.amount,
                 effect.provider_key,
-              );
+              )));
           await this.account(actor, async (client) => {
             const p = await this.lockPacket(client, effect.packet_id);
             await this.fenceEffect(client, effect);
@@ -2051,7 +2257,8 @@ export class CommerceService {
     invariant(
       own.rows[0] &&
         (effect.reconciliation
-          ? own.rows[0].state !== "processing"
+          ? own.rows[0].state !== "processing" &&
+            own.rows[0].attempt === effect.attempt
           : own.rows[0].state === "processing" &&
             own.rows[0].attempt === effect.attempt),
       "effect_lease_lost",

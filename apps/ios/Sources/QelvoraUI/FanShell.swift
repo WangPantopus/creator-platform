@@ -15,6 +15,7 @@ public final class FanSession: ObservableObject {
     private let storage: SecureSessionStorage
     private let baseURL: URL?
     private var generation = 0
+    private var rotatingCredential = false
     private var removedArrivalFor: String?
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
@@ -35,7 +36,7 @@ public final class FanSession: ObservableObject {
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
-        guard let api else { return }
+        guard let api, !rotatingCredential else { return }
         let current = generation
         do {
             guard try await storage.read() != nil else { session = nil; return }
@@ -45,7 +46,10 @@ public final class FanSession: ObservableObject {
             session = value; error = ""
         } catch let failure as CreatorAPIError {
             guard current == generation else { return }
-            if failure.status == 401 { await purge(); error = "Your session ended. Continue with Pantopus again." }
+            if failure.status == 401 {
+                if !busy { await refreshCredentials() }
+                else { await purge(); error = "Your session ended. Continue with Pantopus again." }
+            }
             else { error = Self.message(failure) }
         } catch { guard current == generation else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
@@ -73,24 +77,25 @@ public final class FanSession: ObservableObject {
         } catch { self.error = Self.message(error) }
         #endif
     }
-    public func saveHandle(_ handle: String, intro: String) async {
-        guard let api, !busy else { return }; busy = true; defer { busy = false }
-        do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh() }
-        catch { self.error = Self.message(error) }
+    public func saveHandle(_ handle: String, intro: String) async -> Bool {
+        guard let api, !busy else { return false }; busy = true; defer { busy = false }
+        do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh(); return session?.fan != nil }
+        catch { self.error = Self.message(error); return false }
     }
     public func logout(all: Bool = false) async {
+        guard !busy else { return }; busy = true; defer { busy = false }
         guard let api else { await purge(); return }
         do { if all { _ = try await api.revokeSessions() } else { _ = try await api.logout() }; await purge() }
         catch let error as CreatorAPIError { if error.status == 401 { await purge() } else { self.error = Self.message(error) } }
         catch { self.error = "Sign-out could not reach the server. Retry to revoke the session." }
     }
     public func refreshCredentials() async {
-        guard let api, !busy else { return }; busy = true; let current = generation; defer { busy = false }
-        do { let result = try await api.refreshSession(); guard current == generation else { return }; try await storage.save(result.token); await refresh() }
+        guard let api, !busy else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
+        do { let result = try await api.refreshSession(); guard current == generation else { return }; try await storage.save(result.token); generation += 1; rotatingCredential = false; await refresh() }
         catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { await purge() }; error = Self.message(failure) }
         catch { self.error = "Session refresh could not complete. Reconnect and try again." }
     }
-    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil) }
+    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
@@ -111,7 +116,9 @@ public struct FanAppShell: View {
     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
     public var body: some View {
         VStack(spacing: 0) {
-            if !model.error.isEmpty { Notice(tone: .error, title: "Account status", children: model.error).padding(16) }
+            if !model.error.isEmpty {
+              Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+            }
             if model.choosingDevelopmentActor {
                 VStack(spacing: 16) {
                     Notice(title: "Development identity", children: "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
@@ -126,8 +133,9 @@ public struct FanAppShell: View {
                 NativeHandleForm(model: model)
             } else {
                 VStack(spacing: 0) {
+                    let feature = features.first(where: { $0.matches(model.destination) })
                     if model.session?.mode == .development { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
-                    if model.destination == "/you" || model.destination == "/identity/account" {
+                    if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
                             Text("Your account").qText("display-md")
                             Text("@" + (model.session?.fan?.handle ?? "")).qText("body")
@@ -143,7 +151,7 @@ public struct FanAppShell: View {
                             #endif
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature = features.first(where: { $0.matches(model.destination) }) { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }
@@ -174,7 +182,7 @@ struct NativeHandleForm: View {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
                             SwiftUI.Button { model.destination = "/you" } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text("SIGNED IN WITH PANTOPUS").qText("meta")
+                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("meta")
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
@@ -189,14 +197,14 @@ struct NativeHandleForm: View {
                         }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))
                     }
                     Spacer(minLength: 24)
-                    Button(model.busy ? "Saving…" : "Continue", variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { await model.saveHandle(handle, intro: intro); if model.session?.fan != nil && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
+                    Button(model.busy ? "Saving…" : "Continue", variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { if await model.saveHandle(handle, intro: intro) && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
                 }.frame(minHeight: max(0, frame.size.height - 52)).padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 36)
             }
         }.onAppear { handle = model.session?.fan?.handle ?? ""; intro = model.session?.fan?.intro ?? "" }
     }
     @ViewBuilder private var handleField: some View {
         #if os(iOS)
-        TextField("@handle", text: $handle).textInputAutocapitalization(.never).autocorrectionDisabled().submitLabel(.next)
+        TextField("@handle", text: $handle).qDisableAutoCapitalization().autocorrectionDisabled().submitLabel(.next)
         #else
         TextField("@handle", text: $handle)
         #endif

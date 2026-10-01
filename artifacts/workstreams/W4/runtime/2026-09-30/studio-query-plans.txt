@@ -1,0 +1,30 @@
+BEGIN
+SET
+                                                                                                                                                                 QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=16.77..16.82 rows=2 width=68)
+   ->  Incremental Sort  (cost=16.77..16.82 rows=2 width=68)
+         Sort Key: m.tier_id, m.id
+         Presorted Key: m.tier_id
+         ->  Result  (cost=0.43..16.76 rows=1 width=68)
+               One-Time Filter: (((NULLIF(current_setting('app.fan_id'::text, true), ''::text))::uuid = '00000000-0000-0000-0000-000000000000'::uuid) AND ((NULLIF(current_setting('app.creator_id'::text, true), ''::text))::uuid = '00000000-0000-0000-0000-000000000000'::uuid))
+               ->  Nested Loop  (cost=0.43..16.76 rows=1 width=108)
+                     ->  Index Scan using commerce_membership_current on commerce_membership m  (cost=0.12..8.41 rows=1 width=132)
+                           Index Cond: (fan_id = '00000000-0000-0000-0000-000000000000'::uuid)
+                           Filter: ((creator_id = '00000000-0000-0000-0000-000000000000'::uuid) AND (state = ANY ('{active,grace,cancelled}'::text[])) AND (period_start <= now()) AND creator.commerce_scope(creator_id, fan_id) AND (CASE WHEN (state = 'grace'::text) THEN COALESCE(grace_end, period_end) ELSE period_end END > now()))
+                     ->  Index Scan using access_grant_pkey on access_grant g  (cost=0.28..8.31 rows=1 width=56)
+                           Index Cond: (id = m.grant_id)
+                           Filter: (('ai_message'::text = ANY (capabilities)) AND (fan_id = '00000000-0000-0000-0000-000000000000'::uuid) AND (creator_id = '00000000-0000-0000-0000-000000000000'::uuid) AND (state = 'active'::text) AND (valid_from <= now()) AND (valid_until > now()))
+(13 rows)
+
+                                                                                                                                                   QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.28..8.32 rows=1 width=106)
+   ->  Result  (cost=0.28..8.32 rows=1 width=106)
+         One-Time Filter: (((NULLIF(current_setting('app.fan_id'::text, true), ''::text))::uuid = '00000000-0000-0000-0000-000000000000'::uuid) AND ((NULLIF(current_setting('app.creator_id'::text, true), ''::text))::uuid = '00000000-0000-0000-0000-000000000000'::uuid))
+         ->  Index Scan Backward using message_thread_id_sequence_key on message  (cost=0.28..8.32 rows=1 width=106)
+               Index Cond: (thread_id = '00000000-0000-0000-0000-000000000000'::uuid)
+               Filter: ((delivery_state = ANY ('{delivered,interrupted}'::text[])) AND (fan_id = '00000000-0000-0000-0000-000000000000'::uuid) AND (creator_id = '00000000-0000-0000-0000-000000000000'::uuid) AND (author_kind = 'ai'::text) AND (length(btrim(text)) >= 1) AND (length(btrim(text)) <= 8000))
+(6 rows)
+
+ROLLBACK

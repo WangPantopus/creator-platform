@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-09-30T09:23:42.273087+00:00",
+  "sourceRevision": "9f5afcbec6527a66846d86758e3af9958262a995",
+  "tag": "creator-platform-w8-trust:9f5afcb",
+  "imageId": "sha256:362bb3fb26283ae3de7854580d3b521b009fc5bb44c8fb784bd435f84431f245",
+  "sizeBytes": 353953036,
+  "configuredUser": "node",
+  "runtime": {
+    "uid": 1000,
+    "node": "v24.21.0",
+    "dependencies": {
+      "express": "5.2.1",
+      "pg": "8.23.0",
+      "zod": "4.6.5"
+    },
+    "compilerPresent": false,
+    "backendSourcePresent": false
+  },
+  "unconfiguredStartup": {
+    "exitCode": 1,
+    "expectedConfigurationRefusal": true,
+    "message": "Choose a deployed environment."
+  },
+  "scope": "Local image build and fail-closed startup only; no staging, provider, signing or deployment acceptance."
+}

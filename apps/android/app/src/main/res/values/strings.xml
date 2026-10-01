@@ -206,4 +206,668 @@
   <string name="publishing_pending" formatted="false">Publishing waits until every test passes.</string>
   <string name="sign_biometric" formatted="false">Sign with biometrics</string>
   <string name="exact_biometric_signature" formatted="false">Biometrics sign exactly this. Any change needs a new signature.</string>
+  <string name="growth_this_action_could_not_be_completed" formatted="false">This action could not be completed.</string>
+  <string name="growth_could_not_update_follow" formatted="false">Could not update follow.</string>
+  <string name="growth_saving" formatted="false">Saving…</string>
+  <string name="growth_following_unfollow" formatted="false">Following · unfollow</string>
+  <string name="growth_follow" formatted="false">Follow</string>
+  <string name="growth_this_week" formatted="false">THIS WEEK</string>
+  <string name="growth_could_not_open_update" formatted="false">Could not open update.</string>
+  <string name="growth_share_link" formatted="false">Share link</string>
+  <string name="growth_link_copied" formatted="false">Link copied.</string>
+  <string name="growth_the_link_was_not_shared" formatted="false">The link was not shared.</string>
+  <string name="growth_offline_this_page_may_be_out_of_date_actions_need" formatted="false">Offline · this page may be out of date. Actions need a connection.</string>
+  <string name="growth_answer" formatted="false">Answer {value1}</string>
+  <string name="growth_could_not_save" formatted="false">Could not save.</string>
+  <string name="growth_recommended_next" formatted="false">RECOMMENDED NEXT</string>
+  <string name="growth_answer_once_for_everyone" formatted="false">Answer once for everyone</string>
+  <string name="growth_evidence_distinct_fans_seven_day_window_beginning_effort_and_audience" formatted="false">Evidence: {value1} distinct fans · seven-day window beginning {value2}. Effort and audience must be chosen by you.</string>
+  <string name="growth_outline" formatted="false">Outline</string>
+  <string name="growth_open_group_answer_composer" formatted="false">Open group-answer composer</string>
+  <string name="growth_publishing_is_unavailable" formatted="false">Publishing is unavailable.</string>
+  <string name="growth_action_unavailable" formatted="false">Action unavailable.</string>
+  <string name="growth_the_development_server_is_unavailable" formatted="false">The development server is unavailable.</string>
+  <string name="growth_w7_development_controls" formatted="false">W7 development controls</string>
+  <string name="growth_development_actor" formatted="false">Development actor</string>
+  <string name="growth_use" formatted="false">Use {value1}</string>
+  <string name="growth_public_creator_projection" formatted="false">Public creator projection</string>
+  <string name="growth_publish_synthetic_public_note" formatted="false">Publish synthetic public Note</string>
+  <string name="growth_distinct_fan_insight_signal" formatted="false">Distinct-fan insight signal</string>
+  <string name="growth_synthetic_evidence_week" formatted="false">Synthetic evidence week</string>
+  <string name="growth_topic" formatted="false">Topic</string>
+  <string name="growth_bisque_temperature" formatted="false">Bisque temperature</string>
+  <string name="growth_first_kiln" formatted="false">First kiln</string>
+  <string name="growth_fan_number" formatted="false">Fan number</string>
+  <string name="growth_source_version" formatted="false">Source version</string>
+  <string name="growth_still_unresolved" formatted="false">Still unresolved</string>
+  <string name="growth_record_synthetic_categorical_signal" formatted="false">Record synthetic categorical signal</string>
+  <string name="growth_close_the_synthetic_evidence_window" formatted="false">Close the synthetic evidence window</string>
+  <string name="growth_open_discover" formatted="false">Open Discover</string>
+  <string name="growth_open_home" formatted="false">Open Home</string>
+  <string name="growth_open_notifications" formatted="false">Open Notifications</string>
+  <string name="growth_open_insights" formatted="false">Open Insights</string>
+  <string name="growth_feedback_saved_thank_you" formatted="false">Feedback saved. Thank you.</string>
+  <string name="growth_feedback_was_not_saved" formatted="false">Feedback was not saved.</string>
+  <string name="growth_optional_feedback" formatted="false">Optional feedback</string>
+  <string name="growth_choose_a_topic_and_rating_no_conversation_text_is_collected" formatted="false">Choose a topic and rating. No conversation text is collected.</string>
+  <string name="growth_finding_creators" formatted="false">Finding creators</string>
+  <string name="growth_usefulness" formatted="false">Usefulness</string>
+  <string name="growth_notifications" formatted="false">Notifications</string>
+  <string name="growth_leaving" formatted="false">Leaving</string>
+  <string name="growth_rating" formatted="false">Rating</string>
+  <string name="growth_skip_rating" formatted="false">Skip rating</string>
+  <string name="growth_out_of5" formatted="false">{value1} out of 5</string>
+  <string name="growth_send_feedback" formatted="false">Send feedback</string>
+  <string name="growth_draft_proposal_saved_no_experiment_has_been_activated" formatted="false">Draft proposal saved. No experiment has been activated.</string>
+  <string name="growth_proposal_was_not_saved" formatted="false">Proposal was not saved.</string>
+  <string name="growth_propose_an_experiment" formatted="false">Propose an experiment</string>
+  <string name="growth_drafts_require_an_agreed_review_before_activation_saving_a_draft" formatted="false">Drafts require an agreed review before activation. Saving a draft does not change fan experiences.</string>
+  <string name="growth_hypothesis" formatted="false">Hypothesis</string>
+  <string name="growth_success_criterion" formatted="false">Success criterion</string>
+  <string name="growth_stop_criterion" formatted="false">Stop criterion</string>
+  <string name="growth_save_draft_proposal" formatted="false">Save draft proposal</string>
+  <string name="growth_your_experiment_proposals" formatted="false">Your experiment proposals</string>
+  <string name="growth_stop_this_proposal" formatted="false">Stop this proposal</string>
+  <string name="growth_could_not_stop_this_proposal" formatted="false">Could not stop this proposal.</string>
+  <string name="growth_your_launch_kit" formatted="false">Your launch kit</string>
+  <string name="growth_share_your_public_creator_page_or_an_invitation_with_people" formatted="false">Share your public creator page or an invitation with people who choose to open it.</string>
+  <string name="growth_create_and_copy_invitation" formatted="false">Create and copy invitation</string>
+  <string name="growth_invitation_copied_expires" formatted="false">Invitation copied. Expires {value1}.</string>
+  <string name="growth_invitation_unavailable" formatted="false">Invitation unavailable.</string>
+  <string name="growth_invitations_expire_after30_days_no_messages_are_sent_automatically" formatted="false">Invitations expire after 30 days. No messages are sent automatically. Reply sharing needs both parties\' permission.</string>
+  <string name="growth_in_your_pass" formatted="false">In your pass</string>
+  <string name="growth_joins" formatted="false">Joins {value1}</string>
+  <string name="growth_not_in_your_pass" formatted="false">Not in your pass</string>
+  <string name="growth_preferences_saved_your_in_app_record_remains_available" formatted="false">Preferences saved. Your in-app record remains available.</string>
+  <string name="growth_preferences_were_not_saved" formatted="false">Preferences were not saved.</string>
+  <string name="growth_your_in_app_notification_record_cannot_be_turned_off_push" formatted="false">Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.</string>
+  <string name="growth_push_notifications" formatted="false">Push notifications</string>
+  <string name="growth_email_digest" formatted="false">Email digest</string>
+  <string name="growth_hide_sensitive_previews" formatted="false">Hide sensitive previews</string>
+  <string name="growth_quiet_hours" formatted="false">Quiet hours</string>
+  <string name="growth_from" formatted="false">From</string>
+  <string name="growth_until" formatted="false">Until</string>
+  <string name="growth_time_zone" formatted="false">Time zone</string>
+  <string name="growth_leave_both_times_empty_for_no_quiet_hours_matching_times" formatted="false">Leave both times empty for no quiet hours. Matching times pause optional delivery all day.</string>
+  <string name="growth_updates_from_creators" formatted="false">Updates from creators</string>
+  <string name="growth_creators_you_follow_or_receive_updates_from_appear_here" formatted="false">Creators you follow or receive updates from appear here.</string>
+  <string name="growth_notification_types" formatted="false">Notification types</string>
+  <string name="growth_push" formatted="false">Push</string>
+  <string name="growth_email" formatted="false">Email</string>
+  <string name="growth_save_preferences" formatted="false">Save preferences</string>
+  <string name="growth_this_feature_is_not_connected_yet" formatted="false">This feature is not connected yet.</string>
+  <string name="growth_the_service_is_unavailable_please_try_again" formatted="false">The service is unavailable. Please try again.</string>
+  <string name="growth_this_feature_is_unavailable" formatted="false">This feature is unavailable.</string>
+  <string name="growth_studio" formatted="false">{value1} Studio</string>
+  <string name="growth_impact" formatted="false">Impact</string>
+  <string name="growth_first72_hours" formatted="false">First 72 hours</string>
+  <string name="growth_launch_kit" formatted="false">Launch kit</string>
+  <string name="growth_measurement" formatted="false">Measurement</string>
+  <string name="growth_development_environment_synthetic_data_providers_unavailable" formatted="false">Development environment · synthetic data · providers unavailable ·</string>
+  <string name="growth_development_controls" formatted="false">Development controls</string>
+  <string name="growth_sign_in_to_continue" formatted="false">Sign in to continue</string>
+  <string name="growth_temporarily_unavailable" formatted="false">Temporarily unavailable</string>
+  <string name="growth_try_again" formatted="false">Try again</string>
+  <string name="growth_this_post_is_unavailable" formatted="false">This post is unavailable.</string>
+  <string name="growth_this_post_cannot_be_used_as_conversation_context" formatted="false">This post cannot be used as conversation context.</string>
+  <string name="growth_s_ai" formatted="false">{value1}\'s AI</string>
+  <string name="growth_you_re_talking_to_s_ai_steps_in_on_request" formatted="false">You\'re talking to {value1}\'s AI · {value2} steps in on request.</string>
+  <string name="growth_from_a_post" formatted="false">From a post</string>
+  <string name="growth_ai_paused" formatted="false">AI paused</string>
+  <string name="growth_conversation_service_not_connected" formatted="false">Conversation service not connected</string>
+  <string name="growth_s_ai_is_paused" formatted="false">{value1}\'s AI is paused.</string>
+  <string name="growth_your_entry_context_is_valid_messaging_and_processor_consent_require" formatted="false">Your entry context is valid. Messaging and processor consent require the conversation service.</string>
+  <string name="growth_a_first_conversation_lasts_about24_hours_once_available_no" formatted="false">A first conversation lasts about 24 hours once available. No message has been sent.</string>
+  <string name="growth_creator_unavailable" formatted="false">Creator unavailable</string>
+  <string name="growth_back_to_discover" formatted="false">Back to Discover</string>
+  <string name="growth_s_page" formatted="false">{value1}\'s page</string>
+  <string name="growth_official_ai" formatted="false">Official AI · {value1}</string>
+  <string name="growth_message_s_ai" formatted="false">Message {value1}\'s AI</string>
+  <string name="growth_s_ai_is_paused_public_profile_remains_readable" formatted="false">{value1}\'s AI is paused · public profile remains readable.</string>
+  <string name="growth_official_means_authorized_this_ai_it_does_not_mean_read" formatted="false">Official means {value1} authorized this AI. It does not mean {value2} read your message.</string>
+  <string name="growth_creator_sections" formatted="false">Creator sections</string>
+  <string name="growth_from2" formatted="false">From {value1}</string>
+  <string name="growth_open_post" formatted="false">Open post</string>
+  <string name="growth_come_back_when_publishes_something" formatted="false">Come back when {value1} publishes something.</string>
+  <string name="growth_no_public_posts_yet" formatted="false">No public posts yet</string>
+  <string name="growth_what_s_ai_knows" formatted="false">What {value1}\'s AI knows</string>
+  <string name="growth_s_time_by_request" formatted="false">{value1}\'s time, by request</string>
+  <string name="growth_requests_and_prices_come_from_the_creator_s_current_offer" formatted="false">Requests and prices come from the creator\'s current offer. No offer is connected here yet.</string>
+  <string name="growth_optional_link_choices" formatted="false">Optional link choices</string>
+  <string name="growth_post_unavailable" formatted="false">Post unavailable</string>
+  <string name="growth_public_post" formatted="false">PUBLIC POST</string>
+  <string name="growth_ask_about_this_post_the_context_stays_with_your_conversation" formatted="false">Ask about this post. The context stays with your conversation.</string>
+  <string name="growth_ask_s_ai_about_this" formatted="false">Ask {value1}\'s AI about this</string>
+  <string name="growth_search_creators" formatted="false">Search creators</string>
+  <string name="growth_search_creators_crafts_or_questions" formatted="false">Search creators, crafts or questions</string>
+  <string name="growth_search" formatted="false">Search</string>
+  <string name="growth_categories" formatted="false">Categories</string>
+  <string name="growth_s_ai_can_talk_about" formatted="false">{value1}\'s AI can talk about: {value2}.</string>
+  <string name="growth_official_ai_try_a_first_conversation_when_available" formatted="false">Official AI · try a first conversation when available</string>
+  <string name="growth_try_a_different_need_or_browse_a_category" formatted="false">Try a different need or browse a category.</string>
+  <string name="growth_no_creators_found" formatted="false">No creators found</string>
+  <string name="growth_public_creator_information_alphabetical_order_official_means_the_creator_authorized" formatted="false">Public creator information · alphabetical order. Official means the creator authorized this AI.</string>
+  <string name="growth_refine_your_search_to_see_more_creators" formatted="false">Refine your search to see more creators.</string>
+  <string name="growth_notifications2" formatted="false">Notifications · {value1}</string>
+  <string name="growth_unread_notifications" formatted="false">{value1} unread notifications</string>
+  <string name="growth_your_people" formatted="false">Your people</string>
+  <string name="growth_pick_a_creator_to_start" formatted="false">Pick a creator to start</string>
+  <string name="growth_discover_creators" formatted="false">Discover creators</string>
+  <string name="growth_new_from_people_you_follow" formatted="false">New from people you follow</string>
+  <string name="growth_latest_first" formatted="false">Latest first.</string>
+  <string name="growth_an_invitation_from" formatted="false">AN INVITATION FROM {value1}</string>
+  <string name="growth_s_ai_can_help_you_keep_going" formatted="false">{value1}\'s AI can help you keep going.</string>
+  <string name="growth_accept_invitation" formatted="false">Accept invitation</string>
+  <string name="growth_start_with_a_first_conversation_of_about24_hours_when" formatted="false">Start with a first conversation of about 24 hours when available. No card needed.</string>
+  <string name="growth_settings" formatted="false">Settings</string>
+  <string name="growth_your_in_app_record_will_appear_here_push_and_email" formatted="false">Your in-app record will appear here. Push and email are optional.</string>
+  <string name="growth_no_updates_yet" formatted="false">No updates yet</string>
+  <string name="growth_notification_settings" formatted="false">Notification settings</string>
+  <string name="growth_this_card_was_withdrawn" formatted="false">This card was withdrawn.</string>
+  <string name="growth_the_shared_content_is_no_longer_available" formatted="false">The shared content is no longer available.</string>
+  <string name="growth_prepared_by_ai_approved_by" formatted="false">Prepared by AI · approved by {value1}</string>
+  <string name="growth_signed_by" formatted="false">Signed by {value1} · {value2}</string>
+  <string name="growth_verify_this_immutable_version" formatted="false">Verify this immutable version {value1}: {value2}</string>
+  <string name="growth_s_note_on_this_reply" formatted="false">{value1}\'s note on this reply: {value2}</string>
+  <string name="growth_share_s_reply" formatted="false">Share {value1}\'s reply</string>
+  <string name="growth_the_author_label_and_verification_link_stay_on_the_default" formatted="false">The author label and verification link stay on the default export.</string>
+  <string name="growth_s_reply" formatted="false">{value1}\'s reply</string>
+  <string name="growth_download_labeled_image" formatted="false">Download labeled image</string>
+  <string name="growth_your_first72_hours" formatted="false">Your first 72 hours</string>
+  <string name="growth_your_first_digest_appears_after_the72_hour_observation_window" formatted="false">Your first digest appears after the 72-hour observation window closes.</string>
+  <string name="growth_publish_your_ai_to_start" formatted="false">Publish your AI to start</string>
+  <string name="growth_the_observation_window_closes_counts_will_appear_after_current_publication" formatted="false">The observation window closes {value1}. Counts will appear after current publication and source evidence are checked.</string>
+  <string name="growth_your_digest_needs_a_connected_source" formatted="false">Your digest needs a connected source</string>
+  <string name="growth_your_digest_is_being_prepared" formatted="false">Your digest is being prepared</string>
+  <string name="growth_published_ai_version" formatted="false">PUBLISHED AI VERSION {value1}</string>
+  <string name="growth_approved_sources" formatted="false">approved sources</string>
+  <string name="growth_useful_answers" formatted="false">useful answers</string>
+  <string name="growth_what_to_review_next" formatted="false">What to review next</string>
+  <string name="growth_review_the_sources_your_ai_can_use" formatted="false">Review the sources your AI can use.</string>
+  <string name="growth_review_your_ai_s_boundaries_and_unresolved_topics" formatted="false">Review your AI\'s boundaries and unresolved topics.</string>
+  <string name="growth_keep_your_sources_current_and_return_when_you_have_something" formatted="false">Keep your sources current and return when you have something useful to share.</string>
+  <string name="growth_distinct_fans" formatted="false">{value1} · {value2} distinct fans</string>
+  <string name="growth_open_your_launch_kit" formatted="false">Open your launch kit</string>
+  <string name="growth_your_week_impact" formatted="false">YOUR WEEK · IMPACT</string>
+  <string name="growth_the_people_you_helped_this_week" formatted="false">The people you helped this week.</string>
+  <string name="growth_ai_conversations" formatted="false">AI conversations</string>
+  <string name="growth_personal_replies" formatted="false">Personal replies</string>
+  <string name="growth_thanks" formatted="false">Thanks</string>
+  <string name="growth_seven_days_from_thanks_appear_only_when_fans_choose_to" formatted="false">Seven days from {value1}. Thanks appear only when fans choose to share them.</string>
+  <string name="growth_a_weekly_digest_appears_when_the_activity_and_consented_thanks" formatted="false">A weekly digest appears when the activity and consented Thanks sources are connected. No activity is inferred.</string>
+  <string name="growth_your_first_digest_is_on_its_way" formatted="false">Your first digest is on its way</string>
+  <string name="growth_insights_last_closed_week" formatted="false">INSIGHTS · LAST CLOSED WEEK</string>
+  <string name="growth_what_fans_asked_and_your_sources_couldn_t_answer" formatted="false">What fans asked, and your sources couldn\'t answer</string>
+  <string name="growth_only_groups_with_at_least_five_distinct_fans_appear_closed" formatted="false">Only groups with at least five distinct fans appear. Closed weekly windows prevent repeated small filters from revealing individual questions.</string>
+  <string name="growth_unresolved_signals_from_fans7_days" formatted="false">{value1} unresolved signals from {value2} fans · 7 days</string>
+  <string name="growth_groups_appear_after_a_complete_weekly_evidence_window_with_at" formatted="false">Groups appear after a complete weekly evidence window, with at least five distinct fans. Individual questions stay private.</string>
+  <string name="growth_no_eligible_question_groups_yet" formatted="false">No eligible question groups yet</string>
+  <string name="growth_arrival_and_return" formatted="false">Arrival and return</string>
+  <string name="growth_last30_days_five_actor_minimum" formatted="false">Last 30 days · five-actor minimum</string>
+  <string name="growth_distinct_actors" formatted="false">Distinct actors</string>
+  <string name="growth_closed_arrival_cohorts" formatted="false">Closed arrival cohorts</string>
+  <string name="growth_return_day" formatted="false">Return day</string>
+  <string name="growth_eligible_actors" formatted="false">Eligible actors</string>
+  <string name="growth_unavailable" formatted="false">Unavailable</string>
+  <string name="growth_median_time_to_first_useful_answer" formatted="false">Median time to first useful answer:</string>
+  <string name="growth_seconds" formatted="false">{value1} seconds</string>
+  <string name="growth_pilot_targets_and_growth_experiments_require_agreed_success_and_stop" formatted="false">Pilot targets and growth experiments require agreed success and stop criteria. No uplift is claimed.</string>
+  <string name="growth_keep_useful_updates_within_reach" formatted="false">Keep useful updates within reach</string>
+  <string name="growth_choose_push_or_email_in_settings_when_you_want_updates" formatted="false">Choose push or email in settings when you want updates. You can change them any time.</string>
+  <string name="growth_choose_updates" formatted="false">Choose updates</string>
+  <string name="growth_open_this_in_the_app" formatted="false">Open this in the app</string>
+  <string name="growth_continue_with_the_same_account_installing_is_optional" formatted="false">Continue with the same account. Installing is optional.</string>
+  <string name="growth_open_app_store" formatted="false">Open app store</string>
+  <string name="growth_later" formatted="false">Later</string>
+  <string name="growth_don_t_ask_again" formatted="false">Don\'t ask again</string>
+  <string name="growth_this_choice_could_not_be_saved_try_again" formatted="false">This choice could not be saved. Try again.</string>
+  <string name="growth_create_an_invitation_link" formatted="false">Create an invitation link</string>
+  <string name="growth_invitation_link_ready" formatted="false">Invitation link ready</string>
+  <string name="growth_send_it_only_to_someone_who_wants_it_links_expire" formatted="false">Send it only to someone who wants it. Links expire after 30 days.</string>
+  <string name="growth_revoke_this_invitation" formatted="false">Revoke this invitation</string>
+  <string name="growth_invitation_revoked" formatted="false">Invitation revoked.</string>
+  <string name="growth_allow_this_visit_s_source_to_be_counted" formatted="false">Allow this visit\'s source to be counted</string>
+  <string name="growth_optional_counts_this_creator_link_post_invitation_or_share_with" formatted="false">Optional. Counts this creator link, post, invitation or share with your account. No conversation text or device fingerprint is collected.</string>
+  <string name="growth_your_choice_was_saved" formatted="false">Your choice was saved.</string>
+  <string name="growth_invited_you_in" formatted="false">{name} invited you in</string>
+  <string name="growth_personal_reply2" formatted="false">{name} · personal reply</string>
+  <string name="growth_signed_by_version" formatted="false">Signed by {name} · version {version}</string>
+  <string name="growth_back_to_s_page" formatted="false">Back to {name}\'s page</string>
+  <string name="growth_ask_s_ai_about_this2" formatted="false">Ask {name}\'s AI about this</string>
+  <string name="growth_official_means_authorized_this_ai_it_does_not_mean_read2" formatted="false">Official means {name} authorized this AI. It does not mean {name} read your message.</string>
+  <string name="growth_what_s_ai_knows2" formatted="false">What {name}\'s AI knows</string>
+  <string name="growth_from3" formatted="false">From {name}</string>
+  <string name="growth_come_back_when_publishes_something2" formatted="false">Come back when {name} publishes something.</string>
+  <string name="growth_s_time_by_request2" formatted="false">{name}\'s time, by request</string>
+  <string name="growth_push_and_email2" formatted="false">{name} · push and email</string>
+  <string name="growth_on" formatted="false">on</string>
+  <string name="growth_off" formatted="false">off</string>
+  <string name="growth_muted" formatted="false">muted</string>
+  <string name="growth_push_and_email_allowed" formatted="false">push and email allowed</string>
+  <string name="growth_continue_with_pantopus_to_open_your_account_s_current_state" formatted="false">Continue with Pantopus to open your account\'s current state.</string>
+  <string name="growth_this_action_is_unavailable_to_this_account" formatted="false">This action is unavailable to this account.</string>
+  <string name="growth_this_destination_is_no_longer_available" formatted="false">This destination is no longer available.</string>
+  <string name="growth_the_service_is_unavailable_reconnect_and_try_again" formatted="false">The service is unavailable. Reconnect and try again.</string>
+  <string name="growth_try_another_need_or_browse_a_category" formatted="false">Try another need or browse a category.</string>
+  <string name="growth_your_in_app_record_cannot_be_turned_off" formatted="false">Your in-app record cannot be turned off.</string>
+  <string name="growth_find_a_creator_whose_work_you_care_about" formatted="false">Find a creator whose work you care about.</string>
+  <string name="growth_a_first_conversation_of_about24_hours_no_card_needed" formatted="false">A first conversation of about 24 hours · no card needed.</string>
+  <string name="growth_correction" formatted="false">Correction</string>
+  <string name="growth_this_card_was_withdrawn2" formatted="false">This card was withdrawn</string>
+  <string name="growth_permission_to_share_this_reply_is_no_longer_current" formatted="false">Permission to share this reply is no longer current.</string>
+  <string name="growth_your_valid_entry_context_is_kept_no_message_has_been" formatted="false">Your valid entry context is kept. No message has been sent.</string>
+  <string name="growth_post_public" formatted="false">POST · PUBLIC</string>
+  <string name="growth_current_offers" formatted="false">Current offers</string>
+  <string name="growth_requests_and_prices_need_the_creator_s_current_offer_no" formatted="false">Requests and prices need the creator\'s current offer. No offer is connected here yet.</string>
+  <string name="growth_loading" formatted="false">Loading</string>
+  <string name="growth_draft_for_your_next_pass_cycle" formatted="false">Draft for your next pass cycle</string>
+  <string name="growth_the_growth_service_is_not_configured" formatted="false">The growth service is not configured.</string>
+  <string name="growth_this_destination_is_unavailable_reconnect_and_try_again" formatted="false">This destination is unavailable. Reconnect and try again.</string>
+  <string name="growth_your_in_app_record_cannot_be_turned_off_push_and" formatted="false">Your in-app record cannot be turned off. Push and email are optional.</string>
+  <string name="growth_quiet_hours_from_hh_mm" formatted="false">Quiet hours from · HH:mm</string>
+  <string name="growth_quiet_hours_until_hh_mm" formatted="false">Quiet hours until · HH:mm</string>
+  <string name="growth_leave_both_times_empty_for_no_quiet_hours" formatted="false">Leave both times empty for no quiet hours.</string>
+  <string name="growth_reload_settings" formatted="false">Reload settings</string>
+  <string name="growth_settings_need_a_current_signed_in_account_and_network_connection" formatted="false">Settings need a current signed-in account and network connection.</string>
+  <string name="growth_preferences_were_not_saved_check_both_quiet_hour_times_and" formatted="false">Preferences were not saved. Check both quiet-hour times and reconnect.</string>
+  <string name="growth_this_response_is_unavailable" formatted="false">This response is unavailable.</string>
+  <string name="growth_this_creator_is_unavailable" formatted="false">This creator is unavailable.</string>
+  <string name="growth_this_destination_is_not_connected_yet" formatted="false">This destination is not connected yet.</string>
+  <string name="growth_your_entry_context_is_kept_no_message_has_been_sent" formatted="false">Your entry context is kept. No message has been sent.</string>
+  <string name="growth_getstring" formatted="false">).getString(</string>
+  <string name="growth_loading2" formatted="false">Loading…</string>
+  <string name="growth_kind_ai_reply" formatted="false">ai reply</string>
+  <string name="growth_kind_approved_draft" formatted="false">approved draft</string>
+  <string name="growth_kind_personal_reply" formatted="false">personal reply</string>
+  <string name="growth_kind_request_status" formatted="false">request status</string>
+  <string name="growth_kind_call_reminder" formatted="false">call reminder</string>
+  <string name="growth_kind_answered_publicly" formatted="false">answered publicly</string>
+  <string name="growth_kind_content_match" formatted="false">content match</string>
+  <string name="growth_kind_announcement" formatted="false">announcement</string>
+  <string name="growth_kind_creator_offer" formatted="false">creator offer</string>
+  <string name="growth_kind_slot_change" formatted="false">slot change</string>
+  <string name="growth_kind_new_packet" formatted="false">new packet</string>
+  <string name="growth_kind_commitment_due" formatted="false">commitment due</string>
+  <string name="growth_kind_guardrail" formatted="false">guardrail</string>
+  <string name="growth_kind_pool_share" formatted="false">pool share</string>
+  <string name="growth_kind_note" formatted="false">note</string>
+  <string name="growth_kind_reaction" formatted="false">reaction</string>
+  <string name="growth_kind_public_answer" formatted="false">public answer</string>
+  <string name="growth_kind_spending_reminder" formatted="false">spending reminder</string>
+  <string name="growth_kind_weekly_impact" formatted="false">weekly impact</string>
+  <string name="growth_for_you" formatted="false">For you</string>
+  <string name="growth_crafts" formatted="false">Crafts</string>
+  <string name="growth_music" formatted="false">Music</string>
+  <string name="growth_food" formatted="false">Food</string>
+  <string name="growth_label_with_state" formatted="false">{label} · {state}</string>
+  <string name="growth_creator_with_state" formatted="false">{name} · {state}</string>
+  <string name="growth_decision_accept" formatted="false">Accept</string>
+  <string name="growth_decision_defer" formatted="false">Defer</string>
+  <string name="growth_decision_dismiss" formatted="false">Dismiss</string>
+  <string name="growth_experiment_active" formatted="false">active</string>
+  <string name="growth_experiment_stopped" formatted="false">stopped</string>
+  <string name="growth_system" formatted="false">System</string>
+  <string name="growth_creator_team" formatted="false">{name}\'s team</string>
+  <string name="growth_followers" formatted="false">followers</string>
+  <string name="growth_amount_hidden" formatted="false">[amount hidden]</string>
+  <string name="growth_call_update" formatted="false">Your scheduled call has an update. Open the app to check its current status.</string>
+  <string name="growth_hidden_update" formatted="false">You have an update. Open the app to view it.</string>
+  <string name="growth_your_updates" formatted="false">Your updates</string>
+  <string name="growth_update_unavailable" formatted="false">This update is no longer available.</string>
+  <string name="growth_email_open" formatted="false">Open in the app</string>
+  <string name="growth_email_controls" formatted="false">Email preferences / unsubscribe</string>
+  <string name="growth_email_record" formatted="false">Your in-app record remains available.</string>
+  <string name="growth_email_unsubscribe" formatted="false">Unsubscribe from optional email</string>
+  <string name="growth_email_subject" formatted="false">{brand} · your updates</string>
+  <string name="growth_unsubscribe_title" formatted="false">Stop optional email updates</string>
+  <string name="growth_unsubscribe_explanation" formatted="false">Your in-app record stays available. You can choose email again in account settings.</string>
+  <string name="growth_unsubscribe_action" formatted="false">Unsubscribe from optional email</string>
+  <string name="growth_today" formatted="false">TODAY</string>
+  <string name="growth_earlier" formatted="false">EARLIER</string>
+  <string name="growth_main_navigation" formatted="false">Main</string>
+  <string name="growth_shared_personal_reply" formatted="false">{name} · personal reply</string>
+  <string name="growth_shared_reply_to" formatted="false">{name} replied to {handle}</string>
+  <string name="growth_error_fan_unavailable" formatted="false">The recipient is unavailable.</string>
+  <string name="growth_error_activation_publication_unavailable" formatted="false">The immutable publication must be available before activation.</string>
+  <string name="growth_error_growth_restrictions_unconfigured" formatted="false">Creator controls require current trust restrictions.</string>
+  <string name="growth_error_home_owner_unconfigured" formatted="false">Conversations and requests are not connected yet.</string>
+  <string name="growth_error_separate_growth_roles_required" formatted="false">Growth requires distinct runtime and worker roles.</string>
+  <string name="growth_error_unsafe_growth_membership" formatted="false">Actor persistence must not inherit ETL authority.</string>
+  <string name="growth_error_unsafe_growth_role" formatted="false">Growth requires a non-owner database role.</string>
+  <string name="growth_error_growth_migration_required" formatted="false">Growth\'s registered migrations must be applied before startup.</string>
+  <string name="growth_error_adult_eligibility_required" formatted="false">Adult eligibility is required.</string>
+  <string name="growth_error_growth_authority_required" formatted="false">Current account authority is required.</string>
+  <string name="growth_error_session_required" formatted="false">Continue with Pantopus to use this feature.</string>
+  <string name="growth_error_prompt_claim_conflict" formatted="false">This choice request changed platforms.</string>
+  <string name="growth_error_prompt_unavailable" formatted="false">This choice is unavailable.</string>
+  <string name="growth_error_entry_unavailable" formatted="false">This entry is unavailable.</string>
+  <string name="growth_error_entry_context_required" formatted="false">Choose a valid entry source.</string>
+  <string name="growth_error_entry_unavailable2" formatted="false">This invitation is unavailable.</string>
+  <string name="growth_error_entry_unavailable3" formatted="false">This shared reply is unavailable.</string>
+  <string name="growth_error_entry_id_conflict" formatted="false">This entry ID has different contents.</string>
+  <string name="growth_error_entry_unavailable4" formatted="false">This creator or post is unavailable.</string>
+  <string name="growth_error_invite_limit" formatted="false">Review your active invitation links first.</string>
+  <string name="growth_error_experiments_disabled" formatted="false">Experiments await review.</string>
+  <string name="growth_error_experiment_unavailable" formatted="false">This proposal is unavailable.</string>
+  <string name="growth_error_experiment_review_changed" formatted="false">Review the current hypothesis and criteria.</string>
+  <string name="growth_error_experiment_review_changed2" formatted="false">A stopped or changed experiment needs a new proposal.</string>
+  <string name="growth_error_growth_scope_adapter_required" formatted="false">Creator/thread privacy needs the owner-scoped object mapping.</string>
+  <string name="growth_error_growth_account_scope_required" formatted="false">A durable verified account ownership snapshot is required.</string>
+  <string name="growth_error_growth_export_stream_required" formatted="false">This export requires the streaming artifact adapter.</string>
+  <string name="growth_error_notification_author_mismatch" formatted="false">The event author does not match its notification type.</string>
+  <string name="growth_error_content_match_consent_required" formatted="false">Content matching requires consent.</string>
+  <string name="growth_error_audience_label_required" formatted="false">A Note must name its audience.</string>
+  <string name="growth_error_notification_owner_unconfigured" formatted="false">The current notification owner must be connected before consuming this event.</string>
+  <string name="growth_error_event_id_conflict" formatted="false">This event ID already has different content.</string>
+  <string name="growth_error_notification_owner_unconfigured2" formatted="false">The update owner is temporarily unavailable.</string>
+  <string name="growth_error_producer_event_conflict" formatted="false">This producer event ID belongs to another scope.</string>
+  <string name="growth_error_producer_event_conflict2" formatted="false">The owner event does not match its retry key.</string>
+  <string name="growth_error_producer_event_conflict3" formatted="false">This producer event ID has different contents.</string>
+  <string name="growth_error_impact_window_open" formatted="false">Impact uses closed weekly observation windows.</string>
+  <string name="growth_error_growth_data_erased" formatted="false">Rebuild this Impact without erased subjects.</string>
+  <string name="growth_error_private_reply_unavailable" formatted="false">This private reply is not authorized.</string>
+  <string name="growth_error_comment_expired" formatted="false">This comment is outside the private-reply window.</string>
+  <string name="growth_error_share_unavailable" formatted="false">This card is unavailable.</string>
+  <string name="growth_error_invalid_request" formatted="false">Check the highlighted input.</string>
+  <string name="growth_error_growth_unavailable" formatted="false">This feature is unavailable. Please try again.</string>
+  <string name="growth_error_growth_data_erased2" formatted="false">This account or creator is no longer available.</string>
+  <string name="growth_error_signed_content_required" formatted="false">Public named content requires signed evidence.</string>
+  <string name="growth_error_notification_unavailable" formatted="false">This update is unavailable.</string>
+  <string name="growth_error_growth_data_erased3" formatted="false">This account is no longer available.</string>
+  <string name="growth_error_sharing_unavailable" formatted="false">Sharing is not permitted for this reply.</string>
+  <string name="growth_error_share_version_conflict" formatted="false">The shared version has changed.</string>
+  <string name="growth_error_invite_limit2" formatted="false">You already have 20 active invitation links.</string>
+  <string name="growth_error_creator_required" formatted="false">This view is available to the creator only.</string>
+  <string name="growth_error_invalid_window" formatted="false">Insights use Monday-starting weekly windows.</string>
+  <string name="growth_error_window_closed" formatted="false">This weekly evidence window is already closed.</string>
+  <string name="growth_error_signal_version_conflict" formatted="false">A signal version cannot change its meaning.</string>
+  <string name="growth_error_window_open" formatted="false">Insights publish after the weekly evidence window closes.</string>
+  <string name="growth_error_insight_unavailable" formatted="false">This insight is unavailable.</string>
+  <string name="growth_error_creator_required2" formatted="false">This outcome is outside your creator scope.</string>
+  <string name="growth_error_metric_id_conflict" formatted="false">This outcome ID already refers to another event.</string>
+  <string name="growth_error_experiment_limit" formatted="false">Review your existing draft proposals first.</string>
+  <string name="growth_image_needs_origin" formatted="false">A public verification domain is required before exporting.</string>
+  <string name="growth_image_too_long" formatted="false">This reply is too long for one card. Share the complete verified link.</string>
+  <string name="growth_card_unavailable" formatted="false">This card is unavailable.</string>
+  <string name="growth_email_link_unavailable" formatted="false">This email link is unavailable.</string>
+  <string name="growth_email_preferences" formatted="false">Email preferences</string>
+  <string name="growth_unsubscribed" formatted="false">Unsubscribed</string>
+  <string name="growth_email_service_unavailable" formatted="false">Email service unavailable</string>
+  <string name="w6_signing_is_unavailable" formatted="false">Signing is unavailable.</string>
+  <string name="w6_signature_submission_is_unconfirmed_retry_this_exact_act_or_refresh" formatted="false">Signature submission is unconfirmed. Retry this exact act or refresh the recording before signing again.</string>
+  <string name="w6_signing_was_cancelled_nothing_was_shared" formatted="false">Signing was cancelled. Nothing was shared.</string>
+  <string name="w6_sign_this_exact_recording" formatted="false">Sign this exact recording</string>
+  <string name="w6_recording_fingerprint" formatted="false">Recording fingerprint</string>
+  <string name="w6_review_the_processed_recording_before_signing_a_signature_applies_to" formatted="false">Review the processed recording before signing. A signature applies to these exact audio bytes. Adding content credentials is a separate processing step.</string>
+  <string name="w6_signature_saved" formatted="false">Signature saved</string>
+  <string name="w6_waiting_for_your_passkey" formatted="false">Waiting for your passkey</string>
+  <string name="w6_sign_recording" formatted="false">Sign recording</string>
+  <string name="w6_retry_this_exact_signature" formatted="false">Retry this exact signature</string>
+  <string name="w6_this_recording_is_unavailable_for_the_current_content" formatted="false">This recording is unavailable for the current content.</string>
+  <string name="w6_this_recording_changed_or_is_no_longer_available" formatted="false">This recording changed or is no longer available.</string>
+  <string name="w6_audio_access_could_not_be_confirmed_refresh_the_link_to" formatted="false">Audio access could not be confirmed. Refresh the link to try again.</string>
+  <string name="w6_the_playback_link_is_unavailable_for_this_recording" formatted="false">The playback link is unavailable for this recording.</string>
+  <string name="w6_audio_is_unavailable" formatted="false">Audio is unavailable.</string>
+  <string name="w6_playback_could_not_start_try_again" formatted="false">Playback could not start. Try again.</string>
+  <string name="w6_loading_audio" formatted="false">Loading audio</string>
+  <string name="w6_load_voice_note" formatted="false">Load voice note</string>
+  <string name="w6_pause_voice_note" formatted="false">Pause voice note</string>
+  <string name="w6_play_voice_note" formatted="false">Play voice note</string>
+  <string name="w6_the_audio_link_expired_or_access_changed_refresh_it_to" formatted="false">The audio link expired or access changed. Refresh it to try again.</string>
+  <string name="w6_refresh_audio_link" formatted="false">Refresh audio link</string>
+  <string name="w6_read_transcript" formatted="false">Read transcript</string>
+  <string name="w6_recording_is_awaiting_its_current_duration_limit" formatted="false">Recording is awaiting its current duration limit.</string>
+  <string name="w6_processing_is_unavailable" formatted="false">Processing is unavailable.</string>
+  <string name="w6_the_processed_recording_does_not_match_this_saved_content_refresh" formatted="false">The processed recording does not match this saved content. Refresh before continuing.</string>
+  <string name="w6_the_processed_recording_evidence_is_unavailable_refresh_before_continuing" formatted="false">The processed recording evidence is unavailable. Refresh before continuing.</string>
+  <string name="w6_upload_paused_retry_to_resume_from_the_saved_position" formatted="false">Upload paused. Retry to resume from the saved position.</string>
+  <string name="w6_upload_failed_your_preview_is_still_here" formatted="false">Upload failed. Your preview is still here.</string>
+  <string name="w6_the_uploaded_file_could_not_be_removed_try_again_before" formatted="false">The uploaded file could not be removed. Try again before discarding.</string>
+  <string name="w6_the_upload_is_unconfirmed_retry_it_to_find_and_remove" formatted="false">The upload is unconfirmed. Retry it to find and remove the saved file before discarding.</string>
+  <string name="w6_record_a_voice_note" formatted="false">Record a voice note</string>
+  <string name="w6_your_own_voice" formatted="false">Your own voice</string>
+  <string name="w6_record_listen_and_sign_the_exact_recording_before_it_is" formatted="false">Record, listen, and sign the exact recording before it is shared.</string>
+  <string name="w6_record_again" formatted="false">Record again</string>
+  <string name="w6_record" formatted="false">Record</string>
+  <string name="w6_cancel_permission_request" formatted="false">Cancel permission request</string>
+  <string name="w6_pause" formatted="false">Pause</string>
+  <string name="w6_resume" formatted="false">Resume</string>
+  <string name="w6_stop_and_preview" formatted="false">Stop and preview</string>
+  <string name="w6_private_preview_your_recording" formatted="false">Private preview · your recording</string>
+  <string name="w6_preview_your_own_recording" formatted="false">Preview your own recording</string>
+  <string name="w6_discard_recording" formatted="false">Discard recording</string>
+  <string name="w6_audio_upload_progress" formatted="false">Audio upload progress</string>
+  <string name="w6_pause_upload" formatted="false">Pause upload</string>
+  <string name="w6_retry_upload" formatted="false">Retry upload</string>
+  <string name="w6_upload_recording" formatted="false">Upload recording</string>
+  <string name="w6_processed_review_and_sign_the_exact_recording_in_studio" formatted="false">Processed. Review and sign the exact recording in Studio.</string>
+  <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
+  <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
+  <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
+  <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
+  <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
+  <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>
+  <string name="w6_choose_a_supported_file_within_the_content_s_media_limit" formatted="false">Choose a supported file within the content\'s media limit.</string>
+  <string name="w6_the_resumed_upload_does_not_match_this_recording_start_a" formatted="false">The resumed upload does not match this recording. Start a new upload.</string>
+  <string name="w6_the_saved_upload_could_not_be_confirmed" formatted="false">The saved upload could not be confirmed.</string>
+  <string name="w6_the_resumed_upload_changed" formatted="false">The resumed upload changed.</string>
+  <string name="w6_upload_progress_could_not_be_confirmed_resume_this_recording" formatted="false">Upload progress could not be confirmed. Resume this recording.</string>
+  <string name="w6_recording_is_unavailable_in_this_browser_use_a_supported_browser" formatted="false">Recording is unavailable in this browser. Use a supported browser over HTTPS.</string>
+  <string name="w6_this_browser_cannot_produce_a_supported_recording" formatted="false">This browser cannot produce a supported recording.</string>
+  <string name="w6_this_recording_reached_the_file_limit_record_a_shorter_clip" formatted="false">This recording reached the file limit. Record a shorter clip.</string>
+  <string name="w6_no_audio_was_recorded_try_again" formatted="false">No audio was recorded. Try again.</string>
+  <string name="w6_recording_was_interrupted_preview_what_was_saved_or_record_again" formatted="false">Recording was interrupted. Preview what was saved or record again.</string>
+  <string name="w6_the_microphone_was_disconnected_preview_what_was_saved_or_record" formatted="false">The microphone was disconnected. Preview what was saved or record again.</string>
+  <string name="w6_microphone_access_is_off_allow_it_in_your_browser_settings" formatted="false">Microphone access is off. Allow it in your browser settings, then try again.</string>
+  <string name="w6_the_microphone_is_unavailable" formatted="false">The microphone is unavailable.</string>
+  <string name="w6_microphone_request_cancelled_while_you_left_this_screen_record_when" formatted="false">Microphone request cancelled while you left this screen. Record when you return.</string>
+  <string name="w6_recording_paused_while_you_left_this_screen_resume_or_preview" formatted="false">Recording paused while you left this screen. Resume or preview it.</string>
+  <string name="w6_availability_could_not_be_loaded" formatted="false">Availability could not be loaded.</string>
+  <string name="w6_use_i_s_o_times_with_an_explicit_u_t_c_offset_for_each" formatted="false">Use ISO times with an explicit UTC offset for each boundary.</string>
+  <string name="w6_availability_saved" formatted="false">Availability saved.</string>
+  <string name="w6_availability_could_not_be_saved_your_changes_are_kept" formatted="false">Availability could not be saved. Your changes are kept.</string>
+  <string name="w6_call_availability" formatted="false">Call availability</string>
+  <string name="w6_use_dated_windows_each_offered_call_and_its_reconnect_allowance" formatted="false">Use dated windows. Each offered call and its reconnect allowance must fit inside one window. Existing bookings keep their agreed time.</string>
+  <string name="w6_your_time_zone" formatted="false">Your time zone</string>
+  <string name="w6_no_windows_saved" formatted="false">No windows saved.</string>
+  <string name="w6_add_a_window" formatted="false">Add a window</string>
+  <string name="w6_save_availability" formatted="false">Save availability</string>
+  <string name="w6_reload_saved_windows" formatted="false">Reload saved windows</string>
+  <string name="w6_the_call_is_unavailable" formatted="false">The call is unavailable.</string>
+  <string name="w6_camera_or_microphone_access_is_off_or_unavailable_check_your" formatted="false">Camera or microphone access is off or unavailable. Check your device settings and try again.</string>
+  <string name="w6_calling_is_not_connected_yet_your_booking_is_unchanged" formatted="false">Calling is not connected yet. Your booking is unchanged.</string>
+  <string name="w6_connection_failed_rejoin_the_same_call" formatted="false">Connection failed. Rejoin the same call.</string>
+  <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
+  <string name="w6_the_call_could_not_be_ended_try_again" formatted="false">The call could not be ended. Try again.</string>
+  <string name="w6_the_summary_could_not_be_changed" formatted="false">The summary could not be changed.</string>
+  <string name="w6_this_call_is_unavailable" formatted="false">This call is unavailable</string>
+  <string name="w6_opening_your_call" formatted="false">Opening your call</string>
+  <string name="w6_checking_the_booking_and_participant_access" formatted="false">Checking the booking and participant access.</string>
+  <string name="w6_continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="w6_get_help" formatted="false">Get help</string>
+  <string name="w6_you_missed_the_call" formatted="false">You missed the call.</string>
+  <string name="w6_the_call_ended_because_of_a_technical_problem" formatted="false">The call ended because of a technical problem.</string>
+  <string name="w6_this_call_was_cancelled" formatted="false">This call was cancelled.</string>
+  <string name="w6_call_outcome_is_being_reconciled" formatted="false">Call outcome is being reconciled.</string>
+  <string name="w6_recording_requested_waiting_for_provider_confirmation" formatted="false">Recording requested · waiting for provider confirmation</string>
+  <string name="w6_recording_is_stopping_awaiting_provider_confirmation" formatted="false">Recording is stopping · awaiting provider confirmation</string>
+  <string name="w6_recording_state_could_not_be_confirmed" formatted="false">Recording state could not be confirmed</string>
+  <string name="w6_ending_confirming_provider_history" formatted="false">Ending · confirming provider history</string>
+  <string name="w6_waiting_for_both_participants" formatted="false">Waiting for both participants</string>
+  <string name="w6_connection_lost_displayed_times_are_from_the_last_server_update" formatted="false">Connection lost · displayed times are from the last server update.</string>
+  <string name="w6_recording" formatted="false">Recording</string>
+  <string name="w6_awaiting_confirmation" formatted="false">Awaiting confirmation</string>
+  <string name="w6_if_either_of_you_drops" formatted="false">If either of you drops</string>
+  <string name="w6_time_zone" formatted="false">Time zone</string>
+  <string name="w6_the_fan_s_live_video" formatted="false">The fan\'s live video</string>
+  <string name="w6_reconnecting_timer_paused" formatted="false">Reconnecting · timer paused</string>
+  <string name="w6_private_device_check" formatted="false">Private device check</string>
+  <string name="w6_your_private_camera_preview" formatted="false">Your private camera preview</string>
+  <string name="w6_microphone_change_failed" formatted="false">Microphone change failed.</string>
+  <string name="w6_camera_change_failed" formatted="false">Camera change failed.</string>
+  <string name="w6_camera" formatted="false">Camera</string>
+  <string name="w6_leave" formatted="false">Leave</string>
+  <string name="w6_both_of_you_can_get_a_short_summary" formatted="false">Both of you can get a short summary</string>
+  <string name="w6_separate_permissions" formatted="false">Separate permissions</string>
+  <string name="w6_i_d_like_a_summary" formatted="false">I\'d like a summary</string>
+  <string name="w6_allow_recording" formatted="false">Allow recording</string>
+  <string name="w6_allow_content_reuse" formatted="false">Allow content reuse</string>
+  <string name="w6_allow_use_as_an_a_i_source" formatted="false">Allow use as an AI source</string>
+  <string name="w6_each_purpose_needs_both_people_s_permission_without_recording_permission" formatted="false">Each purpose needs both people\'s permission. Without recording permission, a summary uses only the packet and a creator-typed note. Either of you can delete it.</string>
+  <string name="w6_your_post_call_note" formatted="false">Your post-call note</string>
+  <string name="w6_save_note_for_summary" formatted="false">Save note for summary</string>
+  <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
+  <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
+  <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
+  <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
+  <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>
+  <string name="w6_enter_the_waiting_room" formatted="false">Enter the waiting room</string>
+  <string name="w6_check_camera_and_microphone" formatted="false">Check camera and microphone</string>
+  <string name="w6_end_this_call" formatted="false">End this call?</string>
+  <string name="w6_ending_by_choice_counts_as_your_completed_call_a_technical" formatted="false">Ending by choice counts as your completed call. A technical problem is sent for reconciliation.</string>
+  <string name="w6_ending_before_enough_connected_time_sends_this_call_for_partial" formatted="false">Ending before enough connected time sends this call for partial-delivery reconciliation.</string>
+  <string name="w6_end_by_choice" formatted="false">End by choice</string>
+  <string name="w6_end_call" formatted="false">End call</string>
+  <string name="w6_technical_problem" formatted="false">Technical problem</string>
+  <string name="w6_stay_in_the_call" formatted="false">Stay in the call</string>
+  <string name="w6_publication_is_unconfirmed_retry_this_exact_signed_command_or_reload" formatted="false">Publication is unconfirmed. Retry this exact signed command or reload the saved offer before signing again.</string>
+  <string name="w6_review_and_sign_the_accepted_call_request_before_offering_times" formatted="false">Review and sign the accepted call request before offering times.</string>
+  <string name="w6_each_time_needs_an_explicit_u_t_c_offset_for_example2026" formatted="false">Each time needs an explicit UTC offset, for example 2026-10-14T16:00-07:00.</string>
+  <string name="w6_the_offer_could_not_be_saved" formatted="false">The offer could not be saved.</string>
+  <string name="w6_s_t_u_d_i_o_c_a_l_l_r_e_q_u_e_s_t" formatted="false">STUDIO · CALL REQUEST</string>
+  <string name="w6_times_offered" formatted="false">Times offered</string>
+  <string name="w6_offer_three_times" formatted="false">Offer three times</string>
+  <string name="w6_open_a_call_request_to_load_both_time_zones_and" formatted="false">Open a call request to load both time zones and its signed acceptance.</string>
+  <string name="w6_the_fan_picks_one_this_request_was_charged_on_acceptance" formatted="false">The fan picks one. This request was charged on acceptance; offering times does not add another charge. Creator no-show is refunded in full. A fan no-show is charged as agreed.</string>
+  <string name="w6_edit_your_availability" formatted="false">Edit your availability</string>
+  <string name="w6_review_these_exact_offered_times" formatted="false">Review these exact offered times</string>
+  <string name="w6_your_zone" formatted="false">Your zone</string>
+  <string name="w6_fan_s_zone" formatted="false">Fan\'s zone</string>
+  <string name="w6_offer_expires" formatted="false">Offer expires</string>
+  <string name="w6_enter_three_distinct_future_times_with_explicit_u_t_c_offsets_both" formatted="false">Enter three distinct future times with explicit UTC offsets, both confirmed IANA zones, and an expiry before the first time to review and sign.</string>
+  <string name="w6_retry_this_exact_signed_offer" formatted="false">Retry this exact signed offer</string>
+  <string name="w6_reload_saved_offer" formatted="false">Reload saved offer</string>
+  <string name="w6_send_signed_times" formatted="false">Send signed times</string>
+  <string name="w6_open_an_accepted_request_from_studio_to_review_the_exact" formatted="false">Open an accepted request from Studio to review the exact signed offer.</string>
+  <string name="w6_the_times_could_not_be_loaded" formatted="false">The times could not be loaded.</string>
+  <string name="w6_this_time_is_unavailable_reload_the_current_offer" formatted="false">This time is unavailable. Reload the current offer.</string>
+  <string name="w6_c_a_l_l_r_e_q_u_e_s_t" formatted="false">CALL REQUEST</string>
+  <string name="w6_choose_a_time" formatted="false">Choose a time</string>
+  <string name="w6_your_request_s_accepted_terms_and_payment_stay_with_its" formatted="false">Your request\'s accepted terms and payment stay with its receipt. Choosing a time cannot create a second charge.</string>
+  <string name="w6_confirm_this_time" formatted="false">Confirm this time</string>
+  <string name="w6_open_your_scheduled_call" formatted="false">Open your scheduled call</string>
+  <string name="w6_this_offer_changed_or_expired_open_requests_for_its_current" formatted="false">This offer changed or expired. Open Requests for its current options.</string>
+  <string name="w6_checking_the_current_offer_and_participant_access" formatted="false">Checking the current offer and participant access.</string>
+  <string name="w6_reload_current_offer" formatted="false">Reload current offer</string>
+  <string name="w6_open_requests" formatted="false">Open Requests</string>
+  <string name="w6_the_captured_call_could_not_be_loaded" formatted="false">The captured call could not be loaded.</string>
+  <string name="w6_times_already_offered" formatted="false">Times already offered</string>
+  <string name="w6_open_the_scheduled_call" formatted="false">Open the scheduled call</string>
+  <string name="w6_checking_the_current_captured_request_and_creator_access" formatted="false">Checking the current captured request and creator access.</string>
+  <string name="w6_open_studio_requests" formatted="false">Open Studio requests</string>
+  <string name="w6_the_times_could_not_be_loaded_reconnect_and_try_again" formatted="false">The times could not be loaded. Reconnect and try again.</string>
+  <string name="w6_your_accepted_terms_and_payment_stay_with_the_request_receipt" formatted="false">Your accepted terms and payment stay with the request receipt. Choosing a time cannot create a second charge.</string>
+  <string name="w6_reconnect_to_refresh_this_call_actions_are_unavailable_until_access" formatted="false">Reconnect to refresh this call. Actions are unavailable until access is confirmed.</string>
+  <string name="w6_this_action_could_not_complete_refresh_the_call_before_trying" formatted="false">This action could not complete. Refresh the call before trying again.</string>
+  <string name="w6_recording_stop_requested_awaiting_provider_confirmation" formatted="false">Recording stop requested · awaiting provider confirmation</string>
+  <string name="w6_recording_start_requested_awaiting_provider_confirmation" formatted="false">Recording start requested · awaiting provider confirmation</string>
+  <string name="w6_recording_status_needs_confirmation" formatted="false">Recording status needs confirmation</string>
+  <string name="w6_connection_lost" formatted="false">Connection lost</string>
+  <string name="w6_displayed_times_are_from_the_last_server_update" formatted="false">Displayed times are from the last server update.</string>
+  <string name="w6_media_connection_is_unavailable" formatted="false">Media connection is unavailable.</string>
+  <string name="w6_each_purpose_needs_both_people_s_permission_without_recording_permission8487ed" formatted="false">Each purpose needs both people\'s permission. Without recording permission, a summary uses only the packet and a creator-typed note.</string>
+  <string name="w6_view_requests_for_settlement" formatted="false">View Requests for settlement</string>
+  <string name="w6_open_this_call_from_its_authorized_request_link" formatted="false">Open this call from its authorized request link.</string>
+  <string name="w6_refresh_call" formatted="false">Refresh call</string>
+  <string name="w6_a_fan_ending_by_choice_counts_as_a_completed_call" formatted="false">A fan ending by choice counts as a completed call after actual connected time. Technical problems and creator early ends are reconciled before settlement.</string>
+  <string name="w6_audio_route_changed_check_your_microphone_then_resume_or_record" formatted="false">Audio route changed. Check your microphone, then resume or record again.</string>
+  <string name="w6_microphone_recording_is_unavailable_in_this_app_build" formatted="false">Microphone recording is unavailable in this app build.</string>
+  <string name="w6_microphone_access_is_off_allow_it_in_settings_then_try" formatted="false">Microphone access is off. Allow it in Settings, then try again.</string>
+  <string name="w6_the_microphone_is_unavailable_try_again" formatted="false">The microphone is unavailable. Try again.</string>
+  <string name="w6_microphone_request_cancelled_after_an_interruption_record_when_you_return" formatted="false">Microphone request cancelled after an interruption. Record when you return.</string>
+  <string name="w6_recording_paused_after_an_interruption_resume_or_preview_what_was" formatted="false">Recording paused after an interruption. Resume or preview what was saved.</string>
+  <string name="w6_recording_could_not_resume_preview_it_or_record_again" formatted="false">Recording could not resume. Preview it or record again.</string>
+  <string name="w6_the_saved_recording_could_not_be_played_record_again" formatted="false">The saved recording could not be played. Record again.</string>
+  <string name="w6_record_and_listen_before_uploading_your_preview_stays_on_this" formatted="false">Record and listen before uploading. Your preview stays on this device.</string>
+  <string name="w6_play_private_preview" formatted="false">Play private preview</string>
+  <string name="w6_pause_preview" formatted="false">Pause preview</string>
+  <string name="w6_uploading_and_exact_media_signing_require_a_configured_account_and" formatted="false">Uploading and exact-media signing require a configured account and media service.</string>
+  <string name="w6_sign_in_again" formatted="false">Sign in again.</string>
+  <string name="w6_waiting_for_server_confirmation" formatted="false">Waiting for server confirmation</string>
+  <string name="w6_media_access_expired_or_is_unavailable" formatted="false">Media access expired or is unavailable.</string>
+  <string name="w6_audio_route_changed_check_the_microphone_before_resuming" formatted="false">Audio route changed. Check the microphone before resuming.</string>
+  <string name="w6_recording_was_interrupted_preview_it_or_record_again" formatted="false">Recording was interrupted. Preview it or record again.</string>
+  <string name="w6_recording_could_not_pause_preview_what_was_saved" formatted="false">Recording could not pause. Preview what was saved.</string>
+  <string name="w6_recording_could_not_resume_record_again" formatted="false">Recording could not resume. Record again.</string>
+  <string name="w6_no_usable_audio_was_saved_record_again" formatted="false">No usable audio was saved. Record again.</string>
+  <string name="w6_this_recording_could_not_be_played_record_again" formatted="false">This recording could not be played. Record again.</string>
+  <string name="w6_recording_paused_while_you_left_this_screen" formatted="false">Recording paused while you left this screen.</string>
+  <string name="w6_seconds_m4_a_version" formatted="false">{value1} seconds · M4A · version{value2}</string>
+  <string name="w6_s_a_i_audio" formatted="false">{value1}\'s AI audio</string>
+  <string name="w6_s_recording" formatted="false">{value1}\'s recording</string>
+  <string name="w6_s_a_i_voice_note" formatted="false">{value1}\'s AI voice note</string>
+  <string name="w6_recorded_by" formatted="false">Recorded by {value1}</string>
+  <string name="w6_a_i_voice_opens_with_s_a_i" formatted="false">AI voice · opens with “{value1}’s AI”</string>
+  <string name="w6_seek_in" formatted="false">Seek in {value1}</string>
+  <string name="w6_record_a_voice_note_as" formatted="false">Record a voice note as {value1}</string>
+  <string name="w6_recorded_seconds" formatted="false">Recorded {value1} seconds</string>
+  <string name="w6_of_seconds" formatted="false">of {value1} seconds</string>
+  <string name="w6_window" formatted="false">Window {value1}</string>
+  <string name="w6_remove_window" formatted="false">Remove window {value1}</string>
+  <string name="w6_c_a_l_l" formatted="false">CALL</string>
+  <string name="w6_you_spoke_with_for_minutes" formatted="false">You spoke with {value1} for {value2} minutes{value3}.</string>
+  <string name="w6_m_i_n_u_t_e_c_a_l_l" formatted="false">{value1}-MINUTE {value2} CALL</string>
+  <string name="w6_with" formatted="false">{value1} with {value2}</string>
+  <string name="w6_reconnecting_allowance_left" formatted="false">Reconnecting · {value1} allowance left</string>
+  <string name="w6_starts_in" formatted="false">Starts in {value1}</string>
+  <string name="w6_length" formatted="false">Length</string>
+  <string name="w6_minutes_fixed_no_overtime_charge" formatted="false">{value1} minutes, fixed · no overtime charge</string>
+  <string name="w6_shared_with" formatted="false">Shared with {value1}</string>
+  <string name="w6_attachments" formatted="false">Attachments</string>
+  <string name="w6_shared_files" formatted="false">{value1} shared files</string>
+  <string name="w6_timer_pauses_up_to_min_total" formatted="false">Timer pauses, up to {value1} min total</string>
+  <string name="w6_request" formatted="false">Request</string>
+  <string name="w6_joining_early_starts_nothing_if_doesn_t_join_within_minutes" formatted="false">Joining early starts nothing. If {value1} doesn\'t join within {value2} minutes of the appointment, the booking is sent for a full refund. A fan no-show is charged as agreed.</string>
+  <string name="w6_s_live_video" formatted="false">{value1}\'s live video</string>
+  <string name="w6_y_o_u" formatted="false">YOU</string>
+  <string name="w6_report" formatted="false">Report</string>
+  <string name="w6_connected" formatted="false">Connected</string>
+  <string name="w6_outcome" formatted="false">Outcome</string>
+  <string name="w6_settlement" formatted="false">Settlement</string>
+  <string name="w6_minute_call_accepted_request" formatted="false">{value1} · {value2}-minute {value3} call · accepted request {value4}</string>
+  <string name="w6_your_i_a_n_a_time_zone" formatted="false">Your IANA time zone</string>
+  <string name="w6_fan_s_confirmed_i_a_n_a_time_zone" formatted="false">Fan\'s confirmed IANA time zone</string>
+  <string name="w6_offer_expiry_with_u_t_c_offset" formatted="false">Offer expiry, with UTC offset</string>
+  <string name="w6_time" formatted="false">Time {value1}{value2}</string>
+  <string name="w6_for_the_fan" formatted="false">{value1} for the fan · {value2}</string>
+  <string name="w6_minutes" formatted="false">{value1} minutes · {value2}</string>
+  <string name="w6_your_time" formatted="false">Your time · {value1}</string>
+  <string name="w6_creator_s_time_zone" formatted="false">Creator\'s time zone · {value1}</string>
+  <string name="w6_offer_expirescfe463" formatted="false">Offer expires {value1}.</string>
+  <string name="w6_the_current_offer_is_check_this_saved_offer_before_sending" formatted="false">The current offer is {value1}. Check this saved offer before sending another signed act.</string>
+  <string name="w6_your_time_zonebb173f" formatted="false">Your time zone · </string>
+  <string name="w6_fan_s_time_zone" formatted="false">Fan\'s time zone · </string>
+  <string name="w6_you_spoke_with_for_minutesa8bf6c" formatted="false">You spoke with {value1} for {value2} minutes.</string>
+  <string name="w6_call_outcome" formatted="false">Call outcome: {value1}</string>
+  <string name="w6_requestfc03f5" formatted="false">Request {value1}</string>
+  <string name="w6_joining_early_starts_nothing_the_connected_timer_pauses_during_a" formatted="false">Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.</string>
+  <string name="w6_connected_of" formatted="false">Connected {value1} of {value2}</string>
+  <string name="w6_seconds_recorded" formatted="false">{value1} seconds recorded</string>
+  <string name="w6_up_to_seconds" formatted="false">Up to {value1} seconds</string>
+  <string name="w6_starts" formatted="false">Starts</string>
+  <string name="w6_ends" formatted="false">Ends</string>
+  <string name="w6_off" formatted="false">Off</string>
+  <string name="w6_f_a_n" formatted="false">FAN</string>
+  <string name="w6_unmute" formatted="false">Unmute</string>
+  <string name="w6_mute" formatted="false">Mute</string>
+  <string name="w6_call" formatted="false">Call</string>
+  <string name="w6_on" formatted="false">On</string>
+  <string name="w6_control_status" formatted="false">{label} · {state}</string>
+  <string name="w6_seconds_suffix" formatted="false"> {value1} seconds</string>
+  <string name="w6_creator_ended_early" formatted="false">{value1} had to end early.</string>
+  <string name="w6_creator_did_not_join" formatted="false">{value1} did not join.</string>
+  <string name="w6_time_of_duration" formatted="false">{value1} of {value2}</string>
+  <string name="w6_shared_files_in_zone" formatted="false">{value1} shared files · {value2}</string>
+  <string name="w6_being_reconciled" formatted="false">being reconciled</string>
 </resources>

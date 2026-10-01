@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-01T02:22:58.191099+00:00",
+  "W1Producer": "f2426e582e7eaa27f7325db428bc4dc8686a2c27",
+  "W6SigningValidator": "0ad54abab9a3affec6c8e32590f4971331cf6042",
+  "consumption": "Exact scope/participants/constructor/getter/openThread/held issuance hunks; existing allowance methods byte-identical. No broad trust/runtime/notification consumption.",
+  "compatibilityLease": "W1 explicitly granted only actual Database participant fourth argument and optional held-denial configuration/Access constructor fourth argument",
+  "dependencyByteEquality": [
+    "identity/read.ts",
+    "identity/request-authority.ts"
+  ],
+  "sourceSHA256": {
+    "apps/backend/src/modules/access/scope.ts": "548448ac6be02e2bf1bfed37d81a2c0c98493b756bcc847ab4bc4e5c6b22ea92",
+    "apps/backend/src/db/database.ts": "c9a2a4e24e7cf0c4c557e7809e2c8b412597a5fa094c92958f5455859423d718",
+    "apps/backend/src/integration.ts": "bc28a2f9d9ee7d764b98c6df60a3a324ae485020ca89eadb4923c004f3ab3cea",
+    "apps/backend/src/modules/media/service.ts": "91aa84e344c025d93ded06b4900408da2d3edc5841b113348f8c1f56eb4bdc8c"
+  },
+  "domainContract": {
+    "signature": "signingCommandInTransaction(actualCreatorThreadScope,heldClient,completeProcessedMediaEvidence)",
+    "purpose": "human_reply before first signature only",
+    "requirements": [
+      "Genuinely issued actual ThreadScope; CreatorScope cannot substitute",
+      "Current matching request account/session",
+      "Current actual verified recovery-clear creator and undeleted thread share locks",
+      "Exact unsigned ready asset owner/family/purpose/version/SHA/bytes/MIME/duration",
+      "Current same-client denial and purpose policy"
+    ],
+    "effects": "SELECT/locks only; no new transaction, signature consumption or publication",
+    "commandSubject": "Actual issued ThreadId",
+    "C2PABeforeFirstSign": "Not required; complete manifest required for later association/delivery"
+  },
+  "configuration": "Access.openThreadInTransaction getter false/503 without actual same-client denial callback",
+  "checks": {
+    "productionBuild": "passed",
+    "changedSourceLintFormat": "passed",
+    "unitMergeGate": false,
+    "newCasesHarnesses": 0,
+    "actualHeldSigningJourney": false
+  },
+  "externalGates": [
+    "Actual host/current held denial",
+    "Genuine human signing/C2PA/publish/delivery",
+    "SQL/worker/private fan publication authority"
+  ]
+}

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 import {
   growthRequest,
   GrowthUnavailable,
 } from "../../../../features/growth/server";
 
 const allowed =
-  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+\/read)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites|insights|funnel|impact|activation|experiments|feedback|recommendations(?:\/publish)?)$/u;
+  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+\/read)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites(?:\/[a-f0-9-]+)?|referrals|entry|engagement(?:\/(?:install|return)\/(?:claim|choice))?|insights|funnel|impact|activation|experiments(?:\/[a-f0-9-]+\/stop|\/variant\/[a-z0-9_]+)?|feedback|recommendations(?:\/publish)?)$/u;
 async function handle(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
@@ -16,16 +17,13 @@ async function handle(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (
-    request.method !== "GET" &&
-    request.headers.get("origin") !== request.nextUrl.origin
-  )
+  if (request.method !== "GET" && !sameRequestOrigin(request))
     return NextResponse.json(
       { error: { message: "Open this action from the app." } },
       { status: 403 },
     );
   try {
-    const result = await growthRequest(path, {
+    const result = await growthRequest(path + request.nextUrl.search, {
       method: request.method,
       ...(request.method !== "GET" && request.method !== "DELETE"
         ? { body: await request.text() }

@@ -1,0 +1,135 @@
+{
+  "producer": "W5",
+  "sourceCommit": "7b167fb16f8d7cbe2c6baa0e1c6e6d5cc73dfd32",
+  "scope": "Published content/Studio source only; no seed, development migration runner, peer checkout, shared registry or native app root imported. Approval edits will be recorded separately.",
+  "files": [
+    {
+      "path": "apps/backend/src/modules/content/actor-guard.ts",
+      "sha256": "f45d7faf4b9e9615951cc742e024f84ca9ee085a76b056dcb276effa027408dc"
+    },
+    {
+      "path": "apps/backend/src/modules/content/integration.ts",
+      "sha256": "d2c0754da4edaeb4790c8e7e4913a2c8803b55eac6fa7ef53c340b79e24d8bf7"
+    },
+    {
+      "path": "apps/backend/src/modules/content/privacy.ts",
+      "sha256": "46199f30b4ce463eeae250b9d4cc1c8e69a56ffcd1b981329a94d1e424749a38"
+    },
+    {
+      "path": "apps/backend/src/modules/content/registration.ts",
+      "sha256": "effec923301c2b163dd1654c5e5c0c4a5bc5371f6c8930d1a2a456489f6a4364"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "sha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "sha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "sha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "sha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "sha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "sha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d"
+    },
+    {
+      "path": "apps/backend/src/modules/content/service.ts",
+      "sha256": "68e42f1690aa2333f2ebfc9e6c9a9485f96d84d1deac85cf9a695f70fcc922a2"
+    },
+    {
+      "path": "apps/backend/src/modules/content/sources.ts",
+      "sha256": "44c6e83ac3b36d99447920ec8ead3f828bde98457992ad9a7de998c4cbe89500"
+    },
+    {
+      "path": "apps/backend/src/modules/content/thanks-projection.ts",
+      "sha256": "90102bc2ea40605b65cc3a282a9200f9f7d3a0982666cc2d8c6cd32561b195f4"
+    },
+    {
+      "path": "apps/backend/src/modules/studio/registration.ts",
+      "sha256": "6d33f78097e721a9fd3e74c0107822251fea9a74be125cf6f9b75a7936844eab"
+    },
+    {
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "sha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd"
+    },
+    {
+      "path": "apps/backend/src/modules/studio/service.ts",
+      "sha256": "78ac3e8aee7a467fd48591fc2cf0791de9c3675a05f10c4eea76632a97ec313a"
+    },
+    {
+      "path": "apps/web/app/api/content/[...path]/route.ts",
+      "sha256": "6c9093e57f3ce13a476f727698b7f3f50b7a9c04c39cf16ce71de7acda0f3613"
+    },
+    {
+      "path": "apps/web/app/api/studio/[...path]/route.ts",
+      "sha256": "0b785478a008e8f4977da25a42462a0642ec122280ae12db220a888fbafe4661"
+    },
+    {
+      "path": "apps/web/app/content/[creatorId]/[contentId]/page.tsx",
+      "sha256": "84231ce175edde2810d4fca75c90b07f71d6f03ed40dfd48bab85fc6e46e5b99"
+    },
+    {
+      "path": "apps/web/app/studio/[creatorId]/[[...screen]]/page.tsx",
+      "sha256": "c7de706bd41b829ba775b21de441004231c6cc9083641f083db8ccc81910184b"
+    },
+    {
+      "path": "apps/web/app/studio/workspace/page.tsx",
+      "sha256": "da6962ca13d0d1f1bf63408ad224b4fe569917824d25934f622c6c40251431c8"
+    },
+    {
+      "path": "apps/web/features/content/Content.tsx",
+      "sha256": "588f6f15ce2465ef13f74a76fcaeea9e7871790cd7dddee895a95833a1a72aaa"
+    },
+    {
+      "path": "apps/web/features/studio/Studio.tsx",
+      "sha256": "b353db474ab8eabebd6084e975fb5df73338606e7591a29600a1e397dc1a4a01"
+    },
+    {
+      "path": "apps/web/features/studio/api.ts",
+      "sha256": "c721c4bab532dec4717b97700842685717f65fc3e85928d449dec0486c1031c0"
+    },
+    {
+      "path": "apps/web/features/studio/proxy.ts",
+      "sha256": "d90da59ccc659e4e45b485c35a9b487587dc3d0d36c4b4487587d2600ff83465"
+    },
+    {
+      "path": "apps/web/features/studio/studio.css",
+      "sha256": "971937c2dc1c324f6f350858ef9d205cf6ed990ee541ec4236007573ff2fcf07"
+    },
+    {
+      "path": "packages/api/src/content-client.ts",
+      "sha256": "d6e118f952a4b1c6fe7bad43344d155cc8cb3738b128f4933842b3ab54caedb0"
+    },
+    {
+      "path": "packages/api/src/content.ts",
+      "sha256": "39c451d298f354db054c269581681bb143f55b6399358192d8db232ac287a808"
+    },
+    {
+      "path": "packages/api/src/studio.ts",
+      "sha256": "6091503b736c50f88bccef7c5a7bf0852b72f0fb183eeff5d60b077b6543dd40"
+    }
+  ],
+  "followUp": {
+    "sourceCommit": "edf1b447f521a68254d67fa864ae5ddccb7f9186",
+    "paths": [
+      "apps/backend/src/modules/content/registration.ts",
+      "apps/backend/src/modules/content/service.ts",
+      "apps/backend/src/modules/studio/service.ts",
+      "apps/web/features/studio/studio.css",
+      "packages/api/src/content-client.ts",
+      "apps/web/features/studio/Studio.tsx"
+    ],
+    "reason": "Current signing/tombstone/reply-review fences and Studio queue/role/focus state; reviewed published hunks applied without replacing W4 Approval edits."
+  }
+}

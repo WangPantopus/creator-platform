@@ -1,0 +1,31 @@
+{
+  "pid": 85094,
+  "avd": "Creator_W3_Conversations_Recovery_20261001",
+  "consolePort": 5572,
+  "adbPort": 5043,
+  "startedAt": 1790831396.475667,
+  "dataPreserved": true,
+  "originalAVDPreserved": true,
+  "command": [
+    "/private/tmp/creator-w3-native-20260930/sdk/emulator/emulator",
+    "-avd",
+    "Creator_W3_Conversations_Recovery_20261001",
+    "-port",
+    "5572",
+    "-no-snapshot",
+    "-cores",
+    "4",
+    "-memory",
+    "4096",
+    "-gpu",
+    "swiftshader",
+    "-no-metrics",
+    "-crash-report-mode",
+    "disabled",
+    "-netsim-args",
+    "--instance 13"
+  ],
+  "supersededReason": "Own5043 bridge not visible to standard-port Maestro; OS boot was incomplete, no app acceptance claimed",
+  "gracefulEmulatorStop": true,
+  "own5043ServerStopped": true
+}

@@ -1,0 +1,4 @@
+I/am_anr  (  561): [0,916,com.google.android.bluetooth,550026821,executing service com.google.android.bluetooth/com.android.bluetooth.btservice.AdapterService, waited 23325ms]
+I/am_crash(  561): [561,0,com.google.android.bluetooth,550026821,Native crash,Aborted,unknown,0,0]
+I/am_anr  (  561): [0,802,com.android.systemui,550026765,executing service com.android.systemui/.keyguard.KeyguardService, waited 21671ms]
+I/am_anr  (  561): [0,952,com.android.phone,952647245,Broadcast of Intent { act=android.safetycenter.action.REFRESH_SAFETY_SOURCES flg=0x10000010 pkg=com.android.phone cmp=com.android.phone/.security.SafetySourceReceiver (has extras) }]

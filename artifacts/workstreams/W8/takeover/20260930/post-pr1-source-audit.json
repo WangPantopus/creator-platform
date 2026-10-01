@@ -1,0 +1,109 @@
+{
+  "observedAt": "2026-10-01T06:37:30.642698+00:00",
+  "pr": {
+    "number": 1,
+    "url": "https://github.com/WangPantopus/creator-platform/pull/1",
+    "state": "MERGED",
+    "mergedAt": "2026-10-01T06:07:20Z",
+    "mergeCommit": "0a9a9a74b063ca7ddbd43bbcee6585935ad62ecf",
+    "reviewedProducerHead": "9f805888932c63c5a59d1efab29a7a4f47a42a98"
+  },
+  "verifiedBy": "Authenticated GitHub read and fetched Git objects; read-only source review by W8",
+  "criticalSourceComparisons": [
+    {
+      "path": "infra",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/trust",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/db",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/identity",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/deploy.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/wal.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/readiness.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/app/ops",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/app/support",
+      "unchanged": true
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/realtime",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/realtime-tickets.ts",
+      "unchanged": true
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+      "unchanged": true
+    }
+  ],
+  "all40ActiveSqlUnchanged": true,
+  "registryUnchanged": true,
+  "reserved0048Sha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+  "producerSources": [
+    {
+      "path": "apps/backend/src/modules/agent/trust-adapter.ts",
+      "sha256": "bf378fb8f21df92a6d22df9593a371e81b57007ced5fa7b7c3ff837cb659b6d5"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/privacy-stream.ts",
+      "sha256": "ba7f0511edfc0a99cc815bd736a9679c4ee22f94e19d55ab821e040a34ad49cb"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-journal.ts",
+      "sha256": "f8ce4d2998a1f28d8eedb14a75545e0a611a75bca105cc7867ed7530085e3592"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/journal-privacy.ts",
+      "sha256": "d91a258af410131a20b54c1c878e02b571e94a678d224fc9c15bb97776789e34"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/integration.ts",
+      "sha256": "1fd352df591859182cde682aab944a215dc73afd33eb8360a46c8feab0e81903"
+    }
+  ],
+  "findings": [
+    "Published agent export exposes an opt-in PrivacyExportStream with current task checks, one source transaction, bounded chunks/backpressure, complete source exhaustion and final hash. It is not enabled by publishing the source.",
+    "The prepared generation journal requires exact installed0048 checksum/schema, current pool/client custody, reviewed retention version and actual account/thread privacy registration. Existing legacy agent privacy refuses to omit accounting when lineage exists.",
+    "Journal purge requires current family authority, no open admissions, genuine financial disposition and finite reviewed retention. No successful default retention or authority callback was supplied by W8.",
+    "The optimized family-scoped memory query matches accepted W8 source again; explicit read transaction and thread share lock remain.",
+    "Producer native/provider verification in PR1 is attributed to W2. W8 did not launch its newer binaries or use an OpenAI credential."
+  ],
+  "activationByW8": false,
+  "originalLiveW8SourceUnchanged": true,
+  "limits": "This source audit does not complete W8 C10, license/retention decisions, journal registration, physical/native provider acceptance or release gates."
+}

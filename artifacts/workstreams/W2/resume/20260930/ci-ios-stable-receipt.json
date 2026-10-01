@@ -1,0 +1,53 @@
+{
+  "source": "1e897375042df6001c559ae4f0e805b1aee51ca5",
+  "capturedAt": "2026-09-30T21:23:04.286Z",
+  "workflowRun": 36774068733,
+  "iosJob": 110087447438,
+  "conclusion": "success",
+  "scope": "Prior workflow source, before the Responses accounting change. This does not certify the final handoff head.",
+  "lines": [
+    "2026-09-30T21:02:53.8937200Z Xcode 26.6",
+    "2026-09-30T21:05:13.2141930Z \t Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds",
+    "2026-09-30T21:05:13.2190480Z \t Executed 18 tests, with 0 failures (0 unexpected) in 24.652 (24.657) seconds",
+    "2026-09-30T21:05:13.2193460Z \t Executed 18 tests, with 0 failures (0 unexpected) in 24.652 (24.661) seconds",
+    "2026-09-30T21:17:05.6212940Z Test Case '-[QelvoraUITests.FoundationFlowTests testCreatorAndAIRemainLabeledInNativeCatalog]' passed (13.722 seconds).",
+    "2026-09-30T21:17:24.4673690Z Test Case '-[QelvoraUITests.FoundationFlowTests testWelcomeSignInFailsClosedInBothThemes]' passed (18.820 seconds).",
+    "2026-09-30T21:17:24.4788680Z Test Suite 'FoundationFlowTests' passed at 2026-09-30 21:17:24.443.",
+    "2026-09-30T21:17:24.4847600Z \t Executed 2 tests, with 0 failures (0 unexpected) in 32.542 (32.545) seconds",
+    "2026-09-30T21:17:24.4866410Z \t Executed 2 tests, with 0 failures (0 unexpected) in 32.542 (32.546) seconds",
+    "2026-09-30T21:17:24.4870770Z \t Executed 2 tests, with 0 failures (0 unexpected) in 32.542 (32.548) seconds",
+    "2026-09-30T21:17:25.2657440Z ** TEST SUCCEEDED **"
+  ],
+  "jobs": [
+    {
+      "id": 110087447438,
+      "name": "ios-foundation",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 110087447629,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 110087447657,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null
+    },
+    {
+      "id": 110087447815,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 110087447975,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "observedAt": "2026-10-01T05:49:27.434370+00:00",
+  "sourceCommit": "45bd38729b39ca2ed2ef65120544a84f18d102dc",
+  "reconciledMain": "705215955415332e601adf5c42a2169cd0d173a5",
+  "mergeScope": "guarded source integration; production and genuine paid acceptance remain unavailable",
+  "personallyVerified": {
+    "ios": {
+      "cases": 1,
+      "failures": 0,
+      "seconds": 36.016,
+      "udid": "1969609B-BC02-4C25-B36B-DE0BA1EC7437",
+      "scope": "final rebuilt shipping unavailable sign-in Light/Night; earlier full unchanged2/2 provenance fixture pass is separate prior-source evidence"
+    },
+    "android": {
+      "cases": 4,
+      "failures": 0,
+      "seconds": 11.722,
+      "serial": "emulator-5564",
+      "adbPort": 5044,
+      "coldShippingLaunchMs": 3167,
+      "scope": "shipping unavailable sign-in plus original explicit arrival/catalog/dialog cases; no genuine paid/provider/native product acceptance",
+      "status": "final rebuilt APK4/4 passes on recovered owned runtime; actual shipping cold Light/Night frames personally viewed clear",
+      "coldNightLaunchMs": 2200,
+      "recovery": "Normal reboot onlyownedAVD, data retained; installed SDK-supported SwiftShader, four cores/3072MiB; WiFiPacketStream/Vulkan disabled and isolated netsim4/ADB5044 unchanged. First OSSystemUIANR frames retained as failures."
+    },
+    "web": {
+      "cases": 9,
+      "failures": 0,
+      "scope": "Final original nine strict foundation/auth cases; decoded implementation/reference differences zero; personally clicked actual Access, Account and Studio continuation in CUA. Unavailable identity correctly preserves each destination.",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "buttonLeft": 24,
+        "buttonRight": 366
+      },
+      "nightCapture": "same actual unavailable state displayed with theme query; distinct Night button journey not claimed",
+      "seconds": 14.0
+    },
+    "supporting": [
+      "backend production executable build and actual launch",
+      "final Next production build",
+      "seven workspace typechecks",
+      "generated contract consistency",
+      "repository lint",
+      "full format check",
+      "Final native/backend/API/config bytes identical to compiled d9608b5 source; source.json records exact binary hashes"
+    ]
+  },
+  "strictReferences": {
+    "goldensRerecorded": false,
+    "comparisonsWeakened": false,
+    "swiftPackageFullSnapshots": "not reverified on this Mac26/Intel host; strict original references retained and matching xcode-27 hosted CI remains enabled",
+    "androidOriginalPaparazzi": "passed immediately before main reconciliation; current native runtime evidence is separate",
+    "swiftOriginal110HashesVerified": true,
+    "androidReferences": "Retains four main-owned Composer images published with W6 Ended panel composition correction; W4 rerecorded none. Prior full Paparazzi evidence predates this reconciliation and is not a final full-suite claim."
+  },
+  "resources": {
+    "ios": "normally shut down without erasure after successful UI run",
+    "android": "Normally stopped without erasure after successful final recovered original4cases and actual clear Light/Night cold captures",
+    "api": "owned4104 compiled unconfigured host running",
+    "web": "owned3004 separate Next output running",
+    "databases": "No DB mutation during final main705 reconciliation; canonical40, actual owned installed40, reserved19 including0059/0060 unapplied."
+  },
+  "pending": [
+    "Q03 Stripe/Connect cash topology, countries, fees, tax and refund responsibilities",
+    "Q04 native asynchronous paid written/voice reply policy",
+    "Q08 reviewed catalog/currencies/prices/cost budgets/pass/proration/pool/credits",
+    "Q10 sandbox/store projects/products/secure credentials and genuine creator/passkey",
+    "Q16 retention/deletion and external subscription consequences",
+    "19 reserved migrations remain unapplied; no Approval/weighted/pass effect activation",
+    "pass quoted start versus provider creation time requires reviewed/provider acceptance",
+    "payout original destination/source immutable body custody and genuine provider current-money acceptance",
+    "all original nine packages/R01-R15 positive paid/native/production/a11y/performance acceptance remain open"
+  ],
+  "hostedCI": "no protected main or required checks; final published-head status is read immediately before merge and pending runs are never called passes",
+  "logs": {
+    "ios-ui": "ios-ui.log",
+    "android-build": "android-build.log",
+    "android-ui": "android-ui.log",
+    "android-shipping-launch": "android-shipping-launch.log",
+    "web-visual": "web-visual.log",
+    "backend-build": "backend-build.log",
+    "web-build": "web-build.log",
+    "typecheck": "typecheck.log",
+    "generated": "generated.log",
+    "lint": "lint.log",
+    "format": "format.log",
+    "android-shipping-night-launch": "android-shipping-night-launch.log"
+  },
+  "priorCorrections": [
+    "Restored baseline development Content/Studio host composition and isolated canonical0045 reply-review absence to new reply/read/reaction/quote paths; actual non-owner read confirmed baseline tables available and reply-review unavailable.",
+    "Repaired missed compareCatalog import and restored exact original working web limits from03f58ae after actual six-case failure; no baseline rerecording or original tolerance weakening.",
+    "A transient unhealthy reused Next caused EADDRINUSE before cases; after restoring healthy server final9/9 executed and passed.",
+    "Final Studio build caught missing verificationReady after merge; restored main current verified creator saving/publishing guard and notice, then final production build/types pass.",
+    "Personally applied54 explicit theme-ink styles and two cursors to currentW3FanFeatures after actual owner Night screenshot defect; no sharedTheme/golden/contract or new recording file copied.",
+    "Merged main705(W8PR7), preserved40 canonical entries and19 reservations. Kept original tested Android fixture/strict assertions; adopted fresh isolated PostgreSQL fixture setup. Restored five genuine bounded/scoped memory queries under actual shared thread lock and explicit read mode, retaining unchanged observedStatements50000 without dummy SQL.",
+    "Cold actual Android screenshots exposed OS SystemUIANR overlay; both failure frames are retained and not passes. Normal emulator recovery keeps data and isolated ports."
+  ]
+}

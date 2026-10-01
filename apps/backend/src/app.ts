@@ -30,6 +30,7 @@ import {
 import { requestAuthority } from "./modules/identity/request-authority.js";
 import { createCommerceRouter } from "./modules/commerce/router.js";
 import { createW6Router } from "./modules/media/router.js";
+import { failureClass, type TrustTelemetry } from "./operations/telemetry.js";
 
 export type FeatureRegistration = {
   name: string;
@@ -52,6 +53,11 @@ export type ApplicationDependencies = {
   generationAvailable?: boolean;
   platformIdentity?: IdentityRuntime;
   features?: readonly FeatureRegistration[];
+  trustRouter?: Router;
+  telemetry?: TrustTelemetry;
+  /** Verified provider ingress must receive the original bytes before JSON/auth middleware. */
+  stripeNotifications?: Router;
+  storeNotifications?: Partial<Record<"apple" | "google", Router>>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -62,36 +68,65 @@ export function createApp(
 ) {
   const app = express();
   app.disable("x-powered-by");
+  if (dependencies.telemetry) app.use(dependencies.telemetry.middleware());
   app.use((_req, res, next) => {
-    res.locals.requestId = randomUUID();
+    res.locals.requestId ??= randomUUID();
     res.setHeader("X-Request-Id", res.locals.requestId as string);
     res.setHeader("Cache-Control", "no-store");
     next();
   });
+  if (dependencies.stripeNotifications)
+    app.use(
+      "/v1/commerce/provider-notifications/stripe",
+      dependencies.stripeNotifications,
+    );
+  for (const provider of ["apple", "google"] as const) {
+    const router = dependencies.storeNotifications?.[provider];
+    if (router)
+      app.use(`/v1/commerce/provider-notifications/${provider}`, router);
+  }
+  app.use("/v1/agent", express.json({ limit: "1100kb" }));
   app.use(express.json({ limit: "64kb" }));
   if (dependencies.platformIdentity)
     app.use("/v1", async (req, _res, next) => {
       const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+      const expectedAccount = req.get("X-Expected-Account-Id");
       // Refresh and logout also accept an expired access window within refresh_until.
-      if (
-        !token ||
-        [
-          "/identity/refresh",
-          "/identity/logout",
-          "/identity/revoke-sessions",
-        ].includes(req.path)
-      ) {
+      const refreshing = [
+        "/identity/refresh",
+        "/identity/logout",
+        "/identity/revoke-sessions",
+      ].includes(req.path);
+      if (!token || (refreshing && !expectedAccount)) {
         next();
         return;
       }
-      const resolved =
-        await dependencies.platformIdentity!.sessions.resolve(token);
-      await dependencies.assertActorAllowed?.(resolved.actor);
+      const resolved = await dependencies.platformIdentity!.sessions.resolve(
+        token,
+        refreshing,
+      );
+      // A stale form may have a new browser cookie. This header can only deny a
+      // mismatch; the verified session remains the sole source of authority.
+      if (expectedAccount && expectedAccount !== resolved.actor.accountId)
+        throw new DomainError(
+          "session_account_changed",
+          "Your account changed. Reopen this form before saving.",
+          409,
+        );
+      if (refreshing) {
+        next();
+        return;
+      }
+      // Trust retains authenticated support, appeals and privacy progress for
+      // closed accounts. Its router enforces operation-specific authority.
+      if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
+        await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
         { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },
         next,
       );
     });
+  if (dependencies.trustRouter) app.use(dependencies.trustRouter);
   app.get("/health", (_req, res) =>
     res.json({
       status: "ok",
@@ -262,20 +297,15 @@ export function createApp(
         "Conversation authority is not connected.",
         503,
       );
-    const scope = await dependencies.access.openThread(
-      actor,
-      creatorId,
-      body.fanId,
+    res.json(
+      await dependencies.signing.beginThreadSubject(
+        actor,
+        creatorId,
+        body.fanId,
+        body.command,
+        dependencies.access,
+      ),
     );
-    if (
-      scope.authority !== "creator" ||
-      body.command.subjectId !== scope.threadId
-    )
-      throw new DomainError(
-        "signed_subject_unavailable",
-        "The creator cannot sign this subject.",
-      );
-    res.json(await dependencies.signing.begin(actor, creatorId, body.command));
   });
   app.post("/v1/identity/signed-acts/verify", async (req, res) => {
     const actor = await actorFor(req);
@@ -322,6 +352,7 @@ export function createApp(
         code: "not_found",
         message: "This endpoint is unavailable.",
         requestId: res.locals.requestId as string,
+        correlationId: res.locals.correlationId as string | undefined,
       },
     }),
   );
@@ -342,11 +373,14 @@ export function createApp(
                 "The service is unavailable. Please try again.",
                 503,
               );
+      res.locals.errorCode = domain.code;
+      res.locals.failureClass = failureClass(error);
       res.status(domain.status).json({
         error: {
           code: domain.code,
           message: domain.message,
           requestId: res.locals.requestId as string,
+          correlationId: res.locals.correlationId as string | undefined,
         },
       });
     },

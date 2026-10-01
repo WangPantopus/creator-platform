@@ -3,6 +3,7 @@ package com.pantopus.qelvora.generated
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Required
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -18,8 +19,6 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-
-typealias APIAgentAgentAudience = JsonElement
 
 @Serializable
 data class APIAgentCorrectionRequest(
@@ -167,8 +166,6 @@ data class APIAgentPublishRequest(
   val `changes`: String
 )
 
-typealias APIAgentRevision = Long
-
 @Serializable
 data class APIAgentSourceAction(
   val `expectedRevision`: Long,
@@ -193,6 +190,7 @@ data class APIAgentSourceCreate(
   val `originReference`: String? = null,
   val `audience`: JsonElement,
   val `rightsEvidence`: String,
+  @Required
   val `expiresAt`: String? = null
 )
 
@@ -229,8 +227,6 @@ enum class APICommerceCommitmentState {
   @SerialName("refunded") REFUNDED,
   @SerialName("resolved") RESOLVED
 }
-
-typealias APICommerceCurrency = String
 
 @Serializable
 data class APICommerceDecidePacket(
@@ -290,10 +286,6 @@ data class APICommerceFulfillmentCommand(
   val `messageId`: String
 )
 
-typealias APICommerceIdempotencyKey = String
-
-typealias APICommerceMinorUnits = Long
-
 @Serializable
 enum class APICommerceModeKind {
   @SerialName("written_reply") WRITTEN_REPLY,
@@ -340,6 +332,61 @@ enum class APICommercePacketState {
 }
 
 @Serializable
+data class APICommercePassBillingStatus(
+  val `version`: Long,
+  val `currency`: String,
+  val `desiredRenewal`: Boolean,
+  val `processing`: Boolean,
+  val `effects`: List<APICommercePassBillingStatusEffectsItem>
+)
+
+@Serializable
+data class APICommercePassBillingStatusEffectsItem(
+  val `id`: String,
+  val `state`: APICommercePassBillingStatusEffectsItemState,
+  val `operation`: APICommercePassBillingStatusEffectsItemOperation
+)
+
+@Serializable
+enum class APICommercePassBillingStatusEffectsItemState {
+  @SerialName("pending") PENDING,
+  @SerialName("processing") PROCESSING,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
+enum class APICommercePassBillingStatusEffectsItemOperation {
+  @SerialName("start") START,
+  @SerialName("activate_renewal") ACTIVATE_RENEWAL,
+  @SerialName("cancel") CANCEL,
+  @SerialName("compensate_cancel") COMPENSATE_CANCEL
+}
+
+@Serializable
+data class APICommercePassPurchaseEffect(
+  val `effectId`: String,
+  val `processing`: Boolean,
+  val `clientSecret`: String? = null
+)
+
+@Serializable
+data class APICommercePassPurchaseQuote(
+  val `quoteId`: String,
+  val `version`: Long,
+  val `currency`: String,
+  val `amount`: Long,
+  val `monthlyAmount`: Long,
+  val `slotCapacity`: Long,
+  val `allowance`: Long,
+  val `monthlyAllowance`: Long,
+  val `termsVersion`: String,
+  val `budgetPolicyVersion`: String,
+  val `createdAt`: String,
+  val `expiresAt`: String,
+  val `periodEndsAt`: String
+)
+
+@Serializable
 enum class APICommercePaymentState {
   @SerialName("authorization_pending") AUTHORIZATION_PENDING,
   @SerialName("requires_action") REQUIRES_ACTION,
@@ -378,6 +425,7 @@ enum class APICommerceShareChoiceHandleDisplay {
 @Serializable
 data class APICommerceSpendLimitCommand(
   val `currency`: String,
+  @Required
   val `amount`: Long? = null,
   val `explicitNone`: Boolean,
   val `remindersOn`: Boolean,
@@ -434,12 +482,16 @@ data class APIMediaCreatorMediaAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -483,12 +535,16 @@ data class APIMediaCreatorMediaPlaybackTicketAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -602,12 +658,16 @@ data class APIMediaCreatorMediaUploadTicketAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -644,12 +704,16 @@ data class APIMediaMediaAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null
 )
 
@@ -742,6 +806,7 @@ data class APIMediaProcessedMediaEvidence(
   val `sha256`: String,
   val `bytes`: Long,
   val `mimeType`: APIMediaProcessedMediaEvidenceMimeType,
+  @Required
   val `durationMs`: Long? = null
 )
 
@@ -782,6 +847,50 @@ enum class APIMediaUploadRequestMimeType {
   @SerialName("image/jpeg") IMAGE_JPEG,
   @SerialName("image/png") IMAGE_PNG
 }
+
+@Serializable
+data class APICallAvailabilityCommand(
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityCommandWindowsItem>,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APICallAvailabilityCommandWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+@Serializable
+data class APICallAvailability(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+typealias APICallAvailabilityView = APICallAvailabilityViewValue?
+
+@Serializable
+data class APICallAvailabilityViewValue(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityViewValueWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityViewValueWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
 
 @Serializable
 enum class APICallCallConsentPurpose {
@@ -873,8 +982,6 @@ enum class APICallSessionState {
   @SerialName("cancelled") CANCELLED
 }
 
-typealias APIContentAudience = JsonElement
-
 @Serializable
 data class APIContentConsentResult(
   val `version`: Long,
@@ -892,8 +999,11 @@ data class APIContentDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentDocumentLive? = null
 )
@@ -935,6 +1045,7 @@ data class APIContentDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -943,11 +1054,10 @@ data class APIContentEffectsResult(
   val `processed`: Long
 )
 
-typealias APIContentKey = String
-
 @Serializable
 data class APIContentList(
   val `items`: List<APIContentListItemsItem>,
+  @Required
   val `nextCursor`: String? = null,
   val `serverTime`: String
 )
@@ -958,6 +1068,7 @@ data class APIContentListItemsItem(
   val `creatorId`: String,
   val `creatorName`: String,
   val `creatorHandle`: String,
+  @Required
   val `teamMember`: String? = null,
   val `displayText`: String,
   val `version`: Long,
@@ -965,12 +1076,17 @@ data class APIContentListItemsItem(
   val `authorKind`: APIContentListItemsItemAuthorKind,
   val `authorLabel`: String,
   val `audienceLabel`: String,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `publishedAt`: String? = null,
   val `document`: APIContentListItemsItemDocument,
+  @Required
   val `audienceCount`: Long? = null,
   val `sourceState`: APIContentListItemsItemSourceState,
+  @Required
   val `quotedText`: String? = null,
+  @Required
   val `quotedHandle`: String? = null
 )
 
@@ -991,8 +1107,11 @@ data class APIContentListItemsItemDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentListItemsItemDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentListItemsItemDocumentLive? = null
 )
@@ -1034,6 +1153,7 @@ data class APIContentListItemsItemDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -1057,6 +1177,7 @@ data class APIContentLiveCatalogItemsItem(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null,
   val `replayReady`: Boolean
 )
@@ -1116,6 +1237,7 @@ data class APIContentReactionResult(
 @Serializable
 data class APIContentReplyList(
   val `items`: List<APIContentReplyListItemsItem>,
+  @Required
   val `nextCursor`: String? = null
 )
 
@@ -1132,6 +1254,7 @@ data class APIContentReplyListItemsItem(
   val `version`: Long,
   val `createdAt`: String,
   val `consent`: APIContentReplyListItemsItemConsent,
+  @Required
   val `reaction`: APIContentReplyListItemsItemReaction? = null
 )
 
@@ -1221,25 +1344,6 @@ data class APIContentScheduledResult(
   val `published`: Long
 )
 
-typealias APIContentThanksFeed = List<APIContentThanksFeedValueItem>
-
-@Serializable
-data class APIContentThanksFeedValueItem(
-  val `id`: String,
-  val `version`: Long,
-  val `target_kind`: APIContentThanksFeedValueItemTargetKind,
-  val `target_id`: String,
-  val `text`: String,
-  val `handle`: String? = null,
-  val `created_at`: String
-)
-
-@Serializable
-enum class APIContentThanksFeedValueItemTargetKind {
-  @SerialName("content") CONTENT,
-  @SerialName("message") MESSAGE
-}
-
 @Serializable
 data class APIContentThanksQuery(
   val `targetKind`: APIContentThanksQueryTargetKind,
@@ -1276,6 +1380,7 @@ data class APIContentView(
   val `creatorId`: String,
   val `creatorName`: String,
   val `creatorHandle`: String,
+  @Required
   val `teamMember`: String? = null,
   val `displayText`: String,
   val `version`: Long,
@@ -1283,12 +1388,17 @@ data class APIContentView(
   val `authorKind`: APIContentViewAuthorKind,
   val `authorLabel`: String,
   val `audienceLabel`: String,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `publishedAt`: String? = null,
   val `document`: APIContentViewDocument,
+  @Required
   val `audienceCount`: Long? = null,
   val `sourceState`: APIContentViewSourceState,
+  @Required
   val `quotedText`: String? = null,
+  @Required
   val `quotedHandle`: String? = null
 )
 
@@ -1309,8 +1419,11 @@ data class APIContentViewDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentViewDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentViewDocumentLive? = null
 )
@@ -1352,6 +1465,7 @@ data class APIContentViewDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -1394,6 +1508,7 @@ data class APIPrivateNoteReply(
   val `version`: Long,
   val `createdAt`: String,
   val `consent`: APIPrivateNoteReplyConsent,
+  @Required
   val `reaction`: APIPrivateNoteReplyReaction? = null
 )
 
@@ -1471,8 +1586,11 @@ data class APISaveContentDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APISaveContentDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APISaveContentDocumentLive? = null
 )
@@ -1514,6 +1632,7 @@ data class APISaveContentDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -1601,6 +1720,7 @@ data class APIStudioDraftVersion(
 data class APIStudioReplyDraft(
   val `text`: String,
   val `version`: Long,
+  @Required
   val `sentMessageId`: String? = null
 )
 
@@ -1619,6 +1739,7 @@ data class APIStudioSessionCreatorsItem(
   val `verification`: String,
   val `owned`: Boolean,
   val `roles`: List<APIStudioSessionCreatorsItemRolesItem>,
+  @Required
   val `memberHandle`: String? = null,
   val `viewerAccountId`: String
 )
@@ -1685,8 +1806,6 @@ enum class APIStudioInvitationRolesItem {
   @SerialName("scheduler") SCHEDULER
 }
 
-typealias APIStudioCommerceProjection = JsonElement
-
 @Serializable
 data class APIStudioTeam(
   val `members`: List<APIStudioTeamMembersItem>,
@@ -1697,7 +1816,9 @@ data class APIStudioTeam(
 data class APIStudioTeamMembersItem(
   val `account_id`: String,
   val `roles`: List<APIStudioTeamMembersItemRolesItem>,
+  @Required
   val `revoked_at`: String? = null,
+  @Required
   val `handle`: String? = null
 )
 
@@ -1713,10 +1834,13 @@ enum class APIStudioTeamMembersItemRolesItem {
 data class APIStudioTeamInvitationsItem(
   val `id`: String,
   val `account_id`: String,
+  @Required
   val `handle`: String? = null,
   val `roles`: List<APIStudioTeamInvitationsItemRolesItem>,
   val `expires_at`: String,
+  @Required
   val `accepted_at`: String? = null,
+  @Required
   val `revoked_at`: String? = null
 )
 
@@ -1736,6 +1860,7 @@ data class APIStudioControlCommand(
 @Serializable
 data class APIStudioThreadEntries(
   val `items`: List<APIStudioThreadEntriesItemsItem>,
+  @Required
   val `nextCursor`: String? = null,
   val `coverage`: APIStudioThreadEntriesCoverage
 )
@@ -1788,6 +1913,7 @@ data class APIContentReviewView(
   val `creatorId`: String,
   val `creatorName`: String,
   val `creatorHandle`: String,
+  @Required
   val `teamMember`: String? = null,
   val `displayText`: String,
   val `version`: Long,
@@ -1795,12 +1921,17 @@ data class APIContentReviewView(
   val `authorKind`: APIContentReviewViewAuthorKind,
   val `authorLabel`: String,
   val `audienceLabel`: String,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `publishedAt`: String? = null,
   val `document`: APIContentReviewViewDocument,
+  @Required
   val `audienceCount`: Long? = null,
   val `sourceState`: APIContentReviewViewSourceState,
+  @Required
   val `quotedText`: String? = null,
+  @Required
   val `quotedHandle`: String? = null
 )
 
@@ -1821,8 +1952,11 @@ data class APIContentReviewViewDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentReviewViewDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentReviewViewDocumentLive? = null
 )
@@ -1864,6 +1998,7 @@ data class APIContentReviewViewDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -1952,7 +2087,9 @@ data class APISession(
   val `sessionId`: String,
   val `expiresAt`: String,
   val `mode`: APISessionMode,
+  @Required
   val `fan`: APISessionFan? = null,
+  @Required
   val `creator`: APISessionCreator? = null,
   val `teams`: List<APISessionTeamsItem>
 )
@@ -2027,7 +2164,9 @@ data class APIIdentityCompletionSession(
   val `sessionId`: String,
   val `expiresAt`: String,
   val `mode`: APIIdentityCompletionSessionMode,
+  @Required
   val `fan`: APIIdentityCompletionSessionFan? = null,
+  @Required
   val `creator`: APIIdentityCompletionSessionCreator? = null,
   val `teams`: List<APIIdentityCompletionSessionTeamsItem>
 )
@@ -2135,6 +2274,7 @@ data class APIProof(
   val `accountUrl`: String,
   val `expiresAt`: String,
   val `state`: APIProofState,
+  @Required
   val `reason`: String? = null
 )
 
@@ -2223,6 +2363,7 @@ data class APIPublicSignature(
   val `contentHash`: String,
   val `verifiedAt`: String,
   val `status`: APIPublicSignatureStatus,
+  @Required
   val `content`: JsonElement? = null,
   val `contentAvailable`: Boolean,
   val `explanation`: String
@@ -2478,6 +2619,7 @@ data class APIMessage(
   val `deliveryState`: APIMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -2508,7 +2650,8 @@ enum class APIMessageDeliveryState {
 @Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
-  val `generationId`: String
+  @Required
+  val `generationId`: String? = null
 )
 
 @Serializable
@@ -2520,6 +2663,7 @@ data class APIAcceptedMessageMessage(
   val `deliveryState`: APIAcceptedMessageMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -2556,6 +2700,7 @@ data class APIFrame(
   val `messageId`: String,
   val `authorKind`: APIFrameAuthorKind,
   val `text`: String,
+  @Required
   val `generationId`: String? = null,
   val `sequence`: Long,
   val `control`: APIFrameControl? = null
@@ -2635,6 +2780,7 @@ data class APIThreadTimelineMessagesItem(
   val `deliveryState`: APIThreadTimelineMessagesItemDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -2662,73 +2808,1613 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
   @SerialName("interrupted") INTERRUPTED
 }
 
+@Serializable
+data class APIConversationAgentReplyVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+data class APIConversationAuditEntry(
+  val `id`: String,
+  val `readerAccountId`: String,
+  val `role`: APIConversationAuditEntryRole,
+  val `readAt`: String
+)
+
+@Serializable
+enum class APIConversationAuditEntryRole {
+  @SerialName("creator") CREATOR,
+  @SerialName("triage") TRIAGE,
+  @SerialName("ops") OPS
+}
+
+@Serializable
+data class APIConversationBeginConversation(
+  val `creatorId`: String,
+  val `policyVersion`: String,
+  val `accessNoticeAccepted`: APIConversationBeginConversationAccessNoticeAccepted,
+  val `idempotencyKey`: String
+)
+
+@Serializable(with = APIConversationBeginConversationAccessNoticeAcceptedSerializer::class)
+object APIConversationBeginConversationAccessNoticeAccepted { const val value: Boolean = true }
+object APIConversationBeginConversationAccessNoticeAcceptedSerializer : KSerializer<APIConversationBeginConversationAccessNoticeAccepted> {
+  override val descriptor = PrimitiveSerialDescriptor("APIConversationBeginConversationAccessNoticeAccepted", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIConversationBeginConversationAccessNoticeAccepted {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIConversationBeginConversationAccessNoticeAccepted
+  }
+  override fun serialize(encoder: Encoder, value: APIConversationBeginConversationAccessNoticeAccepted) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIConversationConsentInput(
+  val `version`: String,
+  val `accepted`: Boolean
+)
+
+@Serializable
+data class APIConversationConversationAccountPage(
+  val `fan`: APIConversationConversationAccountPageFan,
+  val `threads`: List<APIConversationConversationAccountPageThreadsItem>,
+  @Required
+  val `nextCursor`: String? = null
+)
+
+@Serializable
+data class APIConversationConversationAccountPageFan(
+  val `id`: String,
+  val `handle`: String,
+  @Required
+  val `intro`: String? = null
+)
+
+@Serializable
+data class APIConversationConversationAccountPageThreadsItem(
+  val `id`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `name`: String
+)
+
+@Serializable
+enum class APIConversationConversationAuthorship {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+data class APIConversationConversationCorrectionCommand(
+  val `actType`: APIConversationConversationCorrectionCommandActType,
+  val `subjectId`: String,
+  val `content`: APIConversationConversationCorrectionCommandContent
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionCommandActType {
+  @SerialName("correction") CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionCommandContent(
+  val `kind`: APIConversationConversationCorrectionCommandContentKind,
+  val `creatorId`: String,
+  val `threadId`: String,
+  val `fanId`: String,
+  val `messageVersion`: Long,
+  val `text`: String
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionCommandContentKind {
+  @SerialName("conversation_correction") CONVERSATION_CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionInput(
+  val `command`: APIConversationConversationCorrectionInputCommand,
+  val `signedActId`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIConversationConversationCorrectionInputCommand(
+  val `actType`: APIConversationConversationCorrectionInputCommandActType,
+  val `subjectId`: String,
+  val `content`: APIConversationConversationCorrectionInputCommandContent
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionInputCommandActType {
+  @SerialName("correction") CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionInputCommandContent(
+  val `kind`: APIConversationConversationCorrectionInputCommandContentKind,
+  val `creatorId`: String,
+  val `threadId`: String,
+  val `fanId`: String,
+  val `messageVersion`: Long,
+  val `text`: String
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionInputCommandContentKind {
+  @SerialName("conversation_correction") CONVERSATION_CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationMessage(
+  val `id`: String,
+  val `threadId`: String,
+  val `authorKind`: APIConversationConversationMessageAuthorKind,
+  val `text`: String,
+  val `deliveryState`: APIConversationConversationMessageDeliveryState,
+  val `controlEpoch`: Long,
+  val `sequence`: Long,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
+  val `citations`: List<String>,
+  val `createdAt`: String,
+  val `offTheRecord`: Boolean,
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationMessageAgentVersion? = null,
+  val `feedback`: APIConversationConversationMessageFeedback? = null,
+  val `recording`: JsonElement? = null,
+  val `correction`: APIConversationConversationMessageCorrection? = null
+)
+
+@Serializable
+enum class APIConversationConversationMessageAuthorKind {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+enum class APIConversationConversationMessageDeliveryState {
+  @SerialName("accepted") ACCEPTED,
+  @SerialName("generating") GENERATING,
+  @SerialName("delivered") DELIVERED,
+  @SerialName("failed") FAILED,
+  @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationMessageAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationMessageFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationMessageCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationPage(
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `creatorName`: String,
+  val `fanHandle`: String,
+  val `control`: APIConversationConversationPageControl,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `revision`: Long,
+  val `generationSequences`: Map<String, Long>,
+  val `messages`: List<APIConversationConversationPageMessagesItem>,
+  @Required
+  val `before`: Long? = null,
+  val `offTheRecord`: Boolean,
+  val `introShared`: Boolean,
+  val `consentCurrent`: Boolean,
+  val `canSend`: Boolean,
+  @Required
+  val `unavailableReason`: String? = null,
+  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null
+)
+
+@Serializable
+enum class APIConversationConversationPageControl {
+  @SerialName("ai_active") AI_ACTIVE,
+  @SerialName("human_active") HUMAN_ACTIVE,
+  @SerialName("ai_paused") AI_PAUSED,
+  @SerialName("closed") CLOSED,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItem(
+  val `id`: String,
+  val `threadId`: String,
+  val `authorKind`: APIConversationConversationPageMessagesItemAuthorKind,
+  val `text`: String,
+  val `deliveryState`: APIConversationConversationPageMessagesItemDeliveryState,
+  val `controlEpoch`: Long,
+  val `sequence`: Long,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
+  val `citations`: List<String>,
+  val `createdAt`: String,
+  val `offTheRecord`: Boolean,
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationPageMessagesItemAgentVersion? = null,
+  val `feedback`: APIConversationConversationPageMessagesItemFeedback? = null,
+  val `recording`: JsonElement? = null,
+  val `correction`: APIConversationConversationPageMessagesItemCorrection? = null
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemAuthorKind {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemDeliveryState {
+  @SerialName("accepted") ACCEPTED,
+  @SerialName("generating") GENERATING,
+  @SerialName("delivered") DELIVERED,
+  @SerialName("failed") FAILED,
+  @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationPageFeedbackPolicy(
+  val `version`: String,
+  val `notice`: String
+)
+
+@Serializable
+data class APIConversationConversationRecordingCommand(
+  val `actType`: APIConversationConversationRecordingCommandActType,
+  val `subjectId`: String,
+  val `content`: APIConversationConversationRecordingCommandContent
+)
+
+@Serializable
+enum class APIConversationConversationRecordingCommandActType {
+  @SerialName("reply") REPLY
+}
+
+@Serializable
+data class APIConversationConversationRecordingCommandContent(
+  val `mediaAssetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `mimeType`: APIConversationConversationRecordingCommandContentMimeType,
+  val `durationMs`: Long,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIConversationConversationRecordingCommandContentMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4
+}
+
+@Serializable
+data class APIConversationConversationRecordingInput(
+  val `evidence`: APIConversationConversationRecordingInputEvidence,
+  val `signedActId`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIConversationConversationRecordingInputEvidence(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `mimeType`: APIConversationConversationRecordingInputEvidenceMimeType,
+  val `durationMs`: Long,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIConversationConversationRecordingInputEvidenceMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4
+}
+
+@Serializable
+data class APIConversationConversationRecordingResult(
+  val `messageId`: String,
+  val `threadId`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIConversationConversationTimeline(
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `control`: APIConversationConversationTimelineControl,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `generationSequences`: Map<String, Long>,
+  val `messages`: List<APIConversationConversationTimelineMessagesItem>
+)
+
+@Serializable
+enum class APIConversationConversationTimelineControl {
+  @SerialName("ai_active") AI_ACTIVE,
+  @SerialName("human_active") HUMAN_ACTIVE,
+  @SerialName("ai_paused") AI_PAUSED,
+  @SerialName("closed") CLOSED,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItem(
+  val `id`: String,
+  val `threadId`: String,
+  val `authorKind`: APIConversationConversationTimelineMessagesItemAuthorKind,
+  val `text`: String,
+  val `deliveryState`: APIConversationConversationTimelineMessagesItemDeliveryState,
+  val `controlEpoch`: Long,
+  val `sequence`: Long,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
+  val `citations`: List<String>,
+  val `createdAt`: String,
+  val `offTheRecord`: Boolean,
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationTimelineMessagesItemAgentVersion? = null,
+  val `feedback`: APIConversationConversationTimelineMessagesItemFeedback? = null,
+  val `recording`: JsonElement? = null,
+  val `correction`: APIConversationConversationTimelineMessagesItemCorrection? = null
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemAuthorKind {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemDeliveryState {
+  @SerialName("accepted") ACCEPTED,
+  @SerialName("generating") GENERATING,
+  @SerialName("delivered") DELIVERED,
+  @SerialName("failed") FAILED,
+  @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationUsage(
+  val `timezone`: APIConversationConversationUsageTimezone,
+  val `days`: List<APIConversationConversationUsageDaysItem>,
+  val `modeAvailable`: Boolean,
+  val `measurement`: String
+)
+
+@Serializable
+enum class APIConversationConversationUsageTimezone {
+  @SerialName("UTC") UTC
+}
+
+@Serializable
+data class APIConversationConversationUsageDaysItem(
+  val `day`: String,
+  val `seconds`: Double,
+  val `companionSeconds`: Double
+)
+
+@Serializable
+data class APIConversationMemoryDecision(
+  val `expectedRevision`: Long,
+  val `action`: APIConversationMemoryDecisionAction,
+  val `text`: String? = null
+)
+
+@Serializable
+enum class APIConversationMemoryDecisionAction {
+  @SerialName("accept") ACCEPT,
+  @SerialName("delete") DELETE,
+  @SerialName("edit") EDIT,
+  @SerialName("resolve") RESOLVE
+}
+
+@Serializable
+data class APIConversationMemoryItem(
+  val `id`: String,
+  val `kind`: APIConversationMemoryItemKind,
+  val `text`: String,
+  val `provenanceMessageId`: String,
+  @Required
+  val `sensitiveCategory`: String? = null,
+  val `state`: APIConversationMemoryItemState,
+  val `editedByFan`: Boolean,
+  val `createdAt`: String
+)
+
+@Serializable
+enum class APIConversationMemoryItemKind {
+  @SerialName("fact") FACT,
+  @SerialName("summary") SUMMARY,
+  @SerialName("open_loop") OPEN_LOOP
+}
+
+@Serializable
+enum class APIConversationMemoryItemState {
+  @SerialName("proposed") PROPOSED,
+  @SerialName("remembered") REMEMBERED,
+  @SerialName("resolved") RESOLVED
+}
+
+@Serializable
+data class APIConversationMemoryProposal(
+  val `kind`: APIConversationMemoryProposalKind,
+  val `text`: String,
+  val `semanticKey`: String,
+  val `provenanceMessageId`: String,
+  val `expectedRevision`: Long,
+  val `sensitiveCategory`: String? = null
+)
+
+@Serializable
+enum class APIConversationMemoryProposalKind {
+  @SerialName("fact") FACT,
+  @SerialName("summary") SUMMARY,
+  @SerialName("open_loop") OPEN_LOOP
+}
+
+@Serializable
+data class APIConversationProviderPolicy(
+  val `version`: String,
+  val `providers`: List<APIConversationProviderPolicyProvidersItem>,
+  val `verified`: Boolean
+)
+
+@Serializable
+data class APIConversationProviderPolicyProvidersItem(
+  val `name`: String,
+  val `termsUrl`: String,
+  val `noTraining`: Boolean,
+  val `noRetention`: Boolean
+)
+
+@Serializable
+data class APIConversationReplyFeedbackInput(
+  val `messageVersion`: Long,
+  val `agentVersion`: APIConversationReplyFeedbackInputAgentVersion,
+  @Required
+  val `rating`: APIConversationReplyFeedbackInputRating? = null,
+  val `consent`: APIConversationReplyFeedbackInputConsent? = null,
+  val `policyVersion`: String? = null
+)
+
+@Serializable
+data class APIConversationReplyFeedbackInputAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackInputRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable(with = APIConversationReplyFeedbackInputConsentSerializer::class)
+object APIConversationReplyFeedbackInputConsent { const val value: Boolean = true }
+object APIConversationReplyFeedbackInputConsentSerializer : KSerializer<APIConversationReplyFeedbackInputConsent> {
+  override val descriptor = PrimitiveSerialDescriptor("APIConversationReplyFeedbackInputConsent", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIConversationReplyFeedbackInputConsent {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIConversationReplyFeedbackInputConsent
+  }
+  override fun serialize(encoder: Encoder, value: APIConversationReplyFeedbackInputConsent) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIConversationReplyFeedbackPolicy(
+  val `version`: String,
+  val `notice`: String
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationTeamReply(
+  val `text`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIConversationThreadPreferences(
+  val `offTheRecord`: Boolean,
+  val `introShared`: Boolean,
+  val `expectedRevision`: Long
+)
+
+@Serializable
+data class APIConversationTranslation(
+  val `messageId`: String,
+  val `originalVersion`: Long,
+  val `language`: String,
+  val `text`: String,
+  val `provider`: String,
+  val `label`: APIConversationTranslationLabel
+)
+
+@Serializable
+enum class APIConversationTranslationLabel {
+  @SerialName("Translated · original available") TRANSLATED___ORIGINAL_AVAILABLE
+}
+
+@Serializable
+data class APIContentContentConsentResult(
+  val `version`: Long,
+  val `share_text`: Boolean,
+  val `show_handle`: Boolean
+)
+
+@Serializable
+data class APIContentContentDocument(
+  val `kind`: APIContentContentDocumentKind,
+  val `title`: String,
+  val `text`: String,
+  val `audience`: JsonElement,
+  val `media`: List<APIContentContentDocumentMediaItem>,
+  val `nameToken`: Boolean,
+  val `showAudienceCount`: Boolean,
+  val `aiUseIntent`: Boolean,
+  @Required
+  val `scheduledAt`: String? = null,
+  @Required
+  val `quote`: APIContentContentDocumentQuote? = null,
+  @Required
+  val `packetId`: String? = null,
+  val `live`: APIContentContentDocumentLive? = null
+)
+
+@Serializable
+enum class APIContentContentDocumentKind {
+  @SerialName("note") NOTE,
+  @SerialName("post") POST,
+  @SerialName("public_answer") PUBLIC_ANSWER,
+  @SerialName("quote_reply") QUOTE_REPLY,
+  @SerialName("live") LIVE,
+  @SerialName("replay") REPLAY
+}
+
+@Serializable
+data class APIContentContentDocumentMediaItem(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `kind`: APIContentContentDocumentMediaItemKind,
+  val `alt`: String
+)
+
+@Serializable
+enum class APIContentContentDocumentMediaItemKind {
+  @SerialName("photo") PHOTO,
+  @SerialName("voice") VOICE,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+data class APIContentContentDocumentQuote(
+  val `replyId`: String,
+  val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentDocumentLive(
+  val `sessionId`: String,
+  val `startsAt`: String,
+  val `endsAt`: String,
+  @Required
+  val `replayContentId`: String? = null
+)
+
+@Serializable
+data class APIContentContentEffectsResult(
+  val `processed`: Long
+)
+
+@Serializable
+data class APIContentContentList(
+  val `items`: List<APIContentContentListItemsItem>,
+  @Required
+  val `nextCursor`: String? = null,
+  val `serverTime`: String
+)
+
+@Serializable
+data class APIContentContentListItemsItem(
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `creatorHandle`: String,
+  @Required
+  val `teamMember`: String? = null,
+  val `displayText`: String,
+  val `version`: Long,
+  val `state`: String,
+  val `authorKind`: APIContentContentListItemsItemAuthorKind,
+  val `authorLabel`: String,
+  val `audienceLabel`: String,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `publishedAt`: String? = null,
+  val `document`: APIContentContentListItemsItemDocument,
+  @Required
+  val `audienceCount`: Long? = null,
+  val `sourceState`: APIContentContentListItemsItemSourceState,
+  @Required
+  val `quotedText`: String? = null,
+  @Required
+  val `quotedHandle`: String? = null
+)
+
+@Serializable
+enum class APIContentContentListItemsItemAuthorKind {
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("team") TEAM
+}
+
+@Serializable
+data class APIContentContentListItemsItemDocument(
+  val `kind`: APIContentContentListItemsItemDocumentKind,
+  val `title`: String,
+  val `text`: String,
+  val `audience`: JsonElement,
+  val `media`: List<APIContentContentListItemsItemDocumentMediaItem>,
+  val `nameToken`: Boolean,
+  val `showAudienceCount`: Boolean,
+  val `aiUseIntent`: Boolean,
+  @Required
+  val `scheduledAt`: String? = null,
+  @Required
+  val `quote`: APIContentContentListItemsItemDocumentQuote? = null,
+  @Required
+  val `packetId`: String? = null,
+  val `live`: APIContentContentListItemsItemDocumentLive? = null
+)
+
+@Serializable
+enum class APIContentContentListItemsItemDocumentKind {
+  @SerialName("note") NOTE,
+  @SerialName("post") POST,
+  @SerialName("public_answer") PUBLIC_ANSWER,
+  @SerialName("quote_reply") QUOTE_REPLY,
+  @SerialName("live") LIVE,
+  @SerialName("replay") REPLAY
+}
+
+@Serializable
+data class APIContentContentListItemsItemDocumentMediaItem(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `kind`: APIContentContentListItemsItemDocumentMediaItemKind,
+  val `alt`: String
+)
+
+@Serializable
+enum class APIContentContentListItemsItemDocumentMediaItemKind {
+  @SerialName("photo") PHOTO,
+  @SerialName("voice") VOICE,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+data class APIContentContentListItemsItemDocumentQuote(
+  val `replyId`: String,
+  val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentListItemsItemDocumentLive(
+  val `sessionId`: String,
+  val `startsAt`: String,
+  val `endsAt`: String,
+  @Required
+  val `replayContentId`: String? = null
+)
+
+@Serializable
+enum class APIContentContentListItemsItemSourceState {
+  @SerialName("not_requested") NOT_REQUESTED,
+  @SerialName("candidate_pending") CANDIDATE_PENDING,
+  @SerialName("candidate") CANDIDATE,
+  @SerialName("revocation_pending") REVOCATION_PENDING,
+  @SerialName("revoked") REVOKED
+}
+
+@Serializable
+data class APIContentContentLiveCatalog(
+  val `available`: Boolean,
+  val `items`: List<APIContentContentLiveCatalogItemsItem>
+)
+
+@Serializable
+data class APIContentContentLiveCatalogItemsItem(
+  val `sessionId`: String,
+  val `startsAt`: String,
+  val `endsAt`: String,
+  @Required
+  val `replayContentId`: String? = null,
+  val `replayReady`: Boolean
+)
+
+@Serializable
+data class APIContentContentMedia(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `kind`: APIContentContentMediaKind,
+  val `alt`: String
+)
+
+@Serializable
+enum class APIContentContentMediaKind {
+  @SerialName("photo") PHOTO,
+  @SerialName("voice") VOICE,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+data class APIContentContentMuteCommand(
+  val `muted`: Boolean
+)
+
+@Serializable
+data class APIContentContentPage(
+  val `cursor`: String? = null,
+  val `limit`: Long,
+  val `state`: APIContentContentPageState? = null,
+  val `query`: String? = null
+)
+
+@Serializable
+enum class APIContentContentPageState {
+  @SerialName("draft") DRAFT,
+  @SerialName("media_pending") MEDIA_PENDING,
+  @SerialName("scheduled") SCHEDULED,
+  @SerialName("published") PUBLISHED,
+  @SerialName("unpublished") UNPUBLISHED,
+  @SerialName("archived") ARCHIVED
+}
+
+@Serializable
+data class APIContentContentPreference(
+  val `accountId`: String,
+  val `muted`: Boolean
+)
+
+@Serializable
+data class APIContentContentReactionResult(
+  val `replyId`: String,
+  val `kind`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIContentContentReplyList(
+  val `items`: List<APIContentContentReplyListItemsItem>,
+  @Required
+  val `nextCursor`: String? = null
+)
+
+@Serializable
+data class APIContentContentReplyListItemsItem(
+  val `safetyState`: APIContentContentReplyListItemsItemSafetyState,
+  val `safetyReviewAvailable`: Boolean,
+  val `read`: Boolean,
+  val `id`: String,
+  val `contentId`: String,
+  val `fanId`: String,
+  val `handle`: String,
+  val `text`: String,
+  val `version`: Long,
+  val `createdAt`: String,
+  val `consent`: APIContentContentReplyListItemsItemConsent,
+  @Required
+  val `reaction`: APIContentContentReplyListItemsItemReaction? = null
+)
+
+@Serializable
+enum class APIContentContentReplyListItemsItemSafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentContentReplyListItemsItemConsent(
+  val `shareText`: Boolean,
+  val `showHandle`: Boolean,
+  val `version`: Long
+)
+
+@Serializable
+data class APIContentContentReplyListItemsItemReaction(
+  val `kind`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIContentContentReplyPage(
+  val `cursor`: String? = null,
+  val `limit`: Long,
+  val `filter`: APIContentContentReplyPageFilter
+)
+
+@Serializable
+enum class APIContentContentReplyPageFilter {
+  @SerialName("all") ALL,
+  @SerialName("unread") UNREAD,
+  @SerialName("reacted") REACTED,
+  @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentContentReplyReadResult(
+  val `id`: String,
+  val `version`: Long,
+  val `read`: APIContentContentReplyReadResultRead
+)
+
+@Serializable(with = APIContentContentReplyReadResultReadSerializer::class)
+object APIContentContentReplyReadResultRead { const val value: Boolean = true }
+object APIContentContentReplyReadResultReadSerializer : KSerializer<APIContentContentReplyReadResultRead> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentReplyReadResultRead", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentReplyReadResultRead {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIContentContentReplyReadResultRead
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentReplyReadResultRead) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIContentContentReplyReviewResult(
+  val `id`: String,
+  val `version`: Long,
+  val `safetyState`: APIContentContentReplyReviewResultSafetyState
+)
+
+@Serializable
+enum class APIContentContentReplyReviewResultSafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentContentResult(
+  val `id`: String,
+  val `version`: Long,
+  val `state`: String,
+  val `signedActId`: String? = null
+)
+
+@Serializable
+data class APIContentContentRevisionResult(
+  val `id`: String,
+  val `version`: Long
+)
+
+@Serializable
+data class APIContentContentScheduledResult(
+  val `published`: Long
+)
+
+@Serializable
+data class APIContentContentThanksQuery(
+  val `targetKind`: APIContentContentThanksQueryTargetKind,
+  val `targetId`: String
+)
+
+@Serializable
+enum class APIContentContentThanksQueryTargetKind {
+  @SerialName("content") CONTENT,
+  @SerialName("message") MESSAGE
+}
+
+typealias APIContentContentThanksView = APIContentContentThanksViewValue?
+
+@Serializable
+data class APIContentContentThanksViewValue(
+  val `id`: String,
+  val `version`: Long,
+  val `text`: String,
+  val `shareWithCreatorDigest`: Boolean,
+  val `showIdentity`: Boolean,
+  val `withdrawn`: Boolean
+)
+
+@Serializable
+data class APIContentContentVersionCommand(
+  val `version`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIContentContentView(
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `creatorHandle`: String,
+  @Required
+  val `teamMember`: String? = null,
+  val `displayText`: String,
+  val `version`: Long,
+  val `state`: String,
+  val `authorKind`: APIContentContentViewAuthorKind,
+  val `authorLabel`: String,
+  val `audienceLabel`: String,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `publishedAt`: String? = null,
+  val `document`: APIContentContentViewDocument,
+  @Required
+  val `audienceCount`: Long? = null,
+  val `sourceState`: APIContentContentViewSourceState,
+  @Required
+  val `quotedText`: String? = null,
+  @Required
+  val `quotedHandle`: String? = null
+)
+
+@Serializable
+enum class APIContentContentViewAuthorKind {
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("team") TEAM
+}
+
+@Serializable
+data class APIContentContentViewDocument(
+  val `kind`: APIContentContentViewDocumentKind,
+  val `title`: String,
+  val `text`: String,
+  val `audience`: JsonElement,
+  val `media`: List<APIContentContentViewDocumentMediaItem>,
+  val `nameToken`: Boolean,
+  val `showAudienceCount`: Boolean,
+  val `aiUseIntent`: Boolean,
+  @Required
+  val `scheduledAt`: String? = null,
+  @Required
+  val `quote`: APIContentContentViewDocumentQuote? = null,
+  @Required
+  val `packetId`: String? = null,
+  val `live`: APIContentContentViewDocumentLive? = null
+)
+
+@Serializable
+enum class APIContentContentViewDocumentKind {
+  @SerialName("note") NOTE,
+  @SerialName("post") POST,
+  @SerialName("public_answer") PUBLIC_ANSWER,
+  @SerialName("quote_reply") QUOTE_REPLY,
+  @SerialName("live") LIVE,
+  @SerialName("replay") REPLAY
+}
+
+@Serializable
+data class APIContentContentViewDocumentMediaItem(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `kind`: APIContentContentViewDocumentMediaItemKind,
+  val `alt`: String
+)
+
+@Serializable
+enum class APIContentContentViewDocumentMediaItemKind {
+  @SerialName("photo") PHOTO,
+  @SerialName("voice") VOICE,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+data class APIContentContentViewDocumentQuote(
+  val `replyId`: String,
+  val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentViewDocumentLive(
+  val `sessionId`: String,
+  val `startsAt`: String,
+  val `endsAt`: String,
+  @Required
+  val `replayContentId`: String? = null
+)
+
+@Serializable
+enum class APIContentContentViewSourceState {
+  @SerialName("not_requested") NOT_REQUESTED,
+  @SerialName("candidate_pending") CANDIDATE_PENDING,
+  @SerialName("candidate") CANDIDATE,
+  @SerialName("revocation_pending") REVOCATION_PENDING,
+  @SerialName("revoked") REVOKED
+}
+
+@Serializable
+data class APIContentContentWithdrawResult(
+  val `id`: String,
+  val `withdrawn`: APIContentContentWithdrawResultWithdrawn
+)
+
+@Serializable(with = APIContentContentWithdrawResultWithdrawnSerializer::class)
+object APIContentContentWithdrawResultWithdrawn { const val value: Boolean = true }
+object APIContentContentWithdrawResultWithdrawnSerializer : KSerializer<APIContentContentWithdrawResultWithdrawn> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentWithdrawResultWithdrawn", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentWithdrawResultWithdrawn {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIContentContentWithdrawResultWithdrawn
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentWithdrawResultWithdrawn) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIContentPrivateNoteReply(
+  val `safetyState`: APIContentPrivateNoteReplySafetyState,
+  val `safetyReviewAvailable`: Boolean,
+  val `read`: Boolean,
+  val `id`: String,
+  val `contentId`: String,
+  val `fanId`: String,
+  val `handle`: String,
+  val `text`: String,
+  val `version`: Long,
+  val `createdAt`: String,
+  val `consent`: APIContentPrivateNoteReplyConsent,
+  @Required
+  val `reaction`: APIContentPrivateNoteReplyReaction? = null
+)
+
+@Serializable
+enum class APIContentPrivateNoteReplySafetyState {
+  @SerialName("pending") PENDING,
+  @SerialName("allowed") ALLOWED,
+  @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentPrivateNoteReplyConsent(
+  val `shareText`: Boolean,
+  val `showHandle`: Boolean,
+  val `version`: Long
+)
+
+@Serializable
+data class APIContentPrivateNoteReplyReaction(
+  val `kind`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIContentPublishContent(
+  val `version`: Long,
+  val `idempotencyKey`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIContentQuoteConsent(
+  val `version`: Long,
+  val `shareText`: Boolean,
+  val `showHandle`: Boolean,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIContentReactToReply(
+  val `version`: Long,
+  val `kind`: APIContentReactToReplyKind,
+  val `signedActId`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+enum class APIContentReactToReplyKind {
+  @SerialName("heart") HEART,
+  @SerialName("thanks") THANKS,
+  @SerialName("helpful") HELPFUL
+}
+
+@Serializable
+data class APIContentReplyToNote(
+  val `text`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIContentSaveContent(
+  val `id`: String,
+  val `expectedVersion`: Long,
+  val `document`: APIContentSaveContentDocument,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIContentSaveContentDocument(
+  val `kind`: APIContentSaveContentDocumentKind,
+  val `title`: String,
+  val `text`: String,
+  val `audience`: JsonElement,
+  val `media`: List<APIContentSaveContentDocumentMediaItem>,
+  val `nameToken`: Boolean,
+  val `showAudienceCount`: Boolean,
+  val `aiUseIntent`: Boolean,
+  @Required
+  val `scheduledAt`: String? = null,
+  @Required
+  val `quote`: APIContentSaveContentDocumentQuote? = null,
+  @Required
+  val `packetId`: String? = null,
+  val `live`: APIContentSaveContentDocumentLive? = null
+)
+
+@Serializable
+enum class APIContentSaveContentDocumentKind {
+  @SerialName("note") NOTE,
+  @SerialName("post") POST,
+  @SerialName("public_answer") PUBLIC_ANSWER,
+  @SerialName("quote_reply") QUOTE_REPLY,
+  @SerialName("live") LIVE,
+  @SerialName("replay") REPLAY
+}
+
+@Serializable
+data class APIContentSaveContentDocumentMediaItem(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `kind`: APIContentSaveContentDocumentMediaItemKind,
+  val `alt`: String
+)
+
+@Serializable
+enum class APIContentSaveContentDocumentMediaItemKind {
+  @SerialName("photo") PHOTO,
+  @SerialName("voice") VOICE,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+data class APIContentSaveContentDocumentQuote(
+  val `replyId`: String,
+  val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentSaveContentDocumentLive(
+  val `sessionId`: String,
+  val `startsAt`: String,
+  val `endsAt`: String,
+  @Required
+  val `replayContentId`: String? = null
+)
+
+@Serializable
+data class APIContentThanksCommand(
+  val `targetKind`: APIContentThanksCommandTargetKind,
+  val `targetId`: String,
+  val `text`: String,
+  val `shareWithCreatorDigest`: Boolean,
+  val `showIdentity`: Boolean,
+  val `withdrawn`: Boolean,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+enum class APIContentThanksCommandTargetKind {
+  @SerialName("content") CONTENT,
+  @SerialName("message") MESSAGE
+}
+
+@Serializable
+data class APIStudioContentVersionCommand(
+  val `version`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioAudiences(
+  val `audienceCountsAvailable`: Boolean,
+  val `tiers`: List<APIStudioStudioAudiencesTiersItem>,
+  val `groups`: List<APIStudioStudioAudiencesGroupsItem>
+)
+
+@Serializable
+data class APIStudioStudioAudiencesTiersItem(
+  val `id`: String,
+  val `name`: String
+)
+
+@Serializable
+data class APIStudioStudioAudiencesGroupsItem(
+  val `id`: String,
+  val `name`: String
+)
+
+@Serializable
+data class APIStudioStudioControlCommand(
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioCorrection(
+  val `idempotencyKey`: String,
+  val `expectedRevision`: Long,
+  val `paraphrasedPrompt`: String,
+  val `rule`: String,
+  val `unacceptableAnswer`: String
+)
+
+@Serializable
+data class APIStudioStudioDraftVersion(
+  val `version`: Long
+)
+
+@Serializable
+data class APIStudioStudioInvitation(
+  val `id`: String,
+  val `roles`: List<APIStudioStudioInvitationRolesItem>,
+  val `creatorId`: String? = null,
+  val `accountId`: String? = null,
+  val `expiresAt`: String? = null,
+  val `accepted`: Boolean? = null
+)
+
+@Serializable
+enum class APIStudioStudioInvitationRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioInvite(
+  val `handle`: String,
+  val `roles`: List<APIStudioStudioInviteRolesItem>
+)
+
+@Serializable
+enum class APIStudioStudioInviteRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioQueueQuery(
+  val `cursor`: String? = null,
+  val `filter`: APIStudioStudioQueueQueryFilter,
+  val `limit`: Long
+)
+
+@Serializable
+enum class APIStudioStudioQueueQueryFilter {
+  @SerialName("all") ALL,
+  @SerialName("due") DUE,
+  @SerialName("decide") DECIDE,
+  @SerialName("more_info") MORE_INFO
+}
+
+@Serializable
+data class APIStudioStudioReplyDraft(
+  val `text`: String,
+  val `version`: Long,
+  @Required
+  val `sentMessageId`: String? = null
+)
+
+@Serializable
+data class APIStudioStudioRevision(
+  val `revision`: Long
+)
+
+@Serializable
+data class APIStudioStudioSaveReplyDraft(
+  val `text`: String,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIStudioStudioSendReplyDraft(
+  val `version`: Long,
+  val `idempotencyKey`: String,
+  val `signedActId`: String
+)
+
+@Serializable
+data class APIStudioStudioSession(
+  val `creators`: List<APIStudioStudioSessionCreatorsItem>,
+  val `invitations`: List<APIStudioStudioSessionInvitationsItem>,
+  val `serverTime`: String
+)
+
+@Serializable
+data class APIStudioStudioSessionCreatorsItem(
+  val `id`: String,
+  val `display_name`: String,
+  val `handle`: String,
+  val `verification`: String,
+  val `owned`: Boolean,
+  val `roles`: List<APIStudioStudioSessionCreatorsItemRolesItem>,
+  @Required
+  val `memberHandle`: String? = null,
+  val `viewerAccountId`: String
+)
+
+@Serializable
+enum class APIStudioStudioSessionCreatorsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioSessionInvitationsItem(
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `roles`: List<APIStudioStudioSessionInvitationsItemRolesItem>,
+  val `expiresAt`: String
+)
+
+@Serializable
+enum class APIStudioStudioSessionInvitationsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioTeam(
+  val `members`: List<APIStudioStudioTeamMembersItem>,
+  val `invitations`: List<APIStudioStudioTeamInvitationsItem>
+)
+
+@Serializable
+data class APIStudioStudioTeamMembersItem(
+  val `account_id`: String,
+  val `roles`: List<APIStudioStudioTeamMembersItemRolesItem>,
+  @Required
+  val `revoked_at`: String? = null,
+  @Required
+  val `handle`: String? = null
+)
+
+@Serializable
+enum class APIStudioStudioTeamMembersItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioTeamInvitationsItem(
+  val `id`: String,
+  val `account_id`: String,
+  @Required
+  val `handle`: String? = null,
+  val `roles`: List<APIStudioStudioTeamInvitationsItemRolesItem>,
+  val `expires_at`: String,
+  @Required
+  val `accepted_at`: String? = null,
+  @Required
+  val `revoked_at`: String? = null
+)
+
+@Serializable
+enum class APIStudioStudioTeamInvitationsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIStudioStudioThreadEntries(
+  val `items`: List<APIStudioStudioThreadEntriesItemsItem>,
+  @Required
+  val `nextCursor`: String? = null,
+  val `coverage`: APIStudioStudioThreadEntriesCoverage
+)
+
+@Serializable
+data class APIStudioStudioThreadEntriesItemsItem(
+  val `fanId`: String,
+  val `handle`: String,
+  val `sources`: List<APIStudioStudioThreadEntriesItemsItemSourcesItem>,
+  val `updatedAt`: String
+)
+
+@Serializable
+enum class APIStudioStudioThreadEntriesItemsItemSourcesItem {
+  @SerialName("note_reply") NOTE_REPLY,
+  @SerialName("request") REQUEST
+}
+
+@Serializable
+enum class APIStudioStudioThreadEntriesCoverage {
+  @SerialName("notes_and_requests") NOTES_AND_REQUESTS
+}
+
+@Serializable
+enum class ReadCreatorMediaPolicyPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
+data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
 class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
-  private suspend fun request(path: String, method: String, body: String? = null, query: Map<String, String> = emptyMap(), expectedAccount: String? = null, authenticated: Boolean): String = withContext(Dispatchers.IO) {
-    val connection = URL(baseURL.trimEnd('/') + path + if (query.isEmpty()) "" else query.toSortedMap().entries.joinToString(prefix = "?", separator = "&") { segment(it.key) + "=" + segment(it.value) }).openConnection() as HttpURLConnection
+  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
+    requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
+  private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
+    val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
+    val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
     try {
       connection.requestMethod = method
       connection.connectTimeout = 15000; connection.readTimeout = 30000
-      connection.setRequestProperty("Accept", "application/json")
-      expectedAccount?.let { connection.setRequestProperty("x-qelvora-expected-account", it) }
+      connection.setRequestProperty("Accept", accept)
+      headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.bufferedWriter().use { it.write(body) } }
+      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
-      if (status !in 200..299) throw CreatorAPIError(status, payload)
-      payload
+      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { it.readBytes() } ?: byteArrayOf()
+      if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
+      CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
     } finally { connection.disconnect() }
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
-  suspend fun contentList(creatorId: String, query: Map<String, String> = emptyMap()): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}", "GET", query = query, authenticated = true))
-  suspend fun studioContentList(creatorId: String, query: Map<String, String> = emptyMap()): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", query = query, authenticated = true))
+  suspend fun contentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
+  suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
-  suspend fun saveContent(creatorId: String, body: APISaveContent, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/drafts", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun contentReplies(creatorId: String, query: Map<String, String> = emptyMap()): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", query = query, authenticated = true))
-  suspend fun studioContentReplies(creatorId: String, query: Map<String, String> = emptyMap()): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", query = query, authenticated = true))
-  suspend fun contentReplyConsent(creatorId: String, id: String, body: APIQuoteConsent, expectedAccount: String? = null): APIContentConsentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/consent", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun contentReplyReaction(creatorId: String, id: String, body: APIReactToReply, expectedAccount: String? = null): APIContentReactionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/reaction", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun withdrawContentReply(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun saveContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APISaveContent): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/drafts", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun contentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
+  suspend fun studioContentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
+  suspend fun contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIQuoteConsent): APIContentConsentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun contentReplyReaction(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIReactToReply): APIContentReactionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/reaction", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentPreference(creatorId: String): APIContentPreference = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "GET", authenticated = true))
-  suspend fun muteContent(creatorId: String, body: APIContentMuteCommand, expectedAccount: String? = null): APIContentMuteCommand = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun muteContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIContentMuteCommand): APIContentMuteCommand = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun myContentThanks(creatorId: String): APIContentThanksView = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "GET", authenticated = true))
-  suspend fun saveContentThanks(creatorId: String, body: APIThanksCommand, expectedAccount: String? = null): APIContentRevisionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun saveContentThanks(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIThanksCommand): APIContentRevisionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioThanksFeed(creatorId: String): APIContentThanksFeed = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/thanks", "GET", authenticated = true))
-  suspend fun runScheduledContent(creatorId: String, expectedAccount: String? = null): APIContentScheduledResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/scheduled/run", "POST", expectedAccount = expectedAccount, authenticated = true))
-  suspend fun runContentEffects(creatorId: String, expectedAccount: String? = null): APIContentEffectsResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/effects/run", "POST", expectedAccount = expectedAccount, authenticated = true))
+  suspend fun runScheduledContent(creatorId: String, xQelvoraExpectedAccount: String? = null): APIContentScheduledResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/scheduled/run", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun runContentEffects(creatorId: String, xQelvoraExpectedAccount: String? = null): APIContentEffectsResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/effects/run", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentView(creatorId: String, id: String): APIContentView = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}", "GET", authenticated = true))
   suspend fun studioContentView(creatorId: String, id: String): APIContentView = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/studio", "GET", authenticated = true))
   suspend fun reviewContent(creatorId: String, id: String): APIContentReview = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/review", "GET", authenticated = true))
-  suspend fun publishContent(creatorId: String, id: String, body: APIPublishContent, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/publish", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun teamPublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/team-publish", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun unpublishContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/unpublish", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun archiveContent(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/archive", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun replyToNote(creatorId: String, id: String, body: APIReplyToNote, expectedAccount: String? = null): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/replies", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun contentReplyReview(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/review", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun contentReplyRead(creatorId: String, id: String, body: APIContentVersionCommand, expectedAccount: String? = null): APIContentReplyReadResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/read", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun studioThreadEntries(creatorId: String, query: Map<String, String> = emptyMap()): APIStudioThreadEntries = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads", "GET", query = query, authenticated = true))
+  suspend fun publishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIPublishContent): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/publish", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun teamPublishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/team-publish", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun unpublishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/unpublish", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun archiveContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/archive", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun replyToNote(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIReplyToNote): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/${segment(id)}/replies", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun contentReplyReview(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentReplyReviewResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/review", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun contentReplyRead(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentReplyReadResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/read", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun studioThreadEntries(creatorId: String, cursor: String? = null, limit: Long? = null): APIStudioThreadEntries = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString())))
   suspend fun studioSession(): APIStudioSession = json.decodeFromString(request("/v1/studio/session", "GET", authenticated = true))
-  suspend fun acceptStudioInvitation(id: String, expectedAccount: String? = null): APIDone = json.decodeFromString(request("/v1/studio/invitations/${segment(id)}/accept", "POST", expectedAccount = expectedAccount, authenticated = true))
-  suspend fun inviteStudioMember(creatorId: String, body: APIStudioInvite, expectedAccount: String? = null): APIStudioInvitation = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/team/invite", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun acceptStudioInvitation(id: String, xQelvoraExpectedAccount: String? = null): APIDone = json.decodeFromString(request("/v1/studio/invitations/${segment(id)}/accept", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun inviteStudioMember(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioInvite): APIStudioInvitation = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/team/invite", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioTeam(creatorId: String): APIStudioTeam = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/team", "GET", authenticated = true))
   suspend fun studioAudiences(creatorId: String): APIStudioAudiences = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/audiences", "GET", authenticated = true))
   suspend fun studioCorrectionRevision(creatorId: String): APIStudioRevision = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/corrections", "GET", authenticated = true))
-  suspend fun submitStudioCorrection(creatorId: String, body: APIStudioCorrection, expectedAccount: String? = null): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/corrections", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun studioQueue(creatorId: String, query: Map<String, String> = emptyMap()): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/queue", "GET", query = query, authenticated = true))
+  suspend fun submitStudioCorrection(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioCorrection): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/corrections", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun studioQueue(creatorId: String, cursor: String? = null, filter: String? = null, limit: Long? = null): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/queue", "GET", authenticated = true, query = listOf("cursor" to cursor, "filter" to filter, "limit" to limit?.toString())))
   suspend fun studioPacket(creatorId: String, packetId: String): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}", "GET", authenticated = true))
-  suspend fun studioDecidePacket(creatorId: String, packetId: String, body: APICommerceDecidePacket, expectedAccount: String? = null): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}/decide", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun studioDecidePacket(creatorId: String, packetId: String, xQelvoraExpectedAccount: String? = null, body: APICommerceDecidePacket): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}/decide", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioPacketDeliveries(creatorId: String, packetId: String): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}/deliveries", "GET", authenticated = true))
-  suspend fun studioDeliverPacket(creatorId: String, packetId: String, body: APICommerceFulfillmentCommand, expectedAccount: String? = null): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}/deliver", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun studioDeliverPacket(creatorId: String, packetId: String, xQelvoraExpectedAccount: String? = null, body: APICommerceFulfillmentCommand): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/packets/${segment(packetId)}/deliver", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioThread(creatorId: String, fanId: String): APIStudioCommerceProjection = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}", "GET", authenticated = true))
-  suspend fun studioTakeover(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = null): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun studioHandback(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = null): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun studioPause(creatorId: String, fanId: String, body: APIStudioControlCommand, expectedAccount: String? = null): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/pause", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun studioHumanReply(creatorId: String, fanId: String, body: APIHumanReply, expectedAccount: String? = null): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/reply", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun studioTakeover(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioControlCommand): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun studioHandback(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioControlCommand): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun studioPause(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioControlCommand): APIFrame = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/pause", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun studioHumanReply(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/reply", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioReplyDraft(creatorId: String, fanId: String): APIStudioReplyDraft = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "GET", authenticated = true))
-  suspend fun saveStudioReplyDraft(creatorId: String, fanId: String, body: APIStudioSaveReplyDraft, expectedAccount: String? = null): APIStudioDraftVersion = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
-  suspend fun sendStudioReplyDraft(creatorId: String, fanId: String, body: APIStudioSendReplyDraft, expectedAccount: String? = null): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/send-draft", "POST", body = json.encodeToString(body), expectedAccount = expectedAccount, authenticated = true))
+  suspend fun saveStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSaveReplyDraft): APIStudioDraftVersion = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSendReplyDraft): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/send-draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun health(): APIHealth = json.decodeFromString(request("/health", "GET", authenticated = false))
   suspend fun identityCapabilities(): APIIdentityCapabilities = json.decodeFromString(request("/v1/identity/capabilities", "GET", authenticated = false))
   suspend fun continueWithPantopus(body: APIIdentityContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/continue", "POST", body = json.encodeToString(body), authenticated = false))
@@ -2755,20 +4441,38 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun publicSignature(signedActId: String): APIPublicSignature = json.decodeFromString(request("/v1/identity/signed-acts/${segment(signedActId)}", "GET", authenticated = false))
   suspend fun beginSignedAct(creatorId: String, body: APIBeginSignedAct): APISignedChallenge = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/signed-acts/begin", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun verifySignedAct(body: APIVerifySignedAct): APISignedActResult = json.decodeFromString(request("/v1/identity/signed-acts/verify", "POST", body = json.encodeToString(body), authenticated = true))
-  suspend fun readThread(creatorId: String, fanId: String): APIThreadTimeline = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}", "GET", authenticated = true))
+  suspend fun readThread(creatorId: String, fanId: String): APIConversationConversationTimeline = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}", "GET", authenticated = true))
   suspend fun sendMessage(creatorId: String, fanId: String, body: APISendMessage): APIAcceptedMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/messages", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
+  suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun audienceCreatorMediaPlayback(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/playback", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null, xQelvoraExpectedAccount: String? = null, expectedAccountId: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket, "expectedAccountId" to expectedAccountId), headers = listOf("Range" to range, "x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
+  suspend fun readCreatorCallAvailability(creatorId: String): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true))
+  suspend fun saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true))
+  suspend fun beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun revokeCreatorMedia(creatorId: String, assetId: String): APIMediaMediaRevocation = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "DELETE", authenticated = true))
+  suspend fun resumeCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/resume", "POST", authenticated = true))
+  suspend fun uploadCreatorMediaChunk(creatorId: String, assetId: String, ticket: String, uploadOffset: Long, body: ByteArray): APIMediaCreatorMediaAsset = json.decodeFromString(requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/upload", "PUT", body = body, authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Upload-Offset" to uploadOffset.toString()).mapNotNull { (name, value) -> value?.let { name to it } }.toMap(), accept = "application/json").body.toString(Charsets.UTF_8))
+  suspend fun finishCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/finish", "POST", authenticated = true))
+  suspend fun creatorMediaPlayback(creatorId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
+  suspend fun readFanCreatorMedia(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun fanCreatorMediaPlayback(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playFanCreatorMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
 }
 
 object ApplicationDestination {
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
-    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$)", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$")
+    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$")
     val literalValues = mapOf("offer" to "1")
     val fields = parts[1].split('&')
     if (fields.size > 2) return false

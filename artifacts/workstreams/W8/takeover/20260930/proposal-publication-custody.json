@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-10-01T03:46:08.294432+00:00",
+  "records": [
+    {
+      "owner": "W3",
+      "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+      "remoteRef": "refs/heads/codex/w3-conversations",
+      "remoteHead": "e34f9365d652c8eddb7bfe8e2329f8d56ea6f6fc",
+      "sourceIsRemoteAncestor": true
+    },
+    {
+      "owner": "W5",
+      "sourceCommit": "e0995381cf3621d1bf862732d95e4029ef6b0f92",
+      "remoteRef": "refs/heads/codex/w5-studio-content",
+      "remoteHead": "a7a5c865f986b6435d8fca0f183506e49d5e6d35",
+      "sourceIsRemoteAncestor": true
+    },
+    {
+      "owner": "W6",
+      "sourceCommit": "682766cdec3318a70aa949eda93a9834845f5f05",
+      "remoteRef": "refs/heads/codex/w6-calls-media-handoff",
+      "remoteHead": "a6df5e380ad0c4f6bff6145637e1524aaf828ca0",
+      "sourceIsRemoteAncestor": true
+    }
+  ],
+  "peerBranchesOrCheckoutsMutated": false
+}

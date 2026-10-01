@@ -1,0 +1,38 @@
+{
+  "observedAt": "2026-09-30T08:43:28.425Z",
+  "environment": "isolated restored synthetic database; controlled fault injection",
+  "jobId": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+  "journalSchemaVersion": 2,
+  "journalReplayMs": 23,
+  "restoredOwnership": [
+    "20000000-0000-4000-8000-000000000002"
+  ],
+  "wrongAccountOwnership": null,
+  "invalidReceipt": {
+    "state": "retry",
+    "error_code": "receipt_invalid",
+    "attempts": 1
+  },
+  "afterNormalRetry": {
+    "state": "blocked",
+    "owned_creators": 1,
+    "complete": 1,
+    "blocked": 7
+  },
+  "restorationAuthority": {
+    "closedGate": {
+      "outcome": "restoration_pending",
+      "ms": 0
+    },
+    "failedGate": {
+      "outcome": "restoration_pending",
+      "ms": 0
+    },
+    "timeoutGate": {
+      "outcome": "restoration_pending",
+      "ms": 2001
+    }
+  },
+  "trafficReady": false,
+  "fullRecoveryRpoRto": "unmeasured"
+}

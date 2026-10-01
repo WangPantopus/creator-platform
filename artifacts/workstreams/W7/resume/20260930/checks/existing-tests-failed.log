@@ -1,0 +1,117 @@
+$ node --test scripts/shared.test.mjs && turbo run test
+✔ one rename updates native identifiers, package scopes and UI names while preserving Pantopus and binary assets (477.76505ms)
+✔ all fixed copy and both themes exist in generated web, Swift and Kotlin resources (298.302648ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 940.774877
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running test in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/api:test: cache bypass, force executing 8411a703c294aabb
+@qelvora/api:build: cache miss, executing 87b6ffe8d4ace773
+@qelvora/copy:build: cache hit, replaying logs 90a85506d44e8acd
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/api:test: $ vitest run --passWithNoTests
+@qelvora/api:test:
+@qelvora/api:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/0546/creator-platform/packages/api
+@qelvora/api:test:
+@qelvora/api:test: No test files found, exiting with code 0
+@qelvora/api:test:
+@qelvora/api:test: include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+@qelvora/api:test: exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+@qelvora/api:test:
+@qelvora/backend:test: cache bypass, force executing 14a8012980d42a38
+@qelvora/backend:test: $ vitest run
+@qelvora/backend:test:
+@qelvora/backend:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/backend
+@qelvora/backend:test:
+@qelvora/backend:test:  ❯ tests/postgres.integration.test.ts (9 tests | 9 skipped) 794ms
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-11 denies unscoped read/write and leaves no tenant context on pooled connections
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-04/T-30 commits announced handback before new AI text and resumes with no duplicates
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-18/T-24 serializes simultaneous retries and last-unit allowance races
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-27 refuses stale extraction and never rebuilds a deleted fact
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > T-28 stores verified duplicate inbox events once and reconciles current state
+@qelvora/backend:test:    ↓ PostgreSQL foundation using the real non-owner role > commits outbox frames with state and retries publication in aggregate order after a crash
+@qelvora/backend:test:  ❯ tests/contracts.test.ts (9 tests | 1 failed) 235ms
+@qelvora/backend:test:    ✓ authority boundaries > T-01 rejects client and model authorship instead of silently stripping it 10ms
+@qelvora/backend:test:    ✓ authority boundaries > fails closed for a fabricated scope and an underage account 6ms
+@qelvora/backend:test:    ✓ authority boundaries > does not import extra Pantopus identity fields 1ms
+@qelvora/backend:test:    × authority boundaries > local backend exposes health and honestly refuses sign-in 184ms
+@qelvora/backend:test:      → expected 400 to be 503 // Object.is equality
+@qelvora/backend:test:    ✓ delivery boundaries on every device > T-23 discards old-epoch sentences after takeover on two devices 4ms
+@qelvora/backend:test:    ✓ delivery boundaries on every device > T-30 arbitrary out-of-order duplicates replay once in committed cursor order 20ms
+@qelvora/backend:test:    ✓ delivery boundaries on every device > T-30 preserves the cursor on a generation gap so corrected replay can recover 7ms
+@qelvora/backend:test:    ✓ delivery boundaries on every device > T-30 serializes generation sequence state so an app restart can resume the third sentence 1ms
+@qelvora/backend:test:    ✓ delivery boundaries on every device > T-30 commits a buffered drain only when all contiguous frames can be returned 1ms
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+@qelvora/backend:test:
+@qelvora/backend:test:  FAIL  tests/postgres.integration.test.ts > PostgreSQL foundation using the real non-owner role
+@qelvora/backend:test: error: permission denied for table fan_profile
+@qelvora/backend:test:  ❯ ../../node_modules/.pnpm/pg@8.23.0/node_modules/pg/lib/client.js:694:17
+@qelvora/backend:test:  ❯ Database.withThread src/db/database.ts:95:21
+@qelvora/backend:test:      93|       // No UPDATE privilege or policy is widened, and errors roll bac…
+@qelvora/backend:test:      94|       if (scope.authority === "fan") {
+@qelvora/backend:test:      95|         const fan = await client.query(
+@qelvora/backend:test:        |                     ^
+@qelvora/backend:test:      96|           "SELECT 1 FROM creator.fan_profile WHERE id=$1 AND account_i…
+@qelvora/backend:test:      97|           [scope.fanId, scope.actorAccountId],
+@qelvora/backend:test:  ❯ tests/postgres.integration.test.ts:135:23
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+@qelvora/backend:test:
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+@qelvora/backend:test:
+@qelvora/backend:test:  FAIL  tests/contracts.test.ts > authority boundaries > local backend exposes health and honestly refuses sign-in
+@qelvora/backend:test: AssertionError: expected 400 to be 503 // Object.is equality
+@qelvora/backend:test:
+@qelvora/backend:test: - Expected
+@qelvora/backend:test: + Received
+@qelvora/backend:test:
+@qelvora/backend:test: - 503
+@qelvora/backend:test: + 400
+@qelvora/backend:test:
+@qelvora/backend:test:  ❯ tests/contracts.test.ts:101:29
+@qelvora/backend:test:      99|         body: JSON.stringify({ returnTo: "/creators/maya?context=kiln"…
+@qelvora/backend:test:     100|       });
+@qelvora/backend:test:     101|       expect(signIn.status).toBe(503);
+@qelvora/backend:test:        |                             ^
+@qelvora/backend:test:     102|       expect(await signIn.json()).toMatchObject({
+@qelvora/backend:test:     103|         error: { code: "identity_unconfigured" },
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+@qelvora/backend:test:
+@qelvora/backend:test:
+@qelvora/backend:test:  Test Files  2 failed (2)
+@qelvora/backend:test:       Tests  1 failed | 8 passed | 9 skipped (18)
+@qelvora/backend:test:    Start at  03:02:40
+@qelvora/backend:test:    Duration  4.80s (transform 345ms, setup 0ms, collect 2.30s, tests 1.03s, environment 1ms, prepare 449ms)
+@qelvora/backend:test:
+@qelvora/backend:test: [ELIFECYCLE] Test failed. See above for more details.
+@qelvora/backend#test:  ERROR  command (/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/backend) /Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm run test exited (1)
+
+ Tasks:    5 successful, 6 total
+Cached:    3 cached, 6 total
+  Time:    15.565s
+Failed:    @qelvora/backend#test
+
+ WARNING  no output files found for task @qelvora/api#build. Please check your `outputs` key in `turbo.json`
+ ERROR  run failed: command  exited (1)
+[ELIFECYCLE] Test failed. See above for more details.

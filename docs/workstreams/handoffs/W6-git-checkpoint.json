@@ -1,0 +1,39 @@
+{
+  "recordedAt": "2026-09-30T04:09:57.430192+00:00",
+  "branch": "codex/w6-calls-media-handoff",
+  "remoteRepository": "WangPantopus/creator-platform",
+  "originalSharedHead": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+  "sharedPrerequisiteCommit": "1a94db352799c9563d15a74514201a6ea9c7f9c6",
+  "sharedPrerequisiteTree": "3f040cef511a42296b49f573095bf5f1e227ca3c",
+  "sharedPrerequisiteSnapshotFiles": 983,
+  "sharedMainAndRealIndexPreserved": true,
+  "ownership": "Prerequisite source is preserved existing foundation/peer work. The following W6 commit contains W6-owned implementation, documentation, and evidence; it does not claim peer authorship or integrated completion.",
+  "excluded": [
+    "Peer run artifacts",
+    "Ignored dependencies and build output",
+    "Private runtime environment/role files outside the repository"
+  ],
+  "w6OwnedSourceCount": 49,
+  "w6BuildEvidenceManifest": "artifacts/workstreams/W6/increment-1/2026-09-29/build-manifest.json",
+  "existingTests": "Preserved source files in prerequisite snapshot; no new tests authored by W6.",
+  "preservedPrerequisiteWhitespace": "Original font-license text and Windows Gradle CRLF/trailing whitespace preserved. W6-owned diff is checked separately.",
+  "capabilitiesAtHandoff": {
+    "mediaAvailable": false,
+    "callsAvailable": false,
+    "aiAudioAvailable": false
+  },
+  "acceptance": "Incomplete; see complete remaining backlog and actual-app limitations in W6.md.",
+  "w6CommitLookup": "Use branch log: W6 implementation and continuation handoff is the child of sharedPrerequisiteCommit. The final published SHA is reported in the delivery.",
+  "laterSharedGeneratedNavigation": {
+    "reason": "W1 added Studio activation and W8 support/access/feedback/crisis/scoped support query destinations after the recorded installed-native builds. W6 three-ID call/offer policy unchanged.",
+    "iosAPIPrerequisiteSHA256": "b42ad7c44e56bc3f9fd8f91e336c121f2eec684ed5c02a102d1687c8e26f2ce6",
+    "androidAPIPrerequisiteSHA256": "f37e14f0b1127cbe40e62016159505435e45c117c1b95ff15a9253709a581da4",
+    "verification": "Existing native generated-model check passes31 operations; fresh branch native builds not claimed. Recorded manifest retains the actual earlier installed-build hashes."
+  },
+  "latePreservedWorkspaceGuidance": {
+    "path": "AGENTS.md",
+    "reason": "Tool-generated root guidance appeared after the prerequisite capture. Preserved unchanged in the handoff commit, not W6-authored framework instructions."
+  },
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/4",
+  "resourceReleaseRecord": "artifacts/workstreams/W6/cleanup/2026-09-29/resource-release.json"
+}

@@ -1,0 +1,64 @@
+{
+  "synthetic": true,
+  "startedAt": "2026-09-30T23:43:57.245905+00:00",
+  "observedAt": "2026-09-30T23:44:09.090465+00:00",
+  "observation": "Actual UI preview; durable pre-call rows are written before the model call; no fan or allowance was created",
+  "rows": [
+    {
+      "id": "4765a96d-4b7a-4352-b433-7487692ac38f",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 130,
+      "output_tokens": 24,
+      "cost_micros": 91,
+      "duration_ms": 1872,
+      "created_at": "2026-09-30T23:44:00.549489+00:00"
+    },
+    {
+      "id": "4793bc25-12f3-4986-b354-01ed862a55f1",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 14,
+      "output_tokens": 0,
+      "cost_micros": 1,
+      "duration_ms": 590,
+      "created_at": "2026-09-30T23:44:02.422634+00:00"
+    },
+    {
+      "id": "66e1a8a9-885b-4deb-999f-3f1acb9b61a9",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-2025-04-14",
+      "input_tokens": 655,
+      "output_tokens": 73,
+      "cost_micros": 1894,
+      "duration_ms": 3494,
+      "created_at": "2026-09-30T23:44:03.023834+00:00"
+    },
+    {
+      "id": "6028fdfd-09df-4d50-bdef-427c87c6b48f",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 593,
+      "output_tokens": 19,
+      "cost_micros": 268,
+      "duration_ms": 1901,
+      "created_at": "2026-09-30T23:44:04.601691+00:00"
+    }
+  ],
+  "actualBrowser": {
+    "answer": "The approved public notes indicate that clay should be allowed to dry slowly before bisque firing, which prepares it for glaze application.",
+    "passage": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+    "durationMs": 5970,
+    "firstApprovedMs": 5955,
+    "displayedCostMicros": 2254,
+    "summedJournalCostMicros": 2254,
+    "citationDetailsOpen": true,
+    "paragraphAncestor": false,
+    "consoleErrorsOrWarnings": []
+  },
+  "scope": "Creator draft preview, not licensed fan delivery; no durable per-generation receipt attribution yet"
+}

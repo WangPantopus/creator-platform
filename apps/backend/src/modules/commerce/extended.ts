@@ -29,20 +29,26 @@ export interface StoreEntitlementVerifier {
     input: { platform: "apple" | "google"; transaction: string },
     actor: Actor,
   ): Promise<VerifiedStoreEntitlement>;
+  /** Only invoked after verified entitlement persistence, never before a grant. */
+  acknowledge?(
+    input: { platform: "apple" | "google"; transaction: string },
+    actor: Actor,
+  ): Promise<void>;
 }
 
 export class ExtendedCommerce {
   get storeConfigured() {
-    return (
-      Boolean(this.stores) &&
-      Boolean(this.service.policy.costAllowanceIntegrated)
-    );
+    return Boolean(this.stores);
   }
   constructor(
     private readonly service: CommerceService,
     private readonly stores?: StoreEntitlementVerifier,
     readonly pass?: import("./pass.js").PassCommerce,
     readonly billing?: import("./billing.js").MembershipBilling,
+    readonly tiers?: import("./tiers.js").CommerceTiers,
+    readonly money?: import("./reconciliation.js").MoneyReconciliation,
+    readonly settlement?: import("./accounting.js").CreatorSettlement,
+    readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
   ) {}
   async storePurchase(
     actor: Actor,
@@ -68,6 +74,11 @@ export class ExtendedCommerce {
     );
     const verified = await this.stores.verifyAndFetchCurrent(input, actor);
     invariant(
+      verified.provider === input.platform,
+      "store_provider_conflict",
+      "The verified purchase does not match this store.",
+    );
+    invariant(
       verified.accountId === actor.accountId,
       "purchase_link_conflict",
       "This purchase belongs to another account.",
@@ -77,7 +88,7 @@ export class ExtendedCommerce {
       "store_period_invalid",
       "The verified subscription period is invalid.",
     );
-    return this.service.account(actor, async (client) => {
+    const result = await this.service.account(actor, async (client) => {
       const fan = (
         await client.query<{ id: string }>(
           "SELECT id FROM creator.fan_profile WHERE account_id=$1",
@@ -88,6 +99,10 @@ export class ExtendedCommerce {
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`store:${verified.provider}:${verified.originalReference}`],
+      );
+      await client.query(
+        "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+        [`commerce.tier:${verified.tierId}`],
       );
       const tier = (
         await client.query<{
@@ -151,6 +166,24 @@ export class ExtendedCommerce {
         "purchase_link_conflict",
         "The original purchase is linked to another account.",
       );
+      const currentPeriod =
+        ["active", "grace", "cancelled"].includes(verified.state) &&
+        verified.startsAt <= new Date() &&
+        verified.endsAt > new Date();
+      // Pausing sales preserves an already purchased tier, including renewals.
+      // A new purchase still requires a currently offered tier.
+      const tierAvailable =
+        tier.state === "active" || (tier.state === "paused" && Boolean(prior));
+      invariant(
+        !currentPeriod ||
+          (tierAvailable &&
+            tier.verification === "verified" &&
+            !tier.recovery_required &&
+            (!tier.ai_allowance ||
+              this.service.policy.costAllowanceIntegrated === true)),
+        "store_access_unavailable",
+        "The purchase was verified, but membership access is not available yet. Restore it when access is available.",
+      );
       await client.query(
         `INSERT INTO creator.commerce_membership(creator_id,fan_id,tier_id,provider,provider_ref,state,period_start,period_end,cancel_at_end,purchased_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(provider_ref) DO UPDATE SET state=excluded.state,first_used_at=CASE WHEN creator.commerce_membership.period_start=excluded.period_start THEN creator.commerce_membership.first_used_at ELSE NULL END,period_start=excluded.period_start,period_end=excluded.period_end,cancel_at_end=excluded.cancel_at_end,purchased_at=excluded.purchased_at,version=creator.commerce_membership.version+1`,
         [
@@ -172,8 +205,8 @@ export class ExtendedCommerce {
         [verified.creatorId, fan.id],
       );
       const active =
-        ["active", "grace", "cancelled"].includes(verified.state) &&
-        tier.state === "active" &&
+        currentPeriod &&
+        tierAvailable &&
         tier.verification === "verified" &&
         !tier.recovery_required &&
         verified.startsAt <= new Date() &&
@@ -227,10 +260,13 @@ export class ExtendedCommerce {
       }
       return {
         serverVerified: true,
+        accessGranted: active,
         state: verified.state,
         validUntil: verified.endsAt.toISOString(),
       };
     });
+    if (result.accessGranted) await this.stores.acknowledge?.(input, actor);
+    return result;
   }
   async draftPass(actor: Actor, input: unknown) {
     invariant(this.pass, "pass_unavailable", "The pass is not available yet.");
@@ -243,6 +279,7 @@ export class ExtendedCommerce {
       "pass_billing_unconfigured",
       "The current pass renewal cannot be verified.",
     );
+    const recovered = await this.passPurchases?.drain(actor);
     const reference = await this.service.account(
       actor,
       async (client) =>
@@ -252,6 +289,13 @@ export class ExtendedCommerce {
           )
         ).rows[0]?.provider_ref,
     );
+    if (!reference && this.passPurchases) {
+      const status = await this.passPurchases.status(actor);
+      return {
+        processing: status.processing,
+        recovered: recovered?.length ?? 0,
+      };
+    }
     invariant(
       reference,
       "pass_required",

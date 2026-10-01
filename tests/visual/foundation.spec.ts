@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
-const webOrigin = process.env.VISUAL_WEB_ORIGIN ?? "http://localhost:3000";
+const origin = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
 const referenceOrigin =
   process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
+
+// Approved artboards are catalog fixtures. Runtime routes depend on real public
+// creator/arrival authority and must never fabricate Maya to satisfy snapshots.
 const foundations = [
   {
     name: "welcome",
@@ -30,7 +33,7 @@ const foundations = [
 ];
 for (const theme of ["light", "night"] as const)
   for (const screen of foundations) {
-    test(`${screen.name} reference composition matches approved design in ${theme}`, async ({
+    test(`${screen.name} catalog matches approved design in ${theme}`, async ({
       page,
       context,
     }) => {
@@ -54,20 +57,27 @@ for (const theme of ["light", "night"] as const)
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
         maxDiffPixels: 0,
       });
       await page.goto(
-        `${webOrigin}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
+        `${origin}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
       );
       await page.getByRole("heading").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({
         path: `test-results/${screen.name}-${theme}-implementation.png`,
         animations: "disabled",
+        caret: "initial",
       });
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await test
         .info()
         .attach("implementation", { body: actual, contentType: "image/png" });
@@ -84,17 +94,20 @@ for (const theme of ["light", "night"] as const)
 test("unconfigured Pantopus sign-in does not create a local identity and preserves arrival", async ({
   page,
 }) => {
-  await page.goto(`${webOrigin}/auth/continue`);
+  await page.goto(`${origin}/auth/continue`);
+  await expect(
+    page.getByRole("button", {
+      name: "Remove this post from your first message",
+    }),
+  ).toHaveCount(0);
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
     .click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Pantopus sign-in" }),
-  ).toContainText("Pantopus sign-in");
+  await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
-    `${webOrigin}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
+    `${origin}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
   );
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
@@ -102,6 +115,6 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
     "/creators/maya/requests",
   );
-  await page.goto(`${webOrigin}/onboarding/handle`);
+  await page.goto(`${origin}/onboarding/handle`);
   await expect(page).toHaveURL(/auth\/continue/);
 });

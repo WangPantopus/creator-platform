@@ -1,0 +1,8 @@
+f0497762e946ec62473b4319b42bf1a1ca01c51f52b155fe0c505072f96766d8  apps/backend/src/modules/access/commerce.ts
+8c17383e382ce51e4dc180a153e46c91ecc7d524ab5d276e9a2d688f78ffafb9  apps/backend/src/modules/access/scope.ts
+dcd8bb4ad7c59fca2396355ed817f9c05e918b8600948e21c1b284b7535decf1  apps/backend/src/modules/commerce/billing.ts
+a6004e20e64c591d09493a60bef3a7c71420ee408fe4efc845871631581d4046  apps/backend/src/modules/commerce/generation-allowance.ts
+dca77c80bdb9565512fa6fca66228b3b332ea10fae2fe44b9edd64a564f89e3c  apps/backend/src/modules/commerce/runtime.ts
+147ea5c6b33185b8da98abd6240978fdf0ff65977f08fbadec0f37b93fcdb2bf  apps/backend/src/modules/commerce/content-audience.ts
+9e63037698f1e1b157cbfcbb4eae98160220f4d62fefe3f0469109f1a4c4eb54  apps/backend/src/modules/conversation/service.ts
+bd83ada6d3e352f5bc7c7891018c3068078f8eb2b703b3011fbd386077f34555  apps/backend/src/server.ts

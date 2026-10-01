@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { SessionSchema } from "@qelvora/api";
 
-// C01 from W1 cf851a5: cookies are shared across ports on a hostname.
-// Isolate explicitly configured loopback development apps from peer sessions.
+// Cookies are shared across ports on a hostname. Isolate explicitly configured
+// loopback development apps so a peer worktree cannot replace/end this session.
 function developmentCookieSuffix() {
   if (process.env.NODE_ENV === "production") return "";
   const configured =
@@ -29,6 +30,9 @@ export async function platformFetch(
   init: RequestInit = {},
   authenticated = true,
 ) {
+  // Runtime configuration and identity availability must never be frozen into
+  // an unavailable page when a deployable bundle is built without secrets.
+  await connection();
   const base = process.env.QELVORA_API_URL;
   if (!base)
     return Response.json(

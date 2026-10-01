@@ -13,11 +13,14 @@ import {
   Receipt,
   Seal,
   TermsBlock,
+  type RequestStatusProps,
 } from "@qelvora/ui-web";
 import { copy, formatCopy } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
+import { SessionSchema, type commerceContracts } from "@qelvora/api";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
+import { PassCheckout } from "./PassCheckout";
 
 type Mode = {
   id: string;
@@ -116,9 +119,19 @@ type Overview = {
     creator_id: string;
     name: string;
     version: number;
-    catalog: { web?: { amount: number; currency: string; interval: "month" } };
+    state: string;
+    capabilities: string[];
+    ai_allowance: number;
+    catalog: {
+      key?: string;
+      web?: { amount: number; currency: string; interval: "month" };
+    };
   }[];
   spendingNotices: { id: string; threshold: number; created_at: string }[];
+  tierCatalog: {
+    creatorId: string;
+    products: { key: string; label: string }[];
+  }[];
   payoutAccounts: { creator_id: string; state: string; details_due: boolean }[];
   limits: Limit[];
   exposure: {
@@ -156,6 +169,7 @@ type Overview = {
   capabilities: {
     paymentsAvailable: boolean;
     membershipAvailable: boolean;
+    passPurchaseAvailable: boolean;
     nativeReplyPurchase: boolean;
     stripePublishableKey: string | null;
   };
@@ -168,6 +182,7 @@ type Detail = {
     version: number;
     due_at: string;
     delivered_at: string | null;
+    accept_act_id?: string;
     evidence?: { signedActId: string; authorKind: string };
   } | null;
   ledger: Ledger[];
@@ -210,14 +225,16 @@ function money(amount: number | string | bigint, currency: string) {
   });
   const value = BigInt(amount),
     divisor = 10n ** BigInt(digits),
-    fraction = value % divisor;
+    absolute = value < 0n ? -value : value,
+    whole = absolute / divisor,
+    fraction = absolute % divisor;
   const localizedFraction = new Intl.NumberFormat(undefined, {
     minimumIntegerDigits: Math.max(1, digits),
     maximumFractionDigits: 0,
     useGrouping: false,
   }).format(fraction);
   return formatter
-    .formatToParts(value / divisor)
+    .formatToParts(value < 0n ? (whole === 0n ? -0 : -whole) : whole)
     .map((part) => (part.type === "fraction" ? localizedFraction : part.value))
     .join("");
 }
@@ -307,31 +324,189 @@ function status(p: Packet, name: string) {
     ["accepting", "releasing"].includes(p.state)
   )
     return "Confirming payment · check again shortly";
-  if (p.payment_state === "refunded")
-    return copy.deadlineMissed.replace("{name}", name);
+  if (p.payment_state === "refunded") return "Refund confirmed";
+  if (
+    p.payment_state === "refund_pending" ||
+    p.commitment_state === "refund_pending"
+  )
+    return "Refund processing · wait for confirmation";
   if (p.payment_state === "requires_action")
     return "Your bank needs authentication · nothing shared yet";
   if (p.payment_state === "failed") return copy.paymentFailed;
+  if (p.state === "draft")
+    return p.payment_state === "released"
+      ? "Previous hold released · authorize this request before it is sent"
+      : "Draft · your request has not been sent";
+  if (p.state === "submitting")
+    return "Confirming the bank hold · nothing shared yet";
   if (p.state === "more_info")
     return `${name} asked for more information · your bank hold still expires`;
   if (p.state === "offer_pending")
     return "A changed offer is waiting for your choice";
-  if (p.commitment_state === "delivered")
+  if (p.commitment_state === "resolution_required")
+    return "This service needs resolution · get help with your request";
+  if (p.delivered_at || p.commitment_state === "delivered")
     return "Delivered · your receipt is below";
   return p.state === "accepted"
     ? "Accepted · charged once"
     : "Seen by the queue · charged only on acceptance";
 }
+function requestCategory(p: Packet) {
+  if (p.delivered_at || p.commitment_state === "delivered") return "Delivered";
+  if (
+    ["draft", "declined", "expired", "withdrawn"].includes(p.state) ||
+    ["refunded", "resolved"].includes(p.commitment_state ?? "")
+  )
+    return "Closed";
+  return "Open";
+}
+function requestSteps(p: Packet): RequestStatusProps["steps"] {
+  const steps: NonNullable<RequestStatusProps["steps"]> = [
+    {
+      label: p.submitted_at
+        ? "Request sent · bank hold confirmed"
+        : p.state === "draft"
+          ? "Draft · not sent"
+          : "Bank hold not confirmed",
+      time: p.submitted_at ? date(p.submitted_at) : "",
+      state: p.submitted_at ? "done" : p.state === "draft" ? "todo" : "current",
+    },
+  ];
+  if (p.accepted_at) {
+    steps.push({
+      label: "Accepted · charged only then",
+      time: date(p.accepted_at),
+      state: "done",
+    });
+    steps.push({
+      label: p.delivered_at
+        ? "Delivered"
+        : ["refunded", "resolved"].includes(p.commitment_state ?? "")
+          ? "Delivery not recorded"
+          : "Delivery due",
+      time: date(p.delivered_at ?? p.due_at),
+      state: p.delivered_at
+        ? "done"
+        : ["refunded", "resolved"].includes(p.commitment_state ?? "")
+          ? "todo"
+          : "current",
+    });
+  } else if (
+    ["submitted", "more_info", "offer_pending", "accepting"].includes(p.state)
+  ) {
+    steps.push({
+      label: p.state === "accepting" ? "Confirming charge" : "Decision due",
+      time: date(p.decision_at),
+      state: "current",
+    });
+  }
+  return steps;
+}
 
-export function CommerceScreen({
+type CommerceScreenProps = {
+  screen: string;
+  creatorId?: string;
+  packetId?: string;
+  accountId: string | null;
+};
+function commerceDestination({
   screen,
   creatorId,
   packetId,
+}: CommerceScreenProps) {
+  const query = new URLSearchParams();
+  if (creatorId) query.set("creatorId", creatorId);
+  if (packetId) query.set("packetId", packetId);
+  const suffix = query.toString();
+  return `/commerce/${screen}${suffix ? `?${suffix}` : ""}`;
+}
+export function CommerceScreen(props: CommerceScreenProps) {
+  const [ended, setEnded] = useState(false);
+  const [identityAvailable, setIdentityAvailable] = useState(
+    Boolean(props.accountId),
+  );
+  useEffect(() => {
+    let active = true;
+    let checking = false;
+    const abort = new AbortController();
+    const check = async () => {
+      if (checking || document.visibilityState !== "visible") return;
+      checking = true;
+      try {
+        const response = await commerceFetch("/api/platform/identity/session", {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
+        });
+        if (!active) return;
+        if (response.status === 401) {
+          setEnded(true);
+          return;
+        }
+        if (!response.ok) throw new Error("Session unavailable");
+        const session = SessionSchema.parse(await response.json());
+        if (!active) return;
+        if (session.accountId !== props.accountId) {
+          setEnded(true);
+          return;
+        }
+        setIdentityAvailable(true);
+      } catch {
+        if (active) setIdentityAvailable(false);
+      } finally {
+        checking = false;
+      }
+    };
+    void check();
+    const timer = setInterval(() => void check(), 4000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      active = false;
+      abort.abort();
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [props.accountId]);
+  if (ended || !props.accountId)
+    return (
+      <div className="commerce commerce-phone">
+        <main className="commerce-main commerce-content">
+          <Empty title="Continue with Pantopus">
+            Your session ended or the account changed. Continue to load this
+            account’s current commerce information.
+            <Link
+              className="commerce-link-button"
+              href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination(props))}`}
+            >
+              {copy.continueWithPantopus}
+            </Link>
+          </Empty>
+        </main>
+      </div>
+    );
+  return (
+    <CommerceAccountScreen {...props} identityAvailable={identityAvailable} />
+  );
+}
+function CommerceAccountScreen({
+  screen,
+  creatorId,
+  packetId,
+  accountId,
+  identityAvailable,
 }: {
   screen: string;
   creatorId?: string;
   packetId?: string;
+  accountId: string | null;
+  identityAvailable: boolean;
 }) {
+  const accountFetch = useCallback(
+    (path: string, init: RequestInit = {}) => {
+      const headers = new Headers(init.headers);
+      if (accountId) headers.set("x-commerce-account-id", accountId);
+      return commerceFetch(path, { ...init, headers });
+    },
+    [accountId],
+  );
   const [data, setData] = useState<Overview | null>(null),
     [detail, setDetail] = useState<Detail | null>(null),
     [error, setError] = useState<string | null>(null),
@@ -350,6 +525,7 @@ export function CommerceScreen({
   const pending = useRef(new Map<string, string>());
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [editingModeId, setEditingModeId] = useState<string | null>(null);
+  const [editingTierId, setEditingTierId] = useState<string | null>(null);
   const [checkout, setCheckout] = useState(false),
     [disclosure, setDisclosure] = useState<{
       messages: {
@@ -365,7 +541,7 @@ export function CommerceScreen({
     if (screen !== "packet" || !selectedCreator || !data?.fan) return;
     const abort = new AbortController();
     setDisclosure(null);
-    void fetch(
+    void accountFetch(
       `/api/commerce/creators/${selectedCreator}/fans/${data.fan.id}/disclosure`,
       { cache: "no-store", signal: abort.signal },
     )
@@ -375,7 +551,7 @@ export function CommerceScreen({
           throw new Error(
             body.error?.message ?? "Conversation disclosure is unavailable.",
           );
-        setDisclosure(body);
+        if (!abort.signal.aborted) setDisclosure(body);
       })
       .catch((error) => {
         if (!abort.signal.aborted)
@@ -386,11 +562,11 @@ export function CommerceScreen({
           );
       });
     return () => abort.abort();
-  }, [screen, selectedCreator, data?.fan?.id]);
+  }, [screen, selectedCreator, data?.fan?.id, accountFetch]);
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await commerceFetch(
+      const response = await accountFetch(
         `/api/commerce/overview${creatorId ? `?creatorId=${encodeURIComponent(creatorId)}` : ""}`,
         { cache: "no-store" },
       );
@@ -415,7 +591,7 @@ export function CommerceScreen({
       setData(body);
       setError(null);
       if (packetId) {
-        const response = await commerceFetch(
+        const response = await accountFetch(
           `/api/commerce/packets/${packetId}`,
           {
             cache: "no-store",
@@ -435,7 +611,7 @@ export function CommerceScreen({
     } finally {
       setLoading(false);
     }
-  }, [creatorId, packetId]);
+  }, [creatorId, packetId, accountFetch]);
   useEffect(() => {
     void load();
   }, [load]);
@@ -447,7 +623,21 @@ export function CommerceScreen({
     const key = pending.current.get(signature) ?? crypto.randomUUID();
     pending.current.set(signature, key);
     try {
-      const response = await commerceFetch(`/api/commerce/${path}`, {
+      if (!identityAvailable)
+        throw new Error("Reconnect to confirm your account before continuing.");
+      const sessionResponse = await accountFetch(
+        "/api/platform/identity/session",
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (
+        !sessionResponse.ok ||
+        SessionSchema.parse(await sessionResponse.json()).accountId !==
+          accountId
+      )
+        throw new Error(
+          "Your session changed. Continue with Pantopus to refresh this account.",
+        );
+      const response = await accountFetch(`/api/commerce/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...body, idempotencyKey: key }),
@@ -480,6 +670,92 @@ export function CommerceScreen({
   const studio = ["offers", "earnings", "pool"].includes(screen);
   const currency = data?.policy.currency ?? "USD";
   const activeCreator = selectedCreator || data?.creators[0]?.id || "";
+  const [access, setAccess] = useState<{
+    value: commerceContracts.CapabilitySnapshot;
+    receivedAt: number;
+  } | null>(null);
+  const [accessNow, setAccessNow] = useState(0);
+  useEffect(() => {
+    setAccess(null);
+    setAccessNow(Date.now());
+    if (
+      screen !== "access" ||
+      !identityAvailable ||
+      !activeCreator ||
+      !data?.fan
+    )
+      return;
+    const fanId = data.fan.id;
+    const abort = new AbortController();
+    let checking = false;
+    const check = async () => {
+      if (checking || document.visibilityState !== "visible") return;
+      checking = true;
+      const checkedAt = Date.now();
+      setAccessNow(checkedAt);
+      try {
+        const response = await accountFetch(
+          `/api/commerce/creators/${activeCreator}/fans/${fanId}/access`,
+          {
+            signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
+          },
+        );
+        const value: commerceContracts.CapabilitySnapshot =
+          await response.json();
+        if (abort.signal.aborted) return;
+        if (
+          !response.ok ||
+          value.creatorId !== activeCreator ||
+          value.fanId !== fanId
+        )
+          throw new Error("Current access is unavailable.");
+        setAccess({ value, receivedAt: checkedAt });
+        setAccessNow(Date.now());
+      } catch {
+        if (!abort.signal.aborted) setAccess(null);
+      } finally {
+        checking = false;
+      }
+    };
+    void check();
+    const refresh = setInterval(() => void check(), 4000);
+    const clock = setInterval(() => setAccessNow(Date.now()), 1000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      abort.abort();
+      clearInterval(refresh);
+      clearInterval(clock);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [screen, activeCreator, data?.fan?.id, identityAvailable, accountFetch]);
+  const currentAccess =
+    access &&
+    access.value.creatorId === activeCreator &&
+    access.value.fanId === data?.fan?.id &&
+    accessNow - access.receivedAt < 5000 &&
+    (!access.value.validUntil ||
+      Date.parse(access.value.validUntil) > accessNow)
+      ? access.value
+      : null;
+  const paidMemberships =
+    data?.memberships.filter(
+      (m) =>
+        m.creator_id === activeCreator &&
+        ["active", "grace", "cancelled"].includes(m.state) &&
+        Date.parse(m.period_end) > accessNow,
+    ) ?? [];
+  const accessChanges = [
+    ...paidMemberships.map(
+      (m) =>
+        `${m.name}: ${m.cancel_at_end || m.state === "cancelled" ? "ends" : "renews"} ${date(m.period_end)}`,
+    ),
+    ...(currentAccess?.sources
+      .filter((s) => s.source !== "membership")
+      .map(
+        (s) =>
+          `${{ pass_slot: "Pass AI reach", trial: "Conversation trial", comp: "Gifted access", commitment: "Accepted service" }[s.source] ?? "Access"} ends ${date(s.validUntil)}`,
+      ) ?? []),
+  ].join("; ");
   const name =
     data?.creators.find((c) => c.id === activeCreator)?.display_name ??
     "the creator";
@@ -489,6 +765,31 @@ export function CommerceScreen({
     ) ?? [];
   const chosen = modes.find((m) => m.id === selectedMode);
   const limit = data?.limits.find((l) => l.currency === currency);
+  const chosenAmount = chosen
+    ? visibility === "public"
+      ? chosen.public_amount
+      : chosen.amount
+    : null;
+  const chosenAvailable =
+    chosen?.state === "offered" &&
+    chosen.used + chosen.reserved < chosen.weekly_limit &&
+    chosenAmount !== null;
+  const requestLimit = data?.limits.find(
+    (l) => l.currency === chosen?.currency,
+  );
+  const requestReady = Boolean(
+    identityAvailable &&
+      data?.capabilities.paymentsAvailable &&
+      data.capabilities.stripePublishableKey &&
+      data.fan &&
+      activeCreator &&
+      disclosure &&
+      requestLimit &&
+      chosenAvailable &&
+      summary.trim(),
+  );
+  const visiblePackets =
+    data?.packets.filter((p) => requestCategory(p) === filter) ?? [];
   const earningsCreator = data?.owned.find(
     (c) =>
       c.id === (creatorId ?? data.owned[0]?.id) &&
@@ -575,6 +876,11 @@ export function CommerceScreen({
           <p className="commerce-announcement" role="status" aria-live="polite">
             {notice}
           </p>
+          {!identityAvailable && (
+            <p role="status">
+              Reconnect to confirm your account. Your input is kept.
+            </p>
+          )}
           {loading && !data && (
             <p role="status">Loading current information…</p>
           )}
@@ -590,7 +896,7 @@ export function CommerceScreen({
               <br />
               {errorCode === "session_required" ? (
                 <Link
-                  href={`/auth/continue?returnTo=${encodeURIComponent(`/commerce/${screen}`)}`}
+                  href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination({ screen, creatorId, packetId, accountId }))}`}
                 >
                   {copy.continueWithPantopus}
                 </Link>
@@ -618,60 +924,36 @@ export function CommerceScreen({
                       </button>
                     ))}
                   </div>
-                  {data.packets
-                    .filter((p) =>
-                      filter === "Open"
-                        ? !["declined", "expired", "withdrawn"].includes(
-                            p.state,
-                          ) && p.commitment_state !== "delivered"
-                        : filter === "Delivered"
-                          ? p.commitment_state === "delivered"
-                          : ["declined", "expired", "withdrawn"].includes(
-                              p.state,
-                            ),
-                    )
-                    .map((p) => (
-                      <Link
-                        className="commerce-request-link"
-                        key={p.id}
-                        href={`/commerce/status?packetId=${p.id}`}
-                      >
-                        <RequestStatus
-                          reqId={requestId(p.id)}
-                          mode={p.snapshot.title}
-                          price={money(p.snapshot.amount, p.snapshot.currency)}
-                          steps={[
-                            {
-                              label:
-                                p.state === "accepted"
-                                  ? "Accepted · charged"
-                                  : "Request sent",
-                              time: date(p.submitted_at),
-                              state: "done",
-                            },
-                            {
-                              label:
-                                p.commitment_state === "delivered"
-                                  ? "Delivered"
-                                  : `Decision by ${date(p.decision_at)}`,
-                              time: date(p.delivered_at),
-                              state:
-                                p.commitment_state === "delivered"
-                                  ? "done"
-                                  : "current",
-                            },
-                          ]}
-                          outcome={status(
-                            p,
-                            data.creators.find((c) => c.id === p.creator_id)
-                              ?.display_name ?? "The creator",
-                          )}
-                        />
-                      </Link>
-                    ))}
-                  {!data.packets.length && (
-                    <Empty title="No requests yet">
-                      Your requests and receipts will appear here.{" "}
+                  {visiblePackets.map((p) => (
+                    <Link
+                      className="commerce-request-link"
+                      key={p.id}
+                      href={`/commerce/status?packetId=${p.id}`}
+                    >
+                      <RequestStatus
+                        reqId={requestId(p.id)}
+                        mode={p.snapshot.title}
+                        price={money(p.snapshot.amount, p.snapshot.currency)}
+                        steps={requestSteps(p)}
+                        outcome={status(
+                          p,
+                          data.creators.find((c) => c.id === p.creator_id)
+                            ?.display_name ?? "The creator",
+                        )}
+                      />
+                    </Link>
+                  ))}
+                  {!visiblePackets.length && (
+                    <Empty
+                      title={
+                        data.packets.length
+                          ? `No ${filter.toLowerCase()} requests`
+                          : "No requests yet"
+                      }
+                    >
+                      {data.packets.length
+                        ? "Choose another category to view your requests and retained receipts."
+                        : "Your requests and receipts will appear here."}{" "}
                       <Link href="/commerce/access">See your access</Link>
                     </Empty>
                   )}
@@ -741,6 +1023,7 @@ export function CommerceScreen({
                     </p>
                   ))}
                   <LimitForm
+                    key={`${currency}:${limit?.version ?? 0}`}
                     currency={currency}
                     limit={limit}
                     busy={busy}
@@ -773,69 +1056,99 @@ export function CommerceScreen({
                   <AccessLines
                     name={name}
                     can={
-                      data.memberships.some(
-                        (m) =>
-                          m.creator_id === activeCreator &&
-                          ["active", "grace", "cancelled"].includes(m.state) &&
-                          Date.parse(m.period_end) > Date.now(),
-                      )
-                        ? "See your active membership benefits."
-                        : "Read your existing conversations."
+                      currentAccess
+                        ? [
+                            currentAccess.capabilities.includes("ai_message")
+                              ? currentAccess.allowance.available > 0
+                                ? "Message this AI."
+                                : "Your AI allowance is used for this period."
+                              : "",
+                            currentAccess.capabilities.includes("note")
+                              ? "Read included notes."
+                              : "",
+                            currentAccess.capabilities.includes("request")
+                              ? "Request available services."
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || "Read your existing conversations."
+                        : "Current access is unavailable. Refresh to try again."
                     }
                     included={
-                      data.memberships
-                        .filter(
-                          (m) =>
-                            m.creator_id === activeCreator &&
-                            ["active", "grace", "cancelled"].includes(
-                              m.state,
-                            ) &&
-                            Date.parse(m.period_end) > Date.now(),
-                        )
-                        .map((m) => m.name)
-                        .join(", ") || "No active membership."
+                      currentAccess
+                        ? [
+                            ...new Set(
+                              currentAccess.sources.map(
+                                (s) =>
+                                  ({
+                                    membership: "Membership",
+                                    comp: "Gifted access",
+                                    commitment: "Accepted service",
+                                    pass_slot: "Pass AI reach",
+                                    trial: "Conversation trial",
+                                  })[s.source] ?? "Current access",
+                              ),
+                            ),
+                          ]
+                            .sort()
+                            .join(", ") ||
+                          "No included access for this creator."
+                        : "Benefits cannot be confirmed."
                     }
                     byRequest={
-                      modes.length
-                        ? modes.map((m) => m.title).join(", ")
+                      modes.some(
+                        (m) =>
+                          m.state === "offered" &&
+                          m.used + m.reserved < m.weekly_limit,
+                      )
+                        ? modes
+                            .filter(
+                              (m) =>
+                                m.state === "offered" &&
+                                m.used + m.reserved < m.weekly_limit,
+                            )
+                            .map((m) => m.title)
+                            .join(", ")
                         : "No human modes are currently available."
                     }
                     changes={
-                      data.memberships.some(
-                        (m) => m.creator_id === activeCreator,
-                      )
-                        ? data.memberships
-                            .filter((m) => m.creator_id === activeCreator)
-                            .map(
-                              (m) =>
-                                `${m.name}: ${m.cancel_at_end ? "ends" : "renews"} ${date(m.period_end)}`,
-                            )
-                            .join("; ")
-                        : "Access refreshes from the server."
+                      accessChanges || "Access refreshes from the server."
                     }
                   />
                   <h2>By request</h2>
-                  {modes.map((m) => (
-                    <section className="commerce-card" key={m.id}>
-                      <h3>{m.title}</h3>
-                      <span className="qv-meta">
-                        {m.amount
-                          ? money(m.amount, m.currency)
-                          : "Price unavailable"}
-                      </span>
-                      <p>
-                        Within {m.delivery_hours} hours or a full refund ·{" "}
-                        {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
-                        {m.weekly_limit} left this week
-                      </p>
-                    </section>
-                  ))}
+                  {modes
+                    .filter((m) => m.state === "offered")
+                    .map((m) => (
+                      <section className="commerce-card" key={m.id}>
+                        <h3>{m.title}</h3>
+                        <span className="qv-meta">
+                          {m.amount
+                            ? money(m.amount, m.currency)
+                            : "Price unavailable"}
+                        </span>
+                        <p>
+                          Within {m.delivery_hours} hours or a full refund ·{" "}
+                          {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
+                          {m.weekly_limit} left this week
+                        </p>
+                      </section>
+                    ))}
                   <p className="commerce-help">
                     Charged only when {name} accepts. {copy.pendingHold}
                   </p>
-                  <Link href={`/commerce/packet${suffix}`}>
-                    Ask {name} to step in
-                  </Link>
+                  {modes.some(
+                    (m) =>
+                      m.state === "offered" &&
+                      m.used + m.reserved < m.weekly_limit,
+                  ) ? (
+                    <Link href={`/commerce/packet${suffix}`}>
+                      Ask {name} to step in
+                    </Link>
+                  ) : (
+                    <p className="commerce-help">
+                      Requests are unavailable right now.
+                    </p>
+                  )}
                   <Link href="/commerce/membership">Manage membership</Link>
                 </>
               )}
@@ -999,40 +1312,34 @@ export function CommerceScreen({
                   {chosen && (
                     <TermsBlock
                       name={name}
-                      price={money(
-                        visibility === "public"
-                          ? (chosen.public_amount ?? 0)
-                          : (chosen.amount ?? 0),
-                        chosen.currency,
-                      )}
+                      price={
+                        chosenAmount === null
+                          ? "Price unavailable"
+                          : money(chosenAmount, chosen.currency)
+                      }
                       deadline={`${chosen.decision_hours} h`}
                     />
                   )}
                   <p className="commerce-help">
-                    Card holds are unavailable until payment setup is complete.
+                    {!data.capabilities.paymentsAvailable ||
+                    !data.capabilities.stripePublishableKey
+                      ? "Card holds are unavailable until payment setup is complete. "
+                      : ""}
                     The server rechecks your access, limit and capacity before
                     any hold.
                   </p>
                   <Button
-                    disabled={
-                      !data.capabilities.paymentsAvailable ||
-                      !data.capabilities.stripePublishableKey ||
-                      !data.fan ||
-                      !disclosure ||
-                      !limit ||
-                      !chosen ||
-                      !summary ||
-                      busy
-                    }
+                    disabled={!requestReady || busy}
                     onClick={() => setCheckout(true)}
                   >
                     Send request
-                    {chosen?.amount
-                      ? ` · ${money(chosen.amount, chosen.currency)} if accepted`
+                    {chosen && chosenAmount !== null
+                      ? ` · ${money(chosenAmount, chosen.currency)} if accepted`
                       : ""}
                   </Button>
                   {checkout &&
                     chosen &&
+                    chosenAvailable &&
                     data.capabilities.stripePublishableKey &&
                     data.fan &&
                     disclosure && (
@@ -1042,11 +1349,15 @@ export function CommerceScreen({
                             data.capabilities.stripePublishableKey
                           }
                           busy={busy}
-                          label={`Place hold · ${money(visibility === "public" ? (chosen.public_amount ?? 0) : (chosen.amount ?? 0), chosen.currency)}`}
+                          label={`Place hold · ${money(chosenAmount!, chosen.currency)}`}
                           onCancel={() => setCheckout(false)}
                           onMethod={async (paymentMethodId) => {
+                            if (!requestReady)
+                              throw new Error(
+                                "This request is unavailable. Return to review its current access, limit and capacity.",
+                              );
                             const result = await command("packets", {
-                              creatorId: selectedCreator,
+                              creatorId: activeCreator,
                               fanId: data.fan!.id,
                               modeId: chosen.id,
                               modeVersion: chosen.version,
@@ -1080,7 +1391,7 @@ export function CommerceScreen({
                         />
                       </div>
                     )}
-                  {!limit && (
+                  {chosen && !requestLimit && (
                     <Link href="/commerce/spending">
                       Choose your monthly limit
                     </Link>
@@ -1237,32 +1548,19 @@ export function CommerceScreen({
                         detail.packet.snapshot.amount,
                         detail.packet.snapshot.currency,
                       )}
-                      steps={[
-                        {
-                          label: "Request sent · hold placed",
-                          time: date(detail.packet.submitted_at),
-                          state: detail.packet.submitted_at
-                            ? "done"
-                            : "current",
-                        },
-                        {
-                          label: "Accepted · charged only then",
-                          time: date(detail.packet.accepted_at),
-                          state: detail.packet.accepted_at ? "done" : "todo",
-                        },
-                        {
-                          label: "Delivered",
-                          time: date(detail.commitment?.delivered_at),
-                          state:
-                            detail.commitment?.state === "delivered"
-                              ? "done"
-                              : "todo",
-                        },
-                      ]}
+                      steps={requestSteps({
+                        ...detail.packet,
+                        commitment_state: detail.commitment?.state,
+                        due_at: detail.commitment?.due_at,
+                        delivered_at:
+                          detail.commitment?.delivered_at ?? undefined,
+                      })}
                       outcome={status(
                         {
                           ...detail.packet,
                           commitment_state: detail.commitment?.state,
+                          delivered_at:
+                            detail.commitment?.delivered_at ?? undefined,
                         },
                         data.creators.find(
                           (c) => c.id === detail.packet.creator_id,
@@ -1321,75 +1619,105 @@ export function CommerceScreen({
                         Check payment status
                       </Button>
                     )}
-                    {detail.commitment?.state === "delivered" && (
-                      <>
-                        <Receipt
-                          name={
-                            data.creators.find(
-                              (c) => c.id === detail.packet.creator_id,
-                            )?.display_name ?? "Creator"
-                          }
-                          reqId={requestId(detail.packet.id)}
-                          title={detail.packet.snapshot.title}
-                          rows={[
-                            [
-                              "Charged",
-                              money(
-                                detail.packet.snapshot.amount,
-                                detail.packet.snapshot.currency,
-                              ),
-                            ],
-                            ["Accepted", date(detail.packet.accepted_at)],
-                            ["Delivered", date(detail.commitment.delivered_at)],
-                          ]}
-                          label={
-                            detail.commitment.evidence?.authorKind ===
-                            "approved_draft"
-                              ? "Prepared by AI · personally approved"
-                              : `${detail.packet.snapshot.title} · personally fulfilled by the creator`
-                          }
-                        />
-                        {detail.commitment.evidence?.signedActId && (
-                          <Link
-                            href={`/verify/${detail.commitment.evidence.signedActId}`}
-                          >
-                            Open signed verification
-                          </Link>
-                        )}
-                        <Button
-                          disabled={
-                            busy ||
-                            !detail.packet.snapshot.shareable ||
-                            Boolean(detail.share?.revoked_at)
-                          }
-                          onClick={() =>
-                            void command(`packets/${detail.packet.id}/share`, {
-                              version: detail.share?.version ?? 1,
-                              enabled: true,
-                              handleDisplay: "hidden",
-                            })
-                          }
-                        >
-                          Allow a share card without your handle
-                        </Button>
-                        {detail.share?.fan_choice && (
-                          <Button
-                            onClick={() =>
-                              void command(
-                                `packets/${detail.packet.id}/share`,
-                                {
-                                  version: detail.share!.version,
-                                  enabled: false,
-                                  handleDisplay: "hidden",
-                                },
-                              )
+                    {detail.commitment?.delivered_at &&
+                      ["delivered", "refunded", "resolved"].includes(
+                        detail.commitment.state,
+                      ) && (
+                        <>
+                          <Receipt
+                            name={
+                              data.creators.find(
+                                (c) => c.id === detail.packet.creator_id,
+                              )?.display_name ?? "Creator"
                             }
-                          >
-                            Revoke sharing
-                          </Button>
-                        )}
-                      </>
-                    )}
+                            reqId={requestId(detail.packet.id)}
+                            title={detail.packet.snapshot.title}
+                            rows={[
+                              [
+                                "Charged",
+                                money(
+                                  detail.packet.snapshot.amount,
+                                  detail.packet.snapshot.currency,
+                                ),
+                              ],
+                              ["Accepted", date(detail.packet.accepted_at)],
+                              [
+                                "Delivered",
+                                date(detail.commitment.delivered_at),
+                              ],
+                              ...detail.ledger
+                                .filter(
+                                  (l) =>
+                                    l.kind === "refund" &&
+                                    l.currency ===
+                                      detail.packet.snapshot.currency,
+                                )
+                                .map((l): [string, string] => [
+                                  "Refund confirmed",
+                                  money(l.amount, l.currency),
+                                ]),
+                            ]}
+                            label={
+                              detail.commitment.evidence?.authorKind ===
+                              "approved_draft"
+                                ? `Prepared by AI · approved by ${data.creators.find((c) => c.id === detail.packet.creator_id)?.display_name ?? "the creator"}`
+                                : `${detail.packet.snapshot.title} · personally fulfilled by the creator`
+                            }
+                          />
+                          {detail.commitment.evidence?.signedActId && (
+                            <Link
+                              href={`/verify/${detail.commitment.evidence.signedActId}`}
+                            >
+                              Open signed verification
+                            </Link>
+                          )}
+                          {!detail.commitment.evidence?.signedActId &&
+                            detail.commitment.accept_act_id && (
+                              <Link
+                                href={`/verify/${detail.commitment.accept_act_id}`}
+                              >
+                                Open signed acceptance
+                              </Link>
+                            )}
+                          {detail.commitment.state === "delivered" && (
+                            <Button
+                              disabled={
+                                busy ||
+                                !detail.packet.snapshot.shareable ||
+                                Boolean(detail.share?.revoked_at)
+                              }
+                              onClick={() =>
+                                void command(
+                                  `packets/${detail.packet.id}/share`,
+                                  {
+                                    version: detail.share?.version ?? 1,
+                                    enabled: true,
+                                    handleDisplay: "hidden",
+                                  },
+                                )
+                              }
+                            >
+                              Allow a share card without your handle
+                            </Button>
+                          )}
+                          {detail.share?.fan_choice && (
+                            <Button
+                              onClick={() =>
+                                void command(
+                                  `packets/${detail.packet.id}/share`,
+                                  {
+                                    version: detail.share!.version,
+                                    enabled: false,
+                                    handleDisplay: "hidden",
+                                  },
+                                )
+                              }
+                            >
+                              Revoke sharing
+                            </Button>
+                          )}
+                        </>
+                      )}
                     <Link href="/support">Get help with this request</Link>
                   </>
                 ))}
@@ -1443,43 +1771,45 @@ export function CommerceScreen({
                       )}
                     </section>
                   ))}
-                  {data.tiers.map((t) => (
-                    <section className="commerce-card" key={t.id}>
-                      <h2>{t.name}</h2>
-                      {t.catalog.web ? (
-                        <>
-                          <p>
-                            {money(
-                              t.catalog.web.amount,
-                              t.catalog.web.currency,
-                            )}{" "}
-                            per month
-                          </p>
-                          <Button
-                            disabled={
-                              busy ||
-                              !limit ||
-                              !data.capabilities.membershipAvailable ||
-                              !data.capabilities.stripePublishableKey ||
-                              data.memberships.some(
-                                (m) =>
-                                  m.creator_id === t.creator_id &&
-                                  ["active", "grace", "cancelled"].includes(
-                                    m.state,
-                                  ) &&
-                                  Date.parse(m.period_end) > Date.now(),
-                              )
-                            }
-                            onClick={() => setMembershipTier(t.id)}
-                          >
-                            Subscribe
-                          </Button>
-                        </>
-                      ) : (
-                        <p>Membership price is unavailable.</p>
-                      )}
-                    </section>
-                  ))}
+                  {data.tiers
+                    .filter((t) => t.state === "active")
+                    .map((t) => (
+                      <section className="commerce-card" key={t.id}>
+                        <h2>{t.name}</h2>
+                        {t.catalog.web ? (
+                          <>
+                            <p>
+                              {money(
+                                t.catalog.web.amount,
+                                t.catalog.web.currency,
+                              )}{" "}
+                              per month
+                            </p>
+                            <Button
+                              disabled={
+                                busy ||
+                                !limit ||
+                                !data.capabilities.membershipAvailable ||
+                                !data.capabilities.stripePublishableKey ||
+                                data.memberships.some(
+                                  (m) =>
+                                    m.creator_id === t.creator_id &&
+                                    ["active", "grace", "cancelled"].includes(
+                                      m.state,
+                                    ) &&
+                                    Date.parse(m.period_end) > Date.now(),
+                                )
+                              }
+                              onClick={() => setMembershipTier(t.id)}
+                            >
+                              Subscribe
+                            </Button>
+                          </>
+                        ) : (
+                          <p>Membership price is unavailable.</p>
+                        )}
+                      </section>
+                    ))}
                   {selectedTier?.catalog.web &&
                     data.capabilities.stripePublishableKey && (
                       <CardEntry
@@ -1538,12 +1868,27 @@ export function CommerceScreen({
               )}
               {screen === "pass" && (
                 <>
-                  {!data.policy.passEnabled ? (
+                  {accountId && data.fan && (
+                    <PassCheckout
+                      key={accountId}
+                      accountId={accountId}
+                      publishableKey={data.capabilities.stripePublishableKey}
+                      available={data.capabilities.passPurchaseAvailable}
+                      disabled={busy || !identityAvailable}
+                      fetchAccount={accountFetch}
+                      refresh={load}
+                      money={money}
+                    />
+                  )}
+                  {!data.policy.passEnabled && (
                     <Empty title="The pass is not available yet">
                       Your memberships and existing conversations remain
                       accessible.
                     </Empty>
-                  ) : (
+                  )}
+                  {(data.policy.passEnabled ||
+                    data.pass.length > 0 ||
+                    data.slots.length > 0) && (
                     <>
                       <h2>Your selected creators</h2>
                       {data.pass[0] && (
@@ -1552,9 +1897,23 @@ export function CommerceScreen({
                             {data.pass[0].used + data.pass[0].reserved} of{" "}
                             {data.pass[0].allowance} shared AI cost units used
                             or reserved this month. Ends{" "}
-                            {date(data.pass[0].cycle_end)}.
+                            {new Intl.DateTimeFormat(undefined, {
+                              dateStyle: "medium",
+                              timeZone: "UTC",
+                            }).format(
+                              new Date(
+                                `${data.pass[0].cycle_end.slice(0, 10)}T00:00:00.000Z`,
+                              ),
+                            )}
+                            .
                           </p>
-                          <PassChoices data={data} busy={busy} save={command} />
+                          {data.policy.passEnabled && (
+                            <PassChoices
+                              data={data}
+                              busy={busy}
+                              save={command}
+                            />
+                          )}
                         </>
                       )}
                       {data.slots.map((s) => (
@@ -1563,7 +1922,10 @@ export function CommerceScreen({
                           <p>
                             {s.state.replaceAll("_", " ")} · {date(s.ends_at)}
                           </p>
-                          {data.passChoices.replaceableSlotIds.includes(s.id) &&
+                          {data.policy.passEnabled &&
+                            data.passChoices.replaceableSlotIds.includes(
+                              s.id,
+                            ) &&
                             data.pass[0] && (
                               <PassReplacement
                                 slotId={s.id}
@@ -1667,10 +2029,55 @@ export function CommerceScreen({
                         }
                       />
                       <div className="commerce-two">
-                        <Empty title="Membership">
-                          Tier publishing waits for a configured billing
-                          catalog.
-                        </Empty>
+                        <section className="commerce-card">
+                          <h2>Membership tiers</h2>
+                          {data.tiers
+                            .filter(
+                              (t) =>
+                                t.creator_id ===
+                                (creatorId ?? data.owned[0]?.id),
+                            )
+                            .map((t) => (
+                              <div key={t.id} className="commerce-row">
+                                <div>
+                                  <h3>{t.name}</h3>
+                                  <p>
+                                    {t.state} ·{" "}
+                                    {t.catalog.web
+                                      ? `${money(t.catalog.web.amount, t.catalog.web.currency)} per month`
+                                      : "Price not set"}
+                                  </p>
+                                </div>
+                                <Button
+                                  disabled={busy}
+                                  onClick={() => setEditingTierId(t.id)}
+                                >
+                                  Edit {t.name}
+                                </Button>
+                              </div>
+                            ))}
+                          <TierForm
+                            key={editingTierId ?? "new-tier"}
+                            existing={data.tiers.find(
+                              (t) => t.id === editingTierId,
+                            )}
+                            products={
+                              data.tierCatalog?.find(
+                                (c) =>
+                                  c.creatorId ===
+                                  (creatorId ?? data.owned[0]?.id),
+                              )?.products ?? []
+                            }
+                            busy={busy}
+                            onNew={() => setEditingTierId(null)}
+                            onSave={(body) =>
+                              void command(
+                                `creators/${creatorId ?? data.owned[0]!.id}/tiers${editingTierId ? `/${editingTierId}` : ""}`,
+                                body,
+                              )
+                            }
+                          />
+                        </section>
                         <Empty title="Call windows">
                           Scheduling uses the current creator and fan time zones
                           when the call service is connected.
@@ -1801,8 +2208,12 @@ function LimitForm({
   busy: boolean;
   save: (body: Record<string, unknown>) => void;
 }) {
-  const [amount, setAmount] = useState(""),
-    [none, setNone] = useState(false),
+  const [amount, setAmount] = useState(
+      decimalInput(limit?.pending_amount ?? limit?.amount ?? null, currency),
+    ),
+    [none, setNone] = useState(
+      limit?.pending_none ?? limit?.explicit_none ?? false,
+    ),
     [reminders, setReminders] = useState(limit?.reminders_on ?? true),
     [error, setError] = useState("");
   function submit(e: FormEvent) {
@@ -2091,6 +2502,143 @@ function ModeForm({
   );
 }
 
+function TierForm({
+  existing,
+  products,
+  busy,
+  onSave,
+  onNew,
+}: {
+  existing?: Overview["tiers"][number];
+  products: { key: string; label: string }[];
+  busy: boolean;
+  onSave: (body: Record<string, unknown>) => void;
+  onNew: () => void;
+}) {
+  const [name, setName] = useState(existing?.name ?? "");
+  const [capabilities, setCapabilities] = useState(
+    existing?.capabilities ?? [],
+  );
+  const [allowance, setAllowance] = useState(
+    existing ? String(existing.ai_allowance) : "",
+  );
+  const [state, setState] = useState(existing?.state ?? "draft");
+  const [catalogKey, setCatalogKey] = useState(existing?.catalog.key ?? "");
+  const includesAI = capabilities.includes("ai_message");
+  return (
+    <form
+      className="commerce-mode-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave({
+          name,
+          capabilities,
+          aiAllowance: includesAI ? Number(allowance) : 0,
+          state,
+          catalogKey: catalogKey || null,
+          version: existing?.version ?? 0,
+        });
+      }}
+    >
+      <h3>{existing ? `Edit ${existing.name}` : "Add a membership tier"}</h3>
+      <p>
+        Save a draft while you choose benefits. Publishing requires a verified
+        membership product. Keep purchased benefits and prices intact; use a new
+        tier to change them.
+      </p>
+      <label className="commerce-field">
+        Tier name
+        <input
+          required
+          maxLength={100}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <fieldset>
+        <legend>Included access</legend>
+        {[
+          ["ai_message", "AI conversations"],
+          ["note", "Creator Notes"],
+          ["request", "Human request access"],
+        ].map(([key, label]) => (
+          <label key={key} className="commerce-check">
+            <input
+              type="checkbox"
+              checked={capabilities.includes(key!)}
+              onChange={(e) =>
+                setCapabilities((current) =>
+                  e.target.checked
+                    ? [...current, key!]
+                    : current.filter((v) => v !== key),
+                )
+              }
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      {includesAI && (
+        <label className="commerce-field">
+          AI allowance (cost units)
+          <input
+            type="number"
+            min={1}
+            max={2147483647}
+            required
+            value={allowance}
+            onChange={(e) => setAllowance(e.target.value)}
+          />
+          <span>
+            Equivalent membership and pass allowances do not add together.
+          </span>
+        </label>
+      )}
+      <label className="commerce-field">
+        Membership product
+        <select
+          value={catalogKey}
+          onChange={(e) => setCatalogKey(e.target.value)}
+        >
+          <option value="">No product selected</option>
+          {existing?.catalog.key &&
+            !products.some((p) => p.key === existing.catalog.key) && (
+              <option value={existing.catalog.key}>Current product</option>
+            )}
+          {products.map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {!products.length && (
+        <p>Products are not configured yet. You can save a draft now.</p>
+      )}
+      <label className="commerce-field">
+        Availability
+        <select value={state} onChange={(e) => setState(e.target.value)}>
+          <option value="draft">Draft</option>
+          <option value="active" disabled={!products.length}>
+            Published
+          </option>
+          <option value="paused">Paused</option>
+        </select>
+      </label>
+      <div className="commerce-actions">
+        <Button type="submit" disabled={busy || (includesAI && !allowance)}>
+          Save tier
+        </Button>
+        {existing && (
+          <Button disabled={busy} onClick={onNew}>
+            Add another tier
+          </Button>
+        )}
+      </div>
+    </form>
+  );
+}
+
 function PassChoices({
   data,
   busy,
@@ -2102,12 +2650,17 @@ function PassChoices({
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const pass = data.pass[0]!;
+  const current =
+    ["active", "cancelled"].includes(pass.state) &&
+    Date.parse(`${pass.cycle_end.slice(0, 10)}T00:00:00.000Z`) > Date.now();
   const occupied = new Set(
     data.slots
       .filter(
         (s) =>
           s.cycle_start.slice(0, 10) === pass.cycle_start.slice(0, 10) &&
-          ["active", "ended_readable", "replaced"].includes(s.state),
+          ["active", "draft_next", "ended_readable", "replaced"].includes(
+            s.state,
+          ),
       )
       .map((s) => s.position),
   ).size;
@@ -2136,7 +2689,9 @@ function PassChoices({
       </fieldset>
       {remaining > 0 && (
         <Button
-          disabled={busy || !selected.length || selected.length > remaining}
+          disabled={
+            busy || !current || !selected.length || selected.length > remaining
+          }
           onClick={() =>
             void save("pass/initial", {
               version: pass.version,
@@ -2148,7 +2703,7 @@ function PassChoices({
         </Button>
       )}
       <Button
-        disabled={busy || selected.length > pass.slot_capacity}
+        disabled={busy || !current || selected.length > pass.slot_capacity}
         onClick={() =>
           void save("pass/draft", {
             version: pass.version,

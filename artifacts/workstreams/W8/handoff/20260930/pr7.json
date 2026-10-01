@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-09-30T21:04:33Z",
+  "url": "https://github.com/WangPantopus/creator-platform/pull/7",
+  "number": 7,
+  "title": "W8: trust operations implementation and continuation handoff",
+  "state": "open",
+  "draft": true,
+  "merged": false,
+  "mergeable": true,
+  "head": "codex/w8-trust-handoff",
+  "headRevision": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+  "base": "main",
+  "baseRevision": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "changedFiles": 1133,
+  "commitsAheadOfMain": 39,
+  "metadataWrite": {
+    "lastAttempt": "403 Resource not accessible by integration",
+    "proposedDescription": "artifacts/workstreams/W8/resume/20260930-local/pr7-proposed-description.md"
+  },
+  "disposition": "Keep this existing PR draft. Git conflict mergeability does not establish CI or enabled-scope release acceptance."
+}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MediaAssetSchema } from "../media.ts";
 import {
   AuthorKindSchema,
   IdSchema,
@@ -110,6 +111,49 @@ export const ConversationCorrectionInputSchema = z.strictObject({
   signedActId: IdSchema,
   idempotencyKey: z.string().min(8).max(128),
 });
+/** The command signs only W6's exact processed recording; no additional prose. */
+export const ConversationRecordingCommandSchema = z.strictObject({
+  actType: z.literal("reply"),
+  subjectId: IdSchema,
+  content: z.strictObject({
+    mediaAssetId: IdSchema,
+    version: z.number().int().positive(),
+    sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+    mimeType: z.literal("audio/mp4"),
+    durationMs: z.number().int().positive().max(3_600_000),
+    bytes: z.number().int().positive().max(268_435_456),
+  }),
+});
+export const ConversationRecordingInputSchema = z.strictObject({
+  evidence: z.strictObject({
+    assetId: IdSchema,
+    version: z.number().int().positive(),
+    sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+    mimeType: z.literal("audio/mp4"),
+    durationMs: z.number().int().positive().max(3_600_000),
+    bytes: z.number().int().positive().max(268_435_456),
+  }),
+  signedActId: IdSchema,
+  idempotencyKey: z.string().min(8).max(128),
+});
+export const ConversationRecordingViewSchema = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("available"),
+    asset: MediaAssetSchema,
+  }),
+  z.strictObject({ state: z.literal("unavailable") }),
+]);
+export const ConversationRecordingResultSchema = z.strictObject({
+  messageId: IdSchema,
+  threadId: IdSchema,
+  signedActId: IdSchema,
+});
+export type ConversationRecordingInput = z.infer<
+  typeof ConversationRecordingInputSchema
+>;
+export type ConversationRecordingResult = z.infer<
+  typeof ConversationRecordingResultSchema
+>;
 export const ConversationMessageSchema = MessageSchema.extend({
   citations: z.array(IdSchema),
   createdAt: z.string(),
@@ -118,6 +162,7 @@ export const ConversationMessageSchema = MessageSchema.extend({
   version: z.number().int().positive(),
   agentVersion: AgentReplyVersionSchema.nullable().optional(),
   feedback: ReplyFeedbackRatingSchema.nullable().optional(),
+  recording: ConversationRecordingViewSchema.nullable().optional(),
   correction: z
     .strictObject({
       originalMessageId: IdSchema,
