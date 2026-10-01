@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download)?|operations\/(metrics|audits))$/i;
@@ -22,7 +23,7 @@ async function forward(
     );
   if (
     request.method === "POST" &&
-    (request.headers.get("origin") !== request.nextUrl.origin ||
+    (!sameRequestOrigin(request) ||
       !request.headers.get("content-type")?.startsWith("application/json"))
   )
     return NextResponse.json(
@@ -47,6 +48,7 @@ async function forward(
   if (target === "dev/logout") {
     const response = NextResponse.json({ signedOut: true });
     response.cookies.delete("w8_local_session");
+    response.cookies.delete("qelvora_session");
     return response;
   }
   const configured = process.env.W8_API_URL;
@@ -83,9 +85,28 @@ async function forward(
     const value = request.nextUrl.searchParams.get(key);
     if (value) url.searchParams.set(key, value);
   }
-  const token = request.cookies.get(
-    development ? "w8_local_session" : "qelvora_session",
-  )?.value;
+  // The explicit local selector is a development-only override. Otherwise use
+  // the same server-held session as the conversation that supplied the report.
+  const token =
+    (development
+      ? request.cookies.get("w8_local_session")?.value
+      : undefined) || request.cookies.get("qelvora_session")?.value;
+  const expectedAccount = request.headers.get("X-Expected-Account-Id");
+  if (
+    request.method === "POST" &&
+    !target.startsWith("dev/") &&
+    (!expectedAccount ||
+      !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/iu.test(expectedAccount))
+  )
+    return NextResponse.json(
+      {
+        error: {
+          code: "session_account_changed",
+          message: "Refresh your account before taking this action.",
+        },
+      },
+      { status: 409 },
+    );
   try {
     const body = request.method === "POST" ? await request.text() : undefined;
     if (body && Buffer.byteLength(body) > 65536)
@@ -102,7 +123,13 @@ async function forward(
       method: request.method,
       headers: {
         "Content-Type": "application/json",
+        ...(request.headers.get("x-correlation-id")
+          ? { "X-Correlation-Id": request.headers.get("x-correlation-id")! }
+          : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(expectedAccount
+          ? { "X-Expected-Account-Id": expectedAccount }
+          : {}),
       },
       ...(body ? { body } : {}),
       cache: "no-store",
@@ -118,6 +145,7 @@ async function forward(
         path: "/",
         maxAge: 3600,
       });
+      response.cookies.delete("qelvora_session");
       return response;
     }
     const response = NextResponse.json(data, {

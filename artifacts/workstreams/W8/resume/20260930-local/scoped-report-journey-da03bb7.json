@@ -1,0 +1,70 @@
+{
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "environment": "local-development; web3008/API4108/non-owner DB55438",
+  "actors": {
+    "reporter": "10000000-0000-4000-8000-000000000002",
+    "reviewer": "10000000-0000-4000-8000-000000000004"
+  },
+  "caseId": "030868cc-e778-4fca-8731-02a4c817fcfa",
+  "caseNumber": 3,
+  "creatorId": "20000000-0000-4000-8000-000000000001",
+  "messageId": "50000000-0000-4000-8000-000000000002",
+  "observedSteps": [
+    "Opened registered support URL with exact creator/message UUIDs; form preselected AI report and retained both references.",
+    "Sent report through actual UI with no paid grant; CASE-003 saved.",
+    "At390x844 Light and Night reporter saw only its CASE-003; no other fan case.",
+    "Selected local supervisor; Night queue showed CASE-003 as metadata. Document390px, main padding24px16px; skip Enter focused MAIN#ops-main.",
+    "Opened CASE-003 through actual queue link; purpose gate skip Enter focused MAIN#ops-main.",
+    "Entered purpose;15-minute lease displayed only reported synthetic AI text with Maya AI author label.",
+    "Selected close, entered reason and confirmed decision in actual dialog; state became resolved with decision timeline.",
+    "Changed to reporter; operator evidence cleared. Support Light390 showed CASE-003 resolved, same reason, own trust-inbox notice and appeal entry."
+  ],
+  "screenshots": {
+    "scoped-report-case-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-case-390.jpg",
+      "sha256": "10ff83c9fc1e1e9f576653ea660156412e2a3e425911265a579f6ff73dee0048",
+      "bytes": 69654
+    },
+    "scoped-report-fan-notice-light-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-fan-notice-light-390.jpg",
+      "sha256": "7ca59c296073d11d4d5f5e96e978b2aa9e4fca2d6e288a8f123aa88d58e76d8b",
+      "bytes": 76856
+    },
+    "scoped-report-night-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-night-390.jpg",
+      "sha256": "259470a3b4c362f24b404b694f5af7f138a098509bb1a2200c0eafbc647322a5",
+      "bytes": 48879
+    },
+    "scoped-report-ops-night-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-ops-night-390.jpg",
+      "sha256": "3484c4d37558bb026b110ddedfa1b039abee8e76e432321ec292bd1d295c3c41",
+      "bytes": 42018
+    },
+    "scoped-report-resolved-night-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-resolved-night-390.jpg",
+      "sha256": "907d5a877220b6744b39650ff98c771d033f05447d1c703565fe8e5720a3ce10",
+      "bytes": 101632
+    },
+    "scoped-report-saved-light-390.jpg": {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform/artifacts/workstreams/W8/resume/20260930-local/scoped-report-saved-light-390.jpg",
+      "sha256": "6c5fed17848980705bdff5427538f3246133057c5e85fd59325051b892abef3b",
+      "bytes": 64458
+    }
+  },
+  "canonicalBrowserAttempt": {
+    "result": "unverified",
+    "observed": [
+      "Development continuation page rendered.",
+      "Actor-two form completion returned200 in redacted API telemetry, CIDd4035baa-d015-4e4d-9336-216362cb82e9.",
+      "Browser Runtime.evaluate then focus-command timed out; canonical authenticated history/report click could not be verified."
+    ],
+    "directOperatorReceipt": "canonical-web-handoff-da03bb7.json"
+  },
+  "limitations": [
+    "Direct support arrival was operated; actual AI-message Report link click awaits canonical browser acceptance.",
+    "Local durable trust-inbox notice is not external delivery.",
+    "Synthetic seeded AI text; no paid generation/payment/referral.",
+    "Geometry/keyboard samples are partial; no complete reference/accessibility/native acceptance."
+  ],
+  "paidAICalls": 0
+}

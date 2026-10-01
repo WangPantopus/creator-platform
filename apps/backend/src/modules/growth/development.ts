@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 /** Explicit loopback-only W7 development runner. Never imported by production bootstrap. */
 import express from "express";
 import pg from "pg";
@@ -93,7 +94,7 @@ const actorFor = async (req: express.Request) => {
     if (!response.ok)
       throw new DomainError(
         "session_required",
-        "Continue with Pantopus to use this feature.",
+        copy.growthErrorSessionRequired,
         401,
       );
     const session = (await response.json()) as {
@@ -109,7 +110,7 @@ const actorFor = async (req: express.Request) => {
   if (selected !== "fan" && selected !== "creator")
     throw new DomainError(
       "session_required",
-      "Continue with Pantopus to use this feature.",
+      copy.growthErrorSessionRequired,
       401,
     );
   return {

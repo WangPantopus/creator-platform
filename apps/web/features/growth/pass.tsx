@@ -1,4 +1,5 @@
 "use client";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { createContext, useContext, useEffect, useState } from "react";
 interface PassAccess {
   enabled: boolean;
@@ -37,10 +38,16 @@ export function PassMarker({ creatorId }: { creatorId: string }) {
   return (
     <p className="growth-meta">
       {marker.state === "active"
-        ? "In your pass"
+        ? growthCopy.growthInYourPass
         : marker.state === "draft_next" && marker.startsAt
-          ? `Joins ${new Date(marker.startsAt).toLocaleDateString("en", { month: "short", day: "numeric", timeZone: "UTC" })}`
-          : "Not in your pass"}
+          ? growthFormat("growthJoins", {
+              value1: new Date(marker.startsAt).toLocaleDateString("en", {
+                month: "short",
+                day: "numeric",
+                timeZone: "UTC",
+              }),
+            })
+          : growthCopy.growthNotInYourPass}
     </p>
   );
 }

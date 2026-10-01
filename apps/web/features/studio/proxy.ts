@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { platformFetch } from "../../lib/session";
+import { sameRequestOrigin } from "../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const allow = {
@@ -30,10 +31,7 @@ export function studioProxy(
         { error: { message: "This endpoint is unavailable." } },
         { status: 404 },
       );
-    if (
-      request.method !== "GET" &&
-      request.headers.get("origin") !== request.nextUrl.origin
-    )
+    if (request.method !== "GET" && !sameRequestOrigin(request))
       return Response.json(
         { error: { message: "Use this app to perform the action." } },
         { status: 403 },

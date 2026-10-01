@@ -259,7 +259,7 @@ public struct NotificationRow: View {
     public var body: some View {
         SwiftUI.Button(action: onOpen) {
             HStack(alignment: .top, spacing: studioSpace("space-3")) {
-                Group { if kind == .maya { Text(String(name.prefix(1))).qText("email-brand").italic() } else { QelvoraGlyph(name: glyph, size: studioSpace("space-4"), color: qColor(iconInk, scheme)) } }
+                Group { if kind == .maya { Text(String(name.prefix(1))).qText("email-brand", italic: true) } else { QelvoraGlyph(name: glyph, size: studioSpace("space-4"), color: qColor(iconInk, scheme)) } }
                     .foregroundStyle(qColor(iconInk, scheme)).frame(width: studioSpace("avatar-size"), height: studioSpace("avatar-size")).background(qColor(iconBackground, scheme), in: RoundedRectangle(cornerRadius: studioSpace("notification-radius"))).overlay { if kind == .ai { RoundedRectangle(cornerRadius: studioSpace("notification-radius")).stroke(qColor("ai-line", scheme), lineWidth: studioSpace("hairline")) } }.accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 0) { Text(sender).qText("label"); Text(children).qText("control-body") }.frame(maxWidth: .infinity, alignment: .leading)
                 if let time { Text(time).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)).fixedSize(horizontal: true, vertical: false) }
@@ -433,7 +433,7 @@ public struct EmailFrame: View {
                 Text(studioCopy("emailSubject", ["subject": subject]))
             }.qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)).padding(.horizontal, studioSpace("space-4")).padding(.vertical, studioSpace("space-2") + studioSpace("space-1") / 2).frame(maxWidth: .infinity, alignment: .leading).background(qColor("surface", scheme)).overlay(alignment: .bottom) { StudioRule() }
             VStack(alignment: .leading, spacing: studioSpace("share-gap")) {
-                Text(QelvoraCopy.brandName).qText("email-brand").italic().padding(.bottom, studioSpace("space-3")).frame(maxWidth: .infinity, alignment: .leading).overlay(alignment: .bottom) { StudioRule() }
+                Text(QelvoraCopy.brandName).qText("email-brand", italic: true).padding(.bottom, studioSpace("space-3")).frame(maxWidth: .infinity, alignment: .leading).overlay(alignment: .bottom) { StudioRule() }
                 if kind == .humanCreator {
                     VStack(alignment: .leading, spacing: studioSpace("space-2") + studioSpace("space-1") / 2) { AuthorLabel(kind: kind, name: name, time: time, onMaya: true); Text(children).qText("voice-lg"); SignedMarker(name: name, href: verificationURL, onMaya: true) }.padding(studioSpace("share-gap")).frame(maxWidth: .infinity, alignment: .leading).foregroundStyle(qColor("on-maya", scheme)).background(qColor("maya-surface", scheme), in: BubbleShape())
                 } else {

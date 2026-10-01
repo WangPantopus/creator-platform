@@ -351,6 +351,11 @@
   }
   .ops-details {
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: var(--space-4);
+  }
+  .ops-details dt,
+  .ops-details dd {
+    overflow-wrap: anywhere;
   }
 }
 @media (prefers-reduced-motion: reduce) {

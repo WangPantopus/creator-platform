@@ -1,0 +1,38 @@
+{
+  "environment": "Isolated genuine W1 synthetic sessions; HTTP authority checks only",
+  "actions": [
+    {
+      "action": "Fresh genuine W1 synthetic continuation actor 1",
+      "currentRoleCount": 1
+    },
+    {
+      "action": "Fresh genuine W1 synthetic continuation actor 2",
+      "currentRoleCount": 0
+    },
+    {
+      "action": "Fresh genuine W1 synthetic continuation actor 4",
+      "currentRoleCount": 1
+    },
+    {
+      "action": "Stale displayed account cannot mutate fan preferences",
+      "status": 403,
+      "errorCode": "content_account_changed",
+      "preferencesUnchanged": true
+    },
+    {
+      "action": "Current displayed account can set its own preference",
+      "status": 200
+    },
+    {
+      "action": "Team cannot grant creator AI reuse intent",
+      "status": 403,
+      "errorCode": "creator_source_intent_required"
+    },
+    {
+      "action": "Unavailable audience count cannot be promised at publication",
+      "status": 403,
+      "errorCode": "audience_count_unavailable",
+      "audienceCountsAvailable": false
+    }
+  ]
+}

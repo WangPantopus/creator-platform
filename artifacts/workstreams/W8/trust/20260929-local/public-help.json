@@ -1,0 +1,7 @@
+{
+  "httpStatus": 200,
+  "protocolVersion": "crisis-v1",
+  "resources": [],
+  "emergencyMessage": "If you are in immediate danger, contact local emergency services. An AI cannot provide emergency help.",
+  "paidRouting": false
+}

@@ -1,0 +1,52 @@
+{
+  "parentRevision": "7ff8ec9bd35574ade7f1cacdf98f0620976f140d",
+  "captureProducer": "139c1567ebd658ba7059586696374f8f49e2632d",
+  "personalAdaptation": "recursive layer and mask redraw only; W1 cacheDisplay composition retained",
+  "references": {
+    "count": 110,
+    "unchanged": true,
+    "sha256WithPaths": "d17c83328618f8b058502efb22cd5e504211ae83c6ab9b9bf2e5b978575a3694"
+  },
+  "comparisonClosureUnchanged": true,
+  "comparisonSha256": "d56edc1f9c6da6902d07666df0ba3567afb4e8bedbf109cb46584f2e1c443e3c",
+  "capture": {
+    "existingCases": 3,
+    "comparisons": 110,
+    "failures": 0,
+    "durationSeconds": 28.582,
+    "completedAt": "2026-09-30T17:26:07-07:00",
+    "backingScale": 2,
+    "logicalSize": [390, 844],
+    "bitmapSize": [780, 1688],
+    "host": "macOS26.7 Intel"
+  },
+  "ui": {
+    "existingCases": 2,
+    "failures": 0,
+    "durationSeconds": 32.878,
+    "completedAt": "2026-09-30T17:28:08-07:00",
+    "simulatorId": "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+    "normallySigned": true,
+    "parallelTesting": false
+  },
+  "logs": {
+    "capture": {
+      "path": "/private/tmp/creator-w1-continuation-layer-snapshots.log",
+      "sha256": "ae16048ea6c241c95bbf9c08ffda33827c42a19242a16c32d6f5496f213d5daf"
+    },
+    "ui": {
+      "path": "/private/tmp/creator-w1-continuation-native-ui.log",
+      "sha256": "e1bed944610cd08d4c1d5e1909a3c0a387c0ea397e8d7ebca4c812cac657eb8a"
+    },
+    "boot": {
+      "path": "/private/tmp/creator-w1-continuation-simulator-boot.log",
+      "sha256": "64c6363e623d97953f23f69726f70a55e25a10cac7529396ff20ed025417d627"
+    }
+  },
+  "limits": [
+    "hosted 1x capture unverified",
+    "automated consistency only; no personally operated native acceptance",
+    "no new test cases/suites/references",
+    "production login/provider/device acceptance remains gated"
+  ]
+}

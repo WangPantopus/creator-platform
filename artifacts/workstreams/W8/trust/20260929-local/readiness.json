@@ -1,0 +1,64 @@
+{
+  "httpStatus": 503,
+  "ready": false,
+  "environment": "local-development",
+  "release": "uncommitted-w8",
+  "capabilities": [
+    {
+      "name": "database",
+      "required": true,
+      "state": "available",
+      "code": "non_owner_rls_verified",
+      "checkedAt": "2026-09-30T03:05:17.952Z"
+    },
+    {
+      "name": "identity",
+      "required": true,
+      "state": "development",
+      "code": "synthetic_local_accounts",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "model",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "payments",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "calls",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "voice",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "push",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    },
+    {
+      "name": "domain_privacy_hooks",
+      "required": true,
+      "state": "unavailable",
+      "code": "adapter_unconfigured",
+      "checkedAt": "2026-09-30T03:05:17.949Z"
+    }
+  ]
+}

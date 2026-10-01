@@ -2,6 +2,7 @@ import type {
   CallRole,
   ConnectedInterval,
 } from "../../../../../packages/api/src/session.js";
+import { invariant } from "../../core/errors.js";
 
 /** Managed media transport. Participant history must be genuine, complete provider evidence. */
 export interface CallProvider {
@@ -37,7 +38,51 @@ export interface CallProvider {
     enabled: boolean,
     idempotencyKey: string,
   ): Promise<{ recording: boolean }>;
-  deleteRecording(roomId: string, idempotencyKey: string): Promise<void>;
+  /** Confirm deletion of retained recordings/egress artifacts, not only that recording stopped. */
+  deleteRecording(
+    roomId: string,
+    idempotencyKey: string,
+  ): Promise<{ deleted: boolean; reference: string }>;
+}
+export function validateProviderState(
+  state: Awaited<ReturnType<CallProvider["state"]>>,
+) {
+  invariant(
+    state &&
+      typeof state.closed === "boolean" &&
+      typeof state.recording === "boolean" &&
+      Array.isArray(state.presentAccountIds) &&
+      state.presentAccountIds.every(
+        (accountId) => typeof accountId === "string" && accountId.length > 0,
+      ),
+    "call_provider_state_invalid",
+    "Call state is awaiting valid provider confirmation.",
+  );
+  return state;
+}
+export function validateRecordingState(
+  state: Awaited<ReturnType<CallProvider["setRecording"]>>,
+) {
+  invariant(
+    state && typeof state.recording === "boolean",
+    "call_provider_recording_invalid",
+    "Recording state is awaiting valid provider confirmation.",
+  );
+  return state;
+}
+export function validateRecordingDeletion(
+  result: Awaited<ReturnType<CallProvider["deleteRecording"]>>,
+) {
+  invariant(
+    result &&
+      result.deleted === true &&
+      typeof result.reference === "string" &&
+      result.reference.trim().length > 0 &&
+      result.reference.length <= 2000,
+    "call_provider_deletion_unconfirmed",
+    "Recording deletion is awaiting provider confirmation.",
+  );
+  return result;
 }
 export class UnavailableCallProvider implements CallProvider {
   readonly name = "unconfigured";
@@ -67,7 +112,7 @@ export class UnavailableCallProvider implements CallProvider {
   async setRecording(): Promise<{ recording: boolean }> {
     return this.unavailable();
   }
-  async deleteRecording(): Promise<void> {
-    this.unavailable();
+  async deleteRecording(): ReturnType<CallProvider["deleteRecording"]> {
+    return this.unavailable();
   }
 }

@@ -90,10 +90,10 @@ struct GrowthRequestFailure: Error {
   let status: Int
   var message: String {
     switch status {
-    case 401: "Continue with Pantopus to open your account's current state."
-    case 403: "This action is unavailable to this account."
-    case 404: "This destination is no longer available."
-    default: "The service is unavailable. Reconnect and try again."
+    case 401: QelvoraCopy.text("growthContinueWithPantopusToOpenYourAccountSCurrentState")
+    case 403: QelvoraCopy.text("growthThisActionIsUnavailableToThisAccount")
+    case 404: QelvoraCopy.text("growthThisDestinationIsNoLongerAvailable")
+    default: QelvoraCopy.text("growthTheServiceIsUnavailableReconnectAndTryAgain")
     }
   }
 }
@@ -203,12 +203,15 @@ public struct GrowthFanFeature: View {
           if route == "/notifications/settings" {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
-            Text("Discover").qText("display-lg")
-            TextField("Search creators, crafts or questions", text: $query).textFieldStyle(
-              .roundedBorder
-            ).submitLabel(.search).onSubmit { Task { await load() } }
-            Segmented(items: ["For you", "Crafts", "Music", "Food"], active: category) { value in
-              category = value
+            Text(QelvoraCopy.text("navDiscover")).qText("display-lg")
+            TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
+              prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
+              .foregroundStyle(qColor("ink", scheme)).padding(12)
+              .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
+              .overlay { RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1) }
+              .submitLabel(.search).onSubmit { Task { await load() } }
+            Segmented(items: growthCategories.map(growthLabel), active: growthLabel(category)) { value in
+              category = growthCategories.first(where: { growthLabel($0) == value }) ?? category
               Task { await load() }
             }
             ForEach(creators) { value in
@@ -219,13 +222,13 @@ public struct GrowthFanFeature: View {
               }.buttonStyle(.plain)
             }
             if creators.isEmpty && !loading && error.isEmpty {
-              EmptyState(title: "No creators found", body: "Try another need or browse a category.")
+              EmptyState(title: QelvoraCopy.text("growthNoCreatorsFound"), body: QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
             }
           } else if route == "/notifications" {
-            Text("Notifications").qText("display-lg")
-            Button("Settings", variant: .quiet) { route = "/notifications/settings" }
+            Text(QelvoraCopy.text("growthNotifications")).qText("display-lg")
+            Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { route = "/notifications/settings" }
             if notifications.isEmpty && !loading && error.isEmpty {
-              EmptyState(title: "No updates yet", body: "Your in-app record cannot be turned off.")
+              EmptyState(title: QelvoraCopy.text("growthNoUpdatesYet"), body: QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
             }
             ForEach(notifications) { item in
               SwiftUI.Button {
@@ -239,10 +242,11 @@ public struct GrowthFanFeature: View {
             }
           } else if route == "/home", let home {
             HStack {
-              Text("Your people").qText("display-lg")
+              Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg")
               Spacer()
-              Button("Notifications", variant: .quiet) { route = "/notifications" }
+              Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { route = "/notifications" }
             }
+            GrowthPostValuePrompt(client: client) { route = $0 }
             ForEach(home.entries) { entry in
               SwiftUI.Button {
                 route = entry.destination
@@ -267,50 +271,49 @@ public struct GrowthFanFeature: View {
             }
             if home.entries.isEmpty && home.posts.isEmpty {
               EmptyState(
-                title: "Pick a creator to start", body: "Find a creator whose work you care about."
-              ) { Button("Discover", variant: .secondary) { route = "/discover" } }
+                title: QelvoraCopy.text("growthPickACreatorToStart"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
+              ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { route = "/discover" } }
             }
           } else if route.hasPrefix("/invite/"), let invitation {
             Seal(initial: String(invitation.creator.name.prefix(1)), size: 56)
-            Text(invitation.creator.name + " invited you in").qText("display-lg")
-            Text("A first conversation of about 24 hours · no card needed.").qText("body")
-            Button("Accept invitation", variant: .ai, block: true) {
+            Text(QelvoraCopy.text("growthInvitedYouIn", values: ["name": invitation.creator.name])).qText("display-lg")
+            Text(QelvoraCopy.text("growthAFirstConversationOfAbout24HoursNoCardNeeded")).qText("body")
+            Button(QelvoraCopy.text("growthAcceptInvitation"), variant: .ai, block: true) {
               route = invitation.destination
             }
           } else if route.hasPrefix("/share/"), let shared {
             if shared.state == "valid", let source = shared.source {
               Text(
                 source.authorKind == "approved_draft"
-                  ? "Prepared by AI · approved by " + source.creatorName
-                  : source.creatorName + " · personal reply"
+                  ? QelvoraCopy.text("approvedAuthor", values: ["name": source.creatorName])
+                  : QelvoraCopy.text("growthPersonalReply2", values: ["name": source.creatorName])
               ).qText("label")
               Text(source.text).qText("voice-md")
-              Text("Signed by " + source.creatorName + " · version " + String(source.version))
+              Text(QelvoraCopy.text("growthSignedByVersion", values: ["name": source.creatorName, "version": String(source.version)]))
                 .qText("caption")
               if let correction = source.correction {
-                Notice(title: "Correction", children: correction)
+                Notice(title: QelvoraCopy.text("growthCorrection"), children: correction)
               }
             } else {
               EmptyState(
-                title: "This card was withdrawn",
-                body: "Permission to share this reply is no longer current.")
+                title: QelvoraCopy.text("growthThisCardWasWithdrawn2"),
+                body: QelvoraCopy.text("growthPermissionToShareThisReplyIsNoLongerCurrent"))
             }
           } else if let creator {
             if route.contains("/chat") {
-              Text(creator.name + "'s AI").qText("display-md")
+              Text(QelvoraCopy.text("aiAuthor", values: ["name": creator.name])).qText("display-md")
               Text(
-                "You're talking to " + creator.name + "'s AI · " + creator.name
-                  + " steps in on request."
+                QelvoraCopy.text("identityStrip", values: ["name": creator.name])
               ).qText("body")
               if let context = posts.first {
-                ContextCard(source: "From a post", title: context.title) {
+                ContextCard(source: QelvoraCopy.text("growthFromAPost"), title: context.title) {
                   route = "/creators/" + creator.handle + "/chat"
                 }
               }
               Notice(
-                title: "Conversation service not connected",
-                children: "Your valid entry context is kept. No message has been sent.")
-              Button("Continue with Pantopus", block: true) { signIn(route) }
+                title: QelvoraCopy.text("growthConversationServiceNotConnected"),
+                children: QelvoraCopy.text("growthYourValidEntryContextIsKeptNoMessageHasBeen"))
+              Button(QelvoraCopy.text("continueWithPantopus"), block: true) { signIn(route) }
             } else if route.contains("/posts/") {
               HStack(spacing: 10) {
                 SwiftUI.Button {
@@ -318,11 +321,11 @@ public struct GrowthFanFeature: View {
                 } label: {
                   QelvoraGlyph(name: "back", color: qColor("ink", scheme))
                     .frame(width: 44, height: 44)
-                }.buttonStyle(.plain).accessibilityLabel("Back to " + creator.name + "'s page")
+                }.buttonStyle(.plain).accessibilityLabel(QelvoraCopy.text("growthBackToSPage", values: ["name": creator.name]))
                 Avatar(initial: String(creator.name.prefix(1)))
                 VStack(alignment: .leading, spacing: 2) {
                   Text(creator.name).qText("body-strong")
-                  Text("POST · PUBLIC").qText("data-sm").foregroundStyle(
+                  Text(QelvoraCopy.text("growthPostPublic")).qText("data-sm").foregroundStyle(
                     qColor("ink-muted", scheme))
                 }
               }.frame(maxWidth: .infinity, alignment: .leading)
@@ -333,9 +336,9 @@ public struct GrowthFanFeature: View {
                 if post.aiContextEligible {
                   VStack(alignment: .leading, spacing: 12) {
                     AuthorLabel(kind: .ai, name: creator.name)
-                    Text("Ask about this post. The context stays with your conversation.")
+                    Text(QelvoraCopy.text("growthAskAboutThisPostTheContextStaysWithYourConversation"))
                       .qText("body").foregroundStyle(qColor("ink", scheme))
-                    Button("Ask " + creator.name + "'s AI about this", variant: .ai, block: true) {
+                    Button(QelvoraCopy.text("growthAskSAiAboutThis2", values: ["name": creator.name]), variant: .ai, block: true) {
                       route = "/creators/" + creator.handle + "/chat?context=" + post.id
                     }
                   }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
@@ -351,26 +354,25 @@ public struct GrowthFanFeature: View {
             } else {
               creatorCard(creator)
               Text(
-                "Official means " + creator.name + " authorized this AI. It does not mean "
-                  + creator.name + " read your message."
+                QelvoraCopy.text("growthOfficialMeansAuthorizedThisAiItDoesNotMeanRead2", values: ["name": creator.name])
               ).qText("caption")
               Button(
-                "Message " + creator.name + "'s AI", block: true,
+                QelvoraCopy.text("messageAI", values: ["name": creator.name]), block: true,
                 disabled: creator.state != "published"
               ) { route = "/creators/" + creator.handle + "/chat" }
               Button(
-                following ? "Following · unfollow" : "Follow", variant: .secondary, block: true
+                following ? QelvoraCopy.text("growthFollowingUnfollow") : QelvoraCopy.text("growthFollow"), variant: .secondary, block: true
               ) { Task { await follow(creator) } }
-              Segmented(items: ["Chat", "Posts", "Requests", "Access"], active: section) {
-                section = $0
+              Segmented(items: growthSections.map(growthLabel), active: growthLabel(section)) { label in
+                section = growthSections.first(where: { growthLabel($0) == label }) ?? section
               }
               if section == "Chat" {
-                Text("What " + creator.name + "'s AI knows").qText("title")
+                Text(QelvoraCopy.text("growthWhatSAiKnows2", values: ["name": creator.name])).qText("title")
                 Text(creator.sourceSummary).qText("body")
                 Text(creator.topics.joined(separator: ", ")).qText("body")
                 Text(creator.presence).qText("caption")
               } else if section == "Posts" {
-                Text("From " + creator.name).qText("title")
+                Text(QelvoraCopy.text("growthFrom3", values: ["name": creator.name])).qText("title")
                 ForEach(posts) { post in
                   SwiftUI.Button {
                     route = "/creators/" + creator.handle + "/posts/" + post.id
@@ -385,29 +387,29 @@ public struct GrowthFanFeature: View {
                 }
                 if posts.isEmpty {
                   EmptyState(
-                    title: "No public posts yet",
-                    body: "Come back when " + creator.name + " publishes something.")
+                    title: QelvoraCopy.text("growthNoPublicPostsYet"),
+                    body: QelvoraCopy.text("growthComeBackWhenPublishesSomething2", values: ["name": creator.name]))
                 }
               } else if section == "Requests" {
-                Text(creator.name + "'s time, by request").qText("title")
+                Text(QelvoraCopy.text("growthSTimeByRequest2", values: ["name": creator.name])).qText("title")
                 Text(creator.capacity).qText("body")
                 Text(creator.reliability).qText("caption")
                 Notice(
-                  title: "Current offers",
+                  title: QelvoraCopy.text("growthCurrentOffers"),
                   children:
-                    "Requests and prices need the creator's current offer. No offer is connected here yet."
+                    QelvoraCopy.text("growthRequestsAndPricesNeedTheCreatorSCurrentOfferNo")
                 )
               } else {
-                Text(creator.membershipLabel ?? "Access").qText("title")
+                Text(creator.membershipLabel ?? QelvoraCopy.text("navAccess")).qText("title")
                 ForEach(creator.accessLines, id: \.self) { Text($0).qText("body") }
               }
             }
           }
-          if loading { ProgressView().accessibilityLabel("Loading") }
+          if loading { ProgressView().accessibilityLabel(QelvoraCopy.text("growthLoading")) }
           if !error.isEmpty {
-            Notice(tone: .error, title: "Unavailable", children: error)
-            if requiresSignIn { Button("Continue with Pantopus", block: true) { signIn(route) } }
-            Button("Try again", variant: .secondary) { Task { await load() } }
+            Notice(tone: .error, title: QelvoraCopy.text("growthUnavailable"), children: error)
+            if requiresSignIn { Button(QelvoraCopy.text("continueWithPantopus"), block: true) { signIn(route) } }
+            Button(QelvoraCopy.text("growthTryAgain"), variant: .secondary) { Task { await load() } }
           }
         }.padding(16)
       }
@@ -445,8 +447,8 @@ public struct GrowthFanFeature: View {
         {
           Text(
             marker.state == "active"
-              ? "In your pass"
-              : marker.state == "draft_next" ? "Draft for your next pass cycle" : "Not in your pass"
+              ? QelvoraCopy.text("growthInYourPass")
+              : marker.state == "draft_next" ? QelvoraCopy.text("growthDraftForYourNextPassCycle") : QelvoraCopy.text("growthNotInYourPass")
           ).qText("data-sm")
         }
       }.padding(16)
@@ -454,7 +456,7 @@ public struct GrowthFanFeature: View {
   }
   private func load() async {
     guard let client else {
-      error = "The growth service is not configured."
+      error = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured")
       return
     }
     loading = true
@@ -533,7 +535,7 @@ public struct GrowthFanFeature: View {
     requiresSignIn = (failure as? GrowthRequestFailure)?.status == 401
     error =
       (failure as? GrowthRequestFailure)?.message
-      ?? "This destination is unavailable. Reconnect and try again."
+      ?? QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
   }
   private func follow(_ creator: GrowthCreator) async {
     guard let client else { return }
@@ -555,4 +557,56 @@ public struct GrowthFanFeature: View {
       route = item.destination
     } catch { if !Task.isCancelled { record(error) } }
   }
+}
+
+/// Optional post-value prompt; the owner-recorded outcome and durable server cap determine visibility.
+private struct GrowthPostValuePrompt: View {
+  private struct Claim: Decodable { let eligible: Bool; let target: String? }
+  private struct Choice: Decodable { let saved: Bool }
+  let client: GrowthClient?
+  let open: (String) -> Void
+  @State private var claimID = UUID().uuidString.lowercased()
+  @State private var target: String?
+  @State private var busy = false
+  @State private var error = ""
+  var body: some View {
+    Group {
+      if let target {
+        VStack(alignment: .leading, spacing: 16) {
+          Text(QelvoraCopy.text("growthKeepUsefulUpdatesWithinReach")).qText("title")
+          Text(QelvoraCopy.text("growthChoosePushOrEmailInSettingsWhenYouWantUpdates")).qText("body")
+          Button(QelvoraCopy.text("growthChooseUpdates"), variant: .secondary) { choose("accepted", target: target) }.disabled(busy)
+          Button(QelvoraCopy.text("growthLater"), variant: .quiet) { choose("later", target: target) }.disabled(busy)
+          Button(QelvoraCopy.text("growthDonTAskAgain"), variant: .quiet) { choose("declined", target: target) }.disabled(busy)
+          if !error.isEmpty { Text(error).qText("caption").accessibilityAddTraits(.updatesFrequently) }
+        }
+      }
+    }.task {
+      guard let client else { return }
+      let body = try? JSONSerialization.data(withJSONObject: ["platform":"ios", "id":claimID])
+      if let claim: Claim = try? await client.request("engagement/return/claim", method:"POST", body:body), !Task.isCancelled {
+        target = claim.eligible ? claim.target : nil
+      }
+    }
+  }
+  private func choose(_ choice: String, target destination: String) {
+    busy = true; error = ""
+    Task {
+      defer { busy = false }
+      do {
+        guard let client else { throw URLError(.notConnectedToInternet) }
+        let body = try JSONSerialization.data(withJSONObject:["id":claimID, "choice":choice])
+        let _: Choice = try await client.request("engagement/return/choice", method:"PUT", body:body)
+        target = nil
+        if choice == "accepted" { open(destination) }
+      } catch { self.error = QelvoraCopy.text("growthThisChoiceCouldNotBeSavedTryAgain") }
+    }
+  }
+}
+
+private let growthCategories = ["For you", "Crafts", "Music", "Food"]
+private let growthSections = ["Chat", "Posts", "Requests", "Access"]
+private func growthLabel(_ value: String) -> String {
+  let keys = ["For you":"growthForYou", "Crafts":"growthCrafts", "Music":"growthMusic", "Food":"growthFood", "Chat":"navChat", "Posts":"navPosts", "Requests":"navRequests", "Access":"navAccess"]
+  return keys[value].map { QelvoraCopy.text($0) } ?? value
 }

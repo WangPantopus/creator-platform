@@ -7,6 +7,8 @@ import { DomainError } from "../core/errors.js";
 import { assertCurrentSession } from "../modules/identity/request-authority.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
 
+export type ThreadLockMode = "read" | "write";
+
 export class Database {
   constructor(
     readonly pool: Pool,
@@ -53,8 +55,19 @@ export class Database {
   async withThread<T>(
     scope: ThreadScope,
     work: (client: PoolClient) => Promise<T>,
+    lockMode: ThreadLockMode = "write",
   ): Promise<T> {
     assertThreadScope(scope);
+    if (lockMode !== "read" && lockMode !== "write")
+      throw new DomainError(
+        "thread_lock_invalid",
+        "The conversation operation is unavailable.",
+        400,
+      );
+    // Mutations acquire their exclusive lock during authorization, before any
+    // domain/idempotency/allowance locks. Concurrent writers must not both take
+    // SHARE and deadlock when they subsequently upgrade to UPDATE.
+    const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
@@ -65,15 +78,12 @@ export class Database {
       await assertCurrentSession(client, scope.actorAccountId);
       // Issued scopes are not durable authority. Recheck role/verification before
       // any scoped read or mutation, including a queued request using an old scope.
-      // Match W2's published 489bbe9 repair: lock the thread before taking an
-      // idempotency lock. Concurrent SHARE holders otherwise deadlock when one
-      // callback upgrades to UPDATE while another waits on the original key.
-      const authority = await client.query(
-        `SELECT 1 FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
+      const authority = await client.query<{ fan_account_id: string }>(
+        `SELECT f.account_id AS fan_account_id FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
          WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND c.account_id=$6 AND t.deleted_at IS NULL AND (
          ($5='fan' AND f.account_id=$4) OR ($5='creator' AND c.account_id=$4 AND c.verification='verified') OR
          ($5='triage' AND c.verification='verified' AND EXISTS(SELECT 1 FROM creator.team_membership tm WHERE tm.creator_id=c.id AND tm.account_id=$4 AND tm.revoked_at IS NULL AND 'triage'=ANY(tm.roles))))
-         FOR UPDATE OF t`,
+         FOR ${threadLock} OF t`,
         [
           scope.threadId,
           scope.creatorId,
@@ -140,7 +150,7 @@ export class Database {
         scope.creatorId,
         scope.threadId,
         {
-          fanAccountId: scope.fanAccountId,
+          fanAccountId: authority.rows[0]!.fan_account_id,
           creatorAccountId: scope.creatorAccountId,
         },
       );

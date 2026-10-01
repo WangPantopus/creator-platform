@@ -222,7 +222,7 @@ export class SessionService implements PantopusIdentityAdapter {
     const session = await this.resolve(token, true);
     const next = randomBytes(32).toString("base64url");
     const updated = await this.pool.query<{ expires_at: Date }>(
-      "UPDATE creator.identity_session SET token_hash=$1,expires_at=LEAST(now()+interval '15 minutes',refresh_until) WHERE id=$2 AND token_hash=$3 AND revoked_at IS NULL RETURNING expires_at",
+      "UPDATE creator.identity_session SET token_hash=$1,expires_at=LEAST(clock_timestamp()+interval '15 minutes',refresh_until) WHERE id=$2 AND token_hash=$3 AND revoked_at IS NULL AND refresh_until>clock_timestamp() RETURNING expires_at",
       [hash(next), session.sessionId, hash(token)],
     );
     if (!updated.rows[0])

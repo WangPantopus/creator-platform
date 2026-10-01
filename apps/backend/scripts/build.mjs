@@ -1,4 +1,14 @@
 import { build } from "esbuild";
+import { readFile } from "node:fs/promises";
+
+const manifest = JSON.parse(
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
+);
+// Bundle workspace TypeScript; installed provider SDKs retain their native
+// Node module format and resolve through the deployed production dependencies.
+const external = Object.entries(manifest.dependencies)
+  .filter(([, version]) => !version.startsWith("workspace:"))
+  .map(([name]) => name);
 
 await build({
   entryPoints: {
@@ -13,16 +23,5 @@ await build({
   target: "node22",
   format: "esm",
   sourcemap: true,
-  // Provider SDKs load CommonJS and Node built-ins internally. Keep their
-  // installed package entry points intact in the ESM production executables.
-  external: [
-    "express",
-    "pg",
-    "ws",
-    "zod",
-    "@simplewebauthn/server",
-    "@apple/app-store-server-library",
-    "google-auth-library",
-    "stripe",
-  ],
+  external,
 });

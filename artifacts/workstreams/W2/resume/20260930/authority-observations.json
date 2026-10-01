@@ -1,0 +1,36 @@
+{
+  "synthetic": true,
+  "missingSession": {
+    "status": 401,
+    "result": {
+      "error": {
+        "code": "session_required",
+        "message": "Continue with Pantopus to use Studio."
+      }
+    }
+  },
+  "otherOwner": {
+    "status": 403,
+    "result": {
+      "error": {
+        "code": "creator_required",
+        "message": "Only the creator can configure this AI."
+      }
+    }
+  },
+  "explicitLoopbackActorWithUnrelatedCookie": {
+    "status": 200,
+    "account": "10000000-0000-4000-8000-000000000001",
+    "creator": "20000000-0000-4000-8000-000000000002",
+    "revision": 14
+  },
+  "changedDisplayedActor": {
+    "status": 409,
+    "result": {
+      "error": {
+        "code": "studio_actor_changed",
+        "message": "Your creator session changed. Reload Studio before continuing."
+      }
+    }
+  }
+}

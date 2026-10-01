@@ -1,0 +1,51 @@
+{
+  "backendBuild": {
+    "logPath": "/private/tmp/creator-w8-integrated-backend-build.log",
+    "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "webProductionBuild": {
+    "logPath": "/private/tmp/creator-w8-integrated-web-build.log",
+    "sha256": "07c3e807eaad6b310f59405c61f1646f994337f8363440308a3cad0fdc1aa125"
+  },
+  "iosShippingBuild": {
+    "logPath": "/private/tmp/creator-w8-integrated-ios-build.log",
+    "sha256": "bf7274d4986ce8d49e6a88e96f438bc1ac2c691c32ad6ad955363a793860f6cb"
+  },
+  "androidShippingBuild": {
+    "logPath": "/private/tmp/creator-w8-integrated-android-build.log",
+    "sha256": "c3d8f425c6bb43d1b456d0f52616ba6113de41abe47694df36cfa35bc5ea7bc1"
+  },
+  "lint": {
+    "logPath": "/private/tmp/creator-w8-integrated-lint.log",
+    "sha256": "c6c4b725b7860cec20bca1c59d73a2bc21483bcdd227bf52f856967ca122f448"
+  },
+  "format": {
+    "logPath": "/private/tmp/creator-w8-integrated-format.log",
+    "sha256": "8488f5b2421bda28ce47eddc32b8fee98def934f4f8d9133c2fcf83cdb53727d"
+  },
+  "migrationReplay": {
+    "logPath": "/private/tmp/creator-w8-integrated-migration-recheck.log",
+    "sha256": "abd7ce10672933b44f078e7f9d868a098ea4b84d7732bcc60d5728413350f2d1"
+  },
+  "existingContracts": {
+    "logPath": "/private/tmp/creator-w8-integrated-existing-contracts.log",
+    "sha256": "e6576f37aa082244e1f574535680efdf9616db2f05f62afbc536a08e51ecfa04"
+  },
+  "outcomes": {
+    "backend": "passed",
+    "web": "passed",
+    "ios": "BUILD SUCCEEDED; ad-hoc signed Simulator SDK26.5",
+    "android": "BUILD SUCCESSFUL;37 tasks;341 seconds",
+    "lint": "passed",
+    "format": "passed",
+    "migrations": "40 existing entries checked; no DDL replay",
+    "existingContracts": "8 passed;1 unchanged invalid-C11-context expected-status failure",
+    "nativeInteraction": "not established by compilation",
+    "paidAICalls": 0
+  },
+  "androidAPK": {
+    "path": "/private/tmp/creator-w8-integrated-android/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "4bed793789d190f53cf838544b071ec38d20bcf37c846f90952b9071e8fb118c",
+    "bytes": 12768221
+  }
+}

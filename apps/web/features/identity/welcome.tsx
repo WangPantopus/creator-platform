@@ -57,10 +57,24 @@ export function IdentityWelcome({
         )}
         {error && (
           <div>
-            <Notice tone="error" title={copy.pantopusUnavailableTitle}>
+            <Notice
+              tone="error"
+              title={
+                error === "invalid_return"
+                  ? "Arrival link unavailable"
+                  : error === "continuation_expired"
+                    ? "Sign-in request expired"
+                    : error === "continuation_failed"
+                      ? "Sign-in could not complete"
+                      : copy.pantopusUnavailableTitle
+              }
+            >
               {error === "invalid_return"
                 ? "This arrival link is unavailable. You can continue to Home."
-                : copy.pantopusUnavailable}
+                : error === "continuation_expired" ||
+                    error === "continuation_failed"
+                  ? "Start again to return to your saved destination."
+                  : copy.pantopusUnavailable}
             </Notice>
           </div>
         )}

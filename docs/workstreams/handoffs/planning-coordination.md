@@ -1,7 +1,5 @@
 # Planning and coordination handoff
 
-> Checkpoint update: the founder subsequently authorized a combined implementation commit. Read [implementation-checkpoint.md](implementation-checkpoint.md) and resume from `codex/foundation-integrations-checkpoint` or a later reviewed integration revision. Earlier documentation-only/uncommitted descriptions below are historical.
-
 Prepared 2026-09-29 (America/Los_Angeles). This is the original planning/foundation session, not an assignment to W1–W8. The successor continues coordination and delivery tracking; the eight domain owners retain their implementation responsibilities.
 
 ## Original assignment and authoritative references

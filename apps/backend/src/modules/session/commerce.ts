@@ -6,6 +6,7 @@ import type { CallProvider } from "./provider.js";
 import { AvailabilityService } from "./availability.js";
 import { SessionService } from "./service.js";
 import { SessionWorker, type CallEffects } from "./worker.js";
+import type { CreatorIdentityAuthority } from "../identity/creator-scope.js";
 
 /** W1/W8 compose this only after allocating availability, approving grace policy and configuring providers.
  * C06 schedules W4's captured obligation; C07 always delegates settlement to W4's durable consumer.
@@ -16,8 +17,12 @@ export function createCommerceCallServices(input: {
   provider: CallProvider;
   graceSeconds: number;
   effects: Omit<Partial<CallEffects>, "settleEvidence">;
+  creatorIdentity?: CreatorIdentityAuthority;
 }) {
-  const availability = new AvailabilityService(input.database);
+  const availability = new AvailabilityService(
+    input.database,
+    input.creatorIdentity,
+  );
   const sessions = new SessionService(
     input.database,
     new CommerceScheduling(input.graceSeconds),

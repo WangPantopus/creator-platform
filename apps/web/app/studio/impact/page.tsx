@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
 import { growthRequest } from "../../../features/growth/server";
 export const dynamic = "force-dynamic";
@@ -16,8 +17,8 @@ export default async function Impact() {
     return (
       <GrowthShell>
         <section className="growth-stack growth-invite qv-on-maya">
-          <span className="growth-meta">YOUR WEEK · IMPACT</span>
-          <h1>The people you helped this week.</h1>
+          <span className="growth-meta">{growthCopy.growthYourWeekImpact}</span>
+          <h1>{growthCopy.growthThePeopleYouHelpedThisWeek}</h1>
           {impact ? (
             <>
               <div
@@ -28,10 +29,10 @@ export default async function Impact() {
                 }}
               >
                 {[
-                  [impact.ai_conversations, "AI conversations"],
-                  [impact.personal_replies, "Personal replies"],
-                  [impact.thanks_count, "Thanks"],
-                  [impact.notes, "Notes"],
+                  [impact.ai_conversations, growthCopy.growthAiConversations],
+                  [impact.personal_replies, growthCopy.growthPersonalReplies],
+                  [impact.thanks_count, growthCopy.growthThanks],
+                  [impact.notes, growthCopy.navNotes],
                 ].map(([n, label]) => (
                   <div key={String(label)}>
                     <strong
@@ -56,14 +57,17 @@ export default async function Impact() {
                 </blockquote>
               ))}
               <p className="growth-help">
-                Seven days from {impact.window_start.slice(0, 10)}. Thanks
-                appear only when fans choose to share them.
+                {growthFormat(
+                  "growthSevenDaysFromThanksAppearOnlyWhenFansChooseTo",
+                  { value1: impact.window_start.slice(0, 10) },
+                )}
               </p>
             </>
           ) : (
-            <NoData title="Your first digest is on its way">
-              A weekly digest appears when the activity and consented Thanks
-              sources are connected. No activity is inferred.
+            <NoData title={growthCopy.growthYourFirstDigestIsOnItsWay}>
+              {
+                growthCopy.growthAWeeklyDigestAppearsWhenTheActivityAndConsentedThanks
+              }
             </NoData>
           )}
         </section>

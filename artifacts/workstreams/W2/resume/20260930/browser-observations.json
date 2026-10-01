@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "pipelineRevision": "w2-context-guardrails-8",
+  "revision": 13,
+  "phone": {
+    "viewport": {
+      "width": 390,
+      "height": 1300
+    },
+    "scrollWidth": 390,
+    "themes": ["light", "night"]
+  },
+  "desktop": {
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "scrollWidth": 1280
+  },
+  "dialog": {
+    "action": "Pause my AI",
+    "escapeClosed": true,
+    "focusReturnedTo": "Pause my AI"
+  },
+  "screensReviewed": [
+    "My AI",
+    "Sources",
+    "Style",
+    "Test",
+    "License",
+    "Onboard",
+    "Interview"
+  ],
+  "consoleErrorsSinceFinalReload": [],
+  "historicalPipeline8Refusal": {
+    "text": "I'm sorry, but I can't share that information.",
+    "durationMs": 2883,
+    "firstApprovedMs": 2879,
+    "costMicros": 1917,
+    "omittedRequiredRedirect": true
+  },
+  "currentPipeline": "w2-context-guardrails-9"
+}

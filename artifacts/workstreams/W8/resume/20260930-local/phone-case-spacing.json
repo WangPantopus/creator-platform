@@ -1,0 +1,54 @@
+{
+  "sourceParent": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "sourceDelta": {
+    "path": "apps/web/app/ops/trust.css",
+    "sha256": "4ca802a680aa0067b3f1c9b85ab3dbbd754e8331ad625deaf38b92b5db371673",
+    "bytes": 8328
+  },
+  "observed": "Reported-author label crowded its AI value in the original390 case capture. Phone-only16px column gap plus long-text wrapping corrected it.",
+  "actualBrowser": {
+    "caseId": "030868cc-e778-4fca-8731-02a4c817fcfa",
+    "state": "resolved",
+    "themes": [
+      "light",
+      "night"
+    ],
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "columnGapPx": 16,
+    "lightReportedAuthorTermHeightPx": 22,
+    "lightValueColumnGapPx": 16,
+    "scopedLeaseRenewed": true,
+    "viewportResetConfirmed": {
+      "width": 1280,
+      "height": 720
+    },
+    "temporaryTabCleanup": "Interrupted tab8 close operation timed out; user tab1 untouched. Fresh active tab9 marked for handoff; no OS/debugger cleanup bypass."
+  },
+  "screenshots": {
+    "light": {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/scoped-report-case-spacing-light-390.jpg",
+      "sha256": "6728b452aa42670b8943a67bd75e36508580143f27ed134260f2dc5599129bb4",
+      "bytes": 93629
+    },
+    "night": {
+      "path": "artifacts/workstreams/W8/resume/20260930-local/scoped-report-case-spacing-night-390.jpg",
+      "sha256": "99c334b70730e1e53019d9bb82136b62fd12a0fb21e180e1eec25cd645d93213",
+      "bytes": 92682
+    }
+  },
+  "productionWebBuild": {
+    "path": "/private/tmp/creator-w8-phone-spacing-web-build.log",
+    "sha256": "974dd4a3b6e77d4bab1a8ba811f9e9fcf756b6f803efa7db51d0ad118c4780de",
+    "bytes": 2598
+  },
+  "format": "Scoped Prettier check passed",
+  "limitations": [
+    "Partial geometry/UI proof; no complete reference/200%/screen-reader/native certification.",
+    "Backend/API/image source stays da03bb7; native source stays matched to8636dd7 whole builds.",
+    "No new test/golden, raw export, credential or paid call."
+  ]
+}

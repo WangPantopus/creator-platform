@@ -18,6 +18,14 @@ import { IdentityProfiles } from "./modules/identity/profiles.js";
 import { PasskeyService } from "./modules/identity/passkeys.js";
 import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
+import { createTrustRuntime } from "./operations/runtime.js";
+import { resolveActor } from "./modules/identity/adapter.js";
+import { DomainError } from "./core/errors.js";
+import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
+import {
+  AudienceIdentityAuthority,
+  type AudienceRestriction,
+} from "./modules/identity/audience-scope.js";
 
 export type BackendRuntime = {
   pool: pg.Pool;
@@ -25,13 +33,22 @@ export type BackendRuntime = {
   access: AccessService;
   conversation: ConversationService;
   identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
-  assertActorAllowed?: (
+  audienceIdentity?: AudienceIdentityAuthority;
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
-  assertScopeAllowed?: ScopeRestriction;
-  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  assertScopeAllowed: ScopeRestriction;
+  assertCreatorAllowed: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
   configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
 };
+type TrustConfiguration = Omit<
+  Parameters<typeof createTrustRuntime>[0],
+  "actor" | "origin"
+>;
 
 /** Pantopus host imports this seam; adapter code is never inferred from a session token. */
 export async function createConfiguredBackend(input: {
@@ -50,35 +67,80 @@ export async function createConfiguredBackend(input: {
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
-  /** Published W1 caller-held denial authority; absence keeps held operations
-   * unavailable rather than substituting an independent scope read. */
+  /** Genuine current denial on the caller-held non-owner core transaction. */
   assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  /** Held-client, purpose-specific content denial; never substitute a thread. */
+  assertAudienceAllowed?: AudienceRestriction;
+  assertCreatorAllowed?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
+  trust?:
+    | TrustConfiguration
+    | ((runtime: BackendRuntime) => Promise<TrustConfiguration>);
 }) {
   if (!input.config.featureEnabled || !input.config.databaseUrl)
     throw new Error(
       "Enable the feature and provide a non-owner runtime DATABASE_URL.",
     );
-  if (input.identity.mode !== "development") {
-    if (!input.config.identitySessionKey)
-      throw new Error(
-        "Configured Pantopus identity requires canonical session custody.",
-      );
-    if (
-      typeof input.assertActorAllowed !== "function" ||
-      typeof input.assertScopeAllowed !== "function" ||
-      typeof input.assertScopeAllowedInTransaction !== "function"
-    )
-      throw new Error(
-        "Configured Pantopus identity requires current account, thread and caller-held trust denials.",
-      );
-  }
+  if (input.trust && input.identity.mode === "development")
+    throw new Error(
+      "Deployed trust requires the configured Pantopus identity adapter.",
+    );
+  if (
+    input.identity.mode !== "development" &&
+    !input.trust &&
+    !(input.assertActorAllowed && input.assertScopeAllowed)
+  )
+    throw new Error(
+      "Configured identity requires both trust denial callbacks or a composed trust runtime.",
+    );
+  if (
+    input.identity.mode !== "development" &&
+    (!input.config.identitySessionKey ||
+      typeof input.assertScopeAllowedInTransaction !== "function")
+  )
+    throw new Error(
+      "Configured identity requires canonical session custody and current caller-held trust denials.",
+    );
   const pool = new pg.Pool({
     connectionString: input.config.databaseUrl,
     max: 20,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
   });
-  const database = new Database(pool, undefined, input.assertScopeAllowed);
+  let trust: Awaited<ReturnType<typeof createTrustRuntime>> | undefined;
+  const assertScopeAllowed: ScopeRestriction = async (...scope) => {
+    if (
+      !input.assertScopeAllowed &&
+      !trust &&
+      input.identity.mode !== "development"
+    )
+      throw new DomainError(
+        "trust_unconfigured",
+        "Current thread denial authority is unavailable.",
+        503,
+      );
+    await input.assertScopeAllowed?.(...scope);
+    await trust?.assertScopeAllowed(...scope);
+  };
+  const assertActorAllowed = async (
+    actor: import("./modules/identity/adapter.js").Actor,
+  ) => {
+    if (
+      !input.assertActorAllowed &&
+      !trust &&
+      input.identity.mode !== "development"
+    )
+      throw new DomainError(
+        "trust_unconfigured",
+        "Current account denial authority is unavailable.",
+        503,
+      );
+    await input.assertActorAllowed?.(actor);
+    await trust?.assertActorAllowed(actor);
+  };
+  const database = new Database(pool, undefined, assertScopeAllowed);
   try {
     await database.assertRuntimeRole();
   } catch (error) {
@@ -88,7 +150,7 @@ export async function createConfiguredBackend(input: {
   const access = new AccessService(
     pool,
     undefined,
-    input.assertScopeAllowed,
+    assertScopeAllowed,
     input.assertScopeAllowedInTransaction,
   );
   const conversation = new ConversationService(
@@ -126,40 +188,90 @@ export async function createConfiguredBackend(input: {
       }
     : undefined;
   let features: readonly FeatureRegistration[];
+  const backendRuntime: BackendRuntime = {
+    pool,
+    database,
+    access,
+    conversation,
+    identity: platformIdentity,
+    ...(input.assertAudienceAllowed && platformIdentity
+      ? {
+          audienceIdentity: new AudienceIdentityAuthority(pool, {
+            mode: platformIdentity.sessions.mode,
+            assertAllowed: input.assertAudienceAllowed,
+          }),
+        }
+      : {}),
+    assertActorAllowed,
+    assertScopeAllowed,
+    ...(input.assertScopeAllowedInTransaction
+      ? {
+          assertScopeAllowedInTransaction:
+            input.assertScopeAllowedInTransaction,
+        }
+      : {}),
+    assertCreatorAllowed: async (actor, creatorId) => {
+      await assertActorAllowed(actor);
+      if (input.assertCreatorAllowed)
+        await input.assertCreatorAllowed(actor, creatorId);
+      else if (!trust && input.identity.mode !== "development")
+        throw new DomainError(
+          "creator_denial_unconfigured",
+          "Creator actions require their current trust authority.",
+          503,
+        );
+      await trust?.service.assertAllowed(actor, creatorId);
+    },
+    configureSignedSubjects: (policies) => {
+      if (featuresConfigured)
+        throw new Error(
+          "Signed subjects must be installed during host composition.",
+        );
+      for (const policy of policies) {
+        if (subjects.some((current) => current.name === policy.name))
+          throw new Error("Duplicate signed-subject registration.");
+        subjects.push(policy);
+      }
+    },
+  };
   try {
-    features =
-      (await input.registerFeatures?.({
-        pool,
-        database,
-        access,
-        conversation,
-        identity: platformIdentity,
-        ...(input.assertActorAllowed
-          ? { assertActorAllowed: input.assertActorAllowed }
-          : {}),
-        ...(input.assertScopeAllowed
-          ? { assertScopeAllowed: input.assertScopeAllowed }
-          : {}),
-        ...(input.assertScopeAllowedInTransaction
-          ? {
-              assertScopeAllowedInTransaction:
-                input.assertScopeAllowedInTransaction,
-            }
-          : {}),
-        configureSignedSubjects: (policies) => {
-          if (featuresConfigured)
-            throw new Error(
-              "Signed subjects must be installed during host composition.",
-            );
-          for (const policy of policies) {
-            if (subjects.some((current) => current.name === policy.name))
-              throw new Error("Duplicate signed-subject registration.");
-            subjects.push(policy);
-          }
+    if (input.trust) {
+      const configuration =
+        typeof input.trust === "function"
+          ? await input.trust(backendRuntime)
+          : input.trust;
+      const privacyAuthority = platformIdentity
+        ? trustIdentityAuthority(pool, platformIdentity, access, database)
+        : {};
+      trust = await createTrustRuntime({
+        ...configuration,
+        dependencies: {
+          ...privacyAuthority,
+          ...configuration.dependencies,
+          privacyVerificationMethod: configuration.dependencies.verifyPrivacy
+            ? (configuration.dependencies.privacyVerificationMethod ??
+              "external_receipt")
+            : privacyAuthority.privacyVerificationMethod,
         },
-      })) ?? [];
+        origin: input.config.allowedOrigin,
+        actor: async (request) => {
+          const token =
+            request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+          if (!token)
+            throw new DomainError(
+              "session_required",
+              "Continue with Pantopus to use this app.",
+              401,
+            );
+          return resolveActor(sessions ?? input.identity, token);
+        },
+      });
+    }
+    features = (await input.registerFeatures?.(backendRuntime)) ?? [];
     featuresConfigured = true;
+    Object.freeze(subjects);
   } catch (error) {
+    await trust?.stop();
     await pool.end();
     throw error;
   }
@@ -172,14 +284,15 @@ export async function createConfiguredBackend(input: {
       signing,
       generationAvailable: false,
       features,
+      ...(trust
+        ? { trustRouter: trust.router, telemetry: trust.telemetry }
+        : {}),
+      assertActorAllowed,
       ...(input.stripeNotifications
         ? { stripeNotifications: input.stripeNotifications }
         : {}),
       ...(input.storeNotifications
         ? { storeNotifications: input.storeNotifications }
-        : {}),
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
         : {}),
     }),
   );
@@ -190,21 +303,22 @@ export async function createConfiguredBackend(input: {
     conversation,
     input.config.allowedOrigin,
     {
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
-        : {}),
+      assertActorAllowed,
       ...(sessions
         ? { resolveSession: (token: string) => sessions.resolve(token) }
         : {}),
     },
   );
+  await trust?.start();
   return {
     server,
     pool,
     identity: platformIdentity,
+    trust,
     close: async () => {
       for (const connection of sockets.clients)
         connection.close(1001, "Server shutdown");
+      await trust?.stop();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),
       );

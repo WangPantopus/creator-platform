@@ -292,3 +292,4 @@ struct CommerceFeature: View {
     private func when(_ value: String?) -> String { guard let value else { return "—" }; guard let date = instant(value) else { return value }; return date.formatted(date: .abbreviated, time: .shortened) }
     private func outcome(_ packet: CommercePacket) -> String { ["released":"Hold released · nothing charged", "failed":"Payment failed · nothing charged", "unknown":"Confirming payment", "requires_action":"Payment authentication needed", "refund_pending":"Refund processing", "refunded":"Refund confirmed"][packet.payment_state] ?? (packet.delivered_at != nil || packet.commitment_state == "delivered" ? "Delivered" : packet.state.replacingOccurrences(of: "_", with: " ")) }
 }
+

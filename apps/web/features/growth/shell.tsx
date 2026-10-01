@@ -1,3 +1,5 @@
+import { growthLabel } from "./copy";
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
 import { EmptyState, Notice, glyphs } from "@qelvora/ui-web";
 import { GrowthUnavailable } from "./server";
@@ -18,12 +20,14 @@ export function GrowthShell({
     <main className={`growth ${studio ? "growth-studio" : ""}`}>
       {studio ? (
         <aside className="growth-sidebar">
-          <span className="growth-wordmark">{brand.name} Studio</span>
-          <a href="/studio/insights">Insights</a>
-          <a href="/studio/impact">Impact</a>
-          <a href="/studio/activation">First 72 hours</a>
-          <a href="/studio/launch">Launch kit</a>
-          <a href="/studio/measurement">Measurement</a>
+          <span className="growth-wordmark">
+            {growthFormat("growthStudio", { value1: brand.name })}
+          </span>
+          <a href="/studio/insights">{growthCopy.navInsights}</a>
+          <a href="/studio/impact">{growthCopy.growthImpact}</a>
+          <a href="/studio/activation">{growthCopy.growthFirst72Hours}</a>
+          <a href="/studio/launch">{growthCopy.growthLaunchKit}</a>
+          <a href="/studio/measurement">{growthCopy.growthMeasurement}</a>
         </aside>
       ) : null}
       <div
@@ -36,13 +40,20 @@ export function GrowthShell({
       >
         {dev ? (
           <div className="growth-dev">
-            Development environment · synthetic data · providers unavailable ·{" "}
-            <a href="/growth-development">Development controls</a>
+            {
+              growthCopy.growthDevelopmentEnvironmentSyntheticDataProvidersUnavailable
+            }{" "}
+            <a href="/growth-development">
+              {growthCopy.growthDevelopmentControls}
+            </a>
           </div>
         ) : null}
         {children}
         {!studio ? (
-          <nav className="qv qv-tabbar growth-nav" aria-label="Main">
+          <nav
+            className="qv qv-tabbar growth-nav"
+            aria-label={growthCopy.growthMainNavigation}
+          >
             {[
               ["Home", "/home", glyphs.home],
               ["Discover", "/discover", glyphs.compass],
@@ -56,7 +67,7 @@ export function GrowthShell({
                 href={String(href)}
               >
                 {typeof icon === "function" ? icon(22) : null}
-                {String(label)}
+                {growthLabel(String(label))}
               </a>
             ))}
           </nav>
@@ -73,14 +84,16 @@ export function Failure({
   returnTo?: string;
 }) {
   const message =
-    error instanceof Error ? error.message : "This feature is unavailable.";
+    error instanceof Error
+      ? error.message
+      : growthCopy.growthThisFeatureIsUnavailable;
   return (
     <div className="growth-stack">
       <Notice
         title={
           error instanceof GrowthUnavailable && error.status === 401
-            ? "Sign in to continue"
-            : "Temporarily unavailable"
+            ? growthCopy.growthSignInToContinue
+            : growthCopy.growthTemporarilyUnavailable
         }
       >
         {message}
@@ -94,8 +107,8 @@ export function Failure({
         }
       >
         {error instanceof GrowthUnavailable && error.status === 401
-          ? "Continue with Pantopus"
-          : "Try again"}
+          ? growthCopy.continueWithPantopus
+          : growthCopy.growthTryAgain}
       </a>
     </div>
   );

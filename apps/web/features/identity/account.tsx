@@ -1,82 +1,31 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Notice } from "@qelvora/ui-web";
-import { SessionSchema, type Session } from "@qelvora/api";
+import { announceSessionEnd, useIdentityRequest } from "./session-boundary";
 
-export function AccountPanel({ initial }: { initial: Session }) {
-  const [session, setSession] = useState(initial);
+export function AccountPanel() {
+  const identity = useIdentityRequest();
+  const session = identity.session;
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const returnTo = "/identity/account";
-  useEffect(() => {
-    let active = true;
-    let checking = false;
-    const check = async () => {
-      if (checking) return;
-      checking = true;
-      try {
-        const response = await fetch("/api/platform/identity/session", {
-          cache: "no-store",
-          signal: AbortSignal.timeout(10000),
-        });
-        if (response.status === 401) {
-          setSession({ ...initial, fan: null, creator: null, teams: [] });
-          location.replace(
-            `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
-          );
-          return;
-        }
-        if (!response.ok)
-          throw new Error(
-            "Reconnect to refresh your account. Privileged actions remain checked by the server.",
-          );
-        const value = SessionSchema.parse(await response.json());
-        if (value.accountId !== initial.accountId) {
-          setSession({ ...initial, fan: null, creator: null, teams: [] });
-          location.replace(
-            `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
-          );
-          return;
-        }
-        if (active) {
-          setSession(value);
-          setError("");
-        }
-      } catch (error) {
-        if (active)
-          setError(
-            error instanceof Error
-              ? error.message
-              : "Reconnect to refresh your account.",
-          );
-      } finally {
-        checking = false;
-      }
-    };
-    const timer = setInterval(check, 4000);
-    return () => {
-      active = false;
-      clearInterval(timer);
-    };
-  }, [initial]);
   const act = async (path: string) => {
     if (busy) return;
     setBusy(true);
     setError("");
     try {
-      const response = await fetch(`/api/platform/identity/${path}`, {
+      const response = await identity.request(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: "{}",
         signal: AbortSignal.timeout(10000),
       });
-      if (!response.ok && response.status !== 401) {
+      if (!response.ok) {
         setError("Could not complete this action. Reconnect and try again.");
         return;
       }
-      if (path !== "refresh" || response.status === 401) {
-        setSession({ ...initial, fan: null, creator: null, teams: [] });
-        location.replace("/auth/continue");
+      if (path !== "refresh") {
+        announceSessionEnd();
+        identity.end();
       }
     } catch {
       setError(

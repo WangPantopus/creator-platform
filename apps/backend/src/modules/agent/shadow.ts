@@ -1,15 +1,18 @@
 import { randomUUID } from "node:crypto";
 import type { CreatorScope } from "./repository.js";
 import { AgentService } from "./service.js";
-import { versionRows } from "./repository.js";
+import { versionRow } from "./repository.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { ThreadSnapshot } from "./pipeline.js";
 import type { VersionComparison } from "../../../../../packages/api/src/agent/contracts.js";
 export interface PrivacyParaphrasePort {
-  verifiedParaphrases(
-    scope: CreatorScope,
-  ): Promise<
-    readonly { paraphrasedPrompt: string; sanitizerReference: string }[]
+  verifiedParaphrases(scope: CreatorScope): Promise<
+    readonly {
+      sampleId: string;
+      occurredAt: string;
+      paraphrasedPrompt: string;
+      sanitizerReference: string;
+    }[]
   >;
 }
 const synthetic: ThreadSnapshot = {
@@ -120,22 +123,46 @@ export class ShadowReplay {
       );
       let collected = 0;
       for (const sample of samples) {
+        const occurredAt = Date.parse(sample.occurredAt);
         invariant(
-          sample.sanitizerReference &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(
+            sample.sampleId,
+          ) &&
+            occurredAt >= Date.now() - 7 * 86400000 &&
+            occurredAt <= Date.now() &&
+            sample.sanitizerReference &&
             sample.paraphrasedPrompt.length >= 5 &&
             sample.paraphrasedPrompt.length <= 1000,
           "paraphrase_required",
           "Only verified privacy-safe paraphrases enter shadow replay.",
         );
         const inserted = await client.query(
-          "INSERT INTO creator.ai_shadow_sample(id,creator_id,paraphrased_prompt,sanitizer_reference,expires_at) SELECT $1,$2,$3,$4,now()+interval '30 days' WHERE NOT EXISTS(SELECT 1 FROM creator.ai_shadow_sample WHERE creator_id=$2 AND sanitizer_reference=$4 AND paraphrased_prompt=$3)",
+          "INSERT INTO creator.ai_shadow_sample(id,creator_id,paraphrased_prompt,sanitizer_reference,created_at,expires_at) VALUES($1,$2,$3,$4,$5,$5::timestamptz+interval '30 days') ON CONFLICT(id) DO NOTHING",
           [
-            randomUUID(),
+            sample.sampleId,
             scope.creatorId,
             sample.paraphrasedPrompt,
             sample.sanitizerReference,
+            sample.occurredAt,
           ],
         );
+        if (!inserted.rowCount) {
+          const existing = await client.query(
+            "SELECT 1 FROM creator.ai_shadow_sample WHERE id=$1 AND creator_id=$2 AND paraphrased_prompt=$3 AND sanitizer_reference=$4 AND created_at=$5",
+            [
+              sample.sampleId,
+              scope.creatorId,
+              sample.paraphrasedPrompt,
+              sample.sanitizerReference,
+              sample.occurredAt,
+            ],
+          );
+          invariant(
+            existing.rowCount === 1,
+            "shadow_sample_conflict",
+            "A sanitizer sample ID cannot be reused for different material.",
+          );
+        }
         collected += inserted.rowCount ?? 0;
       }
       await client.query(
@@ -173,8 +200,10 @@ export class ShadowReplay {
             "draft_changed",
             "Refresh this draft before shadow replay.",
           );
-          const live = (await versionRows(client, scope.creatorId)).find(
-            (v) => v.id === workspace.live_version_id,
+          const live = await versionRow(
+            client,
+            scope.creatorId,
+            workspace.live_version_id,
           );
           invariant(
             live,
@@ -207,6 +236,7 @@ export class ShadowReplay {
         signal.throwIfAborted();
         const base = {
           scope,
+          usageCategory: "shadow" as const,
           creatorName: start.snapshot.creatorName,
           status: start.snapshot.status,
           sponsors: start.snapshot.sponsors,
@@ -306,8 +336,10 @@ export class ShadowReplay {
           );
           const id = jobId ?? randomUUID();
           const passed = comparisons.every((c) => c.draft.score.passed);
-          await client.query(
-            "INSERT INTO creator.ai_shadow_evaluation(id,creator_id,fingerprint,live_version_id,results,state) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(id) DO UPDATE SET results=excluded.results,state=excluded.state,error=NULL,updated_at=now() WHERE creator.ai_shadow_evaluation.creator_id=excluded.creator_id AND creator.ai_shadow_evaluation.fingerprint=excluded.fingerprint",
+          const finalized = await client.query(
+            jobId
+              ? "UPDATE creator.ai_shadow_evaluation SET results=$5,state=$6,error=NULL,updated_at=now() WHERE id=$1 AND creator_id=$2 AND fingerprint=$3 AND live_version_id=$4 AND state='running' RETURNING id"
+              : "INSERT INTO creator.ai_shadow_evaluation(id,creator_id,fingerprint,live_version_id,results,state) VALUES($1,$2,$3,$4,$5,$6) RETURNING id",
             [
               id,
               scope.creatorId,
@@ -316,6 +348,11 @@ export class ShadowReplay {
               JSON.stringify(comparisons),
               passed ? "passed" : "failed",
             ],
+          );
+          invariant(
+            finalized.rowCount === 1,
+            "comparison_expired",
+            "This comparison stopped or expired. Run it again.",
           );
           return { id, passed, comparisons };
         },

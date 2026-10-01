@@ -1,0 +1,1020 @@
+diff --git a/.gitignore b/.gitignore
+index 2ae9dad..ccc89db 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,2 +1,22 @@
+ design/design-system/rendercheck/
+ __pycache__/
++node_modules/
++.next/
++.turbo/
++dist/
++.env
++.env.*
++!.env.example
++.build/
++.swiftpm/
++xcuserdata/
++DerivedData/
++*.xcresult/
++.gradle/
++build/
++local.properties
++test-results/
++playwright-report/
++tmp/
++.DS_Store
++*.tsbuildinfo
+diff --git a/README.md b/README.md
+index dcab616..f1dbabb 100644
+--- a/README.md
++++ b/README.md
+@@ -10,14 +10,29 @@ person.
+ "Qelvora" is a placeholder name; see [docs/NAMING.md](docs/NAMING.md) for how to
+ replace it.
+ 
++## Development
++
++Start parallel product work from the [eight-workstream delivery plan](docs/workstreams/README.md).
++It contains agent assignments, full-scope coverage, ownership/contracts, runtime
++verification standards, and current founder decisions that supersede older build instructions.
++
++The implementation uses Node.js, Next.js, native SwiftUI and native Kotlin/Compose.
++Run `pnpm install && pnpm dev` for the local web/backend hosts. The design review
++catalog is at `/design`; authentication and providers remain unconfigured until
++their adapters are connected.
++
++See [foundation setup](docs/implementation/FOUNDATION.md),
++[build status](docs/BUILD_LOG.md), and [visual evidence](docs/implementation/design-verification.md)
++for what is implemented, what was tested and the remaining product stages.
++
+ ## Repository
+ 
+-| Path | Contents |
+-| --- | --- |
+-| [docs/BRIEF.md](docs/BRIEF.md) | The design brief: a condensed summary of the product, identity system, screens, copy and decisions |
+-| [docs/DESIGN_PLAN.md](docs/DESIGN_PLAN.md) | The design plan and progress |
+-| [docs/NAMING.md](docs/NAMING.md) | Placeholder-name rules and the rename checklist |
+-| [docs/source/](docs/source/) | The source documents: Product Design, Domain Model and Behavioral Contract, System Architecture, and the Second Review |
+-| [docs/research/](docs/research/) | Phase 1 UX research, exported from the [research doc](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803) |
+-| [design/phase2-directions/](design/phase2-directions/) | Phase 2 visual directions, from the [directions canvas](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su) |
+-| [design/design-system/](design/design-system/) | Phase 3 design system in direction D · Atelier, from the [Qelvora design system](https://claude.ai/artifact/AyfModKVToY2VeqMACNxFU) |
++| Path                                                   | Contents                                                                                                                            |
++| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
++| [docs/BRIEF.md](docs/BRIEF.md)                         | The design brief: a condensed summary of the product, identity system, screens, copy and decisions                                  |
++| [docs/DESIGN_PLAN.md](docs/DESIGN_PLAN.md)             | The design plan and progress                                                                                                        |
++| [docs/NAMING.md](docs/NAMING.md)                       | Placeholder-name rules and the rename checklist                                                                                     |
++| [docs/source/](docs/source/)                           | The source documents: Product Design, Domain Model and Behavioral Contract, System Architecture, and the Second Review              |
++| [docs/research/](docs/research/)                       | Phase 1 UX research, exported from the [research doc](https://claude.ai/code/artifact/11bc3a89-d2f4-4399-8e3b-ecfbb2c6f803)         |
++| [design/phase2-directions/](design/phase2-directions/) | Phase 2 visual directions, from the [directions canvas](https://claude.ai/artifact/MyZ9H9crjcdKqE196Pk6su)                          |
++| [design/design-system/](design/design-system/)         | Phase 3 design system in direction D · Atelier, from the [Qelvora design system](https://claude.ai/artifact/AyfModKVToY2VeqMACNxFU) |
+diff --git a/design/handoff/tokens.json b/design/handoff/tokens.json
+index d468ac2..42a3dad 100644
+--- a/design/handoff/tokens.json
++++ b/design/handoff/tokens.json
+@@ -105,7 +105,7 @@
+         "name": "maya-surface",
+         "value": {
+           "light": "#1C1B19",
+-          "night": "#2B211A"
++          "night": "#EDE3D3"
+         },
+         "usage": "The creator's surface: her replies, Notes, corrections and anything else she signs. Never used for the AI or the team."
+       },
+@@ -121,7 +121,7 @@
+         "name": "on-maya",
+         "value": {
+           "light": "#F4F1EA",
+-          "night": "#ECE6DA"
++          "night": "#231C16"
+         },
+         "usage": "Maya's words and primary text on maya-surface (12.6:1 or more)."
+       },
+@@ -129,7 +129,7 @@
+         "name": "on-maya-muted",
+         "value": {
+           "light": "#ABA8A1",
+-          "night": "#B3A99A"
++          "night": "#5E5246"
+         },
+         "usage": "Timestamps and secondary text on maya-surface (6.7:1 or more)."
+       },
+@@ -137,7 +137,7 @@
+         "name": "maya-accent",
+         "value": {
+           "light": "#EE8D5F",
+-          "night": "#E89A6E"
++          "night": "#8E3514"
+         },
+         "usage": "Maya's color on her own surface: her seal, the Signed marker and her label on maya-surface (6.9:1 or more)."
+       },
+@@ -145,7 +145,7 @@
+         "name": "on-maya-accent",
+         "value": {
+           "light": "#1C1B19",
+-          "night": "#14120F"
++          "night": "#FBF5EC"
+         },
+         "usage": "The initial inside a filled seal and text on a maya-accent fill."
+       },
+@@ -190,6 +190,43 @@
+         "name": "focus-on-maya",
+         "value": "{maya-accent}",
+         "usage": "Keyboard focus ring for controls sitting on maya-surface."
++      },
++      {
++        "name": "seal-fill",
++        "value": {
++          "light": "{maya-accent}",
++          "night": "#E89A6E"
++        },
++        "usage": "Creator seal on neutral surfaces; creator plates override with maya-accent."
++      },
++      {
++        "name": "seal-ink",
++        "value": {
++          "light": "{on-maya-accent}",
++          "night": "#14120F"
++        },
++        "usage": "Seal initial on neutral surfaces; creator plates override with on-maya-accent."
++      },
++      {
++        "name": "selected-surface",
++        "value": {
++          "light": "#FFFFFF",
++          "night": "{surface}"
++        },
++        "usage": "Neutral active segment, never the creator plate."
++      },
++      {
++        "name": "overlay-scrim",
++        "value": {
++          "light": "#1C1B1973",
++          "night": "#00000099"
++        },
++        "usage": "Scrim for the instructed overlay correction; derived from shadow-sheet neutral color."
++      },
++      {
++        "name": "plate-rule",
++        "value": "#FFFFFF",
++        "usage": "Original translucent white divider in CapacityHeader and ShareCard."
+       }
+     ]
+   },
+@@ -329,10 +366,259 @@
+             "lineHeight": "14px",
+             "fontWeight": 400,
+             "letterSpacing": "0.05em",
+-            "sample": "REQ-0412 · 14:38",
++            "sample": "REQ-0412 \u00b7 14:38",
+             "usage": "Timestamps, request IDs and uppercase meta lines."
+           }
+         ]
++      },
++      {
++        "name": "Component measurements",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "control-body",
++            "fontSize": "14px",
++            "lineHeight": "20px",
++            "fontWeight": 400
++          },
++          {
++            "name": "tab-label",
++            "fontSize": "11px",
++            "lineHeight": "16px",
++            "fontWeight": 600
++          }
++        ]
++      },
++      {
++        "name": "summary",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "summary",
++            "fontSize": "17px",
++            "lineHeight": "24px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "receipt-title",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "receipt-title",
++            "fontSize": "28px",
++            "lineHeight": "32px",
++            "fontWeight": 400,
++            "letterSpacing": "-0.01em"
++          }
++        ]
++      },
++      {
++        "name": "transcript-human",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "transcript-human",
++            "fontSize": "15px",
++            "lineHeight": "22px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "transcript-ai",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "transcript-ai",
++            "fontSize": "13px",
++            "lineHeight": "19px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "mono-caption",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "mono-caption",
++            "fontSize": "12px",
++            "lineHeight": "17px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "signing-title",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "signing-title",
++            "fontSize": "28px",
++            "lineHeight": "32px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "share-quote",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "share-quote",
++            "fontSize": "22px",
++            "lineHeight": "31px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "data-label",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "data-label",
++            "fontSize": "13px",
++            "lineHeight": "20px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "signing-label",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "signing-label",
++            "fontSize": "11px",
++            "lineHeight": "20px",
++            "fontWeight": 400,
++            "letterSpacing": "0.05em"
++          }
++        ]
++      },
++      {
++        "name": "email-brand",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "email-brand",
++            "fontSize": "22px",
++            "lineHeight": "26px",
++            "fontWeight": 400,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "Sidebar brand",
++        "family": "serif",
++        "styles": [
++          {
++            "name": "sidebar-brand",
++            "fontSize": "14px",
++            "lineHeight": "18px",
++            "fontWeight": 400
++          }
++        ]
++      },
++      {
++        "name": "citation-stamp",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "citation-stamp",
++            "fontSize": "10px",
++            "lineHeight": "10px",
++            "fontWeight": 500,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "access-term",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "access-term",
++            "fontSize": "11px",
++            "lineHeight": "20px",
++            "fontWeight": 400,
++            "letterSpacing": "0.05em"
++          }
++        ]
++      },
++      {
++        "name": "mode-title",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "mode-title",
++            "fontSize": "15px",
++            "lineHeight": "20px",
++            "fontWeight": 600,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "control-compact",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "control-compact",
++            "fontSize": "13px",
++            "lineHeight": "20px",
++            "fontWeight": 600,
++            "letterSpacing": "0em"
++          }
++        ]
++      },
++      {
++        "name": "badge",
++        "family": "mono",
++        "styles": [
++          {
++            "name": "badge",
++            "fontSize": "11px",
++            "lineHeight": "14px",
++            "fontWeight": 500,
++            "letterSpacing": "0.04em"
++          }
++        ]
++      },
++      {
++        "name": "button-lg",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "button-lg",
++            "fontSize": "16px",
++            "lineHeight": "22px",
++            "fontWeight": 600
++          }
++        ]
++      },
++      {
++        "name": "context-body",
++        "family": "sans",
++        "styles": [
++          {
++            "name": "context-body",
++            "fontSize": "14px",
++            "lineHeight": "19px",
++            "fontWeight": 400
++          }
++        ]
+       }
+     ]
+   },
+@@ -461,5 +747,514 @@
+         "usage": "Bottom sheets and the signing sheet."
+       }
+     ]
++  },
++  "layout": {
++    "tokens": [
++      {
++        "name": "phone-width",
++        "value": "390px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "phone-height",
++        "value": "844px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "desktop-width",
++        "value": "1280px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "sidebar-width",
++        "value": "248px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-top",
++        "value": "64px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-bottom",
++        "value": "40px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-gap",
++        "value": "28px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-wordmark",
++        "value": "22px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-title",
++        "value": "44px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-title-line",
++        "value": "46px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-mark-width",
++        "value": "120px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "welcome-mark-height",
++        "value": "56px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "touch-target",
++        "value": "44px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "button-lg",
++        "value": "56px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "author-label-size",
++        "value": "12px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "author-label-line",
++        "value": "17px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "author-gap",
++        "value": "6px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "message-max-width",
++        "value": "334px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "fan-message-max-width",
++        "value": "286px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "message-padding",
++        "value": "14px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "note-fold",
++        "value": "28px",
++        "usage": "Exact reference measurement from Welcome.dc.html or components/bundle.css."
++      },
++      {
++        "name": "hairline",
++        "value": "1px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "glyph-size",
++        "value": "22px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "avatar-size",
++        "value": "38px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "segment-height",
++        "value": "40px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "segment-radius",
++        "value": "10px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "sidebar-min-height",
++        "value": "600px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "dialog-width",
++        "value": "340px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "dialog-padding",
++        "value": "22px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "toast-width",
++        "value": "358px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "sheet-grabber-width",
++        "value": "38px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "sheet-grabber-height",
++        "value": "5px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "sheet-grabber-radius",
++        "value": "3px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "skeleton-width",
++        "value": "300px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "skeleton-label-width",
++        "value": "88px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "skeleton-bubble-height",
++        "value": "72px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "skeleton-radius",
++        "value": "6px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "avatar-radius",
++        "value": "11px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "strip-min-height",
++        "value": "42px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "strip-box-radius",
++        "value": "7px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "glyph-small",
++        "value": "12px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "glyph-caption",
++        "value": "13px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "glyph-inline",
++        "value": "14px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "seal-step",
++        "value": "30px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "seal-reaction",
++        "value": "22px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "seal-presence",
++        "value": "18px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "chip-radius",
++        "value": "10px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "citation-stamp-width",
++        "value": "34px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "citation-stamp-height",
++        "value": "26px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "citation-stamp-size",
++        "value": "10px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "access-term-width",
++        "value": "96px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "checkbox-size",
++        "value": "20px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "limit-radio-size",
++        "value": "18px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "include-row-height",
++        "value": "52px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "request-dot-size",
++        "value": "9px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "request-dot-inset",
++        "value": "3px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "request-dot-stroke",
++        "value": "1.5px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "receipt-max-width",
++        "value": "460px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "receipt-padding-x",
++        "value": "28px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "receipt-padding-y",
++        "value": "26px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "receipt-radius",
++        "value": "6px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "composer-bottom",
++        "value": "28px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "composer-gap",
++        "value": "10px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "composer-input-height",
++        "value": "48px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-width",
++        "value": "3px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-gap",
++        "value": "2px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-radius",
++        "value": "2px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "share-size",
++        "value": "340px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "share-padding",
++        "value": "26px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "share-gap",
++        "value": "18px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "countdown-height",
++        "value": "26px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "call-person-height",
++        "value": "40px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "call-recording-height",
++        "value": "32px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "notification-radius",
++        "value": "11px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "signing-label-width",
++        "value": "88px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "transcript-label-width",
++        "value": "84px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "version-id-width",
++        "value": "36px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-8",
++        "value": "8px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-10",
++        "value": "10px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-12",
++        "value": "12px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-14",
++        "value": "14px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-16",
++        "value": "16px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-18",
++        "value": "18px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-20",
++        "value": "20px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-22",
++        "value": "22px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-24",
++        "value": "24px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "wave-bar-26",
++        "value": "26px",
++        "usage": "Exact native component measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "glow-opacity",
++        "value": "0.62",
++        "usage": "Exact unitless component value from the source reference bundle."
++      },
++      {
++        "name": "seal-font-ratio",
++        "value": "0.62",
++        "usage": "Exact unitless component value from the source reference bundle."
++      },
++      {
++        "name": "wave-opacity",
++        "value": "0.55",
++        "usage": "Exact unitless component value from the source reference bundle."
++      },
++      {
++        "name": "presence-line-opacity",
++        "value": "0.5",
++        "usage": "Exact unitless component value from the source reference bundle."
++      },
++      {
++        "name": "strip-glow-opacity",
++        "value": "0.24",
++        "usage": "Exact unitless component value from the source reference bundle."
++      },
++      {
++        "name": "capacity-rule-opacity",
++        "value": "0.09",
++        "usage": "Exact source creator-plate decorative divider opacity."
++      },
++      {
++        "name": "share-rule-opacity",
++        "value": "0.1",
++        "usage": "Exact source creator-plate decorative divider opacity."
++      },
++      {
++        "name": "strip-glow-x",
++        "value": "0.18",
++        "usage": "Exact reference human identity strip radial gradient scalar."
++      },
++      {
++        "name": "strip-glow-stop",
++        "value": "0.55",
++        "usage": "Exact reference human identity strip radial gradient scalar."
++      },
++      {
++        "name": "strip-glow-scale-x",
++        "value": "1.2",
++        "usage": "Exact reference human identity strip radial gradient scalar."
++      },
++      {
++        "name": "strip-glow-scale-y",
++        "value": "1.6",
++        "usage": "Exact reference human identity strip radial gradient scalar."
++      },
++      {
++        "name": "note-fold-opacity",
++        "value": "0.14",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "note-media-opacity",
++        "value": "0.18",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      },
++      {
++        "name": "note-media-height",
++        "value": "150px",
++        "usage": "Exact measurement from design-system/project/components/bundle.css."
++      }
++    ]
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/docs/BUILD_PROMPT.md b/docs/BUILD_PROMPT.md
+index f12014c..d4e0f39 100644
+--- a/docs/BUILD_PROMPT.md
++++ b/docs/BUILD_PROMPT.md
+@@ -1,5 +1,17 @@
+ # Build prompt for the development agent
+ 
++> Current execution instructions (2026-09-29): read
++> [the parallel workstream plan](workstreams/README.md) before using this prompt.
++> The founder now requires development in this standalone repository first,
++> Pantopus integration later, and feature verification in the running browser,
++> iOS Simulator and Android Emulator without writing new test code or pursuing
++> unit-test coverage. The plan supplies eight agent assignments and supersedes
++> conflicting repository-location/testing instructions below. Node.js, Next.js,
++> native Swift and native Kotlin, exact design fidelity, and replaceable naming
++> remain required. Each assigned agent must personally implement and verify its
++> stream; subagents may only research or check information. Use the
++> [eight paste-ready prompts](workstreams/prompts/README.md) for execution.
++
+ Copy everything below the line into the agent's first message. Give the agent
+ access to the `WangPantopus/creator-platform` repository (design and specs) and
+ the Pantopus monorepo (the backend it builds into).
+diff --git a/docs/NAMING.md b/docs/NAMING.md
+index 75f3bae..c289c8f 100644
+--- a/docs/NAMING.md
++++ b/docs/NAMING.md
+@@ -10,11 +10,11 @@ documents, and not a substring of any other word, so a case-sensitive
+ 
+ ## The three spellings
+ 
+-| Spelling | Used for | Examples |
+-| --- | --- | --- |
+-| `Qelvora` | Prose, UI copy, titles, designs | "Welcome to Qelvora", "Qelvora Studio" |
++| Spelling  | Used for                                                                         | Examples                                              |
++| --------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
++| `Qelvora` | Prose, UI copy, titles, designs                                                  | "Welcome to Qelvora", "Qelvora Studio"                |
+ | `qelvora` | Code identifiers, package names, URLs, file names, database schemas, CSS classes | `@pantopus/qelvora-web`, `qelvora.app`, `qelvora_api` |
+-| `QELVORA` | Environment variables and constants | `QELVORA_API_URL` |
++| `QELVORA` | Environment variables and constants                                              | `QELVORA_API_URL`                                     |
+ 
+ To rename, run three case-sensitive replacements (`Qelvora` → `NewName`,
+ `qelvora` → `newname`, `QELVORA` → `NEWNAME`) across the repository, or one
+@@ -23,6 +23,12 @@ folders whose names contain `qelvora`.
+ 
+ ## Rules that keep the replacement clean
+ 
++New implementation uses `config/brand.json` as its runtime brand source. Run
++`pnpm brand:rename NewName --dry-run` to preview a repository-wide rename, and
++`pnpm brand:rename NewName` to apply it in one command, including text filenames.
++Run `pnpm install && pnpm generate && pnpm check` afterward. The final product
++name is still undecided; Qelvora remains a temporary token.
++
+ 1. **One unbroken word.** It may be joined to other words (`QelvoraStudio`,
+    `qelvora-api`, `qelvoraClient`), but the token itself is never split, spaced
+    or hyphenated inside (`Qel-vora`, `Qel vora`).
+@@ -46,13 +52,13 @@ folders whose names contain `qelvora`.
+ 
+ Log each of these here when it is created, so the rename checklist is complete.
+ 
+-| Item | Why it needs manual work | Status |
+-| --- | --- | --- |
+-| Logo, wordmark, app icon | A drawn asset; the name's length and letterforms change the design | Not created yet |
+-| iOS bundle ID and Android application ID | Cannot be changed after the first store submission. Use `com.pantopus.qelvora` and rename before the first submission | Not created yet |
+-| App Store / Play Store listing names | Changed in the store consoles | Not created yet |
+-| Domain names and email sender domains | Must be registered; old ones should redirect | Not created yet |
+-| Stripe products, prices and statement descriptors | Changed in the Stripe dashboard | Not created yet |
+-| OAuth / passkey relying-party IDs | A WebAuthn relying-party ID is tied to a domain; passkeys registered under the old domain stop working after a domain change. Decide the final domain before creators register passkeys | Not created yet |
+-| Published design artifacts on claude.ai | Artifact titles and canvases are edited in place, not in this repo | Not created yet |
+-| Third-party accounts (analytics, push, model, voice and call providers) | Project names in each provider's console | Not created yet |
++| Item                                                                    | Why it needs manual work                                                                                                                                                                | Status                    |
++| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
++| Logo, wordmark, app icon                                                | A drawn asset; the name's length and letterforms change the design                                                                                                                      | Not created yet           |
++| iOS bundle ID and Android application ID                                | Cannot be changed after the first store submission. Local hosts use `com.pantopus.qelvora`; the rename command updates source IDs before submission                                     | Local only; not submitted |
++| App Store / Play Store listing names                                    | Changed in the store consoles                                                                                                                                                           | Not created yet           |
++| Domain names and email sender domains                                   | Must be registered; old ones should redirect                                                                                                                                            | Not created yet           |
++| Stripe products, prices and statement descriptors                       | Changed in the Stripe dashboard                                                                                                                                                         | Not created yet           |
++| OAuth / passkey relying-party IDs                                       | A WebAuthn relying-party ID is tied to a domain; passkeys registered under the old domain stop working after a domain change. Decide the final domain before creators register passkeys | Not created yet           |
++| Published design artifacts on claude.ai                                 | Artifact titles and canvases are edited in place, not in this repo                                                                                                                      | Not created yet           |
++| Third-party accounts (analytics, push, model, voice and call providers) | Project names in each provider's console                                                                                                                                                | Not created yet           |

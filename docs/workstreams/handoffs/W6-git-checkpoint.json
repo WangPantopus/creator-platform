@@ -29,5 +29,9 @@
     "iosAPIPrerequisiteSHA256": "b42ad7c44e56bc3f9fd8f91e336c121f2eec684ed5c02a102d1687c8e26f2ce6",
     "androidAPIPrerequisiteSHA256": "f37e14f0b1127cbe40e62016159505435e45c117c1b95ff15a9253709a581da4",
     "verification": "Existing native generated-model check passes31 operations; fresh branch native builds not claimed. Recorded manifest retains the actual earlier installed-build hashes."
+  },
+  "latePreservedWorkspaceGuidance": {
+    "path": "AGENTS.md",
+    "reason": "Tool-generated root guidance appeared after the prerequisite capture. Preserved unchanged in the handoff commit, not W6-authored framework instructions."
   }
 }
