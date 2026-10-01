@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — current creator authority during assertion verification, draft
+
+Application `28874d9` holds the uniquely account-owned creator profile through assertion verification and commit, in recovery-compatible profile-before-challenge/key order. It preserves current verified/no-recovery, challenge/account/expiry/replay, owned key, exact content, RP/origin and required user verification checks. Backend/affected source checks and the unchanged original T-34 PostgreSQL signing case pass in a separate disposable cluster (one passed/eight skipped; no new tests). [Exact source, current composed-signing review and limits](../../../artifacts/workstreams/W1/resume/2026-10-01-signing-authority/run.md). Actual genuine passkey/recovery/revocation and named-act interaction remain open; this repair stays draft.
+
+Current owned API4111/web3011/Postgres55451 are stopped during independent source work; data volume, private configuration/keys, final main products and reusable tools remain. The check-only tmpfs cluster on55452 is removed and all four ports have no listener. Shared Docker and peers are untouched. Browser viewport is reset; two blank temporary tabs are closed, while the supported URL policy refuses closure of the two connection-error tabs. All earlier runtime tables and browser receipts remain their historical checkpoints. Hosted CI, browser/native control and genuine production inputs still gate full acceptance.
+
 ## October 1 — integrated retained-history navigation and current rename, draft
 
 Current application `552e252` normally integrates main snapshot `2824ed4` through all six owned W1 branches. Home now links canonical private thread destinations without depending on a published creator handle. Swift/Kotlin Growth pass navigation through the shipping shell; the existing shell and destination owner retain authorization. The public notification/share destination validator, role/RLS/signature policies, migrations and generated contracts remain unchanged. [Current exact source, all-consumer builds and limits](../../../artifacts/workstreams/W1/resume/2026-10-01-integrated-home/run.md). Configured Home history and actual native navigation remain unoperated, so PR29 stays draft.
