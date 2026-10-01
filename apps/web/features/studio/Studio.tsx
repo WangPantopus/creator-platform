@@ -597,16 +597,23 @@ function Notes({ creator }: { creator: Creator }) {
           .filter((n) => n.document.kind === "note")
           .map((n) => (
             <div key={n.id}>
-              <Note
-                name={creator.display_name}
-                audience={n.audienceLabel}
-                time={time(n.publishedAt)}
-                signedActId={n.signedActId ?? undefined}
-                audienceSize={n.audienceCount ?? undefined}
-                reply={false}
-              >
-                {n.document.text}
-              </Note>
+              {n.state === "draft" ? (
+                <article className="w5-card">
+                  <p className="qv-meta">Draft · not signed or sent</p>
+                  <p className="w5-content-text">{n.document.text}</p>
+                </article>
+              ) : (
+                <Note
+                  name={creator.display_name}
+                  audience={n.audienceLabel}
+                  time={time(n.publishedAt)}
+                  signedActId={n.signedActId ?? undefined}
+                  audienceSize={n.audienceCount ?? undefined}
+                  reply={false}
+                >
+                  {n.document.text}
+                </Note>
+              )}
               <p className="qv-help">
                 {n.state === "published" ? "Broadcast" : n.state} ·{" "}
                 {n.sourceState === "not_requested"
