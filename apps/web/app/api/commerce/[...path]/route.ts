@@ -21,11 +21,18 @@ async function proxy(
       { error: { message: "Use this app to perform the action." } },
       { status: 403 },
     );
+  const query = request.nextUrl.searchParams;
   if (
-    request.nextUrl.search &&
+    query.size &&
     !(
+      request.method === "GET" &&
       target === "overview" &&
-      /^\?creatorId=[a-f0-9-]{36}$/u.test(request.nextUrl.search)
+      [...query].every(
+        ([key, value]) =>
+          query.getAll(key).length === 1 &&
+          ((key === "creatorId" && /^[a-f0-9-]{36}$/u.test(value)) ||
+            (key === "poolEarnings" && value === "1")),
+      )
     )
   )
     return Response.json(
