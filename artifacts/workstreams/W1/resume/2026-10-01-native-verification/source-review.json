@@ -1,6 +1,6 @@
 {
-  "recordedAt": "2026-10-01T14:15:16.132740+00:00",
-  "applicationSourceRevision": "81d3c6fd41e318ecc24b0c880c9b1c9654cee828",
+  "recordedAt": "2026-10-01T14:22:31.163785+00:00",
+  "applicationSourceRevision": "8915ebd4c0ca644941190e2eed4088ff8de5debd",
   "baseRevision": "6dc6f67079a3382d1a301ddc27bf5e89897a9712",
   "branch": "codex/w1-native-verification-20261001",
   "sourceFiles": [
@@ -21,8 +21,8 @@
     },
     {
       "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
-      "sha256": "2a8f1e858fa6f7b48fbade0df2c193fd1977226a16c6df6132d782170f6882af",
-      "bytes": 12299
+      "sha256": "63b0e8fb1ebe4f86da97e11b131ae710fea1029ac9d867c75246f54c855ef901",
+      "bytes": 12341
     },
     {
       "path": "apps/android/app/src/main/res/values/strings.xml",
@@ -51,8 +51,8 @@
     },
     {
       "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
-      "sha256": "34570e6508683529f634cd5357f86990455cc1898af3984b8c66df7156c67205",
-      "bytes": 11580
+      "sha256": "1f21ee5c23224205258ce26311bc949aabc1a8e1044602a5a04ac8f6d480b0d4",
+      "bytes": 11665
     },
     {
       "path": "config/copy.json",
@@ -78,12 +78,15 @@
     "canonicalSharedGenerationCheck": "passed; 12 resources",
     "nativeApiGeneratorCheck": "passed; 97 operations",
     "gitDiffCheck": "passed",
-    "newTestsOrScripts": false
+    "newTestsOrScripts": false,
+    "qualification": "Shared-copy/generator/API inputs and emitted bytes are unchanged from 81d3c6f; those source checks apply. The destination follow-up passes git diff check only; native/compiler/app checks remain unrun."
   },
   "nativeBuild": "not run; cleanup restriction",
   "webBackendConsumerBuild": "not run for new shared-copy source; cleanup restriction",
   "currentFreshRename": "not run for this new source; cleanup restriction",
   "appOperation": "not performed; browser/native control and cleanup gates remain",
   "hostedCi": "Code Review GitHub connection unavailable; no provider head or pass returned",
-  "resources": "No owned build/server/database/device started; private config/keys and source/evidence retained; generated resources/tools/dependencies removed under cleanup"
+  "resources": "No owned build/server/database/device started; private config/keys and source/evidence retained; generated resources/tools/dependencies removed under cleanup",
+  "initialApplicationSourceRevision": "81d3c6fd41e318ecc24b0c880c9b1c9654cee828",
+  "destinationFollowup": "Swift screen identity includes API origin and act ID; both renderers require the returned act ID to match. Source review only; not compiled or operated."
 }
