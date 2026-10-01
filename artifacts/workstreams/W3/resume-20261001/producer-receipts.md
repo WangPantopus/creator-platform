@@ -1,3 +1,5 @@
+Latest direct human direction (October 1, 2026) lifts the prior W3 cleanup/runtime hold. Restore tools/dependencies/DB/servers/builds/devices and complete personally operated web/Android Emulator/iOS Simulator E2E. Unit tests are unnecessary; coverage may be restricted. Create and merge ready PRs without repeated approval. [Current handoff](../../../../docs/workstreams/handoffs/W3-resume-2026-10-01.md) supersedes historical cleanup instructions below; prior evidence limits remain truthful.
+
 # Current producer receipts and cleanup boundary
 
 This is source coordination, not delegated W3 implementation or acceptance. Current personally reviewed merged main is `c1c615e6ece53bff4bc6a47d7f4d332757df1295`; W3 normally integrated it at `c675f84668245561be7e2804e33c0606b6a7f2de`, then independently reviewed SDK recovery head a4917db6 at normal branch merge429428a9. This is source integration, not a merged W3 PR. Final operated W3 UI source is30cc2b0; all seven reviewed privacy/client/shared-source hashes are unchanged.
