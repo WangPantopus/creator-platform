@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — current public integrity and held-read integration
+
+Application `4fda909e` normally integrates main `c1c615e6` through all eight W1 branches, including W4's held creator financial-read guard. No genuine held producer is invented or bound; owner money remains unavailable without it. Current canonical resource/native API checks pass for 12 outputs/98 operations. [Current source/branch qualification](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md).
+
+The backend public reader now checks disclosed command type and canonical hash before exposing it; inconsistent public content returns unavailable. All three clients reject blank creator names or malformed SHA-256 strings. Existing public visibility, private/withdrawn concealment, actor/signing/grant authority, migrations and original references remain unchanged. [Exact follow-up review](../../../artifacts/workstreams/W1/resume/2026-10-01-public-verification-web/run.md). No new tests/scripts. These are source repairs with backend/web/native compiler, current rename, actual app/design/accessibility/provider/device and exact-head CI acceptance still unrun. Cleanup remains controlling; original seven groups/H01–H20/full W1 acceptance remain open.
+
 ## October 1 — public web projection and recovery source
 
 Application `5a987db6` aligns the actual web `/verify/:id` page with the new native readers: canonical ID/response binding, explicit public availability/withdrawal and matching named-act checks, metadata-only fallback, approved-AI provenance, exact supplied content version and “Valid when checked” status. Retry/Refresh/Home use real links; scoped metadata/title wrapping avoids an unbounded column. Existing shared copy, API/authority policy, generators, migrations and original references are unchanged. [Source review and pending checks](../../../artifacts/workstreams/W1/resume/2026-10-01-public-verification-web/run.md).

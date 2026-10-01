@@ -86,5 +86,62 @@
   "separateUnmergedDependency": "W2 pool-error listener, draft PR40",
   "resourceState": "No owned runtime/build/device started; dependencies/native tools/products/database container and volume removed during cleanup. Private config/keys/evidence retained; no database restoration inferred.",
   "restriction": "Do not recreate heavy local builds/runtimes until explicit resumption.",
-  "fullW1Acceptance": "open; all seven groups and H01\u2013H20 retained"
+  "fullW1Acceptance": "open; all seven groups and H01\u2013H20 retained",
+  "subsequentMainIntegration": {
+    "recordedAt": "2026-10-01T15:24:33.094129+00:00",
+    "applicationSourceRevision": "4fda909e241c1bea83fae1f299994027ad1fd3ab",
+    "mainSnapshot": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+    "branchRevisionsBeforeReceiptCommit": {
+      "codex/w1-resume-20261001": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "codex/w1-onboarding-timing-20261001": "75267e07852603a7947e5125f3d1ddb665876921",
+      "codex/w1-comprehension-focus-20261001": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "codex/w1-generation-efficiency-20261001": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "codex/w1-team-state-20261001": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "codex/w1-home-host-20261001": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "codex/w1-signing-authority-20261001": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "codex/w1-native-verification-20261001": "4fda909e241c1bea83fae1f299994027ad1fd3ab"
+    },
+    "reviewedSource": "W4 creator financial-read held authority/owner/profile fences, opt-in overview money, current account restoration, pool reader and capability gates. Default graph supplies no genuine held producer.",
+    "publicVerificationSourceFiles": [
+      {
+        "path": "apps/backend/src/modules/identity/signed-acts.ts",
+        "sha256": "d2c1976c18d8b524ef0213f9ddd91a1561905a519b6ac6b5746b17e3fcf40f97",
+        "bytes": 12444
+      },
+      {
+        "path": "apps/backend/src/modules/identity/subjects.ts",
+        "sha256": "45d3a06cff81719d25f29312f96a88c44ab6990fc17bc608de77c8007c770cdc",
+        "bytes": 5139
+      },
+      {
+        "path": "apps/backend/src/core/canonical.ts",
+        "sha256": "f640c52590bd39233bbda1ab8a94577cbae867f83554c9bb9527703377f948ac",
+        "bytes": 805
+      },
+      {
+        "path": "apps/web/app/verify/[id]/page.tsx",
+        "sha256": "45fa4d76b77b21963b60edde871efe4d1b72c693a6abb261fc8d4d8af834a06f",
+        "bytes": 8666
+      },
+      {
+        "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
+        "sha256": "c5c6ded7be21273e60cb937d801be0af786ec776b68e9d6f206ee838e99254b0",
+        "bytes": 12065
+      },
+      {
+        "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
+        "sha256": "1b164a1cea7005db0a4fa4f97cf741176263a16aa56ac7f4bca3f7d2ec39f639",
+        "bytes": 12606
+      }
+    ],
+    "supportingChecks": {
+      "sharedResourceCheck": "passed; 12 outputs",
+      "nativeApiCheck": "passed; 98 operations",
+      "gitDiffCheck": "passed",
+      "originalCheckpointAndMainAncestry": "passed"
+    },
+    "integration": "Ordinary sequential merges; no conflicts, force push, peer checkout changes or new tests.",
+    "currentCompilationRenameAppAndCi": "unrun; resource/control/real-input and Code Review connection gates remain. Earlier compiler/app results retain their exact revision.",
+    "resources": "No packages/tools/build/runtime/database/device recreated; no database state restored."
+  }
 }
