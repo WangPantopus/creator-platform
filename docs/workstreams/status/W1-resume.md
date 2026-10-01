@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — publication audit and authorized W1 worktree removal
+
+The founder requested committing/pushing useful uncommitted source, ensuring PR coverage and removing dedicated W1 worktrees. The [audit](../../../artifacts/workstreams/W1/resume/2026-10-01-worktree-audit/source-publication.json) finds no useful uncommitted W1 source and no W1 commit absent from all origin refs. Eleven branch tips match open PRs; two older tips are already in published main. The older `7f32` checkout is removed; `0516` is authorized for removal immediately after this documentation is pushed to existing ready PR51. Generated build products are disposable; peer worktrees/shared primary/private material remain preserved. Future W1 work must create a fresh checkout from the current published `codex/w1-handoff-20261001` tip. Full W1 acceptance remains incomplete.
+
 ## October 1 — founder release of holds and next-agent handoff
 
 The latest direct founder instruction lifts the previous resource/native-verification holds: restore necessary resources and personally launch/operate web, Android emulator and iOS simulator end to end. No new unit tests or coverage-expansion requirement; affected coverage may be limited. Create ready PRs and merge normally whenever their work and validation are ready, without another permission request. The older pending resource-resumption question and cleanup-hold statements below are historical. Missing real inputs/tool capability remain factual dependencies, with independent work continuing.
