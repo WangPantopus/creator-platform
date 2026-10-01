@@ -1,0 +1,70 @@
+{
+  "compiledHash": "4f387e455f792c16e63a4d9bed7a5dff5d1f4384b3bc57b023783fd32ba085d7",
+  "sentences": [
+    {
+      "text": "I’m an AI. I can’t help with that here.",
+      "citations": []
+    }
+  ],
+  "blocked": true,
+  "category": "knowledge",
+  "passages": [
+    {
+      "id": "5ae0946c-5f06-45df-836d-754cc2f90179",
+      "sourceId": "11e53ba0-0ede-40ee-93ad-58f1a972474c",
+      "sourceRevision": 2,
+      "title": "W2 resume source",
+      "text": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+      "start": 0,
+      "end": 134,
+      "audience": {
+        "kind": "public"
+      }
+    }
+  ],
+  "contextHash": "e239404c9ea2ea8cd1214ba79bffa608c8d6a4ed2f992a4f11e94279e6f3e3af",
+  "usage": [
+    {
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "inputTokens": 135,
+      "outputTokens": 24,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "costMicros": 93
+    },
+    {
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "inputTokens": 18,
+      "outputTokens": 0,
+      "costMicros": 1
+    },
+    {
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "inputTokens": 659,
+      "outputTokens": 19,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "costMicros": 294
+    },
+    {
+      "provider": "configured",
+      "model": "unreconciled-response",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "costMicros": null
+    }
+  ],
+  "durationMs": 3753,
+  "firstApprovedMs": null,
+  "route": "large",
+  "withheld": {
+    "text": "Slow drying helps prevent cracking in clay before the bisque firing step, as outlined in the approved public clay notes.",
+    "allowed": true,
+    "category": "knowledge",
+    "requiresEvidence": true,
+    "supported": false
+  }
+}
