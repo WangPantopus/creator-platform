@@ -147,6 +147,14 @@
       "state": "reserved_unapplied",
       "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
       "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+    },
+    {
+      "id": "0060",
+      "owner": "W8",
+      "version": "0060_w8_composed_signed_message",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
     }
   ],
   "sqlApplied": false,
@@ -164,12 +172,13 @@
     "0047"
   ],
   "activeEntriesAndBytesComparedWith": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4",
-  "observedAt": "2026-10-01T03:03:20.073900+00:00",
+  "observedAt": "2026-10-01T03:39:13.874412+00:00",
   "activeDatabaseChecksumCount": 40,
   "activationLimits": {
     "0054": "Actual finite Q16 policy/provider/effect/ledger registration and acceptance absent; proposal only",
     "0058": "Published exact bytes still drop0044 personal Approval predicate; composition revision required before active registration",
     "0059": "Proposed recording FK requires message-before-media physical deletion and exact preserved export lineage, same-client W1/W6 private authority and current byte credential; repeated require_signed_message replacement still drops0044 personal Approval branch. No source activation/SQL application.",
-    "0047": "Proposed private-fan RLS lacks current license/restriction/publication-purpose held authority. Runtime callbacks and creator-signing/file proof, finite retention/C10 purpose adapters must be reviewed before activation."
+    "0047": "Proposed private-fan RLS lacks current license/restriction/publication-purpose held authority. Runtime callbacks and creator-signing/file proof, finite retention/C10 purpose adapters must be reviewed before activation.",
+    "0060": "Owned exact0044 Approval plus0059 guard source compiles on a separate closed backup clone. Unapplied to current data/registry; full ordered fresh-upgrade/non-owner/genuine signing/private-purpose acceptance remains open."
   }
 }

@@ -354,6 +354,14 @@
       "state": "reserved_unapplied",
       "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
       "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+    },
+    {
+      "id": "0060",
+      "owner": "W8",
+      "version": "0060_w8_composed_signed_message",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
     }
   ]
 }
