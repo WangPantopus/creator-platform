@@ -218,6 +218,103 @@
       "id": "0009",
       "owner": "W3",
       "state": "producer_allocated_at_0041"
+    },
+    {
+      "id": "0044",
+      "owner": "W4",
+      "version": "0044_w4_personal_approval",
+      "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "2dd53adcbaaa0789b9b0a4a0352404bd872ca42f",
+      "sourceSha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+    },
+    {
+      "id": "0045",
+      "owner": "W5",
+      "version": "0045_w5_reply_review",
+      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "15730d79c0c3da7076b7ac517a82d3e8ec2873cc",
+      "sourceSha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+    },
+    {
+      "id": "0046",
+      "owner": "W6",
+      "version": "0046_w6_call_availability",
+      "path": "apps/backend/src/modules/session/availability.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "d52e449cd4690cb8509283fb47a19dbbf40fb077",
+      "sourceSha256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097"
+    },
+    {
+      "id": "0047",
+      "owner": "W6",
+      "version": "0047_w6_creator_media",
+      "path": "apps/backend/src/modules/media/creator-scope.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0048",
+      "owner": "W2",
+      "version": "0048_w2_usage_lineage",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0049",
+      "owner": "W4",
+      "version": "0049_w4_generation_cost_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0050",
+      "owner": "W3",
+      "version": "0050_w3_account_relationship_index",
+      "path": "apps/backend/src/modules/conversation/migrations/0050_w3_account_relationship_index.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0051",
+      "owner": "W5",
+      "version": "0051_w5_media_publication",
+      "path": "apps/backend/src/modules/content/schema-media-publication.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0052",
+      "owner": "W8",
+      "version": "0052_w8_privacy_export_chunks",
+      "path": "apps/backend/migrations/0052_w8_privacy_export_chunks.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0053",
+      "owner": "W8",
+      "version": "0053_w8_runtime_denial_projection",
+      "path": "apps/backend/migrations/0053_w8_runtime_denial_projection.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0054",
+      "owner": "W4",
+      "version": "0054_w4_pass_purchase_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-purchase-effects.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0055",
+      "owner": "W4",
+      "version": "0055_w4_pass_pool_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql",
+      "state": "reserved_unapplied"
+    },
+    {
+      "id": "0056",
+      "owner": "W3",
+      "version": "0056_w3_correction_feedback_lineage",
+      "path": "apps/backend/src/modules/conversation/migrations/0056_w3_correction_feedback_lineage.sql",
+      "state": "reserved_unapplied"
     }
   ]
 }

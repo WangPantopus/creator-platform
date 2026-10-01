@@ -2,6 +2,8 @@
 
 ## Takeover continuation — 2026-09-30
 
+Fresh additive IDs0044–0056 are now reserved, unapplied and absent from the active runner, with exact paths/custody requirements in [next allocations](W8-next-allocations.md). This resolves the ID reservation dependency without inventing owner SQL, changing the40-entry applied ledger, activating unavailable providers, or sending unauthorized peer messages.
+
 The human specifically authorized the five existing fixture/setup corrections in `W8-ci-fixture-proposal.md`. This permits registered positive arrival data/current C11 fallback and invalid-return category, an explicitly scoped Android Welcome fixture using its existing activity content setup, and a fresh per-run disposable PostgreSQL database through the canonical40-entry runner. Existing product assertions, invalid-input denials, checks, goldens, tolerances, immutable SQL and RLS/grants remain unchanged. W8 performs all edits and verification personally. Peer messaging is separately pending.
 
 New W8-only fixture lease: Docker `creator-platform-w8-foundation-20260930-takeover`, loopback55448, isolated `creator_foundation` cluster with per-run random `creator_foundation_<UUID>` databases. It does not use or reset `creator_w8`, alter retained runtime role credentials, or touch peer databases. Existing review ports3008/4108/55438 and the original volume remain retained. A traffic-closed backup validation target `creator_w8_takeover_restore` has40 migrations/four cases/one tombstone/eight pending deletion tasks.
