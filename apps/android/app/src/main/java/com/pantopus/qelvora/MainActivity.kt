@@ -19,8 +19,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         destination.value = returnTarget(intent)
-        val configured = BuildConfig.CREATOR_API_URL.takeIf { it.startsWith("https://") }
-        val local = if (BuildConfig.DEBUG) intent.getStringExtra("api_url")?.takeIf { runCatching { URI(it).let { url -> url.scheme in listOf("http", "https") && url.userInfo == null && url.host in listOf("localhost", "127.0.0.1", "10.0.2.2") } }.getOrDefault(false) } else null
+        val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
+        val local = if (BuildConfig.DEBUG) apiOrigin(intent.getStringExtra("api_url"), loopback = true) else null
         setContent {
             val appearance = if (BuildConfig.DEBUG) intent.getStringExtra("appearance") else null
             val night = when (appearance) { "night" -> true; "light" -> false; else -> isSystemInDarkTheme() }
@@ -39,7 +39,15 @@ class MainActivity : ComponentActivity() {
     private fun returnTarget(intent: Intent): String {
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"
-        if (uri.scheme != "qelvora" || uri.host != "app" || uri.encodedUserInfo != null || uri.fragment != null) return "/unavailable"
+        if (uri.scheme != "qelvora" || uri.host != "app" || uri.port != -1 || uri.encodedUserInfo != null || uri.fragment != null) return "/unavailable"
         return uri.encodedPath.orEmpty() + (uri.encodedQuery?.let { "?$it" } ?: "")
+    }
+    private fun apiOrigin(value: String?, loopback: Boolean = false): String? = value?.takeIf {
+        runCatching {
+            val origin = URI(it)
+            origin.host?.isNotEmpty() == true && origin.userInfo == null && origin.rawQuery == null && origin.rawFragment == null &&
+                origin.rawPath in listOf("", "/") && (origin.port == -1 || origin.port in 1..65535) &&
+                if (loopback) origin.scheme in listOf("http", "https") && origin.host in listOf("localhost", "127.0.0.1", "10.0.2.2") else origin.scheme == "https"
+        }.getOrDefault(false)
     }
 }

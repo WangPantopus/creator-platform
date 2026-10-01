@@ -214,7 +214,7 @@ public struct FanAppShell: View {
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
-                guard (components.scheme == "qelvora" && components.host == "app") || (components.scheme == "https" && associationHost != nil && components.host == associationHost) else { model.error = "This link does not belong to this app."; return }
+                guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
                 model.open(target)
             }
