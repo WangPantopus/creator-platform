@@ -359,38 +359,6 @@
       "canonicalSameSqlBytes": null
     }
   ],
-  "existingAliasesInCanonicalForW5": [
-    {
-      "version": "0035_w5_content",
-      "path": "apps/backend/src/modules/content/schema.sql",
-      "owner": "W5"
-    },
-    {
-      "version": "0036_w5_content_reconciliation",
-      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
-      "owner": "W5"
-    },
-    {
-      "version": "0037_w5_studio_drafts",
-      "path": "apps/backend/src/modules/studio/schema.sql",
-      "owner": "W5"
-    },
-    {
-      "version": "0038_w5_content_consent",
-      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
-      "owner": "W5"
-    },
-    {
-      "version": "0039_w5_content_thread_privacy",
-      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
-      "owner": "W5"
-    },
-    {
-      "version": "0040_w5_content_fan_effects",
-      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
-      "owner": "W5"
-    }
-  ],
   "reservedW5": [
     {
       "id": "0005",
@@ -423,5 +391,48 @@
     "lines": 35,
     "matchesCurrentAppliedLocal0038Bytes": true,
     "activeCanonicalTreeContainsFile": false
+  },
+  "activeCanonicalW5Entries": [
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "owner": "W5"
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "owner": "W5"
+    }
+  ],
+  "canonicalRunnerAudit": {
+    "sourceCommit": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+    "registryRootKeys": [
+      "schemaVersion",
+      "migrations",
+      "reserved"
+    ],
+    "currentW5EntriesHaveAliasMetadata": false,
+    "runner": "apps/backend/scripts/migrate-trust.ts",
+    "behavior": "Rejects applied versions absent from active files before later producerVersion handling. That producerVersion handling removes the legacy row only after executing SQL; it does not recognize the actual preserved W5 aliases without replay. No runner execution/mutations performed."
   }
 }

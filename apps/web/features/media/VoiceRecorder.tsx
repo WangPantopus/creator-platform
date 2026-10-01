@@ -458,11 +458,11 @@ function RecordingForm({
           </button>
         </div>
       )}
-      {(recording.reason || error || asset?.failureCode) && (
+      {(recording.reason ||
+        error ||
+        (asset?.failureCode && asset.state !== "rejected")) && (
         <p className="w6-notice" role="status">
-          {error ??
-            recording.reason ??
-            asset?.failureCode?.replaceAll("_", " ")}
+          {error ?? recording.reason ?? "Processing is unavailable."}
         </p>
       )}
       {upload === "uploading" && (
