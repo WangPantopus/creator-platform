@@ -12,6 +12,10 @@ Current owner-state callback composition, provider ambiguity reconciliation, ema
 
 ## Verification and runtime
 
+Final personal review also corrected the existing invalid-registration path: recognized APNs rejection now records `invalid` before revoking the registration, and a recorded FCM invalid response closes its in-flight marker before revocation. Missing responses remain unknown. The existing error-name classification is preserved; an authorization supplier failure before send no longer revokes a device by that branch. Full backend build/typecheck and explicit-runtime ESLint pass on this final source. An initial combined lint command omitted the Node PATH on its second command (exit127); rerunning ESLint with the explicit installed runtime passed. No new test code or provider outcome is claimed.
+
+Final-source API38834/session44839 now supersedes32371/session4665 after graceful exact-process shutdown/restart. It uses the same managed environment/data and still reports foundationReady=true/ready=false/development identity/generation unconfigured. Web and native resources retain the states recorded below.
+
 Full backend production build/typecheck and changed-source ESLint/Prettier pass. No new test case, suite, script, reference image, artboard, SQL, tolerance or authority assertion was written. Narrow source review checked both new preference reads against `GrowthService`'s account fence and the existing provider receipt states/grants. These are source/compile checks, not provider E2E evidence.
 
 Only W7 API84372/session84072 was gracefully stopped after exact command/listener ownership inspection. Its replacement is API32371/session4665 on127.0.0.1:4107 with the same managed0600 environment and preserved database. Web16845/session19476 on3007, ADB9981 on5047, Docker volume, old encrypted database and peer services remain preserved. The current host still reports foundationReady=true, ready=false, explicit development identity, Growth as its only registered feature and generation unconfigured. No OpenAI or delivery credential was read or used.

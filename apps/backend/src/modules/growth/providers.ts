@@ -157,6 +157,7 @@ export class NativeDeliveryProvider implements DeliveryProvider {
               "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
               [input.idempotencyKey, registrationHash],
             );
+            sending = false;
             await service.db.worker.query(
               "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
               [device.id],
@@ -183,6 +184,27 @@ export class NativeDeliveryProvider implements DeliveryProvider {
           [input.idempotencyKey, registrationHash, receipts.at(-1)],
         );
       } catch (error) {
+        if (
+          sending &&
+          error instanceof Error &&
+          [
+            "BadDeviceToken",
+            "DeviceTokenNotForTopic",
+            "Unregistered",
+            "ExpiredToken",
+          ].includes(error.message)
+        ) {
+          await service.db.worker.query(
+            "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+            [input.idempotencyKey, registrationHash],
+          );
+          sending = false;
+          await service.db.worker.query(
+            "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
+            [device.id],
+          );
+          continue;
+        }
         if (sending && error instanceof DeliveryFailure) {
           await service.db.worker.query(
             "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
@@ -195,21 +217,6 @@ export class NativeDeliveryProvider implements DeliveryProvider {
             "UPDATE growth.provider_receipt SET state='unknown',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
             [input.idempotencyKey, registrationHash],
           );
-        if (
-          error instanceof Error &&
-          [
-            "BadDeviceToken",
-            "DeviceTokenNotForTopic",
-            "Unregistered",
-            "ExpiredToken",
-          ].includes(error.message)
-        ) {
-          await service.db.worker.query(
-            "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-            [device.id],
-          );
-          continue;
-        }
         throw error;
       }
     }
