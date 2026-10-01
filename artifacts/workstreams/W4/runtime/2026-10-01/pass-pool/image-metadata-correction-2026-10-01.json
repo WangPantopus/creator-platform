@@ -1,0 +1,48 @@
+{
+  "recordedAt": "2026-10-01T11:56:48.690019+00:00",
+  "correction": "The historical manifest parsed browser JPEG bytes as PNG headers and reported invalid pixel dimensions. These values supersede only its image dimensions/format. Original image bytes, hashes and observations remain unchanged. No reference images modified.",
+  "images": [
+    {
+      "file": "android-entry-bluetooth-error.png",
+      "pixels": [720, 1280],
+      "format": "png",
+      "sha256": "b8b3935da53e0fd9493cf0617960fd296c50e4c00dac8131ecfa0194cba19b72"
+    },
+    {
+      "file": "pass-gated-light-390.png",
+      "pixels": [390, 1100],
+      "format": "jpeg",
+      "sha256": "ff2ab93aa2340536a1110bdad06471ea239aebfd6d374c98858d565ff29d1300"
+    },
+    {
+      "file": "pass-gated-light.png",
+      "pixels": [1280, 720],
+      "format": "jpeg",
+      "sha256": "ef736ff4d0ca78776d138f4f1fb8f179339caf6b37a63490d24d6632853da8c0"
+    },
+    {
+      "file": "pass-gated-night-390.png",
+      "pixels": [390, 1100],
+      "format": "jpeg",
+      "sha256": "8020a6dc0a6fb0b9e7dc89c83b1e936a6a8c1a66f93faec419037440dbfe84f3"
+    },
+    {
+      "file": "pool-wrong-role-light-1280.png",
+      "pixels": [1280, 900],
+      "format": "jpeg",
+      "sha256": "73f868cceeeca784be416dd7e8c86b946415adfa0f686490a2b17ecc6d591e53"
+    },
+    {
+      "file": "pool-wrong-role-light.png",
+      "pixels": [1280, 720],
+      "format": "jpeg",
+      "sha256": "db408d61b3cfe560be2cbb02a31a0cb24e629ac9e385ddbabe997f9ab2a5ff5f"
+    },
+    {
+      "file": "pool-wrong-role-night-1280.png",
+      "pixels": [1280, 900],
+      "format": "jpeg",
+      "sha256": "ffdaa6f59daf98892534a22dafdcb9eaa602c58df3ee1f037207c790d4994ad6"
+    }
+  ]
+}

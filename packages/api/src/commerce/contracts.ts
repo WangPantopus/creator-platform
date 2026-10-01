@@ -8,6 +8,34 @@ export const MinorUnits = z
   .max(Number.MAX_SAFE_INTEGER);
 export const Currency = z.string().regex(/^[A-Z]{3}$/u);
 export const Money = z.strictObject({ amount: MinorUnits, currency: Currency });
+const IntegerText = z.string().regex(/^\d+$/u).max(32);
+/** Creator-only projection of canonical slots and posted pool cash. It contains
+ * no fan identities, private invoices, provider keys or estimated money. */
+export const PoolEarnings = z.strictObject({
+  creatorId: z.uuid(),
+  cycle: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/u),
+  observedAt: z.iso.datetime({ offset: true }),
+  closesAt: z.iso.datetime({ offset: true }),
+  fanCount: MinorUnits,
+  slotCount: MinorUnits,
+  historyLimited: z.boolean(),
+  postedCycles: z
+    .array(
+      z.strictObject({
+        cycle: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/u),
+        currency: Currency,
+        allocationMinor: IntegerText,
+        transferredMinor: IntegerText.nullable(),
+        reversedMinor: IntegerText.nullable(),
+        slotSeconds: IntegerText,
+        totalSlotSeconds: IntegerText,
+        pendingEffects: MinorUnits,
+        postedAt: z.iso.datetime({ offset: true }),
+      }),
+    )
+    .max(12),
+});
+export type PoolEarnings = z.infer<typeof PoolEarnings>;
 /** Public consent projection of a real persisted provider pass preview.
  * Provider/customer references remain on the server's original quote. */
 export const PassPurchaseQuote = z

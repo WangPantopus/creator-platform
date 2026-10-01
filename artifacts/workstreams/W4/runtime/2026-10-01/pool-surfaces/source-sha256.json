@@ -1,0 +1,20 @@
+{
+  "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt": "fa0a3f6ee529f850e65ba74390e177a6bb402becd0a7758c501f1bc809c0622a",
+  "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt": "1d4dc6fa8eca0cbc1acaa5812da1b4aedcd41576736c50a38ca6d39cde55fbb4",
+  "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "df572f1318aa84cea24c3a9c7670698d45de8c87b33d0988facec081b2f3fe21",
+  "apps/backend/src/modules/commerce/extended.ts": "229db548526bdfc33008648001662c9f82719b8c7ad5d5f912c43e3c910b7bff",
+  "apps/backend/src/modules/commerce/pass-pool-journal.ts": "fc090f0cbf6943241ab3c230be0ab28a786f9905b40491ac866ead52a49e1e05",
+  "apps/backend/src/modules/commerce/router.ts": "2699d20e7f3a84dcdcdb809fb47d6ad232205d4952232c8ebbabb0b51626794a",
+  "apps/backend/src/modules/commerce/runtime.ts": "df157f5aa6f76902f4479870087273dfdaccd1129c89fdc9313d3e3d398e466c",
+  "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca",
+  "apps/backend/src/modules/commerce/service.ts": "df41ef57dd9d26a5bb671c805bf1568171ca511ff3b862f4a8e4ed9d7f0908d9",
+  "apps/ios/Sources/Generated/QelvoraAPI.swift": "38cca1b4408721ee54bad7b0f5e1bf43c846160f500a498344990af94255d5c9",
+  "apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift": "9064b916216ded2418963372e67ae8f14c630a499dbb8f3ef303c638f29308d4",
+  "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift": "4d53ecd72bdc627dabd2d8dcfb3970171714cd6852e09fce28fb726fbc93ef37",
+  "apps/web/app/api/commerce/[...path]/route.ts": "38c194af5c10d4db8a4f8a6bab8aaf8ea57154b9fa00ee26591fecfeff144501",
+  "apps/web/features/commerce/CommerceScreen.tsx": "4f008827c3287624429d205f8f60e2bf5622abb81e5a8246b7e2671684f4fba6",
+  "apps/web/features/commerce/commerce.css": "4878cbc1967cf1ae9ca96dc49df0f33788bfaa5905ffafebfd57fea2c3ff8795",
+  "packages/api/generated/openapi.json": "94c0f1f57a20355da205126c83a14b3b482bfe4652c30f64478da9cdbf7296f5",
+  "packages/api/src/commerce/contracts.ts": "b3ee8d5f9d0d3789dcb1520b5f549cc2a8e9ee7ecaee34befb1e23ac19cf8a27",
+  "apps/web/features/commerce/PoolEarnings.tsx": "f5b0815c830554ddde296d053964d5f529364f744cdbc00506f7a6c96ea4d474"
+}

@@ -1,0 +1,48 @@
+{
+  "primary": {
+    "bytes": 541147,
+    "sha256": "2828ecadd0edb0424012b7b5dc04e6de00511adfdbebc3e8373ff0391260ee9d",
+    "schemaVersion": 2,
+    "creatorId": "20000000-0000-4000-8000-000000000002",
+    "revision": 18,
+    "counts": {
+      "sources": 1,
+      "versions": 0,
+      "sponsors": 0,
+      "regressions": 1,
+      "usage": 706,
+      "ai_evaluation": 20,
+      "ai_shadow_sample": 0,
+      "ai_shadow_evaluation": 0,
+      "ai_ingestion": 2,
+      "ai_event": 25,
+      "ai_cost_hold": 0,
+      "ai_chunk": 1,
+      "ai_command": 40,
+      "ai_style_embedding": 1
+    }
+  },
+  "benchmark": {
+    "bytes": 72355946,
+    "sha256": "ad331265a9fcb952c9ba162d73ca31a7b4ec426c139c90f0930be38551f986cf",
+    "schemaVersion": 2,
+    "creatorId": "20000000-0000-4000-8000-000000000003",
+    "revision": 6,
+    "counts": {
+      "sources": 122,
+      "versions": 105,
+      "sponsors": 0,
+      "regressions": 0,
+      "usage": 3,
+      "ai_evaluation": 1,
+      "ai_shadow_sample": 0,
+      "ai_shadow_evaluation": 0,
+      "ai_ingestion": 2,
+      "ai_event": 6,
+      "ai_cost_hold": 0,
+      "ai_chunk": 10,
+      "ai_command": 4,
+      "ai_style_embedding": 0
+    }
+  }
+}
