@@ -1,0 +1,785 @@
+﻿2026-10-01T15:18:08.2558862Z Current runner version: '2.337.0'
+2026-10-01T15:18:08.2580211Z ##[group]Runner Image Provisioner
+2026-10-01T15:18:08.2580884Z Hosted Compute Agent
+2026-10-01T15:18:08.2581345Z Version: 20260901.588
+2026-10-01T15:18:08.2581916Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-01T15:18:08.2582538Z Build Date: 2026-09-01T19:56:44Z
+2026-10-01T15:18:08.2583117Z Worker ID: {312f0f27-b2fc-4364-aa75-dd4038ad58ac}
+2026-10-01T15:18:08.2583725Z Azure Region: eastus
+2026-10-01T15:18:08.2584194Z ##[endgroup]
+2026-10-01T15:18:08.2585275Z ##[group]Operating System
+2026-10-01T15:18:08.2585849Z Ubuntu
+2026-10-01T15:18:08.2586348Z 24.04.5
+2026-10-01T15:18:08.2586780Z LTS
+2026-10-01T15:18:08.2587457Z ##[endgroup]
+2026-10-01T15:18:08.2587953Z ##[group]Runner Image
+2026-10-01T15:18:08.2588463Z Image: ubuntu-24.04
+2026-10-01T15:18:08.2588916Z Version: 20260927.320.1
+2026-10-01T15:18:08.2590007Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-01T15:18:08.2591292Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-01T15:18:08.2592105Z ##[endgroup]
+2026-10-01T15:18:08.2593113Z ##[group]GITHUB_TOKEN Permissions
+2026-10-01T15:18:08.2594964Z Contents: read
+2026-10-01T15:18:08.2595439Z Metadata: read
+2026-10-01T15:18:08.2596008Z Packages: read
+2026-10-01T15:18:08.2596496Z ##[endgroup]
+2026-10-01T15:18:08.2598444Z Secret source: Actions
+2026-10-01T15:18:08.2599186Z Cache mode: write
+2026-10-01T15:18:08.2599990Z Prepare workflow directory
+2026-10-01T15:18:08.2862593Z Prepare all required actions
+2026-10-01T15:18:08.2902013Z Getting action download info
+2026-10-01T15:18:08.4938857Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-01T15:18:08.6218484Z Download action repository 'actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-10-01T15:18:09.2430279Z Download action repository 'reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d' (SHA:a421e43855164a8197daf9d8d40fe71c6996bb0d)
+2026-10-01T15:18:09.3774908Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-01T15:18:09.6122365Z Complete job name: android-runtime
+2026-10-01T15:18:09.6775303Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-01T15:18:09.6776300Z with:
+2026-10-01T15:18:09.6776822Z   repository: WangPantopus/creator-platform
+2026-10-01T15:18:09.6780532Z   token: ***
+2026-10-01T15:18:09.6780971Z   ssh-strict: true
+2026-10-01T15:18:09.6781466Z   ssh-user: git
+2026-10-01T15:18:09.6781914Z   persist-credentials: true
+2026-10-01T15:18:09.6782451Z   clean: true
+2026-10-01T15:18:09.6782959Z   sparse-checkout-cone-mode: true
+2026-10-01T15:18:09.6783456Z   fetch-depth: 1
+2026-10-01T15:18:09.6783934Z   fetch-tags: false
+2026-10-01T15:18:09.6784392Z   show-progress: true
+2026-10-01T15:18:09.6784860Z   lfs: false
+2026-10-01T15:18:09.6785360Z   submodules: false
+2026-10-01T15:18:09.6785808Z   set-safe-directory: true
+2026-10-01T15:18:09.6786313Z   allow-unsafe-pr-checkout: false
+2026-10-01T15:18:09.6787345Z ##[endgroup]
+2026-10-01T15:18:09.7633769Z Syncing repository: WangPantopus/creator-platform
+2026-10-01T15:18:09.7636021Z ##[group]Getting Git version info
+2026-10-01T15:18:09.7636778Z Working directory is '/home/runner/work/creator-platform/creator-platform'
+2026-10-01T15:18:09.7638320Z [command]/usr/bin/git version
+2026-10-01T15:18:09.7762932Z git version 2.55.0
+2026-10-01T15:18:09.7863535Z ##[endgroup]
+2026-10-01T15:18:09.7870283Z Temporarily overriding HOME='/home/runner/work/_temp/6e2e1975-0ebd-4b72-8eba-d417643fd454' before making global git config changes
+2026-10-01T15:18:09.7871418Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T15:18:09.7872403Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/creator-platform/creator-platform
+2026-10-01T15:18:09.7982201Z Deleting the contents of '/home/runner/work/creator-platform/creator-platform'
+2026-10-01T15:18:09.8007456Z ##[group]Initializing the repository
+2026-10-01T15:18:09.8008503Z [command]/usr/bin/git init /home/runner/work/creator-platform/creator-platform
+2026-10-01T15:18:09.8674028Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-01T15:18:09.8675206Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-01T15:18:09.8676312Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-01T15:18:09.8677480Z hint: call:
+2026-10-01T15:18:09.8678020Z hint:
+2026-10-01T15:18:09.8678653Z hint: 	git config --global init.defaultBranch <name>
+2026-10-01T15:18:09.8679440Z hint:
+2026-10-01T15:18:09.8680176Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-01T15:18:09.8681038Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-01T15:18:09.8681676Z hint:
+2026-10-01T15:18:09.8682059Z hint: 	git branch -m <name>
+2026-10-01T15:18:09.8682572Z hint:
+2026-10-01T15:18:09.8683157Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-01T15:18:09.8684268Z Initialized empty Git repository in /home/runner/work/creator-platform/creator-platform/.git/
+2026-10-01T15:18:09.8686042Z [command]/usr/bin/git remote add origin https://github.com/WangPantopus/creator-platform
+2026-10-01T15:18:09.8834484Z ##[endgroup]
+2026-10-01T15:18:09.8835181Z ##[group]Disabling automatic garbage collection
+2026-10-01T15:18:09.8837705Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-01T15:18:09.8914022Z ##[endgroup]
+2026-10-01T15:18:09.8914661Z ##[group]Setting up auth
+2026-10-01T15:18:09.8919979Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T15:18:09.8953540Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T15:18:09.9391494Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T15:18:09.9424933Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T15:18:09.9622076Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T15:18:09.9654996Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T15:18:09.9852420Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-01T15:18:10.0831502Z ##[endgroup]
+2026-10-01T15:18:10.0833062Z ##[group]Fetching the repository
+2026-10-01T15:18:10.0841194Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e0eea53a2ea82d2510b11b0f03af14375d8cba75:refs/remotes/pull/45/merge
+2026-10-01T15:18:12.8473766Z From https://github.com/WangPantopus/creator-platform
+2026-10-01T15:18:12.8475362Z  * [new ref]         e0eea53a2ea82d2510b11b0f03af14375d8cba75 -> pull/45/merge
+2026-10-01T15:18:12.8478181Z ##[endgroup]
+2026-10-01T15:18:12.8478900Z ##[group]Determining the checkout info
+2026-10-01T15:18:12.8479881Z ##[endgroup]
+2026-10-01T15:18:12.8486294Z [command]/usr/bin/git sparse-checkout disable
+2026-10-01T15:18:12.9946769Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-01T15:18:12.9976721Z ##[group]Checking out the ref
+2026-10-01T15:18:12.9979676Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/45/merge
+2026-10-01T15:18:13.5489252Z Note: switching to 'refs/remotes/pull/45/merge'.
+2026-10-01T15:18:13.5489657Z 
+2026-10-01T15:18:13.5489900Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-01T15:18:13.5490982Z changes and commit them, and you can discard any commits you make in this
+2026-10-01T15:18:13.5491753Z state without impacting any branches by switching back to a branch.
+2026-10-01T15:18:13.5492078Z 
+2026-10-01T15:18:13.5492930Z If you want to create a new branch to retain commits you create, you may
+2026-10-01T15:18:13.5493464Z do so (now or later) by using -c with the switch command. Example:
+2026-10-01T15:18:13.5493684Z 
+2026-10-01T15:18:13.5493776Z   git switch -c <new-branch-name>
+2026-10-01T15:18:13.5493954Z 
+2026-10-01T15:18:13.5494069Z Or undo this operation with:
+2026-10-01T15:18:13.5494207Z 
+2026-10-01T15:18:13.5494313Z   git switch -
+2026-10-01T15:18:13.5494490Z 
+2026-10-01T15:18:13.5495016Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-01T15:18:13.5495527Z 
+2026-10-01T15:18:13.5495845Z HEAD is now at e0eea53 Merge a4917db65767dd16534f38a7b257010d213257d9 into c1c615e6ece53bff4bc6a47d7f4d332757df1295
+2026-10-01T15:18:13.5511944Z ##[endgroup]
+2026-10-01T15:18:13.5553716Z [command]/usr/bin/git log -1 --format=%H
+2026-10-01T15:18:13.5578890Z e0eea53a2ea82d2510b11b0f03af14375d8cba75
+2026-10-01T15:18:13.5843878Z ##[group]Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+2026-10-01T15:18:13.5844210Z with:
+2026-10-01T15:18:13.5844406Z   distribution: temurin
+2026-10-01T15:18:13.5844599Z   java-version: 21
+2026-10-01T15:18:13.5844783Z   java-package: jdk
+2026-10-01T15:18:13.5844971Z   check-latest: false
+2026-10-01T15:18:13.5845157Z   server-id: github
+2026-10-01T15:18:13.5845374Z   server-username: GITHUB_ACTOR
+2026-10-01T15:18:13.5845593Z   server-password: GITHUB_TOKEN
+2026-10-01T15:18:13.5845801Z   overwrite-settings: true
+2026-10-01T15:18:13.5845997Z   job-status: success
+2026-10-01T15:18:13.5848363Z   token: ***
+2026-10-01T15:18:13.5848551Z ##[endgroup]
+2026-10-01T15:18:13.7213986Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-10-01T15:18:13.7220524Z ##[group]Installed distributions
+2026-10-01T15:18:13.7323287Z Resolved Java 21.0.12+1 from tool-cache
+2026-10-01T15:18:13.7323850Z Setting Java 21.0.12+1 as the default
+2026-10-01T15:18:13.7332331Z (node:2078) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T15:18:13.7333290Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T15:18:13.7335701Z Creating toolchains.xml for JDK version 21 from temurin
+2026-10-01T15:18:13.7390938Z Writing to /home/runner/.m2/toolchains.xml
+2026-10-01T15:18:13.7391295Z 
+2026-10-01T15:18:13.7391434Z Java configuration:
+2026-10-01T15:18:13.7391740Z   Distribution: temurin
+2026-10-01T15:18:13.7392059Z   Version: 21.0.12+1
+2026-10-01T15:18:13.7392514Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:18:13.7392892Z 
+2026-10-01T15:18:13.7393332Z ##[endgroup]
+2026-10-01T15:18:13.7411561Z Creating settings.xml with server-id: github
+2026-10-01T15:18:13.7434951Z Writing to /home/runner/.m2/settings.xml
+2026-10-01T15:18:13.7577375Z ##[group]Run echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+2026-10-01T15:18:13.7578139Z [36;1mecho 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules[0m
+2026-10-01T15:18:13.7578620Z [36;1msudo udevadm control --reload-rules[0m
+2026-10-01T15:18:13.7578891Z [36;1msudo udevadm trigger --name-match=kvm[0m
+2026-10-01T15:18:13.8328756Z shell: /usr/bin/bash -e {0}
+2026-10-01T15:18:13.8329010Z env:
+2026-10-01T15:18:13.8329287Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:18:13.8329702Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:18:13.8330005Z ##[endgroup]
+2026-10-01T15:18:13.8489565Z KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"
+2026-10-01T15:18:13.8836744Z ##[group]Run w3_sdk_manager="${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager"
+2026-10-01T15:18:13.8837479Z [36;1mw3_sdk_manager="${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager"[0m
+2026-10-01T15:18:13.8837870Z [36;1mw3_install_log="${RUNNER_TEMP:?}/android-emulator-install.log"[0m
+2026-10-01T15:18:13.8838295Z [36;1mif ! "$w3_sdk_manager" --install emulator --channel=0 > "$w3_install_log" 2>&1; then[0m
+2026-10-01T15:18:13.8838653Z [36;1m  cat "$w3_install_log"[0m
+2026-10-01T15:18:13.8838969Z [36;1m  # Retry this observed SDK archive failure once; other failures stay fatal.[0m
+2026-10-01T15:18:13.8839381Z [36;1m  if ! grep -Fq 'Error on ZipFile unknown archive' "$w3_install_log"; then[0m
+2026-10-01T15:18:13.8839682Z [36;1m    exit 1[0m
+2026-10-01T15:18:13.8839861Z [36;1m  fi[0m
+2026-10-01T15:18:13.8840075Z [36;1m  "$w3_sdk_manager" --install emulator --channel=0[0m
+2026-10-01T15:18:13.8840321Z [36;1melse[0m
+2026-10-01T15:18:13.8840533Z [36;1m  cat "$w3_install_log"[0m
+2026-10-01T15:18:13.8840774Z [36;1mfi[0m
+2026-10-01T15:18:13.8841020Z [36;1m"${ANDROID_HOME}/emulator/emulator" -no-window -noaudio -version[0m
+2026-10-01T15:18:13.8901840Z shell: /usr/bin/bash -e {0}
+2026-10-01T15:18:13.8902065Z env:
+2026-10-01T15:18:13.8902328Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:18:13.8902728Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:18:13.8903030Z ##[endgroup]
+2026-10-01T15:19:15.4809304Z Loading package information...                                                  
+2026-10-01T15:19:15.4809943Z Loading local repository...                                                     
+2026-10-01T15:19:15.4810444Z [                                       ] 3% Loading local repository...        
+2026-10-01T15:19:15.4810850Z [                                       ] 3% Fetch remote repository...         
+2026-10-01T15:19:15.4811287Z [=                                      ] 3% Fetch remote repository...         
+2026-10-01T15:19:15.4811774Z [=                                      ] 4% Fetch remote repository...         
+2026-10-01T15:19:15.4812223Z [=                                      ] 5% Fetch remote repository...         
+2026-10-01T15:19:15.4812661Z [==                                     ] 5% Fetch remote repository...         
+2026-10-01T15:19:15.4813119Z [==                                     ] 6% Fetch remote repository...         
+2026-10-01T15:19:15.4813565Z [==                                     ] 7% Fetch remote repository...         
+2026-10-01T15:19:15.4814065Z [==                                     ] 7% Computing updates...               
+2026-10-01T15:19:15.4814595Z [===                                    ] 8% Computing updates...               
+2026-10-01T15:19:15.4815040Z [===                                    ] 10% Computing updates...              
+2026-10-01T15:19:15.4815503Z [===                                    ] 10% Installing Android Emulator       
+2026-10-01T15:19:15.4815968Z [===                                    ] 10% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4816440Z [====                                   ] 10% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4816891Z [====                                   ] 11% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4817895Z [====                                   ] 12% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4818358Z [=====                                  ] 13% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4818816Z [=====                                  ] 14% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4819263Z [=====                                  ] 15% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4819711Z [======                                 ] 15% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4820145Z [======                                 ] 16% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4820925Z [======                                 ] 17% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4821600Z [=======                                ] 18% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4822051Z [=======                                ] 19% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4822538Z [=======                                ] 20% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4822991Z [========                               ] 20% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4823315Z [========                               ] 21% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4823645Z [========                               ] 22% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4823934Z [=========                              ] 23% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4824217Z [=========                              ] 24% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4824558Z [=========                              ] 25% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4825003Z [==========                             ] 25% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4825439Z [==========                             ] 26% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4825877Z [==========                             ] 27% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4826328Z [===========                            ] 28% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4826784Z [===========                            ] 29% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4827388Z [===========                            ] 30% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4827931Z [============                           ] 30% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4828405Z [============                           ] 31% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4828863Z [============                           ] 32% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4829319Z [============                           ] 33% Downloading emulator-linux_x64-164
+2026-10-01T15:19:15.4829766Z [============                           ] 33% Unzipping...                      
+2026-10-01T15:19:15.4830194Z                                                                                 
+2026-10-01T15:19:15.4830923Z Warning: An error occurred while preparing SDK package Android Emulator: Error on ZipFile unknown archive.
+2026-10-01T15:19:16.0110613Z [============                           ] 33% Unzipping...                      
+2026-10-01T15:19:16.0133637Z Loading package information...                                                  
+2026-10-01T15:19:16.0875263Z Loading local repository...                                                     
+2026-10-01T15:19:16.0877242Z [                                       ] 3% Loading local repository...        
+2026-10-01T15:19:16.0909411Z [                                       ] 3% Fetch remote repository...         
+2026-10-01T15:19:16.3178959Z [=                                      ] 3% Fetch remote repository...         
+2026-10-01T15:19:16.3529361Z [=                                      ] 4% Fetch remote repository...         
+2026-10-01T15:19:16.3711550Z [=                                      ] 5% Fetch remote repository...         
+2026-10-01T15:19:16.4039704Z [==                                     ] 5% Fetch remote repository...         
+2026-10-01T15:19:16.4439344Z [==                                     ] 6% Fetch remote repository...         
+2026-10-01T15:19:16.4951940Z [==                                     ] 7% Fetch remote repository...         
+2026-10-01T15:19:16.4977889Z [==                                     ] 7% Computing updates...               
+2026-10-01T15:19:16.5049002Z [===                                    ] 8% Computing updates...               
+2026-10-01T15:19:16.5159219Z [===                                    ] 10% Computing updates...              
+2026-10-01T15:19:17.0817809Z [===                                    ] 10% Installing Android Emulator       
+2026-10-01T15:19:17.1849055Z [===                                    ] 10% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.2531456Z [====                                   ] 10% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.3385099Z [====                                   ] 11% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.4013720Z [====                                   ] 12% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.4649127Z [=====                                  ] 13% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.5279373Z [=====                                  ] 14% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.5805702Z [=====                                  ] 15% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.6488771Z [======                                 ] 15% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.7025785Z [======                                 ] 16% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.7869275Z [======                                 ] 17% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.8384587Z [=======                                ] 18% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.9176104Z [=======                                ] 19% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.9431077Z [=======                                ] 20% Downloading emulator-linux_x64-164
+2026-10-01T15:19:17.9717803Z [========                               ] 20% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.0358349Z [========                               ] 21% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.0983362Z [========                               ] 22% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.1568988Z [=========                              ] 23% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.2352560Z [=========                              ] 24% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.2607324Z [=========                              ] 25% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.2897676Z [==========                             ] 25% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.3669590Z [==========                             ] 26% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.4315385Z [==========                             ] 27% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.5074653Z [===========                            ] 28% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.5740213Z [===========                            ] 29% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.6053574Z [===========                            ] 30% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.6650560Z [============                           ] 30% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.7992728Z [============                           ] 31% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.9119850Z [============                           ] 32% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.9123732Z [============                           ] 33% Downloading emulator-linux_x64-164
+2026-10-01T15:19:18.9643226Z [============                           ] 33% Unzipping...                      
+2026-10-01T15:19:18.9643840Z [============                           ] 33% Unzipping... emulator/            
+2026-10-01T15:19:18.9644891Z [============                           ] 33% Unzipping... emulator/resources/  
+2026-10-01T15:19:18.9659253Z [============                           ] 33% Unzipping... emulator/qsn         
+2026-10-01T15:19:18.9960208Z [=============                          ] 33% Unzipping... emulator/qsn         
+2026-10-01T15:19:19.0444662Z [=============                          ] 33% Unzipping... emulator/emulator    
+2026-10-01T15:19:19.1467577Z [=============                          ] 33% Unzipping... emulator/netsimd     
+2026-10-01T15:19:19.1468419Z [=============                          ] 33% Unzipping... emulator/bin64/      
+2026-10-01T15:19:19.1469017Z [=============                          ] 33% Unzipping... emulator/qemu/       
+2026-10-01T15:19:19.1495818Z [=============                          ] 33% Unzipping... emulator/NOTICE.txt  
+2026-10-01T15:19:19.1583292Z [=============                          ] 33% Unzipping... emulator/crashpad_han
+2026-10-01T15:19:19.1631045Z [=============                          ] 34% Unzipping... emulator/crashpad_han
+2026-10-01T15:19:19.1634110Z [=============                          ] 34% Unzipping... emulator/source.prope
+2026-10-01T15:19:19.2219566Z [=============                          ] 34% Unzipping... emulator/nimble_bridg
+2026-10-01T15:19:19.2222604Z [=============                          ] 34% Unzipping... emulator/LICENSE     
+2026-10-01T15:19:19.2223679Z [=============                          ] 34% Unzipping... emulator/lib/        
+2026-10-01T15:19:19.2295969Z [=============                          ] 34% Unzipping... emulator/qemu-img    
+2026-10-01T15:19:19.2296844Z [=============                          ] 34% Unzipping... emulator/include/    
+2026-10-01T15:19:19.2299587Z [=============                          ] 34% Unzipping... emulator/NOTICE.csv  
+2026-10-01T15:19:19.2300139Z [=============                          ] 34% Unzipping... emulator/lib64/      
+2026-10-01T15:19:19.2436791Z [=============                          ] 34% Unzipping... emulator/emulator-che
+2026-10-01T15:19:19.2615809Z [=============                          ] 34% Unzipping... emulator/crashreport 
+2026-10-01T15:19:19.2621791Z [=============                          ] 34% Unzipping... emulator/mksdcard    
+2026-10-01T15:19:19.2782489Z [=============                          ] 34% Unzipping... emulator/resources/To
+2026-10-01T15:19:19.2803726Z [=============                          ] 35% Unzipping... emulator/resources/To
+2026-10-01T15:19:19.2855781Z [=============                          ] 35% Unzipping... emulator/resources/de
+2026-10-01T15:19:19.2858183Z [=============                          ] 35% Unzipping... emulator/resources/To
+2026-10-01T15:19:19.2870206Z [=============                          ] 35% Unzipping... emulator/resources/de
+2026-10-01T15:19:19.3014712Z [=============                          ] 35% Unzipping... emulator/resources/To
+2026-10-01T15:19:19.3037616Z [=============                          ] 35% Unzipping... emulator/resources/ma
+2026-10-01T15:19:19.3067422Z [=============                          ] 35% Unzipping... emulator/resources/de
+2026-10-01T15:19:19.3068173Z [=============                          ] 35% Unzipping... emulator/resources/sk
+2026-10-01T15:19:19.3089900Z [=============                          ] 35% Unzipping... emulator/resources/de
+2026-10-01T15:19:19.3091165Z [=============                          ] 35% Unzipping... emulator/resources/ma
+2026-10-01T15:19:19.3138549Z [=============                          ] 35% Unzipping... emulator/resources/po
+2026-10-01T15:19:19.3168942Z [=============                          ] 35% Unzipping... emulator/resources/ma
+2026-10-01T15:19:19.3174057Z [==============                         ] 35% Unzipping... emulator/resources/ma
+2026-10-01T15:19:19.3938398Z [==============                         ] 35% Unzipping... emulator/resources/sk
+2026-10-01T15:19:19.3939281Z [==============                         ] 35% Unzipping... emulator/resources/ma
+2026-10-01T15:19:19.3962013Z [==============                         ] 35% Unzipping... emulator/bin64/e2fsck
+2026-10-01T15:19:19.3997909Z [==============                         ] 35% Unzipping... emulator/bin64/fsck.e
+2026-10-01T15:19:19.4019359Z [==============                         ] 35% Unzipping... emulator/bin64/tune2f
+2026-10-01T15:19:19.4030654Z [==============                         ] 35% Unzipping... emulator/bin64/resize
+2026-10-01T15:19:19.4050358Z [==============                         ] 35% Unzipping... emulator/bin64/mkfs.e
+2026-10-01T15:19:19.4799334Z [==============                         ] 35% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:19.7423495Z [==============                         ] 36% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.1306823Z [==============                         ] 37% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.2848020Z [===============                        ] 38% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.6611938Z [===============                        ] 39% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.7281982Z [===============                        ] 40% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.9139871Z [================                       ] 40% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:20.9973304Z [================                       ] 41% Unzipping... emulator/qemu/linux-x
+2026-10-01T15:19:21.1130134Z [================                       ] 41% Unzipping... emulator/lib/emulator
+2026-10-01T15:19:21.1133205Z [================                       ] 41% Unzipping... emulator/lib/rtc_serv
+2026-10-01T15:19:21.1136080Z [================                       ] 41% Unzipping... emulator/lib/advanced
+2026-10-01T15:19:21.1137253Z [================                       ] 41% Unzipping... emulator/lib/cmake/  
+2026-10-01T15:19:21.1139143Z [================                       ] 41% Unzipping... emulator/lib/emulator
+2026-10-01T15:19:21.1141224Z [================                       ] 41% Unzipping... emulator/lib/control_
+2026-10-01T15:19:21.1142905Z [================                       ] 41% Unzipping... emulator/lib/emulated
+2026-10-01T15:19:21.1144911Z [================                       ] 41% Unzipping... emulator/lib/rtc_serv
+2026-10-01T15:19:21.1147680Z [================                       ] 41% Unzipping... emulator/lib/emu-orig
+2026-10-01T15:19:21.1150378Z [================                       ] 41% Unzipping... emulator/lib/hardware
+2026-10-01T15:19:21.1150941Z [================                       ] 41% Unzipping... emulator/lib/pkgconfi
+2026-10-01T15:19:21.1151641Z [================                       ] 41% Unzipping... emulator/lib/pc-bios/
+2026-10-01T15:19:21.1157734Z [================                       ] 41% Unzipping... emulator/lib/snapshot
+2026-10-01T15:19:21.1158329Z [================                       ] 41% Unzipping... emulator/lib/adb_serv
+2026-10-01T15:19:21.1162863Z [================                       ] 41% Unzipping... emulator/lib/hostapd.
+2026-10-01T15:19:21.1165565Z [================                       ] 41% Unzipping... emulator/lib/grpc_end
+2026-10-01T15:19:21.1182366Z [================                       ] 41% Unzipping... emulator/lib/ca-bundl
+2026-10-01T15:19:21.1185253Z [================                       ] 41% Unzipping... emulator/lib/ui_contr
+2026-10-01T15:19:21.1188974Z [================                       ] 41% Unzipping... emulator/lib/snapshot
+2026-10-01T15:19:21.1191675Z [================                       ] 41% Unzipping... emulator/lib/ice_conf
+2026-10-01T15:19:21.1456895Z [================                       ] 41% Unzipping... emulator/lib/libflatb
+2026-10-01T15:19:21.1462794Z [================                       ] 41% Unzipping... emulator/lib/emulator
+2026-10-01T15:19:21.1464922Z [================                       ] 41% Unzipping... emulator/lib/waterfal
+2026-10-01T15:19:21.1467433Z [================                       ] 41% Unzipping... emulator/lib/emulated
+2026-10-01T15:19:21.1477151Z [================                       ] 41% Unzipping... emulator/lib/cmake/fl
+2026-10-01T15:19:21.1479269Z [================                       ] 41% Unzipping... emulator/lib/pkgconfi
+2026-10-01T15:19:21.1613378Z [================                       ] 41% Unzipping... emulator/lib/pc-bios/
+2026-10-01T15:19:21.2133224Z [================                       ] 41% Unzipping... emulator/include/flat
+2026-10-01T15:19:21.2192046Z [================                       ] 41% Unzipping... emulator/lib64/libgli
+2026-10-01T15:19:21.2295713Z [================                       ] 41% Unzipping... emulator/lib64/libpro
+2026-10-01T15:19:21.2296406Z [================                       ] 41% Unzipping... emulator/lib64/qt/   
+2026-10-01T15:19:21.2671561Z [================                       ] 41% Unzipping... emulator/lib64/liband
+2026-10-01T15:19:21.2692255Z [================                       ] 41% Unzipping... emulator/lib64/libgfx
+2026-10-01T15:19:21.3269879Z [================                       ] 42% Unzipping... emulator/lib64/libgfx
+2026-10-01T15:19:21.3270371Z [================                       ] 42% Unzipping... emulator/lib64/gles_l
+2026-10-01T15:19:21.3277963Z [================                       ] 42% Unzipping... emulator/lib64/liband
+2026-10-01T15:19:21.3278439Z [================                       ] 42% Unzipping... emulator/lib64/vulkan
+2026-10-01T15:19:21.3278865Z [================                       ] 42% Unzipping... emulator/lib64/gles_s
+2026-10-01T15:19:21.3282125Z [================                       ] 42% Unzipping... emulator/lib64/libemu
+2026-10-01T15:19:21.3384824Z [================                       ] 42% Unzipping... emulator/lib64/libpro
+2026-10-01T15:19:21.4382183Z [================                       ] 42% Unzipping... emulator/lib64/liband
+2026-10-01T15:19:21.5897323Z [=================                      ] 43% Unzipping... emulator/lib64/liband
+2026-10-01T15:19:21.5913309Z [=================                      ] 43% Unzipping... emulator/lib64/libtcm
+2026-10-01T15:19:21.5915283Z [=================                      ] 43% Unzipping... emulator/lib64/libima
+2026-10-01T15:19:21.5969765Z [=================                      ] 43% Unzipping... emulator/lib64/libc++
+2026-10-01T15:19:21.6237909Z [=================                      ] 43% Unzipping... emulator/lib64/liband
+2026-10-01T15:19:21.6275304Z [=================                      ] 43% Unzipping... emulator/lib64/libabs
+2026-10-01T15:19:21.6275876Z [=================                      ] 43% Unzipping... emulator/lib64/gles_a
+2026-10-01T15:19:21.7027771Z [=================                      ] 43% Unzipping... emulator/lib64/libsha
+2026-10-01T15:19:21.7083208Z [=================                      ] 43% Unzipping... emulator/lib64/libc++
+2026-10-01T15:19:21.7083757Z [=================                      ] 43% Unzipping... emulator/lib64/qt/res
+2026-10-01T15:19:21.7084399Z [=================                      ] 43% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:21.7085198Z [=================                      ] 43% Unzipping... emulator/lib64/qt/tra
+2026-10-01T15:19:21.7085864Z [=================                      ] 43% Unzipping... emulator/lib64/qt/plu
+2026-10-01T15:19:21.7300158Z [=================                      ] 43% Unzipping... emulator/lib64/qt/res
+2026-10-01T15:19:21.7788319Z [=================                      ] 44% Unzipping... emulator/lib64/qt/res
+2026-10-01T15:19:21.8004705Z [=================                      ] 44% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:21.9395884Z [=================                      ] 45% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:22.1633597Z [==================                     ] 45% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:22.3241745Z [==================                     ] 46% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:22.4997750Z [==================                     ] 47% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:22.6766911Z [===================                    ] 48% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:23.5492007Z [===================                    ] 49% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:23.7000382Z [===================                    ] 50% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:23.7711059Z [====================                   ] 50% Unzipping... emulator/lib64/qt/lib
+2026-10-01T15:19:23.8568648Z [====================                   ] 50% Unzipping... emulator/lib64/qt/tra
+2026-10-01T15:19:23.9620487Z [====================                   ] 51% Unzipping... emulator/lib64/qt/tra
+2026-10-01T15:19:23.9717612Z [====================                   ] 51% Unzipping... emulator/lib64/qt/plu
+2026-10-01T15:19:24.1475216Z [====================                   ] 51% Unzipping... emulator/lib64/gles_l
+2026-10-01T15:19:24.1923445Z [====================                   ] 51% Unzipping... emulator/lib64/vulkan
+2026-10-01T15:19:24.3396743Z [====================                   ] 52% Unzipping... emulator/lib64/vulkan
+2026-10-01T15:19:24.5642751Z [=====================                  ] 53% Unzipping... emulator/lib64/vulkan
+2026-10-01T15:19:25.1545823Z [=====================                  ] 54% Unzipping... emulator/lib64/vulkan
+2026-10-01T15:19:25.1772244Z [=====================                  ] 54% Unzipping... emulator/lib64/gles_s
+2026-10-01T15:19:25.3012210Z [=====================                  ] 55% Unzipping... emulator/lib64/gles_s
+2026-10-01T15:19:25.3915159Z [=====================                  ] 55% Unzipping... emulator/lib64/gles_a
+2026-10-01T15:19:25.3915868Z [=======================================] 100% Unzipping... emulator/lib64/gles_
+2026-10-01T15:19:26.7072663Z 
+2026-10-01T15:19:26.7568505Z Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)
+2026-10-01T15:19:26.7569209Z Copyright (C) 2006-2024 The Android Open Source Project and many others.
+2026-10-01T15:19:26.7569842Z This program is a derivative of the QEMU CPU emulator (www.qemu.org).
+2026-10-01T15:19:26.7570205Z 
+2026-10-01T15:19:26.7570444Z   This software is licensed under the terms of the GNU General Public
+2026-10-01T15:19:26.7571028Z   License version 2, as published by the Free Software Foundation, and
+2026-10-01T15:19:26.7571576Z   may be copied, distributed, and modified under those terms.
+2026-10-01T15:19:26.7571893Z 
+2026-10-01T15:19:26.7572112Z   This program is distributed in the hope that it will be useful,
+2026-10-01T15:19:26.7572697Z   but WITHOUT ANY WARRANTY; without even the implied warranty of
+2026-10-01T15:19:26.7573256Z   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+2026-10-01T15:19:26.7573805Z   GNU General Public License for more details.
+2026-10-01T15:19:26.7574064Z 
+2026-10-01T15:19:26.7663458Z ##[group]Run reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+2026-10-01T15:19:26.7663831Z with:
+2026-10-01T15:19:26.7663994Z   api-level: 34
+2026-10-01T15:19:26.7664160Z   arch: x86_64
+2026-10-01T15:19:26.7664399Z   script: cd apps/android && ./gradlew :app:connectedDebugAndroidTest
+2026-10-01T15:19:26.7664679Z   target: default
+2026-10-01T15:19:26.7664838Z   cores: 2
+2026-10-01T15:19:26.7664985Z   avd-name: test
+2026-10-01T15:19:26.7665157Z   force-avd-creation: true
+2026-10-01T15:19:26.7665358Z   emulator-boot-timeout: 600
+2026-10-01T15:19:26.7665554Z   emulator-port: 5554
+2026-10-01T15:19:26.7665895Z   emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+2026-10-01T15:19:26.7666249Z   disable-animations: true
+2026-10-01T15:19:26.7666446Z   disable-spellchecker: false
+2026-10-01T15:19:26.7666649Z   disable-linux-hw-accel: auto
+2026-10-01T15:19:26.7666861Z   enable-hw-keyboard: false
+2026-10-01T15:19:26.7667315Z   channel: stable
+2026-10-01T15:19:26.7667479Z env:
+2026-10-01T15:19:26.7667725Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:19:26.7668128Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:19:26.7668448Z ##[endgroup]
+2026-10-01T15:19:26.8114867Z ##[group]Configure emulator
+2026-10-01T15:19:26.8115957Z API level: 34
+2026-10-01T15:19:26.8116738Z System image API level: 34
+2026-10-01T15:19:26.8117221Z target: default
+2026-10-01T15:19:26.8117511Z CPU architecture: x86_64
+2026-10-01T15:19:26.8117823Z Hardware profile: 
+2026-10-01T15:19:26.8119406Z Cores: 2
+2026-10-01T15:19:26.8119649Z RAM size: 
+2026-10-01T15:19:26.8119820Z Heap size: 
+2026-10-01T15:19:26.8119987Z SD card path or size: 
+2026-10-01T15:19:26.8120302Z Disk size: 
+2026-10-01T15:19:26.8120629Z AVD name: test
+2026-10-01T15:19:26.8120929Z force avd creation: true
+2026-10-01T15:19:26.8121580Z Emulator boot timeout: 600
+2026-10-01T15:19:26.8121952Z emulator port: 5554
+2026-10-01T15:19:26.8122505Z emulator options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+2026-10-01T15:19:26.8122951Z disable animations: true
+2026-10-01T15:19:26.8123299Z disable spellchecker: false
+2026-10-01T15:19:26.8123690Z disable Linux hardware acceleration: false
+2026-10-01T15:19:26.8124083Z enable hardware keyboard: false
+2026-10-01T15:19:26.8124447Z Channel: 0 (stable)
+2026-10-01T15:19:26.8124746Z Script:
+2026-10-01T15:19:26.8125094Z cd apps/android && ./gradlew :app:connectedDebugAndroidTest
+2026-10-01T15:19:26.8125503Z Pre emulator launch script:
+2026-10-01T15:19:26.8126064Z ##[endgroup]
+2026-10-01T15:19:26.8126457Z ##[group]Install Android SDK
+2026-10-01T15:19:26.8161962Z [command]/usr/bin/sh -c \yes | sdkmanager --licenses > /dev/null
+2026-10-01T15:19:28.0943315Z Installing latest build tools, platform tools, and platform.
+2026-10-01T15:19:28.0953622Z [command]/usr/bin/sh -c \sdkmanager --install 'build-tools;37.0.0' platform-tools 'platforms;android-34'> /dev/null
+2026-10-01T15:19:29.2700777Z Installing latest emulator.
+2026-10-01T15:19:29.2711067Z [command]/usr/bin/sh -c \sdkmanager --install emulator --channel=0 > /dev/null
+2026-10-01T15:19:30.3312079Z Installing system images.
+2026-10-01T15:19:30.3324043Z [command]/usr/bin/sh -c \sdkmanager --install 'system-images;android-34;default;x86_64' --channel=0 > /dev/null
+2026-10-01T15:19:49.8049599Z ##[endgroup]
+2026-10-01T15:19:49.8050590Z ##[group]Create AVD
+2026-10-01T15:19:49.8051043Z Creating AVD.
+2026-10-01T15:19:49.8069900Z [command]/usr/bin/sh -c \echo no | avdmanager create avd --force -n test --package 'system-images;android-34;default;x86_64'
+2026-10-01T15:19:50.4472606Z Loading local repository...                                                     
+2026-10-01T15:19:50.4473249Z [=========                              ] 25% Loading local repository...       
+2026-10-01T15:19:50.4476642Z [=========                              ] 25% Fetch remote repository...        
+2026-10-01T15:19:50.4477739Z [=======================================] 100% Fetch remote repository...       
+2026-10-01T15:19:51.3191896Z Auto-selecting single ABI x86_64
+2026-10-01T15:19:51.3710428Z Do you wish to create a custom hardware profile? [no] [command]/usr/bin/sh -c \printf 'hw.cpu.ncore=2\n' >> /home/runner/.android/avd/test.avd/config.ini
+2026-10-01T15:19:51.3728127Z ##[endgroup]
+2026-10-01T15:19:51.3729572Z ##[group]Launch Emulator
+2026-10-01T15:19:51.3729862Z Starting emulator.
+2026-10-01T15:19:51.3740398Z [command]/usr/bin/sh -c \/usr/local/lib/android/sdk/emulator/emulator -port 5554 -avd test -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
+2026-10-01T15:19:51.3843886Z INFO         | Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)
+2026-10-01T15:19:51.3844394Z INFO         | Graphics backend: gfxstream
+2026-10-01T15:19:51.3844978Z INFO         | Found systemPath /usr/local/lib/android/sdk/system-images/android-34/default/x86_64/
+2026-10-01T15:19:51.4253398Z INFO         | Saving last run QEMU version for the AVD to 2
+2026-10-01T15:19:51.4254215Z INFO         | Increasing RAM size to 2560MB
+2026-10-01T15:19:51.4254751Z ##############################################################################
+2026-10-01T15:19:51.4255374Z ##                        WARNING - ACTION REQUIRED                         ##
+2026-10-01T15:19:51.4256086Z ##  Consider using the '-metrics-collection' flag to help improve the       ##
+2026-10-01T15:19:51.4256829Z ##  emulator by sending anonymized usage data. Or use the '-no-metrics'     ##
+2026-10-01T15:19:51.4258068Z ##  flag to bypass this warning and turn off the metrics collection.        ##
+2026-10-01T15:19:51.4259244Z ##  In a future release this warning will turn into a one-time blocking     ##
+2026-10-01T15:19:51.4260252Z ##  prompt to ask for explicit user input regarding metrics collection.     ##
+2026-10-01T15:19:51.4261054Z ##                                                                          ##
+2026-10-01T15:19:51.4265940Z ##  Please see '-help-metrics-collection' for more details. You can use     ##
+2026-10-01T15:19:51.4266647Z ##  '-metrics-to-file' or '-metrics-to-console' flags to see what type of   ##
+2026-10-01T15:19:51.4267556Z ##  data is being collected by emulator as part of usage statistics.        ##
+2026-10-01T15:19:51.4268195Z ##############################################################################
+2026-10-01T15:19:51.4268751Z INFO         | Guest GLES Driver: Auto (ext controls)
+2026-10-01T15:19:51.4269499Z INFO         | emuglConfig_init: vulkan_mode_selected:swiftshader gles_mode_selected:swiftshader
+2026-10-01T15:19:51.4270233Z INFO         | Checking system compatibility:
+2026-10-01T15:19:51.4270761Z INFO         |   Checking: hasSufficientDiskSpace
+2026-10-01T15:19:51.4271353Z INFO         |      Ok: Disk space requirements to run avd: `test` are met
+2026-10-01T15:19:51.4271914Z INFO         |   Checking: hasSufficientHwGpu
+2026-10-01T15:19:51.4272409Z INFO         |      Ok: Hardware GPU compatibility checks are not required
+2026-10-01T15:19:51.4272923Z INFO         |   Checking: hasSufficientSystem
+2026-10-01T15:19:51.4273420Z INFO         |      Ok: System requirements to run avd: `test` are met
+2026-10-01T15:19:51.4274616Z WARNING      | Feature QuickbootFileBacked is disabled due to stability issues, if you really want that, the environment variable ANDROID_EMU_FORCE_QUICKBOOT_FILE_BACKED need to set to 1
+2026-10-01T15:19:52.5516032Z ERROR        | Unable to connect to adb daemon on port: 5037
+2026-10-01T15:19:52.5518131Z INFO         | Storing crashdata in: /tmp/android-runner/emu-crash-37.2.12.db, detection is enabled for process: 2535
+2026-10-01T15:19:52.5518963Z INFO         | Initializing gfxstream backend
+2026-10-01T15:19:52.5527912Z INFO         | startOpenglesRendererImpl: gpu info
+2026-10-01T15:19:52.5528343Z INFO         | 
+2026-10-01T15:19:52.5530607Z INFO         | initIcdPaths: ICD set to 'swiftshader', using Swiftshader ICD
+2026-10-01T15:19:52.5532039Z INFO         | Setting ICD filenames for the loader = /usr/local/lib/android/sdk/emulator/lib64/vulkan/vk_swiftshader_icd.json
+2026-10-01T15:19:52.5532763Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so]
+2026-10-01T15:19:52.5533367Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so.1]
+2026-10-01T15:19:52.5533987Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so]
+2026-10-01T15:19:52.5534682Z INFO         | Added library: /usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so
+2026-10-01T15:19:52.5570567Z INFO         | Selecting Vulkan device: SwiftShader Device (Subzero), Version: 1.3.0
+2026-10-01T15:19:52.5571176Z INFO         | Using Vulkan externalMemoryMode: OpaqueFd for VkEmulation
+2026-10-01T15:19:52.5661823Z INFO         | Format VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16 does not support YCbCr sampler conversion
+2026-10-01T15:19:52.5687907Z INFO         | SharedLibrary::open for [libX11]
+2026-10-01T15:19:52.5690697Z WARNING      | Could not open libX11.so, try libX11.so.6
+2026-10-01T15:19:52.5691139Z INFO         | SharedLibrary::open for [libX11.so.6]
+2026-10-01T15:19:52.5691536Z INFO         | SharedLibrary::open for [libX11-xcb]
+2026-10-01T15:19:52.5691831Z WARNING      | Could not open libX11-xcb.so, try libX11-xcb.so.1
+2026-10-01T15:19:52.5692169Z INFO         | SharedLibrary::open for [libX11-xcb.so.1]
+2026-10-01T15:19:52.5989332Z INFO         | Initializing VkEmulation features:
+2026-10-01T15:19:52.5989714Z INFO         |     glInteropSupported: false
+2026-10-01T15:19:52.5990098Z INFO         |     useDeferredCommands: true
+2026-10-01T15:19:52.5990548Z INFO         |     createResourceWithRequirements: true
+2026-10-01T15:19:52.5990947Z INFO         |     useVulkanComposition: false
+2026-10-01T15:19:52.5991310Z INFO         |     useVulkanNativeSwapchain: false
+2026-10-01T15:19:52.5992129Z INFO         |     enable guestRenderDoc: false
+2026-10-01T15:19:52.5992537Z INFO         |     ASTC LDR emulation mode: Gpu
+2026-10-01T15:19:52.5992907Z INFO         |     enable ETC2 emulation: true
+2026-10-01T15:19:52.5993285Z INFO         |     enable Ycbcr emulation: false
+2026-10-01T15:19:52.5993648Z INFO         |     guestVulkanOnly: false
+2026-10-01T15:19:52.5994011Z INFO         |     useDedicatedAllocations: false
+2026-10-01T15:19:52.5994359Z INFO         |     guestVulkanMaxApiVersion: 1.3.0
+2026-10-01T15:19:52.5994725Z INFO         |     enableProtectedMemoryEmulation: false
+2026-10-01T15:19:52.5995127Z INFO         | Graphics Adapter Vendor Google (Google Inc.)
+2026-10-01T15:19:52.5995641Z INFO         | Graphics Adapter Android Emulator OpenGL ES Translator (Google SwiftShader)
+2026-10-01T15:19:52.5996219Z INFO         | Graphics API Version OpenGL ES 3.0 (OpenGL ES 3.0 SwiftShader 4.0.0.1)
+2026-10-01T15:19:52.5998259Z INFO         | Graphics API Extensions GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_packed_depth_stencil GL_OES_vertex_half_float GL_OES_standard_derivatives GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_texture_format_BGRA8888 GL_APPLE_texture_format_BGRA8888 
+2026-10-01T15:19:52.5999828Z INFO         | Graphics Device Extensions N/A
+2026-10-01T15:19:52.6000100Z INFO         | Disabling sparse binding feature support
+2026-10-01T15:19:52.6036469Z INFO         | Sending adb public key [QAAAAE001jZ72zNx7XLGAeb65pis+FAsgWHY7DiPYQcyPZ1cjw8fIbefyP7WFpYcfexM0fXEE6/LY7rw9lXyhUY0IU0Efpr+E8cO+hIF0dmbTRdI74Qa6cxiF8hB3orlds5sX5sH+EDwYTZ1UU6VmAwR8lhWDnL3w+/eIVM27AUKw5HK9PMP900IDMrNeRceFkmw6v/6b/rNHGKgtJTDEbaARgzY6+mYFn8YMoC9r1dwZ8GmlTFD7skVudZv6/0LIlXAjACNIVbMz12FZy/ug1gxyHKBTlBMxcWkEJeKMCvpAXdmDK+fw9P/XEm6PuUee1ikQkZPokj2urDoL35xY7bi2m3lvAm5GMNgi/E39gD5E8KUgzcUUCTkLE9+MxuhWcueqQjWXG8ybA6bnXecvSAuuW5hhELnmRegk3Ef3zAfvk/sBw+X3rNjF2e/wGCAFFZg30SbACJsKgGFos4WazFD4BQWbaEadIqRA85NhSa/xz2hPRQNs5G5pygOmNv553cD/74Ya7vLMSst5GcnLnjycDbNwcwPZsiEFzKeC0w8wpS5HgV2RzZzLj+rr1Zesxgi13Cu1gib0k7wiI8qKGPEeT6HlDQ+OESGrAPFI4iyL4oKNeRlBn6I3G++1oHOn6b7yDkfSCOvZ8ogLl09SnCokNXAq+A/pH/wneP7AEoFwfqv2dc2IgEAAQA= runner@unknown]
+2026-10-01T15:19:52.6040656Z INFO         | Userspace boot properties:
+2026-10-01T15:19:52.6041011Z INFO         |   androidboot.boot_devices=pci0000:00/0000:00:03.0 pci0000:00/0000:00:06.0
+2026-10-01T15:19:52.6041379Z INFO         |   androidboot.dalvik.vm.heapsize=576m
+2026-10-01T15:19:52.6041699Z INFO         |   androidboot.debug.hwui.renderer=skiagl
+2026-10-01T15:19:52.6041982Z INFO         |   androidboot.debug.sf.nobootanimation=1
+2026-10-01T15:19:52.6042247Z INFO         |   androidboot.hardware=ranchu
+2026-10-01T15:19:52.6042504Z INFO         |   androidboot.hardware.gltransport=pipe
+2026-10-01T15:19:52.6042786Z INFO         |   androidboot.hardware.vulkan=ranchu
+2026-10-01T15:19:52.6043032Z INFO         |   androidboot.logcat=*:V
+2026-10-01T15:19:52.6043280Z INFO         |   androidboot.opengles.version=196608
+2026-10-01T15:19:52.6043519Z INFO         |   androidboot.qemu=1
+2026-10-01T15:19:52.6046196Z INFO         |   androidboot.qemu.adb.pubkey=QAAAAE001jZ72zNx7XLGAeb65pis+FAsgWHY7DiPYQcyPZ1cjw8fIbefyP7WFpYcfexM0fXEE6/LY7rw9lXyhUY0IU0Efpr+E8cO+hIF0dmbTRdI74Qa6cxiF8hB3orlds5sX5sH+EDwYTZ1UU6VmAwR8lhWDnL3w+/eIVM27AUKw5HK9PMP900IDMrNeRceFkmw6v/6b/rNHGKgtJTDEbaARgzY6+mYFn8YMoC9r1dwZ8GmlTFD7skVudZv6/0LIlXAjACNIVbMz12FZy/ug1gxyHKBTlBMxcWkEJeKMCvpAXdmDK+fw9P/XEm6PuUee1ikQkZPokj2urDoL35xY7bi2m3lvAm5GMNgi/E39gD5E8KUgzcUUCTkLE9+MxuhWcueqQjWXG8ybA6bnXecvSAuuW5hhELnmRegk3Ef3zAfvk/sBw+X3rNjF2e/wGCAFFZg30SbACJsKgGFos4WazFD4BQWbaEadIqRA85NhSa/xz2hPRQNs5G5pygOmNv553cD/74Ya7vLMSst5GcnLnjycDbNwcwPZsiEFzKeC0w8wpS5HgV2RzZzLj+rr1Zesxgi13Cu1gib0k7wiI8qKGPEeT6HlDQ+OESGrAPFI4iyL4oKNeRlBn6I3G++1oHOn6b7yDkfSCOvZ8ogLl09SnCokNXAq+A/pH/wneP7AEoFwfqv2dc2IgEAAQA= runner@unknown
+2026-10-01T15:19:52.6049234Z INFO         |   androidboot.qemu.avd_name=test
+2026-10-01T15:19:52.6049526Z INFO         |   androidboot.qemu.camera_hq_edge_processing=0
+2026-10-01T15:19:52.6049821Z INFO         |   androidboot.qemu.camera_protocol_ver=1
+2026-10-01T15:19:52.6050116Z INFO         |   androidboot.qemu.cpuvulkan.version=4206592
+2026-10-01T15:19:52.6050435Z INFO         |   androidboot.qemu.gltransport.drawFlushInterval=800
+2026-10-01T15:19:52.6050750Z INFO         |   androidboot.qemu.gltransport.name=pipe
+2026-10-01T15:19:52.6051018Z INFO         |   androidboot.qemu.hwcodec.avcdec=2
+2026-10-01T15:19:52.6051280Z INFO         |   androidboot.qemu.hwcodec.hevcdec=2
+2026-10-01T15:19:52.6051539Z INFO         |   androidboot.qemu.hwcodec.vpxdec=2
+2026-10-01T15:19:52.6051857Z INFO         |   androidboot.qemu.settings.system.screen_off_timeout=2147483647
+2026-10-01T15:19:52.6052186Z INFO         |   androidboot.qemu.skin=320x640
+2026-10-01T15:19:52.6052445Z INFO         |   androidboot.qemu.virtiowifi=1
+2026-10-01T15:19:52.6052860Z INFO         |   androidboot.qemu.vsync=60
+2026-10-01T15:19:52.6053146Z INFO         |   androidboot.serialno=EMULATOR37X2X12X0
+2026-10-01T15:19:52.6053549Z INFO         |   androidboot.vbmeta.digest=8bee4f6105b6acd7de887b1ee6629ab07066df02ee9bbca07663adffdad97fc1
+2026-10-01T15:19:52.6053953Z INFO         |   androidboot.vbmeta.hash_alg=sha256
+2026-10-01T15:19:52.6054202Z INFO         |   androidboot.vbmeta.size=6656
+2026-10-01T15:19:52.6054459Z INFO         |   androidboot.veritymode=enforcing
+2026-10-01T15:19:52.6217966Z WARNING: cannnot unmap ptr 0x7f2705401000 as it is in the protected range from 0x7f2665400000 to 0x7f2705600000
+2026-10-01T15:19:52.6373701Z INFO         | Monitoring duration of emulator setup.
+2026-10-01T15:19:53.6633903Z INFO         | Successfully initialized netsim WiFi
+2026-10-01T15:19:53.6634573Z INFO         | Activated packet streamer for bluetooth emulation
+2026-10-01T15:19:53.6683669Z INFO         | Setting display: 0 configuration to: 320x640, dpi: 160x160 
+2026-10-01T15:19:53.6684088Z INFO         | setDisplayActiveConfig: id:0, 320x640
+2026-10-01T15:19:53.6684690Z INFO         | emulatorSetupEnvironment: Environment scene is not required
+2026-10-01T15:19:53.6744362Z USER_INFO    | Emulator is performing a full startup. This may take upto two minutes, or more.
+2026-10-01T15:19:53.6745472Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+2026-10-01T15:19:53.7724174Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+2026-10-01T15:20:01.3777569Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:01.3807556Z * daemon not running; starting now at tcp:5037
+2026-10-01T15:20:01.6618870Z * daemon started successfully
+2026-10-01T15:20:01.6621500Z adb: device offline
+2026-10-01T15:20:01.6630406Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-10-01T15:20:03.6668618Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:03.6716246Z adb: device offline
+2026-10-01T15:20:03.6719322Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-10-01T15:20:05.6778706Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:05.7381221Z 
+2026-10-01T15:20:07.7439932Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:07.7715219Z 
+2026-10-01T15:20:09.7796402Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:09.8112853Z 
+2026-10-01T15:20:11.8182014Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:11.8442454Z 
+2026-10-01T15:20:13.8544673Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:13.8804829Z 
+2026-10-01T15:20:15.8830345Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-10-01T15:20:15.9093584Z 1
+2026-10-01T15:20:15.9111855Z Emulator booted.
+2026-10-01T15:20:15.9180832Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell input keyevent 82
+2026-10-01T15:20:15.9989543Z INFO         | Boot completed in 24590 ms
+2026-10-01T15:20:15.9990344Z INFO         | Increasing screen off timeout, logcat buffer size to 2M.
+2026-10-01T15:20:16.0335577Z Disabling animations.
+2026-10-01T15:20:16.0352886Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global window_animation_scale 0.0
+2026-10-01T15:20:16.1398376Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global transition_animation_scale 0.0
+2026-10-01T15:20:16.1860449Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global animator_duration_scale 0.0
+2026-10-01T15:20:16.3036276Z ##[endgroup]
+2026-10-01T15:20:16.3069121Z [command]/usr/bin/sh -c cd apps/android && ./gradlew :app:connectedDebugAndroidTest
+2026-10-01T15:20:16.5078099Z Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
+2026-10-01T15:20:18.6599476Z ............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+2026-10-01T15:20:19.9679441Z 
+2026-10-01T15:20:19.9680170Z Welcome to Gradle 8.9!
+2026-10-01T15:20:19.9683441Z 
+2026-10-01T15:20:19.9684050Z Here are the highlights of this release:
+2026-10-01T15:20:19.9684851Z  - Enhanced Error and Warning Messages
+2026-10-01T15:20:19.9685374Z  - IDE Integration Improvements
+2026-10-01T15:20:19.9685861Z  - Daemon JVM Information
+2026-10-01T15:20:19.9686205Z 
+2026-10-01T15:20:19.9687228Z For more details see https://docs.gradle.org/8.9/release-notes.html
+2026-10-01T15:20:19.9687887Z 
+2026-10-01T15:20:20.5671003Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-10-01T15:21:24.7709937Z > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+2026-10-01T15:21:24.7710713Z > Task :app:preBuild UP-TO-DATE
+2026-10-01T15:21:24.7711116Z > Task :app:preDebugBuild UP-TO-DATE
+2026-10-01T15:21:24.9668784Z > Task :app:generateDebugBuildConfig
+2026-10-01T15:21:54.9666323Z > Task :app:checkDebugAarMetadata
+2026-10-01T15:21:57.0670329Z > Task :app:generateDebugResValues
+2026-10-01T15:21:57.1688207Z > Task :app:mapDebugSourceSetPaths
+2026-10-01T15:21:57.1703826Z > Task :app:generateDebugResources
+2026-10-01T15:21:58.1667193Z > Task :app:packageDebugResources
+2026-10-01T15:21:58.7665987Z > Task :app:mergeDebugResources
+2026-10-01T15:22:01.0710476Z > Task :app:createDebugCompatibleScreenManifests
+2026-10-01T15:22:01.0729710Z > Task :app:extractDeepLinksDebug
+2026-10-01T15:22:01.1670073Z > Task :app:parseDebugLocalResources
+2026-10-01T15:22:01.3668421Z > Task :app:processDebugMainManifest
+2026-10-01T15:22:01.3668937Z > Task :app:processDebugManifest
+2026-10-01T15:22:01.4666101Z > Task :app:javaPreCompileDebug
+2026-10-01T15:22:01.4666436Z > Task :app:processDebugManifestForPackage
+2026-10-01T15:22:02.2667453Z > Task :app:preDebugAndroidTestBuild SKIPPED
+2026-10-01T15:22:02.7666294Z > Task :app:processDebugResources
+2026-10-01T15:22:05.5667892Z > Task :app:processDebugAndroidTestManifest
+2026-10-01T15:22:10.7688471Z > Task :app:generateDebugAndroidTestBuildConfig
+2026-10-01T15:22:10.8678082Z > Task :app:checkDebugAndroidTestAarMetadata
+2026-10-01T15:22:10.8727296Z > Task :app:generateDebugAndroidTestResValues
+2026-10-01T15:22:10.8747552Z > Task :app:mapDebugAndroidTestSourceSetPaths
+2026-10-01T15:22:10.8748508Z > Task :app:generateDebugAndroidTestResources
+2026-10-01T15:22:11.1674271Z > Task :app:mergeDebugAndroidTestResources
+2026-10-01T15:22:11.3669938Z > Task :app:processDebugAndroidTestResources
+2026-10-01T15:22:11.3670762Z > Task :app:javaPreCompileDebugAndroidTest
+2026-10-01T15:22:11.3671138Z > Task :app:mergeDebugShaders
+2026-10-01T15:22:11.3671463Z > Task :app:compileDebugShaders NO-SOURCE
+2026-10-01T15:22:11.3671824Z > Task :app:generateDebugAssets UP-TO-DATE
+2026-10-01T15:22:11.5718353Z > Task :app:mergeDebugAssets
+2026-10-01T15:22:11.5732781Z > Task :app:compressDebugAssets
+2026-10-01T15:22:11.5733418Z > Task :app:desugarDebugFileDependencies
+2026-10-01T15:22:13.3669229Z > Task :app:checkDebugDuplicateClasses
+2026-10-01T15:22:35.5718114Z > Task :app:compileDebugKotlin
+2026-10-01T15:22:43.3673820Z > Task :app:mergeExtDexDebug
+2026-10-01T15:23:34.9718021Z > Task :app:compileDebugJavaWithJavac
+2026-10-01T15:23:40.2669162Z > Task :app:bundleDebugClassesToCompileJar
+2026-10-01T15:23:40.8692093Z > Task :app:dexBuilderDebug
+2026-10-01T15:23:44.9688255Z > Task :app:mergeDebugGlobalSynthetics
+2026-10-01T15:23:44.9717946Z > Task :app:processDebugJavaRes
+2026-10-01T15:23:46.6672104Z > Task :app:compileDebugAndroidTestKotlin
+2026-10-01T15:23:46.8688144Z > Task :app:mergeDebugJavaResource
+2026-10-01T15:23:47.4688529Z > Task :app:compileDebugAndroidTestJavaWithJavac
+2026-10-01T15:23:47.4689232Z > Task :app:mergeLibDexDebug
+2026-10-01T15:23:47.4717601Z > Task :app:mergeDebugJniLibFolders
+2026-10-01T15:23:48.1677141Z > Task :app:mergeProjectDexDebug
+2026-10-01T15:23:48.1679195Z > Task :app:mergeDebugNativeLibs
+2026-10-01T15:23:48.8685755Z > Task :app:validateSigningDebug
+2026-10-01T15:23:48.8715961Z > Task :app:writeDebugAppMetadata
+2026-10-01T15:23:48.8738006Z > Task :app:writeDebugSigningConfigVersions
+2026-10-01T15:23:48.8749232Z 
+2026-10-01T15:23:48.8778490Z > Task :app:stripDebugDebugSymbols
+2026-10-01T15:23:48.8788744Z Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so.
+2026-10-01T15:23:48.8805833Z 
+2026-10-01T15:23:48.8846113Z > Task :app:mergeDebugAndroidTestShaders
+2026-10-01T15:23:48.8876075Z > Task :app:compileDebugAndroidTestShaders NO-SOURCE
+2026-10-01T15:23:48.8877258Z > Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+2026-10-01T15:23:48.9672817Z > Task :app:mergeDebugAndroidTestAssets
+2026-10-01T15:23:48.9697929Z > Task :app:compressDebugAndroidTestAssets
+2026-10-01T15:23:48.9728169Z > Task :app:desugarDebugAndroidTestFileDependencies
+2026-10-01T15:23:49.0711600Z > Task :app:dexBuilderDebugAndroidTest
+2026-10-01T15:23:50.9668275Z > Task :app:mergeDebugAndroidTestGlobalSynthetics
+2026-10-01T15:23:50.9671751Z > Task :app:packageDebug
+2026-10-01T15:23:50.9672373Z > Task :app:createDebugApkListingFileRedirect
+2026-10-01T15:23:50.9673007Z > Task :app:processDebugAndroidTestJavaRes
+2026-10-01T15:23:51.0680994Z > Task :app:checkDebugAndroidTestDuplicateClasses
+2026-10-01T15:23:51.1689461Z > Task :app:mergeDebugAndroidTestJavaResource
+2026-10-01T15:23:51.4672364Z > Task :app:mergeExtDexDebugAndroidTest
+2026-10-01T15:23:51.4703365Z > Task :app:mergeLibDexDebugAndroidTest
+2026-10-01T15:23:51.4727597Z > Task :app:mergeDebugAndroidTestJniLibFolders
+2026-10-01T15:23:51.4728106Z > Task :app:mergeProjectDexDebugAndroidTest
+2026-10-01T15:23:51.4728561Z > Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+2026-10-01T15:23:51.4729036Z > Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+2026-10-01T15:23:51.4729473Z > Task :app:validateSigningDebugAndroidTest
+2026-10-01T15:23:51.4729907Z > Task :app:writeDebugAndroidTestSigningConfigVersions
+2026-10-01T15:23:51.5669432Z > Task :app:packageDebugAndroidTest
+2026-10-01T15:23:51.5670242Z > Task :app:createDebugAndroidTestApkListingFileRedirect
+2026-10-01T15:24:02.4666624Z [EmulatorConsole]: Failed to start Emulator console for 5554
+2026-10-01T15:24:08.9667875Z 
+2026-10-01T15:24:08.9668733Z > Task :app:connectedDebugAndroidTest
+2026-10-01T15:24:08.9669188Z Starting 4 tests on emulator-5554 - 14
+2026-10-01T15:24:14.0678674Z 
+2026-10-01T15:24:14.0695831Z Finished 4 tests on emulator-5554 - 14
+2026-10-01T15:24:15.9665724Z 
+2026-10-01T15:24:15.9674717Z BUILD SUCCESSFUL in 3m 59s
+2026-10-01T15:24:15.9675832Z 67 actionable tasks: 67 executed
+2026-10-01T15:24:16.3215300Z ##[group]Terminate Emulator
+2026-10-01T15:24:16.3226270Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 emu kill
+2026-10-01T15:24:16.3255888Z OK: killing emulator, bye bye
+2026-10-01T15:24:16.3256354Z OK
+2026-10-01T15:24:16.3259312Z ##[endgroup]
+2026-10-01T15:24:16.3260241Z INFO         | Wait for emulator (pid 2535) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+2026-10-01T15:24:16.3261061Z 
+2026-10-01T15:24:16.3317839Z USER_INFO    | Snapshots have been disabled by the user, save request is ignored.
+2026-10-01T15:24:16.3318604Z INFO         | Saving snapshot 'default_boot' took 0 ms
+2026-10-01T15:24:16.8038394Z ERROR        | stop: Not implemented
+2026-10-01T15:24:16.8038973Z WARNING      | Emulator client has not yet been configured.. Call configure me first!
+2026-10-01T15:24:16.8152073Z INFO         | removeAll
+2026-10-01T15:24:16.8629071Z WARNING      | Netsim Wifi dns:///localhost:36933 is gone due to Stream removed (CANCELLED)
+2026-10-01T15:24:17.6506349Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-01T15:24:17.6506675Z with:
+2026-10-01T15:24:17.6506842Z   name: android-runtime-review
+2026-10-01T15:24:17.6507407Z   path: apps/android/app/build/reports/androidTests
+2026-10-01T15:24:17.6507655Z   if-no-files-found: warn
+2026-10-01T15:24:17.6507839Z   compression-level: 6
+2026-10-01T15:24:17.6508012Z   overwrite: false
+2026-10-01T15:24:17.6508180Z   include-hidden-files: false
+2026-10-01T15:24:17.6508363Z env:
+2026-10-01T15:24:17.6508602Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:24:17.6508980Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+2026-10-01T15:24:17.6509306Z   ANDROID_AVD_HOME: /home/runner/.android/avd
+2026-10-01T15:24:17.6509520Z ##[endgroup]
+2026-10-01T15:24:17.7827610Z (node:3328) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T15:24:17.7828253Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T15:24:17.7886382Z With the provided path, there will be 7 files uploaded
+2026-10-01T15:24:17.7890698Z Artifact name is valid!
+2026-10-01T15:24:17.7891231Z Root directory input is valid!
+2026-10-01T15:24:17.9932036Z Beginning upload of artifact content to blob storage
+2026-10-01T15:24:18.0147427Z (node:3328) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-01T15:24:18.0393894Z Uploaded bytes 6305
+2026-10-01T15:24:18.0542015Z Finished uploading artifact content to blob storage!
+2026-10-01T15:24:18.0542606Z SHA256 digest of uploaded artifact zip is 698c259012a40f12471308abf25b0f34e6d928cc95b3b55aec2d3beaeb865f2d
+2026-10-01T15:24:18.0544362Z Finalizing artifact upload
+2026-10-01T15:24:18.2630010Z Artifact android-runtime-review.zip successfully finalized. Artifact ID 11173795894
+2026-10-01T15:24:18.2630971Z Artifact android-runtime-review has been successfully uploaded! Final size is 6305 bytes. Artifact ID is 11173795894
+2026-10-01T15:24:18.2635790Z Artifact download URL: https://github.com/WangPantopus/creator-platform/actions/runs/36882556015/artifacts/11173795894
+2026-10-01T15:24:18.2790451Z Post job cleanup.
+2026-10-01T15:24:18.3862556Z (node:3341) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T15:24:18.3863208Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T15:24:18.4038100Z Post job cleanup.
+2026-10-01T15:24:18.4747226Z [command]/usr/bin/git version
+2026-10-01T15:24:18.4787546Z git version 2.55.0
+2026-10-01T15:24:18.4834883Z Temporarily overriding HOME='/home/runner/work/_temp/8ecb7382-99f1-4188-a9b9-f9e63d5a63c8' before making global git config changes
+2026-10-01T15:24:18.4836120Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T15:24:18.4837159Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/creator-platform/creator-platform
+2026-10-01T15:24:18.4866689Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T15:24:18.4905825Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T15:24:18.5120417Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T15:24:18.5146911Z http.https://github.com/.extraheader
+2026-10-01T15:24:18.5156910Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-01T15:24:18.5186725Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T15:24:18.5435355Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T15:24:18.5487184Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T15:24:18.5864720Z Cleaning up orphan processes
+2026-10-01T15:24:18.6198101Z Terminate orphan process: pid (2695) (adb)
+2026-10-01T15:24:18.6265333Z Terminate orphan process: pid (2834) (java)
+2026-10-01T15:24:18.6382359Z Terminate orphan process: pid (3001) (java)
+2026-10-01T15:24:18.6427700Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

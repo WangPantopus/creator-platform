@@ -1,6 +1,6 @@
 # W3 requirement → source → current live evidence
 
-Current integrated main: `4c2ea26867d27ba7466e0ac7446216fe0a49b24f`, normally merged into the privacy continuation at `fc167eb90a3a4fd662af8ffe6b4976b38926be7e`. PR8 is merged. Account PR24 remains at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1` with web/backend and Android runtime success and six queued macOS jobs; it is unmerged. The privacy continuation at source30cc2b0 is published for independent review as draftPR36 at initial checkpoint23c74a29345f41a81ec08814da7caf49b38ed9cc, with populated-memory/security acceptance still open. This register drives personal implementation and must not be read as completion.
+Current personally reviewed integrated main: `c1c615e6ece53bff4bc6a47d7f4d332757df1295`, normally merged at `c675f84668245561be7e2804e33c0606b6a7f2de`. The approved SDK recovery head `a4917db65767dd16534f38a7b257010d213257d9` is normally integrated at429428a9; both Android hosted jobs passed all4 existing tests and both web/backend jobs passed, with one actual SDK archive-error retry accepted. [Exact hosted checkpoint](privacy-refresh/ci-checkpoint-a4917db.json). CI PR45 and account PR24 are ready/unmerged under six queued Mac jobs; no waiver. PR8 is merged. Privacy PR36 remains draft for populated/full-W3 gates, with all seven personally operated source30cc2b0/main1c11 hashes unchanged. Latest source integration is not new whole-graph native/product acceptance. The direct human cleanup hold prohibits heavy local runtimes/builds/dependencies/devices; every live-resource statement below describes its dated pre-cleanup checkpoint. This register is an incomplete original-scope acceptance record.
 
 | Package | Current W3 source / canonical producers | Current live evidence and next boundary |
 |---|---|---|
@@ -14,7 +14,7 @@ Current integrated main: `4c2ea26867d27ba7466e0ac7446216fe0a49b24f`, normally me
 | H Offline/wellbeing/lifecycle | resume metadata, realtime, `wellbeing.ts`, `privacy.ts`; W1/W8 current authority/lifecycle and W4 natural pause | Cursor metadata is not offline content. No reviewed offline eligibility/expiry producer exists. Three-hour/90-minute/seven-day data exist; actual timing/lifecycle/purge/retention acceptance remains. |
 | I Language/original | W2 fan-language generator, optional translated display and immutable original consumers | AI language requires actual configured pipeline. No approved optional human-translation provider/consent (Q18); original signing/version must remain immutable. |
 
-## Restored custody
+## Historical restored custody
 
 W5 cleanup is complete (146 GiB reclaimed). Missing source checkout was recreated from the existing `codex/w3-conversations` branch at `3bd918e1a9b047d986ba245d5e44a1cf006bd282`, then normally fast-forwarded to current main. The archived Package.resolved bytes were restored unstaged (SHA256 `9d2d4764e569259be9107b6d28d257f9cf0ffa0e2da0c9028d6277337cfb1318`); W1 says committed main remains intentional and grants no reconciliation lease.
 
@@ -28,6 +28,6 @@ Full private W3 export SHA256 `b92b011fe6cbcd2da770737c68054e500632be7e75b876b38
 - W1/W8: reviewed purpose-issued generation discovery/recovery and secure offline-content authority. Exact [worker consumer requirements](worker-recovery-consumer-requirements.md) and [offline consumer requirements](offline-content-consumer-requirements.md) describe issuer/family/current denial/revocation/expiry/version custody without implementing authority. Interactive request scopes are explicitly unsuitable.
 - W2/W1/W8: Q18 optional human translation producer/processor consent and original proof semantics.
 
-Continue every independent source fix and actual account/safety/unavailable journey while these dependent paths stay closed. No new tests, saved UI flows, delegated implementation/acceptance, provider/license/cost/retention fabrication, peer resource mutation or production-ready claim.
+Continue independent lightweight source/Git/hosted-check work while dependent paths stay closed. Further personally operated account/safety/unavailable journeys require the cleanup hold to be lifted. No new tests, saved UI flows, delegated implementation/acceptance, provider/license/cost/retention fabrication, peer resource mutation or production-ready claim.
 
 Subsequent W5 cleanup removed the restored DB container/volume after W3 stopped it. Original authored source remains in the reverified private export; canonical synthetic session/account transient state is not claimed retained. Catalog/zero-row observations are historical actual evidence, not a current running database. Current runtime/producer receipts and exact remaining call/recording/configuration gates: [producer receipts](producer-receipts.md). No heavy runtime/build was restarted during active cleanup.
