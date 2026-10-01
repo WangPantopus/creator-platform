@@ -101,6 +101,39 @@ function fieldType(schema, name, language = "swift") {
 }
 for (const [name, schema] of Object.entries(spec.components.schemas))
   register(modelName(name), schema);
+const operations = Object.entries(spec.paths).flatMap(([route, item]) =>
+  ["get", "post", "put", "delete", "patch"]
+    .filter((method) => item[method])
+    .map((method) => ({
+      route,
+      method,
+      operation: item[method],
+      parameters: [
+        ...(item.parameters ?? []),
+        ...(item[method].parameters ?? []),
+      ],
+    })),
+);
+// Inline parameter enums must be known before models are emitted.
+for (const { operation, parameters } of operations) {
+  for (const parameter of parameters) {
+    if (parameter.schema?.enum) {
+      if (
+        parameter.schema.type !== "string" ||
+        !Array.isArray(parameter.schema.enum) ||
+        parameter.schema.enum.length === 0 ||
+        !parameter.schema.enum.every((value) => typeof value === "string")
+      )
+        throw new Error(
+          `Unsupported parameter enum for ${operation.operationId}`,
+        );
+      fieldType(
+        parameter.schema,
+        `${pascal(operation.operationId)}${pascal(parameter.name)}`,
+      );
+    }
+  }
+}
 let swift =
   "// Generated from packages/api/generated/openapi.json. Do not edit.\nimport Foundation\n\n";
 let kotlin =
@@ -128,19 +161,6 @@ for (const [name, { kind, schema }] of models) {
     kotlin += `@Serializable\ndata class ${name}(\n${properties.map(({ key, value, optional }) => `  val \`${key}\`: ${fieldType(value, `${name}${pascal(key)}`, "kotlin")}${optional ? "? = null" : ""}`).join(",\n")}\n)\n\n`;
   }
 }
-const operations = Object.entries(spec.paths).flatMap(([route, item]) =>
-  ["get", "post", "put", "delete", "patch"]
-    .filter((method) => item[method])
-    .map((method) => ({
-      route,
-      method,
-      operation: item[method],
-      parameters: [
-        ...(item.parameters ?? []),
-        ...(item[method].parameters ?? []),
-      ],
-    })),
-);
 swift += `public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
 public struct CreatorAPIBinaryResponse: Sendable {
   public let body: Data
@@ -284,14 +304,6 @@ for (const { route, method, operation, parameters } of operations) {
     throw new Error(
       `Missing native path parameter for ${operation.operationId}`,
     );
-  const swiftPath = route.replace(
-    /\{([^}]+)\}/g,
-    (_, key) => `\\(segment(${key}))`,
-  );
-  const kotlinPath = route.replace(
-    /\{([^}]+)\}/g,
-    (_, key) => `\x24{segment(${key})}`,
-  );
   const parameterType = (field, language) =>
     fieldType(
       field.schema,
@@ -299,6 +311,15 @@ for (const { route, method, operation, parameters } of operations) {
       language,
     );
   const stringValue = (field, language) => {
+    if (field.schema.enum) {
+      if (language === "swift")
+        return `${field.argument}${field.required ? "." : "?."}rawValue`;
+      const wire = (value) =>
+        `json.decodeFromString<String>(json.encodeToString(${value}))`;
+      return field.required
+        ? wire(field.argument)
+        : `${field.argument}?.let { ${wire("it")} }`;
+    }
     if (field.schema.type === "string") return field.argument;
     if (language === "swift")
       return field.required
@@ -308,6 +329,22 @@ for (const { route, method, operation, parameters } of operations) {
       ? `${field.argument}.toString()`
       : `${field.argument}?.toString()`;
   };
+  const swiftPath = route.replace(
+    /\{([^}]+)\}/g,
+    (_, key) =>
+      `\\(segment(${stringValue(
+        pathFields.find((field) => field.name === key),
+        "swift",
+      )}))`,
+  );
+  const kotlinPath = route.replace(
+    /\{([^}]+)\}/g,
+    (_, key) =>
+      `\x24{segment(${stringValue(
+        pathFields.find((field) => field.name === key),
+        "kotlin",
+      )})}`,
+  );
   const query = fields.filter((field) => field.in === "query");
   const headers = fields.filter((field) => field.in === "header");
   const swiftExtras =
