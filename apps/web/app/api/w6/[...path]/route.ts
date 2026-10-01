@@ -35,40 +35,50 @@ async function proxy(
     if (value) headers[key] = value;
   }
   try {
-    const expected = request.headers.get("x-qelvora-expected-account");
-    if (expected) {
-      if (!IdSchema.safeParse(expected).success)
+    // W5 binds metadata/tickets and native media-element byte requests to the
+    // account that opened the content. A selector is a precondition, not an actor.
+    const query = new URLSearchParams(request.nextUrl.search);
+    const queryAccounts = query.getAll("expectedAccountId");
+    const headerAccount = request.headers.get("x-qelvora-expected-account");
+    const selector = headerAccount ?? queryAccounts[0];
+    if (selector !== undefined && selector !== null) {
+      const expected = IdSchema.safeParse(selector);
+      if (
+        !expected.success ||
+        queryAccounts.length > 1 ||
+        (headerAccount !== null &&
+          queryAccounts.length === 1 &&
+          headerAccount !== queryAccounts[0])
+      )
         return Response.json(
           {
             error: {
-              code: "account_precondition_invalid",
-              message: "Reload this page before continuing.",
+              code: "session_account_invalid",
+              message: "Reopen this content with your current account.",
             },
           },
-          { status: 400 },
+          { status: 400, headers: { "Cache-Control": "no-store" } },
         );
-      const current = await platformFetch("/v1/identity/session");
-      if (!current.ok)
-        return new Response(current.body, {
-          status: current.status,
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "private, no-store",
-          },
+      const actual = await platformFetch("/v1/identity/session");
+      if (!actual.ok)
+        return Response.json(await actual.json(), {
+          status: actual.status,
+          headers: { "Cache-Control": "no-store" },
         });
-      if (SessionSchema.parse(await current.json()).accountId !== expected)
+      if (SessionSchema.parse(await actual.json()).accountId !== expected.data)
         return Response.json(
           {
             error: {
               code: "session_account_changed",
-              message:
-                "Your account changed. Reload this page before continuing.",
+              message: "Your account changed. Reopen this content to continue.",
             },
           },
-          { status: 409, headers: { "Cache-Control": "private, no-store" } },
+          { status: 409, headers: { "Cache-Control": "no-store" } },
         );
-      headers["x-qelvora-expected-account"] = expected;
+      headers["x-qelvora-expected-account"] = expected.data;
     }
+    query.delete("expectedAccountId");
+    const upstreamQuery = query.toString();
     const data = ["GET", "HEAD"].includes(request.method)
       ? undefined
       : await request.arrayBuffer();
@@ -78,7 +88,7 @@ async function proxy(
         { status: 413 },
       );
     const response = await platformFetch(
-      `/v1/w6/${path.join("/")}${request.nextUrl.search}`,
+      `/v1/w6/${path.join("/")}${upstreamQuery ? `?${upstreamQuery}` : ""}`,
       {
         method: request.method,
         headers,

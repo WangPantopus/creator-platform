@@ -1,0 +1,33 @@
+Merge made by the 'ort' strategy.
+ apps/web/features/studio/Studio.tsx                |  27 +++---
+ .../W5/2026-10-01/draft-attribution/README.md      |  17 ++++
+ .../draft-attribution/actual-browser-states.json   |  77 +++++++++++++++++
+ .../draft-attribution/after-draft-390-light.jpg    | Bin 0 -> 25457 bytes
+ .../before-signed-draft-390-light.jpg              | Bin 0 -> 30228 bytes
+ .../database-after-restoration.json                |   1 +
+ .../draft-attribution/production-web-build.log     |  94 +++++++++++++++++++++
+ .../restored-original-draft-390-night.jpg          | Bin 0 -> 25457 bytes
+ .../draft-attribution/saved-draft-1280-light.jpg   | Bin 0 -> 53074 bytes
+ .../draft-attribution/saved-draft-1280-night.jpg   | Bin 0 -> 50489 bytes
+ .../draft-attribution/saved-draft-390-light.jpg    | Bin 0 -> 37145 bytes
+ .../draft-attribution/saved-draft-390-night.jpg    | Bin 0 -> 35602 bytes
+ .../2026-10-01/draft-attribution/source-sha256.txt |   2 +
+ .../team-composer-before-removal.jpg               | Bin 0 -> 33124 bytes
+ .../team-revocation-database.jsonl                 |   3 +
+ .../draft-attribution/team-view-after-removal.jpg  | Bin 0 -> 11266 bytes
+ 16 files changed, 211 insertions(+), 10 deletions(-)
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/README.md
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/actual-browser-states.json
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/after-draft-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/before-signed-draft-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/database-after-restoration.json
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/production-web-build.log
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/restored-original-draft-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/saved-draft-1280-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/saved-draft-1280-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/saved-draft-390-light.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/saved-draft-390-night.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/source-sha256.txt
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/team-composer-before-removal.jpg
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/team-revocation-database.jsonl
+ create mode 100644 artifacts/workstreams/W5/2026-10-01/draft-attribution/team-view-after-removal.jpg

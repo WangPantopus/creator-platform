@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "calls_unconfigured",
+    "message": "Calling is not connected yet.",
+    "requestId": "67408677-7b83-44de-bff9-64d7999b5922"
+  }
+}

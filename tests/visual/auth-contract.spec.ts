@@ -45,7 +45,7 @@ test("welcome and auth seam preserve an opaque context without draft content", a
   request,
 }) => {
   const returnTo =
-    "/creators/maya/requests?context=00000000-0000-4000-8000-000000000001";
+    "/creators/maya/requests?context=11111111-1111-4111-8111-111111111111";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
     name: "Continue with Pantopus",

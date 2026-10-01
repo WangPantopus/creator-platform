@@ -1,4 +1,5 @@
 "use client";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useState } from "react";
 import type {
   CallOfferContext,
@@ -45,7 +46,7 @@ function CurrentOffer(props: Destination) {
           setNotice(
             failure instanceof Error
               ? failure.message
-              : "The captured call could not be loaded.",
+              : copy.w6TheCapturedCallCouldNotBeLoaded,
           );
       });
     return () => {
@@ -60,13 +61,14 @@ function CurrentOffer(props: Destination) {
     />
   ) : (
     <main className="w6-call w6-offer">
-      <span className="qv-meta">STUDIO · CALL REQUEST</span>
-      <h1>{existing ? "Times already offered" : "Offer three times"}</h1>
+      <span className="qv-meta">{copy.w6STUDIOCALLREQUEST}</span>
+      <h1>{existing ? copy.w6TimesAlreadyOffered : copy.w6OfferThreeTimes}</h1>
       {existing ? (
         <>
           <p>
-            The current offer is {existing.state}. Check this saved offer before
-            sending another signed act.
+            {formatCopy("w6TheCurrentOfferIsCheckThisSavedOfferBeforeSending", {
+              value1: existing.state,
+            })}
           </p>
           <ul>
             {existing.slots.map((slot) => (
@@ -74,32 +76,33 @@ function CurrentOffer(props: Destination) {
             ))}
           </ul>
           <p>
-            Your time zone · {existing.creatorTimeZone}
+            {copy.w6YourTimeZonebb173f}
+            {existing.creatorTimeZone}
             <br />
-            Fan's time zone · {existing.fanTimeZone}
+            {copy.w6FanSTimeZone}
+            {existing.fanTimeZone}
           </p>
           {existing.selectedSessionId && (
             <a
               href={`/calls/${props.creatorId}/${props.fanId}/${existing.selectedSessionId}`}
             >
-              Open the scheduled call
+              {copy.w6OpenTheScheduledCall}
             </a>
           )}
         </>
       ) : (
         <p>
-          {notice ??
-            "Checking the current captured request and creator access."}
+          {notice ?? copy.w6CheckingTheCurrentCapturedRequestAndCreatorAccess}
         </p>
       )}
       <button
         className="qv-btn qv-btn--quiet"
         onClick={() => setRevision(revision + 1)}
       >
-        Reload current offer
+        {copy.w6ReloadCurrentOffer}
       </button>
       <a className="qv-btn qv-btn--quiet" href="/studio/requests">
-        Open Studio requests
+        {copy.w6OpenStudioRequests}
       </a>
     </main>
   );

@@ -27,7 +27,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             Task { @MainActor [weak self] in
                 guard let self, self.state == .recording else { return }
                 self.pause(interrupted: true)
-                self.reason = "Audio route changed. Check your microphone, then resume or record again."
+                self.reason = QelvoraCopy.text("w6AudioRouteChangedCheckYourMicrophoneThenResumeOrRecord")
             }
         })
         #endif
@@ -37,12 +37,12 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
         let requestGeneration = generation
         #if os(iOS)
         guard Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") != nil else {
-            state = .failed; reason = "Microphone recording is unavailable in this app build."; return
+            state = .failed; reason = QelvoraCopy.text("w6MicrophoneRecordingIsUnavailableInThisAppBuild"); return
         }
         state = .requesting
         let allowed = await AVAudioApplication.requestRecordPermission()
         guard requestGeneration == generation else { return }
-        guard allowed else { state = .denied; reason = "Microphone access is off. Allow it in Settings, then try again."; return }
+        guard allowed else { state = .denied; reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry"); return }
         #endif
         do {
             #if os(iOS)
@@ -64,17 +64,17 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
                     if self.duration >= self.maximumDuration { self.stop(); return }
                 }
             }
-        } catch { state = .failed; reason = "The microphone is unavailable. Try again."; deactivate() }
+        } catch { state = .failed; reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain"); deactivate() }
     }
     public func pause(interrupted: Bool = false) {
         if interrupted && state == .requesting {
             generation += 1; state = .idle
-            reason = "Microphone request cancelled after an interruption. Record when you return."
+            reason = QelvoraCopy.text("w6MicrophoneRequestCancelledAfterAnInterruptionRecordWhenYouReturn")
             return
         }
         guard state == .recording else { return }
         duration = recorder?.currentTime ?? duration; recorder?.pause(); state = .paused
-        if interrupted { reason = "Recording paused after an interruption. Resume or preview what was saved." }
+        if interrupted { reason = QelvoraCopy.text("w6RecordingPausedAfterAnInterruptionResumeOrPreviewWhatWas") }
     }
     public func resume() {
         guard state == .paused else { return }
@@ -84,7 +84,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             #endif
             guard recorder?.record() == true else { throw CocoaError(.fileWriteUnknown) }
             state = .recording; reason = nil
-        } catch { reason = "Recording could not resume. Preview it or record again." }
+        } catch { reason = QelvoraCopy.text("w6RecordingCouldNotResumePreviewItOrRecordAgain") }
     }
     public func stop() {
         guard state == .recording || state == .paused else { return }
@@ -100,7 +100,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             try AVAudioSession.sharedInstance().setActive(true)
             #endif
             player = try AVAudioPlayer(contentsOf: file); player?.play()
-        } catch { reason = "The saved recording could not be played. Record again." }
+        } catch { reason = QelvoraCopy.text("w6TheSavedRecordingCouldNotBePlayedRecordAgain") }
     }
     public func seek(to seconds: TimeInterval) { player?.currentTime = min(duration, max(0, seconds)) }
     public func pausePreview() { player?.pause() }
@@ -116,7 +116,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
     }
     public func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         guard self.recorder === recorder else { return }
-        stop(); reason = "Recording was interrupted. Preview what was saved or record again."
+        stop(); reason = QelvoraCopy.text("w6RecordingWasInterruptedPreviewWhatWasSavedOrRecordAgain")
     }
 }
 
@@ -128,25 +128,25 @@ public struct MediaRecordingView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: QelvoraTokens.space5) {
-                Text("Your own voice").qText("display-md")
-                Text("Record and listen before uploading. Your preview stays on this device.").qText("body")
-                Text(String(format: "%d:%02d", Int(recorder.duration) / 60, Int(recorder.duration) % 60)).qText("data-lg").accessibilityLabel("\(Int(recorder.duration)) seconds recorded")
-                Text("Up to \(Int(recorder.maximumDuration)) seconds").qText("caption")
+                Text(QelvoraCopy.text("w6YourOwnVoice")).qText("display-md")
+                Text(QelvoraCopy.text("w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis")).qText("body")
+                Text(String(format: "%d:%02d", Int(recorder.duration) / 60, Int(recorder.duration) % 60)).qText("data-lg").accessibilityLabel(QelvoraCopy.text("w6SecondsRecorded", values: ["value1": String(describing: Int(recorder.duration))]))
+                Text(QelvoraCopy.text("w6UpToSeconds", values: ["value1": String(describing: Int(recorder.maximumDuration))])).qText("caption")
                 if recorder.state == .recording || recorder.state == .paused {
-                    Button(recorder.state == .recording ? "Pause" : "Resume", variant: .secondary) { if recorder.state == .recording { recorder.pause() } else { recorder.resume() } }
-                    Button("Stop and preview", variant: .secondary) { recorder.stop() }
+                    Button(recorder.state == .recording ? QelvoraCopy.text("w6Pause") : QelvoraCopy.text("w6Resume"), variant: .secondary) { if recorder.state == .recording { recorder.pause() } else { recorder.resume() } }
+                    Button(QelvoraCopy.text("w6StopAndPreview"), variant: .secondary) { recorder.stop() }
                 } else if recorder.state == .requesting {
-                    Button("Cancel permission request", variant: .secondary) { recorder.discard() }
+                    Button(QelvoraCopy.text("w6CancelPermissionRequest"), variant: .secondary) { recorder.discard() }
                 } else {
-                    Button(recorder.state == .preview ? "Record again" : "Record", variant: .secondary) { Task { await recorder.start() } }
+                    Button(recorder.state == .preview ? QelvoraCopy.text("w6RecordAgain") : QelvoraCopy.text("w6Record"), variant: .secondary) { Task { await recorder.start() } }
                 }
                 if recorder.state == .preview {
-                    Button("Play private preview", variant: .secondary) { recorder.preview() }
-                    Button("Pause preview", variant: .secondary) { recorder.pausePreview() }
-                    Button("Discard recording", variant: .quiet) { recorder.discard() }
+                    Button(QelvoraCopy.text("w6PlayPrivatePreview"), variant: .secondary) { recorder.preview() }
+                    Button(QelvoraCopy.text("w6PausePreview"), variant: .secondary) { recorder.pausePreview() }
+                    Button(QelvoraCopy.text("w6DiscardRecording"), variant: .quiet) { recorder.discard() }
                 }
                 if let reason = recorder.reason { Text(reason).qText("caption").accessibilityAddTraits(.updatesFrequently) }
-                Text("Uploading and exact-media signing require a configured account and media service.").qText("caption")
+                Text(QelvoraCopy.text("w6UploadingAndExactMediaSigningRequireAConfiguredAccountAnd")).qText("caption")
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
             .onChange(of: scenePhase) { _, phase in if phase != .active { recorder.pause(interrupted: true); recorder.pausePreview() } }

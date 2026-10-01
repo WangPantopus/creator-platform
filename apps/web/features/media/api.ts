@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 import type {
   MediaAsset,
   UploadTicket,
@@ -12,6 +13,7 @@ export async function readCreatorMediaPolicy(input: {
   creatorId: string;
   objectId: string;
   purpose: CreatorMediaPurpose;
+  expectedAccountId?: string;
   signal?: AbortSignal;
 }) {
   const query = new URLSearchParams({
@@ -21,7 +23,7 @@ export async function readCreatorMediaPolicy(input: {
   const result = CreatorMediaPolicyViewSchema.parse(
     await mediaRequest<unknown>(
       `creators/${input.creatorId}/media-policy?${query}`,
-      { signal: input.signal },
+      { signal: input.signal, expectedAccountId: input.expectedAccountId },
     ),
   );
   if (
@@ -30,7 +32,7 @@ export async function readCreatorMediaPolicy(input: {
     result.purpose !== input.purpose
   )
     throw new Error(
-      "This recording limit does not match the current saved content.",
+      copy.w6ThisRecordingLimitDoesNotMatchTheCurrentSavedContent,
     );
   return result;
 }
@@ -61,19 +63,34 @@ export function configureMediaRequests(current: MediaIdentity) {
 
 export async function mediaRequest<T>(
   path: string,
-  init: RequestInit = {},
+  init: RequestInit & { expectedAccountId?: string } = {},
 ): Promise<T> {
   const current = identity;
-  const headers = new Headers(init.headers);
+  const { expectedAccountId, ...request } = init;
+  if (
+    current &&
+    expectedAccountId !== undefined &&
+    expectedAccountId !== current.accountId
+  )
+    throw new MediaRequestError(
+      "Your account changed. Reopen this content to continue.",
+      409,
+      "session_account_changed",
+    );
+  const headers = new Headers(request.headers);
   if (!headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
-  if (current) headers.set("X-Qelvora-Expected-Account", current.accountId);
+  const account = expectedAccountId ?? current?.accountId;
+  if (account !== undefined) headers.set("x-qelvora-expected-account", account);
   const signal = current
-    ? AbortSignal.any([current.signal, ...(init.signal ? [init.signal] : [])])
-    : init.signal;
+    ? AbortSignal.any([
+        current.signal,
+        ...(request.signal ? [request.signal] : []),
+      ])
+    : request.signal;
   signal?.throwIfAborted();
   const response = await fetch(`/api/w6/${path}`, {
-    ...init,
+    ...request,
     credentials: "same-origin",
     cache: "no-store",
     headers,
@@ -90,7 +107,7 @@ export async function mediaRequest<T>(
     )
       current?.end();
     throw new MediaRequestError(
-      error?.error?.message ?? "Media is unavailable. Try again.",
+      error?.error?.message ?? copy.w6MediaIsUnavailableTryAgain,
       response.status,
       error?.error?.code,
     );
@@ -105,6 +122,8 @@ export type RecordingUploadInput = {
   purpose: "human_note" | "human_reply" | "interview_audio";
   blob: Blob;
   durationMs: number;
+  /** Current host account precondition, never identity or access authority. */
+  expectedAccountId?: string;
   /** Retain with the recording, including when the initial response is lost. */
   idempotencyKey: string;
   signal: AbortSignal;
@@ -136,11 +155,11 @@ export function uploadCreatorMedia(
     if (
       ticket.asset.creatorId !== input.creatorId ||
       ticket.asset.objectId !== input.objectId ||
-      ticket.asset.purpose !== input.purpose
+      ticket.asset.purpose !== input.purpose ||
+      (input.expectedAccountId !== undefined &&
+        ticket.asset.ownerAccountId !== input.expectedAccountId)
     )
-      throw new Error(
-        "This upload does not belong to the current content. Refresh before continuing.",
-      );
+      throw new Error(copy.w6ThisUploadDoesNotBelongToTheCurrentContentRefresh);
     input.onTicket(ticket);
   };
   return uploadBinary<CreatorMediaAsset>({
@@ -156,6 +175,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   declaration: Record<string, string>;
   blob: Blob;
   durationMs?: number;
+  expectedAccountId?: string;
   idempotencyKey: string;
   signal: AbortSignal;
   progress: (ratio: number) => void;
@@ -163,6 +183,11 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   onTicket: (ticket: BinaryTicket<A>) => void;
 }): Promise<A> {
   const family = input.family;
+  const request = <T>(path: string, init: RequestInit = {}) =>
+    mediaRequest<T>(path, {
+      ...init,
+      expectedAccountId: input.expectedAccountId,
+    });
   if (
     !Number.isSafeInteger(input.blob.size) ||
     input.blob.size <= 0 ||
@@ -180,9 +205,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
         input.durationMs <= 0 ||
         input.durationMs > 3_600_000))
   )
-    throw new Error(
-      "Choose a supported file within the content's media limit.",
-    );
+    throw new Error(copy.w6ChooseASupportedFileWithinTheContentSMediaLimit);
   input.signal.throwIfAborted();
   const digest = Array.from(
     new Uint8Array(
@@ -194,7 +217,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   input.signal.throwIfAborted();
   let ticket =
     input.resumed ??
-    (await mediaRequest<BinaryTicket<A>>(family, {
+    (await request<BinaryTicket<A>>(family, {
       method: "POST",
       body: JSON.stringify({
         ...input.declaration,
@@ -218,24 +241,22 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
       ticket.chunkBytes < 1 ||
       ticket.chunkBytes > 1_048_576
     )
-      throw new Error(
-        "The resumed upload does not match this recording. Start a new upload.",
-      );
+      throw new Error(copy.w6TheResumedUploadDoesNotMatchThisRecordingStartA);
   };
   validateTicket();
   const assetId = ticket.asset.id;
   input.onTicket(ticket);
   // A finish response may be lost after the worker has already claimed or processed the asset.
-  const current = await mediaRequest<A>(`${family}/${ticket.asset.id}`, {
+  const current = await request<A>(`${family}/${ticket.asset.id}`, {
     signal: input.signal,
   });
   if (current.id !== assetId)
-    throw new Error("The saved upload could not be confirmed.");
+    throw new Error(copy.w6TheSavedUploadCouldNotBeConfirmed);
   if (
     ["quarantined", "processing", "ready", "rejected"].includes(current.state)
   )
     return current;
-  ticket = await mediaRequest<BinaryTicket<A>>(
+  ticket = await request<BinaryTicket<A>>(
     `${family}/${ticket.asset.id}/resume`,
     {
       method: "POST",
@@ -245,25 +266,25 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   );
   validateTicket();
   if (ticket.asset.id !== assetId)
-    throw new Error("The resumed upload changed.");
+    throw new Error(copy.w6TheResumedUploadChanged);
   input.onTicket(ticket);
   let offset = ticket.asset.uploadedBytes;
   input.progress(offset / input.blob.size);
   while (offset < input.blob.size) {
     if (Date.parse(ticket.expiresAt) <= Date.now() + 5000) {
-      ticket = await mediaRequest<BinaryTicket<A>>(
+      ticket = await request<BinaryTicket<A>>(
         `${family}/${ticket.asset.id}/resume`,
         { method: "POST", body: "{}", signal: input.signal },
       );
       validateTicket();
       if (ticket.asset.id !== assetId)
-        throw new Error("The resumed upload changed.");
+        throw new Error(copy.w6TheResumedUploadChanged);
       offset = ticket.asset.uploadedBytes;
       input.onTicket(ticket);
     }
     const url = new URL(ticket.url);
     const next = Math.min(input.blob.size, offset + ticket.chunkBytes);
-    const asset = await mediaRequest<A>(
+    const asset = await request<A>(
       `${family}/${ticket.asset.id}/upload${url.search}`,
       {
         method: "PUT",
@@ -277,12 +298,12 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     );
     if (asset.id !== assetId || asset.uploadedBytes !== next)
       throw new Error(
-        "Upload progress could not be confirmed. Resume this recording.",
+        copy.w6UploadProgressCouldNotBeConfirmedResumeThisRecording,
       );
     offset = asset.uploadedBytes;
     input.progress(offset / input.blob.size);
   }
-  return mediaRequest<A>(`${family}/${ticket.asset.id}/finish`, {
+  return request<A>(`${family}/${ticket.asset.id}/finish`, {
     method: "POST",
     body: "{}",
     signal: input.signal,

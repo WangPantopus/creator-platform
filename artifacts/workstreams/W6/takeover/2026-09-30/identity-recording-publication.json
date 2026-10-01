@@ -1,0 +1,61 @@
+{
+  "recordedAt": "2026-10-01T01:48:22.358947+00:00",
+  "identity": {
+    "producer": "0805caad635b6daafcd7bfe1117a2ebe0a6723e5",
+    "consumedRevision": "622c9c2754467006f856287139329a45a7b2cb90",
+    "onlyFiles": ["creator-scope.ts", "audience-scope.ts"],
+    "requestAuthorityDependencyMatchesProducer": true,
+    "checks": "Backend production and9 existing contracts pass184ms cases/1.76s runner; no actual session/denial race acceptance"
+  },
+  "recording": {
+    "fullManifestRevision": "30237f5702f395c15f56efafaa6cabf99afe947b",
+    "currentReadRevision": "e2b646620c9e1a6fa42aec87c8a38771889f2d92",
+    "actualCommand": {
+      "actType": "reply",
+      "subjectId": "actual ThreadScope.threadId",
+      "content": [
+        "mediaAssetId",
+        "version",
+        "sha256",
+        "mimeType",
+        "durationMs",
+        "bytes"
+      ]
+    },
+    "fullOccurrenceFields": [
+      "schemaVersion",
+      "kind",
+      "c2paVerified",
+      "accountId",
+      "creatorId",
+      "fanId",
+      "threadId",
+      "purpose",
+      "assetId",
+      "assetVersion",
+      "signedActId",
+      "processedMediaSha256",
+      "processedMediaBytes",
+      "processedMediaMimeType",
+      "processedMediaDurationMs",
+      "transform",
+      "fileSha256"
+    ],
+    "olderIncompleteManifest": "Denied at association/fan delivery; no automatic rewrite",
+    "sameClientCurrentRead": "publishedRecordingRead requires genuine scope, actual family/owner/current deny/purpose/expiry, exact persisted evidence and full occurrence. Creator verifies consumed/unwithdrawn publication on same client; fan requires strict currentRecordingPublication port. Absence denies metadata/ticket/stream reads.",
+    "privateRegistryConstraint": "W1 confirms signer-account RLS and public verification hash/status do not supply exact private current consumed publication authority under fan account. W8 reviewed purpose/RLS/current visibility producer still required.",
+    "checks": "Backend production/ESLint and9existing contracts pass245ms/2.05s manifest and370ms/3.06s read-port runners; no new cases"
+  },
+  "sourceSha256": {
+    "apps/backend/src/modules/identity/creator-scope.ts": "05a0a1b0aed8b533e53c4805d0a3372db81a2eb282e8c9face3a3c32e79dbad1",
+    "apps/backend/src/modules/identity/audience-scope.ts": "f9cc6e0246d9afe65c0f5b281a2a532b3a4d05d28b91c65cba0f9584eef896ea",
+    "apps/backend/src/modules/identity/request-authority.ts": "42c02fdda43855be37b0013cebce0fc97a4b4386626de2c2dbef8c10f60efd4e",
+    "apps/backend/src/modules/media/service.ts": "9e42bb0af9be124fbe28e4c96652e83f15eac64756ce2b72a444e2ce237b3be5",
+    "apps/backend/src/modules/media/worker.ts": "dda5032a4f2b2b4490e7e2929d9a770464e8aba2d07853d6bdbfd6f9afccbcd8",
+    "apps/backend/src/modules/media/creator-worker.ts": "453c6afaf6980929612ee02b93aeba4dff163bd3b0ac2646da0534150efccff9"
+  },
+  "actualSignerOrPlaybackAcceptance": false,
+  "newTestsCasesHarnessesGoldensOrThresholds": 0,
+  "capabilitiesEnabled": false,
+  "pushed": false
+}

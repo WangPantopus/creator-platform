@@ -1,3 +1,4 @@
+import { copy } from "@qelvora/copy";
 export type RecordingState =
   | "idle"
   | "requesting"
@@ -54,7 +55,7 @@ export class VoiceRecorder {
         typeof MediaRecorder === "undefined"
       )
         throw new Error(
-          "Recording is unavailable in this browser. Use a supported browser over HTTPS.",
+          copy.w6RecordingIsUnavailableInThisBrowserUseASupportedBrowser,
         );
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
@@ -71,7 +72,7 @@ export class VoiceRecorder {
         "audio/ogg;codecs=opus",
       ].find((type) => MediaRecorder.isTypeSupported(type));
       if (!mimeType)
-        throw new Error("This browser cannot produce a supported recording.");
+        throw new Error(copy.w6ThisBrowserCannotProduceASupportedRecording);
       const recorder = new MediaRecorder(stream, {
         mimeType,
         audioBitsPerSecond: 96_000,
@@ -83,8 +84,7 @@ export class VoiceRecorder {
           this.discard();
           this.publish({
             state: "failed",
-            reason:
-              "This recording reached the file limit. Record a shorter clip.",
+            reason: copy.w6ThisRecordingReachedTheFileLimitRecordAShorterClip,
           });
           return;
         }
@@ -107,14 +107,14 @@ export class VoiceRecorder {
           durationMs,
           reason: blob.size
             ? this.snapshot.reason
-            : "No audio was recorded. Try again.",
+            : copy.w6NoAudioWasRecordedTryAgain,
         });
       };
       recorder.onerror = () => {
         if (generation !== this.generation) return;
         this.publish({
           reason:
-            "Recording was interrupted. Preview what was saved or record again.",
+            copy.w6RecordingWasInterruptedPreviewWhatWasSavedOrRecordAgain,
         });
         this.stop();
       };
@@ -123,7 +123,7 @@ export class VoiceRecorder {
           if (generation !== this.generation) return;
           this.publish({
             reason:
-              "The microphone was disconnected. Preview what was saved or record again.",
+              copy.w6TheMicrophoneWasDisconnectedPreviewWhatWasSavedOrRecord,
           });
           this.stop();
         };
@@ -145,10 +145,10 @@ export class VoiceRecorder {
       this.publish({
         state: denied ? "denied" : "failed",
         reason: denied
-          ? "Microphone access is off. Allow it in your browser settings, then try again."
+          ? copy.w6MicrophoneAccessIsOffAllowItInYourBrowserSettings
           : error instanceof Error
             ? error.message
-            : "The microphone is unavailable.",
+            : copy.w6TheMicrophoneIsUnavailable,
       });
     }
   }
@@ -161,7 +161,7 @@ export class VoiceRecorder {
       this.publish({
         state: "idle",
         reason:
-          "Microphone request cancelled while you left this screen. Record when you return.",
+          copy.w6MicrophoneRequestCancelledWhileYouLeftThisScreenRecordWhen,
       });
       return;
     }
@@ -172,7 +172,7 @@ export class VoiceRecorder {
       state: "paused",
       durationMs: this.elapsed,
       reason: interrupted
-        ? "Recording paused while you left this screen. Resume or preview it."
+        ? copy.w6RecordingPausedWhileYouLeftThisScreenResumeOrPreview
         : null,
     });
   }

@@ -1,0 +1,36 @@
+{
+  "producer": "adc7cd1487d1cba663b84c8da7aad2459ddf7cd8",
+  "consumer": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+  "heldThreadScopeConsumer": "a6e8785",
+  "sourceSha256": {
+    "apps/backend/src/app.ts": "1c1447794b034afae6e77b76feeaec9988f37936d44e21021caa73b8e6b2d183",
+    "apps/backend/src/modules/identity/subjects.ts": "45d3a06cff81719d25f29312f96a88c44ab6990fc17bc608de77c8007c770cdc",
+    "apps/backend/src/modules/identity/signed-acts.ts": "434836ecfdd098f3b6127f447d4ddac1539b6cfe1cb9cba5d76d619eb663a7a3",
+    "apps/backend/src/modules/media/service.ts": "9b2a49fc51e7e0700c86579ee290a809749406679f68c2587816d5a92368c988",
+    "apps/backend/src/modules/access/scope.ts": "548448ac6be02e2bf1bfed37d81a2c0c98493b756bcc847ab4bc4e5c6b22ea92",
+    "apps/backend/src/db/database.ts": "c9a2a4e24e7cf0c4c557e7809e2c8b412597a5fa094c92958f5455859423d718",
+    "apps/backend/src/integration.ts": "bc28a2f9d9ee7d764b98c6df60a3a324ae485020ca89eadb4923c004f3ab3cea"
+  },
+  "behavior": [
+    "Actual thread/fan/current actor selected on the held client before subject preparation",
+    "Direct opaque fifth ThreadScope argument; request JSON cannot construct authority",
+    "First media signing requires actual locked human_active thread control",
+    "Challenge preparation uses the same held transaction"
+  ],
+  "unchangedVerifyWithdrawPasskeySuffixSha256": "ede4d6d427e1ffc24aa6f6b295ec9450fefb1737faf8714690e78cb2b54fa517",
+  "checks": {
+    "backendProductionBuild": "pass",
+    "format": "pass",
+    "lint": "pass",
+    "newTests": false
+  },
+  "limits": [
+    "Genuine SQL/creator/passkey/publication/fan-delivery journey remains unproved",
+    "No second consumption, new transaction, caption, fake fan, or media provider"
+  ],
+  "featureGates": {
+    "calls": false,
+    "media": false,
+    "aiAudio": false
+  }
+}

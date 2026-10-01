@@ -1,0 +1,3742 @@
+[
+  {
+    "name": "testAuthorIdentitySurfaces.light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 93140,
+    "currentSha256": "f7183d1b67f1defe6e17cd44005c5ce6d348e6d7546b0c77befa8ab9b5255edd",
+    "referenceSha256": "42cfd099a6c802436dabc11d830a441d064f10492b4bfb4d06117a2b8df15e66"
+  },
+  {
+    "name": "testAuthorIdentitySurfaces.night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 803735,
+    "currentSha256": "557fb3fe1df63b9b4157e1686c087955ba3fd2862438171094c8330b89608220",
+    "referenceSha256": "2f2e260ab549a691cfefc5390cda2c631de4025393c9ee80a51670f011d09d4e"
+  },
+  {
+    "name": "testComponentCatalogThemes.AccessLines-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 47681,
+    "currentSha256": "bf11585dc2c2f7c1808e6015c86aeddf700c32b86fa17861160260ae2dd365ff",
+    "referenceSha256": "1df1fa309307066c3c390a96228d24c5af07e02263d0f2147fa4e5a624f558af"
+  },
+  {
+    "name": "testComponentCatalogThemes.AccessLines-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1316209,
+    "currentSha256": "cd93d39dde12426e0faf8c5cfedff751b68093a84af3ce1048571b7c5857a780",
+    "referenceSha256": "0a1ca55fb3ed8ee0506cc61b4791782d5902ec6f0dfc18e70561dd9bad12cadb"
+  },
+  {
+    "name": "testComponentCatalogThemes.AuditBanner-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 17519,
+    "currentSha256": "a20cd1ccca3ab5a504eab38c2d8cece3f7f25de1188a86fa84278b992c35dbd8",
+    "referenceSha256": "6d8610e2f76e7bd88f28b8ea383deb097a568c5215ebbbac12846197567cb6e4"
+  },
+  {
+    "name": "testComponentCatalogThemes.AuditBanner-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1249259,
+    "currentSha256": "b308b96a131f0e98e7c99e399cd127156dda2e9dd4d12d8fb71d25f223f1050c",
+    "referenceSha256": "400fc99cd26237c91393cceb57fb6b6bcc6e93c07d3349966c02f08459680ac0"
+  },
+  {
+    "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 41776,
+    "currentSha256": "387ce38e0e79c5e1c435cf8398b80eefbd82f1d618ce6ae939f1bbeddb05a2b2",
+    "referenceSha256": "e73efc519abc642a49d0950edadd3b6dd1f50428b501c02f9d377d1201b7450d"
+  },
+  {
+    "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315061,
+    "currentSha256": "f15fb27800169c466808783836936a09f9b3071dc3bbc3db12ec141a14710efa",
+    "referenceSha256": "14890049cf6af76803e189d238cb6064de4fa803a34466e31c805a09ad1e0694"
+  },
+  {
+    "name": "testComponentCatalogThemes.Avatar-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 38350,
+    "currentSha256": "8f329f7353bef65f876e893f5190ae86bc62eeb13f5b776b0f6dbb324663d9f4",
+    "referenceSha256": "0e7a59c4a5ef88531dd78560a25b63bb4e846eeff0f4523770553f4659f2646e"
+  },
+  {
+    "name": "testComponentCatalogThemes.Avatar-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1309516,
+    "currentSha256": "ad6cb549ddd1124176fb9cadb99383262aab81392050fde13516c9b30da218dd",
+    "referenceSha256": "e78db00e03744e3c9e2d7b002147072112da4df460a8d6533266c83dbf7904b2"
+  },
+  {
+    "name": "testComponentCatalogThemes.Button-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 37349,
+    "currentSha256": "9d3b909cd494b0d55408bc59341117a436dd726b7fcde743761bb77de68d48d1",
+    "referenceSha256": "16835416a029ac2c41fd71e9bd5b47a839ab463bc8863578c02f9341d519e4e1"
+  },
+  {
+    "name": "testComponentCatalogThemes.Button-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1247989,
+    "currentSha256": "21ff971235df6a13eacda6add13d8f40bf1f1af6c28af15a1977f0f69aff7203",
+    "referenceSha256": "7aa3937ba45b95736d55e993fac81c8c9bd56ddac6c1c3117a6337d0d32d1ced"
+  },
+  {
+    "name": "testComponentCatalogThemes.CallChip-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 67729,
+    "currentSha256": "f8692176b04d74bfae2554d4e11ec4763abd0bea718a20a490f6a26d7a0adab9",
+    "referenceSha256": "cefbe28a926a6f330e935430dbd210878ab90af8cd5802d2820a324ee7b0f610"
+  },
+  {
+    "name": "testComponentCatalogThemes.CallChip-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1282724,
+    "currentSha256": "2e7550e479f478273e11dc167e4927b66af11052c9dd8b1d783716d95f102946",
+    "referenceSha256": "d5ddf9b15e1a0ae19fd65afdd8eeac4deea7d11bcf9cf9fbc30d4c0a5137b34c"
+  },
+  {
+    "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 27429,
+    "currentSha256": "83d3398a6e63661f6ea6883599e922e835d4a2d829bef1a47aaad357eced38d4",
+    "referenceSha256": "d9224a272aaf37866d296b1eefffe66ffc7272d358a56d338c6c9add2a9da895"
+  },
+  {
+    "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1157078,
+    "currentSha256": "d8c8f9adee56bb5c7d4f3afc3484996562d633ab7b4c4aebf1b396a2b75270f9",
+    "referenceSha256": "1a46a38542ce7c3bf53ea0ae941a85a891fc17a88741fa2181d423e701df25bb"
+  },
+  {
+    "name": "testComponentCatalogThemes.CitationChip-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 26185,
+    "currentSha256": "09ba4a349795d2f1ae4bc8442bfa5622bb2a709880ae23fa2c9a613c0083637d",
+    "referenceSha256": "e84e172c0bb2ab21270cf1be4497b7a05398f13bcedee3abe63f80e321dfb113"
+  },
+  {
+    "name": "testComponentCatalogThemes.CitationChip-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1312918,
+    "currentSha256": "529ea199c9d77ed7643e3ec48c74a400063704bd65f8cdef97ade5e69171db6d",
+    "referenceSha256": "20bd37056cea20c13b5b1e4e1e3cea9670d34ee18da8035ec90a42863c0a8610"
+  },
+  {
+    "name": "testComponentCatalogThemes.Composer-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 82160,
+    "currentSha256": "a11fb11571cbcac9cbb3084a93a0ba4d5bfb2e3f39cbfbe1e2ce80c340faf232",
+    "referenceSha256": "b4fc6f9484dc9bb38525ccff4aa5c5a3a6f174844bf3519400b5093fe5ecb081"
+  },
+  {
+    "name": "testComponentCatalogThemes.Composer-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1198553,
+    "currentSha256": "6661a638ad47a9afb757db225f30b7a411890cc2509c4fc9f087a4ad37fa4597",
+    "referenceSha256": "253891f2b2db282080dfff5cb6a7cf15d78c370757dedb6d21f41e8e49b28eac"
+  },
+  {
+    "name": "testComponentCatalogThemes.ContextCard-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 15903,
+    "currentSha256": "ab56d89c64a42427de030bd5e230163db2d5e902e6c4f93e55cdcf7fd4bcc23a",
+    "referenceSha256": "38ea2dd3b5f42e7dd6e65aa49bd44398cda37f204f971c7b2ac9b9ad5b83055b"
+  },
+  {
+    "name": "testComponentCatalogThemes.ContextCard-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315838,
+    "currentSha256": "e95b97e2a7e5610af6f7712064ba7e39f3a39be603c7fd75c29646f06b4151f4",
+    "referenceSha256": "58adf25476793f7921705e2559df919a568f94ef0c2e96da2388f4d2ccc8caac"
+  },
+  {
+    "name": "testComponentCatalogThemes.Correction-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 41841,
+    "currentSha256": "ceb4bf5d8ac3bc8cb129fc159c20e66fe9810ea3addaf99857fc8464c7c44f04",
+    "referenceSha256": "82b4f15d70ae53103fc833308bf31186c23ebf07251dad3ffa1fc2e4a431f34e"
+  },
+  {
+    "name": "testComponentCatalogThemes.Correction-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1156515,
+    "currentSha256": "8509bd1f7c336d7d7c71421a50a0c439e5143a38b1e2916c98bf85cb56b995f5",
+    "referenceSha256": "f2d59453be019208640ea281cbc20ba21f618b969723e7d78b8a9009b4267b36"
+  },
+  {
+    "name": "testComponentCatalogThemes.Countdown-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 13357,
+    "currentSha256": "2fb274f6be274c853b494c9e0d4b81b67433589e6e5bb7c50a1d3874326f878c",
+    "referenceSha256": "8f1583199b4af8de900dbc8166c6b465c8439fa2ac0f5ce86c37836f4cde5d53"
+  },
+  {
+    "name": "testComponentCatalogThemes.Countdown-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1314746,
+    "currentSha256": "611c5175c27c60dc9efc0bf44009445899a3f08c4bc640003ca3319fdaba4e6a",
+    "referenceSha256": "8a47c8bc9a2c063216be9139ba23d6a2f69d253042ffa3dd53e5340f1fe0ffa0"
+  },
+  {
+    "name": "testComponentCatalogThemes.Dialog-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 41737,
+    "currentSha256": "bf77e6888e1c6d86e7af83a14c443389adff92c923e9a2e381774693b982d85e",
+    "referenceSha256": "90c93e8e58d780f5d2d3a0dc1352d124438517adf792ba00e871a9186786c6d1"
+  },
+  {
+    "name": "testComponentCatalogThemes.Dialog-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 233283,
+    "currentSha256": "b896278b54e537661c57c4add3a54729067566ac3c6ac899fbd0fecebfb040c3",
+    "referenceSha256": "9f83964e3b3d5affeb39aeb575665f19170f1cee04353d87e37e962da28c946e"
+  },
+  {
+    "name": "testComponentCatalogThemes.DigestItem-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 49230,
+    "currentSha256": "8fa673d46b72ced9124542358f707abb477c67304e03468fb51dda322b599efd",
+    "referenceSha256": "4e462f0414354ce0f04c9f81ea35944673f2724d0f82530040212a83d84871da"
+  },
+  {
+    "name": "testComponentCatalogThemes.DigestItem-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1308236,
+    "currentSha256": "7d49d94e51ea2e22e34f158ba5364f9fbd933905b0763d9c7070962b2a2f3a86",
+    "referenceSha256": "58a724af6b41ff388ba5a24cdd2563f1500b498b0d106a2bd9ed7fd1ffc2e5f7"
+  },
+  {
+    "name": "testComponentCatalogThemes.EmailFrame-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 64764,
+    "currentSha256": "2718bcaab368c825455a83ea0ec52f643ca502943f03e746b6dadac98cee5cb3",
+    "referenceSha256": "98cdc8e62303feb78a53288c2b53acd69b0900536879741cb18c9dd58cc80cbc"
+  },
+  {
+    "name": "testComponentCatalogThemes.EmailFrame-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1167498,
+    "currentSha256": "0b88f25212e0373fdb45d5805c9b6836056f7947273959fe12791da263224f14",
+    "referenceSha256": "7bca79754af00d7f5e48b32b3d0e1af83df61c4047299200b233dbeed7ff4958"
+  },
+  {
+    "name": "testComponentCatalogThemes.EmptyState-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 30250,
+    "currentSha256": "dd9424f51fedfbe62c24fe5142e2ae887dabc8c9292d140176cc34a1562eacb5",
+    "referenceSha256": "d8ef31cd3c1138fdabb0d2dded2748638dde5782ebd6073abaf57f0368ade370"
+  },
+  {
+    "name": "testComponentCatalogThemes.EmptyState-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1313566,
+    "currentSha256": "4bccd28bd3d95dbd84a0a2fa6343ccc4c2ae55f7b55d073e1bd1033b725a022c",
+    "referenceSha256": "6f5ee22d6181223b28c5b00c8f45781d611e25f7adfa67d9bd67aa0411f47621"
+  },
+  {
+    "name": "testComponentCatalogThemes.EtaLine-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 15389,
+    "currentSha256": "94f571d3ded117298941fa7cec0fec9e77bebff37a5f38fc687addcfa8629f40",
+    "referenceSha256": "b8eb3ac2c4527c388876ea77841ef27e5df08a4f827746cfade679d0993ddf42"
+  },
+  {
+    "name": "testComponentCatalogThemes.EtaLine-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315787,
+    "currentSha256": "9dc423601439796427967b8514d9f10ccd0c2f86aef1a20853ff3811a5246edf",
+    "referenceSha256": "2d59e1802dbcecc30f1ca9e7cb850a98fed6ffb281f6a5f122a601d96d1f891d"
+  },
+  {
+    "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 78299,
+    "currentSha256": "e60f762a6ce541d7d8bc5e9c5a9b7ecc5a02d02de0b8093b41ca6be2089f73e8",
+    "referenceSha256": "4e469d39112d06b5740d73e82fd9f7bca5ce00871b835fc284778a3c2628211e"
+  },
+  {
+    "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1178150,
+    "currentSha256": "58d01f696ef6c7f72e05c4dac0afd3fba4ece436fd2e25f9ea968cf176a2da2b",
+    "referenceSha256": "18e2f5c72d534c9dfec6a1a63a3ce5fe0c6dd9128134275a4e7e18593d3fa41d"
+  },
+  {
+    "name": "testComponentCatalogThemes.IncludeList-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 41889,
+    "currentSha256": "4a3b94b6f91ecd86a4bb040c4f698918bcbedec92ac35f84a6b6331e14dfc27f",
+    "referenceSha256": "0ef14420e377e0642c64f26bfd9366da30078f6d341d727095d71670c6854fd8"
+  },
+  {
+    "name": "testComponentCatalogThemes.IncludeList-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1305927,
+    "currentSha256": "63353a1232d23c2cc5c5fe3053ac6d2ce5bcfcaa84a51419c851ba40bfea02c8",
+    "referenceSha256": "809ac2f052e1b9e0d0ea9bd0b6a5fd1f4c356253178971519bca8077f7f0a610"
+  },
+  {
+    "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 80636,
+    "currentSha256": "fa2a2bf3805b2db10a0548d09033885e11dbbb08e44482f18fac40f6437893d7",
+    "referenceSha256": "eabd134d2931a06022d60e7fcaa2906de41c16f0b558d629c81ffd3fa61a5f88"
+  },
+  {
+    "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1314561,
+    "currentSha256": "11d8afe9335f96a6cb538387c145a2603d3404fb0542e947ba900997fe76e619",
+    "referenceSha256": "89d0f2b1acdc08f7ec61f1afd35d8d57c46dc0c4adb4567d2c6aadf01fcb12c6"
+  },
+  {
+    "name": "testComponentCatalogThemes.LabelPreview-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 28378,
+    "currentSha256": "ab0b67d67e57799af013840a5c6b8f7063b65c8afb0b4cf1823dbff3a781571e",
+    "referenceSha256": "86e17981a14ab74df2281d976306fa1b7a01b90edb526924eefe085d7772b540"
+  },
+  {
+    "name": "testComponentCatalogThemes.LabelPreview-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1311106,
+    "currentSha256": "08b3480770edd6fac7026967fe508d6fd0882a01a92a284b051dd5ca0e7476dd",
+    "referenceSha256": "719c031114f5593185af310fa2df4278279a231d0c5e1e4bf5a459f7913d6651"
+  },
+  {
+    "name": "testComponentCatalogThemes.Mark-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 6002,
+    "currentSha256": "8c3ae09147bd1c08a5aa9b2587ab99a2ac74b48a8bef983fd5ad77cb8887c810",
+    "referenceSha256": "acc902ca7a717b544b109d838b3c1562c4296c80f544f70f551893a7b3481111"
+  },
+  {
+    "name": "testComponentCatalogThemes.Mark-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1314509,
+    "currentSha256": "fe4580a2bd363c7ba74f071e3106cdcf3b1e3b0e24499e9faf5e6d16e4e2009b",
+    "referenceSha256": "b93eed37f85c73bc7b06747f154a660d3fbd744af375bf7304e05842feb29e02"
+  },
+  {
+    "name": "testComponentCatalogThemes.MemoryChip-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 43385,
+    "currentSha256": "3f50847886a134bdcdf028803ef5e8b0497de074e609a6853bc603b012b72eb0",
+    "referenceSha256": "24141bc34748f1ddcfb55d0215ecf9d6c2c4aba5f48c8cfe1e08801bf0124bb7"
+  },
+  {
+    "name": "testComponentCatalogThemes.MemoryChip-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1308528,
+    "currentSha256": "b7d65766e8ee393417dec014547e42b55d04758f3707eae1a6430a47ed5aa6d3",
+    "referenceSha256": "1f067b3f07e6b3436944e350836df238f3d866f824401222f347602b4a257477"
+  },
+  {
+    "name": "testComponentCatalogThemes.Message-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 114339,
+    "currentSha256": "2e58cd850b25076a7f3cabacde4afa7050d48e8735b4eb4b08363bb916f53c24",
+    "referenceSha256": "96cb70ae654d91840d3adf859547a6dc5b35d8de646e1dc47ac3c5b35ec53e56"
+  },
+  {
+    "name": "testComponentCatalogThemes.Message-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 916779,
+    "currentSha256": "3c4ba2043033a840d95a369f03fed1e270f6b1719bbf0f009e16a470fecbfcb8",
+    "referenceSha256": "628360cc1f2614f3b81e5ebf7eb61f84cfe92f259441dfe65511a178f0566ba5"
+  },
+  {
+    "name": "testComponentCatalogThemes.ModeList-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 27212,
+    "currentSha256": "d7502f65b4261556237fc43d286c7bdeb8750ac0516cb60d42f2b0ee15560b79",
+    "referenceSha256": "572d2d793c88b67655c4a3c8c818cd564ce6941093ae901927038f6a239b7bfc"
+  },
+  {
+    "name": "testComponentCatalogThemes.ModeList-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1225614,
+    "currentSha256": "b95432b5c68dc0e7408bd693943e00d0bf4dc51faec84f5e0269e2dfd3b34bee",
+    "referenceSha256": "13a75faf1f57a6129436cd5922d90e53bf47fcfe918409fefb5069b3f9914c8a"
+  },
+  {
+    "name": "testComponentCatalogThemes.Note-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 56190,
+    "currentSha256": "a70896d8bfd5bef14989040fac4f45e56975d0c154a48bede83ec6e0740223e8",
+    "referenceSha256": "0cfd63b15e20a6f9cf7a0cdd09fae2a2fdc177282030ba44b2c93e1a362e21e7"
+  },
+  {
+    "name": "testComponentCatalogThemes.Note-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 825054,
+    "currentSha256": "a657f6e7a6175460cb311b1106050ac76036ecaf9b340e2548d4a61a2bf0fa36",
+    "referenceSha256": "97ddec827f74fcb98b82cdc04d3469db6615c272bfa77852bf4b035b0d1bf1d9"
+  },
+  {
+    "name": "testComponentCatalogThemes.Notice-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 35869,
+    "currentSha256": "306467de3833c0dc1cb940e4b36150874644fda6cab393a2f17553c5a2bdd981",
+    "referenceSha256": "8a03f7969aeeaa5a1f96579a905c75149914965c863014d511f2679c4a9ab469"
+  },
+  {
+    "name": "testComponentCatalogThemes.Notice-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1183394,
+    "currentSha256": "e31013fcda90b9a9409f68c9e363d32eba4f48804f3c8d27c180ebce5184d36a",
+    "referenceSha256": "d65dac255ad33ee166dc61a2cbf2c40c3ebba6f895814e54383378834bb883d3"
+  },
+  {
+    "name": "testComponentCatalogThemes.NotificationRow-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 83728,
+    "currentSha256": "8665c5768a8798b8b0ef47208ae7148ebb21ed33cb14b201e273a9b9a1b3fd90",
+    "referenceSha256": "f61de86c5c0a61070f17823f54771b882f99d925eb8df62b0ed52fc399618f0e"
+  },
+  {
+    "name": "testComponentCatalogThemes.NotificationRow-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1285118,
+    "currentSha256": "c416fae455c6f72917e1a2e127c46cce173d830d4a9afea2b1426d1a090eee99",
+    "referenceSha256": "9383993a21c456f5ef382057a8d8d13837d486316308c8487681fce12db9a3cc"
+  },
+  {
+    "name": "testComponentCatalogThemes.QueueCard-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 60353,
+    "currentSha256": "1b7ac69566459222181bc4b678ba3f6b4a537bc0ba78cf454a00b187c393b6a2",
+    "referenceSha256": "f7cfef106b96f7038a07e1c6cecf6887efd1bc42c62e23cd3b83d1978f20dfe4"
+  },
+  {
+    "name": "testComponentCatalogThemes.QueueCard-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1312763,
+    "currentSha256": "92b29d96b150f3890e9978b42dba28eac31f7e8229be548a25b5d1c1605194a5",
+    "referenceSha256": "5098c626773997e218d9ceca99e674197295522646c804eceebab430d0c91ac2"
+  },
+  {
+    "name": "testComponentCatalogThemes.ReactionChip-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 11990,
+    "currentSha256": "f2b6c75b17112a50f8f29a8de5628e05fffb83d6320d2186e9765557b0039916",
+    "referenceSha256": "04e15986d61a6992905553ab513c453ce6acf8c50f264fc17f58da4d8edad0bc"
+  },
+  {
+    "name": "testComponentCatalogThemes.ReactionChip-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1297558,
+    "currentSha256": "c1acad8593da18bb2065112cfe0a124f04fc8112ab79f665930b713288359581",
+    "referenceSha256": "c79c4b2bae6951bab4253a68a828be325c6511e130e57aef310884614a72a81f"
+  },
+  {
+    "name": "testComponentCatalogThemes.Receipt-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 38453,
+    "currentSha256": "f5c50948b7e74acb186056d018efd88b491ea2b0cd286c47ca1dea901bd36c82",
+    "referenceSha256": "e779b90ae8c5abe28d845197c8ad1e6b594961d50a2767f97e96c842c57f4ffa"
+  },
+  {
+    "name": "testComponentCatalogThemes.Receipt-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1314898,
+    "currentSha256": "a1b800d3259c8d8a881ac8a371e2353c1075deda3f19d966e0d6740acfd23b28",
+    "referenceSha256": "6161f1992fcfb895d0d2330562aeb52532a20e52f29fdde2f97c3d0de165b5f8"
+  },
+  {
+    "name": "testComponentCatalogThemes.RequestStatus-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 36397,
+    "currentSha256": "14dd5ef2ffa06aa8eb9e76df715c933dac32b94bcb355ff9f81c4ce368eeb596",
+    "referenceSha256": "ebb6c978660ffd424b44ba3e30202ba5934ab8140542acee4354146cb76d1bb8"
+  },
+  {
+    "name": "testComponentCatalogThemes.RequestStatus-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315038,
+    "currentSha256": "0f234c96f6fa310b3120d2acb8dd406d1a019b6b43bc0fb56531e423a3c4df1c",
+    "referenceSha256": "d8fc553e400dadf36976f6a65aca519b076306a39096eae70bf0b74febae16de"
+  },
+  {
+    "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 36647,
+    "currentSha256": "176d990f778df721f9dc14d91b06ed78da50bf29ada4d4e8982bccef632c7e3c",
+    "referenceSha256": "8352384ad1a2b09b9b75ef68a6813f47f1e0ca8a3b5dbae4a15105bfb941d880"
+  },
+  {
+    "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1311630,
+    "currentSha256": "ec19d092427e05659a03a4062b18e9cf9ddd8c75254abc565b9848aa99411d42",
+    "referenceSha256": "540238cf9ee229286b6ade7c35829220d13dc1b14bfeed867ed306f98bc1d623"
+  },
+  {
+    "name": "testComponentCatalogThemes.Seal-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 28422,
+    "currentSha256": "d4825435628b05eb87aa46d5c7c12f7bdcc3c17ac0b6ebcbb84740f44dd502be",
+    "referenceSha256": "44feb8ac3bb7afb0a4bf8f3eef96c8cb091cae5caefb96ffa3cdd0b935eb8e08"
+  },
+  {
+    "name": "testComponentCatalogThemes.Seal-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1313174,
+    "currentSha256": "928fd36f227aa7c2b5b10f7cf4802889dd36fd383fdc0550b36e168466b47b7e",
+    "referenceSha256": "5df432936d8dc8a2e0aa12464d6c3c2e46027a8437329e639e6e1547fe5e5fdf"
+  },
+  {
+    "name": "testComponentCatalogThemes.Segmented-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 11168,
+    "currentSha256": "e063e159d5f1937c91dfe2280e00aed64ee5d6d6a43c8d8f4777f17baa393a67",
+    "referenceSha256": "c0274be1745dba6944e30e99f633a52d4dcb1f5546cc4505f45d405a2bf295a8"
+  },
+  {
+    "name": "testComponentCatalogThemes.Segmented-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1266942,
+    "currentSha256": "63b039d88c73c83af8f0d17393601c1bcee5ec8c886820a77019f64b11cf5e80",
+    "referenceSha256": "595a15bfe601758dde853c77440ae333b179e2b93b44c9b1537b3e94cf9d86f6"
+  },
+  {
+    "name": "testComponentCatalogThemes.ShareCard-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 50808,
+    "currentSha256": "e1c6be9dd023d4cf51c597cc0a57d4b5c5d2f1c0cb73c2a6d0dcc915b3e08b92",
+    "referenceSha256": "0fd633d85e6f664363e432ca69af02f5abd418429b3fabbaae8ef4c788f88be2"
+  },
+  {
+    "name": "testComponentCatalogThemes.ShareCard-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 899315,
+    "currentSha256": "cea70f835de1221aedfd8db110e7008429e715b1a222bbc1c0f9fbb99098873b",
+    "referenceSha256": "9f09c86154b4a72942bba7e62d08de93e20d89bde8f67a85ec43512c90609a84"
+  },
+  {
+    "name": "testComponentCatalogThemes.Sheet-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 85281,
+    "currentSha256": "8c0c90331a35e788997bdde3d2509b7c9b632200269791b58661f29ec4155237",
+    "referenceSha256": "1ee64f23c246a09d2ae0641d31549884dc5f622bd7bbee97160f5c53e2a4a39a"
+  },
+  {
+    "name": "testComponentCatalogThemes.Sheet-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1294026,
+    "currentSha256": "53557e6dd90f63c126bad62ca37dcc1d6e22843614f8fc90fd0877ba467d621a",
+    "referenceSha256": "589e659449116226cca2e51c9804e956d1aea9383cfe671ec22100ace0bf6d51"
+  },
+  {
+    "name": "testComponentCatalogThemes.Sidebar-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 28657,
+    "currentSha256": "686f8fff6a9d7a3451d7b7a5b559283ed3e34e06e861f1defc7cb80707da35df",
+    "referenceSha256": "b262570e8290f8b4316dab5adfe035f3aa13798bfa3a36e8e36c94d18ffb5690"
+  },
+  {
+    "name": "testComponentCatalogThemes.Sidebar-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1276724,
+    "currentSha256": "0c445d5e0ff4e8d6b8906ce064ddd071ecb59df1467d775f1641ff7b862eb317",
+    "referenceSha256": "9346c294ed1704154515616e859d9d64bcc5efca3bb723e237ca3e7f1d8f1dd3"
+  },
+  {
+    "name": "testComponentCatalogThemes.SignedMarker-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 18026,
+    "currentSha256": "290d556d7eaab4025c8dfccaa55d5bb902e61a7363f4fee82c52e13522bf552d",
+    "referenceSha256": "907476b3989b665cd9a99a2c6f8c8517702bc7978f5622de9e0fe737f0a75a36"
+  },
+  {
+    "name": "testComponentCatalogThemes.SignedMarker-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1258570,
+    "currentSha256": "be944f5ff0c9f15144b30e25fc25d1db0f6a69bee15ac2a8597806add7efe7c4",
+    "referenceSha256": "03f8cdbe988896ca92306b6bc7f523a9345a2d7c91853e0f37b8bdbfdc485384"
+  },
+  {
+    "name": "testComponentCatalogThemes.SigningSheet-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 64429,
+    "currentSha256": "4f1d4105a2241442ab0a3188298620f006ede560790ba3eb80aa3d629aa3e153",
+    "referenceSha256": "53662947267586776a469736e8f93b9f778c2442cc527f99ede91a0fd62e5d39"
+  },
+  {
+    "name": "testComponentCatalogThemes.SigningSheet-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1232468,
+    "currentSha256": "c4d8615e92347a9d7001bd639515c6005062d77d03161eda20c37c3bd5e32229",
+    "referenceSha256": "e3094bb89c35cdc1627acd2717d8af8665295a1dd52f54ddf52ec59b6de968c6"
+  },
+  {
+    "name": "testComponentCatalogThemes.Skeleton-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 4175,
+    "currentSha256": "a9497b7720c4723f91c67e94fef9a8f7203f2e0edeb5a8a0562d72e8b4317f40",
+    "referenceSha256": "e29ab9be370457933a30cb5f6a0778f4c14c17f881d91af545fa7c5f4618933f"
+  },
+  {
+    "name": "testComponentCatalogThemes.Skeleton-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1316133,
+    "currentSha256": "a55ade1420d4640c1568f21a67b78f280c0cfaa7175868cada79f6d863e5d8ec",
+    "referenceSha256": "3bd6131e9838535c7212d42e954b743b21a44013fee6533e0a6d9dc3e9e199ed"
+  },
+  {
+    "name": "testComponentCatalogThemes.SourceRow-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 31242,
+    "currentSha256": "30caee3e7637b1bfc2766f607770981ad94319803477d5d52a3b9e2be0f599f9",
+    "referenceSha256": "b22f4f3c079bed4d69bbbadab275cf6d950a6dd775092e8e2751cfa38ef88440"
+  },
+  {
+    "name": "testComponentCatalogThemes.SourceRow-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1313602,
+    "currentSha256": "0a7cb4e78799b88491a527e63f45fc53d383b0b75564871e2d3c2df194f06544",
+    "referenceSha256": "61f09ae57886a9616eb704d967e71c09438ab1d38d4697a374aa036015e19b55"
+  },
+  {
+    "name": "testComponentCatalogThemes.SpendLimit-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 41852,
+    "currentSha256": "1511f06b6f6ca499d023f31dd9f45978f9fec63d60095949a6b7fbe2748cc3a7",
+    "referenceSha256": "940214d0b59e5036a4968cf7e80988a1bb32c689f0db21c8df3b1e47c0c9b113"
+  },
+  {
+    "name": "testComponentCatalogThemes.SpendLimit-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1307357,
+    "currentSha256": "eb7fea0e038dfa575390f2eaaf3b1e901b33f018ac8a87172fe0e8c7079a5776",
+    "referenceSha256": "3e569064a3423f9ab83c6404fd8201ebf96bf8b9f54a2984054baa6b65ce469c"
+  },
+  {
+    "name": "testComponentCatalogThemes.StepIn-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 23635,
+    "currentSha256": "23ab9a392acb120fd886eb9134bda71ffb406780ce19763e041e42d5317d05e8",
+    "referenceSha256": "6401159aee9c8de5cf562da7442a94bfe6ade540f5ec3418940e3ea109a199e7"
+  },
+  {
+    "name": "testComponentCatalogThemes.StepIn-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1289927,
+    "currentSha256": "96b7fbc2ba5330e4f7becd8270dad4627c4b0de3989a367541606737fd352bb4",
+    "referenceSha256": "30de6a222e4ae3362d9d5b66d2d6e5f5152aebc13c82a0df894e1191ee0b3cbf"
+  },
+  {
+    "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 12263,
+    "currentSha256": "005e6fde73d0070111dc356f100b0d987905f177d535fb3e454055338e937cd3",
+    "referenceSha256": "7890bc65b3020351674c5bc6631030fb46cbfd974c48900b497261b567b332a0"
+  },
+  {
+    "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1313570,
+    "currentSha256": "83c031e29a01a325c8663aeef9aa1f7eea6b04a51fb870739fb42e2c7fd24078",
+    "referenceSha256": "932d5fdfed4e19b3e8f115cbf3f871c62fa3b294669158a50f514167f0b37d26"
+  },
+  {
+    "name": "testComponentCatalogThemes.SystemLine-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 22310,
+    "currentSha256": "43f18b48d6ad9a6e704e51c5d341b33ca2570332c20cf7179d690026e6ff50dc",
+    "referenceSha256": "c0ebdf029bbd39d12920c51c4e4c1c6436290a37c6eeafdc4e94d868fe229183"
+  },
+  {
+    "name": "testComponentCatalogThemes.SystemLine-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1301863,
+    "currentSha256": "abef31361a864fff7dbddb954638fdab2e9a9114b09c816a3d9d840ab3039f87",
+    "referenceSha256": "9507f9ae9880e573760132dfc7d18822a19f3c747bce4ba2e8cdacbb43f09c88"
+  },
+  {
+    "name": "testComponentCatalogThemes.TabBar-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 7901,
+    "currentSha256": "1beae3667837e23a239b44be56cea4d6c7b15ee1599fdad37f7f1c7934b81731",
+    "referenceSha256": "41878d22e0e51982b51e0452b7afdfb847668ade9c7361f77fb1ff0daea6a60d"
+  },
+  {
+    "name": "testComponentCatalogThemes.TabBar-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315088,
+    "currentSha256": "8755b6864203d593b9a377d29ac82bd79925f514bc9b7111c747e1105d34e0f7",
+    "referenceSha256": "58a6ef5b350b2fcaad9ad2d582721b797f48e545ad196b52d4646e9e11b73678"
+  },
+  {
+    "name": "testComponentCatalogThemes.TermsBlock-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 51725,
+    "currentSha256": "0d4749f831fad8d5b779ef31cb2d159ca7aaf54c7d4564f90f232bef07cf4e6c",
+    "referenceSha256": "c5e9dad67aa795b7337d15d6e7ecc371cebb1bc10bed77be80862c295a808642"
+  },
+  {
+    "name": "testComponentCatalogThemes.TermsBlock-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315981,
+    "currentSha256": "66c0ef92cc801474218020169b2505f738ceca60be81c571107d2ff1d2d7c50d",
+    "referenceSha256": "20c6483efacdb9831fba81a5fe802bb7b4d69f3b9f6d61febff2a74679788719"
+  },
+  {
+    "name": "testComponentCatalogThemes.TestConsole-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 72938,
+    "currentSha256": "005d7a2d182489d828c83f73945d9966951ee43e9f312b5aee5bbd0ec550dfd3",
+    "referenceSha256": "ffe485f15b81b583c0b35d46dcadc5e4a1babb03234a46e56773109b826ae221"
+  },
+  {
+    "name": "testComponentCatalogThemes.TestConsole-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1296876,
+    "currentSha256": "f0f50e79b630216066500f48f87a128175a72c98068c1c3f7b4942b5d9189754",
+    "referenceSha256": "8e09881790f535bddc55c1c22dddbf9a58a17765b9a4ce90a734e389286b2679"
+  },
+  {
+    "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 53747,
+    "currentSha256": "bb4dc67a5147b0a39e0674524ad18251762728b7de9d88cc7a85e8c2fc8bde96",
+    "referenceSha256": "078f95a32ca2e6af1c02574d2e573278887c1758cd145e52060de363b2ee6c9c"
+  },
+  {
+    "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1308037,
+    "currentSha256": "5cd0fc474d7ffc3717094ca1e88960605fee3d6fc6421ab3af2352b9f84042b3",
+    "referenceSha256": "f31e430199610902924ac41ffbd8236cb3baca057c17fe6e9cb9aa1a5048ded6"
+  },
+  {
+    "name": "testComponentCatalogThemes.Toast-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 9167,
+    "currentSha256": "ff2666ee70ec2805f206d222973b96e1407c39992f6527cce9c7b7ec2c65b62e",
+    "referenceSha256": "6f7ed4152d506365f27db9299ad8a505efc73240819a28ded5c13f62c519a076"
+  },
+  {
+    "name": "testComponentCatalogThemes.Toast-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1313153,
+    "currentSha256": "29c1d5508744a959c82ca54db61f26d00bcc18684115baffe1418b76b6e746a4",
+    "referenceSha256": "97f41b7b0f8ef4b6f35883fcfae23e96f3d15c2ea87aa879479580b1e25fe10a"
+  },
+  {
+    "name": "testComponentCatalogThemes.VersionList-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 29015,
+    "currentSha256": "cf7ef06e3fd764557a20cf7ddcf55b926daca193b8ae3490bfa1181686cda964",
+    "referenceSha256": "c7ba88f9e4866b6ea2a201d4249bc1c2b33f4f7d122d76aaf202231ce9968146"
+  },
+  {
+    "name": "testComponentCatalogThemes.VersionList-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1315105,
+    "currentSha256": "dc502e173e31f40c72525a4746bda7ab4bb73992df0069c5eab2f8200209c8a1",
+    "referenceSha256": "6e6ef16eadac8b42e7ca7ef1fa5da25a76d0f084faf4c9e9abceb5ccb7042177"
+  },
+  {
+    "name": "testComponentCatalogThemes.VoiceNote-light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 54637,
+    "currentSha256": "bd46eb808e14f6c3a7292083908d4035bc4978512b669775179f2c01495d1b78",
+    "referenceSha256": "87370544420e6f3f382a0a8887269b6ad9bbb624e980f2cb5674ca474f45a60a"
+  },
+  {
+    "name": "testComponentCatalogThemes.VoiceNote-night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1095852,
+    "currentSha256": "5e9761b7ae517cb73d6144dbd7a011124bff6e4251913e21e93250cef00a9db6",
+    "referenceSha256": "0e73b2456798cde8b55ef8d46ed0b94223dfbef2f9a9d2caf539bca223f6753f"
+  },
+  {
+    "name": "testWelcomeThemes.light.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 107573,
+    "currentSha256": "72ec810a577f47ee1bd5d279acb241b1468ec3e3bcb31becd104f3fc80114030",
+    "referenceSha256": "dbacded5d23c87dca46659b9689ea8b426061e46c2cfe77f1df4b34ab5424357"
+  },
+  {
+    "name": "testWelcomeThemes.night.png",
+    "currentSize": [
+      780,
+      1688
+    ],
+    "referenceSize": [
+      780,
+      1688
+    ],
+    "currentMode": "RGBA",
+    "referenceMode": "RGBA",
+    "currentProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ]
+    },
+    "referenceProfiles": {
+      "srgb": 0,
+      "exif": "562ce5e34da85626229406ede4266038c021ad8486a58f1549ed28dae4a82dec",
+      "dpi": [
+        143.99259999999998,
+        143.99259999999998
+      ],
+      "xmp": "6c9abf3fcb6088e60e1781572d359a4eeca34eb8ff32e0a101d95d2101f3a9a3",
+      "XML:com.adobe.xmp": "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 6.0.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\"\n            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\">\n         <exif:PixelYDimension>1688</exif:PixelYDimension>\n         <exif:PixelXDimension>780</exif:PixelXDimension>\n         <tiff:YResolution>144</tiff:YResolution>\n         <tiff:XResolution>144</tiff:XResolution>\n         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    },
+    "differingPixels": 1290004,
+    "currentSha256": "b0b805ef725dae9acc68fee54339de545f630d0392cbfa9fc90a0471b5c2b59c",
+    "referenceSha256": "176f5b6ec23f6249b3162bede0980e9e73d0139ded65d76aa6dc66e6060d1f0e"
+  }
+]

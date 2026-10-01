@@ -1,0 +1,54 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Copying Localizable.xcstrings
+[2/4] Copying Glyphs.json
+[3/4] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Compiling QelvoraUI QelvoraCopy.swift
+[6/12] Compiling QelvoraUI NativeMediaClient.swift
+[7/12] Compiling QelvoraUI NativeCallOffers.swift
+[8/12] Compiling QelvoraUI NativeVoiceRecorder.swift
+[9/12] Compiling QelvoraUI NativeCallView.swift
+[10/25] Compiling QelvoraUI QelvoraTokens.swift
+[11/25] Emitting module QelvoraUI
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[12/25] Compiling QelvoraUI QelvoraAPI.swift
+[13/25] Compiling QelvoraUI ThreadComponents.swift
+[14/25] Compiling QelvoraUI StudioComponents.swift
+[15/25] Compiling QelvoraUI Navigation.swift
+[16/25] Compiling QelvoraUI Welcome.swift
+[17/25] Compiling QelvoraUI ComponentPreview.swift
+[18/25] Compiling QelvoraUI AccessComponents.swift
+[19/25] Compiling QelvoraUI Controls.swift
+[20/25] Compiling QelvoraUI FanShell.swift
+[21/25] Compiling QelvoraUI Overlays.swift
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/QelvoraUI/Overlays.swift:325:21: warning: call to main actor-isolated static method 'post(notification:argument:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+321 | }
+322 | 
+323 | private func announce(_ text: String) {
+    |              `- note: add '@MainActor' to make global function 'announce' part of global actor 'MainActor'
+324 |   #if canImport(UIKit)
+325 |     UIAccessibility.post(notification: .announcement, argument: text)
+    |                     `- warning: call to main actor-isolated static method 'post(notification:argument:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+326 |   #endif
+327 | }
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIAccessibility.h:521:19: note: calls to static method 'post(notification:argument:)' from outside of its actor context are implicitly asynchronous
+519 |  See UIAccessibilityConstants.h for a list of notifications.
+520 |  */
+521 | UIKIT_EXTERN void UIAccessibilityPostNotification(UIAccessibilityNotifications notification, __nullable id argument) API_UNAVAILABLE(watchos) NS_SWIFT_UI_ACTOR;
+    |                   `- note: calls to static method 'post(notification:argument:)' from outside of its actor context are implicitly asynchronous
+522 | 
+523 | /* 
+
+[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>
+[22/25] Compiling QelvoraUI Identity.swift
+[23/25] Compiling QelvoraUI Conversation.swift
+[24/25] Compiling QelvoraUI Growth.swift
+[25/25] Compiling QelvoraUI CommerceFeature.swift
+Build of target: 'QelvoraUI' complete! (62.70s)

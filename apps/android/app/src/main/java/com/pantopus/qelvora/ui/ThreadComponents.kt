@@ -199,10 +199,12 @@ fun Composer(state: ComposerState = ComposerState.AI, name: String = "Maya", tri
     Column(Modifier.fillMaxWidth().background(qColor("ground")).drawWithContent { drawContent(); drawLine(topLine, Offset.Zero, Offset(size.width, 0f), T.hairline.toPx()) }.padding(start = T.space4, end = T.space4, top = T.space3, bottom = T.welcomeGap), verticalArrangement = Arrangement.spacedBy(T.composerGap)) {
         if (state == ComposerState.PAUSED) { TextLine(copy("aiPausedBack", "name" to name, "date" to backDate), "label", "ink-muted"); StepIn(name, onClick = onStepIn) }
         else if (state == ComposerState.ENDED) {
+            Panel(Modifier.fillMaxWidth(), radius = T.radiusMd) {
+                TextLine(copy("freeConversationEnded"), "body-strong")
+                AccessLines(name, can = copy("endCan", "name" to name), included = copy("endIncluded"), changes = copy("endChanges", "name" to name))
+                Button(copy("joinClub"), ButtonVariant.SECONDARY, block = true, onClick = onJoin)
+            }
             StepIn(name, onClick = onStepIn)
-            TextLine(copy("freeConversationEnded"), "body-strong")
-            AccessLines(name, can = copy("endCan", "name" to name), included = copy("endIncluded"), changes = copy("endChanges", "name" to name))
-            Button(copy("joinClub"), ButtonVariant.SECONDARY, block = true, onClick = onJoin)
         } else {
             if (state == ComposerState.TRIAL) TextLine(copy("freeConversationCountdown", "left" to trialLeft), "mono-caption", "ink-muted")
             if (!human) StepIn(name, disabled = state == ComposerState.CAPACITY_ZERO, onClick = onStepIn)
