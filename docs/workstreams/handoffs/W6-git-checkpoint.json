@@ -33,5 +33,7 @@
   "latePreservedWorkspaceGuidance": {
     "path": "AGENTS.md",
     "reason": "Tool-generated root guidance appeared after the prerequisite capture. Preserved unchanged in the handoff commit, not W6-authored framework instructions."
-  }
+  },
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/4",
+  "resourceReleaseRecord": "artifacts/workstreams/W6/cleanup/2026-09-29/resource-release.json"
 }

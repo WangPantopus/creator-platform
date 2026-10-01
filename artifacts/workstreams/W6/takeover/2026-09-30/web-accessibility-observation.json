@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-01T03:02:40.655181+00:00",
+  "origin": "http://127.0.0.1:3006",
+  "viewport": [
+    390,
+    844
+  ],
+  "theme": "Night",
+  "keyboardTab": "Actual Tab focuses enabled Record; visible focus outline personally inspected",
+  "microphone": "Previously actually denied; status remains explicit;Record/0:00 preserved",
+  "browserZoomAttempt": {
+    "action": "5 actual super+equal shortcut presses",
+    "observed": "No DOM viewport/font/layout change:390x844, heading34px, recorder390px",
+    "accepted200Percent": false
+  },
+  "capture": "launched-apps/web-current-keyboard-focus.png",
+  "actualCaptureSigningPlayback": false
+}

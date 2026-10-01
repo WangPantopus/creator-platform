@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-10-01T02:59:39.746861+00:00",
+  "source": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+  "ownedResources": {
+    "adbPort": 5046,
+    "serial": "emulator-5566",
+    "avd": "CreatorPlatformW6Media20261001",
+    "netsimInstance": 6,
+    "grpc": "127.0.0.1:8566 with JWT",
+    "runtime": "Google APIs35x86_64r9/emulator37.1.11"
+  },
+  "packaging": {
+    "shippingApkSha256": "8a96c91081d0fdcb4c14e5789ee712e2ee090f117b21a6aabfaaa45610627498",
+    "instrumentationApkSha256": "46051ea8cbc99fe4e1535154dec001e8aa889cf6efdff643b0d7429502cb5339",
+    "build": "66 tasks;6m2s;success",
+    "signatures": "Both actual APKs verified normally signed v2"
+  },
+  "actualLaunch": {
+    "status": "ok",
+    "state": "COLD",
+    "totalMilliseconds": 12655,
+    "screen": "Actual Recorder behind System UI ANR",
+    "bootMilliseconds": 111075
+  },
+  "existingShippingJourney": {
+    "classMethod": "NativeAcceptanceTest#unavailableSignInNeverPretendsToAuthenticate",
+    "result": "INSTRUMENTATION_RESULT: shortMsg=Process crashed. INSTRUMENTATION_CODE:0",
+    "passed": false,
+    "addedOrChangedCase": false,
+    "processEvents": "Actual Qelvora instrumentation process2693 failed to complete startup, ANR, killed by Android; exact underlying cause not established"
+  },
+  "environmentObserved": [
+    "Bluetooth HciHal stack failed with SIGABRT",
+    "System UI Keyguard service ANR waited21671ms",
+    "Phone safety refresh ANR"
+  ],
+  "qualification": "System failures observed; exact instrumentation crash root cause not established. No System UI dismissal, assertion weakening or clean acceptance claim.",
+  "screens": [
+    "launched-apps/android-isolated-recorder-anr.png",
+    "launched-apps/android-isolated-signin-final.png"
+  ],
+  "logs": {
+    "playback-proof-android-build.log": "4c3e03a7f7dfdc6d1265115e8c0f59eb305de33d167fce9ea5b02dee2b0ca6ef",
+    "android-final-apk-signature.log": "b0a1af67205efcd284e5bbae691ebf4a0d296b4fcae02cd28e7e0509d0e0efbc",
+    "android-final-instrumentation-signature.log": "b0a1af67205efcd284e5bbae691ebf4a0d296b4fcae02cd28e7e0509d0e0efbc",
+    "android-isolated-recorder-launch.log": "2a257c48919c619750c3b68224b367d66913804915b6b5d1e316a40d307469e7",
+    "android-isolated-shipping-signin.log": "cc376fcd260b55a01f82c04af5e0a9ead88516f600131a38bdea1a3e05b10a8d",
+    "android-isolated-anr-events.log": "2b9d591c40482a24201406be37760cf69b070a9cee11115d862aa1473c90e33a",
+    "android-isolated-instrumentation-crash.log": "e6b22df40d01db397c69be7fcbf5f6517664f42119336243d7a6ab9da61ae50f",
+    "android-emulator-host-isolated.log": "7aebff9091274e2e7efb534b1a76e11fdfdb2028cd8fa2136e1b5848c9905f7e",
+    "android-isolated-final-process-events.log": "d1863dff45872d3dc060017d65e40ebebba2ebd02bf732fb6a18517ea6e8c33d"
+  },
+  "nativeMediaAcceptance": false,
+  "mergeReady": false,
+  "ownedRuntimeReleased": true
+}

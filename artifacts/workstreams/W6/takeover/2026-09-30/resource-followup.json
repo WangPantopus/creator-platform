@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-01T00:35:13.908888+00:00",
+  "stoppedOwnedContainerRemoved": "29b5cd9c8fcf3c13c50afa67e77223c87975dbe1d0b91f1a2dd6e2d3f4e03a02",
+  "soleVolumeRemoved": "184e9de621c5316def8da917a69521f2ed5176d06b83a20283fd62303ae50961",
+  "ownershipReverified": true,
+  "volumeAbsenceVerified": true,
+  "unusedInstallerArchivesRemoved": [
+    {
+      "path": "/tmp/qelvora-w6-native-recovery-20260930/temurin-jdk-x64.tar.gz",
+      "bytes": 194316575
+    },
+    {
+      "path": "/tmp/qelvora-w6-native-recovery-20260930/android-tools.zip",
+      "bytes": 155582504
+    }
+  ],
+  "archiveBytes": 349899079,
+  "workingToolchainRetained": "/tmp/qelvora-w6-native-recovery-20260930",
+  "peerResourcesChanged": false,
+  "dockerEngineRestarted": false
+}

@@ -1,5 +1,7 @@
 # W6 resume checkpoint — 2026-09-30
 
+**Authorized CI continuation:** the founder subsequently authorized shared code/CI repairs. The nine-file proposal is now applied, with corrections to existing auth, reference-composition and PostgreSQL setup checks. No new cases/suites or relaxed baselines/tolerances. [Current repairs, local outcomes and remaining CI gates](../../ci-repair/2026-09-30/README.md) supersede the pending-lease statements below.
+
 Personally implemented and checked in the isolated `970d/creator-platform` worktree on `codex/w6-calls-media-handoff`. No agents, new test code, provider fixtures, AI requests, credential reads or peer-runtime mutations were used. This checkpoint is **implemented in part, build checked, and awaiting integrated acceptance**.
 
 ## Branch comparison
