@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T01:57:17.435148+00:00",
+  "sourceParent": "8e3ae716c4f2c735fd450d0754a13398dd13e559",
+  "source": {
+    "path": "apps/backend/src/operations/local-server.ts",
+    "sha256": "d1c165d49234b04727601674073804e730beacac30c1a72337e67ff7e1612e5f"
+  },
+  "change": "Fixed aggregate shutdown start/completion records and forced-socket counter around the existing 1001 close/five-second drain; no socket authorization or timing policy change.",
+  "fields": [
+    "timestamp",
+    "event",
+    "environment",
+    "release",
+    "activeSockets",
+    "durationMs",
+    "forcedSockets"
+  ],
+  "verification": {
+    "backendBuild": "pass",
+    "changedSourceLint": "pass",
+    "changedSourceFormat": "pass",
+    "newTestsWritten": false,
+    "existingTestsChanged": false
+  },
+  "acceptance": "Actual process drain/reconnect pending; compilation is not launched-app acceptance.",
+  "preservation": {
+    "sqlRolesRlsGrantsChanged": false,
+    "runtimeCredentialsChanged": false,
+    "paidCalls": 0
+  }
+}

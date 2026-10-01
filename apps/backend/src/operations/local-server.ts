@@ -655,9 +655,23 @@ let stopping = false;
 const stop = async () => {
   if (stopping) return;
   stopping = true;
+  const started = performance.now();
+  let forcedSockets = 0;
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_started",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      activeSockets: sockets.clients.size,
+    }),
+  );
   for (const connection of sockets.clients)
     connection.close(1001, "Server shutdown");
   const drain = setTimeout(() => {
+    forcedSockets = sockets.clients.size;
+    if (forcedSockets)
+      telemetry.increment("realtime_shutdown_forced", forcedSockets);
     for (const connection of sockets.clients) connection.terminate();
   }, 5000);
   drain.unref();
@@ -672,6 +686,17 @@ const stop = async () => {
     conversationPool.end(),
     ...growthPools.map((current) => current.end()),
   ]);
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_completed",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      durationMs: Number((performance.now() - started).toFixed(2)),
+      activeSockets: sockets.clients.size,
+      forcedSockets,
+    }),
+  );
 };
 process.on("SIGTERM", () => void stop());
 process.on("SIGINT", () => void stop());

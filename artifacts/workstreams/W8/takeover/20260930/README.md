@@ -1,5 +1,7 @@
 # W8 takeover evidence — 2026-09-30
 
+[Shutdown observability source](realtime-shutdown-source.json) adds fixed aggregate records around the existing local drain. Launched-browser process restart acceptance follows separately; no provider, SLO or native acceptance is inferred from a build.
+
 [Read-only repository queue diagnosis](ci-queue-diagnosis.json) distinguishes actual queued checks from source/test failures. Foundation has no serializing concurrency block and its hosted labels are valid; hosted capacity/account cause remains unverified. No run, runner, billing, check or workflow was changed.
 
 [Actual expired-purpose/keyboard acceptance](expired-purpose-acceptance.json) verifies zero current case leases, no private evidence and MAIN#ops-main focus without renewing or changing the case. [PR7 body update/readback](pr7-update-current.json) is successful; [exact4f058a0 check observation](ci-4f058a0.json) has all11 checks queued, so no check or merge readiness is inferred. All five authorized fixture files were compared with439c336 and remain byte-identical, with no later test change.
