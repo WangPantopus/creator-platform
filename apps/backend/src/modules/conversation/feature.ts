@@ -66,7 +66,10 @@ export class ConversationFeature {
       consentAvailable: Boolean(this.policy?.verified),
       generationAvailable:
         this.generationAvailable && Boolean(this.policy?.verified),
-      firstConversationAvailable: Boolean(this.firstConversation),
+      firstConversationAvailable:
+        Boolean(this.firstConversation) &&
+        this.generationAvailable &&
+        Boolean(this.policy?.verified),
       correctionsAvailable: Boolean(this.corrections),
       accessDisclosure,
     };
@@ -82,6 +85,11 @@ export class ConversationFeature {
       this.policy?.verified && body.policyVersion === this.policy.version,
       "providers_unconfigured",
       "AI providers and their verified terms are not configured yet.",
+    );
+    invariant(
+      this.generationAvailable,
+      "generation_unavailable",
+      "AI conversations are not available yet. No first conversation has started.",
     );
     const client = await this.db.pool.connect();
     let fanId: string;

@@ -13,7 +13,6 @@ import {
   type Frame,
   type Message,
   type ThreadControl,
-  type ThreadTimeline,
 } from "@qelvora/api";
 import { Database } from "../../db/database.js";
 import {
@@ -27,7 +26,11 @@ import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
-import { TeamReplySchema } from "../../../../../packages/api/src/conversation/contracts.js";
+import {
+  ConversationMessageSchema,
+  TeamReplySchema,
+  type ConversationTimeline,
+} from "../../../../../packages/api/src/conversation/contracts.js";
 import { crisisText } from "../agent/pipeline.js";
 import { contentHash } from "../../core/canonical.js";
 import type { ConversationLineage } from "./lineage.js";
@@ -52,6 +55,10 @@ type MessageRow = {
   signed_act_id: string | null;
   author_account_id: string | null;
   team_member: string | null;
+  version: number;
+  citations: string[];
+  created_at: Date;
+  off_the_record: boolean;
 };
 type GenerationRow = {
   id: string;
@@ -454,7 +461,7 @@ export class ConversationService {
     );
     return message(result.rows[0]!);
   }
-  async read(scope: ThreadScope): Promise<ThreadTimeline> {
+  async read(scope: ThreadScope): Promise<ConversationTimeline> {
     return this.db.withThread(scope, async (client) => {
       const thread = await this.lockThread(client, scope, true);
       const rows = await client.query<MessageRow>(
@@ -468,6 +475,18 @@ export class ConversationService {
         "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN ('queued','generating')",
         [scope.threadId, scope.creatorId, scope.fanId],
       );
+      const selected = rows.rows.map((row) =>
+        ConversationMessageSchema.parse({
+          ...message(row),
+          version: row.version,
+          citations: row.citations,
+          createdAt: row.created_at.toISOString(),
+          offTheRecord: row.off_the_record,
+        }),
+      );
+      const messages = this.delivery.lineage
+        ? await this.delivery.lineage.enrich(scope, client, selected)
+        : selected;
       return {
         threadId: scope.threadId,
         creatorId: scope.creatorId,
@@ -478,7 +497,7 @@ export class ConversationService {
         generationSequences: Object.fromEntries(
           generations.rows.map((row) => [row.id, row.last_sequence]),
         ),
-        messages: rows.rows.map(message),
+        messages,
       };
     });
   }
