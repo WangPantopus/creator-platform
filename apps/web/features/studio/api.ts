@@ -11,7 +11,7 @@ export class StudioFailure extends Error {
 // an unknown response; raw input remains in memory, never browser storage.
 const pendingCommands = new Map<string, string>();
 export async function studioRequest<T>(
-  domain: "studio" | "content",
+  domain: "studio" | "content" | "commerce-approvals" | "conversations",
   path: string,
   body?: unknown,
   expectedAccountId?: string,
@@ -31,7 +31,12 @@ export async function studioRequest<T>(
       headers: {
         "Content-Type": "application/json",
         ...(expectedAccountId
-          ? { "x-qelvora-expected-account": expectedAccountId }
+          ? {
+              "x-qelvora-expected-account": expectedAccountId,
+              ...(domain === "conversations"
+                ? { "X-Expected-Account-Id": expectedAccountId }
+                : {}),
+            }
           : {}),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -48,6 +53,12 @@ export async function studioRequest<T>(
   try {
     value = await response.json();
   } catch {
+    if (response.status === 404)
+      throw new StudioFailure(
+        404,
+        "producer_unavailable",
+        "This service is not connected in the current workspace. Your input is kept.",
+      );
     throw new StudioFailure(
       503,
       "response_unknown",

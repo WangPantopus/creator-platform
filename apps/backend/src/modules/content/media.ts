@@ -51,6 +51,66 @@ export function contentMediaAuthority(
         )
       ).rowCount,
     );
+  const currentRead = async (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    objectId: string,
+    asset: ContentMediaAsset,
+  ) => {
+    await content.assertCurrentAllowed(client, actor, creatorId);
+    if (asset.creatorId !== creatorId || asset.objectId !== objectId)
+      return null;
+    const owner = await owned(client, actor, creatorId);
+    if (owner) await content.role(client, actor, creatorId);
+    // index holds the shared object lock through the caller's transaction.
+    const row = await content.index(client, creatorId, objectId);
+    try {
+      await content.authorizeRead(client, actor, row, owner);
+    } catch (error) {
+      if (error instanceof DomainError && [403, 404].includes(error.status))
+        return null;
+      throw error;
+    }
+    const current = await content.view(client, actor, row);
+    if (!purposeAllowed(current.document.kind, asset.purpose)) return null;
+    // Owner previews need no publication tuple. W6 checks asset custody.
+    if (owner && asset.ownerAccountId === actor.accountId)
+      return { ownerPreview: true, publication: null };
+    const attachment = current.document.media.find(
+      (item) =>
+        item.assetId === asset.id &&
+        item.version === asset.version &&
+        item.sha256 === asset.sha256 &&
+        ((asset.purpose === "human_note" && item.kind === "voice") ||
+          (asset.purpose === "post_photo" && item.kind === "photo")),
+    );
+    if (
+      !attachment ||
+      current.state !== "published" ||
+      !current.signedActId ||
+      asset.signedActId !== current.signedActId ||
+      asset.provenance?.c2paVerified !== true ||
+      asset.provenance.processedMediaSha256 !== attachment.sha256 ||
+      asset.provenance.signedActId !== asset.signedActId ||
+      !(await publicationBinding(
+        client,
+        actor,
+        creatorId,
+        objectId,
+        current.signedActId,
+        asset,
+      ))
+    )
+      return null;
+    return {
+      ownerPreview: false,
+      publication: {
+        signedActId: current.signedActId,
+        version: current.version,
+      },
+    };
+  };
   return {
     async policy(
       client: PoolClient,
@@ -103,48 +163,19 @@ export function contentMediaAuthority(
       objectId: string,
       asset: ContentMediaAsset,
     ): Promise<boolean> {
-      await content.assertCurrentAllowed(client, actor, creatorId);
-      if (asset.creatorId !== creatorId || asset.objectId !== objectId)
-        return false;
-      const owner = await owned(client, actor, creatorId);
-      if (owner) await content.role(client, actor, creatorId);
-      const row = await content.index(client, creatorId, objectId);
-      try {
-        await content.authorizeRead(client, actor, row, owner);
-      } catch (error) {
-        if (error instanceof DomainError && [403, 404].includes(error.status))
-          return false;
-        throw error;
-      }
-      const current = await content.view(client, actor, row);
-      if (!purposeAllowed(current.document.kind, asset.purpose)) return false;
-      // Owners may inspect an uploaded, processed asset before saving its
-      // attachment into the draft. W6 independently checks exact asset custody.
-      if (owner && asset.ownerAccountId === actor.accountId) return true;
-      const attachment = current.document.media.find(
-        (item) =>
-          item.assetId === asset.id &&
-          item.version === asset.version &&
-          item.sha256 === asset.sha256 &&
-          ((asset.purpose === "human_note" && item.kind === "voice") ||
-            (asset.purpose === "post_photo" && item.kind === "photo")),
-      );
       return Boolean(
-        attachment &&
-          current.state === "published" &&
-          current.signedActId &&
-          asset.provenance?.c2paVerified === true &&
-          asset.provenance.processedMediaSha256 === attachment.sha256 &&
-          asset.provenance.signedActId === asset.signedActId &&
-          (await publicationBinding(
-            client,
-            actor,
-            creatorId,
-            objectId,
-            current.signedActId,
-            asset,
-          )),
+        await currentRead(client, actor, creatorId, objectId, asset),
       );
+    },
+    async currentPublication(
+      client: PoolClient,
+      actor: Actor,
+      creatorId: string,
+      objectId: string,
+      asset: ContentMediaAsset,
+    ): Promise<{ signedActId: string; version: number } | null> {
+      const read = await currentRead(client, actor, creatorId, objectId, asset);
+      return read?.publication ?? null;
     },
   };
 }

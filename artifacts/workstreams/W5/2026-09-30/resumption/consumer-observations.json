@@ -1,0 +1,57 @@
+{
+  "recordedAt": "2026-10-01T00:48:00Z",
+  "basis": "Personally operated existing W5 development actors through IAB UI; no synthetic producer receipts",
+  "threads": {
+    "creatorId": "50000000-0000-4000-8000-000000000001",
+    "directory": "Current linked directory genuinely empty",
+    "fanId": "60000000-0000-4000-8000-000000000002",
+    "actualThreadAvailable": false,
+    "populatedPaginationVerified": false
+  },
+  "modalRecovery": {
+    "viewport": [390, 844],
+    "theme": "light",
+    "method": "Only owned API4105 pid39939 SIGSTOP then SIGCONT; real current authority expiry and recovery",
+    "suspended": {
+      "dialogOpen": false,
+      "ancestorHidden": true,
+      "unsavedAlternativeTextRetained": true
+    },
+    "recovered": {
+      "dialogOpen": true,
+      "ancestorHidden": false,
+      "sameUnsavedAlternativeText": true,
+      "focusPlaceholder": "Describe the photo",
+      "horizontalScrollWidth": 390
+    },
+    "noteId": "a9181632-d598-49f5-9be8-49a66184081c",
+    "savedNoteRevision": 9,
+    "mediaUploaded": false,
+    "microphonePermissionRequested": false,
+    "genuineSigningOperated": false,
+    "latency": "Not measured; no p95 claim"
+  },
+  "checks": {
+    "existingBackend": {
+      "passed": 18,
+      "seconds": 338.03,
+      "workloadPreserved": "1000 actual test threads/10000 random pair assertions"
+    },
+    "canonicalGeneration": "Pass:12 shared resources and78 W5 operations; W1 explicitly leased existing command regeneration",
+    "workspaceTypesLintFormat": "Pass; final scoped backend/web types and lint also pass",
+    "productionWebBackend": "Pass; final bounded withdrawal guard backend build passes at checkpoint",
+    "swift": {
+      "methods": 18,
+      "nonSnapshotPass": 15,
+      "strictSnapshotFailures": 110,
+      "goldensChanged": false,
+      "comparatorChanged": false
+    }
+  },
+  "limits": [
+    "Approval/Team producer assemblies and canonical migrations unavailable in this local host; consumer compiled, no real approval/delivery claimed.",
+    "User instructed genuine signing remain blocked.",
+    "No new test cases/files/suites; existing capture plumbing repair preserves original assertions.",
+    "No actual media/C2PA, provider payment, delivery/privacy completion, model call or native device acceptance."
+  ]
+}

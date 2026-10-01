@@ -40,6 +40,8 @@ type MessageRow = {
   control_epoch: number;
   sequence: number;
   signed_act_id: string | null;
+  author_account_id: string | null;
+  team_member: string | null;
 };
 type GenerationRow = {
   id: string;
@@ -59,6 +61,8 @@ function message(row: MessageRow): Message {
     controlEpoch: row.control_epoch,
     sequence: row.sequence,
     signedActId: row.signed_act_id,
+    member: row.team_member ?? null,
+    authorAccountId: row.author_account_id ?? null,
   };
 }
 

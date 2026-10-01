@@ -102,6 +102,17 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // Redraw hosted layers at the reference scale before compositing. A1x
+      // layer cache would otherwise magnify blurred text on a hosted display.
+      func prepareLayer(_ layer: CALayer) {
+        layer.contentsScale = 2
+        layer.rasterizationScale = 2
+        layer.setNeedsDisplay()
+        for child in layer.sublayers ?? [] { prepareLayer(child) }
+        if let mask = layer.mask { prepareLayer(mask) }
+        layer.displayIfNeeded()
+      }
+      if let layer = host.layer { prepareLayer(layer) }
       // Baselines use the documented 390x844 logical size at 2x. A hosted
       // runner's display backing scale must not change the comparison size.
       let bitmap = NSBitmapImageRep(

@@ -153,6 +153,9 @@ export const MessageSchema = z.strictObject({
   controlEpoch: z.number().int().nonnegative(),
   sequence: z.number().int().positive(),
   signedActId: IdSchema.nullable(),
+  // Scoped server attribution; never request authority or public signature data.
+  member: z.string().nullable().optional(),
+  authorAccountId: IdSchema.nullable().optional(),
 });
 export const AcceptedMessageSchema = z.strictObject({
   message: MessageSchema,

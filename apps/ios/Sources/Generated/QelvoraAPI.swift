@@ -566,6 +566,240 @@ public struct APICommerceVersionCommand: Codable, Sendable {
   }
 }
 
+public struct APIMediaCreatorMediaAsset: Codable, Sendable {
+  public let `id`: String
+  public let `purpose`: APIMediaCreatorMediaAssetPurpose
+  public let `state`: APIMediaCreatorMediaAssetState
+  public let `version`: Int
+  public let `mimeType`: String
+  public let `bytes`: Int
+  public let `uploadedBytes`: Int
+  public let `durationMs`: Int?
+  public let `sha256`: String
+  public let `waveform`: [Double]
+  public let `signedActId`: String?
+  public let `expiresAt`: String
+  public let `failureCode`: String?
+  public let `provenance`: [String: APIJSONValue]?
+  public let `creatorId`: String
+  public let `objectId`: String
+  public let `ownerAccountId`: String
+  public init(id: String, purpose: APIMediaCreatorMediaAssetPurpose, state: APIMediaCreatorMediaAssetState, version: Int, mimeType: String, bytes: Int, uploadedBytes: Int, durationMs: Int? = nil, sha256: String, waveform: [Double], signedActId: String? = nil, expiresAt: String, failureCode: String? = nil, provenance: [String: APIJSONValue]? = nil, creatorId: String, objectId: String, ownerAccountId: String) {
+    self.id = id
+    self.purpose = purpose
+    self.state = state
+    self.version = version
+    self.mimeType = mimeType
+    self.bytes = bytes
+    self.uploadedBytes = uploadedBytes
+    self.durationMs = durationMs
+    self.sha256 = sha256
+    self.waveform = waveform
+    self.signedActId = signedActId
+    self.expiresAt = expiresAt
+    self.failureCode = failureCode
+    self.provenance = provenance
+    self.creatorId = creatorId
+    self.objectId = objectId
+    self.ownerAccountId = ownerAccountId
+  }
+}
+
+public enum APIMediaCreatorMediaAssetPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+}
+
+public enum APIMediaCreatorMediaAssetState: String, Codable, Sendable {
+  case `uploading` = "uploading"
+  case `quarantined` = "quarantined"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `rejected` = "rejected"
+  case `revoked` = "revoked"
+  case `deleted` = "deleted"
+}
+
+public struct APIMediaCreatorMediaPlaybackTicket: Codable, Sendable {
+  public let `asset`: APIMediaCreatorMediaPlaybackTicketAsset
+  public let `url`: String
+  public let `expiresAt`: String
+  public init(asset: APIMediaCreatorMediaPlaybackTicketAsset, url: String, expiresAt: String) {
+    self.asset = asset
+    self.url = url
+    self.expiresAt = expiresAt
+  }
+}
+
+public struct APIMediaCreatorMediaPlaybackTicketAsset: Codable, Sendable {
+  public let `id`: String
+  public let `purpose`: APIMediaCreatorMediaPlaybackTicketAssetPurpose
+  public let `state`: APIMediaCreatorMediaPlaybackTicketAssetState
+  public let `version`: Int
+  public let `mimeType`: String
+  public let `bytes`: Int
+  public let `uploadedBytes`: Int
+  public let `durationMs`: Int?
+  public let `sha256`: String
+  public let `waveform`: [Double]
+  public let `signedActId`: String?
+  public let `expiresAt`: String
+  public let `failureCode`: String?
+  public let `provenance`: [String: APIJSONValue]?
+  public let `creatorId`: String
+  public let `objectId`: String
+  public let `ownerAccountId`: String
+  public init(id: String, purpose: APIMediaCreatorMediaPlaybackTicketAssetPurpose, state: APIMediaCreatorMediaPlaybackTicketAssetState, version: Int, mimeType: String, bytes: Int, uploadedBytes: Int, durationMs: Int? = nil, sha256: String, waveform: [Double], signedActId: String? = nil, expiresAt: String, failureCode: String? = nil, provenance: [String: APIJSONValue]? = nil, creatorId: String, objectId: String, ownerAccountId: String) {
+    self.id = id
+    self.purpose = purpose
+    self.state = state
+    self.version = version
+    self.mimeType = mimeType
+    self.bytes = bytes
+    self.uploadedBytes = uploadedBytes
+    self.durationMs = durationMs
+    self.sha256 = sha256
+    self.waveform = waveform
+    self.signedActId = signedActId
+    self.expiresAt = expiresAt
+    self.failureCode = failureCode
+    self.provenance = provenance
+    self.creatorId = creatorId
+    self.objectId = objectId
+    self.ownerAccountId = ownerAccountId
+  }
+}
+
+public enum APIMediaCreatorMediaPlaybackTicketAssetPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+}
+
+public enum APIMediaCreatorMediaPlaybackTicketAssetState: String, Codable, Sendable {
+  case `uploading` = "uploading"
+  case `quarantined` = "quarantined"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `rejected` = "rejected"
+  case `revoked` = "revoked"
+  case `deleted` = "deleted"
+}
+
+public enum APIMediaCreatorMediaPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+}
+
+public struct APIMediaCreatorMediaUploadRequest: Codable, Sendable {
+  public let `purpose`: APIMediaCreatorMediaUploadRequestPurpose
+  public let `mimeType`: APIMediaCreatorMediaUploadRequestMimeType
+  public let `bytes`: Int
+  public let `durationMs`: Int?
+  public let `sha256`: String
+  public let `idempotencyKey`: String
+  public let `objectId`: String
+  public init(purpose: APIMediaCreatorMediaUploadRequestPurpose, mimeType: APIMediaCreatorMediaUploadRequestMimeType, bytes: Int, durationMs: Int? = nil, sha256: String, idempotencyKey: String, objectId: String) {
+    self.purpose = purpose
+    self.mimeType = mimeType
+    self.bytes = bytes
+    self.durationMs = durationMs
+    self.sha256 = sha256
+    self.idempotencyKey = idempotencyKey
+    self.objectId = objectId
+  }
+}
+
+public enum APIMediaCreatorMediaUploadRequestPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+}
+
+public enum APIMediaCreatorMediaUploadRequestMimeType: String, Codable, Sendable {
+  case `audio_webm` = "audio/webm"
+  case `audio_mp4` = "audio/mp4"
+  case `audio_ogg` = "audio/ogg"
+  case `audio_wav` = "audio/wav"
+  case `image_jpeg` = "image/jpeg"
+  case `image_png` = "image/png"
+}
+
+public struct APIMediaCreatorMediaUploadTicket: Codable, Sendable {
+  public let `asset`: APIMediaCreatorMediaUploadTicketAsset
+  public let `url`: String
+  public let `expiresAt`: String
+  public let `chunkBytes`: Int
+  public init(asset: APIMediaCreatorMediaUploadTicketAsset, url: String, expiresAt: String, chunkBytes: Int) {
+    self.asset = asset
+    self.url = url
+    self.expiresAt = expiresAt
+    self.chunkBytes = chunkBytes
+  }
+}
+
+public struct APIMediaCreatorMediaUploadTicketAsset: Codable, Sendable {
+  public let `id`: String
+  public let `purpose`: APIMediaCreatorMediaUploadTicketAssetPurpose
+  public let `state`: APIMediaCreatorMediaUploadTicketAssetState
+  public let `version`: Int
+  public let `mimeType`: String
+  public let `bytes`: Int
+  public let `uploadedBytes`: Int
+  public let `durationMs`: Int?
+  public let `sha256`: String
+  public let `waveform`: [Double]
+  public let `signedActId`: String?
+  public let `expiresAt`: String
+  public let `failureCode`: String?
+  public let `provenance`: [String: APIJSONValue]?
+  public let `creatorId`: String
+  public let `objectId`: String
+  public let `ownerAccountId`: String
+  public init(id: String, purpose: APIMediaCreatorMediaUploadTicketAssetPurpose, state: APIMediaCreatorMediaUploadTicketAssetState, version: Int, mimeType: String, bytes: Int, uploadedBytes: Int, durationMs: Int? = nil, sha256: String, waveform: [Double], signedActId: String? = nil, expiresAt: String, failureCode: String? = nil, provenance: [String: APIJSONValue]? = nil, creatorId: String, objectId: String, ownerAccountId: String) {
+    self.id = id
+    self.purpose = purpose
+    self.state = state
+    self.version = version
+    self.mimeType = mimeType
+    self.bytes = bytes
+    self.uploadedBytes = uploadedBytes
+    self.durationMs = durationMs
+    self.sha256 = sha256
+    self.waveform = waveform
+    self.signedActId = signedActId
+    self.expiresAt = expiresAt
+    self.failureCode = failureCode
+    self.provenance = provenance
+    self.creatorId = creatorId
+    self.objectId = objectId
+    self.ownerAccountId = ownerAccountId
+  }
+}
+
+public enum APIMediaCreatorMediaUploadTicketAssetPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+}
+
+public enum APIMediaCreatorMediaUploadTicketAssetState: String, Codable, Sendable {
+  case `uploading` = "uploading"
+  case `quarantined` = "quarantined"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `rejected` = "rejected"
+  case `revoked` = "revoked"
+  case `deleted` = "deleted"
+}
+
 public struct APIMediaMediaAsset: Codable, Sendable {
   public let `id`: String
   public let `threadId`: String
@@ -633,6 +867,23 @@ public enum APIMediaMediaPurpose: String, Codable, Sendable {
   case `ai_audio` = "ai_audio"
 }
 
+public struct APIMediaMediaRevocation: Codable, Sendable {
+  public let `state`: APIMediaMediaRevocationState
+  public let `deletion`: APIMediaMediaRevocationDeletion
+  public init(state: APIMediaMediaRevocationState, deletion: APIMediaMediaRevocationDeletion) {
+    self.state = state
+    self.deletion = deletion
+  }
+}
+
+public enum APIMediaMediaRevocationState: String, Codable, Sendable {
+  case `revoked` = "revoked"
+}
+
+public enum APIMediaMediaRevocationDeletion: String, Codable, Sendable {
+  case `pending` = "pending"
+}
+
 public struct APIMediaMediaSign: Codable, Sendable {
   public let `signedActId`: String
   public let `version`: Int
@@ -652,6 +903,28 @@ public enum APIMediaMediaState: String, Codable, Sendable {
   case `rejected` = "rejected"
   case `revoked` = "revoked"
   case `deleted` = "deleted"
+}
+
+public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `bytes`: Int
+  public let `mimeType`: APIMediaProcessedMediaEvidenceMimeType
+  public let `durationMs`: Int?
+  public init(assetId: String, version: Int, sha256: String, bytes: Int, mimeType: APIMediaProcessedMediaEvidenceMimeType, durationMs: Int? = nil) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.bytes = bytes
+    self.mimeType = mimeType
+    self.durationMs = durationMs
+  }
+}
+
+public enum APIMediaProcessedMediaEvidenceMimeType: String, Codable, Sendable {
+  case `audio_mp4` = "audio/mp4"
+  case `image_png` = "image/png"
 }
 
 public struct APIMediaUploadRequest: Codable, Sendable {
@@ -1122,6 +1395,7 @@ public struct APIContentPage: Codable, Sendable {
 
 public enum APIContentPageState: String, Codable, Sendable {
   case `draft` = "draft"
+  case `media_pending` = "media_pending"
   case `scheduled` = "scheduled"
   case `published` = "published"
   case `unpublished` = "unpublished"
@@ -3003,7 +3277,9 @@ public struct APIMessage: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -3012,6 +3288,8 @@ public struct APIMessage: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 
@@ -3053,7 +3331,9 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -3062,6 +3342,8 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 
@@ -3193,7 +3475,9 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -3202,6 +3486,8 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 

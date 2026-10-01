@@ -105,6 +105,22 @@ export interface ContentDependencies {
     audience: Audience,
   ) => Promise<number | null>;
   mediaPublication?: ContentPublicationMedia;
+  /** W1 withdrawal-only registry. Must verify this exact consumed act and
+   * persist a durable audit for the actual publisher on this held client.
+   * It cannot issue signing authority or disclose a new public command. */
+  withdrawPublicationSignature?: (
+    client: PoolClient,
+    actor: Actor,
+    input: Readonly<{
+      creatorId: string;
+      objectId: string;
+      version: number;
+      signedActId: string;
+      signerAccountId: string;
+      command: SignedActCommand;
+      withdrawn: true;
+    }>,
+  ) => Promise<void>;
   publicPacket?: (
     client: PoolClient,
     actor: Actor,
@@ -1112,14 +1128,12 @@ export class ContentService {
   ) {
     const publication = (
       await client.query(
-        "SELECT signed_act_id,author_account_id FROM creator.content_publication WHERE content_id=$1 AND version=$2",
+        "SELECT * FROM creator.content_publication WHERE content_id=$1 AND version=$2",
         [row.id, row.version],
       )
     ).rows[0];
-    if (
-      publication?.signed_act_id &&
-      publication.author_account_id === actor.accountId
-    )
+    if (!publication?.signed_act_id) return;
+    if (publication.author_account_id === actor.accountId) {
       await setSignatureVisibility(
         client,
         actor,
@@ -1127,6 +1141,47 @@ export class ContentService {
         false,
         true,
       );
+      return;
+    }
+    // A Team edit/withdrawal cannot silently leave the creator's old public
+    // signature visible. Require the current publisher and W1's real registry;
+    // never substitute a fabricated signer Actor for this request account.
+    const role = await this.role(client, actor, row.creator_id, ["publisher"]);
+    invariant(
+      !role.creator && publication.author_account_id === role.account_id,
+      "publication_signature_unavailable",
+      "The stored publication signature is unavailable.",
+    );
+    invariant(
+      this.dependencies.withdrawPublicationSignature,
+      "publication_withdrawal_unconfigured",
+      "Current publisher signature withdrawal authority is required before changing this publication.",
+    );
+    const revision = (
+      await client.query(
+        "SELECT document FROM creator.content_revision WHERE content_id=$1 AND version=$2",
+        [row.id, row.version],
+      )
+    ).rows[0];
+    const document = ContentDocument.parse(revision?.document),
+      evidence = z
+        .array(ProcessedMediaEvidenceSchema)
+        .max(10)
+        .parse(publication.media_evidence ?? []);
+    invariant(
+      evidence.length === document.media.length,
+      "publication_evidence_unavailable",
+      "The exact stored publication evidence is required for withdrawal.",
+    );
+    await this.dependencies.withdrawPublicationSignature(client, actor, {
+      creatorId: row.creator_id,
+      objectId: row.id,
+      version: row.version,
+      signedActId: publication.signed_act_id,
+      signerAccountId: publication.author_account_id,
+      command: publicationCommand(row, document, evidence),
+      withdrawn: true,
+    });
   }
   async effect(
     client: PoolClient,
