@@ -1,0 +1,88 @@
+{
+  "recordedAt": "2026-10-01T09:24:42.332504+00:00",
+  "sourceBase": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "branch": "codex/w1-resume-20261001",
+  "worktree": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform",
+  "changedSource": {
+    "path": "apps/web/features/identity/setup.tsx",
+    "sha256": "292f4b1cd163922405844f4d005d990e5cc42125eac89452ad7c2c12c327e70e",
+    "gitBlob": "e2a6cbb5b39cc352619bc9b84b58eea452fd2ba7"
+  },
+  "builds": {
+    "backend": "Built unchanged current-main source with TypeScript and the canonical bundler; launched on 4111.",
+    "webProductionBuildId": "UelkpBeJ2iJq089K4505-",
+    "browserBuild": "Next development host compiles the changedSource above. Production build is supporting evidence."
+  },
+  "environment": {
+    "node": "24.19.0",
+    "packageManager": "Installed fallback pnpm 11.19.0; frozen lockfile unchanged. Repository requests 12.5.1.",
+    "apiPort": 4111,
+    "webPort": 3011,
+    "databasePort": 55451,
+    "container": "creator-platform-w1-resume-20261001",
+    "imageDigest": "sha256:cf134a767f474095eeba57e0117be8e568e011a63f33fbf252f14c9b760f8e6f",
+    "privateConfig": "W1-only directory mode0700; separate runtime/migration/container files mode0600 outside Git. No previous database restored."
+  },
+  "interaction": {
+    "surface": "Codex in-app browser on macOS; native controls disabled",
+    "identity": "Explicit loopback synthetic actors one and two; no genuine identity or creator proof",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1280,
+        "height": 900
+      }
+    ],
+    "themes": ["light", "night"],
+    "fault": "Supported tab-scoped Network.setBlockedURLs interrupts only identity proof requests. No responses or hidden storage manipulated. Cleared after verification.",
+    "results": [
+      "Actor one sign-in \u2192 new Handle/intro \u2192 exact Account return; session refresh and reload preserve profile.",
+      "Creator draft persisted pending; invalid external URL rejected. One local-only challenge created; no post submitted, review, approval, key or signed act.",
+      "Blocked initial proof read reproduced silent empty state before repair. Repaired UI shows unavailable/retry and disables proof changes.",
+      "Retry recovers the exact existing challenge; a failed manual refresh hides stale code, blocks actions and retains unsent post input.",
+      "Actor one signed out; actor two has empty separate onboarding, handle collision denied, alternate profile and creator draft saved. Confirmed proof_not_found permits challenge creation.",
+      "Keyboard retry originally left BODY focused. Failed retry now focuses Retry verification status; successful no-proof retry focuses Create proof code.",
+      "Existing-proof keyboard refresh failure focuses Retry verification status; successful retry focuses Refresh verification status."
+    ]
+  },
+  "checks": {
+    "backendBuild": "pass",
+    "webTypecheck": "pass",
+    "changedSourceESLint": "pass",
+    "changedSourcePrettier": "pass",
+    "finalWebProductionBuild": "pass",
+    "hostedCI": "Not yet requested; no queued checks counted as pass.",
+    "newTestCode": false
+  },
+  "limits": [
+    "One browser cookie jar; no independent-client, native, revoke latency or p95 acceptance.",
+    "No genuine proof, passkey, licensed AI, payment, call, public signed content, provider receipt or participant study.",
+    "Only new setup recovery states visually inspected; no full six-artboard/53-component acceptance.",
+    "Full W1 remains active; H01\u2013H20 and original source coverage stay open."
+  ],
+  "captures": [
+    {
+      "path": "account-rotation.jpg",
+      "sha256": "96dd79efc45a02bb407d8429c98f18493726bfd7955b587c66528225d3eb3bc7"
+    },
+    {
+      "path": "proof-read-unavailable-light-desktop.jpg",
+      "sha256": "bfd20e2d593cdaeeec7dbaba7e4af7af8d3b248745a956406f2c044ae588ef3b"
+    },
+    {
+      "path": "proof-read-unavailable-light.jpg",
+      "sha256": "bab169cfc37cafa78a14c07bec409cba634053461151c38167b91a5096c0fb81"
+    },
+    {
+      "path": "proof-read-unavailable-night-desktop.jpg",
+      "sha256": "ad444a5987fdfdfe25cda3e7d7a849cd43c8119860cdde88c07ba45ae8bbd833"
+    },
+    {
+      "path": "proof-read-unavailable-night-phone.jpg",
+      "sha256": "602ed214b54a514b3ca5d5ce4daed194063dc4279ae53fb2f99f505038af6e75"
+    }
+  ]
+}
