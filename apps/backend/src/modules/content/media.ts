@@ -89,9 +89,10 @@ export function contentMediaAuthority(
       !attachment ||
       current.state !== "published" ||
       !current.signedActId ||
-      asset.signedActId !== current.signedActId ||
       asset.provenance?.c2paVerified !== true ||
       asset.provenance.processedMediaSha256 !== attachment.sha256 ||
+      // Preserve the original recording occurrence. A later signed revision
+      // has its own publication association, verified below on this client.
       asset.provenance.signedActId !== asset.signedActId ||
       !(await publicationBinding(
         client,

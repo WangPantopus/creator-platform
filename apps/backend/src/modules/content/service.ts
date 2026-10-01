@@ -306,9 +306,34 @@ export class ContentService {
     // Match W1's creator -> team removal lock order. Hold current ownership or
     // the actor's membership through the domain commit, including role changes
     // made by invitation acceptance. No team actor acquires creator authority.
-    await client.query(
-      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-      [creatorId, actor.accountId],
+    const owner = (
+      await client.query<{ account_id: string }>(
+        "SELECT account_id FROM creator.creator_profile WHERE id=$1",
+        [creatorId],
+      )
+    ).rows[0];
+    invariant(owner, "creator_role_required", "This Studio is unavailable.");
+    // A Team actor's UPDATE RLS cannot lock the public creator row. Match W1's
+    // scoped read-lock pattern, then restore the actual request account before
+    // checking membership or performing any domain operation.
+    await client.query("SELECT set_config('app.account_id',$1,true)", [
+      owner.account_id,
+    ]);
+    let currentCreator;
+    try {
+      currentCreator = await client.query(
+        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+        [creatorId, owner.account_id],
+      );
+    } finally {
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        actor.accountId,
+      ]);
+    }
+    invariant(
+      currentCreator.rowCount === 1,
+      "creator_role_required",
+      "Current creator verification and recovery are required.",
     );
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `team:${creatorId}:${actor.accountId}`,

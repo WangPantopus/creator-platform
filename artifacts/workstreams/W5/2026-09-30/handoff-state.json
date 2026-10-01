@@ -109,9 +109,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T00:48:00Z",
+    "recordedAt": "2026-10-01T00:56:00Z",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "074290033b3d3041cec23910a40ef04564e20d10; next consumer/generation checkpoint is this commit, inspect HEAD",
+    "lastPushedCheckpoint": "01ad9a53c7a10941b9aafd6c955e04d867f0362e; publication-occurrence correction follows, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -167,6 +167,6 @@
     ],
     "replyConsumers": "Personal W4 exact approval and W3 Team UI/BFF implemented; actual producer write-purpose/denial/migration assemblies absent; no approval/delivery proof",
     "signatureWithdrawal": "W1 withdrawal-only exact stored command/current publisher/durable actual-actor audit port proposed; absent blocks Team mutation of creator-signed publication",
-    "mediaCurrentPublication": "Exact published signedAct/version/current audience/attachment/C2PA/binding; owner preview no tuple"
+    "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version"
   }
 }
