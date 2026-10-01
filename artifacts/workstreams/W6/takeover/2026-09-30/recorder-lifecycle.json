@@ -1,0 +1,72 @@
+{
+  "recordedAt": "2026-10-01T01:16:20.784779+00:00",
+  "nativeRevision": "20fb92330429ba84ed1a85d3dbe92b348f6cc7f4",
+  "webRevision": "de17183743a0c2aa3c6fb4ed8e4b0308708b3422",
+  "priorBrowserClassRevision": "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+  "sourceSHA256": {
+    "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "17d6134ce254db3cd3b65be76c743b03fff786e1b54c105a8d7cd14c5f6a2e67",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt": "a6933e38a75251d9207440404615ba60f5c0e048d94093c4dde031725224ede1",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "c00db89769b06b7eb51c1f237f34e2daa4d1cbe4e24b8463147c03e69a474d53",
+    "apps/web/features/media/VoiceRecorder.tsx": "4984b61ed25c70943f68b1a7f107288a3f675ce4ff82de1811bbcf77b78f0bdd",
+    "apps/web/features/media/VoicePlayer.tsx": "ec5e424ee2a91df51697f843f6a8dc9d0aebbdafda43d1ae9cc0e3322ed5c35b",
+    "apps/web/features/media/recorder.ts": "6dc610a8dc207c33c2774f79feebff4aa29760362a98f25226b1f282dc9cddca"
+  },
+  "checks": {
+    "iosSimulatorLibrary": {
+      "target": "QelvoraUI",
+      "passed": true,
+      "durationSeconds": 13.17
+    },
+    "android": {
+      "task": ":app:compileDebugKotlin",
+      "passed": true,
+      "durationSeconds": 141,
+      "newAPKPackaged": false
+    },
+    "webProductionBuild": {
+      "passed": true,
+      "nextVersion": "16.3.7",
+      "compiledSeconds": 10.9,
+      "typescriptSeconds": 12.9,
+      "staticPages": 29
+    },
+    "webTypecheckLintFormat": "passed",
+    "existingAndroidCases": "Earlier19-case record predates these permission/lifecycle paths; no new coverage claim",
+    "existingSnapshots": "No source/reference/assertion/threshold changes for this increment"
+  },
+  "behavior": {
+    "swift": "Interrupted pending permission invalidates generation; delegate error must come from current recorder.",
+    "android": "Only mounted current recording intent plus permission and RESUMED lifecycle starts capture; grant may wait until resume. STOP/dispose/cancel clears intent; in-flight request cannot be replaced; launcher/recorder keyed to current lifecycle and closed/stale callbacks cannot start/stop later capture.",
+    "web": "Observe actual hidden/inert/aria-hidden/dialogclosed ancestors with initial current check; concealed recording and private preview pause without blob discard. Current src/preview keyed nodes allow captured old-element cleanup to pause/clear/load without removing the replacement source."
+  },
+  "primaryReferences": [
+    "https://developer.android.com/training/basics/intents/result",
+    "https://github.com/androidx/androidx/blob/androidx-main/activity/activity/src/main/java/androidx/activity/result/ActivityResultRegistry.kt",
+    "https://developer.apple.com/documentation/swiftui/scenephase"
+  ],
+  "limits": "Compilation/source review only; genuine permission prompts, media/network/signing/provider and physical hardware acceptance remain open. No actual background/cellular/audio-route proof. Last actual APK remains47 operations; generated contract remains48.",
+  "newTestsCasesSuitesHarnesses": 0,
+  "goldensOrThresholdsChanged": false,
+  "realMediaProviderHardwareAcceptance": false,
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "preservedCI": {
+    "runId": 36780139572,
+    "iosFoundation": "queued",
+    "webVisual": "queued",
+    "iosReviewAvailable": false,
+    "localChangesPushed": false
+  },
+  "concealedPlayerFollowup": {
+    "revision": "f57571968ea81e7a3bc7c755386c99132a74705a",
+    "path": "apps/web/features/media/VoicePlayer.tsx",
+    "sha256": "13f275684e706db03b3225b1fb154e3ee979d56a98c7751e04ca435b9ad5526d",
+    "behavior": "Own actual ancestor/document visibility observation with initial check pauses processed player independently from private preview, retaining source for explicit resume. Old-node cleanup and current-authority poll remain.",
+    "typeLintFormat": "passed",
+    "productionBuild": "precedingde17183 passed; this additive concealment observer not yet rebuilt separately",
+    "actualAudioRecovery": "unverified"
+  }
+}

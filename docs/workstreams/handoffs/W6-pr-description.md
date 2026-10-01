@@ -10,6 +10,8 @@ W8 reserves0046 availability/0047 creator media as reserved_unapplied. Latest pr
 
 Local `d15a451` supplies the actual saved-object recording limit to W5’s Post consumer through a creator-only policy read; no approved duration fallback or upload/publication side effect. Narrow W1-leased `1ada936` repairs closed parameter-enum declaration/wire serialization. Local `c425ae7` fences hidden pending microphone permission and stale capture callbacks. W5’s published1c90032 corrected original recording versus current publication source is inspected; runtime composition remains pending.
 
+Local20fb923 adds native current-request/visible lifecycle permission fences; webde17183/f575719 pause concealed capture/private preview/processed audio and release keyed old nodes on replacement/removal while retaining captured input. Native library/Kotlin compile and web production/types/lint pass; actual permission/audio/background acceptance remains open.
+
 The founder approved LiveKit Cloud evaluation only. Provider one-use admission, complete recoverable history, revocation, closure and all recording-output deletion require actual demonstrations. No purchase or credentials were accessed. Initial late grace, both-absent and cancellation/rescheduling remain undecided;180 seconds is cumulative reconnect budget.
 
 ## Validation and remaining gates

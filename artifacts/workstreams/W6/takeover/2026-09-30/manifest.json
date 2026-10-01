@@ -208,5 +208,14 @@
     "iosSimulatorLibrary": "passed50.33s",
     "androidKotlin": "passed177s; compile only, last actualAPK47",
     "functionalAcceptance": false
+  },
+  "recordingLifecycleFollowup": {
+    "evidence": "recorder-lifecycle.json",
+    "nativeRevision": "20fb92330429ba84ed1a85d3dbe92b348f6cc7f4",
+    "webRevision": "de17183743a0c2aa3c6fb4ed8e4b0308708b3422",
+    "webProduction": "passed",
+    "iosSimulatorLibrary": "passed13.17s",
+    "androidKotlin": "passed141s;compile only",
+    "actualPermissionHardwareAcceptance": false
   }
 }
