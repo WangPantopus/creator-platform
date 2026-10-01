@@ -1,0 +1,149 @@
+{
+  "observedAt": "2026-10-01T05:13:18.623578+00:00",
+  "pr": {
+    "baseRefOid": "de1d42d71c00810d864fe599de2bb0f3c39b1a8f",
+    "headRefOid": "189db7ccf5a051ede3be76220ba56eb3e8006119",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "705215955415332e601adf5c42a2169cd0d173a5"
+    },
+    "mergedAt": "2026-10-01T05:10:56Z",
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T05:13:09Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818476045/job/110228661777",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T05:11:18Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479369/job/110228673102",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T05:10:03Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479349/job/110228668582",
+        "name": "compile",
+        "startedAt": "2026-10-01T05:13:11Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "Trust release compilation"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479369/job/110228672650",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T05:10:03Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818476045/job/110228661843",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T05:10:00Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479369/job/110228672427",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T05:10:03Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818476045/job/110228661568",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T05:10:00Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479369/job/110228672868",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T05:10:03Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818476045/job/110228661784",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T05:10:00Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818479369/job/110228672549",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T05:13:12Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36818476045/job/110228661781",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T05:11:18Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "Foundation checks"
+      }
+    ],
+    "url": "https://github.com/WangPantopus/creator-platform/pull/7"
+  },
+  "actualRemoteMain": "705215955415332e601adf5c42a2169cd0d173a5",
+  "mergedTreeExactlyEqualsReviewedHead": true,
+  "tree": "4068edc949620ac6f860fb6ceb56d62bfbdffe5e",
+  "normalAuthenticatedMergeCommand": {
+    "mode": "merge",
+    "matchedHead": "189db7ccf5a051ede3be76220ba56eb3e8006119",
+    "adminOverride": false,
+    "branchOrRulesetChange": false
+  },
+  "configuredRequiredChecks": [],
+  "basis": "Human authorized source merge after actual launched-app E2E and excludes unit/coverage. Local exact-tree backend/web builds and iOS2/2/Android4/4 real-app runs plus canonical Report/privacy/role journeys are recorded. Nonrequired CI is queued/running as shown; no all-green claim.",
+  "prBodyReadbackMatchesPreparedDescription": true,
+  "all40AndRetainedDataReceipt": "final-preservation.json",
+  "fullR1ToR10Complete": false,
+  "remainingReleaseCapabilitiesHeld": true,
+  "paidAiCalls": 0,
+  "runningResourcesPreserved": [
+    "API4108/PID77099/a3e15ac",
+    "web3008",
+    "Postgres55438/creator_w8/original volume",
+    "private keys/backups and all retained cases/jobs/blocks/tombstone"
+  ],
+  "nativeResources": "Only W8 Android normally stopped; XCTest simulator is Shutdown, data/builds/results preserved; peer/default services unchanged"
+}

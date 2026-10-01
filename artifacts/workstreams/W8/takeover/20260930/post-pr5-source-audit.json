@@ -1,0 +1,730 @@
+{
+  "observedAt": "2026-10-01T05:58:58.988080+00:00",
+  "kind": "read_only_post_merge_source_audit",
+  "acceptedW8Merge": "705215955415332e601adf5c42a2169cd0d173a5",
+  "ownedBranchHead": "e24b5530a91facb0778dd86e37a6dd328ff92378",
+  "fetchedMain": "c4b4a4f06e55399f1c976077f636579f0411d677",
+  "pr5": {
+    "baseRefOid": "705215955415332e601adf5c42a2169cd0d173a5",
+    "headRefOid": "c1802963d8a470ad31df9dded7200bdb1bd9daca",
+    "mergeCommit": {
+      "oid": "c4b4a4f06e55399f1c976077f636579f0411d677"
+    },
+    "mergedAt": "2026-10-01T05:51:05Z",
+    "number": 5,
+    "state": "MERGED",
+    "title": "Integrate guarded commerce with canonical authority and native entry fixes",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/5"
+  },
+  "scope": "Source custody review of the subsequent PR5 merge. It is not a new W8 merge, integration, build or launched-app acceptance.",
+  "changedPathCount": 285,
+  "activeMigrations": [
+    {
+      "version": "0001_foundation",
+      "path": "apps/backend/migrations/0001_foundation.sql",
+      "sha256": "1ccd0d6a99e11865850cd40f27d9446035e7d769d9b47f4f6d5c80776274117b",
+      "unchanged": true
+    },
+    {
+      "version": "0002_w1_identity",
+      "path": "apps/backend/migrations/0002_w1_identity.sql",
+      "sha256": "5aa91502d511375eb7a43e0f226f3e1aeeee896981b7ea4b6faf1aa5bee97f82",
+      "unchanged": true
+    },
+    {
+      "version": "0003_w2_agent",
+      "path": "apps/backend/src/modules/agent/migrations/0003_w2_agent.sql",
+      "sha256": "73996996033babd30c919a9f06822f352270987630e96c588ae5f6fe73aef510",
+      "unchanged": true
+    },
+    {
+      "version": "0004_commerce",
+      "path": "apps/backend/src/modules/commerce/schema.sql",
+      "sha256": "5a4aaeb45cc02d53a72d3c4e1558609e9dbf52b2f15b94d7f228d308813c76cc",
+      "unchanged": true
+    },
+    {
+      "version": "0006_w6_media_sessions",
+      "path": "apps/backend/src/modules/media/schema.sql",
+      "sha256": "0206427e525c5569c7f1753b92d39556bfe56ca0c1df61932213514da681a427",
+      "unchanged": true
+    },
+    {
+      "version": "0007_growth",
+      "path": "apps/backend/migrations/0007_growth.sql",
+      "sha256": "1ead3fb1b0c213c253bc2170e67467bf945821c9d6a9bb7d3b700b39d7d75c42",
+      "unchanged": true
+    },
+    {
+      "version": "0008_trust_operations",
+      "path": "apps/backend/migrations/0008_trust_operations.sql",
+      "sha256": "f88465f4d15dfb19176893789429aef648a0b16fed3403c4dd27a0ffbcf5b50c",
+      "unchanged": true
+    },
+    {
+      "version": "0010_w8_operational_guardrails",
+      "path": "apps/backend/migrations/0010_w8_operational_guardrails.sql",
+      "sha256": "5b7be49722ccaf787b1b0f1df17aaea48b5b29b6539a62e55d40328a153dd0b8",
+      "unchanged": true
+    },
+    {
+      "version": "0011_growth_retention",
+      "path": "apps/backend/migrations/0011_growth_retention.sql",
+      "sha256": "69478a0f75d4c91f61d74d5f3416e8c07077fffcbe7978325fc7131fb847f79c",
+      "unchanged": true
+    },
+    {
+      "version": "0012_w8_crisis_event_rls",
+      "path": "apps/backend/migrations/0012_w8_crisis_event_rls.sql",
+      "sha256": "1f60f00ac0457c506296a818de81af473c2aa8e057d5355a387a3fcc55b7cbd1",
+      "unchanged": true
+    },
+    {
+      "version": "0013_w2_agent_extensions",
+      "path": "infra/migrations/history/0013_w2_agent_extensions.sql",
+      "sha256": "7fc5995956d2e407475f815a2a707737c225cce0346643b8fd6b345d972fe59c",
+      "unchanged": true
+    },
+    {
+      "version": "0015_w4_reliability",
+      "path": "infra/migrations/history/0015_w4_reliability.sql",
+      "sha256": "5a94d77858838e26c94c6df559b01034d9cd48b94fd1530ebe937ab9840a89b4",
+      "unchanged": true
+    },
+    {
+      "version": "0016_w4_disclosure",
+      "path": "infra/migrations/history/0016_w4_disclosure.sql",
+      "sha256": "927291027eb0ad9942679b188f5e3f2cd74c1767d1b30aab7284f86de114fc89",
+      "unchanged": true
+    },
+    {
+      "version": "0017_growth_delivery",
+      "path": "apps/backend/migrations/0014_growth_delivery.sql",
+      "sha256": "9a0623260bebbda477f95a81e692b8cc39d991891e282c5cf144963efafaf33b",
+      "unchanged": true
+    },
+    {
+      "version": "0018_growth_activation",
+      "path": "apps/backend/migrations/0015_growth_activation.sql",
+      "sha256": "615ce7b38c2d894dc54767953dc5c0d1e9b17aa9c77d5867cd1b1619a850e509",
+      "unchanged": true
+    },
+    {
+      "version": "0019_w2_shadow_jobs",
+      "path": "infra/migrations/history/0019_w2_shadow_jobs.sql",
+      "sha256": "1f8e6e5ef1aa11859e3d972fb87273bec9fe233b4b406f51bc02df922d75158b",
+      "unchanged": true
+    },
+    {
+      "version": "0020_w2_purge_tombstone",
+      "path": "infra/migrations/history/0020_w2_purge_tombstone.sql",
+      "sha256": "419dd13b87d853363cfa3fee934f1916d78423dd0a6bdd88abcf4f1853d540ca",
+      "unchanged": true
+    },
+    {
+      "version": "0021_w4_lifecycle",
+      "path": "apps/backend/src/modules/commerce/schema-lifecycle.sql",
+      "sha256": "5c6d0225bd8180341877b6881214f035af89a8377d6265c1223dfa6d82a5a965",
+      "unchanged": true
+    },
+    {
+      "version": "0022_w4_lineage",
+      "path": "infra/migrations/history/0022_w4_lineage.sql",
+      "sha256": "03705311adf220a1658ec5b1cc2e3d661a3b5a8367664bd3204b51c4d3bba698",
+      "unchanged": true
+    },
+    {
+      "version": "0023_w8_action_recovery",
+      "path": "apps/backend/migrations/0023_w8_action_recovery.sql",
+      "sha256": "4c2ec5cee7e66d7a6178b87271c21a4b060fe34e9e6a587ddaf9ebe39852a720",
+      "unchanged": true
+    },
+    {
+      "version": "0024_growth_insight_versions",
+      "path": "apps/backend/migrations/0016_growth_insight_versions.sql",
+      "sha256": "bfbc1d4380037e7accd313ba06e720b31dd5af9cdfc94157e7bebd7c246efea4",
+      "unchanged": true
+    },
+    {
+      "version": "0025_growth_closed_windows",
+      "path": "apps/backend/migrations/0017_growth_closed_windows.sql",
+      "sha256": "a52750f6db6ff8f114f67ee14cf5966da5d936f7fccc06e714c0a9c2b08c182d",
+      "unchanged": true
+    },
+    {
+      "version": "0026_growth_window_backfill",
+      "path": "apps/backend/migrations/0018_growth_window_backfill.sql",
+      "sha256": "63e50cb371ac650c31a0a05310de6e7ddc6db09643e0670d573e93f4f62d5466",
+      "unchanged": true
+    },
+    {
+      "version": "0027_w8_privacy_ownership",
+      "path": "apps/backend/migrations/0027_w8_privacy_ownership.sql",
+      "sha256": "de8587672985d79c480bafb41961041be9390f565b3612ca14285d87d2319028",
+      "unchanged": true
+    },
+    {
+      "version": "0028_w4_membership_history",
+      "path": "apps/backend/src/modules/commerce/schema-membership-history.sql",
+      "sha256": "b8af45b7fa1804e5127bc0a49287fca0bad80be7eb84bf86a3afc4f85f2a880c",
+      "unchanged": true
+    },
+    {
+      "version": "0029_w4_recovery_fencing",
+      "path": "apps/backend/src/modules/commerce/schema-recovery-fencing.sql",
+      "sha256": "b7b8a04af277d9be7877c691e1f1eeeeffbcfb440ba74b519a14206d7fc4ead9",
+      "unchanged": true
+    },
+    {
+      "version": "0030_w4_spending_notices",
+      "path": "apps/backend/src/modules/commerce/schema-spending-notices.sql",
+      "sha256": "ac608681416e8a5388ec3e966b68bae7fe0e77553b0eb4dd16cf0941c12e2dcd",
+      "unchanged": true
+    },
+    {
+      "version": "0031_w4_purchase_history",
+      "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
+      "sha256": "72d14f4065cad72a5a836daa724c816abd79557078f5f0602bd9a39e64c00a6e",
+      "unchanged": true
+    },
+    {
+      "version": "0032_growth_continuation",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "sha256": "669a9d73446a6ec932dcf70a3bf257a6f07b7033cee56ea88fcfe5ac7d27eb61",
+      "unchanged": true
+    },
+    {
+      "version": "0033_growth_prompt_claims",
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "sha256": "d693befce3bbfe6fb5fa9077acf238f16d22b41e5604a82be0deb96378bfbca9",
+      "unchanged": true
+    },
+    {
+      "version": "0034_growth_erasure_fence",
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "sha256": "24e5eb660d23d181f13847734d4007851c36bd4ff74c8d1a064b748cb16c050b",
+      "unchanged": true
+    },
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "sha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d",
+      "unchanged": true
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "sha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5",
+      "unchanged": true
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "sha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd",
+      "unchanged": true
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "sha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a",
+      "unchanged": true
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "sha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6",
+      "unchanged": true
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "sha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9",
+      "unchanged": true
+    },
+    {
+      "version": "0041_w3_conversations",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_conversations.sql",
+      "sha256": "2c6f20f0a1152952ad9f864fbe3cd73efd40e182de3b8d93b64ecf0c89604456",
+      "unchanged": true
+    },
+    {
+      "version": "0042_w3_wellbeing",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_wellbeing.sql",
+      "sha256": "1f57a65084256d08ab906f9f15d2da893a8c0665dd34589cd9417decbb838a0a",
+      "unchanged": true
+    },
+    {
+      "version": "0043_w8_relationship_backfill",
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "sha256": "503a6e637f790491b060066cd9d5b0dd84d5e5b737d476c1f325204c4e87f8f6",
+      "unchanged": true
+    }
+  ],
+  "registryUnchanged": true,
+  "criticalSourceComparisons": [
+    {
+      "path": "infra",
+      "baseObject": "9d29075a9ab22febc709dd1c32ed9d2b21871c39",
+      "mainObject": "9d29075a9ab22febc709dd1c32ed9d2b21871c39",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/trust",
+      "baseObject": "1bf6f3d4986fc136f7cd9148fabdd51c900b2456",
+      "mainObject": "1bf6f3d4986fc136f7cd9148fabdd51c900b2456",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/db",
+      "baseObject": "e5727507ddfb97e429f5545427f5ffcb48aa90a6",
+      "mainObject": "e5727507ddfb97e429f5545427f5ffcb48aa90a6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/identity",
+      "baseObject": "a63bc6e662f88746c5c1e16d865b4a0628e867bc",
+      "mainObject": "a63bc6e662f88746c5c1e16d865b4a0628e867bc",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/deploy.ts",
+      "baseObject": "7d9701090b6b5b2df37991621228fc07e6656161",
+      "mainObject": "7d9701090b6b5b2df37991621228fc07e6656161",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "baseObject": "c4938eba4b33fae98fe8980db98bffdaa79ecd99",
+      "mainObject": "c4938eba4b33fae98fe8980db98bffdaa79ecd99",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "baseObject": "76f9a4dd29a72488d7a817b420d5f12eaf5dce3c",
+      "mainObject": "76f9a4dd29a72488d7a817b420d5f12eaf5dce3c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/wal.ts",
+      "baseObject": "58fb8f30f0db2625c7b1a5d6460b4a9f7ac311e5",
+      "mainObject": "58fb8f30f0db2625c7b1a5d6460b4a9f7ac311e5",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/operations/readiness.ts",
+      "baseObject": "f6e35a81ed70188c2058c09273d3f5b9766218ae",
+      "mainObject": "f6e35a81ed70188c2058c09273d3f5b9766218ae",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/app/ops",
+      "baseObject": "dc4521bfe03b838b5c8aa411388e9e0098a00325",
+      "mainObject": "dc4521bfe03b838b5c8aa411388e9e0098a00325",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/app/support",
+      "baseObject": "24f345ae02344d78023b242bde43be492d8e3b97",
+      "mainObject": "24f345ae02344d78023b242bde43be492d8e3b97",
+      "unchanged": true
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+      "baseObject": "73816c38535299ba39439ceab821d1167f9855d6",
+      "mainObject": "73816c38535299ba39439ceab821d1167f9855d6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/realtime",
+      "baseObject": "b1b8292f007e11ace39bb7afe9ae80156d0b074d",
+      "mainObject": "b1b8292f007e11ace39bb7afe9ae80156d0b074d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/realtime-tickets.ts",
+      "baseObject": "78d8d26bd3bccc314b9950dd6f42ca7d56053160",
+      "mainObject": "78d8d26bd3bccc314b9950dd6f42ca7d56053160",
+      "unchanged": true
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+      "baseObject": "de463f360444dd3ccaee0992f3f988944bc6a723",
+      "mainObject": "de463f360444dd3ccaee0992f3f988944bc6a723",
+      "unchanged": true
+    }
+  ],
+  "reserved0060": {
+    "sha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc",
+    "unchanged": true,
+    "appliedByThisAudit": false
+  },
+  "nativeProductionChanges": [
+    "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift",
+    "apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift",
+    "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift"
+  ],
+  "incomingTestAndWorkflowChanges": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "baseObject": "981e6d3880a14eca5d758f5affd38ab9354425ec",
+      "mainObject": "570feb740a798cfdf972aabf8a088532e627d3ae"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/com/pantopus/qelvora/NativeAcceptanceTest.kt",
+      "baseObject": "b5368a1ecc9b6662b3884b7997180f78492942db",
+      "mainObject": "8fcba2d5bcc3da4750785442b43378632852f99b"
+    },
+    {
+      "path": "apps/backend/tests/postgres.integration.test.ts",
+      "baseObject": "796833e6a3ae86911f62b0e167e06d3430639b20",
+      "mainObject": "5216304e2093c75252691139e7cd251028e5c5a5"
+    },
+    {
+      "path": "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift",
+      "baseObject": "c3b9bff82b3eba1b324e60e17dfe68398c8ebbaa",
+      "mainObject": "69691663afd5616d5be430e11e1fdb354aca82bf"
+    },
+    {
+      "path": "tests/visual/README.md",
+      "baseObject": "4f4cb5f28282150a70db6424f086d08af539a7aa",
+      "mainObject": "a5588928ef429a1589f30fb903067c2cb3b10715"
+    },
+    {
+      "path": "tests/visual/auth-contract.spec.ts",
+      "baseObject": "f790549474facfc87bedb28d52d4c8805b3e3ccd",
+      "mainObject": "f8f2b52c6ae6c99a9dc9fe16869c3e6cfce09fb9"
+    },
+    {
+      "path": "tests/visual/catalog.spec.ts",
+      "baseObject": "324a2d8e0b88cd0eee1d4bb4acfe2b6d8b606f76",
+      "mainObject": "f145991c72dd5422aa9ec449c46d6010264c7b9b"
+    },
+    {
+      "path": "tests/visual/foundation.spec.ts",
+      "baseObject": "2e22b514d30be62e459b709559eb443e209c173f",
+      "mainObject": "a150060f39ec74297878ecd832f6b26647a4030a"
+    }
+  ],
+  "incomingSnapshotReferences": {
+    "changedAgainstAcceptedMain": 110,
+    "paths": [
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png",
+      "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png"
+    ],
+    "meaning": "These references differ from accepted main7052159; a claim of preserving historical original references does not imply no change against this base. W8 did not rewrite or adopt them."
+  },
+  "reviewFindings": [
+    "W8 Trust service/store/worker, task fences, private-file streaming, runtime/deploy/WAL/telemetry, canonical identity/database authority and Ops/support source retain their compared Git objects.",
+    "local-server.ts changes only to await the now-asynchronous createCommerceRuntime. The local content privacy input remains absent; no content consumer or new schema is activated by this review.",
+    "Content owner privacy now queries reply-read/review relations from reserved0045. Its current registration is explicit-purpose-pool only; source must not be represented as complete current40-schema content export acceptance.",
+    "Configured non-development identity additionally requires canonical session custody and current caller-held denials. Signed-subject feature registration freezes after composition.",
+    "Memory assembly restores five genuine bounded family-scoped queries while preserving the read transaction and explicit thread share lock. W8 did not alter T11 or its assertions.",
+    "Conversation approved-draft delivery requires creator authority, human takeover, exact prepared approval and idempotent held transaction. Visible-output allowance settlement changes require fresh enabled producer acceptance.",
+    "Native commerce/conversation/generated clients and Android Welcome changed. Earlier W8 iOS2/2 and Android4/4 results apply to the PR7 source, not to this new native source.",
+    "The incoming iOS Foundation runner changes macos-26-intel to xcode-27, the capture implementation changes, and110 snapshot PNGs differ from accepted main. These peer changes were inspected only; W8 made no new test/golden exception.",
+    "The incoming root web visual fixtures and Android launch fixture also differ. This source-only audit preserves the local authorized fixture bytes and does not count incoming fixture edits as personally reverified product behavior.",
+    "Open PRs1,2,9 are conflicting at observation. PR8 advanced to e38e275 and is mergeable/draft; its own current verification description explicitly says combined native shipping rebuilds and final launch verification are still in progress. No other PR is declared ready or merged by this review."
+  ],
+  "openPullRequests": [
+    {
+      "headRefOid": "e47a3eb90d976939ddaa65dc5c987cbbd6480e22",
+      "isDraft": true,
+      "mergeStateStatus": "DIRTY",
+      "mergeable": "CONFLICTING",
+      "number": 9,
+      "title": "Implement Creator Studio and persisted content workflows",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/9"
+    },
+    {
+      "headRefOid": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+      "isDraft": true,
+      "mergeStateStatus": "UNSTABLE",
+      "mergeable": "MERGEABLE",
+      "number": 8,
+      "title": "W3: guarded conversation integration and verified account flows",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/8"
+    },
+    {
+      "headRefOid": "3639136ea5b312a555d7f3d94a9a4191c52b811f",
+      "isDraft": false,
+      "mergeStateStatus": "DIRTY",
+      "mergeable": "CONFLICTING",
+      "number": 2,
+      "title": "W7: fence notification delivery and privacy; recover preference forms",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/2"
+    },
+    {
+      "headRefOid": "d02d9c6bb228a4fbbdc869be70a29386ab608d58",
+      "isDraft": false,
+      "mergeStateStatus": "DIRTY",
+      "mergeable": "CONFLICTING",
+      "number": 1,
+      "title": "Resume W2 Creator AI with guarded generation and provider accounting",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/1"
+    }
+  ],
+  "existingRuntimeHealth": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "correlationId": "3f9894f0-9660-416e-af17-a950b601d7b4",
+      "response": {
+        "alive": true
+      }
+    },
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "correlationId": "67002857-a37d-4144-8d58-af6c5c380fc2",
+      "response": {
+        "ready": false,
+        "environment": "local-development",
+        "release": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+        "capabilities": [
+          {
+            "name": "database",
+            "required": true,
+            "state": "available",
+            "code": "non_owner_rls_verified",
+            "checkedAt": "2026-10-01T05:58:58.987Z"
+          },
+          {
+            "name": "identity",
+            "required": true,
+            "state": "development",
+            "code": "synthetic_local_accounts",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "model",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "payments",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "calls",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "voice",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "push",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_identity",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_conversation",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_agent",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_commerce",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_content",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_media",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_growth",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          },
+          {
+            "name": "privacy_trust",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T05:58:58.976Z"
+          }
+        ]
+      }
+    }
+  ],
+  "preservation": {
+    "sourceMergedLocally": false,
+    "runtimeRestarted": false,
+    "databaseWritten": false,
+    "databaseResetOrReseed": false,
+    "migrationsApplied": false,
+    "testsOrGoldensEdited": false,
+    "peerCheckoutEdited": false,
+    "externalMessagesSent": false,
+    "secretsOpened": false,
+    "paidCalls": 0,
+    "priorDatabaseEvidence": "final-preservation.json; not re-read by this source-only audit"
+  },
+  "remaining": "Original R1-R10 and exact required-input gates remain assigned. Fresh integrated/native acceptance is required before extending W8 acceptance to this subsequent main tree.",
+  "pr8AcceptanceObservation": {
+    "observedAt": "2026-10-01T05:59:35.459521+00:00",
+    "head": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+    "base": "c4b4a4f06e55399f1c976077f636579f0411d677",
+    "isDraft": true,
+    "mergeable": true,
+    "source": "Authenticated GitHub PR8 body, personally read",
+    "qualification": "Fresh combined native shipping rebuilds and final launch verification are in progress; prior binaries are separately identified. Not yet current combined-source E2E acceptance."
+  }
+}
