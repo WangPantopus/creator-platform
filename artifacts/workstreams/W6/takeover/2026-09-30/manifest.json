@@ -56,7 +56,7 @@
     "backendWeb": "success",
     "androidRuntime": "success",
     "androidFoundation": "success",
-    "webVisual": "queued",
+    "webVisual": "failure;observedcause repaired in existingcapturecalls",
     "iosFoundation": "queued",
     "iosReviewAvailable": false
   },
@@ -219,8 +219,8 @@
     "actualPermissionHardwareAcceptance": false
   },
   "latestContinuation": {
-    "recordedAt": "2026-10-01T02:08:22.158837+00:00",
-    "sourceCommit": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
+    "recordedAt": "2026-10-01T02:59:39.746861+00:00",
+    "sourceCommit": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
     "accountPins": "bbe1b309943ca2b31aa0715c7129d7bb4b3c7cdc",
     "accountConsumer": "eceb62e61deea7947a401976dee8999e4fa62c9f",
     "existingCaptureRepair": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
@@ -235,6 +235,32 @@
     "pushed": false,
     "mergedPRs": [],
     "newTestCasesOrHarnesses": 0,
-    "nativeJourney": "Current shipping builds/runtime provisioning pending"
+    "nativeJourney": "iOS same2 existing UI journeys passed0failures54.693s afterdec1050; Android actual recorder behindSystemUIANR and existingshipping sign-in processcrashed",
+    "servedFileProofSource": "682766cdec3318a70aa949eda93a9834845f5f05",
+    "archiveExpectationSource": "9b4540ecd20b580768e49836a15df5804d9e154e",
+    "heldSigningReceipt": "held-signing-entry.json",
+    "playbackProofReceipt": "playback-file-proof.json",
+    "nativeJourneyReceipts": [
+      "ios-launched-signin-repair.json",
+      "android-launched-apps.json"
+    ],
+    "producerLeases": "All narrow W1 leases released including playback generation; no runtime enablement",
+    "webMicrophone": "Actual keyboard request denied; enabledRecord/0:00 withexplicitreason; userpermissionpending",
+    "mergeReadinessRecheck": {
+      "prs": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "ready": [],
+      "basis": "Owner actualjourney gates/currentheadCI open; none eligible",
+      "pr4DescriptionUpdated": true,
+      "pr4PublishedHead": "d52e449cd4690cb8509283fb47a19dbbf40fb077"
+    }
   }
 }
