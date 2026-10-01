@@ -1,4 +1,5 @@
 /** W6 creator-object paths. W1 composes these into the canonical OpenAPI and clients. */
+import { CreatorMediaPurposeSchema } from "./media.ts";
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const json = (name: string) => ({ "application/json": { schema: ref(name) } });
 const path = (name: string) => ({
@@ -56,7 +57,46 @@ const owner = [path("creatorId"), path("assetId")];
 const fan = [path("creatorId"), path("fanId"), path("assetId")];
 const creator = "/v1/w6/creators/{creatorId}/media";
 const thread = "/v1/w6/threads/{creatorId}/{fanId}/creator-media";
+const audience = "/v1/w6/creators/{creatorId}/audience-media";
 export const mediaPaths = {
+  "/v1/w6/creators/{creatorId}/media-policy": {
+    parameters: [path("creatorId")],
+    get: {
+      ...operation("readCreatorMediaPolicy", "MediaCreatorMediaPolicyView"),
+      parameters: [
+        {
+          in: "query",
+          name: "objectId",
+          required: true,
+          schema: { type: "string", format: "uuid" },
+        },
+        {
+          in: "query",
+          name: "purpose",
+          required: true,
+          schema: {
+            type: "string",
+            enum: CreatorMediaPurposeSchema.options,
+          },
+        },
+      ],
+    },
+  },
+  [`${audience}/{assetId}`]: {
+    parameters: owner,
+    get: operation("readAudienceCreatorMedia", "MediaCreatorMediaAsset"),
+  },
+  [`${audience}/{assetId}/playback`]: {
+    parameters: owner,
+    post: operation(
+      "audienceCreatorMediaPlayback",
+      "MediaCreatorMediaPlaybackTicket",
+    ),
+  },
+  [`${audience}/{assetId}/play`]: {
+    parameters: owner,
+    get: playback("playAudienceCreatorMedia"),
+  },
   "/v1/w6/creators/{creatorId}/call-availability": {
     parameters: [path("creatorId")],
     get: operation("readCreatorCallAvailability", "CallAvailabilityView"),

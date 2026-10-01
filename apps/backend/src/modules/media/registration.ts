@@ -3,7 +3,10 @@ import { createW6Router, type W6RouterDependencies } from "./router.js";
 
 /** Canonical bootstrap supplies W1's fresh actor/thread authority. No competing identity middleware. */
 export function mediaFeature(
-  services: Omit<W6RouterDependencies, "scopeFor" | "creatorScopeFor">,
+  services: Omit<
+    W6RouterDependencies,
+    "scopeFor" | "creatorScopeFor" | "audienceScopeFor"
+  >,
 ): FeatureRegistration {
   if (
     services.creatorMedia &&
@@ -25,6 +28,13 @@ export function mediaFeature(
         creatorScopeFor: creatorIdentity
           ? async (req) =>
               creatorIdentity.open(
+                await actorFor(req),
+                String(req.params.creatorId),
+              )
+          : undefined,
+        audienceScopeFor: services.creatorMedia?.audienceIdentity
+          ? async (req) =>
+              services.creatorMedia!.audienceIdentity!.open(
                 await actorFor(req),
                 String(req.params.creatorId),
               )

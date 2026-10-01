@@ -2884,6 +2884,465 @@
         }
       }
     },
+    "/v1/w6/creators/{creatorId}/media-policy": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readCreatorMediaPolicy",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaCreatorMediaPolicyView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "objectId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "purpose",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "source_audio",
+                "interview_audio",
+                "post_photo",
+                "post_audio",
+                "human_note"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/v1/w6/creators/{creatorId}/audience-media/{assetId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assetId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readAudienceCreatorMedia",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaCreatorMediaAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/w6/creators/{creatorId}/audience-media/{assetId}/playback": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assetId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "audienceCreatorMediaPlayback",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaCreatorMediaPlaybackTicket"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/w6/creators/{creatorId}/audience-media/{assetId}/play": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assetId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "playAudienceCreatorMedia",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ticket",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "in": "header",
+            "name": "Range",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized current media bytes",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Authorized current byte range",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "416": {
+            "description": "Unsatisfiable single byte range"
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/w6/creators/{creatorId}/call-availability": {
       "parameters": [
         {
@@ -5600,6 +6059,7 @@
               "source_audio",
               "interview_audio",
               "post_photo",
+              "post_audio",
               "human_note"
             ]
           },
@@ -5784,6 +6244,7 @@
                   "source_audio",
                   "interview_audio",
                   "post_photo",
+                  "post_audio",
                   "human_note"
                 ]
               },
@@ -5967,6 +6428,50 @@
           }
         }
       },
+      "MediaCreatorMediaPolicyView": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "creatorId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "objectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "source_audio",
+              "interview_audio",
+              "post_photo",
+              "post_audio",
+              "human_note"
+            ]
+          },
+          "maxBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 268435456
+          },
+          "maxDurationMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600000
+          }
+        },
+        "required": [
+          "creatorId",
+          "objectId",
+          "purpose",
+          "maxBytes",
+          "maxDurationMs"
+        ],
+        "additionalProperties": false
+      },
       "MediaCreatorMediaPurpose": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "string",
@@ -5974,6 +6479,7 @@
           "source_audio",
           "interview_audio",
           "post_photo",
+          "post_audio",
           "human_note"
         ]
       },
@@ -5987,6 +6493,7 @@
               "source_audio",
               "interview_audio",
               "post_photo",
+              "post_audio",
               "human_note"
             ]
           },
@@ -6054,6 +6561,7 @@
                   "source_audio",
                   "interview_audio",
                   "post_photo",
+                  "post_audio",
                   "human_note"
                 ]
               },

@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.media
 
 import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -25,14 +26,39 @@ import com.pantopus.qelvora.ui.qText
 @Composable
 fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
     val context = LocalContext.current
-    val recorder = remember(context, maxDurationMs) { NativeVoiceRecorder(context, maxDurationMs) }
-    val snapshot by recorder.snapshot.collectAsState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) recorder.start() else recorder.deny() }
+    val recorder = remember(context, maxDurationMs, lifecycle) { NativeVoiceRecorder(context, maxDurationMs) }
+    val snapshot by recorder.snapshot.collectAsState()
+    var mounted by remember(recorder, lifecycle) { mutableStateOf(true) }
+    var requestPending by remember(recorder) { mutableStateOf(false) }
+    var permissionInFlight by remember(recorder) { mutableStateOf(false) }
+    var grantedPending by remember(recorder) { mutableStateOf(false) }
+    fun startWhenResumed() {
+        if (mounted && requestPending && grantedPending && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            requestPending = false; grantedPending = false; recorder.start()
+        }
+    }
+    val permission = key(recorder) {
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            permissionInFlight = false
+            if (mounted && requestPending) {
+                if (granted) { grantedPending = true; startWhenResumed() }
+                else { requestPending = false; recorder.deny() }
+            }
+        }
+    }
     DisposableEffect(recorder, lifecycle) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_PAUSE) { recorder.pause("Recording paused while you left this screen."); recorder.pausePreview() } }
+        mounted = true
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> startWhenResumed()
+                Lifecycle.Event.ON_PAUSE -> { recorder.pause("Recording paused while you left this screen."); recorder.pausePreview() }
+                Lifecycle.Event.ON_STOP -> { requestPending = false; grantedPending = false }
+                else -> Unit
+            }
+        }
         lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer); recorder.close() }
+        onDispose { mounted = false; requestPending = false; grantedPending = false; lifecycle.removeObserver(observer); recorder.close() }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.space5)) {
         BasicText("Your own voice", style = qText("display-md").copy(color = qColor("ink")))
@@ -42,7 +68,12 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
         if (snapshot.state in listOf("recording", "paused")) {
             Button(if (snapshot.state == "recording") "Pause" else "Resume", ButtonVariant.SECONDARY) { if (snapshot.state == "recording") recorder.pause() else recorder.resume() }
             Button("Stop and preview", ButtonVariant.SECONDARY) { recorder.stop() }
-        } else Button(if (snapshot.state == "preview") "Record again" else "Record", ButtonVariant.SECONDARY) { permission.launch(Manifest.permission.RECORD_AUDIO) }
+        } else if (requestPending) Button("Cancel permission request", ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false }
+        else Button(if (snapshot.state == "preview") "Record again" else "Record", ButtonVariant.SECONDARY, disabled = permissionInFlight) {
+            if (!mounted || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@Button
+            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) recorder.start()
+            else { requestPending = true; grantedPending = false; permissionInFlight = true; permission.launch(Manifest.permission.RECORD_AUDIO) }
+        }
         if (snapshot.state == "preview") {
             Button("Play private preview", ButtonVariant.SECONDARY) { recorder.playPreview() }
             Button("Pause preview", ButtonVariant.SECONDARY) { recorder.pausePreview() }

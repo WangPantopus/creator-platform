@@ -34,7 +34,11 @@ type Row = {
 export function createCreatorMediaPrivacyHook(input: {
   media: CreatorMediaService;
   /** Complete owned creator-family enumeration from the current privacy job. */
-  scopesFor: (job: PrivacyInput) => Promise<readonly CreatorMediaWorkerScope[]>;
+  scopesFor: (
+    job: PrivacyInput,
+  ) => Promise<
+    Iterable<CreatorMediaWorkerScope> | AsyncIterable<CreatorMediaWorkerScope>
+  >;
   /** Current job/task/account/family and scoped non-owner authority, independent of HTTP sessions. */
   transaction: <T>(
     job: PrivacyInput,
@@ -70,7 +74,7 @@ export function createCreatorMediaPrivacyHook(input: {
         let complete = false;
         let assets = 0;
         const pages = async function* () {
-          for (const scope of scopes) {
+          for await (const scope of scopes) {
             let cursor: string | null = null;
             while (true) {
               const rows: Row[] = await transaction(
@@ -138,7 +142,7 @@ export function createCreatorMediaPrivacyHook(input: {
       const retained: NonNullable<
         Awaited<ReturnType<PrivacyHook["run"]>>["retained"]
       > = [];
-      for (const scope of scopes) {
+      for await (const scope of scopes) {
         // Invalidate the whole owned family before any bounded page can fail.
         await transaction(scope, async (client) => {
           await client.query(

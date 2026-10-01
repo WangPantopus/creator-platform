@@ -11,6 +11,7 @@ import type { ThreadScope } from "../access/scope.js";
 import type { MediaService } from "./service.js";
 import type { CreatorMediaService } from "./creator-service.js";
 import type { CreatorScope } from "../identity/creator-scope.js";
+import type { AudienceScope } from "../identity/audience-scope.js";
 import type { SessionService } from "../session/service.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
@@ -22,6 +23,7 @@ export type W6RouterDependencies = {
   media?: MediaService;
   creatorMedia?: CreatorMediaService;
   creatorScopeFor?: (request: Request) => Promise<CreatorScope>;
+  audienceScopeFor?: (request: Request) => Promise<AudienceScope>;
   sessions?: SessionService;
   availability?: AvailabilityService;
 };
@@ -39,6 +41,10 @@ export function createW6Router(dependencies: W6RouterDependencies) {
       mediaAvailable: Boolean(dependencies.media),
       creatorMediaAvailable: Boolean(
         dependencies.creatorMedia && dependencies.creatorScopeFor,
+      ),
+      creatorMediaAudienceAvailable: Boolean(
+        dependencies.creatorMedia?.audienceIdentity &&
+          dependencies.audienceScopeFor,
       ),
       callsAvailable: Boolean(
         dependencies.sessions &&
@@ -96,6 +102,16 @@ export function createW6Router(dependencies: W6RouterDependencies) {
       );
     return dependencies.creatorScopeFor!(req);
   };
+  const audienceScope = async (req: Request) => {
+    z.uuid().parse(req.params.creatorId);
+    if (!dependencies.audienceScopeFor)
+      throw new DomainError(
+        "media_audience_unconfigured",
+        "Content playback is awaiting its current audience authority.",
+        503,
+      );
+    return dependencies.audienceScopeFor(req);
+  };
   const creatorAvailability = () => {
     if (!dependencies.availability)
       throw new DomainError(
@@ -117,6 +133,14 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     ),
   );
   const creatorRoot = "/creators/:creatorId/media";
+  router.get("/creators/:creatorId/media-policy", async (req, res) =>
+    res.json(
+      await creatorMedia().uploadPolicy(await creatorScope(req), {
+        objectId: req.query.objectId,
+        purpose: req.query.purpose,
+      }),
+    ),
+  );
   router.post(creatorRoot, async (req, res) =>
     res
       .status(201)
@@ -174,6 +198,33 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         assetId,
         result.asset.version,
         result.accessEpoch,
+        result.publication,
+      ),
+    );
+  });
+  const audienceRoot = "/creators/:creatorId/audience-media";
+  router.get(`${audienceRoot}/:assetId`, async (req, res) =>
+    res.json(await creatorMedia().read(await audienceScope(req), id(req))),
+  );
+  router.post(`${audienceRoot}/:assetId/playback`, async (req, res) =>
+    res.json(await creatorMedia().playback(await audienceScope(req), id(req))),
+  );
+  router.get(`${audienceRoot}/:assetId/play`, async (req, res) => {
+    const service = creatorMedia();
+    const current = await audienceScope(req);
+    const assetId = id(req);
+    const result = await service.download(
+      current,
+      assetId,
+      z.string().parse(req.query.ticket),
+    );
+    await streamMedia(req, res, result, () =>
+      service.assertPlaybackCurrent(
+        current,
+        assetId,
+        result.asset.version,
+        result.accessEpoch,
+        result.publication,
       ),
     );
   });
@@ -198,6 +249,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         assetId,
         result.asset.version,
         result.accessEpoch,
+        result.publication,
       ),
     );
   });
