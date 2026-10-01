@@ -19,6 +19,20 @@ import { PasskeyService } from "./modules/identity/passkeys.js";
 import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
 
+export type BackendRuntime = {
+  pool: pg.Pool;
+  database: Database;
+  access: AccessService;
+  conversation: ConversationService;
+  identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
+  assertActorAllowed?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+  ) => Promise<void>;
+  assertScopeAllowed?: ScopeRestriction;
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
+};
+
 /** Pantopus host imports this seam; adapter code is never inferred from a session token. */
 export async function createConfiguredBackend(input: {
   config: BackendConfig;
@@ -29,16 +43,9 @@ export async function createConfiguredBackend(input: {
   stripeNotifications?: Router;
   /** Each store router verifies its signed/OIDC signal before durable ingress. */
   storeNotifications?: Partial<Record<"apple" | "google", Router>>;
-  registerFeatures?: (runtime: {
-    pool: pg.Pool;
-    database: Database;
-    access: AccessService;
-    conversation: ConversationService;
-    identity:
-      | import("./modules/identity/router.js").IdentityRuntime
-      | undefined;
-    configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
-  }) => Promise<readonly FeatureRegistration[]>;
+  registerFeatures?: (
+    runtime: BackendRuntime,
+  ) => Promise<readonly FeatureRegistration[]>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -51,6 +58,20 @@ export async function createConfiguredBackend(input: {
     throw new Error(
       "Enable the feature and provide a non-owner runtime DATABASE_URL.",
     );
+  if (input.identity.mode !== "development") {
+    if (!input.config.identitySessionKey)
+      throw new Error(
+        "Configured Pantopus identity requires canonical session custody.",
+      );
+    if (
+      typeof input.assertActorAllowed !== "function" ||
+      typeof input.assertScopeAllowed !== "function" ||
+      typeof input.assertScopeAllowedInTransaction !== "function"
+    )
+      throw new Error(
+        "Configured Pantopus identity requires current account, thread and caller-held trust denials.",
+      );
+  }
   const pool = new pg.Pool({
     connectionString: input.config.databaseUrl,
     max: 20,
@@ -113,6 +134,18 @@ export async function createConfiguredBackend(input: {
         access,
         conversation,
         identity: platformIdentity,
+        ...(input.assertActorAllowed
+          ? { assertActorAllowed: input.assertActorAllowed }
+          : {}),
+        ...(input.assertScopeAllowed
+          ? { assertScopeAllowed: input.assertScopeAllowed }
+          : {}),
+        ...(input.assertScopeAllowedInTransaction
+          ? {
+              assertScopeAllowedInTransaction:
+                input.assertScopeAllowedInTransaction,
+            }
+          : {}),
         configureSignedSubjects: (policies) => {
           if (featuresConfigured)
             throw new Error(
