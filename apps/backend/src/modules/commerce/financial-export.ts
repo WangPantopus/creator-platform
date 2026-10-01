@@ -231,14 +231,27 @@ export async function exportCommerceFinancial(
             [creator],
           );
           const payoutCustody = (
-            await client.query<{ relation: string | null }>(
-              "SELECT to_regclass('creator.commerce_payout_custody')::text AS relation",
+            await client.query<{ count: string }>(
+              "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_payout_custody','commerce_payout_reversal_custody')",
             )
           ).rows[0];
-          if (payoutCustody?.relation)
+          invariant(
+            payoutCustody?.count === "0" || payoutCustody?.count === "2",
+            "payout_schema_incomplete",
+            "Complete original transfer and compensation history is required before publishing this export.",
+          );
+          if (payoutCustody?.count === "2")
             await page(
               "payoutCustody",
               "SELECT effect_id,creator_id,commitment_id,destination,source_payment,source_transaction,amount,currency,request_hash,created_at FROM creator.commerce_payout_custody",
+              scope,
+              ["effect_id"],
+              [creator],
+            );
+          if (payoutCustody?.count === "2")
+            await page(
+              "payoutReversalCustody",
+              "SELECT effect_id,creator_id,commitment_id,provider_ref,amount,request_hash,created_at FROM creator.commerce_payout_reversal_custody",
               scope,
               ["effect_id"],
               [creator],
