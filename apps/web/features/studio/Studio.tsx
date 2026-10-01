@@ -274,7 +274,7 @@ export function Studio({
       previousFocus.current.focus();
       previousFocus.current = null;
     }
-  }, [suspended]);
+  }, [loading, suspended]);
   useEffect(() => {
     void refresh();
     return () => {
@@ -420,7 +420,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
-            disabled={loading}
+            aria-busy={loading}
             onClick={() => void refresh()}
           >
             Check connection and roles
