@@ -22,6 +22,14 @@ const modelName = (value) => `API${pascal(value)}`;
 const nullable = (schema) =>
   (Array.isArray(schema.type) && schema.type.includes("null")) ||
   (schema.anyOf ?? schema.oneOf ?? []).some((item) => item.type === "null");
+const nullableField = (schema, seen = new Set()) => {
+  if (nullable(schema)) return true;
+  const reference = schema.$ref;
+  if (!reference?.startsWith("#/components/schemas/") || seen.has(reference))
+    return false;
+  const target = spec.components.schemas[reference.split("/").pop()];
+  return target ? nullableField(target, new Set([...seen, reference])) : false;
+};
 const concrete = (schema) => {
   const alternatives = schema.anyOf ?? schema.oneOf;
   if (
@@ -137,7 +145,7 @@ for (const { operation, parameters } of operations) {
 let swift =
   "// Generated from packages/api/generated/openapi.json. Do not edit.\nimport Foundation\n\n";
 let kotlin =
-  "// Generated from packages/api/generated/openapi.json. Do not edit.\npackage com.pantopus.qelvora.generated\n\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.SerialName\nimport kotlinx.serialization.KSerializer\nimport kotlinx.serialization.SerializationException\nimport kotlinx.serialization.descriptors.PrimitiveKind\nimport kotlinx.serialization.descriptors.PrimitiveSerialDescriptor\nimport kotlinx.serialization.encoding.Decoder\nimport kotlinx.serialization.encoding.Encoder\nimport kotlinx.serialization.encodeToString\nimport kotlinx.serialization.decodeFromString\nimport kotlinx.serialization.json.Json\nimport kotlinx.serialization.json.JsonElement\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\nimport java.net.HttpURLConnection\nimport java.net.URL\nimport java.net.URLEncoder\n\n";
+  "// Generated from packages/api/generated/openapi.json. Do not edit.\npackage com.pantopus.qelvora.generated\n\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.SerialName\nimport kotlinx.serialization.Required\nimport kotlinx.serialization.KSerializer\nimport kotlinx.serialization.SerializationException\nimport kotlinx.serialization.descriptors.PrimitiveKind\nimport kotlinx.serialization.descriptors.PrimitiveSerialDescriptor\nimport kotlinx.serialization.encoding.Decoder\nimport kotlinx.serialization.encoding.Encoder\nimport kotlinx.serialization.encodeToString\nimport kotlinx.serialization.decodeFromString\nimport kotlinx.serialization.json.Json\nimport kotlinx.serialization.json.JsonElement\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\nimport java.net.HttpURLConnection\nimport java.net.URL\nimport java.net.URLEncoder\n\n";
 swift += `public enum APIJSONValue: Codable, Sendable {\n  case string(String), number(Double), boolean(Bool), array([APIJSONValue]), object([String: APIJSONValue]), null\n  public init(from decoder: Decoder) throws {\n    let container = try decoder.singleValueContainer()\n    if container.decodeNil() { self = .null }\n    else if let value = try? container.decode(Bool.self) { self = .boolean(value) }\n    else if let value = try? container.decode(Double.self) { self = .number(value) }\n    else if let value = try? container.decode(String.self) { self = .string(value) }\n    else if let value = try? container.decode([APIJSONValue].self) { self = .array(value) }\n    else { self = .object(try container.decode([String: APIJSONValue].self)) }\n  }\n  public func encode(to encoder: Encoder) throws {\n    var container = encoder.singleValueContainer()\n    switch self {\n      case .string(let value): try container.encode(value)\n      case .number(let value): try container.encode(value)\n      case .boolean(let value): try container.encode(value)\n      case .array(let value): try container.encode(value)\n      case .object(let value): try container.encode(value)\n      case .null: try container.encodeNil()\n    }\n  }\n}\n\n`;
 for (const [name, { kind, schema }] of models) {
   if (kind === "nullable") {
@@ -154,11 +162,23 @@ for (const [name, { kind, schema }] of models) {
       ([key, value]) => ({
         key,
         value,
+        required: Boolean(schema.required?.includes(key)),
+        requiredNullable:
+          Boolean(schema.required?.includes(key)) && nullableField(value),
         optional: !schema.required?.includes(key) || nullable(value),
       }),
     );
-    swift += `public struct ${name}: Codable, Sendable {\n${properties.map(({ key, value, optional }) => `  public let \`${key}\`: ${fieldType(value, `${name}${pascal(key)}`)}${optional ? "?" : ""}`).join("\n")}\n  public init(${properties.map(({ key, value, optional }) => `${key}: ${fieldType(value, `${name}${pascal(key)}`)}${optional ? "? = nil" : ""}`).join(", ")}) {\n${properties.map(({ key }) => `    self.${key} = ${key}`).join("\n")}\n  }\n}\n\n`;
-    kotlin += `@Serializable\ndata class ${name}(\n${properties.map(({ key, value, optional }) => `  val \`${key}\`: ${fieldType(value, `${name}${pascal(key)}`, "kotlin")}${optional ? "? = null" : ""}`).join(",\n")}\n)\n\n`;
+    const swiftFieldType = ({ key, value, optional }) =>
+      `${fieldType(value, `${name}${pascal(key)}`)}${optional ? "?" : ""}`;
+    // A required nullable key must be present as either a value or JSON null.
+    // Synthesized Codable treats Optional properties as absent-key defaults.
+    const swiftCodable = properties.some(
+      ({ requiredNullable }) => requiredNullable,
+    )
+      ? `  private enum CodingKeys: String, CodingKey {\n${properties.map(({ key }) => `    case \`${key}\``).join("\n")}\n  }\n  public init(from decoder: Decoder) throws {\n    let container = try decoder.container(keyedBy: CodingKeys.self)\n${properties.map((property) => `    self.${property.key} = try container.${property.required ? "decode" : "decodeIfPresent"}(${property.required ? swiftFieldType(property) : fieldType(property.value, `${name}${pascal(property.key)}`)}.self, forKey: .${property.key})`).join("\n")}\n  }\n  public func encode(to encoder: Encoder) throws {\n    var container = encoder.container(keyedBy: CodingKeys.self)\n${properties.map(({ key, required }) => `    try container.${required ? "encode" : "encodeIfPresent"}(${key}, forKey: .${key})`).join("\n")}\n  }\n`
+      : "";
+    swift += `public struct ${name}: Codable, Sendable {\n${properties.map((property) => `  public let \`${property.key}\`: ${swiftFieldType(property)}`).join("\n")}\n  public init(${properties.map(({ key, value, optional }) => `${key}: ${fieldType(value, `${name}${pascal(key)}`)}${optional ? "? = nil" : ""}`).join(", ")}) {\n${properties.map(({ key }) => `    self.${key} = ${key}`).join("\n")}\n  }\n${swiftCodable}}\n\n`;
+    kotlin += `@Serializable\ndata class ${name}(\n${properties.map(({ key, value, optional, requiredNullable }) => `${requiredNullable ? "  @Required\n" : ""}  val \`${key}\`: ${fieldType(value, `${name}${pascal(key)}`, "kotlin")}${optional ? "? = null" : ""}`).join(",\n")}\n)\n\n`;
   }
 }
 swift += `public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }

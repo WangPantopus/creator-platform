@@ -10,6 +10,8 @@ import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { createConversationRuntime } from "./modules/conversation/runtime.js";
 import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
+import { createAgentDomain } from "./modules/agent/integration.js";
+import { agentFeature } from "./modules/agent/feature.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -49,6 +51,7 @@ const configured =
             : undefined;
           const conversation = createConversationRuntime(runtime);
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+          const agent = createAgentDomain({ pool: runtime.pool, model: null });
           const content = createContentStudio({
             pool: runtime.pool,
             owners: {
@@ -62,6 +65,11 @@ const configured =
           runtime.configureSignedSubjects([content.signedSubjects]);
           return [
             conversation.registration,
+            agentFeature({
+              domain: agent,
+              pool: runtime.pool,
+              development: config.identityAdapter === "development",
+            }),
             mediaFeature({}),
             ...(commerce ? [commerce.feature] : []),
             ...content.features,

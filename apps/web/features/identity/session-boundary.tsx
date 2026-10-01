@@ -41,6 +41,7 @@ export function IdentitySessionBoundary({
   const [error, setError] = useState("");
   const [session, setSession] = useState(initial);
   const accountId = initial.accountId;
+  const sessionId = initial.sessionId;
   const controller = useRef<AbortController | null>(null);
   if (!controller.current) controller.current = new AbortController();
   const end = useCallback(() => {
@@ -78,7 +79,10 @@ export function IdentitySessionBoundary({
           );
         const session = SessionSchema.parse(await response.json());
         if (!active) return;
-        if (session.accountId !== accountId) {
+        if (
+          session.accountId !== accountId ||
+          session.sessionId !== sessionId
+        ) {
           end();
           return;
         }
@@ -114,7 +118,7 @@ export function IdentitySessionBoundary({
       window.removeEventListener("pageshow", check);
       document.removeEventListener("visibilitychange", check);
     };
-  }, [accountId, end]);
+  }, [accountId, sessionId, end]);
   if (!valid) return null;
   return (
     <Scope.Provider

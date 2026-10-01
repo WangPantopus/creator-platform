@@ -269,6 +269,35 @@ public struct APIAgentSourceCreate: Codable, Sendable {
     self.rightsEvidence = rightsEvidence
     self.expiresAt = expiresAt
   }
+  private enum CodingKeys: String, CodingKey {
+    case `title`
+    case `text`
+    case `origin`
+    case `originReference`
+    case `audience`
+    case `rightsEvidence`
+    case `expiresAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.origin = try container.decode(APIAgentSourceCreateOrigin.self, forKey: .origin)
+    self.originReference = try container.decodeIfPresent(String.self, forKey: .originReference)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.rightsEvidence = try container.decode(String.self, forKey: .rightsEvidence)
+    self.expiresAt = try container.decode(String?.self, forKey: .expiresAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(origin, forKey: .origin)
+    try container.encodeIfPresent(originReference, forKey: .originReference)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(rightsEvidence, forKey: .rightsEvidence)
+    try container.encode(expiresAt, forKey: .expiresAt)
+  }
 }
 
 public enum APIAgentSourceCreateOrigin: String, Codable, Sendable {
@@ -495,6 +524,29 @@ public struct APICommerceSpendLimitCommand: Codable, Sendable {
     self.remindersOn = remindersOn
     self.idempotencyKey = idempotencyKey
   }
+  private enum CodingKeys: String, CodingKey {
+    case `currency`
+    case `amount`
+    case `explicitNone`
+    case `remindersOn`
+    case `idempotencyKey`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.currency = try container.decode(String.self, forKey: .currency)
+    self.amount = try container.decode(Int?.self, forKey: .amount)
+    self.explicitNone = try container.decode(Bool.self, forKey: .explicitNone)
+    self.remindersOn = try container.decode(Bool.self, forKey: .remindersOn)
+    self.idempotencyKey = try container.decode(String.self, forKey: .idempotencyKey)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(currency, forKey: .currency)
+    try container.encode(amount, forKey: .amount)
+    try container.encode(explicitNone, forKey: .explicitNone)
+    try container.encode(remindersOn, forKey: .remindersOn)
+    try container.encode(idempotencyKey, forKey: .idempotencyKey)
+  }
 }
 
 public struct APICommerceSubmitPacket: Codable, Sendable {
@@ -593,6 +645,65 @@ public struct APIMediaCreatorMediaAsset: Codable, Sendable {
     self.objectId = objectId
     self.ownerAccountId = ownerAccountId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `purpose`
+    case `state`
+    case `version`
+    case `mimeType`
+    case `bytes`
+    case `uploadedBytes`
+    case `durationMs`
+    case `sha256`
+    case `waveform`
+    case `signedActId`
+    case `expiresAt`
+    case `failureCode`
+    case `provenance`
+    case `creatorId`
+    case `objectId`
+    case `ownerAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.purpose = try container.decode(APIMediaCreatorMediaAssetPurpose.self, forKey: .purpose)
+    self.state = try container.decode(APIMediaCreatorMediaAssetState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.mimeType = try container.decode(String.self, forKey: .mimeType)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.uploadedBytes = try container.decode(Int.self, forKey: .uploadedBytes)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.waveform = try container.decode([Double].self, forKey: .waveform)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.failureCode = try container.decode(String?.self, forKey: .failureCode)
+    self.provenance = try container.decode([String: APIJSONValue]?.self, forKey: .provenance)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.objectId = try container.decode(String.self, forKey: .objectId)
+    self.ownerAccountId = try container.decode(String.self, forKey: .ownerAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(uploadedBytes, forKey: .uploadedBytes)
+    try container.encode(durationMs, forKey: .durationMs)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(waveform, forKey: .waveform)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(failureCode, forKey: .failureCode)
+    try container.encode(provenance, forKey: .provenance)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(objectId, forKey: .objectId)
+    try container.encode(ownerAccountId, forKey: .ownerAccountId)
+  }
 }
 
 public enum APIMediaCreatorMediaAssetPurpose: String, Codable, Sendable {
@@ -662,6 +773,65 @@ public struct APIMediaCreatorMediaPlaybackTicketAsset: Codable, Sendable {
     self.creatorId = creatorId
     self.objectId = objectId
     self.ownerAccountId = ownerAccountId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `purpose`
+    case `state`
+    case `version`
+    case `mimeType`
+    case `bytes`
+    case `uploadedBytes`
+    case `durationMs`
+    case `sha256`
+    case `waveform`
+    case `signedActId`
+    case `expiresAt`
+    case `failureCode`
+    case `provenance`
+    case `creatorId`
+    case `objectId`
+    case `ownerAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.purpose = try container.decode(APIMediaCreatorMediaPlaybackTicketAssetPurpose.self, forKey: .purpose)
+    self.state = try container.decode(APIMediaCreatorMediaPlaybackTicketAssetState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.mimeType = try container.decode(String.self, forKey: .mimeType)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.uploadedBytes = try container.decode(Int.self, forKey: .uploadedBytes)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.waveform = try container.decode([Double].self, forKey: .waveform)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.failureCode = try container.decode(String?.self, forKey: .failureCode)
+    self.provenance = try container.decode([String: APIJSONValue]?.self, forKey: .provenance)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.objectId = try container.decode(String.self, forKey: .objectId)
+    self.ownerAccountId = try container.decode(String.self, forKey: .ownerAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(uploadedBytes, forKey: .uploadedBytes)
+    try container.encode(durationMs, forKey: .durationMs)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(waveform, forKey: .waveform)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(failureCode, forKey: .failureCode)
+    try container.encode(provenance, forKey: .provenance)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(objectId, forKey: .objectId)
+    try container.encode(ownerAccountId, forKey: .ownerAccountId)
   }
 }
 
@@ -816,6 +986,65 @@ public struct APIMediaCreatorMediaUploadTicketAsset: Codable, Sendable {
     self.objectId = objectId
     self.ownerAccountId = ownerAccountId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `purpose`
+    case `state`
+    case `version`
+    case `mimeType`
+    case `bytes`
+    case `uploadedBytes`
+    case `durationMs`
+    case `sha256`
+    case `waveform`
+    case `signedActId`
+    case `expiresAt`
+    case `failureCode`
+    case `provenance`
+    case `creatorId`
+    case `objectId`
+    case `ownerAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.purpose = try container.decode(APIMediaCreatorMediaUploadTicketAssetPurpose.self, forKey: .purpose)
+    self.state = try container.decode(APIMediaCreatorMediaUploadTicketAssetState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.mimeType = try container.decode(String.self, forKey: .mimeType)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.uploadedBytes = try container.decode(Int.self, forKey: .uploadedBytes)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.waveform = try container.decode([Double].self, forKey: .waveform)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.failureCode = try container.decode(String?.self, forKey: .failureCode)
+    self.provenance = try container.decode([String: APIJSONValue]?.self, forKey: .provenance)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.objectId = try container.decode(String.self, forKey: .objectId)
+    self.ownerAccountId = try container.decode(String.self, forKey: .ownerAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(uploadedBytes, forKey: .uploadedBytes)
+    try container.encode(durationMs, forKey: .durationMs)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(waveform, forKey: .waveform)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(failureCode, forKey: .failureCode)
+    try container.encode(provenance, forKey: .provenance)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(objectId, forKey: .objectId)
+    try container.encode(ownerAccountId, forKey: .ownerAccountId)
+  }
 }
 
 public enum APIMediaCreatorMediaUploadTicketAssetPurpose: String, Codable, Sendable {
@@ -868,6 +1097,59 @@ public struct APIMediaMediaAsset: Codable, Sendable {
     self.expiresAt = expiresAt
     self.failureCode = failureCode
     self.provenance = provenance
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `purpose`
+    case `state`
+    case `version`
+    case `mimeType`
+    case `bytes`
+    case `uploadedBytes`
+    case `durationMs`
+    case `sha256`
+    case `waveform`
+    case `signedActId`
+    case `expiresAt`
+    case `failureCode`
+    case `provenance`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.purpose = try container.decode(APIMediaMediaAssetPurpose.self, forKey: .purpose)
+    self.state = try container.decode(APIMediaMediaAssetState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.mimeType = try container.decode(String.self, forKey: .mimeType)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.uploadedBytes = try container.decode(Int.self, forKey: .uploadedBytes)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.waveform = try container.decode([Double].self, forKey: .waveform)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.failureCode = try container.decode(String?.self, forKey: .failureCode)
+    self.provenance = try container.decode([String: APIJSONValue]?.self, forKey: .provenance)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(uploadedBytes, forKey: .uploadedBytes)
+    try container.encode(durationMs, forKey: .durationMs)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(waveform, forKey: .waveform)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(failureCode, forKey: .failureCode)
+    try container.encode(provenance, forKey: .provenance)
   }
 }
 
@@ -971,6 +1253,32 @@ public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
     self.bytes = bytes
     self.mimeType = mimeType
     self.durationMs = durationMs
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `assetId`
+    case `version`
+    case `sha256`
+    case `bytes`
+    case `mimeType`
+    case `durationMs`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.assetId = try container.decode(String.self, forKey: .assetId)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.mimeType = try container.decode(APIMediaProcessedMediaEvidenceMimeType.self, forKey: .mimeType)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(assetId, forKey: .assetId)
+    try container.encode(version, forKey: .version)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(durationMs, forKey: .durationMs)
   }
 }
 
@@ -1318,6 +1626,38 @@ public struct APISession: Codable, Sendable {
     self.creator = creator
     self.teams = teams
   }
+  private enum CodingKeys: String, CodingKey {
+    case `accountId`
+    case `adultEligible`
+    case `sessionId`
+    case `expiresAt`
+    case `mode`
+    case `fan`
+    case `creator`
+    case `teams`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.accountId = try container.decode(String.self, forKey: .accountId)
+    self.adultEligible = try container.decode(APISessionAdultEligible.self, forKey: .adultEligible)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.mode = try container.decode(APISessionMode.self, forKey: .mode)
+    self.fan = try container.decode(APISessionFan?.self, forKey: .fan)
+    self.creator = try container.decode(APISessionCreator?.self, forKey: .creator)
+    self.teams = try container.decode([APISessionTeamsItem].self, forKey: .teams)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accountId, forKey: .accountId)
+    try container.encode(adultEligible, forKey: .adultEligible)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(mode, forKey: .mode)
+    try container.encode(fan, forKey: .fan)
+    try container.encode(creator, forKey: .creator)
+    try container.encode(teams, forKey: .teams)
+  }
 }
 
 public struct APISessionAdultEligible: Codable, Sendable {
@@ -1415,6 +1755,38 @@ public struct APIIdentityCompletionSession: Codable, Sendable {
     self.fan = fan
     self.creator = creator
     self.teams = teams
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `accountId`
+    case `adultEligible`
+    case `sessionId`
+    case `expiresAt`
+    case `mode`
+    case `fan`
+    case `creator`
+    case `teams`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.accountId = try container.decode(String.self, forKey: .accountId)
+    self.adultEligible = try container.decode(APIIdentityCompletionSessionAdultEligible.self, forKey: .adultEligible)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.mode = try container.decode(APIIdentityCompletionSessionMode.self, forKey: .mode)
+    self.fan = try container.decode(APIIdentityCompletionSessionFan?.self, forKey: .fan)
+    self.creator = try container.decode(APIIdentityCompletionSessionCreator?.self, forKey: .creator)
+    self.teams = try container.decode([APIIdentityCompletionSessionTeamsItem].self, forKey: .teams)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accountId, forKey: .accountId)
+    try container.encode(adultEligible, forKey: .adultEligible)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(mode, forKey: .mode)
+    try container.encode(fan, forKey: .fan)
+    try container.encode(creator, forKey: .creator)
+    try container.encode(teams, forKey: .teams)
   }
 }
 
@@ -1548,6 +1920,35 @@ public struct APIProof: Codable, Sendable {
     self.state = state
     self.reason = reason
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `code`
+    case `platform`
+    case `accountUrl`
+    case `expiresAt`
+    case `state`
+    case `reason`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.code = try container.decode(String.self, forKey: .code)
+    self.platform = try container.decode(APIProofPlatform.self, forKey: .platform)
+    self.accountUrl = try container.decode(String.self, forKey: .accountUrl)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.state = try container.decode(APIProofState.self, forKey: .state)
+    self.reason = try container.decode(String?.self, forKey: .reason)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(code, forKey: .code)
+    try container.encode(platform, forKey: .platform)
+    try container.encode(accountUrl, forKey: .accountUrl)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(state, forKey: .state)
+    try container.encode(reason, forKey: .reason)
+  }
 }
 
 public enum APIProofPlatform: String, Codable, Sendable {
@@ -1668,6 +2069,41 @@ public struct APIPublicSignature: Codable, Sendable {
     self.content = content
     self.contentAvailable = contentAvailable
     self.explanation = explanation
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `signedActId`
+    case `creatorName`
+    case `actType`
+    case `contentHash`
+    case `verifiedAt`
+    case `status`
+    case `content`
+    case `contentAvailable`
+    case `explanation`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.signedActId = try container.decode(String.self, forKey: .signedActId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.actType = try container.decode(String.self, forKey: .actType)
+    self.contentHash = try container.decode(String.self, forKey: .contentHash)
+    self.verifiedAt = try container.decode(String.self, forKey: .verifiedAt)
+    self.status = try container.decode(APIPublicSignatureStatus.self, forKey: .status)
+    self.content = try container.decode(APIJSONValue?.self, forKey: .content)
+    self.contentAvailable = try container.decode(Bool.self, forKey: .contentAvailable)
+    self.explanation = try container.decode(String.self, forKey: .explanation)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(actType, forKey: .actType)
+    try container.encode(contentHash, forKey: .contentHash)
+    try container.encode(verifiedAt, forKey: .verifiedAt)
+    try container.encode(status, forKey: .status)
+    try container.encode(content, forKey: .content)
+    try container.encode(contentAvailable, forKey: .contentAvailable)
+    try container.encode(explanation, forKey: .explanation)
   }
 }
 
@@ -1996,6 +2432,44 @@ public struct APIMessage: Codable, Sendable {
     self.member = member
     self.authorAccountId = authorAccountId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIMessageAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIMessageDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decodeIfPresent(String.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encodeIfPresent(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+  }
 }
 
 public enum APIMessageAuthorKind: String, Codable, Sendable {
@@ -2025,6 +2499,20 @@ public struct APIAcceptedMessage: Codable, Sendable {
     self.message = message
     self.generationId = generationId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `message`
+    case `generationId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.message = try container.decode(APIAcceptedMessageMessage.self, forKey: .message)
+    self.generationId = try container.decode(String?.self, forKey: .generationId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(message, forKey: .message)
+    try container.encode(generationId, forKey: .generationId)
+  }
 }
 
 public struct APIAcceptedMessageMessage: Codable, Sendable {
@@ -2049,6 +2537,44 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIAcceptedMessageMessageAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIAcceptedMessageMessageDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decodeIfPresent(String.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encodeIfPresent(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
   }
 }
 
@@ -2094,6 +2620,44 @@ public struct APIFrame: Codable, Sendable {
     self.generationId = generationId
     self.sequence = sequence
     self.control = control
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `threadId`
+    case `cursor`
+    case `epoch`
+    case `kind`
+    case `messageId`
+    case `authorKind`
+    case `text`
+    case `generationId`
+    case `sequence`
+    case `control`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.cursor = try container.decode(Int.self, forKey: .cursor)
+    self.epoch = try container.decode(Int.self, forKey: .epoch)
+    self.kind = try container.decode(APIFrameKind.self, forKey: .kind)
+    self.messageId = try container.decode(String.self, forKey: .messageId)
+    self.authorKind = try container.decode(APIFrameAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.generationId = try container.decode(String?.self, forKey: .generationId)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.control = try container.decodeIfPresent(APIFrameControl.self, forKey: .control)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(cursor, forKey: .cursor)
+    try container.encode(epoch, forKey: .epoch)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(messageId, forKey: .messageId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(generationId, forKey: .generationId)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encodeIfPresent(control, forKey: .control)
   }
 }
 
@@ -2194,6 +2758,44 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     self.member = member
     self.authorAccountId = authorAccountId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIThreadTimelineMessagesItemAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIThreadTimelineMessagesItemDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decodeIfPresent(String.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encodeIfPresent(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+  }
 }
 
 public enum APIThreadTimelineMessagesItemAuthorKind: String, Codable, Sendable {
@@ -2285,6 +2887,23 @@ public struct APIConversationConversationAccountPage: Codable, Sendable {
     self.threads = threads
     self.nextCursor = nextCursor
   }
+  private enum CodingKeys: String, CodingKey {
+    case `fan`
+    case `threads`
+    case `nextCursor`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.fan = try container.decode(APIConversationConversationAccountPageFan.self, forKey: .fan)
+    self.threads = try container.decode([APIConversationConversationAccountPageThreadsItem].self, forKey: .threads)
+    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(fan, forKey: .fan)
+    try container.encode(threads, forKey: .threads)
+    try container.encode(nextCursor, forKey: .nextCursor)
+  }
 }
 
 public struct APIConversationConversationAccountPageFan: Codable, Sendable {
@@ -2295,6 +2914,23 @@ public struct APIConversationConversationAccountPageFan: Codable, Sendable {
     self.id = id
     self.handle = handle
     self.intro = intro
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `handle`
+    case `intro`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.handle = try container.decode(String.self, forKey: .handle)
+    self.intro = try container.decode(String?.self, forKey: .intro)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(intro, forKey: .intro)
   }
 }
 
@@ -2445,6 +3081,68 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.recording = recording
     self.correction = correction
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+    case `citations`
+    case `createdAt`
+    case `offTheRecord`
+    case `version`
+    case `agentVersion`
+    case `feedback`
+    case `recording`
+    case `correction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIConversationConversationMessageAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIConversationConversationMessageDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decode(String?.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.citations = try container.decode([String].self, forKey: .citations)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.agentVersion = try container.decodeIfPresent(APIConversationConversationMessageAgentVersion.self, forKey: .agentVersion)
+    self.feedback = try container.decodeIfPresent(APIConversationConversationMessageFeedback.self, forKey: .feedback)
+    self.recording = try container.decodeIfPresent(APIJSONValue.self, forKey: .recording)
+    self.correction = try container.decodeIfPresent(APIConversationConversationMessageCorrection.self, forKey: .correction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encode(citations, forKey: .citations)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(version, forKey: .version)
+    try container.encodeIfPresent(agentVersion, forKey: .agentVersion)
+    try container.encodeIfPresent(feedback, forKey: .feedback)
+    try container.encodeIfPresent(recording, forKey: .recording)
+    try container.encodeIfPresent(correction, forKey: .correction)
+  }
 }
 
 public enum APIConversationConversationMessageAuthorKind: String, Codable, Sendable {
@@ -2529,6 +3227,68 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.unavailableReason = unavailableReason
     self.feedbackPolicy = feedbackPolicy
   }
+  private enum CodingKeys: String, CodingKey {
+    case `threadId`
+    case `creatorId`
+    case `fanId`
+    case `creatorName`
+    case `fanHandle`
+    case `control`
+    case `epoch`
+    case `cursor`
+    case `revision`
+    case `generationSequences`
+    case `messages`
+    case `before`
+    case `offTheRecord`
+    case `introShared`
+    case `consentCurrent`
+    case `canSend`
+    case `unavailableReason`
+    case `feedbackPolicy`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.fanId = try container.decode(String.self, forKey: .fanId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.fanHandle = try container.decode(String.self, forKey: .fanHandle)
+    self.control = try container.decode(APIConversationConversationPageControl.self, forKey: .control)
+    self.epoch = try container.decode(Int.self, forKey: .epoch)
+    self.cursor = try container.decode(Int.self, forKey: .cursor)
+    self.revision = try container.decode(Int.self, forKey: .revision)
+    self.generationSequences = try container.decode([String: Int].self, forKey: .generationSequences)
+    self.messages = try container.decode([APIConversationConversationPageMessagesItem].self, forKey: .messages)
+    self.before = try container.decode(Int?.self, forKey: .before)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.introShared = try container.decode(Bool.self, forKey: .introShared)
+    self.consentCurrent = try container.decode(Bool.self, forKey: .consentCurrent)
+    self.canSend = try container.decode(Bool.self, forKey: .canSend)
+    self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
+    self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(fanId, forKey: .fanId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(fanHandle, forKey: .fanHandle)
+    try container.encode(control, forKey: .control)
+    try container.encode(epoch, forKey: .epoch)
+    try container.encode(cursor, forKey: .cursor)
+    try container.encode(revision, forKey: .revision)
+    try container.encode(generationSequences, forKey: .generationSequences)
+    try container.encode(messages, forKey: .messages)
+    try container.encode(before, forKey: .before)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(introShared, forKey: .introShared)
+    try container.encode(consentCurrent, forKey: .consentCurrent)
+    try container.encode(canSend, forKey: .canSend)
+    try container.encode(unavailableReason, forKey: .unavailableReason)
+    try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+  }
 }
 
 public enum APIConversationConversationPageControl: String, Codable, Sendable {
@@ -2577,6 +3337,68 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.feedback = feedback
     self.recording = recording
     self.correction = correction
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+    case `citations`
+    case `createdAt`
+    case `offTheRecord`
+    case `version`
+    case `agentVersion`
+    case `feedback`
+    case `recording`
+    case `correction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIConversationConversationPageMessagesItemAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIConversationConversationPageMessagesItemDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decode(String?.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.citations = try container.decode([String].self, forKey: .citations)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.agentVersion = try container.decodeIfPresent(APIConversationConversationPageMessagesItemAgentVersion.self, forKey: .agentVersion)
+    self.feedback = try container.decodeIfPresent(APIConversationConversationPageMessagesItemFeedback.self, forKey: .feedback)
+    self.recording = try container.decodeIfPresent(APIJSONValue.self, forKey: .recording)
+    self.correction = try container.decodeIfPresent(APIConversationConversationPageMessagesItemCorrection.self, forKey: .correction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encode(citations, forKey: .citations)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(version, forKey: .version)
+    try container.encodeIfPresent(agentVersion, forKey: .agentVersion)
+    try container.encodeIfPresent(feedback, forKey: .feedback)
+    try container.encodeIfPresent(recording, forKey: .recording)
+    try container.encodeIfPresent(correction, forKey: .correction)
   }
 }
 
@@ -2779,6 +3601,68 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     self.recording = recording
     self.correction = correction
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+    case `citations`
+    case `createdAt`
+    case `offTheRecord`
+    case `version`
+    case `agentVersion`
+    case `feedback`
+    case `recording`
+    case `correction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIConversationConversationTimelineMessagesItemAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIConversationConversationTimelineMessagesItemDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decode(String?.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.citations = try container.decode([String].self, forKey: .citations)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.agentVersion = try container.decodeIfPresent(APIConversationConversationTimelineMessagesItemAgentVersion.self, forKey: .agentVersion)
+    self.feedback = try container.decodeIfPresent(APIConversationConversationTimelineMessagesItemFeedback.self, forKey: .feedback)
+    self.recording = try container.decodeIfPresent(APIJSONValue.self, forKey: .recording)
+    self.correction = try container.decodeIfPresent(APIConversationConversationTimelineMessagesItemCorrection.self, forKey: .correction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encode(citations, forKey: .citations)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(version, forKey: .version)
+    try container.encodeIfPresent(agentVersion, forKey: .agentVersion)
+    try container.encodeIfPresent(feedback, forKey: .feedback)
+    try container.encodeIfPresent(recording, forKey: .recording)
+    try container.encodeIfPresent(correction, forKey: .correction)
+  }
 }
 
 public enum APIConversationConversationTimelineMessagesItemAuthorKind: String, Codable, Sendable {
@@ -2889,6 +3773,38 @@ public struct APIConversationMemoryItem: Codable, Sendable {
     self.editedByFan = editedByFan
     self.createdAt = createdAt
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `kind`
+    case `text`
+    case `provenanceMessageId`
+    case `sensitiveCategory`
+    case `state`
+    case `editedByFan`
+    case `createdAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.kind = try container.decode(APIConversationMemoryItemKind.self, forKey: .kind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.provenanceMessageId = try container.decode(String.self, forKey: .provenanceMessageId)
+    self.sensitiveCategory = try container.decode(String?.self, forKey: .sensitiveCategory)
+    self.state = try container.decode(APIConversationMemoryItemState.self, forKey: .state)
+    self.editedByFan = try container.decode(Bool.self, forKey: .editedByFan)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(text, forKey: .text)
+    try container.encode(provenanceMessageId, forKey: .provenanceMessageId)
+    try container.encode(sensitiveCategory, forKey: .sensitiveCategory)
+    try container.encode(state, forKey: .state)
+    try container.encode(editedByFan, forKey: .editedByFan)
+    try container.encode(createdAt, forKey: .createdAt)
+  }
 }
 
 public enum APIConversationMemoryItemKind: String, Codable, Sendable {
@@ -2962,6 +3878,29 @@ public struct APIConversationReplyFeedbackInput: Codable, Sendable {
     self.rating = rating
     self.consent = consent
     self.policyVersion = policyVersion
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `messageVersion`
+    case `agentVersion`
+    case `rating`
+    case `consent`
+    case `policyVersion`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.messageVersion = try container.decode(Int.self, forKey: .messageVersion)
+    self.agentVersion = try container.decode(APIConversationReplyFeedbackInputAgentVersion.self, forKey: .agentVersion)
+    self.rating = try container.decode(APIConversationReplyFeedbackInputRating?.self, forKey: .rating)
+    self.consent = try container.decodeIfPresent(APIConversationReplyFeedbackInputConsent.self, forKey: .consent)
+    self.policyVersion = try container.decodeIfPresent(String.self, forKey: .policyVersion)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(messageVersion, forKey: .messageVersion)
+    try container.encode(agentVersion, forKey: .agentVersion)
+    try container.encode(rating, forKey: .rating)
+    try container.encodeIfPresent(consent, forKey: .consent)
+    try container.encodeIfPresent(policyVersion, forKey: .policyVersion)
   }
 }
 
@@ -3071,6 +4010,50 @@ public struct APIContentContentDocument: Codable, Sendable {
     self.packetId = packetId
     self.live = live
   }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentContentDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentContentDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentContentDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentContentDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
 }
 
 public enum APIContentContentDocumentKind: String, Codable, Sendable {
@@ -3122,6 +4105,26 @@ public struct APIContentContentDocumentLive: Codable, Sendable {
     self.startsAt = startsAt
     self.endsAt = endsAt
     self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
   }
 }
 
@@ -3268,6 +4271,50 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
     self.packetId = packetId
     self.live = live
   }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentSaveContentDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentSaveContentDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentSaveContentDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentSaveContentDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
 }
 
 public enum APIContentSaveContentDocumentKind: String, Codable, Sendable {
@@ -3319,6 +4366,26 @@ public struct APIContentSaveContentDocumentLive: Codable, Sendable {
     self.startsAt = startsAt
     self.endsAt = endsAt
     self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
   }
 }
 
@@ -3482,6 +4549,23 @@ public struct APIStudioStudioReplyDraft: Codable, Sendable {
     self.version = version
     self.sentMessageId = sentMessageId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `text`
+    case `version`
+    case `sentMessageId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.sentMessageId = try container.decode(String?.self, forKey: .sentMessageId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(text, forKey: .text)
+    try container.encode(version, forKey: .version)
+    try container.encode(sentMessageId, forKey: .sentMessageId)
+  }
 }
 
 public struct APIStudioStudioRevision: Codable, Sendable {
@@ -3543,6 +4627,38 @@ public struct APIStudioStudioSessionCreatorsItem: Codable, Sendable {
     self.memberHandle = memberHandle
     self.viewerAccountId = viewerAccountId
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `display_name`
+    case `handle`
+    case `verification`
+    case `owned`
+    case `roles`
+    case `memberHandle`
+    case `viewerAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.display_name = try container.decode(String.self, forKey: .display_name)
+    self.handle = try container.decode(String.self, forKey: .handle)
+    self.verification = try container.decode(String.self, forKey: .verification)
+    self.owned = try container.decode(Bool.self, forKey: .owned)
+    self.roles = try container.decode([APIStudioStudioSessionCreatorsItemRolesItem].self, forKey: .roles)
+    self.memberHandle = try container.decode(String?.self, forKey: .memberHandle)
+    self.viewerAccountId = try container.decode(String.self, forKey: .viewerAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(display_name, forKey: .display_name)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(verification, forKey: .verification)
+    try container.encode(owned, forKey: .owned)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(memberHandle, forKey: .memberHandle)
+    try container.encode(viewerAccountId, forKey: .viewerAccountId)
+  }
 }
 
 public enum APIStudioStudioSessionCreatorsItemRolesItem: String, Codable, Sendable {
@@ -3594,6 +4710,26 @@ public struct APIStudioStudioTeamMembersItem: Codable, Sendable {
     self.revoked_at = revoked_at
     self.handle = handle
   }
+  private enum CodingKeys: String, CodingKey {
+    case `account_id`
+    case `roles`
+    case `revoked_at`
+    case `handle`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.account_id = try container.decode(String.self, forKey: .account_id)
+    self.roles = try container.decode([APIStudioStudioTeamMembersItemRolesItem].self, forKey: .roles)
+    self.revoked_at = try container.decode(String?.self, forKey: .revoked_at)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(account_id, forKey: .account_id)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(revoked_at, forKey: .revoked_at)
+    try container.encode(handle, forKey: .handle)
+  }
 }
 
 public enum APIStudioStudioTeamMembersItemRolesItem: String, Codable, Sendable {
@@ -3620,6 +4756,35 @@ public struct APIStudioStudioTeamInvitationsItem: Codable, Sendable {
     self.accepted_at = accepted_at
     self.revoked_at = revoked_at
   }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `account_id`
+    case `handle`
+    case `roles`
+    case `expires_at`
+    case `accepted_at`
+    case `revoked_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.account_id = try container.decode(String.self, forKey: .account_id)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.roles = try container.decode([APIStudioStudioTeamInvitationsItemRolesItem].self, forKey: .roles)
+    self.expires_at = try container.decode(String.self, forKey: .expires_at)
+    self.accepted_at = try container.decode(String?.self, forKey: .accepted_at)
+    self.revoked_at = try container.decode(String?.self, forKey: .revoked_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(account_id, forKey: .account_id)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(expires_at, forKey: .expires_at)
+    try container.encode(accepted_at, forKey: .accepted_at)
+    try container.encode(revoked_at, forKey: .revoked_at)
+  }
 }
 
 public enum APIStudioStudioTeamInvitationsItemRolesItem: String, Codable, Sendable {
@@ -3637,6 +4802,23 @@ public struct APIStudioStudioThreadEntries: Codable, Sendable {
     self.items = items
     self.nextCursor = nextCursor
     self.coverage = coverage
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextCursor`
+    case `coverage`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIStudioStudioThreadEntriesItemsItem].self, forKey: .items)
+    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
+    self.coverage = try container.decode(APIStudioStudioThreadEntriesCoverage.self, forKey: .coverage)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextCursor, forKey: .nextCursor)
+    try container.encode(coverage, forKey: .coverage)
   }
 }
 
@@ -3861,7 +5043,7 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
     let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$"]
     let literalValues = ["offer": "1"]

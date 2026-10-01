@@ -3,6 +3,7 @@ package com.pantopus.qelvora.generated
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Required
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -189,6 +190,7 @@ data class APIAgentSourceCreate(
   val `originReference`: String? = null,
   val `audience`: JsonElement,
   val `rightsEvidence`: String,
+  @Required
   val `expiresAt`: String? = null
 )
 
@@ -368,6 +370,7 @@ enum class APICommerceShareChoiceHandleDisplay {
 @Serializable
 data class APICommerceSpendLimitCommand(
   val `currency`: String,
+  @Required
   val `amount`: Long? = null,
   val `explicitNone`: Boolean,
   val `remindersOn`: Boolean,
@@ -424,12 +427,16 @@ data class APIMediaCreatorMediaAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -473,12 +480,16 @@ data class APIMediaCreatorMediaPlaybackTicketAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -592,12 +603,16 @@ data class APIMediaCreatorMediaUploadTicketAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null,
   val `creatorId`: String,
   val `objectId`: String,
@@ -634,12 +649,16 @@ data class APIMediaMediaAsset(
   val `mimeType`: String,
   val `bytes`: Long,
   val `uploadedBytes`: Long,
+  @Required
   val `durationMs`: Long? = null,
   val `sha256`: String,
   val `waveform`: List<Double>,
+  @Required
   val `signedActId`: String? = null,
   val `expiresAt`: String,
+  @Required
   val `failureCode`: String? = null,
+  @Required
   val `provenance`: Map<String, JsonElement>? = null
 )
 
@@ -732,6 +751,7 @@ data class APIMediaProcessedMediaEvidence(
   val `sha256`: String,
   val `bytes`: Long,
   val `mimeType`: APIMediaProcessedMediaEvidenceMimeType,
+  @Required
   val `durationMs`: Long? = null
 )
 
@@ -983,7 +1003,9 @@ data class APISession(
   val `sessionId`: String,
   val `expiresAt`: String,
   val `mode`: APISessionMode,
+  @Required
   val `fan`: APISessionFan? = null,
+  @Required
   val `creator`: APISessionCreator? = null,
   val `teams`: List<APISessionTeamsItem>
 )
@@ -1058,7 +1080,9 @@ data class APIIdentityCompletionSession(
   val `sessionId`: String,
   val `expiresAt`: String,
   val `mode`: APIIdentityCompletionSessionMode,
+  @Required
   val `fan`: APIIdentityCompletionSessionFan? = null,
+  @Required
   val `creator`: APIIdentityCompletionSessionCreator? = null,
   val `teams`: List<APIIdentityCompletionSessionTeamsItem>
 )
@@ -1166,6 +1190,7 @@ data class APIProof(
   val `accountUrl`: String,
   val `expiresAt`: String,
   val `state`: APIProofState,
+  @Required
   val `reason`: String? = null
 )
 
@@ -1254,6 +1279,7 @@ data class APIPublicSignature(
   val `contentHash`: String,
   val `verifiedAt`: String,
   val `status`: APIPublicSignatureStatus,
+  @Required
   val `content`: JsonElement? = null,
   val `contentAvailable`: Boolean,
   val `explanation`: String
@@ -1509,6 +1535,7 @@ data class APIMessage(
   val `deliveryState`: APIMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -1539,6 +1566,7 @@ enum class APIMessageDeliveryState {
 @Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
+  @Required
   val `generationId`: String? = null
 )
 
@@ -1551,6 +1579,7 @@ data class APIAcceptedMessageMessage(
   val `deliveryState`: APIAcceptedMessageMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -1587,6 +1616,7 @@ data class APIFrame(
   val `messageId`: String,
   val `authorKind`: APIFrameAuthorKind,
   val `text`: String,
+  @Required
   val `generationId`: String? = null,
   val `sequence`: Long,
   val `control`: APIFrameControl? = null
@@ -1666,6 +1696,7 @@ data class APIThreadTimelineMessagesItem(
   val `deliveryState`: APIThreadTimelineMessagesItemDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
   val `authorAccountId`: String? = null
@@ -1743,6 +1774,7 @@ data class APIConversationConsentInput(
 data class APIConversationConversationAccountPage(
   val `fan`: APIConversationConversationAccountPageFan,
   val `threads`: List<APIConversationConversationAccountPageThreadsItem>,
+  @Required
   val `nextCursor`: String? = null
 )
 
@@ -1750,6 +1782,7 @@ data class APIConversationConversationAccountPage(
 data class APIConversationConversationAccountPageFan(
   val `id`: String,
   val `handle`: String,
+  @Required
   val `intro`: String? = null
 )
 
@@ -1844,7 +1877,9 @@ data class APIConversationConversationMessage(
   val `deliveryState`: APIConversationConversationMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
   val `citations`: List<String>,
@@ -1910,11 +1945,13 @@ data class APIConversationConversationPage(
   val `revision`: Long,
   val `generationSequences`: Map<String, Long>,
   val `messages`: List<APIConversationConversationPageMessagesItem>,
+  @Required
   val `before`: Long? = null,
   val `offTheRecord`: Boolean,
   val `introShared`: Boolean,
   val `consentCurrent`: Boolean,
   val `canSend`: Boolean,
+  @Required
   val `unavailableReason`: String? = null,
   val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null
 )
@@ -1937,7 +1974,9 @@ data class APIConversationConversationPageMessagesItem(
   val `deliveryState`: APIConversationConversationPageMessagesItemDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
   val `citations`: List<String>,
@@ -2082,7 +2121,9 @@ data class APIConversationConversationTimelineMessagesItem(
   val `deliveryState`: APIConversationConversationTimelineMessagesItemDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
+  @Required
   val `signedActId`: String? = null,
+  @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
   val `citations`: List<String>,
@@ -2176,6 +2217,7 @@ data class APIConversationMemoryItem(
   val `kind`: APIConversationMemoryItemKind,
   val `text`: String,
   val `provenanceMessageId`: String,
+  @Required
   val `sensitiveCategory`: String? = null,
   val `state`: APIConversationMemoryItemState,
   val `editedByFan`: Boolean,
@@ -2232,6 +2274,7 @@ data class APIConversationProviderPolicyProvidersItem(
 data class APIConversationReplyFeedbackInput(
   val `messageVersion`: Long,
   val `agentVersion`: APIConversationReplyFeedbackInputAgentVersion,
+  @Required
   val `rating`: APIConversationReplyFeedbackInputRating? = null,
   val `consent`: APIConversationReplyFeedbackInputConsent? = null,
   val `policyVersion`: String? = null
@@ -2310,8 +2353,11 @@ data class APIContentContentDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentContentDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentContentDocumentLive? = null
 )
@@ -2353,6 +2399,7 @@ data class APIContentContentDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -2449,8 +2496,11 @@ data class APIContentSaveContentDocument(
   val `nameToken`: Boolean,
   val `showAudienceCount`: Boolean,
   val `aiUseIntent`: Boolean,
+  @Required
   val `scheduledAt`: String? = null,
+  @Required
   val `quote`: APIContentSaveContentDocumentQuote? = null,
+  @Required
   val `packetId`: String? = null,
   val `live`: APIContentSaveContentDocumentLive? = null
 )
@@ -2492,6 +2542,7 @@ data class APIContentSaveContentDocumentLive(
   val `sessionId`: String,
   val `startsAt`: String,
   val `endsAt`: String,
+  @Required
   val `replayContentId`: String? = null
 )
 
@@ -2608,6 +2659,7 @@ enum class APIStudioStudioQueueQueryFilter {
 data class APIStudioStudioReplyDraft(
   val `text`: String,
   val `version`: Long,
+  @Required
   val `sentMessageId`: String? = null
 )
 
@@ -2645,6 +2697,7 @@ data class APIStudioStudioSessionCreatorsItem(
   val `verification`: String,
   val `owned`: Boolean,
   val `roles`: List<APIStudioStudioSessionCreatorsItemRolesItem>,
+  @Required
   val `memberHandle`: String? = null,
   val `viewerAccountId`: String
 )
@@ -2684,7 +2737,9 @@ data class APIStudioStudioTeam(
 data class APIStudioStudioTeamMembersItem(
   val `account_id`: String,
   val `roles`: List<APIStudioStudioTeamMembersItemRolesItem>,
+  @Required
   val `revoked_at`: String? = null,
+  @Required
   val `handle`: String? = null
 )
 
@@ -2700,10 +2755,13 @@ enum class APIStudioStudioTeamMembersItemRolesItem {
 data class APIStudioStudioTeamInvitationsItem(
   val `id`: String,
   val `account_id`: String,
+  @Required
   val `handle`: String? = null,
   val `roles`: List<APIStudioStudioTeamInvitationsItemRolesItem>,
   val `expires_at`: String,
+  @Required
   val `accepted_at`: String? = null,
+  @Required
   val `revoked_at`: String? = null
 )
 
@@ -2718,6 +2776,7 @@ enum class APIStudioStudioTeamInvitationsItemRolesItem {
 @Serializable
 data class APIStudioStudioThreadEntries(
   val `items`: List<APIStudioStudioThreadEntriesItemsItem>,
+  @Required
   val `nextCursor`: String? = null,
   val `coverage`: APIStudioStudioThreadEntriesCoverage
 )
@@ -2829,7 +2888,7 @@ object ApplicationDestination {
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/license)?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
     val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$")
     val literalValues = mapOf("offer" to "1")

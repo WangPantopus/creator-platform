@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { SessionSchema } from "@qelvora/api";
 import { AuthorLabel, Avatar, Mark, Notice, Skeleton } from "@qelvora/ui-web";
 import type {
   Configuration,
@@ -23,6 +24,12 @@ import { DraftConfig as ConfigurationSchema } from "../../../../packages/api/src
 import "./creator-ai.css";
 
 type ErrorBody = { error?: { code: string; message: string } };
+type CreatorAIIdentity = Readonly<{
+  accountId: string;
+  sessionId: string;
+  signal: AbortSignal;
+  end: () => void;
+}>;
 type Preview = {
   sentences: { text: string; citations: string[] }[];
   passages: {
@@ -179,7 +186,15 @@ function Glyph({ name, size = 20 }: { name: string; size?: number }) {
     </svg>
   );
 }
-export function CreatorAI({ section }: { section: string }) {
+export function CreatorAI({
+  section,
+  creatorId,
+  identity,
+}: {
+  section: string;
+  creatorId?: string;
+  identity?: CreatorAIIdentity;
+}) {
   const router = useRouter();
   const current = sections.includes(section) ? section : "overview";
   const [state, setState] = useState<StudioState | null>(null);
@@ -245,129 +260,224 @@ export function CreatorAI({ section }: { section: string }) {
   } | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const pendingKeys = useRef(new Map<string, string>());
+  const identityAccount = identity?.accountId;
+  const identitySession = identity?.sessionId;
+  const identitySignal = identity?.signal;
+  const endIdentity = identity?.end;
+  const request = useCallback(
+    async (path: string, init: RequestInit = {}) => {
+      identitySignal?.throwIfAborted();
+      const headers = new Headers(init.headers);
+      if (identityAccount)
+        headers.set("X-Expected-Account-Id", identityAccount);
+      const response = await fetch(path, {
+        ...init,
+        headers,
+        cache: "no-store",
+        ...(identitySignal
+          ? {
+              signal: AbortSignal.any([
+                identitySignal,
+                ...(init.signal ? [init.signal] : []),
+              ]),
+            }
+          : {}),
+      });
+      if (identitySignal && endIdentity && identityAccount) {
+        if (response.status === 401) {
+          const current = await fetch("/api/platform/identity/session", {
+            cache: "no-store",
+            signal: AbortSignal.any([
+              identitySignal,
+              AbortSignal.timeout(4000),
+            ]),
+          });
+          if (
+            current.status === 401 ||
+            (current.ok &&
+              SessionSchema.parse(await current.json()).accountId !==
+                identityAccount)
+          )
+            endIdentity();
+        } else if (response.status === 409) {
+          const code = ((await response.clone().json()) as ErrorBody).error
+            ?.code;
+          if (
+            ["session_account_changed", "studio_actor_changed"].includes(
+              code ?? "",
+            )
+          )
+            endIdentity();
+        }
+        identitySignal.throwIfAborted();
+      }
+      return response;
+    },
+    [identityAccount, identitySignal, endIdentity],
+  );
+  useEffect(() => {
+    if (!identitySignal || !identityAccount || !identitySession) return;
+    const sessionKey = `w2-session:${identityAccount}`;
+    const purge = () => {
+      ++fetchSequence.current;
+      actorKey.current = null;
+      pendingKeys.current.clear();
+      try {
+        const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
+          (kind) => `${kind}:${identityAccount}:`,
+        );
+        const keys = Object.keys(localStorage).filter((key) =>
+          prefixes.some((prefix) => key.startsWith(prefix)),
+        );
+        for (const key of keys) localStorage.removeItem(key);
+        localStorage.removeItem(sessionKey);
+      } catch {
+        /* Storage may already be unavailable; the account boundary unmounts. */
+      }
+    };
+    if (identitySignal.aborted) purge();
+    else {
+      // Access-token rotation retains the server session ID. Fresh sign-in
+      // creates another ID, so a draft left on an unmounted page cannot return.
+      if (readDraft(sessionKey) !== identitySession) purge();
+      storeDraft(sessionKey, identitySession);
+      identitySignal.addEventListener("abort", purge, { once: true });
+    }
+    return () => identitySignal.removeEventListener("abort", purge);
+  }, [identityAccount, identitySession, identitySignal]);
   const edit = (next: Configuration) => {
     if (!dirtyRef.current) draftRevision.current = state?.revision ?? null;
     setConfiguration(next);
     dirtyRef.current = true;
     setDirty(true);
   };
-  const fetchState = useCallback(async (initial = false) => {
-    const sequence = ++fetchSequence.current;
-    try {
-      const response = await fetch("/api/studio/ai/state", {
-        cache: "no-store",
-      });
-      const data = (await response.json()) as StudioState & ErrorBody;
-      if (sequence !== fetchSequence.current) return null;
-      if (!response.ok) {
-        if ([401, 403].includes(response.status)) {
-          setState(null);
-          setConfiguration(null);
-          setReview(null);
-          setPreview(null);
-          setSelectedCase(null);
-          setOlderVersions([]);
-          setComparisons({ available: false, items: [] });
-          setConfirmation(null);
-          actorKey.current = null;
+  const fetchState = useCallback(
+    async (initial = false) => {
+      const sequence = ++fetchSequence.current;
+      try {
+        const response = await request("/api/studio/ai/state", {
+          cache: "no-store",
+        });
+        const data = (await response.json()) as StudioState & ErrorBody;
+        identitySignal?.throwIfAborted();
+        if (sequence !== fetchSequence.current) return null;
+        if (!response.ok) {
+          if ([401, 403].includes(response.status)) {
+            setState(null);
+            setConfiguration(null);
+            setReview(null);
+            setPreview(null);
+            setSelectedCase(null);
+            setOlderVersions([]);
+            setComparisons({ available: false, items: [] });
+            setConfirmation(null);
+            actorKey.current = null;
+            dirtyRef.current = false;
+            draftRevision.current = null;
+            setDirty(false);
+            pendingKeys.current.clear();
+          }
+          throw new Error(data.error?.message ?? "Studio is unavailable.");
+        }
+        if (identityAccount && data.actorAccountId !== identityAccount) {
+          endIdentity?.();
+          throw new Error(
+            "Your creator session changed. Continue with Pantopus again.",
+          );
+        }
+        const nextActor = `${data.actorAccountId}:${data.creator.id}`;
+        if (actorKey.current !== nextActor) {
+          initial = true;
+          actorKey.current = nextActor;
           dirtyRef.current = false;
           draftRevision.current = null;
           setDirty(false);
+          setTitle("");
+          setText("");
+          setRights("");
+          setScopeKind("public");
+          setScopeIds("");
+          setExpiry("");
+          setSourceOrigin("manual_text");
+          setSourceForm(false);
+          setReview(null);
+          setPreview(null);
+          setPrompt("");
+          setExample("");
+          setParaphrase("");
+          setRule("");
+          setSponsorBrand("");
+          setAliases("");
+          setSponsorExpiry("");
+          setChanges("");
+          setConfirmed({});
+          setSelectedCase(null);
+          setConfirmation(null);
+          setOlderVersions([]);
+          setHistoryEnd(false);
+          setComparisons({ available: false, items: [] });
+          setMessage("");
+          setError("");
           pendingKeys.current.clear();
         }
-        throw new Error(data.error?.message ?? "Studio is unavailable.");
-      }
-      const nextActor = `${data.actorAccountId}:${data.creator.id}`;
-      if (actorKey.current !== nextActor) {
-        initial = true;
-        actorKey.current = nextActor;
-        dirtyRef.current = false;
-        draftRevision.current = null;
-        setDirty(false);
-        setTitle("");
-        setText("");
-        setRights("");
-        setScopeKind("public");
-        setScopeIds("");
-        setExpiry("");
-        setSourceOrigin("manual_text");
-        setSourceForm(false);
-        setReview(null);
-        setPreview(null);
-        setPrompt("");
-        setExample("");
-        setParaphrase("");
-        setRule("");
-        setSponsorBrand("");
-        setAliases("");
-        setSponsorExpiry("");
-        setChanges("");
-        setConfirmed({});
-        setSelectedCase(null);
-        setConfirmation(null);
-        setOlderVersions([]);
-        setHistoryEnd(false);
-        setComparisons({ available: false, items: [] });
-        setMessage("");
-        setError("");
-        pendingKeys.current.clear();
-      }
-      setState(data);
-      if (!dirtyRef.current) setConfiguration(data.configuration);
-      if (initial) {
-        setStory(data.interview.story);
-        setBoundaries(data.interview.boundaries);
-        setStatusText(data.status?.text ?? "");
-        const cached = readDraft(`w2-source:${nextActor}`);
-        if (cached && typeof cached === "object") {
-          const source = cached as {
-            title: string;
-            text: string;
-            rights: string;
-            scopeKind?: string;
-            scopeIds?: string;
-            expiry?: string;
-            sourceOrigin?: "manual_text" | "manual_upload";
-          };
-          setTitle(source.title);
-          setText(source.text);
-          setRights(source.rights);
-          setScopeKind(source.scopeKind ?? "public");
-          setScopeIds(source.scopeIds ?? "");
-          setExpiry(source.expiry ?? "");
-          setSourceOrigin(source.sourceOrigin ?? "manual_text");
+        setState(data);
+        if (!dirtyRef.current) setConfiguration(data.configuration);
+        if (initial) {
+          setStory(data.interview.story);
+          setBoundaries(data.interview.boundaries);
+          setStatusText(data.status?.text ?? "");
+          const cached = readDraft(`w2-source:${nextActor}`);
+          if (cached && typeof cached === "object") {
+            const source = cached as {
+              title: string;
+              text: string;
+              rights: string;
+              scopeKind?: string;
+              scopeIds?: string;
+              expiry?: string;
+              sourceOrigin?: "manual_text" | "manual_upload";
+            };
+            setTitle(source.title);
+            setText(source.text);
+            setRights(source.rights);
+            setScopeKind(source.scopeKind ?? "public");
+            setScopeIds(source.scopeIds ?? "");
+            setExpiry(source.expiry ?? "");
+            setSourceOrigin(source.sourceOrigin ?? "manual_text");
+          }
+          const interview = readDraft(`w2-interview:${nextActor}`);
+          if (interview && typeof interview === "object") {
+            const stored = interview as {
+              story: string;
+              boundaries: string;
+            };
+            setStory(stored.story);
+            setBoundaries(stored.boundaries);
+          }
+          const draft = readDraft(`w2-config:${nextActor}`) as {
+            revision?: number;
+            configuration?: unknown;
+          } | null;
+          const restored = ConfigurationSchema.safeParse(draft?.configuration);
+          if (restored.success && Number.isInteger(draft?.revision)) {
+            setConfiguration(restored.data);
+            draftRevision.current = draft!.revision!;
+            dirtyRef.current = true;
+            setDirty(true);
+            if (draft!.revision !== data.revision)
+              setError(
+                "The saved draft changed elsewhere. Your unsaved input is preserved; reload the saved draft before editing it again.",
+              );
+          }
         }
-        const interview = readDraft(`w2-interview:${nextActor}`);
-        if (interview && typeof interview === "object") {
-          const stored = interview as {
-            story: string;
-            boundaries: string;
-          };
-          setStory(stored.story);
-          setBoundaries(stored.boundaries);
-        }
-        const draft = readDraft(`w2-config:${nextActor}`) as {
-          revision?: number;
-          configuration?: unknown;
-        } | null;
-        const restored = ConfigurationSchema.safeParse(draft?.configuration);
-        if (restored.success && Number.isInteger(draft?.revision)) {
-          setConfiguration(restored.data);
-          draftRevision.current = draft!.revision!;
-          dirtyRef.current = true;
-          setDirty(true);
-          if (draft!.revision !== data.revision)
-            setError(
-              "The saved draft changed elsewhere. Your unsaved input is preserved; reload the saved draft before editing it again.",
-            );
-        }
+        return data;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Studio is unavailable.");
+        return null;
       }
-      return data;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Studio is unavailable.");
-      return null;
-    }
-  }, []);
+    },
+    [request, identityAccount, identitySignal, endIdentity],
+  );
   useEffect(() => {
     void fetchState(true);
     const connected = () => {
@@ -388,7 +498,7 @@ export function CreatorAI({ section }: { section: string }) {
     };
   }, [fetchState]);
   useEffect(() => {
-    if (!state) return;
+    if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
       text,
@@ -408,21 +518,34 @@ export function CreatorAI({ section }: { section: string }) {
     sourceOrigin,
     state?.creator.id,
     state?.actorAccountId,
+    identitySignal,
   ]);
   useEffect(() => {
-    if (!state) return;
+    if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-interview:${state.actorAccountId}:${state.creator.id}`, {
       story,
       boundaries,
     });
-  }, [story, boundaries, state?.creator.id, state?.actorAccountId]);
+  }, [
+    story,
+    boundaries,
+    state?.creator.id,
+    state?.actorAccountId,
+    identitySignal,
+  ]);
   useEffect(() => {
-    if (state && dirty && configuration)
+    if (state && dirty && configuration && !identitySignal?.aborted)
       storeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, {
         revision: draftRevision.current,
         configuration,
       });
-  }, [configuration, dirty, state?.creator.id, state?.actorAccountId]);
+  }, [
+    configuration,
+    dirty,
+    state?.creator.id,
+    state?.actorAccountId,
+    identitySignal,
+  ]);
   useEffect(() => {
     if (
       !state?.sources.some((s) => s.state === "processing") &&
@@ -442,7 +565,7 @@ export function CreatorAI({ section }: { section: string }) {
     const expectedActor = actorKey.current;
     const load = async () => {
       try {
-        const response = await fetch("/api/studio/ai/comparisons", {
+        const response = await request("/api/studio/ai/comparisons", {
           cache: "no-store",
           headers: expectedActor ? { "X-Studio-Actor": expectedActor } : {},
         });
@@ -461,7 +584,7 @@ export function CreatorAI({ section }: { section: string }) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [current, state?.creator.id, state?.actorAccountId]);
+  }, [current, state?.creator.id, state?.actorAccountId, request]);
   const api = async (path: string, body?: unknown, method = "POST") => {
     if (!navigator.onLine)
       throw new Error(
@@ -473,7 +596,7 @@ export function CreatorAI({ section }: { section: string }) {
     const identity = expectedActor + path + JSON.stringify(body ?? {});
     const key = pendingKeys.current.get(identity) ?? crypto.randomUUID();
     pendingKeys.current.set(identity, key);
-    const response = await fetch(`/api/studio/ai/${path}`, {
+    const response = await request(`/api/studio/ai/${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -484,6 +607,7 @@ export function CreatorAI({ section }: { section: string }) {
     });
     const result = (await response.json()) as ErrorBody &
       Record<string, unknown>;
+    identitySignal?.throwIfAborted();
     if (actorKey.current !== expectedActor)
       throw new Error("Your Studio session changed. Reload before continuing.");
     if (!response.ok)
@@ -569,8 +693,15 @@ export function CreatorAI({ section }: { section: string }) {
     "Earnings",
     "Team",
   ];
-  const destination = (name: string) =>
-    name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
+  const destination = (name: string) => {
+    if (["Notes", "Requests", "Threads"].includes(name)) {
+      const currentCreator = creatorId ?? state?.creator.id;
+      return currentCreator
+        ? `/studio/${encodeURIComponent(currentCreator)}/${name.toLowerCase()}`
+        : "/studio/workspace";
+    }
+    return name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
+  };
   const controlsDisabled = busy || !online;
   const navigate = (
     event: React.MouseEvent<HTMLAnchorElement>,

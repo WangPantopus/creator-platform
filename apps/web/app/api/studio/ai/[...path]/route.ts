@@ -98,6 +98,17 @@ async function bridge(
     ? token.replace(/^development:/u, "")
     : session?.accountId;
   const expectedActor = request.headers.get("X-Studio-Actor");
+  const expectedAccount = request.headers.get("X-Expected-Account-Id");
+  if (expectedAccount && expectedAccount !== accountId)
+    return Response.json(
+      {
+        error: {
+          code: "session_account_changed",
+          message: "Your account changed. Continue with Pantopus again.",
+        },
+      },
+      { status: 409 },
+    );
   if (
     (request.method !== "GET" || expectedActor) &&
     expectedActor !== `${accountId}:${creatorId}`
@@ -181,6 +192,7 @@ async function bridge(
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          ...(accountId ? { "X-Expected-Account-Id": accountId } : {}),
           ...(request.headers.get("Idempotency-Key")
             ? { "Idempotency-Key": request.headers.get("Idempotency-Key")! }
             : {}),
