@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — main 3de0f14 integration and cleanup restriction
+
+Application `aade864` normally integrates current main `3de0f14` through all seven owned W1 branches, retaining the Home navigation and signing authority repairs. Generation/check validates 12 resources and 97 operations with no generated drift; backend, production web, normal shipping iOS/Android and nine unchanged backend contracts pass. A fresh rename passes generation/backend/web/iOS with all 1,219 binary assets and 110 original iOS references unchanged. Its Android build was not run because the coordinated cleanup request forbids new heavy local builds/runtimes until explicit resumption. [Exact current-source results and qualifications](../../../artifacts/workstreams/W1/resume/2026-10-01-main-3de0f14/run.md).
+
+No W1 build or local API/web listener remains; no device was allocated. The new disposable clone/native products are removed after digest retention. Central cleanup has also removed the former W1 container and matching volume; private configuration/keys remain but no preserved database state is inferred. Independent source work continues. Earlier runtime/build receipts below remain historical; no current configured host, native interaction, CI or release acceptance is claimed.
+
 ## October 1 — current creator authority during assertion verification, draft
 
 Application `28874d9` holds the uniquely account-owned creator profile through assertion verification and commit, in recovery-compatible profile-before-challenge/key order. It preserves current verified/no-recovery, challenge/account/expiry/replay, owned key, exact content, RP/origin and required user verification checks. Backend/affected source checks and the unchanged original T-34 PostgreSQL signing case pass in a separate disposable cluster (one passed/eight skipped; no new tests). [Exact source, current composed-signing review and limits](../../../artifacts/workstreams/W1/resume/2026-10-01-signing-authority/run.md). Actual genuine passkey/recovery/revocation and named-act interaction remain open; this repair stays draft.
