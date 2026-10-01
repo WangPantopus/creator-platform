@@ -1,0 +1,33 @@
+BEGIN
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+GRANT
+GRANT
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+       relname        | relrowsecurity | relforcerowsecurity 
+----------------------+----------------+---------------------
+ commerce_pool_cycle  | t              | t
+ commerce_pool_effect | t              | t
+(2 rows)
+
+ROLLBACK
+ canonical_migrations 
+----------------------
+                   40
+(1 row)
+
+ proposal_after_rollback 
+-------------------------
+ 
+(1 row)
+

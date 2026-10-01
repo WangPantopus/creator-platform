@@ -31,6 +31,7 @@ type CreatorAIIdentity = Readonly<{
   end: () => void;
 }>;
 type Preview = {
+  revision: number;
   sentences: { text: string; citations: string[] }[];
   passages: {
     id: string;
@@ -71,12 +72,14 @@ function storeDraft(key: string, value: unknown) {
   }
 }
 function Button({
+  id,
   children,
   onClick,
   disabled = false,
   variant = "secondary",
   type = "button",
 }: {
+  id?: string;
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
@@ -85,6 +88,7 @@ function Button({
 }) {
   return (
     <button
+      id={id}
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -206,6 +210,7 @@ export function CreatorAI({
   const draftRevision = useRef<number | null>(null);
   const actorKey = useRef<string | null>(null);
   const fetchSequence = useRef(0);
+  const sourceFileSequence = useRef(0);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -320,6 +325,7 @@ export function CreatorAI({
     const sessionKey = `w2-session:${identityAccount}`;
     const purge = () => {
       ++fetchSequence.current;
+      ++sourceFileSequence.current;
       actorKey.current = null;
       pendingKeys.current.clear();
       try {
@@ -388,6 +394,7 @@ export function CreatorAI({
         const nextActor = `${data.actorAccountId}:${data.creator.id}`;
         if (actorKey.current !== nextActor) {
           initial = true;
+          ++sourceFileSequence.current;
           actorKey.current = nextActor;
           dirtyRef.current = false;
           draftRevision.current = null;
@@ -498,6 +505,10 @@ export function CreatorAI({
     };
   }, [fetchState]);
   useEffect(() => {
+    if (preview && (dirty || preview.revision !== state?.revision))
+      setPreview(null);
+  }, [dirty, preview, state?.revision]);
+  useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
@@ -556,8 +567,14 @@ export function CreatorAI({
     return () => clearInterval(timer);
   }, [state, fetchState]);
   useEffect(() => {
-    if (confirmation && !dialog.current?.open) dialog.current?.showModal();
-    else if (!confirmation && dialog.current?.open) dialog.current.close();
+    if (confirmation && !dialog.current?.open) {
+      setError("");
+      setMessage("");
+      dialog.current?.showModal();
+      dialog.current
+        ?.querySelector<HTMLButtonElement>("#w2-confirm-cancel")
+        ?.focus();
+    } else if (!confirmation && dialog.current?.open) dialog.current.close();
   }, [confirmation]);
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
@@ -617,14 +634,17 @@ export function CreatorAI({
     pendingKeys.current.delete(identity);
     return result;
   };
-  const action = async (run: () => Promise<void>, success = "Saved.") => {
+  const action = async (
+    run: () => Promise<void | string>,
+    success = "Saved.",
+  ) => {
     if (busy) return;
     setBusy(true);
     setError("");
     setMessage("");
     try {
-      await run();
-      setMessage(success);
+      const outcome = await run();
+      setMessage(outcome ?? success);
       await fetchState();
     } catch (e) {
       setError(e instanceof Error ? e.message : "The action did not finish.");
@@ -1241,9 +1261,7 @@ export function CreatorAI({
                                 : null,
                             });
                             if (result.duplicate)
-                              setMessage(
-                                "This source already exists; no duplicate was created.",
-                              );
+                              return "This source already exists; no duplicate was created.";
                             else {
                               setTitle("");
                               setText("");
@@ -1260,19 +1278,49 @@ export function CreatorAI({
                             type="file"
                             accept=".txt,.md,.vtt,.csv,text/plain,text/markdown"
                             onChange={(e) => {
+                              const sequence = ++sourceFileSequence.current;
+                              const expectedActor = actorKey.current;
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              setMessage("");
+                              setError("");
+                              // Permit selecting the same file after fixing it.
+                              e.target.value = "";
                               if (file.size > 1_000_000) {
                                 setError(
                                   "This file is too large. Split it into files up to 1 MB.",
                                 );
                                 return;
                               }
-                              void file.text().then((content) => {
-                                setText(content);
-                                setTitle(file.name);
-                                setSourceOrigin("manual_upload");
-                              });
+                              const currentRead = () =>
+                                sourceFileSequence.current === sequence &&
+                                actorKey.current === expectedActor &&
+                                !identitySignal?.aborted;
+                              void file
+                                .arrayBuffer()
+                                .then((bytes) => {
+                                  const content = new TextDecoder("utf-8", {
+                                    fatal: true,
+                                  }).decode(bytes);
+                                  if (!currentRead()) return;
+                                  if (content.length > 250_000) {
+                                    setError(
+                                      "Split this source into files with at most 250,000 characters.",
+                                    );
+                                    return;
+                                  }
+                                  setError("");
+                                  setMessage("");
+                                  setText(content);
+                                  setTitle(file.name);
+                                  setSourceOrigin("manual_upload");
+                                })
+                                .catch(() => {
+                                  if (currentRead())
+                                    setError(
+                                      "This file could not be read as UTF-8 text. Save it as UTF-8 and try again.",
+                                    );
+                                });
                             }}
                           />
                         </Field>
@@ -1889,11 +1937,18 @@ export function CreatorAI({
                           onSubmit={(e) => {
                             e.preventDefault();
                             void action(async () => {
+                              const revision = state.revision;
                               const result = await api("preview", {
-                                expectedRevision: state.revision,
+                                expectedRevision: revision,
                                 message: prompt,
                               });
-                              setPreview(result as unknown as Preview);
+                              setPreview({
+                                ...(result as unknown as Omit<
+                                  Preview,
+                                  "revision"
+                                >),
+                                revision,
+                              });
                             }, "Draft preview complete.");
                           }}
                         >
@@ -1913,30 +1968,41 @@ export function CreatorAI({
                             Send to draft AI
                           </Button>
                         </form>
-                        {preview && (
-                          <>
-                            <AuthorLabel kind="ai" name={state.creator.name} />
-                            {preview.sentences.map((sentence, index) => (
-                              <div key={index}>
-                                <p>{sentence.text}</p>
-                                {sentence.citations.map((id) => (
-                                  <details key={id}>
-                                    <summary>Open authorized passage</summary>
-                                    {preview.passages.find((p) => p.id === id)
-                                      ?.text ?? "No longer accessible to you"}
-                                  </details>
-                                ))}
-                              </div>
-                            ))}
-                            <p className="qv-help">
-                              Pipeline {preview.durationMs} ms · first approved{" "}
-                              {preview.firstApprovedMs ?? "withheld"} ms · cost{" "}
-                              {preview.usage.some((u) => u.costMicros === null)
-                                ? "awaiting provider usage or rate reconciliation"
-                                : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
-                            </p>
-                          </>
-                        )}
+                        {preview &&
+                          preview.revision === state.revision &&
+                          !dirty && (
+                            <>
+                              <p className="qv-meta">
+                                Draft preview · revision {preview.revision}
+                              </p>
+                              <AuthorLabel
+                                kind="ai"
+                                name={state.creator.name}
+                              />
+                              {preview.sentences.map((sentence, index) => (
+                                <div key={index}>
+                                  <p>{sentence.text}</p>
+                                  {sentence.citations.map((id) => (
+                                    <details key={id}>
+                                      <summary>Open authorized passage</summary>
+                                      {preview.passages.find((p) => p.id === id)
+                                        ?.text ?? "No longer accessible to you"}
+                                    </details>
+                                  ))}
+                                </div>
+                              ))}
+                              <p className="qv-help">
+                                Pipeline {preview.durationMs} ms · first
+                                approved {preview.firstApprovedMs ?? "withheld"}{" "}
+                                ms · cost{" "}
+                                {preview.usage.some(
+                                  (u) => u.costMicros === null,
+                                )
+                                  ? "awaiting provider usage or rate reconciliation"
+                                  : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
+                              </p>
+                            </>
+                          )}
                       </Panel>
                       <Panel title="I’D NEVER SAY THAT">
                         <p className="qv-help">
@@ -2411,6 +2477,22 @@ export function CreatorAI({
         className="w2-dialog"
         aria-labelledby="w2-confirm-title"
         aria-describedby="w2-confirm-body"
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const buttons =
+            event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "button:not(:disabled)",
+            );
+          const first = buttons[0];
+          const last = buttons[buttons.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
         onCancel={() => setConfirmation(null)}
         onClose={() => setConfirmation(null)}
       >
@@ -2430,7 +2512,11 @@ export function CreatorAI({
           >
             {confirmation?.confirm}
           </Button>
-          <Button variant="quiet" onClick={() => setConfirmation(null)}>
+          <Button
+            id="w2-confirm-cancel"
+            variant="quiet"
+            onClick={() => setConfirmation(null)}
+          >
             Cancel
           </Button>
         </div>

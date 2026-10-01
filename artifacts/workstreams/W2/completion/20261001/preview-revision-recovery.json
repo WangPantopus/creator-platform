@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-10-01T12:07:26.895Z",
+  "creatorRole": "secondary expert, canonical separate sessions",
+  "submittedRevision": 16,
+  "updatedRevision": 17,
+  "operation": "Weekly status saved in the second real Studio session while first preview was running",
+  "response": {
+    "status": 200,
+    "blocked": false,
+    "durationMs": 3878,
+    "firstApprovedMs": 3872,
+    "sentences": [
+      {
+        "text": "The recovered creator-owned source states: \"Synthetic workshop guidance: let the sample clay dry slowly before bisque firing. Use these invented notes only for local source recovery review.\"",
+        "citations": ["eeb66d2e-c0fa-4555-adb8-490d673e345e"]
+      }
+    ],
+    "costMicros": 2484
+  },
+  "relevantUiLabels": [
+    "MY AI",
+    "DRAFT \u00b7 REVISION 17",
+    "TEST IT AS A FAN \u00b7 PUBLIC AUDIENCE",
+    "I\u2019D NEVER SAY THAT",
+    "VERSIONS",
+    "REVISION 17",
+    "COMPARE WITH THE LIVE VERSION"
+  ],
+  "draftPreviewLabelPresent": false
+}

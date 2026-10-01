@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-10-01T13:22:26.456Z",
+  "database": "creator_w4_sql_review",
+  "role": "creator_runtime",
+  "mode": "EXPLAIN only without financial/actor rows or provider call",
+  "queries": [
+    {
+      "name": "heldOwner",
+      "sql": "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+      "plan": {
+        "Plan": {
+          "Node Type": "LockRows",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 0,
+          "Total Cost": 0,
+          "Plan Rows": 0,
+          "Plan Width": 0,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 0,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "initialAccount",
+      "sql": "SELECT provider_ref,version FROM creator.commerce_payout_account WHERE creator_id=$1 FOR SHARE",
+      "plan": {
+        "Plan": {
+          "Node Type": "LockRows",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 0,
+          "Total Cost": 0,
+          "Plan Rows": 0,
+          "Plan Width": 0,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 0,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "finalAccount",
+      "sql": "SELECT provider_ref,version FROM creator.commerce_payout_account WHERE creator_id=$1 FOR UPDATE",
+      "plan": {
+        "Plan": {
+          "Node Type": "LockRows",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 0,
+          "Total Cost": 0,
+          "Plan Rows": 0,
+          "Plan Width": 0,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 0,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "fencedState",
+      "sql": "UPDATE creator.commerce_payout_account SET state=$4,details_due=$5,version=version+1 WHERE creator_id=$1 AND provider_ref=$2 AND version=$3 RETURNING version",
+      "plan": {
+        "Plan": {
+          "Node Type": "ModifyTable",
+          "Operation": "Update",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "commerce_payout_account",
+          "Alias": "commerce_payout_account",
+          "Startup Cost": 0,
+          "Total Cost": 0,
+          "Plan Rows": 0,
+          "Plan Width": 43,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 43,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "rolledBack": true
+}

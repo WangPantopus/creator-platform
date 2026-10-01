@@ -279,7 +279,7 @@ details[open] > summary:before {
   padding: 10px 0;
   min-height: 44px;
 }
-.w2-console .qv-console__line {
+.w2-main .qv-console__line {
   overflow-wrap: anywhere;
 }
 .w2-main .qv-console__foot .w2-field {
@@ -300,6 +300,10 @@ details[open] > summary:before {
 .w2-main .qv-meta,
 .w2-main .qv-scope {
   white-space: nowrap;
+}
+.w2-main .qv-console__transcript > .qv-meta {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .w2-main .qv-source {
   flex-wrap: wrap;
@@ -449,6 +453,12 @@ details[open] > summary:before {
   }
 }
 @media (max-width: 700px) {
+  html:has(.w2-studio) {
+    scroll-padding-block: 16px calc(80px + env(safe-area-inset-bottom));
+  }
+  .w2-main :is(input, textarea, select, button, a, summary) {
+    scroll-margin-block: 16px calc(80px + env(safe-area-inset-bottom));
+  }
   .w2-sidebar {
     display: none;
   }

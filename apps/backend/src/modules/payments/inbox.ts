@@ -51,6 +51,8 @@ export type CommerceWorkScope = Readonly<
   | { actor: Actor; kind: "billing" }
   | { actor: Actor; kind: "pass" }
   | { actor: Actor; kind: "payout"; effectId: string }
+  | { actor: Actor; kind: "pool"; effectId: string }
+  | { actor: Actor; kind: "pool_cycle"; creatorId: string; cycle: string }
 >;
 export interface CommerceWorkIndex {
   // Issued by the configured identity/operations adapter. No public caller supplies an actor.
@@ -71,6 +73,8 @@ export class CommerceRecoveryWorker {
       billing?: import("../commerce/billing.js").MembershipBilling;
       pass?: import("../commerce/extended.js").ExtendedCommerce;
       payout?: import("../commerce/accounting.js").CreatorSettlement;
+      pool?: import("../commerce/pass-pool-journal.js").PassPoolJournal;
+      poolSettlement?: import("../commerce/accounting.js").PoolSettlement;
     },
   ) {}
   private async reconcileScope(scope: CommerceWorkScope) {
@@ -95,6 +99,24 @@ export class CommerceRecoveryWorker {
         "Payout recovery is not configured.",
       );
       await this.recovery.payout.run(scope.actor, scope.effectId);
+    } else if (scope.kind === "pool") {
+      invariant(
+        this.recovery?.pool,
+        "pool_recovery_unavailable",
+        "Pool recovery is not configured.",
+      );
+      await this.recovery.pool.run(scope.actor, scope.effectId);
+    } else if (scope.kind === "pool_cycle") {
+      invariant(
+        this.recovery?.poolSettlement,
+        "pool_recovery_unavailable",
+        "Pool cycle settlement is not configured.",
+      );
+      await this.recovery.poolSettlement.post(
+        scope.actor,
+        scope.creatorId,
+        scope.cycle,
+      );
     } else {
       await this.service.reconcileDeadlines(scope.actor);
       await this.service.reconcile(scope.actor, scope.packetId);

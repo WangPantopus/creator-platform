@@ -1,0 +1,233 @@
+{
+  "workstream": "W4",
+  "releasedAtUtc": "2026-09-30T21:56:48+00:00",
+  "sourceCommit": "a16558c70d725ce72a99e390c990018335203405",
+  "precedingHandoffCommit": "c4275d47e4bfc74e50e2851989a3b781abd9fc6c",
+  "reason": "Founder requested release of unnecessary W4 Mac resources after handoff. Preserve explicitly reusable native devices, dependency caches, canonical app DB/config, diagnostics and shared/peer resources.",
+  "removedPaths": [
+    {
+      "path": "/private/tmp/creator-w4-resume-derived",
+      "allocatedBytesBefore": 554106880,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-swift-package",
+      "allocatedBytesBefore": 670871552,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-build",
+      "allocatedBytesBefore": 12341248,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-gradle-ci-output",
+      "allocatedBytesBefore": 79667200,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-gradle-output",
+      "allocatedBytesBefore": 95354880,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-ci-swift-fixed-profile",
+      "allocatedBytesBefore": 323584,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-ci-swift-fixed-scale",
+      "allocatedBytesBefore": 319488,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w4-ci-swift-snapshots",
+      "allocatedBytesBefore": 319488,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next",
+      "allocatedBytesBefore": 322465792,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-approval-build",
+      "allocatedBytesBefore": 98463744,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-ci",
+      "allocatedBytesBefore": 149204992,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-ci-build",
+      "allocatedBytesBefore": 98422784,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-pass-build",
+      "allocatedBytesBefore": 98394112,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-pass-preview",
+      "allocatedBytesBefore": 305893376,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.next-w4-studio-build",
+      "allocatedBytesBefore": 109551616,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/backend/dist",
+      "allocatedBytesBefore": 8101888,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/backend/.turbo",
+      "allocatedBytesBefore": 4096,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/web/.turbo",
+      "allocatedBytesBefore": 4096,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/apps/android/.gradle",
+      "allocatedBytesBefore": 5861376,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/playwright-report",
+      "allocatedBytesBefore": 1138688,
+      "kind": "generated build/cache/output",
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform/test-results",
+      "allocatedBytesBefore": 610304,
+      "kind": "generated build/cache/output",
+      "removed": true
+    }
+  ],
+  "totalAllocatedBytesBefore": 2611421184,
+  "measurement": "Sum of du -sk allocated sizes of removed paths; not exact APFS free-space delta. Docker storage not included.",
+  "stopped": {
+    "ownedApiProcesses": [
+      47095,
+      47068,
+      47019
+    ],
+    "ownedNextProcesses": [
+      50193,
+      50174,
+      50120
+    ],
+    "android": {
+      "avd": "CreatorPlatform_W4_Resume_20260930",
+      "serial": "emulator-5564",
+      "previousPid": 19231,
+      "deviceData": "retained cold"
+    },
+    "ios": {
+      "udid": "1969609B-BC02-4C25-B36B-DE0BA1EC7437",
+      "name": "Creator Platform W4 Resume 20260930",
+      "deviceData": "retained cold"
+    },
+    "appDatabase": {
+      "container": "creator-platform-w4-resume-20260930",
+      "port": 55444,
+      "volume": "4d55c65d4b161450ea3923baaa38a6a817a9814d0d3c0f4c44321a5ed2e7b093",
+      "data": "preserved"
+    }
+  },
+  "removedDisposableDatabase": {
+    "container": "creator-platform-w4-ci-20260930",
+    "port": 55445,
+    "exclusiveAnonymousVolume": "abfea148602f731d833066a4c67e878f48a8ba491a93980432bf25c6ddff1705",
+    "data": "disposable checks only"
+  },
+  "preserved": [
+    {
+      "path": "/private/tmp/creator-platform-w4-resume.env",
+      "reason": "Mode-0600 server-side configuration for retained app DB/authority. Contents never printed/committed."
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-avds",
+      "reason": "Dedicated cold Android device; next agent has native acceptance work. No active emulator CPU/RAM."
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-gradle-cache",
+      "reason": "Reusable Android dependencies/wrapper cache for remaining native builds; no confirmed W4 daemon running."
+    },
+    {
+      "path": "/private/tmp/creator-w4-resume-packages",
+      "reason": "Reusable fetched Swift dependencies; stale native compiled/DerivedData outputs removed."
+    },
+    {
+      "path": "/private/tmp/W4-ios-3ca155a*",
+      "reason": "Exact earlier macOS27/arm64 CI capture artifacts for unresolved strict Swift mismatch."
+    },
+    {
+      "path": "/private/tmp/W4-ios-c71d1c8*",
+      "reason": "Exact later macOS27/arm64 CI capture artifacts for unresolved strict Swift mismatch."
+    },
+    {
+      "path": "/private/tmp/creator-w4-swift-backing-scale",
+      "reason": "Small final local Swift diagnostic images for unresolved CI verification."
+    },
+    {
+      "path": "/private/tmp/creator-w4-*.log and source/plan/patch aids",
+      "reason": "Small supporting diagnostics referenced by committed verification; not active jobs."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform",
+      "reason": "Committed source, docs, evidence and existing installed workspace dependencies."
+    },
+    {
+      "path": "Shared runtimes/SDKs/pnpm/Java/Docker images and peer processes/volumes/devices",
+      "reason": "Not exclusive W4 ownership; untouched."
+    }
+  ],
+  "browserRepl": "Own CUA JS kernel reset; no user/peer browser tabs deleted.",
+  "verification": "All named W4 resources verified; no global prune, shared daemon stop, peer deletion, user/peer browser-tab deletion or secret output.",
+  "verifiedAtUtc": "2026-09-30T21:59:02+00:00",
+  "verified": {
+    "removedPathsAbsent": 21,
+    "portsFree": [
+      3004,
+      4104,
+      55444,
+      55445
+    ],
+    "androidEmulatorStopped": true,
+    "iosState": "Shutdown",
+    "appContainerStatus": "exited",
+    "appDataVolumeRetained": true,
+    "disposableContainerAndVolumeAbsent": true,
+    "privateConfigMode": "0600"
+  },
+  "peerObservation": "Only exact W4 mutations were performed. Peer owners are working concurrently; later peer lifecycle changes cannot be treated as W4 cleanup effects or guaranteed unchanged state."
+}
