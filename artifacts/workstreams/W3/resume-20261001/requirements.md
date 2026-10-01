@@ -1,6 +1,6 @@
 # W3 requirement → source → current live evidence
 
-Current integrated main: `3de0f14ba82139c9d694ddd3cd676216103a036c`, normally merged into the privacy continuation at `eb7dc7e8180daa95365aa4bcba6938f349509cd8`. PR8 is merged. Account PR24 remains at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1` with web/backend and Android runtime success and six queued macOS jobs; it is unmerged. The privacy continuation at source30cc2b0 is published for independent review as draftPR36 at initial checkpoint23c74a29345f41a81ec08814da7caf49b38ed9cc, with populated-memory/security acceptance still open. This register drives personal implementation and must not be read as completion.
+Current integrated main: `4c2ea26867d27ba7466e0ac7446216fe0a49b24f`, normally merged into the privacy continuation at `fc167eb90a3a4fd662af8ffe6b4976b38926be7e`. PR8 is merged. Account PR24 remains at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1` with web/backend and Android runtime success and six queued macOS jobs; it is unmerged. The privacy continuation at source30cc2b0 is published for independent review as draftPR36 at initial checkpoint23c74a29345f41a81ec08814da7caf49b38ed9cc, with populated-memory/security acceptance still open. This register drives personal implementation and must not be read as completion.
 
 | Package | Current W3 source / canonical producers | Current live evidence and next boundary |
 |---|---|---|
@@ -29,3 +29,5 @@ Full private W3 export SHA256 `b92b011fe6cbcd2da770737c68054e500632be7e75b876b38
 - W2/W1/W8: Q18 optional human translation producer/processor consent and original proof semantics.
 
 Continue every independent source fix and actual account/safety/unavailable journey while these dependent paths stay closed. No new tests, saved UI flows, delegated implementation/acceptance, provider/license/cost/retention fabrication, peer resource mutation or production-ready claim.
+
+Subsequent W5 cleanup removed the restored DB container/volume after W3 stopped it. Original authored source remains in the reverified private export; canonical synthetic session/account transient state is not claimed retained. Catalog/zero-row observations are historical actual evidence, not a current running database. Current runtime/producer receipts and exact remaining call/recording/configuration gates: [producer receipts](producer-receipts.md). No heavy runtime/build was restarted during active cleanup.

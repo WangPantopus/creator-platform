@@ -284,6 +284,7 @@
     "incoming-earnings-native-api.diff": "acb4db6cec7d0cf003f05f9680dd3747f7438cae50e79f9a766dbe6540b884e8",
     "incoming-main-final-native-and-conversation-diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "incoming-main-native-and-conversation-diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "incoming-payout-W3-contract-diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "incoming-pool-W3-contract-diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "ios-build.log": "47ab5b65bb64a00576956d70f47ee0ecb1018b80cd08d69454c6c6fd289d8d79",
     "ios-controls-light-before-provider-copy.png": "ea33d5fd45bfefc7c14419336472c377c38287ec8e6c77efd4d50c4af4dd2e29",
@@ -310,7 +311,7 @@
     "ios-time-history-denied-night.png": "3a167e7ee0a360abc4b3fbc86f24a0e89dbc0ed7f0169f415b22dc6933d4531b",
     "ios-time-history-signature.log": "5618bd9bd1012edb0b7ff77e1555240c9d914841a6da6bd82ee2d30db309842b",
     "operated-observations.json": "c3d3cc9daa1f248e211a009b28767c8a8d404f52efa6fc035c14cf9d14249712",
-    "run.md": "4a1b90be671e251afeba1be0f16c45b340ffabbd81c2c0ac9e3ef2fbe2952a64",
+    "run.md": "4173768124608ec718b222f2ab3bc6c580a117c802ebcc193468e6e74392390b",
     "web-current-denied-light.png": "528a26246f86b2cad17b50a75371f8969373e05583df6018a1926408f54e1ed5",
     "web-current-main-denied-light.png": "528a26246f86b2cad17b50a75371f8969373e05583df6018a1926408f54e1ed5",
     "web-current-main-denied-night.png": "f73c7137c79fce2c872ac38bd33713c03b29eaf0afc64e35a95b42e2580ba855",
@@ -346,5 +347,24 @@
     "nativeBuildAndOperationBoundary": "30cc2b0/main1c11; all affected code hashes unchanged",
     "W1LeasesClosedAt": "23c74a29345f41a81ec08814da7caf49b38ed9cc",
     "PR": 36
+  },
+  "subsequentPayoutIntegration": {
+    "currentMain": "4c2ea26867d27ba7466e0ac7446216fe0a49b24f",
+    "normalMerge": "fc167eb90a3a4fd662af8ffe6b4976b38926be7e",
+    "W3SourceHashesUnchanged": true,
+    "incomingW3ContractDiffBytes": 0,
+    "postMergeLocalNativeBuildOrTypesClaimed": false,
+    "reason": "active renewed W5 cleanup; no heavy runtime/build restarted",
+    "actualOperatedBoundary": "30cc2b0/main1c11"
+  },
+  "subsequentCleanup": {
+    "reportedBy": "W5",
+    "restoredContainerAndVolumeRemoved": true,
+    "originalAuthoredMayaUnchangedAfterRestore": true,
+    "verifiedOriginalExport": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001/creator-platform-w3-20260930.sql.gz",
+    "bytes": 55281,
+    "sha256": "b92b011fe6cbcd2da770737c68054e500632be7e75b876b388d1ba87c5309a15",
+    "transientSyntheticSessionRowsRetained": false,
+    "heavyRuntimeRestarted": false
   }
 }
