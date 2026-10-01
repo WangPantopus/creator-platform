@@ -377,11 +377,12 @@ export function FanContent({
                 {new Date(content.document.live.endsAt).toLocaleString()}
               </p>
             )}
-            {content.document.media.length > 0 && (
+            {content.document.media.length > 0 && viewer && (
               <ContentAttachments
                 key={`${viewer}:${content.id}:${content.version}`}
                 content={content}
                 active={current}
+                expectedAccountId={viewer}
               />
             )}
           </>

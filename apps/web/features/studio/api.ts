@@ -15,6 +15,7 @@ export async function studioRequest<T>(
   path: string,
   body?: unknown,
   expectedAccountId?: string,
+  options?: { signal?: AbortSignal },
 ): Promise<T> {
   let response: Response;
   let fingerprint: string | undefined;
@@ -41,6 +42,7 @@ export async function studioRequest<T>(
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       cache: "no-store",
+      ...(options?.signal ? { signal: options.signal } : {}),
     });
   } catch {
     throw new StudioFailure(

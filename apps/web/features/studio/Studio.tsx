@@ -38,6 +38,8 @@ import { CreatorVoiceRecording } from "../media/VoiceRecorder";
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ApprovedReply } from "./ApprovedReply";
+import { CorrectionReply } from "./CorrectionReply";
+import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
 import { StudioFailure, studioRequest } from "./api";
 import "./studio.css";
 
@@ -767,10 +769,12 @@ function Modal({
   title,
   onClose,
   children,
+  closeDisabled = false,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  closeDisabled?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -810,10 +814,21 @@ function Modal({
     };
   }, []);
   return (
-    <dialog ref={ref} className="qv w5-dialog" onCancel={onClose}>
+    <dialog
+      ref={ref}
+      className="qv w5-dialog"
+      onCancel={(event) => {
+        event.preventDefault();
+        if (!closeDisabled) onClose();
+      }}
+    >
       <div className="w5-row">
         <h2>{title}</h2>
-        <button className="qv-btn qv-btn--quiet" onClick={onClose}>
+        <button
+          className="qv-btn qv-btn--quiet"
+          disabled={closeDisabled}
+          onClick={onClose}
+        >
           Close
         </button>
       </div>
@@ -2596,6 +2611,8 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
           deliveryState: string;
           signedActId?: string;
           member?: string | null;
+          version?: number;
+          correction?: unknown;
         }[];
       };
       authority: string;
@@ -2608,6 +2625,11 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     [review, setReview] = useState(false),
     [approveDraft, setApproveDraft] = useState(false),
     [correction, setCorrection] = useState<string | null>(null),
+    [attachedCorrection, setAttachedCorrection] = useState<string | null>(null),
+    [attachedVersion, setAttachedVersion] = useState<number | undefined>(
+      undefined,
+    ),
+    [correctionPending, setCorrectionPending] = useState(false),
     [threadCurrent, setThreadCurrent] = useState(false),
     [teamPending, setTeamPending] = useState<{
       idempotencyKey: string;
@@ -2640,6 +2662,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     if (threadLoading.current) return;
     threadLoading.current = true;
     const generation = threadGeneration.current;
+    const started = performance.now();
     try {
       if (fanId) {
         const timeline = await studioRequest<NonNullable<typeof data>>(
@@ -2710,14 +2733,16 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         directoryPages.current = loadedPages;
         setEntries(value);
       }
-      threadCheckedAt.current = Date.now();
-      setThreadCurrent(true);
+      threadCheckedAt.current = started;
+      setThreadCurrent(performance.now() - started < 5000);
     } catch (error) {
       if (threadMounted.current && generation === threadGeneration.current) {
         setThreadCurrent(false);
         if (
           error instanceof StudioFailure &&
-          [401, 403, 404].includes(error.status)
+          ([401, 403, 404].includes(error.status) ||
+            error.code === "session_account_changed" ||
+            error.code === "session_changed")
         ) {
           setData(null);
           setEntries(null);
@@ -2725,6 +2750,8 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
           setReview(false);
           setApproveDraft(false);
           setCorrection(null);
+          setAttachedCorrection(null);
+          setCorrectionPending(false);
           draftEdited.current = false;
         }
       }
@@ -2754,7 +2781,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     const refresh = () => void action.run(load),
       polling = setInterval(refresh, 4000),
       expiry = setInterval(() => {
-        if (Date.now() - threadCheckedAt.current >= 5000)
+        if (performance.now() - threadCheckedAt.current >= 5000)
           setThreadCurrent(false);
       }, 500);
     window.addEventListener("focus", refresh);
@@ -2929,27 +2956,73 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                   {data.timeline.epoch}
                 </p>
                 <div className="w5-thread-messages">
-                  {data.timeline.messages.map((m) => (
-                    <article key={m.id}>
-                      <Message
-                        kind={m.authorKind as "fan"}
-                        name={creator.display_name}
-                        signedActId={m.signedActId}
-                        member={m.member ?? "Member identity unavailable"}
-                        actions={false}
-                      >
-                        {m.text}
-                      </Message>
-                      {creator.owned && m.authorKind === "ai" && (
-                        <button
-                          className="qv-btn qv-btn--quiet"
-                          onClick={() => setCorrection(m.text)}
+                  {data.timeline.messages.map((m) => {
+                    const parsed =
+                      ConversationCorrectionMessageSchema.safeParse(m);
+                    const attachment =
+                      parsed.success &&
+                      parsed.data.authorKind === "human_creator" &&
+                      parsed.data.signedActId
+                        ? parsed.data.correction
+                        : null;
+                    return (
+                      <article key={m.id}>
+                        <Message
+                          kind={m.authorKind as "fan"}
+                          name={creator.display_name}
+                          signedActId={m.signedActId}
+                          member={m.member ?? "Member identity unavailable"}
+                          actions={false}
                         >
-                          I’d never say that
-                        </button>
-                      )}
-                    </article>
-                  ))}
+                          {m.text}
+                        </Message>
+                        {attachment && (
+                          <Notice title="Correction to the AI answer">
+                            <p>
+                              Original answer · version{" "}
+                              {attachment.originalVersion}
+                            </p>
+                            <button
+                              className="qv-btn qv-btn--quiet"
+                              onClick={() => {
+                                setAttachedVersion(attachment.originalVersion);
+                                setAttachedCorrection(
+                                  attachment.originalMessageId,
+                                );
+                              }}
+                            >
+                              Open original answer
+                            </button>
+                          </Notice>
+                        )}
+                        {creator.owned && m.authorKind === "ai" && (
+                          <div className="w5-actions">
+                            <button
+                              className="qv-btn qv-btn--quiet"
+                              disabled={
+                                !m.text.trim() ||
+                                !["delivered", "interrupted"].includes(
+                                  m.deliveryState,
+                                )
+                              }
+                              onClick={() => {
+                                setAttachedVersion(undefined);
+                                setAttachedCorrection(m.id);
+                              }}
+                            >
+                              Correct this answer
+                            </button>
+                            <button
+                              className="qv-btn qv-btn--quiet"
+                              onClick={() => setCorrection(m.text)}
+                            >
+                              I’d never say that
+                            </button>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
                 </div>
                 <div className="w5-actions">
                   {[
@@ -3148,6 +3221,24 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         </div>
       </div>
       <div hidden={!threadCurrent} inert={!threadCurrent}>
+        {attachedCorrection && fanId && data && (
+          <Modal
+            title="Correct this answer"
+            closeDisabled={correctionPending}
+            onClose={() => setAttachedCorrection(null)}
+          >
+            <CorrectionReply
+              key={`${creator.viewerAccountId}:${creator.id}:${fanId}:${attachedCorrection}:${attachedVersion ?? "current"}`}
+              creator={creator}
+              fanId={fanId}
+              threadId={data.timeline.threadId}
+              originalMessageId={attachedCorrection}
+              originalVersion={attachedVersion}
+              onDelivered={load}
+              onPendingChange={setCorrectionPending}
+            />
+          </Modal>
+        )}
         {correction !== null && (
           <Modal title="Correct my AI" onClose={() => setCorrection(null)}>
             <CorrectionForm creator={creator} answer={correction} />
@@ -3270,8 +3361,8 @@ function CorrectionForm({
       )}
       <Link href="/studio/ai">Open My AI</Link>
       <p className="qv-help">
-        Sending a signed correction attached to the original answer requires the
-        conversation correction service.
+        Use “Correct this answer” beside the original AI answer to review a
+        signed correction for that fan.
       </p>
     </>
   );

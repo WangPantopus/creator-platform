@@ -13,9 +13,11 @@ type Attachment = ContentView["document"]["media"][number];
 export function ContentAttachments({
   content,
   active,
+  expectedAccountId,
 }: {
   content: ContentView;
   active: boolean;
+  expectedAccountId: string;
 }) {
   return (
     <section aria-label="Content attachments">
@@ -25,6 +27,7 @@ export function ContentAttachments({
           content={content}
           attachment={attachment}
           active={active}
+          expectedAccountId={expectedAccountId}
         />
       ))}
     </section>
@@ -34,10 +37,12 @@ function CurrentAttachment({
   content,
   attachment,
   active,
+  expectedAccountId,
 }: {
   content: ContentView;
   attachment: Attachment;
   active: boolean;
+  expectedAccountId: string;
 }) {
   const [asset, setAsset] = useState<CreatorMediaAsset | null>(null),
     [photo, setPhoto] = useState<string | null>(null),
@@ -83,16 +88,18 @@ function CurrentAttachment({
     const abort = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     const expiry = setInterval(() => {
-      if (Date.now() - checkedAt.current >= 5000) {
+      if (performance.now() - checkedAt.current >= 5000) {
         setAsset(null);
         setPhoto(null);
       }
     }, 500);
     const read = async () => {
+      const started = performance.now();
       try {
         const capability = await mediaRequest<{
           creatorMediaAudienceAvailable?: boolean;
         }>("capabilities", {
+          headers: { "x-qelvora-expected-account": expectedAccountId },
           signal: AbortSignal.any([abort.signal, AbortSignal.timeout(2000)]),
         });
         if (capability.creatorMediaAudienceAvailable !== true)
@@ -101,6 +108,7 @@ function CurrentAttachment({
           );
         const value = CreatorMediaAssetSchema.parse(
           await mediaRequest(`${family}/${attachment.assetId}`, {
+            headers: { "x-qelvora-expected-account": expectedAccountId },
             signal: AbortSignal.any([abort.signal, AbortSignal.timeout(2000)]),
           }),
         );
@@ -109,7 +117,11 @@ function CurrentAttachment({
             "This attachment is unavailable for the current publication.",
           );
         if (!abort.signal.aborted && revision === generation.current) {
-          checkedAt.current = Date.now();
+          checkedAt.current = started;
+          if (performance.now() - started >= 5000)
+            throw new Error(
+              "Check current attachment access before continuing.",
+            );
           setAsset(value);
           setError("");
         }
@@ -139,6 +151,7 @@ function CurrentAttachment({
     // the actual W1 audience, never a fan ID or fabricated conversation.
   }, [
     active,
+    expectedAccountId,
     family,
     attachment.assetId,
     attachment.version,
@@ -159,7 +172,8 @@ function CurrentAttachment({
         await mediaRequest(`${family}/${attachment.assetId}/playback`, {
           method: "POST",
           body: "{}",
-          signal: abort.signal,
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(4000)]),
+          headers: { "x-qelvora-expected-account": expectedAccountId },
         }),
       );
       const url = new URL(ticket.url),
@@ -173,7 +187,12 @@ function CurrentAttachment({
         throw new Error(
           "The photo link does not match this current attachment.",
         );
-      if (!abort.signal.aborted && revision === generation.current)
+      url.searchParams.set("expectedAccountId", expectedAccountId);
+      if (
+        !abort.signal.aborted &&
+        revision === generation.current &&
+        performance.now() - checkedAt.current < 5000
+      )
         setPhoto(`/api/w6/${path}${url.search}`);
     } catch (failure) {
       if (!abort.signal.aborted && revision === generation.current) {
@@ -203,6 +222,7 @@ function CurrentAttachment({
           objectId={content.id}
           creatorName={content.creatorName}
           audience
+          expectedAccountId={expectedAccountId}
           time={content.publishedAt ?? undefined}
         />
       )}

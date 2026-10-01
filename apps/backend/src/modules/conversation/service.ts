@@ -126,7 +126,7 @@ export class ConversationService {
     return this.db.withThread(scope, async (client) => {
       const thread = await this.lockThread(client, scope);
       const rows = await client.query<MessageRow>(
-        "SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence",
+        "SELECT * FROM (SELECT * FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence DESC LIMIT 100) recent ORDER BY sequence",
         [scope.threadId, scope.creatorId, scope.fanId],
       );
       const generations = await client.query<{

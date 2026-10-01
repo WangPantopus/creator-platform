@@ -18,12 +18,14 @@ type VoicePlayerProps = {
   transcript?: string;
   /** W3/W5 supply the persisted publication time; the player never invents it. */
   time?: string;
+  /** Optional current-account precondition; never supplies W1 authority. */
+  expectedAccountId?: string;
 };
 export function VoicePlayer(props: VoicePlayerProps) {
   const family = `threads/${props.creatorId}/${props.fanId}/media`;
   return (
     <Player
-      key={`${family}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      key={`${props.expectedAccountId ?? ""}/${family}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
       {...props}
       family={family}
     />
@@ -59,7 +61,7 @@ export function CreatorVoicePlayer(
     );
   return (
     <Player
-      key={`${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      key={`${props.expectedAccountId ?? ""}/${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
       {...props}
       family={family}
     />
@@ -71,12 +73,14 @@ function Player({
   transcript,
   time,
   family,
+  expectedAccountId,
 }: {
   asset: MediaAsset | CreatorMediaAsset;
   creatorName: string;
   transcript?: string;
   time?: string;
   family: string;
+  expectedAccountId?: string;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const surface = useRef<HTMLElement | null>(null);
@@ -141,7 +145,12 @@ function Player({
       checking = true;
       void mediaRequest<MediaAsset | CreatorMediaAsset>(
         `${family}/${asset.id}`,
-        { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]) },
+        {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]),
+          ...(expectedAccountId
+            ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+            : {}),
+        },
       )
         .then((current) => {
           if (
@@ -178,7 +187,7 @@ function Player({
       element?.removeAttribute("src");
       element?.load();
     };
-  }, [src, family, asset.id, asset.version, asset.sha256]);
+  }, [src, family, asset.id, asset.version, asset.sha256, expectedAccountId]);
   async function load() {
     if (loadRequest.current) return;
     const abort = new AbortController();
@@ -191,6 +200,9 @@ function Player({
         method: "POST",
         body: "{}",
         signal: abort.signal,
+        ...(expectedAccountId
+          ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+          : {}),
       });
       const url = new URL(ticket.url);
       // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.
@@ -199,12 +211,16 @@ function Player({
         url.pathname !== `/v1/w6/${path}` ||
         ticket.asset.id !== asset.id ||
         ticket.asset.version !== asset.version ||
-        ticket.asset.sha256 !== asset.sha256
+        ticket.asset.sha256 !== asset.sha256 ||
+        !url.searchParams.has("ticket") ||
+        [...url.searchParams.keys()].some((name) => name !== "ticket")
       )
         throw new Error("The playback link is unavailable for this recording.");
       if (abort.signal.aborted) return;
       audio.current?.pause();
       setPlaying(false);
+      if (expectedAccountId)
+        url.searchParams.set("expectedAccountId", expectedAccountId);
       setSrc(`/api/w6/${path}${url.search}`);
       setPosition(0);
       setError(null);

@@ -1,0 +1,39 @@
+{
+  "recordedAt": "2026-10-01T01:44:45.388526+00:00",
+  "baseHead": "b2f7788c6afdde167a324a032a7b3d2703518d99",
+  "producerContract": "3cda401692fab65fe1af36eb4a8c41ac81b01f8c",
+  "sourceSha256": {
+    "packages/api/src/conversation/correction.ts": "77541d0fa29bc8add618f01d296b546d68631cd0c27b9844a6a82aa171b5186a",
+    "apps/web/features/studio/CorrectionReply.tsx": "08aea1c99d659b7eb77981944f614a5e3bec3519bd591116e3c67af0072abc42",
+    "apps/web/features/studio/Studio.tsx": "11c330b8b0b7f266721dfc1d2990c7265f1b7e8cc50d67bf41268d222e3d5dda",
+    "apps/web/features/studio/api.ts": "a4506cab67c93e5504e81893873afc70de3545942186702d2dd38bde51a1219b",
+    "apps/web/app/api/conversations/[...path]/route.ts": "920a59111e22981a84f8612d9598fb74a326800e1cf94b5d87b5462eb7c27f30",
+    "packages/api/src/conversation/contracts.ts": "039f15d986314a9a7ee21d2cb16420e555c102321875dc549252e1ca10fe6109",
+    "apps/backend/src/modules/conversation/service.ts": "813d4ba6593a11b00252db77ad6bf28ada2f919fe9b2588aa175671fca4d6b60"
+  },
+  "existingChecks": {
+    "generateOperations": 78,
+    "APIWebTypesLintFormatProductionWeb": "pass",
+    "newTests": false
+  },
+  "actualBrowser": {
+    "account": "existing synthetic W5 development creator selected via actual canonical continuation",
+    "linkedConversations": 0,
+    "viewport": 390,
+    "scrollWidth": 390,
+    "openDialogs": 0,
+    "screenshot": "correction-current-empty-directory.jpg",
+    "correctionOperated": false
+  },
+  "genuineSigning": "explicit human hold, no UV invoked",
+  "deliveryProof": false,
+  "pendingRecovery": "same signed command/key in memory, editor close blocked until confirmation; reload recovery unverified",
+  "externalGates": [
+    "W3 actual original AI answer and prepared producer",
+    "W3 bounded audited timeline metadata",
+    "W8 exact allocated immutable lineage/correction manifest",
+    "W1 genuine held signing, human UV"
+  ],
+  "contractsCheckpoint": "16162c4f778c2c0dd6e49ab658acadbda05c1bee",
+  "projectionGate": "Actual14 message columns lack citations/off_the_record/team_member; no prepared lineage/full read installed. newest100 query preserved compatible base."
+}
