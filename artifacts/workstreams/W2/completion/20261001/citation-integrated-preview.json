@@ -1,0 +1,72 @@
+{
+  "capturedAt": "2026-10-01T12:25:58.777Z",
+  "sourceHead": "7dd17c088ed2bd121b0074e8653499cd74705582",
+  "creatorRole": "primary companion, canonical Studio actor one",
+  "draftRevision": 19,
+  "status": 200,
+  "response": {
+    "compiledHash": "8f64dc6119db94ace631cfe37560e0e21441d10c96ce52c0d18a04ef7aa4fde9",
+    "sentences": [
+      {
+        "text": "The approved notes state: \"Clay dries slowly. A bisque firing prepares it for glaze.\"",
+        "citations": ["5ae0946c-5f06-45df-836d-754cc2f90179"]
+      }
+    ],
+    "blocked": false,
+    "category": null,
+    "passages": [
+      {
+        "id": "5ae0946c-5f06-45df-836d-754cc2f90179",
+        "sourceId": "11e53ba0-0ede-40ee-93ad-58f1a972474c",
+        "sourceRevision": 2,
+        "title": "W2 resume source",
+        "text": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+        "start": 0,
+        "end": 134,
+        "audience": {
+          "kind": "public"
+        }
+      }
+    ],
+    "contextHash": "ce30ecf3577ee06e0e5fb25fa0a21cab73aaec23249665c372a846a4ddd59384",
+    "usage": [
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 137,
+        "outputTokens": 24,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 94
+      },
+      {
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "inputTokens": 21,
+        "outputTokens": 0,
+        "costMicros": 1
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 685,
+        "outputTokens": 19,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 305
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-2025-04-14",
+        "inputTokens": 689,
+        "outputTokens": 68,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1922
+      }
+    ],
+    "durationMs": 5339,
+    "firstApprovedMs": 5326,
+    "route": "large"
+  }
+}
