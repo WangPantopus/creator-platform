@@ -18,7 +18,12 @@ import {
   MoneyReconciliation,
   type MoneyStatementProvider,
 } from "./reconciliation.js";
-import type { CreatorSettlement } from "./accounting.js";
+import {
+  PoolSettlement,
+  type CreatorSettlement,
+  type PoolCycleVerifier,
+} from "./accounting.js";
+import type { PassPoolJournal } from "./pass-pool-journal.js";
 import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
 import type { GenerationPrivacyConfiguration } from "./generation-privacy.js";
 import {
@@ -57,9 +62,12 @@ export async function createCommerceRuntime(input: {
   passPurchases?: (
     service: CommerceService,
     pass: import("./pass.js").PassCommerce,
+    pool: Readonly<{ journal: PassPoolJournal; settlement: PoolSettlement }>,
   ) => Promise<PassPurchaseJournal>;
   moneyStatement?: MoneyStatementProvider;
   settlement?: (service: CommerceService) => CreatorSettlement;
+  poolCycleVerifier?: PoolCycleVerifier;
+  poolJournal?: (service: CommerceService) => Promise<PassPoolJournal>;
   assertActorAllowed?: (
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -126,15 +134,34 @@ export async function createCommerceRuntime(input: {
     ? new MoneyReconciliation(service, input.moneyStatement)
     : undefined;
   const settlement = input.settlement?.(service);
+  invariant(
+    Boolean(input.poolJournal) === Boolean(input.poolCycleVerifier),
+    "pool_unconfigured",
+    "Pool allocation and cash require the same complete prepared provider graph.",
+  );
+  const poolJournal = input.poolJournal
+    ? await input.poolJournal(service)
+    : undefined;
+  invariant(
+    !poolJournal || poolJournal.isForService(service),
+    "pool_graph_mismatch",
+    "Pool custody must belong to this exact canonical commerce graph.",
+  );
+  const poolSettlement = poolJournal
+    ? new PoolSettlement(service, input.poolCycleVerifier, poolJournal)
+    : undefined;
   const pass = input.pass?.(service);
   invariant(
-    !input.passPurchases || pass,
+    !input.passPurchases || (pass && poolJournal && poolSettlement),
     "pass_billing_unconfigured",
-    "Pass purchases require the same canonical pass graph.",
+    "Pass purchases require the same canonical pass and prepared pool cash graph.",
   );
   const passPurchases =
-    input.passPurchases && pass
-      ? await input.passPurchases(service, pass)
+    input.passPurchases && pass && poolJournal && poolSettlement
+      ? await input.passPurchases(service, pass, {
+          journal: poolJournal,
+          settlement: poolSettlement,
+        })
       : undefined;
   const extended = new ExtendedCommerce(
     service,
@@ -145,8 +172,10 @@ export async function createCommerceRuntime(input: {
     money,
     settlement,
     passPurchases,
+    poolJournal,
   );
   return {
+    ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
     ...(generationAllowance ? { allowance: generationAllowance } : {}),
     service,
     billing,

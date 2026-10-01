@@ -1,0 +1,138 @@
+{
+  "workstream": "W4",
+  "increment": "immutable payout request custody and deliberate spending preferences",
+  "baseline": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "sourceIdentity": "source-sha256.txt pins the reviewed application bytes; the containing commit identifies this record",
+  "sourceReferences": [
+    "R08",
+    "R09",
+    "R10",
+    "R13",
+    "R14",
+    "INV16",
+    "INV18",
+    "T28",
+    "T29",
+    "T38",
+    "4A07",
+    "4B07",
+    "4D06"
+  ],
+  "environment": {
+    "host": "macOS26.5 x86_64",
+    "web": "Next development, loopback3004, 390x1000",
+    "api": "compiled shipping server, loopback4104",
+    "database": "owned creator_w4, non-owner creator_runtime, loopback55444",
+    "reviewDatabase": "separate disposable creator_w4_sql_review",
+    "actor": "canonical development actor one, synthetic fan w4_local_fan",
+    "identity": "development; no genuine verified creator/passkey",
+    "providers": "unconfigured; no Stripe/Connect/Apple/Play/OpenAI request",
+    "apiReadiness": "ready:false; foundationReady:true"
+  },
+  "browser": {
+    "personallyOperated": true,
+    "route": "/commerce/spending",
+    "themes": ["light", "night"],
+    "actions": [
+      {
+        "action": "first arrival",
+        "observed": "amount empty, explicit no-limit unchecked, reminders unchecked, save disabled"
+      },
+      {
+        "action": "save25 then raise50",
+        "observed": "current25; pending50 effective24hours later"
+      },
+      {
+        "action": "lower10 and explicitly opt into reminders",
+        "observed": "current10 immediately; pending cleared; saved opt-in persists on reload"
+      },
+      {
+        "action": "explicit no-limit and reminders off",
+        "observed": "current10; pending no-limit24hours later"
+      },
+      {
+        "action": "save10 again",
+        "observed": "pending cleared; reminders off"
+      },
+      {
+        "action": "offline save5 before correction",
+        "observed": "raw Failed to fetch; draft5 kept; server cap10",
+        "status": "failed readable-error requirement"
+      },
+      {
+        "action": "offline save5 after correction",
+        "observed": "connection unavailable/action not confirmed; draft5 kept; header10; reconnect and refresh do not replay the save"
+      },
+      {
+        "action": "clear amount, then keyboard Tab from amount",
+        "observed": "empty save disabled; focus moves to explicit no-limit checkbox"
+      },
+      {
+        "action": "fan opens /commerce/earnings",
+        "observed": "Creator access required; no creator earnings returned"
+      },
+      {
+        "action": "restart compiled API and refresh spending",
+        "observed": "cap10 and reminders off persist"
+      }
+    ],
+    "durableFinal": {
+      "migrations": 40,
+      "amount": 1000,
+      "currency": "USD",
+      "pendingAmount": null,
+      "pendingNone": null,
+      "effectiveAt": null,
+      "explicitNone": false,
+      "remindersOn": false,
+      "version": 5,
+      "packets": 0,
+      "ledger": 0
+    },
+    "accessibilityScope": "basic keyboard order/empty-input state observed; complete keyboard, 200% text, screen readers and reference comparison remain unverified",
+    "screenshots": [
+      "spending-pending-light.png",
+      "spending-saved-night.png",
+      "spending-no-limit-pending-night.png",
+      "spending-offline-corrected-light.png",
+      "earnings-wrong-role-light.png"
+    ]
+  },
+  "ios": {
+    "device": "owned158299BD-9DB7-442D-9D98-BD6BFF5FB3D0, iPhone16Pro/iOS26.5",
+    "shippingBundle": "com.pantopus.qelvora",
+    "build": "full app BUILD SUCCEEDED, two build jobs; final simulator build signed to run locally",
+    "launch": "installed/launched actual app with localhost4104 and /commerce/spending return path; inspected Light/Night Welcome captures",
+    "failedObservation": "unsigned initial app showed secure-storage-related Account status notice; preserved ios-spending-entry-light/night.png",
+    "correction": "normal simulator signing removes the account-status notice; preserved ios-signed-entry-light/night.png",
+    "interaction": "native input is disabled in the available computer tool; no signed-in native commerce, store purchase or screen-reader acceptance claimed",
+    "released": "owned simulator normally shut down without erasure"
+  },
+  "android": {
+    "build": "shipping :app:assembleDebug BUILD SUCCESSFUL in10m7s; two workers; no existing tests run locally",
+    "launch": "pending recovery; initial fresh API36.1 emulator remained offline; stopped only owned AVD",
+    "device": "private creator_w4_completion_20261001; serial emulator-5564; isolated ADB5044",
+    "interaction": "native input disabled; no native spending/store/accessibility acceptance claimed"
+  },
+  "schema": {
+    "proposal": "apps/backend/src/modules/commerce/schema-payout-custody.sql",
+    "sha256": "311d5a4ead33f3b39c14bae3063971b7a0e4e71d531aca345fb7090128a10323",
+    "allocation": "none; no guessed ID",
+    "installed": false,
+    "ddl": "compiled in review database inside transaction and rolled back; forced RLS confirmed;40 canonical migrations unchanged; proposal relation absent afterward",
+    "history": "no actor, signature, financial row, original request or provider receipt fabricated"
+  },
+  "supportingChecks": [
+    "backend TypeScript and shipping bundles pass",
+    "seven workspace typechecks pass",
+    "scoped lint/format pass",
+    "generated consistency passes:12 resources/96 operations",
+    "git diff --check passes",
+    "shipping iOS and Android builds pass"
+  ],
+  "newTestCode": false,
+  "existingAssertionsOrReferencesChanged": false,
+  "providerAcceptance": false,
+  "releaseReady": false,
+  "remainingScope": "all original nine packages and R01–R15; independent pool effects work continues; exact external policy/provider/identity/migration/authority paths stay gated"
+}

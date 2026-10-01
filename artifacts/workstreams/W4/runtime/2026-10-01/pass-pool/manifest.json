@@ -1,0 +1,102 @@
+{
+  "observedAtUTC": "2026-10-01T11:02:18.545163+00:00",
+  "baseCommit": "70ba74a7983dc4f5d0fd0ccd6bcfb657576f9a0b",
+  "branch": "codex/w4-pass-pool-20261001",
+  "exactSource": "source-sha256.txt",
+  "exactBackendBuild": "build-sha256.txt",
+  "migration": {
+    "version": "0055_w4_pass_pool_effects",
+    "sha256": "9392b556d185adff8724a3b094591c2ce80c3e64c3f09f8703fad39233169544",
+    "state": "reserved_unregistered_unapplied_inactive",
+    "review": "Complete DDL compiled, forced RLS on both relations, transaction rolled back; 40 canonical migrations retained, proposed relations absent."
+  },
+  "environment": {
+    "host": "macOS26.5 Intel shared load; owned Docker PostgreSQL17 one CPU/256MiB",
+    "api": "compiled shipping development host localhost4104",
+    "web": "Next development localhost3004; exact override390x1100 fan /1280x900 Studio",
+    "actor": "canonical development fan w4_local_fan; not genuine creator/production identity",
+    "providerMode": "unconfigured; no provider keys loaded or API/money writes"
+  },
+  "checks": {
+    "backendBuild": "pass",
+    "workspaceTypecheck": "seven pass; subsequent owner-only changes rechecked by backend build",
+    "scopedESLint": "pass",
+    "scopedPrettier": "pass",
+    "generatedConsistency": "12 resources /96 operations pass",
+    "newTestsCasesScripts": "none"
+  },
+  "observations": [
+    {
+      "journey": "pass Light/Night",
+      "actions": "Navigate actual pass route after compiled API restart; observe loading then available response",
+      "expected": "No unconfigured checkout or funded slots",
+      "observed": "The pass is not available yet; memberships/existing conversations remain accessible",
+      "scope": "Gate only; no positive subscription journey"
+    },
+    {
+      "journey": "pool Light/Night",
+      "actions": "Navigate actual pool route as canonical development fan",
+      "expected": "Creator-only money unavailable to fan",
+      "observed": "Creator access required; earnings belong to verified creator",
+      "scope": "Wrong-role UI only; no financial writes"
+    },
+    {
+      "journey": "Android shipping launch",
+      "device": "Owned AVD API34 Google APIs x86_64 r14; emulator37.1.11;720x1280, density320",
+      "actions": "Build, install shipping APK, launch MainActivity with local API/commerce spending destination",
+      "observed": "APK install Success; am start -W timed out. Later screenshot shows actual Welcome behind Bluetooth keeps stopping dialog. Crash buffer reports HciHalHidl stack-start assertion.",
+      "result": "Failed emulator environment observation; no native signed-in/commerce acceptance",
+      "cleanup": "Owned emulator5564 and own isolated ADB5044 stopped; peer5037 untouched"
+    },
+    {
+      "journey": "iOS corrected Night entry",
+      "device": "Owned iPhone16Pro/iOS26.5 simulator",
+      "observed": "Existing normally simulator-signed Night capture personally inspected: Welcome, no unsigned secure-storage account error.",
+      "sourceEvidence": "../payout-custody/ios-signed-entry-night.png",
+      "scope": "Entry only; native input disabled"
+    }
+  ],
+  "images": [
+    {
+      "file": "android-entry-bluetooth-error.png",
+      "pixels": [720, 1280],
+      "sha256": "b8b3935da53e0fd9493cf0617960fd296c50e4c00dac8131ecfa0194cba19b72"
+    },
+    {
+      "file": "pass-gated-light-390.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "ff2ab93aa2340536a1110bdad06471ea239aebfd6d374c98858d565ff29d1300"
+    },
+    {
+      "file": "pass-gated-light.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "ef736ff4d0ca78776d138f4f1fb8f179339caf6b37a63490d24d6632853da8c0"
+    },
+    {
+      "file": "pass-gated-night-390.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "8020a6dc0a6fb0b9e7dc89c83b1e936a6a8c1a66f93faec419037440dbfe84f3"
+    },
+    {
+      "file": "pool-wrong-role-light-1280.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "73f868cceeeca784be416dd7e8c86b946415adfa0f686490a2b17ecc6d591e53"
+    },
+    {
+      "file": "pool-wrong-role-light.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "db408d61b3cfe560be2cbb02a31a0cb24e629ac9e385ddbabe997f9ab2a5ff5f"
+    },
+    {
+      "file": "pool-wrong-role-night-1280.png",
+      "pixels": [65536, 4292542531],
+      "sha256": "ffdaa6f59daf98892534a22dafdcb9eaa602c58df3ee1f037207c790d4994ad6"
+    }
+  ],
+  "limitations": [
+    "No genuine signed creator, Stripe/store/AI/provider acceptance; founder confirms no approved configuration exists.",
+    "Canonical0054/0055 registration/installation, actual full purpose-authorized population/current worker/restricted-creator scopes and explicit Q03/Q08/Q10/Q16 policies are pending.",
+    "No financial/identity rows fabricated. Native input, signed-in native/store/a11y, full reference/performance acceptance remain unverified.",
+    "Unsupported/mixed/multi-line cash or oversized/stale population remains held for reviewed reconciliation; source interfaces are not producer activation."
+  ]
+}
