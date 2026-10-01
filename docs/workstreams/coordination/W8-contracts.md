@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Final merge continuation:** current main through de1d42d is normally merged with producer provenance intact. Actual W8 iOS2/2 and Android4/4 on-device checks pass on identical backend/native trees; canonical web Report references/case and original blocked export are verified. The owned TrustSession selector preserves its visible pending choice across four-second unchanged-account refresh; no canonical/server authority changes. Exact five-fixture and one-selector human exceptions remain the entire W8 test scope. All40 active SQL/ledger/RLS/grants and retained jobs/cases/blocks/tombstone remain unchanged; reserved0060 remains closed/unapplied. See [final receipt](../../../artifacts/workstreams/W8/takeover/20260930/final-merge-acceptance.json). Full release gates remain pending.
+
 **Native runtime recovery and Metrics source:** owned Android host-graphics/temp-directory retry preserves the same AVD/app data and passes the four unchanged original UI flows after an actual unobstructed shipping Help launch. Netsim fallback remains explicit, not Bluetooth/isolation acceptance. Native private Report arrivals stay at Welcome; current W1 auth/native input/system-sheet gates remain. W8 edits only owned Metrics TSX/CSS to wrap the fixed mono route text; actual390 Light/Night no-overflow/main keyboard focus and1280 desktop verified. No test/golden/SQL/authority change; [evidence](../../../artifacts/workstreams/W8/takeover/20260930/metrics-phone-overflow.json).
 
 

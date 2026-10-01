@@ -1,0 +1,230 @@
+{
+  "recordedAt": "2026-10-01T05:00:09.204517+00:00",
+  "integratedSource": "f999dff2428a5318fe68aec1968a666f3108eb47",
+  "baseMain": "de1d42d71c00810d864fe599de2bb0f3c39b1a8f",
+  "runtimeAndNativeBuildSource": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+  "backendIosAndroidTreeEqualityAcrossFinalWebOnlyMerge": true,
+  "trees": {
+    "apps/backend": "1bb44b08d1027dad8f1f4932d77f2f53692e98ad",
+    "apps/ios": "92524e2e46930ec8be6002dccd1d92f8ac58a15a",
+    "apps/android": "11733c9e5c78452393719a63c104fa412155abfe"
+  },
+  "ios": {
+    "source": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+    "startedAt": "2026-10-01T04:43:29.118952+00:00",
+    "args": [
+      "/usr/bin/xcodebuild",
+      "test",
+      "-project",
+      "apps/ios/QelvoraApp.xcodeproj",
+      "-scheme",
+      "QelvoraApp",
+      "-destination",
+      "id=27D0D594-A376-425D-966F-914ED2D3A4A0",
+      "-derivedDataPath",
+      "/private/tmp/creator-w8-native-resume-20260930/ios/derived",
+      "-resultBundlePath",
+      "/private/tmp/creator-w8-native-resume-20260930/ios/final-integrated-ui.xcresult",
+      "-parallel-testing-enabled",
+      "NO",
+      "-jobs",
+      "2",
+      "-only-testing:QelvoraUITests/FoundationFlowTests"
+    ],
+    "samePreservedDevice": true,
+    "completedAt": "2026-10-01T04:50:31.813635+00:00",
+    "exitCode": 0,
+    "passed": 2,
+    "failed": 0,
+    "caseSeconds": 64.206,
+    "operationSeconds": 171.848,
+    "signedWholeAppRebuilt": true,
+    "simulatorFinalState": "Shutdown; XCTest-owned lifecycle",
+    "personallyInspectedPassingPixels": [
+      "ios-final-signin-unconfigured-light.png",
+      "ios-final-signin-unconfigured-dark.png",
+      "ios-final-native-message-identities.png"
+    ],
+    "postTestSdkLaunch": "Refused with simulator state Shutdown (405), not counted as launch acceptance; current signed app proof is the actual two UI flows and exported attachments."
+  },
+  "android": {
+    "source": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+    "startedAt": "2026-10-01T04:47:05.088779+00:00",
+    "operatorFailuresBeforeTests": [
+      "AVD response includes an OK line",
+      "Rebuild used global debug certificate; update refused, no deletion performed"
+    ],
+    "retainedDebugCertificateSha256": "0e32a767b8f0ce73dfa1feeb0418429417c85916a29db094383f9ea91da8060e",
+    "installs": [
+      {
+        "file": "app-debug.apk",
+        "sha256": "7177eadc8d10aea2d8ba4be8dbba12bb28ad1e43e342b516a364cd92b7c9947f",
+        "result": "Success",
+        "preservedAppData": true
+      },
+      {
+        "file": "app-debug-androidTest.apk",
+        "sha256": "28ea4d5467dbcccdf38a7c0398bc4d16553bdaf88261166ed9152112e5af87d6",
+        "result": "Success",
+        "preservedAppData": true
+      }
+    ],
+    "completedAt": "2026-10-01T04:49:32.449092+00:00",
+    "exitCode": 0,
+    "fourTestsPassed": true,
+    "caseSeconds": 100.001,
+    "publicProtocolLightNightPersonallyInspected": true
+  },
+  "androidBuild": {
+    "source": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+    "startedAt": "2026-10-01T04:43:12.963120+00:00",
+    "args": [
+      "./gradlew",
+      "--no-daemon",
+      "--max-workers=2",
+      "--project-cache-dir",
+      "/private/tmp/creator-w8-native-resume-20260930/android/project-cache",
+      "-PcreatorBuildDir=/private/tmp/creator-w8-native-resume-20260930/android/build",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest"
+    ],
+    "retainedDebugKey": true,
+    "exitCode": 0,
+    "completedAt": "2026-10-01T04:45:16.579398+00:00"
+  },
+  "androidSdkLaunch": {
+    "source": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+    "startedAt": "2026-10-01T04:51:05.650141+00:00",
+    "completedAt": "2026-10-01T04:51:14.254440+00:00",
+    "args": [
+      "am",
+      "start",
+      "-S",
+      "-W",
+      "-n",
+      "com.pantopus.qelvora/.MainActivity",
+      "--es",
+      "api_url",
+      "http://10.0.2.2:4108",
+      "--es",
+      "return_to",
+      "/trust",
+      "--es",
+      "appearance",
+      "light"
+    ],
+    "exitCode": 0,
+    "stdout": "Stopping: com.pantopus.qelvora\nStarting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: ok\nLaunchState: COLD\nActivity: com.pantopus.qelvora/.MainActivity\nTotalTime: 8001\nWaitTime: 8055\nComplete\n",
+    "stderr": ""
+  },
+  "nativeRelease": {
+    "startedAt": "2026-10-01T04:54:42.393484+00:00",
+    "normalOwnedEmulatorStop": true,
+    "stdout": "OK: killing emulator, bye bye\nOK",
+    "dataPreserved": true,
+    "peerOrDefaultServicesStopped": false
+  },
+  "iosDependencyResolution": {
+    "retainedSha256": "84c4303864908906c37a4047cc420c4b3afd71454b5c14a7a95a84dd08139c3e",
+    "duringBuildSha256": "c37940d3f8353123c7fe565f20d6d1503092aec755f8c29b6e0c81525c686fdf",
+    "currentHeadPackageRestored": true
+  },
+  "browser": {
+    "normalCanonicalIdentity": "Development actor two, no token injection",
+    "actualReportLinkClick": true,
+    "creatorId": "20000000-0000-4000-8000-000000000001",
+    "messageId": "50000000-0000-4000-8000-000000000002",
+    "grantRequired": false,
+    "retainedCase": "CASE-004/resolved/v2",
+    "noNewReportOrPrivacyRetry": true,
+    "differentFan403": "Actor one at actor two\u2019s family is denied; authorized actor two sees retained history.",
+    "controllerRecovery": "Supported cua browser accessibility controls recover real input; prior Playwright control timeouts are not cookie failures.",
+    "privacyActorTwo": "Five complete; content/media/growth blocked; no Download.",
+    "localActorSelectionRetest": "PASS: visible Fan selection remains across current-session refresh/focus; actual selected Fan after apply, original account export seven complete/content blocked/no Download. Private previous-actor job disappeared during account transition. Initial ref-only attempt remained insufficient and is not called passed.; actual fan\u2192Ops supervisor switch also passes.",
+    "actorSelectionRootCause": "4s current-session refresh clears data to null, making the same account dependency transition undefined\u2192accountId and resetting a pending actor choice. The verified-account ref now distinguishes a real account change; submission consumes the visible selected value.",
+    "actorBindingSourceSha256": "e1670e41fb5efb10e7b41228f20e613d64ed4e199110a3727c29b6d6f4a407ed",
+    "privacyOriginal": "Seven complete/content blocked/no Download; no retry/new job",
+    "operationsRoleDenial": "PASS: fan Metrics denied with CID4783a958-8662-4333-83ad-480e185d58ec; fan queue denied with CIDef045587-93a7-48cf-8e35-30eb81f30647; switching the visible choice to Ops supervisor opens only the four-case metadata queue",
+    "supervisorMetrics": "PASS: current APIa3e15ac snapshot; non-owner WAL75 successful samples/zero errors, archiving off; private queue and transport counters truthfully bounded; no provider/SLO/RPO claim."
+  },
+  "checks": {
+    "backendBuild": "pass",
+    "generated49Operations12SharedResources": "pass",
+    "webProductionBuildAfterMain13": "pass",
+    "scopedSourceLint": "pass",
+    "finalActorBindingWebBuild": "pass",
+    "finalSelectorLintFormatting": "pass"
+  },
+  "policy": {
+    "authenticatedMainBranchProtected": false,
+    "rulesets": [],
+    "configuredRequiredChecks": [],
+    "latestHumanGate": "Actual launched-app E2E; unit tests/coverage not merge criteria. Existing tests/checks preserved.",
+    "latestObservedRemoteHead": "a51afd1c03bb3becf97737b0a2968fdf803200c7",
+    "ciFailure": "web-and-backend T11 expected50000 context statements, observed30000 from W8 locked batching. Assertion retained; no all-green CI claim.",
+    "oldHeadAndroidRuntime": "pass; both a51 Foundation Android runtime jobs succeeded",
+    "queuedVisualAndIosAndroidFoundation": "not accepted from queue status"
+  },
+  "limits": [
+    "Native authenticated Report/system-save, physical devices, all-reference/accessibility matrix and provider flows remain unverified/disabled.",
+    "Readiness is deliberately503; real identity/providers/privacy retention remain gated.",
+    "Full C10, same-revision deployment, signing/hardware/staffing/pilot and full R1\u2013R10 release are not complete.",
+    "No live migration beyond40, RLS/grant change, reseed/reset, key disclosure or paid AI call."
+  ],
+  "screenshots": [
+    {
+      "path": "native-launched/android-final-crisis-night.png",
+      "sha256": "98490f47b841c4f7b75e4595aa6297edd429b18ee15c3dcad17c1ee33b480d29"
+    },
+    {
+      "path": "native-launched/android-final-help-light.png",
+      "sha256": "400a1e0397b91f5fa296f533e12f4192d054f767f5a000a526cb5242a57c0af9"
+    },
+    {
+      "path": "native-launched/ios-final-native-message-identities.png",
+      "sha256": "4a1a0534ba7485e1ddb25b99ba74d204801b731db146bd2fd6098621401f354b"
+    },
+    {
+      "path": "native-launched/ios-final-signin-unconfigured-dark.png",
+      "sha256": "cad377ad5c9ea9293ab57a71bab682ded560d4bf1c8250d5a002809c3ba45b32"
+    },
+    {
+      "path": "native-launched/ios-final-signin-unconfigured-light.png",
+      "sha256": "2f3583b67fc74e986aa32aad2959b89ab612ff9af876215c99ced061ad2e5bbd"
+    },
+    {
+      "path": "native-launched/ios-final-welcome-dark.png",
+      "sha256": "d706688a00b649c46de757b60a8519a4850409e762c103b2ee73be073605e6b7"
+    },
+    {
+      "path": "native-launched/ios-final-welcome-light.png",
+      "sha256": "2a68dff4e24bec9d63aa74154eff81ed34058cb16cf1abfc46a0ddfdfe468147"
+    },
+    {
+      "path": "final-canonical-report-full.jpg",
+      "sha256": "102285756b0c3342ee17d4daac6cffc9d82469fda906112d783df6edff97ecc4"
+    },
+    {
+      "path": "final-privacy-actor-two.jpg",
+      "sha256": "67462e04e20c31d02f3418ce68bd03bdad53347676d1ea49a0f65cf580b9ff71"
+    },
+    {
+      "path": "final-privacy-original.jpg",
+      "sha256": "904c6da30985092318ef09104a671f3194f8256625f098d5b5ce46d3706ac8f3"
+    },
+    {
+      "path": "final-ops-fan-denied.jpg",
+      "sha256": "123c2acaa7ec10aa66b8a958c9af91c71640e75164061831e13a7406140f994d"
+    },
+    {
+      "path": "final-ops-supervisor-queue.jpg",
+      "sha256": "c55c2607f4f4dd46f8f60e804755fbc1e2a79eb58ea22721d6191523e8b902a4"
+    },
+    {
+      "path": "final-ops-supervisor-metrics.jpg",
+      "sha256": "38c6330f04e0e345edc61f7ae206dfffb0fd53e532a1e3eb94ba1252537c3e9a"
+    }
+  ],
+  "sourceFixCommit": "bf34dbd533b617b9312a784bea97acc9e99f1fde",
+  "publicBuildLogHandling": "Copied compilation output only; terminal trailing whitespace normalized, exact original logs retained privately."
+}

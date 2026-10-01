@@ -1,5 +1,9 @@
 # W8 takeover evidence — 2026-09-30
 
+Final merge verification personally covers the actual canonical W1 sign-in and per-AI Report click, exact creator/message references without a grant, retained resolved CASE-004 and reporter-only notice; original privacy jobs remain blocked with no Download. On the integrated main source, signed iOS whole-app rebuild and the two existing UI flows pass64.206s, including Light/Night sign-in refusal and authorship labels. Android rebuild/update preserves its original W8 debug certificate and data; all four existing on-device UI flows pass100.001s, and public crisis protocol Light/Night is rendered unobstructed. Native authenticated Report/system save, complete reference/accessibility matrix and physical/provider flows remain unverified/disabled.
+
+[Final acceptance](final-merge-acceptance.json), [preserved SQL/data](final-preservation.json) and [actual readiness](final-runtime-readiness.json) distinguish this source merge from full R1–R10 release. All40 active SQL/checksums, cases, block, tombstone and three privacy jobs/24 tasks are unchanged. Actual non-owner APIa3e15ac is live200/ready503 with providers/retention held. Original disabled integrations remain closed; zero paid AI calls. W8 native devices were normally stopped with data/results preserved, and API/web/database remain running.
+
 Actual iOS authorized-selector retry now passes both existing on-device UI flows (65.074s); Android preserved-AVD retry passes all four (13.36s). These are launched-app results, with exact one-selector human exception and unchanged other assertions, waits, goldens/tolerances. Earlier ANR/selector failures remain dated. Full authenticated native Report/system save/reference/physical/provider acceptance is not inferred. Additional feature work is paused for the human’s requested PR7 merge-verification priority; disabled providers/retention/signing gates remain closed.
 
 
