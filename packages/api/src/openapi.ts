@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
 import * as conversation from "./conversation/contracts.ts";
 import * as content from "./content.ts";
+import { mediaPaths } from "./media-openapi.ts";
 
 // Aggregate owner contracts here after the core module initializes; conversation
 // itself imports core schemas and cannot be imported back into that module.
@@ -227,6 +228,7 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      ...mediaPaths,
     },
     components: {
       securitySchemes: {

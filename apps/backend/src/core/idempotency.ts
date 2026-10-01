@@ -5,7 +5,10 @@ import { invariant } from "./errors.js";
 
 export async function idempotent<T>(
   client: PoolClient,
-  scope: ThreadScope,
+  scope: {
+    actorAccountId: ThreadScope["actorAccountId"];
+    threadId: ThreadScope["threadId"] | null;
+  },
   operation: string,
   key: string,
   request: unknown,

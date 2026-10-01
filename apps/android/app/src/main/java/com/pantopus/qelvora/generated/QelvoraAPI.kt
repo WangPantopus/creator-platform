@@ -416,6 +416,178 @@ data class APICommerceVersionCommand(
 )
 
 @Serializable
+data class APIMediaCreatorMediaAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaAssetPurpose,
+  val `state`: APIMediaCreatorMediaAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaCreatorMediaPlaybackTicket(
+  val `asset`: APIMediaCreatorMediaPlaybackTicketAsset,
+  val `url`: String,
+  val `expiresAt`: String
+)
+
+@Serializable
+data class APIMediaCreatorMediaPlaybackTicketAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaPlaybackTicketAssetPurpose,
+  val `state`: APIMediaCreatorMediaPlaybackTicketAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaPlaybackTicketAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaPlaybackTicketAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
+enum class APIMediaCreatorMediaPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+data class APIMediaCreatorMediaUploadRequest(
+  val `purpose`: APIMediaCreatorMediaUploadRequestPurpose,
+  val `mimeType`: APIMediaCreatorMediaUploadRequestMimeType,
+  val `bytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `idempotencyKey`: String,
+  val `objectId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaUploadRequestPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaUploadRequestMimeType {
+  @SerialName("audio/webm") AUDIO_WEBM,
+  @SerialName("audio/mp4") AUDIO_MP4,
+  @SerialName("audio/ogg") AUDIO_OGG,
+  @SerialName("audio/wav") AUDIO_WAV,
+  @SerialName("image/jpeg") IMAGE_JPEG,
+  @SerialName("image/png") IMAGE_PNG
+}
+
+@Serializable
+data class APIMediaCreatorMediaUploadTicket(
+  val `asset`: APIMediaCreatorMediaUploadTicketAsset,
+  val `url`: String,
+  val `expiresAt`: String,
+  val `chunkBytes`: Long
+)
+
+@Serializable
+data class APIMediaCreatorMediaUploadTicketAsset(
+  val `id`: String,
+  val `purpose`: APIMediaCreatorMediaUploadTicketAssetPurpose,
+  val `state`: APIMediaCreatorMediaUploadTicketAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  val `failureCode`: String? = null,
+  val `provenance`: Map<String, JsonElement>? = null,
+  val `creatorId`: String,
+  val `objectId`: String,
+  val `ownerAccountId`: String
+)
+
+@Serializable
+enum class APIMediaCreatorMediaUploadTicketAssetPurpose {
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE
+}
+
+@Serializable
+enum class APIMediaCreatorMediaUploadTicketAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
 data class APIMediaMediaAsset(
   val `id`: String,
   val `threadId`: String,
@@ -470,6 +642,22 @@ enum class APIMediaMediaPurpose {
 }
 
 @Serializable
+data class APIMediaMediaRevocation(
+  val `state`: APIMediaMediaRevocationState,
+  val `deletion`: APIMediaMediaRevocationDeletion
+)
+
+@Serializable
+enum class APIMediaMediaRevocationState {
+  @SerialName("revoked") REVOKED
+}
+
+@Serializable
+enum class APIMediaMediaRevocationDeletion {
+  @SerialName("pending") PENDING
+}
+
+@Serializable
 data class APIMediaMediaSign(
   val `signedActId`: String,
   val `version`: Long,
@@ -485,6 +673,22 @@ enum class APIMediaMediaState {
   @SerialName("rejected") REJECTED,
   @SerialName("revoked") REVOKED,
   @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaProcessedMediaEvidence(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `bytes`: Long,
+  val `mimeType`: APIMediaProcessedMediaEvidenceMimeType,
+  val `durationMs`: Long? = null
+)
+
+@Serializable
+enum class APIMediaProcessedMediaEvidenceMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4,
+  @SerialName("image/png") IMAGE_PNG
 }
 
 @Serializable
@@ -518,6 +722,50 @@ enum class APIMediaUploadRequestMimeType {
   @SerialName("image/jpeg") IMAGE_JPEG,
   @SerialName("image/png") IMAGE_PNG
 }
+
+@Serializable
+data class APICallAvailabilityCommand(
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityCommandWindowsItem>,
+  val `expectedVersion`: Long,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APICallAvailabilityCommandWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+@Serializable
+data class APICallAvailability(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
+
+typealias APICallAvailabilityView = APICallAvailabilityViewValue?
+
+@Serializable
+data class APICallAvailabilityViewValue(
+  val `creatorId`: String,
+  val `version`: Long,
+  val `timeZone`: String,
+  val `windows`: List<APICallAvailabilityViewValueWindowsItem>
+)
+
+@Serializable
+data class APICallAvailabilityViewValueWindowsItem(
+  val `startsAt`: String,
+  val `endsAt`: String
+)
 
 @Serializable
 enum class APICallCallConsentPurpose {
@@ -1907,21 +2155,26 @@ enum class APIContentThanksCommandTargetKind {
 }
 
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
+data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
 class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
-  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean): String = withContext(Dispatchers.IO) {
-    val connection = URL(baseURL.trimEnd('/') + path).openConnection() as HttpURLConnection
+  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
+    requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
+  private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
+    val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
+    val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
     try {
       connection.requestMethod = method
       connection.connectTimeout = 15000; connection.readTimeout = 30000
-      connection.setRequestProperty("Accept", "application/json")
+      connection.setRequestProperty("Accept", accept)
+      headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.bufferedWriter().use { it.write(body) } }
+      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
-      if (status !in 200..299) throw CreatorAPIError(status, payload)
-      payload
+      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { it.readBytes() } ?: byteArrayOf()
+      if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
+      CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
     } finally { connection.disconnect() }
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
@@ -1956,6 +2209,19 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorCallAvailability(creatorId: String): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true))
+  suspend fun saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true))
+  suspend fun beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun revokeCreatorMedia(creatorId: String, assetId: String): APIMediaMediaRevocation = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "DELETE", authenticated = true))
+  suspend fun resumeCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/resume", "POST", authenticated = true))
+  suspend fun uploadCreatorMediaChunk(creatorId: String, assetId: String, ticket: String, uploadOffset: Long, body: ByteArray): APIMediaCreatorMediaAsset = json.decodeFromString(requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/upload", "PUT", body = body, authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Upload-Offset" to uploadOffset.toString()).mapNotNull { (name, value) -> value?.let { name to it } }.toMap(), accept = "application/json").body.toString(Charsets.UTF_8))
+  suspend fun finishCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/finish", "POST", authenticated = true))
+  suspend fun creatorMediaPlayback(creatorId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
+  suspend fun readFanCreatorMedia(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun fanCreatorMediaPlayback(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playFanCreatorMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
 }
 
 object ApplicationDestination {

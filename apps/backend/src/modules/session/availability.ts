@@ -1,24 +1,16 @@
-import { z } from "zod";
+import { AvailabilityCommandSchema } from "../../../../../packages/api/src/session.js";
 import type { PoolClient } from "pg";
 import type { Database } from "../../db/database.js";
 import type { ThreadScope } from "../access/scope.js";
 import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { validateZone } from "./service.js";
+import type {
+  CreatorIdentityAuthority,
+  CreatorScope,
+} from "../identity/creator-scope.js";
 
-export const AvailabilitySchema = z.strictObject({
-  timeZone: z.string().min(1).max(80),
-  windows: z
-    .array(
-      z.strictObject({
-        startsAt: z.iso.datetime({ offset: true }),
-        endsAt: z.iso.datetime({ offset: true }),
-      }),
-    )
-    .max(64),
-  expectedVersion: z.number().int().nonnegative(),
-  idempotencyKey: z.string().min(8).max(128),
-});
+export const AvailabilitySchema = AvailabilityCommandSchema;
 type Availability = {
   creatorId: string;
   version: number;
@@ -28,9 +20,26 @@ type Availability = {
 
 /** Explicit dated windows avoid guessing recurring DST gaps or ambiguous wall times. */
 export class AvailabilityService {
-  constructor(readonly db: Database) {}
+  constructor(
+    readonly db: Database,
+    readonly identity?: CreatorIdentityAuthority,
+  ) {}
+  private transaction<T>(
+    scope: CreatorScope | ThreadScope,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    if ("accountId" in scope) {
+      invariant(
+        this.identity,
+        "availability_identity_unconfigured",
+        "Creator availability is not connected yet.",
+      );
+      return this.identity.withCreator(scope, work, "verified");
+    }
+    return this.db.withThread(scope, work);
+  }
   async current(
-    scope: ThreadScope,
+    scope: Pick<ThreadScope, "creatorId">,
     client: PoolClient,
   ): Promise<Availability | null> {
     const row = (
@@ -55,6 +64,12 @@ export class AvailabilityService {
   async read(scope: ThreadScope) {
     return this.db.withThread(scope, (client) => this.current(scope, client));
   }
+  async readCreator(scope: CreatorScope) {
+    return this.transaction(scope, (client) => this.current(scope, client));
+  }
+  async saveCreator(scope: CreatorScope, input: unknown) {
+    return this.saveScoped(scope, input);
+  }
   async save(scope: ThreadScope, input: unknown) {
     invariant(
       scope.authority === "creator" &&
@@ -62,6 +77,9 @@ export class AvailabilityService {
       "creator_required",
       "Only the verified creator can edit availability.",
     );
+    return this.saveScoped(scope, input);
+  }
+  private async saveScoped(scope: CreatorScope | ThreadScope, input: unknown) {
     const body = AvailabilitySchema.parse(input);
     const zone = validateZone(body.timeZone);
     const windows = body.windows
@@ -81,13 +99,15 @@ export class AvailabilityService {
       "availability_invalid",
       "Use future windows with positive length and no overlaps. Explicit UTC offsets distinguish daylight-saving occurrences.",
     );
-    return this.db.withThread(scope, (client) =>
+    return this.transaction(scope, (client) =>
       idempotent(
         client,
-        scope,
+        "accountId" in scope
+          ? { actorAccountId: scope.accountId, threadId: null }
+          : scope,
         "session.availability",
         body.idempotencyKey,
-        body,
+        "accountId" in scope ? { creatorId: scope.creatorId, ...body } : body,
         async () => {
           await client.query(
             "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
@@ -104,7 +124,7 @@ export class AvailabilityService {
             "INSERT INTO creator.call_availability(creator_id,creator_account_id,version,time_zone,windows) VALUES($1,$2,$3,$4,$5) ON CONFLICT(creator_id) DO UPDATE SET version=EXCLUDED.version,time_zone=EXCLUDED.time_zone,windows=EXCLUDED.windows,updated_at=now()",
             [
               scope.creatorId,
-              scope.creatorAccountId,
+              "accountId" in scope ? scope.accountId : scope.creatorAccountId,
               version,
               zone,
               JSON.stringify(windows),
