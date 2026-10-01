@@ -206,7 +206,7 @@ function RecordingForm({
     void mediaRequest<{
       mediaAvailable: boolean;
       creatorMediaAvailable?: boolean;
-    }>("capabilities", { signal: abort.signal })
+    }>("capabilities", { signal: abort.signal, expectedAccountId })
       .then((value) => {
         if (!abort.signal.aborted)
           setAvailable(
@@ -218,7 +218,7 @@ function RecordingForm({
         if (!abort.signal.aborted) setAvailable(false);
       });
     return () => abort.abort();
-  }, [objectId]);
+  }, [objectId, expectedAccountId]);
   useEffect(() => {
     if (
       !asset ||
