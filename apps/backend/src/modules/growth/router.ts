@@ -203,6 +203,11 @@ export function createGrowthRouter(
   router.get("/notifications", async (req, res) =>
     res.json({ notifications: await service.inbox(await actorFor(req)) }),
   );
+  router.get("/notifications/:id", async (req, res) =>
+    res.json(
+      await service.notification(await actorFor(req), uuid(req.params.id)),
+    ),
+  );
   router.put("/notifications/:id/read", async (req, res) =>
     res.json(await service.markRead(await actorFor(req), uuid(req.params.id))),
   );
@@ -222,7 +227,11 @@ export function createGrowthRouter(
   );
   router.delete("/devices/:id", async (req, res) =>
     res.json(
-      await service.revokeDevice(await actorFor(req), uuid(req.params.id)),
+      await service.revokeDevice(
+        await actorFor(req),
+        uuid(req.params.id),
+        req.body,
+      ),
     ),
   );
   router.post("/shares", async (req, res) =>

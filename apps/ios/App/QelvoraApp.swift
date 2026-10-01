@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct QelvoraApp: App {
+    @UIApplicationDelegateAdaptor(GrowthPushAppDelegate.self) private var pushDelegate
     init() { QelvoraFonts.register() }
     var body: some Scene {
         WindowGroup {

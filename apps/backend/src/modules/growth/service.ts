@@ -619,6 +619,27 @@ export class GrowthService {
       return { read: true };
     });
   }
+  async notification(actor: Actor, id: string) {
+    const rows = await this.db.actor(
+      actor,
+      null,
+      async (client) =>
+        (
+          await client.query(
+            "SELECT * FROM growth.notification WHERE id=$1 AND account_id=$2",
+            [id, actor.accountId],
+          )
+        ).rows,
+    );
+    const current = (await this.notifications.listCurrent(rows))[0];
+    if (!current)
+      throw new DomainError(
+        "notification_unavailable",
+        copy.growthErrorNotificationUnavailable,
+        404,
+      );
+    return current;
+  }
   async registerDevice(actor: Actor, input: unknown) {
     const value = z
       .strictObject({
@@ -626,6 +647,12 @@ export class GrowthService {
         platform: z.enum(["ios", "android"]),
         token: z.string().min(16).max(4096),
         permission: z.enum(["granted", "denied"]),
+        registrationRevision: z
+          .number()
+          .int()
+          .min(1)
+          .max(Number.MAX_SAFE_INTEGER)
+          .optional(),
       })
       .parse(input);
     const hash = createHash("sha256").update(value.token).digest("hex");
@@ -643,7 +670,7 @@ export class GrowthService {
             [key],
           );
         const previous = await client.query(
-          "SELECT DISTINCT account_id FROM growth.device WHERE installation_id=$1 OR token_hash=$2 LIMIT 257",
+          "SELECT account_id,installation_id,platform,permission,token_hash,encrypted_token FROM growth.device WHERE installation_id=$1 OR token_hash=$2 LIMIT 257",
           [value.installationId, hash],
         );
         if (previous.rowCount! > 256)
@@ -656,6 +683,11 @@ export class GrowthService {
           actor.accountId,
           ...previous.rows.map((row) => row.account_id),
         ]);
+        this.devices.assertRegistrationRevision(
+          actor.accountId,
+          value,
+          previous.rows,
+        );
         if (!(await this.erasure.subjects(client, [actor.accountId])))
           throw new DomainError(
             "growth_data_erased",
@@ -684,6 +716,7 @@ export class GrowthService {
               value.token,
               value.installationId,
               value.platform,
+              value.registrationRevision,
             ),
             value.permission,
           ],
@@ -692,7 +725,47 @@ export class GrowthService {
       },
     );
   }
-  async revokeDevice(actor: Actor, id: string) {
+  async revokeDevice(actor: Actor, id: string, input?: unknown) {
+    const value = z
+      .strictObject({
+        registrationRevision: z
+          .number()
+          .int()
+          .min(1)
+          .max(Number.MAX_SAFE_INTEGER)
+          .optional(),
+      })
+      .parse(input ?? {});
+    if (value.registrationRevision) {
+      const revision = value.registrationRevision;
+      await this.db.fencedWorkerActor(
+        actor,
+        async (client) => {
+          // Ordered revocation uses the installation ID, matching registration.
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`growth.device:installation:${id}`],
+          );
+          await this.erasure.lockSubjects(client, [actor.accountId]);
+        },
+        async (client) => {
+          const current = await client.query(
+            "SELECT id,encrypted_token FROM growth.device WHERE account_id=$1 AND installation_id=$2 FOR UPDATE",
+            [actor.accountId, id],
+          );
+          for (const row of current.rows)
+            await client.query(
+              "UPDATE growth.device SET revoked_at=now(),permission='denied',encrypted_token=$3,updated_at=now() WHERE id=$1 AND account_id=$2",
+              [
+                row.id,
+                actor.accountId,
+                this.devices.revokeRegistration(row.encrypted_token, revision),
+              ],
+            );
+        },
+      );
+      return { revoked: true };
+    }
     await this.db.actor(actor, null, async (client) => {
       await client.query(
         "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND (id=$2 OR installation_id=$2)",

@@ -13,6 +13,12 @@ const Registration = z.strictObject({
   installationId: z.uuid(),
   platform: z.enum(["ios", "android"]),
   token: z.string().min(16).max(4096),
+  registrationRevision: z
+    .number()
+    .int()
+    .min(1)
+    .max(Number.MAX_SAFE_INTEGER)
+    .optional(),
 });
 
 /** Captures the real request session and later checks its negative lifecycle.
@@ -29,6 +35,7 @@ export class GrowthDeviceSessions {
     token: string,
     installationId: string,
     platform: "ios" | "android",
+    registrationRevision?: number,
   ) {
     const authority = requestAuthority.getStore();
     if (!authority || authority.accountId !== accountId)
@@ -44,8 +51,83 @@ export class GrowthDeviceSessions {
       installationId,
       platform,
       token,
+      registrationRevision,
     });
     return prefix + this.seal(JSON.stringify(registration));
+  }
+
+  assertRegistrationRevision(
+    accountId: string,
+    input: {
+      installationId: string;
+      token: string;
+      platform: string;
+      permission: string;
+      registrationRevision?: number;
+    },
+    previous: {
+      encrypted_token: string;
+      token_hash: string;
+      installation_id: string;
+      account_id: string;
+      platform: string;
+      permission: string;
+    }[],
+  ) {
+    for (const row of previous) {
+      if (
+        row.installation_id !== input.installationId ||
+        !row.encrypted_token.startsWith(prefix)
+      )
+        continue;
+      const old = Registration.parse(
+        JSON.parse(this.open(row.encrypted_token.slice(prefix.length))),
+      );
+      if (
+        old.accountId !== row.account_id ||
+        old.installationId !== row.installation_id ||
+        old.platform !== row.platform ||
+        createHash("sha256").update(old.token).digest("hex") !== row.token_hash
+      )
+        throw new DomainError(
+          "device_registration_unavailable",
+          copy.growthErrorGrowthAuthorityRequired,
+          503,
+        );
+      if (!old.registrationRevision) continue;
+      const revision = input.registrationRevision ?? 0;
+      const same =
+        old.accountId === accountId &&
+        old.sessionId === requestAuthority.getStore()?.sessionId &&
+        old.token === input.token &&
+        old.platform === input.platform &&
+        row.permission === input.permission;
+      if (
+        revision < old.registrationRevision ||
+        (revision === old.registrationRevision && !same)
+      )
+        throw new DomainError(
+          "device_registration_stale",
+          copy.growthThisActionIsUnavailableToThisAccount,
+          409,
+        );
+    }
+  }
+  revokeRegistration(encrypted: string, revision: number) {
+    if (!encrypted.startsWith(prefix)) return encrypted;
+    const old = Registration.parse(
+      JSON.parse(this.open(encrypted.slice(prefix.length))),
+    );
+    if (revision < (old.registrationRevision ?? 0))
+      throw new DomainError(
+        "device_registration_stale",
+        copy.growthThisActionIsUnavailableToThisAccount,
+        409,
+      );
+    return (
+      prefix +
+      this.seal(JSON.stringify({ ...old, registrationRevision: revision }))
+    );
   }
 
   async withCurrent<T>(

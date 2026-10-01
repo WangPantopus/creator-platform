@@ -171,14 +171,26 @@ public struct GrowthClient: Sendable {
     if expectedSession != nil, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
-  public func registerDevice(installationID: UUID, token value: Data, granted: Bool) async throws {
+  public func registerDevice(installationID: UUID, token value: Data, granted: Bool, registrationRevision: Int, expectedSession: String) async throws {
     struct Ack: Decodable { let id: String }
     let body = try JSONSerialization.data(withJSONObject: [
       "installationId": installationID.uuidString.lowercased(), "platform": "ios",
       "token": value.map { String(format: "%02x", $0) }.joined(),
       "permission": granted ? "granted" : "denied",
+      "registrationRevision": registrationRevision,
     ])
-    let _: Ack = try await request("devices", method: "PUT", body: body)
+    let _: Ack = try await request("devices", method: "PUT", body: body, expectedSession: expectedSession)
+  }
+  public func revokeDevice(installationID: UUID, registrationRevision: Int, expectedSession: String) async throws {
+    struct Ack: Decodable { let revoked: Bool }
+    let body = try JSONSerialization.data(withJSONObject: ["registrationRevision": registrationRevision])
+    let _: Ack = try await request("devices/" + installationID.uuidString.lowercased(), method: "DELETE", body: body, expectedSession: expectedSession)
+  }
+  func notificationDestination(id: UUID, expectedSession: String) async throws -> String {
+    struct Current: Decodable { let destination: String }
+    let current: Current = try await request("notifications/" + id.uuidString.lowercased(), expectedSession: expectedSession)
+    guard ApplicationDestination.isPermitted(current.destination) else { throw URLError(.badServerResponse) }
+    return current.destination
   }
 }
 
