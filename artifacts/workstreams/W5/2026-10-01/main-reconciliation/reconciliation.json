@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-10-01T07:00:38.032553+00:00",
+  "recordedAt": "2026-10-01T07:51:02.882673+00:00",
   "main": "ebb24c7e640d972933ca907a673bb879b8190a56",
   "originalHead": "39f55d91b058738a2deaddfab8ad84e461d4e7f8",
   "migration": {
@@ -26,14 +26,61 @@
     "webProductionBuild": "pass",
     "scopedEslint": "pass",
     "mergeMarkersRemaining": 0,
-    "iosShippingBuild": "pass after top-level array/record native generator alias repair",
-    "androidShippingBuild": "pass after same alias repair",
-    "combinedAppAcceptance": "running: preserved Note revision17 loaded, save revision18 and hard reload passed, original wording restored as revision19"
+    "iosShippingBuild": "pass on final application source; local ad-hoc signed simulator artifact installed over retained app and operated",
+    "androidShippingBuild": "pass on final application source; shipping APK installed over retained app and operated",
+    "combinedAppAcceptance": "PASS for the operated local increment: actual browser, shipping iOS simulator and shipping Android emulator; synthetic development identities against the actual persisted API. Provider-dependent and genuine creator-signing paths remain held.",
+    "applicationHead": "3caabeb012bc6496df30ea3cb9de13d15a31efd1",
+    "hostedCI": "Application 3caabeb: web-and-backend and Android runtime completed successfully. Hosted macOS visual/native foundation jobs remain queued; queued jobs are not counted passed. Latest human merge direction prioritizes operated app acceptance, not unit coverage. No check assertion, threshold or reference was weakened for this merge.",
+    "privateThanksAbsentFromCreatorFeed": true,
+    "iosOperated": "pass: canonical local fan-two sign-in; exact web-saved private Thanks read; digest opt-in with handle off; creator web feed receives anonymous text; cold Night launch preserves consent; native withdrawal clears entry and creator live feed; 24-second actual API pause conceals content and retains exact unsent words on recovery",
+    "iosPackaging": "Initial unsigned simulator artifact failed Keychain session storage. Rebuilt with CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-, codesign --verify --deep --strict passed; installed over retained app without reset. Canonical sign-in passed. No source/entitlement/credential fabrication.",
+    "iosInteractionQualifications": [
+      "Tapping the Toggle text label left it unchanged; observed switch bounds were tapped and checked state verified.",
+      "Maestro hideKeyboard returned failure; entered text was visible with two final periods (Unsent iOS recovery words..). The actual outage concealed the input and dismissed its keyboard, then restored exactly those words. No keyboard-dismiss or native focus-restoration claim."
+    ],
+    "nativeRefreshRepair": {
+      "commit": "3caabeb012bc6496df30ea3cb9de13d15a31efd1",
+      "observedFailure": "Android input lost focus mid-typing when the read-completion-based refresh delay exceeded the five-second authority freshness window. Failure screenshot retained.",
+      "repair": "Both native refresh loops schedule serial attempts from read start, at two seconds with a 250ms minimum sleep; the independent five-second access expiry and current-account/lifecycle guards remain.",
+      "operatedReadback": "Android typed the complete text, remained focused through several polling cycles, and appended Still focused. without another tap. Both final binaries saved exact independent Thanks and retained them after cold launch."
+    },
+    "androidOperated": "pass: canonical fan-one sign-in; Team attribution/body; actual keyboard input/focus through refreshes; private Thanks save and cold Night readback; explicit digest and handle opt-in; creator feed receives exact text with @w5_actor_2; final real API outage concealment/recovery; live unpublish hides post; withdrawal from unavailable screen removes Withdraw Thanks action.",
+    "iosFinalOperated": "pass on final application: canonical fan-two session retained; actual keyboard input, scroll to Save, save private Thanks, cold Light readback; private text absent from creator feed; final real API outage concealment/recovery; live unpublish hides post; withdrawal from unavailable screen removes Withdraw Thanks action. Earlier signed build also verified anonymous digest opt-in/cold Night/withdrawal.",
+    "finalNativeOutage": {
+      "apiStoppedAt": "2026-10-01T07:42:59.422Z",
+      "apiResumedAt": "2026-10-01T07:43:24.648Z",
+      "durationSeconds": 25.226,
+      "observed": "Both apps concealed post and Thanks fields; after resume iOS restored iOS final private Thanks. with consent off, Android restored Android private Thanks. Still focused. with sharing and handle on.",
+      "screenshots": [
+        "ios-final-outage-concealed-light.png",
+        "ios-final-outage-recovered-light.png",
+        "android-final-outage-concealed-night.png",
+        "android-final-outage-recovered-night.png"
+      ]
+    },
+    "finalWithdrawalAndArchive": "PASS: creator browser unpublishes actual Team post; both open native clients hide title/body and retain withdrawal control; actual native withdrawals remove that control; creator Thanks feed is empty; actual browser archives the local acceptance post.",
+    "interactionQualifications": [
+      "Earlier Android Back input exited the app; that frame is retained as a failed interaction, followed by a fresh normal launch.",
+      "Earlier emulator system ANRs remain historical failed evidence; the final API35 retained-device boot and operated acceptance completed without an observed ANR.",
+      "The iOS hideKeyboard command failed. Final keyboard entry used an observed scroll to expose Save, followed by exact cold-launch persisted readback."
+    ]
   },
   "gates": {
     "genuineCreatorSigning": "blocked by user choice; never simulated",
     "reservedFutureMigrations": "not applied",
-    "providerDependentMediaApprovalDelivery": "unavailable unless canonical producer authority is configured"
+    "providerDependentMediaApprovalDelivery": "unavailable unless canonical producer authority is configured",
+    "remainingScope": "No claim for full nine-package completion, genuine signed Note/two-fan private reply/reaction loop, approved AI reply, human media/C2PA, live/replay, payments/grants, actual external distribution/Impact, provider privacy completion, physical devices, store or measured production reliability/cost."
   },
-  "review": "W1 personally reviewed reconciled identity/session/BFF/shared boundaries, no source blocker; not blanket acceptance."
+  "review": "W1 personally reviewed reconciled identity/session/BFF/shared boundaries and final two-native refresh diff with no source blocker; serial read, independent five-second expiry, account and scene guards preserved. Package.swift and Package.resolved byte-match main ebb24c7. W5 personally reviewed W7 final 8214bed content adapter compatibility; producer source review is not provider acceptance.",
+  "objects": {
+    "preservedNoteId": "a9181632-d598-49f5-9be8-49a66184081c",
+    "preservedNoteRevision": 21,
+    "noteOriginalWordsRestored": true,
+    "localTeamPostId": "ecc93017-d7ff-46aa-8628-ef7657bef733",
+    "localTeamPostState": "archived after actual publication, cross-client acceptance and unpublish; unsigned Team attribution, AI reuse off; source removal remains pending, not acknowledged",
+    "fanTwoPrivateThanks": "Final private Thanks withdrawn from native after unpublish; Withdraw Thanks action absent",
+    "fanTwoSharing": false,
+    "fanTwoShowHandle": false,
+    "fanOneThanks": "Final shared text and handle withdrawn from Android after unpublish; Withdraw Thanks action absent; creator feed empty"
+  }
 }
