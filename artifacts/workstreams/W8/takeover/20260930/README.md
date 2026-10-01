@@ -1,5 +1,7 @@
 # W8 takeover evidence — 2026-09-30
 
+[Actual corrected launched-browser drain/reconnect](realtime-corrected-drain.json) records zero late tickets, one socket closed without force,16.68ms whole-process completion and subsequent one subscription/1397 replay batches. All40 migrations/cases/jobs/block/tombstone/private keys remain preserved. Current API/source3685c0a is separate from the older d1 image/e33 receipts. [All open PR readiness](open-pr-readiness.json) uses the human’s actual launched-app acceptance gate; no PR is ready to merge. [Published journal retention review](journal-retention-custody.json) refuses to infer Q16 expiry/purge from W4’s actual financial hash.
+
 [First actual launched-browser drain](realtime-first-drain.json) retained history/reconnected and preserved all40 migrations/cases/jobs, but exposed24.7418-second completion and four post-start tickets. [Shutdown source correction](realtime-shutdown-source.json) begins HTTP/socket close before waiting on the fenced worker and adds fixed stage timings. Corrected-source acceptance follows; no provider, SLO or native acceptance is inferred from a build.
 
 [Read-only repository queue diagnosis](ci-queue-diagnosis.json) distinguishes actual queued checks from source/test failures. Foundation has no serializing concurrency block and its hosted labels are valid; hosted capacity/account cause remains unverified. No run, runner, billing, check or workflow was changed.

@@ -1,0 +1,64 @@
+{
+  "reservedAt": "2026-10-01T02:07:35.091926+00:00",
+  "name": "Creator Platform W8 Resume 20260930",
+  "udid": "27D0D594-A376-425D-966F-914ED2D3A4A0",
+  "type": "iPhone17",
+  "runtime": "iOS26.5",
+  "freshDevice": true,
+  "historicalDeviceReused": false,
+  "peerDevicesChanged": false,
+  "derivedData": "/private/tmp/creator-w8-native-resume-20260930/ios/derived",
+  "purpose": "Personally build/launch current W8 app; interaction/accessibility not inferred from creation or compilation.",
+  "recordedAt": "2026-10-01T02:34:27.340472+00:00",
+  "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+  "iosBuild": "BUILD SUCCEEDED",
+  "iosBinarySha256": "1b97c475bb4ab865bf34988ab46119bd4ccb8b8bbfbe86efd7dbfb69cb3149e5",
+  "iosInstallAndLaunch": {
+    "bundle": "com.pantopus.qelvora",
+    "pid": 4377,
+    "args": [
+      "--api-url",
+      "http://127.0.0.1:4108",
+      "--return-to",
+      "/trust",
+      "--appearance",
+      "light"
+    ],
+    "actualPublicHelpVisible": true,
+    "regionalResourcesUnconfiguredVisible": true,
+    "nativeComputerInput": false
+  },
+  "screenshots": [
+    {
+      "path": "ios-help-light.png",
+      "pixelDimensions": [
+        1206,
+        2622
+      ],
+      "logicalDimensions": [
+        402,
+        874
+      ],
+      "sha256": "8ac16785f2bf5a629d8f149b57b6a9a471ded69885a26d6a59bc9f1c5a1c5a3b"
+    }
+  ],
+  "iosBootHistory": {
+    "firstBoot": "NSPOSIX60, SimLaunchHostService4/unknownservice1102",
+    "afterBuildRetry": "boot succeeded; data/system migration5m34s, without resetting shared engine or any device"
+  },
+  "existingIosUiFlows": "Running unchanged original two tests. Welcome-unconfigured Light assertion16 failed: pantopus-unavailable staticText missing. No readiness inferred; current-source actual captures/triage pending.",
+  "androidBuild": "BUILD SUCCESSFUL in14m46s; :app:assembleDebug and :app:assembleDebugAndroidTest. Own SDK/emulator/API35 x86_64 and fresh AVD prepared, runtime not yet launched.",
+  "preservation": {
+    "historicalDevicesReused": false,
+    "peerDevicesOrCachesModified": false,
+    "goldensTestsTolerancesChanged": false,
+    "ownAutoPackageResolutionRestored": true,
+    "sqlRolesRlsGrantsChanged": false,
+    "paidCalls": 0
+  },
+  "limitations": [
+    "Signed app install/SDK launch and personally inspected help pixels are actual launched-app evidence, not authenticated Report/passkey/audio/background/system-sheet/accessibility acceptance.",
+    "Existing native test failure remains a failure and is not covered by the five-fixture exception.",
+    "402x874 is the actual iPhone17 viewport; not the390 reference matrix."
+  ]
+}

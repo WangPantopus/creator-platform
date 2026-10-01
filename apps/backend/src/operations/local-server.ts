@@ -40,6 +40,7 @@ import { GrowthDatabase } from "../modules/growth/database.js";
 import { GrowthService } from "../modules/growth/service.js";
 import { unavailableOwners } from "../modules/growth/contracts.js";
 import { attachRealtime } from "../realtime/gateway.js";
+import { PostgresWalObserver } from "./wal.js";
 
 // Explicit local harness, never imported by production bootstrap. No production identity fallback.
 if (
@@ -630,6 +631,8 @@ const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
     : telemetry.observe(signal, value),
 );
 await worker.start();
+const wal = new PostgresWalObserver(workerPool, telemetry);
+await wal.start();
 const server = createServer(app);
 const sockets = attachRealtime(
   server,
@@ -676,7 +679,7 @@ const stop = async () => {
   }, 5000);
   drain.unref();
   const elapsed = () => Number((performance.now() - started).toFixed(2));
-  const stages = { httpMs: 0, socketsMs: 0, workerMs: 0, poolsMs: 0 };
+  const stages = { httpMs: 0, socketsMs: 0, workerMs: 0, walMs: 0, poolsMs: 0 };
   // Stop intake before waiting for the current fenced worker task. Otherwise
   // polling clients can keep obtaining tickets while shutdown is already active.
   await Promise.all([
@@ -688,6 +691,9 @@ const stop = async () => {
     }),
     worker.stop().then(() => {
       stages.workerMs = elapsed();
+    }),
+    wal.stop().then(() => {
+      stages.walMs = elapsed();
     }),
   ]);
   clearTimeout(drain);

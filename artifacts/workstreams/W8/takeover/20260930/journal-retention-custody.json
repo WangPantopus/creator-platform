@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-01T02:14:01.387965+00:00",
+  "w8Source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+  "sources": [
+    {
+      "commit": "3f426241186f0e6a549c95fbf10b12ba7d58f47b",
+      "path": "apps/backend/src/modules/agent/journal-privacy.ts",
+      "sha256": "d91a258af410131a20b54c1c878e02b571e94a678d224fc9c15bb97776789e34"
+    },
+    {
+      "commit": "62af6606b767a86a1483ed483dba4e69052c8d21",
+      "path": "apps/backend/src/modules/commerce/generation-privacy.ts",
+      "sha256": "9273606eb367143157c21c17927fda720692c85299a09987af099993fc25f8a7"
+    }
+  ],
+  "w4FinancialPort": {
+    "interface": "GenerationCostPrivacyReconciliation.disposition(client, actualLeasedJob, family)",
+    "returns": [
+      "financialDispositionReference"
+    ],
+    "providesApprovedAccountingUntilOrReason": false,
+    "sourceUnchangedAtLatest62af660": true
+  },
+  "w2RetentionPort": {
+    "interface": "JournalPrivacyRetention.current(client, actualLeasedJob, family)",
+    "requires": [
+      "financialDispositionReference",
+      "accountingUntil",
+      "reason"
+    ],
+    "purgeChecks": [
+      "actual deletion family/purpose authority and workspace lock",
+      "no open admission",
+      "retention version matches prepared journal policy",
+      "reference >=8 chars/reason >=12 chars",
+      "finite accountingUntil at least current UTC cap-window end",
+      "bounded <=2000 source rows, unlinking fan/thread/generation/attempt/call/hold fields",
+      "revalidation after purge"
+    ],
+    "physicalExpiryRegistrationOrExecutionFromReturnedDate": false
+  },
+  "w8CurrentState": {
+    "approvedFiniteQ16PolicyVersionDeadlineReasonAuthority": false,
+    "publishedReviewedFiniteCurrentAdapter": false,
+    "durableFamilyScopedPhysicalAccountingExpiryRegistration": false,
+    "durablePrePurgeFamilySnapshotBeforeIdentityErasure": false,
+    "existingRetainedRecordMetadataIsPhysicalPurgeProof": false,
+    "sevenDayExportPayloadExpiryIsFinancialRetentionApproval": false,
+    "financialDispositionHashIsPurgeApproval": false
+  },
+  "requiredInputs": [
+    "Approved finite Q16 accounting policy/version/reason and original-expiry rules",
+    "Actual current leased pre-purge family authority with durable exhaustion proof",
+    "Reviewed same-client financial reconciliation plus policy resolver",
+    "Durable purpose-bound physical accounting-expiry registration and actual expiry execution/receipt; preserved state/retries after restart"
+  ],
+  "disposition": "Do not activate erasure or fabricate a JournalPrivacyRetention.current that succeeds from a financial hash/default deadline. Continue independent app/runtime work; existing blocked jobs and retained records remain preserved.",
+  "sqlRolesRlsGrantsOrJobsChanged": false,
+  "externalMessagesSent": 0
+}

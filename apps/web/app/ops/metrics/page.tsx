@@ -49,16 +49,63 @@ export default function MetricsPage() {
           </section>
           <section className="trust-panel">
             <h2>Runtime and transport signals</h2>
-            {Object.entries(data.signals).map(([name, value]) => (
-              <p key={name}>
-                {name.replaceAll("_", " ")}:{" "}
-                <span className="qv-mono">{value.toFixed(2)}</span>
-              </p>
-            ))}
+            {Object.entries(data.signals)
+              .filter(([name]) => !name.startsWith("wal_"))
+              .map(([name, value]) => (
+                <p key={name}>
+                  {name.replaceAll("_", " ")}:{" "}
+                  <span className="qv-mono">{value.toFixed(2)}</span>
+                </p>
+              ))}
             {Object.keys(data.signals).length === 0 && (
               <p>No signal sample is available yet.</p>
             )}
           </section>
+          {"wal_sample_available" in data.signals && (
+            <section className="trust-panel">
+              <h2>PostgreSQL WAL</h2>
+              <p>
+                These totals cover the connected PostgreSQL cluster. Recovery
+                targets require a verified archive and restore.
+              </p>
+              {data.signals.wal_sample_available === 1 ? (
+                <>
+                  <p>
+                    Sampled{" "}
+                    {new Date(
+                      (data.signals.wal_sampled_at_epoch_seconds ?? 0) * 1000,
+                    ).toLocaleString()}
+                    {" · statistics reset "}
+                    {new Date(
+                      (data.signals.wal_stats_reset_epoch_seconds ?? 0) * 1000,
+                    ).toLocaleString()}
+                  </p>
+                  <p>
+                    Archiving:{" "}
+                    {data.signals.wal_archive_enabled === 1 ? "on" : "off"}
+                  </p>
+                  {[
+                    ["WAL records", "wal_records_total"],
+                    ["WAL bytes", "wal_bytes_total"],
+                    ["Full-buffer writes", "wal_buffers_full_total"],
+                    ["Archived files", "wal_archived_total"],
+                    ["Archive failures", "wal_archive_failures_total"],
+                  ].map(([label, name]) => (
+                    <p key={name}>
+                      {label}: {data.signals[name ?? ""]?.toLocaleString()}
+                    </p>
+                  ))}
+                </>
+              ) : (
+                <p role="status">WAL statistics are unavailable.</p>
+              )}
+              <p>
+                Successful samples: {data.signals.wal_samples_completed ?? 0}
+                {" · sample errors: "}
+                {data.signals.wal_sample_errors ?? 0}
+              </p>
+            </section>
+          )}
           {data.timings && Object.keys(data.timings).length > 0 && (
             <section className="trust-panel">
               <h2>Transport timing</h2>
