@@ -411,6 +411,9 @@ details[open] > summary:before {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
+.w2-action-alert:focus:not(:focus-visible) {
+  outline: none;
+}
 .w2-main pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

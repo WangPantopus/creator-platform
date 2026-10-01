@@ -20,7 +20,11 @@ import type {
   Version,
   VersionComparison,
 } from "../../../../packages/api/src/agent/contracts";
-import { DraftConfig as ConfigurationSchema } from "../../../../packages/api/src/agent/contracts";
+import {
+  DEVELOPMENT_LICENSE_TERMS,
+  DraftConfig as ConfigurationSchema,
+  developmentProofReference,
+} from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
 
 type ErrorBody = { error?: { code: string; message: string } };
@@ -212,6 +216,14 @@ export function CreatorAI({
   const fetchSequence = useRef(0);
   const sourceFileSequence = useRef(0);
   const [error, setError] = useState("");
+  // Counts failures of person-initiated actions. Background refreshes never
+  // move focus while someone is typing.
+  const [actionFailure, setActionFailure] = useState(0);
+  const errorNotice = useRef<HTMLDivElement>(null);
+  const failAction = (text: string) => {
+    setError(text);
+    setActionFailure((count) => count + 1);
+  };
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [online, setOnline] = useState(true);
@@ -509,6 +521,19 @@ export function CreatorAI({
       setPreview(null);
   }, [dirty, preview, state?.revision]);
   useEffect(() => {
+    const notice = errorNotice.current;
+    if (!actionFailure || !notice) return;
+    // Notices sit at the top of the screen. Bring this one to whoever acted
+    // further down; reduced-motion preferences get an immediate jump.
+    notice.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+    notice.focus({ preventScroll: true });
+  }, [actionFailure]);
+  useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
@@ -647,7 +672,7 @@ export function CreatorAI({
       setMessage(outcome ?? success);
       await fetchState();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The action did not finish.");
+      failAction(e instanceof Error ? e.message : "The action did not finish.");
     } finally {
       setBusy(false);
     }
@@ -830,8 +855,14 @@ export function CreatorAI({
       <main className={`w2-main w2-${current}`}>
         {state?.development && (
           <div className="w2-development" role="note">
-            Development identity · pending verification · external fan
-            publication disabled
+            Development identity ·{" "}
+            {state.creator.verification === "verified"
+              ? "fictional verified creator"
+              : "pending verification"}
+            {state.capabilities.syntheticLicensing
+              ? " · synthetic license only"
+              : ""}{" "}
+            · external fan publication disabled
           </div>
         )}
         {!online && (
@@ -842,7 +873,12 @@ export function CreatorAI({
         )}
         {!["test", "license"].includes(current) && studioHeader}
         {error && (
-          <div role="alert">
+          <div
+            role="alert"
+            ref={errorNotice}
+            tabIndex={-1}
+            className="w2-action-alert"
+          >
             <Notice tone="error" title="Action needs attention">
               {error}
             </Notice>
@@ -1287,7 +1323,7 @@ export function CreatorAI({
                               // Permit selecting the same file after fixing it.
                               e.target.value = "";
                               if (file.size > 1_000_000) {
-                                setError(
+                                failAction(
                                   "This file is too large. Split it into files up to 1 MB.",
                                 );
                                 return;
@@ -1304,7 +1340,7 @@ export function CreatorAI({
                                   }).decode(bytes);
                                   if (!currentRead()) return;
                                   if (content.length > 250_000) {
-                                    setError(
+                                    failAction(
                                       "Split this source into files with at most 250,000 characters.",
                                     );
                                     return;
@@ -1317,7 +1353,7 @@ export function CreatorAI({
                                 })
                                 .catch(() => {
                                   if (currentRead())
-                                    setError(
+                                    failAction(
                                       "This file could not be read as UTF-8 text. Save it as UTF-8 and try again.",
                                     );
                                 });
@@ -2235,9 +2271,14 @@ export function CreatorAI({
                   {studioHeader}
                   <Panel
                     title={
-                      state.license
-                        ? `LICENSE · ${state.license.state}`
-                        : "LICENSE · REVIEWED TERMS REQUIRED"
+                      state.license?.counselVersion ===
+                      DEVELOPMENT_LICENSE_TERMS
+                        ? `DEVELOPMENT LICENSE · NOT REVIEWED · ${state.license.state}`
+                        : state.license
+                          ? `LICENSE · ${state.license.state}`
+                          : state.capabilities.syntheticLicensing
+                            ? "DEVELOPMENT LICENSE · NOT RECORDED"
+                            : "LICENSE · REVIEWED TERMS REQUIRED"
                     }
                   >
                     <span>
@@ -2255,7 +2296,12 @@ export function CreatorAI({
                     </span>
                     {state.license ? (
                       <>
-                        <p>Reviewed terms: {state.license.counselVersion}</p>
+                        <p>
+                          {state.license.counselVersion ===
+                          DEVELOPMENT_LICENSE_TERMS
+                            ? "Synthetic terms for a fictional development creator. Counsel has not reviewed them, nothing was signed, and real fans, payments and AI voice stay off."
+                            : `Reviewed terms: ${state.license.counselVersion}`}
+                        </p>
                         <p>
                           Term ends{" "}
                           {new Date(state.license.termEndsAt).toLocaleString()}
@@ -2264,6 +2310,45 @@ export function CreatorAI({
                           Permitted uses:{" "}
                           {state.license.permittedUses.join(", ")}
                         </p>
+                      </>
+                    ) : state.capabilities.syntheticLicensing ? (
+                      <>
+                        <p className="qv-help">
+                          This loopback host can record a labeled development
+                          license so a fictional creator’s AI can be tested end
+                          to end. It is not a reviewed license, carries no
+                          signature and never applies to real fans.
+                        </p>
+                        <Button
+                          disabled={
+                            controlsDisabled ||
+                            state.creator.verification !== "verified"
+                          }
+                          onClick={() =>
+                            void action(async () => {
+                              await api("license", {
+                                proofReference: developmentProofReference(
+                                  state.creator.id,
+                                ),
+                                counselVersion: DEVELOPMENT_LICENSE_TERMS,
+                                permittedUses: [
+                                  "sponsored_mentions",
+                                  "text_ai",
+                                ],
+                                termEndsAt: new Date(
+                                  Date.now() + 90 * 86_400_000,
+                                ).toISOString(),
+                              });
+                            }, "Development license recorded for 90 days.")
+                          }
+                        >
+                          Record development license
+                        </Button>
+                        {state.creator.verification !== "verified" && (
+                          <span className="qv-help">
+                            Creator verification is pending.
+                          </span>
+                        )}
                       </>
                     ) : (
                       <p className="qv-help">
