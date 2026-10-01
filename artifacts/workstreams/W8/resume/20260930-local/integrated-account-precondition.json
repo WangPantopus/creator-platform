@@ -1,0 +1,34 @@
+{
+  "scope": "Direct local operator requests; no new test code. Expected account belongs to a different synthetic actor; no mutation accepted.",
+  "observations": [
+    {
+      "path": "privacy/jobs",
+      "method": "GET",
+      "status": 409,
+      "error": {
+        "code": "session_account_changed",
+        "message": "Your account changed. Reopen this page before taking this action.",
+        "correlationId": "e79aa8a0-e3cb-4590-873e-1f4325e37f69"
+      }
+    },
+    {
+      "path": "privacy/jobs/758588f9-de97-4eef-b820-5c6720fcb6a7/retry",
+      "method": "POST",
+      "status": 409,
+      "error": {
+        "code": "session_account_changed",
+        "message": "Your account changed. Reopen this page before taking this action.",
+        "correlationId": "e79aa8a0-e3cb-4590-873e-1f4325e37f69"
+      }
+    },
+    {
+      "path": "privacy/jobs/758588f9-de97-4eef-b820-5c6720fcb6a7/retry",
+      "method": "POST",
+      "status": 409,
+      "error": {
+        "code": "session_account_changed",
+        "message": "Refresh your account before taking this action."
+      }
+    }
+  ]
+}

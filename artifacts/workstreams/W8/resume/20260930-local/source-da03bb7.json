@@ -1,0 +1,31 @@
+{
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "parentIntegrationRevision": "bf44ada37268bb489c97d32432e4c4d81f25c8f9",
+  "mainRevision": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "paths": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "1926921204a0161627873ba6eeb31d4e72557e2daf65686f608accb9075d0bde",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "fef0643759c357b4e2102d67ac0810952b4f1712891ec2c63f28ff9cd6ec3a65",
+    "apps/backend/src/app.ts": "ee0a5150551f95a07c3c1809e75279d60db3e7072ee2f515867192a4b57a9d64",
+    "apps/backend/src/integration.ts": "8ddeebaa22dba6e2e67bf5e756b2cecfc1e9fd866e809427d57fa21f52282da5",
+    "apps/backend/src/modules/access/commerce.ts": "92c36e3488c3838aa135969f476bb3e8fb8c2ec8adc31241eddad57f9edd32a9",
+    "apps/backend/src/modules/trust/router.ts": "594a2ab09b626d52d40bbef6a0d26f4022802b318ffd7e7f0cbcba5d7a3cb2e9",
+    "apps/backend/src/operations/local-server.ts": "e782b79a66b5a8e8d6413f2b562fe2806d4e35bf4afb057b821a64029dfb6e25",
+    "apps/backend/src/operations/runtime.ts": "dcf51831db5f876a747794620ce0d08cce7e99b022ae547a5b9a289ac15328e2",
+    "apps/backend/src/operations/telemetry.ts": "2bb8d64317fb4ebaf653c0bfd00b0ef01e4c0dbe7b6f45016bbace55e2d594e3",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift": "1c4315d4e602fdda8971ea2b9ddf1ef85e77ec54f3ebc859093e5511db1ebbf2",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "97bf815e223507179050ed337234f6b9ccdbc82f309010577b09714594c4d14b",
+    "apps/web/app/api/auth/complete/route.ts": "fb25758a38de04c5db640537b90f317476bdd5d6017f21b71e4ed311bb98d28a",
+    "apps/web/app/api/conversations/[...path]/route.ts": "5f4ea7672487ad8d28bcd986cf16ee98e25479757874d515844cde0b2be11c6a",
+    "apps/web/app/api/trust/[...path]/route.ts": "6c306be6b93047d1ab5c15215f6dfdfe4dd0085236f044ecbb1cf987b2e43bbf",
+    "apps/web/app/ops/audits/page.tsx": "8842deea16c65e702a9dbf05cbc3d1a33b9d7d95b4804c024da2640809d6e5f7",
+    "apps/web/app/ops/cases/[id]/page.tsx": "a9f7f06ee06080b7465441845d3f0b32f0e313b82d32c184b5a1a1bdaa5eef4c",
+    "apps/web/app/ops/metrics/page.tsx": "3e97133d25835f2d3d9f8f7e83733fab7567bc15ac600f97ede0906c99ef3a78",
+    "apps/web/app/ops/page.tsx": "994e3da0dcb292f539f34c6fca85b8b422dee625b427b2533196b5652d16c92c",
+    "apps/web/app/ops/trust-client.tsx": "486843852907fbbdc8e54a9dc403202e00a8eff56c7dc731b0d17e0b6a0f5fef",
+    "apps/web/app/support/page.tsx": "024aab3a28d1bea305f52802e3c46b6a6e5f267e8a7c874949aae0733adad261",
+    "apps/web/features/conversation/ConversationScreen.tsx": "82fc5a685559cad54a94f6f3adf122dbd0f4d4aa05652eff09c2fde4c66541db",
+    "apps/web/features/conversation/api.ts": "359d8f499e268ad599f0d62a811895f85b360e35f4d7738960050f3a4bca4809"
+  },
+  "nativeSourceUnchangedFromBuild": true,
+  "scope": "Source follow-ups after published-producer integration; no test/golden/generated/immutable SQL/RLS/grant change."
+}

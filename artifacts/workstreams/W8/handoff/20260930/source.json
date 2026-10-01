@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-09-30T21:11:05Z",
+  "sourceCheckpoint": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+  "mainRevision": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "branch": "codex/w8-trust-handoff",
+  "cleanBeforeHandoff": true,
+  "baseDifference": ["0", "39"],
+  "sourceTrees": {
+    "apps/backend": "533bb2adacb1bd006ad725c986b597aa7f1f8484",
+    "infra": "2a3ecce5ce06ce4b7e7a04ae43f36ebed8c1548d",
+    "apps/ios": "1cbc3121d7f1ef64df35ac22504dcbbc94d6d0e1",
+    "apps/android": "210119ca201da76189bf10fd3e152b6c451eef03",
+    "apps/web": "c684c4def8342be08f3340f5c261d122834cebcd"
+  },
+  "backendDiffSinceVerifiedImage": "",
+  "nativeDiffSinceWholeBuild": "",
+  "latestProductChange": "4fab21cf44b7b921924eae5037734b7a9bfa2281",
+  "imageRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "wholeNativeBuildRevision": "8636dd7c6302dd1667cf78364e85d14555bac9f7",
+  "scope": "This handoff adds only documentation and sanitized receipts. Source tree IDs identify the existing verified build inputs; a later handoff commit is not a new runtime image."
+}

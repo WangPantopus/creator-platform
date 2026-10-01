@@ -1,31 +1,93 @@
-import { VoiceRecording } from "../../../features/media/VoiceRecorder";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { IdSchema, ReturnTargetSchema } from "@qelvora/api";
+import { Notice } from "@qelvora/ui-web";
+import {
+  CreatorVoiceRecording,
+  VoiceRecording,
+} from "../../../features/media/VoiceRecorder";
+import { MediaSession } from "../../../features/media/session";
+import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
+import { IdentityWelcome } from "../../../features/identity/welcome";
 import { currentSession } from "../../../lib/session";
+
 export default async function VoicePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = await searchParams;
-  const session = await currentSession();
-  const uuid = /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/iu;
-  const creatorId =
-    typeof query.creatorId === "string" && uuid.test(query.creatorId)
-      ? query.creatorId
-      : undefined;
-  const fanId =
-    typeof query.fanId === "string" && uuid.test(query.fanId)
-      ? query.fanId
-      : undefined;
-  // D-17 Note voice limit is60 seconds. Personal reply limits come from W4, never a query parameter.
+  const creatorId = query.creatorId;
+  const objectId = query.objectId;
+  if (
+    Object.keys(query).some(
+      (key) => !["creatorId", "objectId", "theme"].includes(key),
+    ) ||
+    (query.theme !== undefined &&
+      !["light", "night"].includes(String(query.theme))) ||
+    (creatorId !== undefined && !IdSchema.safeParse(creatorId).success) ||
+    (objectId !== undefined && !IdSchema.safeParse(objectId).success)
+  )
+    notFound();
+  if (
+    (creatorId !== undefined || objectId !== undefined) &&
+    (creatorId === undefined || objectId === undefined)
+  )
+    return (
+      <main className="qv">
+        <Notice title="This recording link is incomplete">
+          Open a saved Note in your Studio to choose where the recording
+          belongs. <Link href="/studio/workspace">Choose a Note</Link>
+        </Notice>
+      </main>
+    );
+  const returnTo =
+    typeof creatorId === "string" && typeof objectId === "string"
+      ? `/media/voice?creatorId=${creatorId}&objectId=${objectId}`
+      : "/media/voice";
+  if (!ReturnTargetSchema.safeParse(returnTo).success) notFound();
+  const session = await currentSession(returnTo);
+  if (!session) {
+    if (creatorId === undefined && objectId === undefined)
+      return (
+        <main>
+          <VoiceRecording purpose="human_note" maxDurationMs={60_000} />
+        </main>
+      );
+    return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  }
   return (
-    <main>
-      <VoiceRecording
-        creatorId={session ? creatorId : undefined}
-        fanId={session ? fanId : undefined}
-        expectedAccountId={session?.accountId}
-        purpose="human_note"
-        maxDurationMs={60_000}
-      />
-    </main>
+    <IdentitySessionBoundary
+      key={session.accountId}
+      initial={session}
+      returnTo={returnTo}
+    >
+      <main className="qv">
+        {typeof creatorId === "string" &&
+        typeof objectId === "string" &&
+        session.creator?.id === creatorId ? (
+          <MediaSession>
+            <CreatorVoiceRecording
+              creatorId={creatorId}
+              objectId={objectId}
+              expectedAccountId={session.accountId}
+              creatorName={session.creator.displayName}
+            />
+            <p className="qv-help">
+              Return to the saved Note in Studio to attach the processed
+              recording and review its complete signature.
+            </p>
+            <Link href={`/studio/${creatorId}/compose/${objectId}`}>
+              Open your Note
+            </Link>
+          </MediaSession>
+        ) : (
+          <Notice title="Open a saved Note">
+            Choose a Note in your own Studio before recording its voice note.
+            <Link href="/studio/workspace">Open Studio</Link>
+          </Notice>
+        )}
+      </main>
+    </IdentitySessionBoundary>
   );
 }

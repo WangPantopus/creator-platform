@@ -1,0 +1,67 @@
+{
+  "sourceRevision": "9f5afcbec6527a66846d86758e3af9958262a995",
+  "observedAt": "2026-09-30T09:39:05.799059+00:00",
+  "workflows": [
+    {
+      "id": 36695549394,
+      "name": "Trust release compilation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36695549394"
+    },
+    {
+      "id": 36695549277,
+      "name": "Foundation checks",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36695549277"
+    }
+  ],
+  "foundationJobs": [
+    {
+      "id": 109822528993,
+      "name": "web-and-backend",
+      "result": "failure",
+      "observation": "All seven TypeScript targets and ESLint passed; Prettier stopped pnpm check before tests/build.",
+      "formattingPaths": [
+        "apps/backend/src/config.ts",
+        "apps/backend/src/server.ts",
+        "apps/web/app/auth/development/page.tsx",
+        "apps/web/app/globals.css",
+        "apps/web/app/unsubscribe/[token]/route.ts"
+      ]
+    },
+    {
+      "id": 109822528862,
+      "name": "android-foundation",
+      "result": "failure",
+      "observation": "setup-android requested default tools platform-tools; sdkmanager failed to find tools. Gradle checks were skipped."
+    },
+    {
+      "id": 109822528857,
+      "name": "android-runtime",
+      "result": "failure",
+      "observation": "Current application/instrumented-test APK compilation completed; existing arrivalContextCanBeRemoved failed to inject touch input. This does not establish native trust tap-through."
+    },
+    {
+      "id": 109822528737,
+      "name": "ios-foundation",
+      "result": "failure",
+      "observation": "macOS swift test failed compiling CommerceFeature.swift:120, unsupported keyboardType. App build/install checks were skipped."
+    },
+    {
+      "id": 109822529063,
+      "name": "web-visual",
+      "result": "failure",
+      "passed": 6,
+      "failed": 7,
+      "observation": "Catalog references/components passed both themes; auth return-context assertions, welcome pixels, creator-home availability and duplicate-alert assertion failed. No tests or reference artboards were changed."
+    }
+  ],
+  "followup": {
+    "ciSetup": "W8-owned CI definition now pins observed action revisions and explicitly requests platform-tools; requires a subsequent run.",
+    "formatting": "Prepared formatter-only patch; five-file lease requested, not yet applied.",
+    "native": "Subsequent W8 credential-account guard and request-reference changes passed iOS Simulator-target library compilation; current Android source still needs subsequent compile/interactive acceptance."
+  },
+  "logs": "Only this sanitized observation is committed; raw CI logs are not copied into the repository."
+}

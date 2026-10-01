@@ -12,11 +12,30 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
         const parameters = [input.accountId, input.creatorId, input.threadId];
         const cases = (
           await client.query(
-            `SELECT id,number,kind,state,reason,resolution_reason,created_at FROM creator_trust.safety_case WHERE ${matches} ORDER BY created_at,id LIMIT 2000`,
+            `SELECT id,number,kind,state,reason,resolution_reason,created_at FROM creator_trust.safety_case WHERE ${matches} ORDER BY created_at,id LIMIT 2001`,
             parameters,
           )
         ).rows;
         const ids = cases.map((c) => c.id as string);
+        // Subject accounts receive only their own case metadata and addressed
+        // notices. Another fan's report reason or evidence is never exported.
+        const subjectCases = (
+          await client.query(
+            `SELECT id,number,kind,state,creator_id,version,created_at,updated_at
+             FROM creator_trust.safety_case WHERE subject_account_id=$1
+             AND ($2::uuid IS NULL OR creator_id=$2)
+             AND ($3::uuid IS NULL OR EXISTS(SELECT 1 FROM creator_trust.case_evidence e
+               WHERE e.case_id=creator_trust.safety_case.id AND e.snapshot->>'thread_id'=$3::text))
+             ORDER BY created_at,id LIMIT 2001`,
+            parameters,
+          )
+        ).rows;
+        const involvedIds = [
+          ...new Set([
+            ...ids,
+            ...subjectCases.map((item) => item.id as string),
+          ]),
+        ];
         const retainedExpiry = (
           await client.query<{ until: Date | null }>(
             "SELECT max(expires_at) AS until FROM creator_trust.case_evidence WHERE case_id=ANY($1::uuid[]) AND case_id IN(SELECT id FROM creator_trust.safety_case WHERE kind='dispute')",
@@ -25,25 +44,84 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
         ).rows[0]?.until;
         const notices = (
           await client.query(
-            "SELECT type,reason,case_id,created_at FROM creator_trust.notice WHERE recipient_account_id=$1 AND case_id=ANY($2::uuid[]) ORDER BY created_at,id LIMIT 2000",
-            [input.accountId, ids],
+            "SELECT type,reason,case_id,created_at FROM creator_trust.notice WHERE recipient_account_id=$1 AND ($3::boolean OR case_id=ANY($2::uuid[])) ORDER BY created_at,id LIMIT 2001",
+            [input.accountId, involvedIds, input.scope === "account"],
           )
         ).rows;
         const feedback =
           input.scope === "account"
             ? (
                 await client.query(
-                  "SELECT useful,authorship_clear,cohort,comment,created_at FROM creator_trust.feedback WHERE account_id=$1 ORDER BY created_at,id LIMIT 2000",
+                  "SELECT useful,authorship_clear,cohort,comment,created_at FROM creator_trust.feedback WHERE account_id=$1 ORDER BY created_at,id LIMIT 2001",
                   [input.accountId],
                 )
               ).rows
             : [];
         if (
-          cases.length === 2000 ||
-          notices.length === 2000 ||
-          feedback.length === 2000
+          cases.length > 2000 ||
+          subjectCases.length > 2000 ||
+          notices.length > 2000 ||
+          feedback.length > 2000
         )
           throw new Error("bounded_subjob_required");
+        let exported: Record<string, unknown> | undefined;
+        if (input.kind === "export") {
+          const evidence = (
+            await client.query(
+              "SELECT case_id,category,snapshot,created_at,expires_at FROM creator_trust.case_evidence WHERE case_id=ANY($1::uuid[]) AND expires_at>now() ORDER BY created_at,id LIMIT 2001",
+              [ids],
+            )
+          ).rows;
+          const events = (
+            await client.query(
+              "SELECT case_id,type,reason,created_at FROM creator_trust.case_event WHERE case_id=ANY($1::uuid[]) ORDER BY created_at,id LIMIT 2001",
+              [ids],
+            )
+          ).rows;
+          const accesses = (
+            await client.query(
+              "SELECT case_id,action,purpose,created_at FROM creator_trust.access_audit WHERE case_id=ANY($1::uuid[]) ORDER BY created_at,id LIMIT 2001",
+              [involvedIds],
+            )
+          ).rows;
+          const blocks =
+            input.scope === "thread"
+              ? []
+              : (
+                  await client.query(
+                    "SELECT creator_id,case_id,created_at,revoked_at FROM creator_trust.block WHERE account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) ORDER BY created_at,creator_id LIMIT 2001",
+                    [input.accountId, input.creatorId],
+                  )
+                ).rows;
+          const requests = (
+            await client.query(
+              "SELECT id,kind,scope,creator_id,thread_id,state,created_at,completed_at FROM creator_trust.privacy_job WHERE account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND ($3::uuid IS NULL OR thread_id=$3) ORDER BY created_at,id LIMIT 2001",
+              parameters,
+            )
+          ).rows;
+          if (
+            [evidence, events, accesses, blocks, requests].some(
+              (rows) => rows.length > 2000,
+            )
+          )
+            throw new Error("bounded_subjob_required");
+          exported = {
+            cases,
+            casesAboutYou: subjectCases,
+            evidence,
+            events,
+            accesses,
+            notices,
+            feedback,
+            blocks,
+            requests,
+          };
+          if (
+            Buffer.byteLength(JSON.stringify(exported)) >
+            4 * 1024 * 1024 - 64 * 1024
+          )
+            throw new Error("bounded_subjob_required");
+        }
         if (input.kind === "delete") {
           // Account-delete evidence retention awaits Q16; do not silently apply thread dispute retention account-wide.
           if (
@@ -64,8 +142,8 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
             [ids],
           );
           await client.query(
-            "UPDATE creator_trust.notice SET reason='Removed following a data deletion request.' WHERE recipient_account_id=$1 AND case_id=ANY($2::uuid[])",
-            [input.accountId, ids],
+            "UPDATE creator_trust.notice SET reason='Removed following a data deletion request.' WHERE recipient_account_id=$1 AND ($3::boolean OR case_id=ANY($2::uuid[]))",
+            [input.accountId, involvedIds, input.scope === "account"],
           );
           if (input.scope === "account") {
             await client.query(
@@ -114,9 +192,7 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
             processedCases: ids.length,
             completedAt: new Date().toISOString(),
           },
-          ...(input.kind === "export"
-            ? { data: { cases, notices, feedback } }
-            : {}),
+          ...(input.kind === "export" ? { data: exported } : {}),
           retained: input.kind === "delete" ? retained : [],
         };
       } catch (error) {

@@ -1,0 +1,104 @@
+{
+  "sourceRevision": "da03bb764cd05d0f6ac7e19fcd012611226465c5",
+  "observedAt": "2026-09-30T20:29:00Z",
+  "checks": [
+    {
+      "id": 110072622677,
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690565/job/110072622677"
+    },
+    {
+      "id": 110072622103,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690304/job/110072622103"
+    },
+    {
+      "id": 110072622089,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690304/job/110072622089"
+    },
+    {
+      "id": 110072622073,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690304/job/110072622073"
+    },
+    {
+      "id": 110072622012,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690304/job/110072622012"
+    },
+    {
+      "id": 110072621975,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769690304/job/110072621975"
+    },
+    {
+      "id": 110072597776,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769683367/job/110072597776"
+    },
+    {
+      "id": 110072597703,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769683367/job/110072597703"
+    },
+    {
+      "id": 110072597598,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769683367/job/110072597598"
+    },
+    {
+      "id": 110072597568,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769683367/job/110072597568"
+    },
+    {
+      "id": 110072597254,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36769683367/job/110072597254"
+    }
+  ],
+  "confirmedFailures": [
+    {
+      "jobId": 110072622089,
+      "issues": [
+        "contracts.test.ts positive continuation uses context=kiln; current UUID-only C11 returns400 while fixture expects503 (8 pass/1 fail)",
+        "postgres.integration.test.ts setup applies only0001; runtime profile row lock is denied42501 before9 cases run"
+      ]
+    },
+    {
+      "jobId": 110072622012,
+      "issues": [
+        "arrivalContextCanBeRemoved failed to inject touch input;3 other runtime cases passed",
+        "Existing case supplies no arrival; current MainActivity defaults to /home. The diagnostic does not establish that fixture mismatch alone caused touch injection failure."
+      ]
+    }
+  ],
+  "limitations": [
+    "Queued jobs are not passing checks; previous source visual/snapshot failures remain open.",
+    "Trust compilation passed independently of Foundation.",
+    "No test/golden, tolerance, SQL, RLS/grant or check was changed or waived."
+  ]
+}

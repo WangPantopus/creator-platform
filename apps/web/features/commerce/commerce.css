@@ -81,11 +81,11 @@
   padding: var(--space-6) var(--space-4) var(--space-8);
 }
 .commerce-sheet {
-  padding: var(--space-3) var(--space-5) var(--space-9);
+  padding: var(--space-3) var(--space-5) calc(var(--space-8) + var(--space-1));
   background: var(--surface);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-sheet);
-  margin-top: var(--space-10);
+  margin-top: calc(var(--space-8) + var(--space-2));
 }
 .commerce-grabber {
   width: var(--sheet-grabber-width);
@@ -290,7 +290,7 @@
   border-radius: var(--radius-md);
 }
 .commerce-studio .commerce-content {
-  padding: var(--space-9) var(--space-12);
+  padding: calc(var(--space-8) + var(--space-1)) var(--space-12);
   gap: var(--space-6);
 }
 .commerce-two {
@@ -390,6 +390,7 @@
 }
 
 .commerce-checkout {
+  box-sizing: border-box;
   width: calc(100% - 32px);
   max-width: var(--phone-width);
   max-height: calc(100dvh - 32px);

@@ -93,7 +93,7 @@
   padding: 0;
   cursor: pointer;
   overflow-wrap: anywhere;
-  min-height: 28px;
+  min-height: 44px;
 }
 .w2-source-review {
   font-size: 12px;
@@ -104,7 +104,7 @@
 .w2-source-review summary,
 details summary {
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 8px;

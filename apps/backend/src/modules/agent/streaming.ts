@@ -2,6 +2,8 @@ import { z } from "zod";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError } from "../../core/errors.js";
 import { ReplySchema, type ModelConfiguration } from "./model.js";
+import { responseUsage } from "./response-usage.js";
+import { contentHash } from "../../core/canonical.js";
 export type ReplySentence = z.infer<typeof ReplySchema>["sentences"][number];
 export type StreamProposal = { sentence: ReplySentence } | { usage: Usage };
 
@@ -72,6 +74,11 @@ export async function* streamResponses(
       stream: true,
       max_output_tokens: 2000,
       instructions,
+      prompt_cache_key: contentHash({
+        model,
+        instructions,
+        schema: "agent_reply",
+      }),
       input: [{ role: "user", content: context.join("\n\n") }],
       text: {
         format: {
@@ -149,27 +156,9 @@ export async function* streamResponses(
           const reply = ReplySchema.parse(JSON.parse(raw));
           while (delivered < reply.sentences.length)
             yield { sentence: reply.sentences[delivered++]! };
-          const usage = z
-            .object({
-              input_tokens: z.number().int().nonnegative(),
-              output_tokens: z.number().int().nonnegative(),
-            })
-            .parse(item.response.usage);
           const rate = configuration.rates?.[model];
           yield {
-            usage: {
-              provider: "OpenAI",
-              model,
-              inputTokens: usage.input_tokens,
-              outputTokens: usage.output_tokens,
-              costMicros: rate
-                ? Math.ceil(
-                    (usage.input_tokens * rate.inputMicrosPerMillion +
-                      usage.output_tokens * rate.outputMicrosPerMillion) /
-                      1_000_000,
-                  )
-                : null,
-            },
+            usage: responseUsage(item.response.usage, model, rate),
           };
           completed = true;
         } else if (

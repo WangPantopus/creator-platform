@@ -47,33 +47,74 @@ export class MediaRequestError extends Error {
   }
 }
 
+type MediaIdentity = {
+  accountId: string;
+  signal: AbortSignal;
+  end: () => void;
+};
+let identity: MediaIdentity | undefined;
+/** W1 attaches the current account boundary before mounting private media. */
+export function configureMediaRequests(current: MediaIdentity) {
+  identity = current;
+  return () => {
+    if (identity === current) identity = undefined;
+  };
+}
+
 export async function mediaRequest<T>(
   path: string,
   init: RequestInit & { expectedAccountId?: string } = {},
 ): Promise<T> {
+  const current = identity;
   const { expectedAccountId, ...request } = init;
+  if (
+    current &&
+    expectedAccountId !== undefined &&
+    expectedAccountId !== current.accountId
+  )
+    throw new MediaRequestError(
+      "Your account changed. Reopen this content to continue.",
+      409,
+      "session_account_changed",
+    );
   const headers = new Headers(request.headers);
   if (!headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
-  if (expectedAccountId !== undefined)
-    headers.set("x-qelvora-expected-account", expectedAccountId);
+  const account = expectedAccountId ?? current?.accountId;
+  if (account !== undefined) headers.set("x-qelvora-expected-account", account);
+  const signal = current
+    ? AbortSignal.any([
+        current.signal,
+        ...(request.signal ? [request.signal] : []),
+      ])
+    : request.signal;
+  signal?.throwIfAborted();
   const response = await fetch(`/api/w6/${path}`, {
     ...request,
     credentials: "same-origin",
     cache: "no-store",
     headers,
+    signal,
   });
+  signal?.throwIfAborted();
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
+    if (
+      response.status === 409 &&
+      error?.error?.code === "session_account_changed"
+    )
+      current?.end();
     throw new MediaRequestError(
       error?.error?.message ?? copy.w6MediaIsUnavailableTryAgain,
       response.status,
       error?.error?.code,
     );
   }
-  return response.json() as Promise<T>;
+  const result = (await response.json()) as T;
+  signal?.throwIfAborted();
+  return result;
 }
 export type RecordingUploadInput = {
   creatorId: string;

@@ -1,3 +1,4 @@
+import { visualWebURL, visualReferenceURL } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
 const foundations = [
   {
@@ -44,7 +45,7 @@ for (const theme of ["light", "night"] as const)
         height: screen.height,
       });
       await reference.goto(
-        `http://127.0.0.1:3101/${screen.group}/${screen.id}.dc.html`,
+        `${visualReferenceURL}/${screen.group}/${screen.id}.dc.html`,
       );
       await reference.locator("x-dc").getByRole("heading").first().waitFor();
       await reference.evaluate((mode) => {
@@ -61,7 +62,7 @@ for (const theme of ["light", "night"] as const)
         maxDiffPixels: 0,
       });
       await page.goto(
-        `http://localhost:3000${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
+        `${visualWebURL}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
       );
       await page.getByRole("heading").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -90,7 +91,7 @@ for (const theme of ["light", "night"] as const)
 test("unconfigured Pantopus sign-in does not create a local identity and preserves arrival", async ({
   page,
 }) => {
-  await page.goto("http://localhost:3000/auth/continue");
+  await page.goto(`${visualWebURL}/auth/continue`);
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
     .click();
@@ -98,7 +99,7 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
   await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
-    "http://localhost:3000/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests",
+    `${visualWebURL}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
   );
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
@@ -106,6 +107,6 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
     "/creators/maya/requests",
   );
-  await page.goto("http://localhost:3000/onboarding/handle");
+  await page.goto(`${visualWebURL}/onboarding/handle`);
   await expect(page).toHaveURL(/auth\/continue/);
 });

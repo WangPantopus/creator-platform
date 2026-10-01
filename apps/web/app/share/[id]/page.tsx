@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import {
   growthRequest,
   configuredOrigin,
@@ -31,8 +32,8 @@ export default async function Share({
       return (
         <GrowthShell>
           <div className="growth-stack">
-            <h1>This card was withdrawn.</h1>
-            <p>The shared content is no longer available.</p>
+            <h1>{growthCopy.growthThisCardWasWithdrawn}</h1>
+            <p>{growthCopy.growthTheSharedContentIsNoLongerAvailable}</p>
           </div>
         </GrowthShell>
       );
@@ -48,8 +49,17 @@ export default async function Share({
           <article className="growth-export qv-on-maya">
             <strong>
               {source.authorKind === "approved_draft"
-                ? `Prepared by AI · approved by ${source.creatorName}`
-                : `${source.creatorName}${source.handle ? ` replied to ${source.handle}` : " · personal reply"}`}
+                ? growthFormat("growthPreparedByAiApprovedBy", {
+                    value1: source.creatorName,
+                  })
+                : source.handle
+                  ? growthFormat("growthSharedReplyTo", {
+                      name: source.creatorName,
+                      handle: source.handle,
+                    })
+                  : growthFormat("growthSharedPersonalReply", {
+                      name: source.creatorName,
+                    })}
             </strong>
             <p
               className={
@@ -59,25 +69,38 @@ export default async function Share({
               {source.text}
             </p>
             <span>
-              Signed by {source.creatorName} ·{" "}
-              {new Date(source.signedAt).toLocaleDateString()}
+              {growthFormat("growthSignedBy", {
+                value1: source.creatorName,
+                value2: new Date(source.signedAt).toLocaleDateString(),
+              })}
             </span>
             <a href={url}>
-              Verify this immutable version {source.version}: {url}
+              {growthFormat("growthVerifyThisImmutableVersion", {
+                value1: source.version,
+                value2: url,
+              })}
             </a>
             {source.correction ? (
               <p>
-                {source.creatorName}'s note on this reply: {source.correction}
+                {growthFormat("growthSNoteOnThisReply", {
+                  value1: source.creatorName,
+                  value2: source.correction,
+                })}
               </p>
             ) : null}
           </article>
-          <h2>Share {source.creatorName}'s reply</h2>
+          <h2>
+            {growthFormat("growthShareSReply", { value1: source.creatorName })}
+          </h2>
           <p className="growth-help">
-            The author label and verification link stay on the default export.
+            {growthCopy.growthTheAuthorLabelAndVerificationLinkStayOnTheDefault}
           </p>
-          <ShareLink url={url} title={`${source.creatorName}'s reply`} />
+          <ShareLink
+            url={url}
+            title={growthFormat("growthSReply", { value1: source.creatorName })}
+          />
           <a className="qv-btn qv-btn--secondary" href={`/share/${id}/image`}>
-            Download labeled image
+            {growthCopy.growthDownloadLabeledImage}
           </a>
         </section>
       </GrowthShell>

@@ -1,0 +1,264 @@
+{
+  "sourceParent": "240fb92adc9435465ef47dabfe6568588074fe77",
+  "publishedProducers": {
+    "W3": "3cda401692fab65fe1af36eb4a8c41ac81b01f8c",
+    "W3PreJournalLineageSeams": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
+    "W6NativeFormatterOnly": "a4d4108794f061ddaab25c40d22ac5752f7131e3",
+    "W7DevelopmentListenOnly": "a6e81193af729b279d63c2db29dd5f0355ddb86e"
+  },
+  "virtualBase": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "6c25f24797a93908bb8781496e80e9bba0afef240f1e97e710ec9932b90c2686",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "158327e879affb3b71f96a6d498a9b62598d74db01a51276da9a3c5d29af0219",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "a6ed1402ba5c2bbd8337c85215cbc77b1954bc54753ad8663f91db432238bd28",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "ad46e57b5ce33ae3c14d362bfc68a7bfa55374b5163d13df36678591e4e06299",
+    "apps/backend/src/modules/conversation/feature.ts": "352f423d1d3eb9d372dbf0aebcf7da7fc326080f684a2e70caee70241e4d4c6b",
+    "apps/backend/src/modules/conversation/privacy.ts": "b5fc99a8d55511a4f68d8ac9ca1bb7ed433ad925ad522b7c53806530e9e9f409",
+    "apps/backend/src/modules/conversation/runtime.ts": "e0db9567dba284d5e5dff71635c0e8b69d031925ad7c66fa51b806eb2a4815e4",
+    "apps/backend/src/modules/conversation/service.ts": "3918ae8be18f4cb3d16822c9bb0a72833b99e8644711492df2b5997b0b50c664",
+    "apps/backend/src/server.ts": "5d5bed398ab60cce6d785d71f391016c4dabc509a6e660f7bc21f71d3d874465",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "ac8d784414e9470465d50274d6d807cc4b78165a2dd0da4019611782ee3f601e",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "17f1ea2c68579393ce595c51ec85484c5c68e97d92f00ee0d9b8c72addc76f99",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift": "27d4013f6d4fa0a8eedbc28c114336ef2ba978af9a6bc0b4025af6bee2f2a76b",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "7e2a3fb86b1e8bdf797958e5497e36bee17faabb45760a4c551c7031b0d23774",
+    "apps/web/app/api/conversations/[...path]/route.ts": "89771c40cec11c8b271880c7b8cbf945aab050f29f0f69104e5f88baf62dace0",
+    "apps/web/app/threads/[creatorId]/[fanId]/messages/[messageId]/page.tsx": "7721ef3653b0a73e91225e834933bd93847af7373c2920f5cab332c634efaa8a",
+    "apps/web/features/conversation/ConversationScreen.tsx": "1d167a8eac95b198300a3b2f9370cf55b13cd4e43f7e6dd9571320c575aa69bd",
+    "packages/api/generated/openapi.json": "d1467c8a70fdb02ef3484165221fab58f6fbd19b348fd605fb76981bc7b38cf8",
+    "packages/api/src/conversation/contracts.ts": "99029c7f9b33d92b96a3fbc2e75d515a6ce47bdf27ceb85928669a379f0c2756",
+    "scripts/generate-shared.mjs": "a3681bc64aa94d73594e9bf4f93206e92a6a57d8f0206ba7a2bb0c6443437572",
+    "apps/backend/src/modules/conversation/corrections.ts": "8010b7877a697bad53f0f9a1216f2140f3885f3a546185cb076f7bca966b27a8",
+    "apps/backend/src/modules/conversation/lineage.ts": "debe2ecac831777592b9ef61902ab529a86f518cd0e1b36bf3d5b1d78562cbd8",
+    "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911",
+    "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11",
+    "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+  },
+  "canonicalApi": {
+    "operations": 48,
+    "allPriorPathsAndOperationObjectsUnchanged": true,
+    "change": "Additive optional conversation lineage/feedback/correction schemas; emitted native models compile"
+  },
+  "sql": {
+    "state": "Three owner proposals copied exactly; unallocated/unapplied; no canonical registry or applied SQL change",
+    "sha256": {
+      "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    }
+  },
+  "preserved": [
+    "Current request-only/same-client thread issuer and 13 existing mutation locks",
+    "Actual account/session cancellation, expected-account BFF/origin guards and native correlation/report scope",
+    "No routeSafety/free-safety emitter, journal/weighted-cost/root/identity/worker copies imported",
+    "All original204 config/copy.json values unchanged; no W6 extraction or protocol copy imported"
+  ],
+  "checks": {
+    "canonicalGenerationConsistency": "passed:48",
+    "backendWebProduction": "passed",
+    "affectedLintFormat": "passed; final loopback server checked again",
+    "existingContracts": "9 passed,2.62s",
+    "existingShared": "2 passed,1.35s",
+    "signedShippingIOS": "passed, normal generic Simulator signing",
+    "android": "assemble/unit/Paparazzi passed,19 cases,zero failures/errors/skips,1m37s",
+    "FolioPreview": "regenerated48 + backend/web/normally signed generic iOS Simulator/Android assemble passed"
+  },
+  "androidXml": [
+    {
+      "path": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.DeliveryProtocolTest.xml",
+      "sha256": "fff78120306e906f4324fe1e0952a73067cd00c31f58f652284762f29eaaebe0",
+      "name": "com.pantopus.qelvora.DeliveryProtocolTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.GeneratedContractTest.xml",
+      "sha256": "1188ea3d29c7cf575d07c3c37f1d6814212d56714310c0c0b81e00841a6a9c98",
+      "name": "com.pantopus.qelvora.GeneratedContractTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.NativeSnapshotsTest.xml",
+      "sha256": "ad6e53f07fa5c3044ea91a80621b836cd5f9c16063cc9fd7f6031eea7dea6fa8",
+      "name": "com.pantopus.qelvora.NativeSnapshotsTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "renameCanonicalInputs": [
+    {
+      "canonical": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+      "renamed": "apps/android/app/src/main/java/com/pantopus/foliopreview/conversation/ConversationClient.kt",
+      "sourceSha256": "6c25f24797a93908bb8781496e80e9bba0afef240f1e97e710ec9932b90c2686"
+    },
+    {
+      "canonical": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "renamed": "apps/android/app/src/main/java/com/pantopus/foliopreview/conversation/W3FanFeatures.kt",
+      "sourceSha256": "158327e879affb3b71f96a6d498a9b62598d74db01a51276da9a3c5d29af0219"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/feature.ts",
+      "renamed": "apps/backend/src/modules/conversation/feature.ts",
+      "sourceSha256": "352f423d1d3eb9d372dbf0aebcf7da7fc326080f684a2e70caee70241e4d4c6b"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/privacy.ts",
+      "renamed": "apps/backend/src/modules/conversation/privacy.ts",
+      "sourceSha256": "b5fc99a8d55511a4f68d8ac9ca1bb7ed433ad925ad522b7c53806530e9e9f409"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/runtime.ts",
+      "renamed": "apps/backend/src/modules/conversation/runtime.ts",
+      "sourceSha256": "e0db9567dba284d5e5dff71635c0e8b69d031925ad7c66fa51b806eb2a4815e4"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/service.ts",
+      "renamed": "apps/backend/src/modules/conversation/service.ts",
+      "sourceSha256": "3918ae8be18f4cb3d16822c9bb0a72833b99e8644711492df2b5997b0b50c664"
+    },
+    {
+      "canonical": "apps/backend/src/server.ts",
+      "renamed": "apps/backend/src/server.ts",
+      "sourceSha256": "5d5bed398ab60cce6d785d71f391016c4dabc509a6e660f7bc21f71d3d874465"
+    },
+    {
+      "canonical": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+      "renamed": "apps/ios/Sources/FolioPreviewUI/Conversation/W3ConversationClient.swift",
+      "sourceSha256": "27d4013f6d4fa0a8eedbc28c114336ef2ba978af9a6bc0b4025af6bee2f2a76b"
+    },
+    {
+      "canonical": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "renamed": "apps/ios/Sources/FolioPreviewUI/Conversation/W3FanFeatures.swift",
+      "sourceSha256": "7e2a3fb86b1e8bdf797958e5497e36bee17faabb45760a4c551c7031b0d23774"
+    },
+    {
+      "canonical": "apps/web/app/api/conversations/[...path]/route.ts",
+      "renamed": "apps/web/app/api/conversations/[...path]/route.ts",
+      "sourceSha256": "89771c40cec11c8b271880c7b8cbf945aab050f29f0f69104e5f88baf62dace0"
+    },
+    {
+      "canonical": "apps/web/app/threads/[creatorId]/[fanId]/messages/[messageId]/page.tsx",
+      "renamed": "apps/web/app/threads/[creatorId]/[fanId]/messages/[messageId]/page.tsx",
+      "sourceSha256": "7721ef3653b0a73e91225e834933bd93847af7373c2920f5cab332c634efaa8a"
+    },
+    {
+      "canonical": "apps/web/features/conversation/ConversationScreen.tsx",
+      "renamed": "apps/web/features/conversation/ConversationScreen.tsx",
+      "sourceSha256": "1d167a8eac95b198300a3b2f9370cf55b13cd4e43f7e6dd9571320c575aa69bd"
+    },
+    {
+      "canonical": "packages/api/src/conversation/contracts.ts",
+      "renamed": "packages/api/src/conversation/contracts.ts",
+      "sourceSha256": "99029c7f9b33d92b96a3fbc2e75d515a6ce47bdf27ceb85928669a379f0c2756"
+    },
+    {
+      "canonical": "scripts/generate-shared.mjs",
+      "renamed": "scripts/generate-shared.mjs",
+      "sourceSha256": "a3681bc64aa94d73594e9bf4f93206e92a6a57d8f0206ba7a2bb0c6443437572"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/corrections.ts",
+      "renamed": "apps/backend/src/modules/conversation/corrections.ts",
+      "sourceSha256": "8010b7877a697bad53f0f9a1216f2140f3885f3a546185cb076f7bca966b27a8"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/lineage.ts",
+      "renamed": "apps/backend/src/modules/conversation/lineage.ts",
+      "sourceSha256": "debe2ecac831777592b9ef61902ab529a86f518cd0e1b36bf3d5b1d78562cbd8"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "renamed": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "sourceSha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
+      "renamed": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
+      "sourceSha256": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "renamed": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "sourceSha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    }
+  ],
+  "logsSha256": {
+    "/private/tmp/creator-w1-continuation-correction-android.log": "7b339f890582c0d36491b9fe1207f2383b01e241468be6b9c466b8a8913b5cb8",
+    "/private/tmp/creator-w1-continuation-correction-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-correction-contracts.log": "ec5ccdaf595aac54c1159f083fdedf6b3ecb45bca30cab641a790d41f8adccbe",
+    "/private/tmp/creator-w1-continuation-correction-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "/private/tmp/creator-w1-continuation-correction-generate-check.log": "2b7c099f006c9ec898a779ce993a0ba17ecc6d55eb32372bdf6c854f252fbef4",
+    "/private/tmp/creator-w1-continuation-correction-generate.log": "14c9029d31d8984b01a2d494bae96e7ba32115809d1a6ac2f278a765d6d49347",
+    "/private/tmp/creator-w1-continuation-correction-ios.log": "96e113aafcb9f4fca57d1f0036db909eacf694ff75a5b68921df8496a0391526",
+    "/private/tmp/creator-w1-continuation-correction-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/creator-w1-continuation-correction-loopback-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "/private/tmp/creator-w1-continuation-correction-loopback-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/creator-w1-continuation-correction-rename-android.log": "ccabd58dbdb5726ca689cff8dfcc570098ceda76b540f1e73112ca0b111c5fdc",
+    "/private/tmp/creator-w1-continuation-correction-rename-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-correction-rename-ios.log": "0a1c08a16ffe968c30be00c47fd787d33c647bf23c90a88ab370bf78b51c23d6",
+    "/private/tmp/creator-w1-continuation-correction-rename-web.log": "6d6054ebfe4a971477b880ea8f18d9037350fdfed8cc99d4ad17d802a1fc72ef",
+    "/private/tmp/creator-w1-continuation-correction-rename.log": "db1eb61d3b2eadbff97fd7277246a1018186c308c183b3c2310b06cd63fa1ed6",
+    "/private/tmp/creator-w1-continuation-correction-shared.log": "00ace799fb15452bb54645808b6af6261e705cbc9c71bd680baf542ae8b06c40",
+    "/private/tmp/creator-w1-continuation-correction-web.log": "18615c7797959273d9dfea71fe5b3a96ba11840e0fd1c6adc1bcb19d80dbe8f4"
+  },
+  "buildGeneratedNoise": {
+    "apps/ios/Package.resolved": {
+      "observedSha256": "1751e9687db9ee9805d9ae66204aa4689473d7e85d298e697b4ce59ba380cfd6",
+      "restoredCommittedSha256": "84c4303864908906c37a4047cc420c4b3afd71454b5c14a7a95a84dd08139c3e",
+      "privateObservedCopy": "/private/tmp/creator-w1-continuation-correction-Package.resolved"
+    },
+    "apps/web/next-env.d.ts": {
+      "observedSha256": "4977aa99004d6920742f195ffedb98408560b266dd9822af715cfe41c90e65f6",
+      "restoredCommittedSha256": "d0f458f50491cf538c328fc7f5e91d1be5b0ecc13ae80ee66966c9675f3efc71",
+      "privateObservedCopy": "/private/tmp/creator-w1-continuation-correction-next-env.d.ts"
+    }
+  },
+  "actualDefaultHost": {
+    "health": {
+      "status": "ok",
+      "ready": false,
+      "foundationReady": true,
+      "identity": "configured",
+      "identityMode": "development",
+      "generation": "unconfigured",
+      "registeredFeatures": ["conversation", "media", "content", "studio"],
+      "readinessEndpoint": "/health/ready",
+      "database": "configured",
+      "featureEnabled": true
+    },
+    "capabilities": {
+      "providers": null,
+      "consentAvailable": false,
+      "generationAvailable": false,
+      "firstConversationAvailable": false,
+      "correctionsAvailable": false,
+      "accessDisclosure": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
+    },
+    "listener": "PID86590,127.0.0.1:4101; own source launch/session88988"
+  },
+  "browserObservation": {
+    "documentWidth": 390,
+    "dpr": 1,
+    "height": 844,
+    "text": "@w1_resume_two\n\nSynthetic local account. Pantopus production sign-in is not connected.\n\nYour intro\n\nW1 disposable intro retained while reconnecting\n\nEdit handle and intro\nMe and privacy\nMemories, who opened your conversations, consents\n\u203a\nSpending and time\nYour limit, receipts, time with each AI\n\u203a\nMemberships\nManage your memberships\n\u203a\nNotifications\nPush and email, per creator, quiet hours\n\u203a\nReceipts\nYour purchases and deliveries\n\u203a\nHelp and safety\nReport, block, crisis support\n\u203a\nMe and privacy\n\nNo conversations yet.\n\nExport or delete my data\nHome\nDiscover\nRequests\nYou",
+    "theme": "light",
+    "url": "http://localhost:3001/you",
+    "width": 390,
+    "screenshot": "artifacts/workstreams/W1/resume/2026-09-30-continuation/correction-account-readback.png",
+    "screenshotSha256": "9361612102d285080ccd3e302380541897fe16499ba8f82547c28b2e84ac9b86"
+  },
+  "limits": [
+    "No actual correction, feedback consent, genuine signature, named publication, microphone/provider or native operation was fabricated",
+    "Default host corrections/provider/generation/first-conversation capability false, foundationReady=true/ready=false",
+    "W3 attributed journal/cost/privacy authority and increment15 canonical entry/audited Studio read remain separately reviewed work, not consumed here",
+    "Earlier13 web/106 component/12 artboard pairs/18 Swift110 images/iOSUI2 are qualified prior-source checks; not new invocation results",
+    "Xcode app-resolution lock archived/restored; no dependency upgrade or hand-edited generated semantics",
+    "Hosted exact-head CI/merge and full H01-H20/release acceptance remain open"
+  ]
+}

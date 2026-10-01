@@ -1,0 +1,82 @@
+{
+  "observedAt": "2026-09-30T19:20:00Z",
+  "headRevision": "bf44ada37268bb489c97d32432e4c4d81f25c8f9",
+  "checks": [
+    {
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746806/job/110042358224"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746521/job/110042355093"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746521/job/110042355020"
+    },
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746521/job/110042354882"
+    },
+    {
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746521/job/110042354844"
+    },
+    {
+      "name": "web-visual",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760746521/job/110042354540"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760744078/job/110042346039"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760744078/job/110042345793"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760744078/job/110042345730"
+    },
+    {
+      "name": "android-foundation",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760744078/job/110042345489"
+    },
+    {
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36760744078/job/110042345083"
+    }
+  ],
+  "diagnostics": {
+    "webAndBackend": "Eight contract cases pass; old non-UUID context fixture expects503 but current C11 returns400. PostgreSQL setup applies only0001 and lacks later identity privileges; no RLS/grant or test change.",
+    "androidRuntime": "Three pass, one fails: legacy invalid arrival cannot expose Remove this post from your first message.",
+    "androidFoundation": "Four existing NativeSnapshotsTest cases fail; goldens unchanged.",
+    "webVisual": "Four pass, nine fail. Invalid legacy arrival/context fixtures; welcome/creator-home references; catalog differences in NoteCompose/Style Light and Thread Night. References and tests unchanged.",
+    "ios": "Queued at this observation; no success inferred."
+  },
+  "mergeReady": false,
+  "prMetadataUpdate": "403 Resource not accessible by integration",
+  "paidAICalls": 0
+}

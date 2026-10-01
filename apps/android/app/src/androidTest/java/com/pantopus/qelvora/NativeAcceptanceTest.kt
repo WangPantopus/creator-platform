@@ -21,7 +21,8 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
-        // Reference composition; the app shell requires real public metadata for arrival.
+        // Exercise removal with explicit illustrative component content. The
+        // unconfigured app host must not invent a public creator's metadata.
         compose.activity.runOnUiThread { compose.activity.setContent { QelvoraTheme(false) { Welcome() } } }
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()

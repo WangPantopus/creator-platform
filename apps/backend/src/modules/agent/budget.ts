@@ -14,9 +14,20 @@ export async function reserveCreatorCost(
     "pricing_required",
     "Verified provider rates are required before live generation.",
   );
+  await repository.transaction(scope, async (client) => {
+    // An expired hold can be an orphaned provider call after a crash. Its cost is
+    // uncertain, so expiry alone must not silently restore the daily budget.
+    await client.query(
+      `WITH expired AS (UPDATE creator.ai_cost_hold SET state='settled'
+       WHERE creator_id=$1 AND state='held' AND expires_at<=now() RETURNING id)
+       INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms)
+       SELECT $1,id::text,'unreconciled','expired-cost-hold',0,0,NULL,'provider_unknown',0 FROM expired`,
+      [scope.creatorId],
+    );
+  });
   return repository.transaction(scope, async (client) => {
     const usage = await client.query<{ total: string; unknown: string }>(
-      "SELECT coalesce(sum(cost_micros),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','provider_unknown') AND created_at>=date_trunc('day',now())",
+      "SELECT coalesce(sum(cost_micros) FILTER(WHERE created_at>=date_trunc('day',now())),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','provider_unknown')",
       [scope.creatorId],
     );
     const holds = await client.query<{ total: string }>(

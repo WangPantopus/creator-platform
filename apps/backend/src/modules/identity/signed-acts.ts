@@ -6,7 +6,7 @@ import {
 import type { Pool, PoolClient } from "pg";
 import { HumanReplySchema, type SignedActCommand } from "@qelvora/api";
 import { contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
 import { identityTransaction } from "./transaction.js";
@@ -300,7 +300,12 @@ export class SignedActService {
       [id],
     );
     const row = result.rows[0];
-    invariant(row, "signature_not_found", "This signed act is unavailable.");
+    if (!row)
+      throw new DomainError(
+        "signature_not_found",
+        "This signed act is unavailable.",
+        404,
+      );
     return {
       signedActId: row.id,
       creatorName: row.creator_name,

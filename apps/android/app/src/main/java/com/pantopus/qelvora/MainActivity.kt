@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.SideEffect
+import androidx.core.view.WindowCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import android.content.Intent
 import java.net.URI
@@ -21,7 +23,14 @@ class MainActivity : ComponentActivity() {
         val local = if (BuildConfig.DEBUG) intent.getStringExtra("api_url")?.takeIf { runCatching { URI(it).let { url -> url.scheme in listOf("http", "https") && url.userInfo == null && url.host in listOf("localhost", "127.0.0.1", "10.0.2.2") } }.getOrDefault(false) } else null
         setContent {
             val appearance = if (BuildConfig.DEBUG) intent.getStringExtra("appearance") else null
-            QelvoraTheme(night = when (appearance) { "night" -> true; "light" -> false; else -> isSystemInDarkTheme() }) {
+            val night = when (appearance) { "night" -> true; "light" -> false; else -> isSystemInDarkTheme() }
+            SideEffect {
+                WindowCompat.getInsetsController(window, window.decorView).apply {
+                    isAppearanceLightStatusBars = !night
+                    isAppearanceLightNavigationBars = !night
+                }
+            }
+            QelvoraTheme(night = night) {
                 if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured))
             }
         }

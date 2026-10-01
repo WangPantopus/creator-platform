@@ -1,4 +1,11 @@
 import { defineConfig } from "@playwright/test";
+const webPort = Number(process.env.CREATOR_VISUAL_WEB_PORT ?? 3000);
+const referencePort = Number(process.env.REFERENCE_PORT ?? 3101);
+for (const port of [webPort, referencePort])
+  if (!Number.isInteger(port) || port < 1024 || port > 65535)
+    throw new Error("Visual checks require a valid unprivileged port.");
+export const visualWebURL = `http://localhost:${webPort}`;
+export const visualReferenceURL = `http://127.0.0.1:${referencePort}`;
 export default defineConfig({
   testDir: "./tests/visual",
   fullyParallel: false,
@@ -13,12 +20,13 @@ export default defineConfig({
   webServer: [
     {
       command: "node scripts/visual-reference.mjs",
-      url: "http://127.0.0.1:3101/phase4a-fan-core/Welcome.dc.html",
+      url: `${visualReferenceURL}/phase4a-fan-core/Welcome.dc.html`,
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: "pnpm --filter @qelvora/web dev",
-      url: "http://localhost:3000/auth/continue",
+      command: `pnpm --filter @qelvora/web exec next dev -p ${webPort}`,
+      url: `${visualWebURL}/auth/continue`,
+      env: { QELVORA_API_URL: "" },
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },

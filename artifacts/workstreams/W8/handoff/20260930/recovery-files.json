@@ -1,0 +1,32 @@
+{
+  "snapshotObservedAt": "2026-09-30T21:04:33Z",
+  "journalExportedAt": "2026-09-30T21:11:05.512Z",
+  "database": "creator_w8",
+  "privateFiles": [
+    {
+      "path": "/private/tmp/creator-w8-handoff-20260930-2104.dump",
+      "bytes": 548072,
+      "mode": "0o600",
+      "sha256": "ce36e73d771113e529d8c521c434662219007908dffea235dcc5e73a2c9e3e0e"
+    },
+    {
+      "path": "/private/tmp/creator-w8-handoff-20260930-2104-journal.json",
+      "bytes": 453,
+      "mode": "0o600",
+      "sha256": "540fd2f04fc0949b51194658b23212976453a47a0540f4e6754841eac847bc16"
+    }
+  ],
+  "snapshotArchiveList": {
+    "exitCode": 0,
+    "entries": 1277
+  },
+  "journal": {
+    "schemaVersion": 2,
+    "tombstones": 1,
+    "credentialRole": "existing non-owner W8 worker",
+    "ownershipPreserved": true
+  },
+  "currentSnapshotRestored": false,
+  "earlierRehearsal": "artifacts/workstreams/W8/resume/20260930-local/integrated-recovery.json",
+  "limits": "Current logical snapshot and journal were exported and checked privately. This is not a WAL backup, off-host durable backup, full erasure receipt, traffic-reopen authorization, or a new restore/RPO/RTO measurement. Never commit either private file."
+}

@@ -46,6 +46,8 @@ export interface MemoryProposalPort {
     scope: ThreadScope,
     item: {
       itemHash: string;
+      kind: "fact" | "open_loop";
+      semanticKey: string;
       text: string;
       category: string;
       expectedRevision: number;
@@ -74,6 +76,7 @@ export async function proposeMemory(input: {
     input.signal,
   );
   await input.onUsage(result.usage);
+  input.signal.throwIfAborted();
   for (const item of result.value.items) {
     const key = item.semanticKey.normalize("NFKC").toLowerCase().trim();
     if (!key || input.snapshot.excludedKeys.includes(key)) continue;
@@ -89,6 +92,7 @@ export async function proposeMemory(input: {
       input.signal,
     );
     await input.onUsage(sensitive.usage);
+    input.signal.throwIfAborted();
     const category =
       item.sensitiveCategory ??
       sensitive.value.category ??
@@ -98,6 +102,8 @@ export async function proposeMemory(input: {
     if (category)
       await input.port.requestConsentOnce(input.scope, {
         itemHash: contentHash({ key, text: item.text, category }),
+        kind: item.kind,
+        semanticKey: key,
         text: item.text,
         category,
         expectedRevision: input.snapshot.revision,

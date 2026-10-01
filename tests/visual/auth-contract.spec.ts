@@ -1,6 +1,7 @@
+import { visualWebURL } from "../../playwright.config";
 import { expect, test } from "@playwright/test";
 
-const origin = "http://localhost:3000";
+const origin = visualWebURL;
 const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",

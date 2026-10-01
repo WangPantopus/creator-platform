@@ -10,18 +10,26 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { SessionSchema } from "@qelvora/api";
 import { AuthorLabel, Avatar, Mark, Notice, Skeleton } from "@qelvora/ui-web";
 import type {
   Configuration,
   EvaluationCase,
   Source,
   StudioState,
+  Version,
   VersionComparison,
 } from "../../../../packages/api/src/agent/contracts";
 import { DraftConfig as ConfigurationSchema } from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
 
 type ErrorBody = { error?: { code: string; message: string } };
+type CreatorAIIdentity = Readonly<{
+  accountId: string;
+  sessionId: string;
+  signal: AbortSignal;
+  end: () => void;
+}>;
 type Preview = {
   sentences: { text: string; citations: string[] }[];
   passages: {
@@ -178,7 +186,15 @@ function Glyph({ name, size = 20 }: { name: string; size?: number }) {
     </svg>
   );
 }
-export function CreatorAI({ section }: { section: string }) {
+export function CreatorAI({
+  section,
+  creatorId,
+  identity,
+}: {
+  section: string;
+  creatorId?: string;
+  identity?: CreatorAIIdentity;
+}) {
   const router = useRouter();
   const current = sections.includes(section) ? section : "overview";
   const [state, setState] = useState<StudioState | null>(null);
@@ -188,6 +204,8 @@ export function CreatorAI({ section }: { section: string }) {
   const [dirty, setDirty] = useState(false);
   const dirtyRef = useRef(false);
   const draftRevision = useRef<number | null>(null);
+  const actorKey = useRef<string | null>(null);
+  const fetchSequence = useRef(0);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -212,6 +230,8 @@ export function CreatorAI({ section }: { section: string }) {
     rightsEvidence: string;
     revision: number;
   } | null>(null);
+  const [olderVersions, setOlderVersions] = useState<Version[]>([]);
+  const [historyEnd, setHistoryEnd] = useState(false);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
   const [selectedCase, setSelectedCase] = useState<EvaluationCase | null>(null);
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -235,94 +255,251 @@ export function CreatorAI({ section }: { section: string }) {
   const [confirmation, setConfirmation] = useState<{
     title: string;
     body: string;
+    confirm: string;
     run: () => Promise<void>;
   } | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const pendingKeys = useRef(new Map<string, string>());
+  const identityAccount = identity?.accountId;
+  const identitySession = identity?.sessionId;
+  const identitySignal = identity?.signal;
+  const endIdentity = identity?.end;
+  const request = useCallback(
+    async (path: string, init: RequestInit = {}) => {
+      identitySignal?.throwIfAborted();
+      const headers = new Headers(init.headers);
+      if (identityAccount)
+        headers.set("X-Expected-Account-Id", identityAccount);
+      const response = await fetch(path, {
+        ...init,
+        headers,
+        cache: "no-store",
+        ...(identitySignal
+          ? {
+              signal: AbortSignal.any([
+                identitySignal,
+                ...(init.signal ? [init.signal] : []),
+              ]),
+            }
+          : {}),
+      });
+      if (identitySignal && endIdentity && identityAccount) {
+        if (response.status === 401) {
+          const current = await fetch("/api/platform/identity/session", {
+            cache: "no-store",
+            signal: AbortSignal.any([
+              identitySignal,
+              AbortSignal.timeout(4000),
+            ]),
+          });
+          if (
+            current.status === 401 ||
+            (current.ok &&
+              SessionSchema.parse(await current.json()).accountId !==
+                identityAccount)
+          )
+            endIdentity();
+        } else if (response.status === 409) {
+          const code = ((await response.clone().json()) as ErrorBody).error
+            ?.code;
+          if (
+            ["session_account_changed", "studio_actor_changed"].includes(
+              code ?? "",
+            )
+          )
+            endIdentity();
+        }
+        identitySignal.throwIfAborted();
+      }
+      return response;
+    },
+    [identityAccount, identitySignal, endIdentity],
+  );
+  useEffect(() => {
+    if (!identitySignal || !identityAccount || !identitySession) return;
+    const sessionKey = `w2-session:${identityAccount}`;
+    const purge = () => {
+      ++fetchSequence.current;
+      actorKey.current = null;
+      pendingKeys.current.clear();
+      try {
+        const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
+          (kind) => `${kind}:${identityAccount}:`,
+        );
+        const keys = Object.keys(localStorage).filter((key) =>
+          prefixes.some((prefix) => key.startsWith(prefix)),
+        );
+        for (const key of keys) localStorage.removeItem(key);
+        localStorage.removeItem(sessionKey);
+      } catch {
+        /* Storage may already be unavailable; the account boundary unmounts. */
+      }
+    };
+    if (identitySignal.aborted) purge();
+    else {
+      // Access-token rotation retains the server session ID. Fresh sign-in
+      // creates another ID, so a draft left on an unmounted page cannot return.
+      if (readDraft(sessionKey) !== identitySession) purge();
+      storeDraft(sessionKey, identitySession);
+      identitySignal.addEventListener("abort", purge, { once: true });
+    }
+    return () => identitySignal.removeEventListener("abort", purge);
+  }, [identityAccount, identitySession, identitySignal]);
   const edit = (next: Configuration) => {
     if (!dirtyRef.current) draftRevision.current = state?.revision ?? null;
     setConfiguration(next);
     dirtyRef.current = true;
     setDirty(true);
   };
-  const fetchState = useCallback(async (initial = false) => {
-    try {
-      const response = await fetch("/api/studio/ai/state", {
-        cache: "no-store",
-      });
-      const data = (await response.json()) as StudioState & ErrorBody;
-      if (!response.ok)
-        throw new Error(data.error?.message ?? "Studio is unavailable.");
-      setState(data);
-      if (!dirtyRef.current) setConfiguration(data.configuration);
-      if (initial) {
-        setStory(data.interview.story);
-        setBoundaries(data.interview.boundaries);
-        setStatusText(data.status?.text ?? "");
-        const cached = readDraft(`w2-source:${data.creator.id}`);
-        if (cached && typeof cached === "object") {
-          const source = cached as {
-            title: string;
-            text: string;
-            rights: string;
-            scopeKind?: string;
-            scopeIds?: string;
-            expiry?: string;
-            sourceOrigin?: "manual_text" | "manual_upload";
-          };
-          setTitle(source.title);
-          setText(source.text);
-          setRights(source.rights);
-          setScopeKind(source.scopeKind ?? "public");
-          setScopeIds(source.scopeIds ?? "");
-          setExpiry(source.expiry ?? "");
-          setSourceOrigin(source.sourceOrigin ?? "manual_text");
+  const fetchState = useCallback(
+    async (initial = false) => {
+      const sequence = ++fetchSequence.current;
+      try {
+        const response = await request("/api/studio/ai/state", {
+          cache: "no-store",
+        });
+        const data = (await response.json()) as StudioState & ErrorBody;
+        identitySignal?.throwIfAborted();
+        if (sequence !== fetchSequence.current) return null;
+        if (!response.ok) {
+          if ([401, 403].includes(response.status)) {
+            setState(null);
+            setConfiguration(null);
+            setReview(null);
+            setPreview(null);
+            setSelectedCase(null);
+            setOlderVersions([]);
+            setComparisons({ available: false, items: [] });
+            setConfirmation(null);
+            actorKey.current = null;
+            dirtyRef.current = false;
+            draftRevision.current = null;
+            setDirty(false);
+            pendingKeys.current.clear();
+          }
+          throw new Error(data.error?.message ?? "Studio is unavailable.");
         }
-        const interview = readDraft(`w2-interview:${data.creator.id}`);
-        if (interview && typeof interview === "object") {
-          const stored = interview as {
-            story: string;
-            boundaries: string;
-          };
-          setStory(stored.story);
-          setBoundaries(stored.boundaries);
+        if (identityAccount && data.actorAccountId !== identityAccount) {
+          endIdentity?.();
+          throw new Error(
+            "Your creator session changed. Continue with Pantopus again.",
+          );
         }
-        const draft = readDraft(`w2-config:${data.creator.id}`) as {
-          revision?: number;
-          configuration?: unknown;
-        } | null;
-        const restored = ConfigurationSchema.safeParse(draft?.configuration);
-        if (restored.success && Number.isInteger(draft?.revision)) {
-          setConfiguration(restored.data);
-          draftRevision.current = draft!.revision!;
-          dirtyRef.current = true;
-          setDirty(true);
-          if (draft!.revision !== data.revision)
-            setError(
-              "The saved draft changed elsewhere. Your unsaved input is preserved; reload the saved draft before editing it again.",
-            );
+        const nextActor = `${data.actorAccountId}:${data.creator.id}`;
+        if (actorKey.current !== nextActor) {
+          initial = true;
+          actorKey.current = nextActor;
+          dirtyRef.current = false;
+          draftRevision.current = null;
+          setDirty(false);
+          setTitle("");
+          setText("");
+          setRights("");
+          setScopeKind("public");
+          setScopeIds("");
+          setExpiry("");
+          setSourceOrigin("manual_text");
+          setSourceForm(false);
+          setReview(null);
+          setPreview(null);
+          setPrompt("");
+          setExample("");
+          setParaphrase("");
+          setRule("");
+          setSponsorBrand("");
+          setAliases("");
+          setSponsorExpiry("");
+          setChanges("");
+          setConfirmed({});
+          setSelectedCase(null);
+          setConfirmation(null);
+          setOlderVersions([]);
+          setHistoryEnd(false);
+          setComparisons({ available: false, items: [] });
+          setMessage("");
+          setError("");
+          pendingKeys.current.clear();
         }
+        setState(data);
+        if (!dirtyRef.current) setConfiguration(data.configuration);
+        if (initial) {
+          setStory(data.interview.story);
+          setBoundaries(data.interview.boundaries);
+          setStatusText(data.status?.text ?? "");
+          const cached = readDraft(`w2-source:${nextActor}`);
+          if (cached && typeof cached === "object") {
+            const source = cached as {
+              title: string;
+              text: string;
+              rights: string;
+              scopeKind?: string;
+              scopeIds?: string;
+              expiry?: string;
+              sourceOrigin?: "manual_text" | "manual_upload";
+            };
+            setTitle(source.title);
+            setText(source.text);
+            setRights(source.rights);
+            setScopeKind(source.scopeKind ?? "public");
+            setScopeIds(source.scopeIds ?? "");
+            setExpiry(source.expiry ?? "");
+            setSourceOrigin(source.sourceOrigin ?? "manual_text");
+          }
+          const interview = readDraft(`w2-interview:${nextActor}`);
+          if (interview && typeof interview === "object") {
+            const stored = interview as {
+              story: string;
+              boundaries: string;
+            };
+            setStory(stored.story);
+            setBoundaries(stored.boundaries);
+          }
+          const draft = readDraft(`w2-config:${nextActor}`) as {
+            revision?: number;
+            configuration?: unknown;
+          } | null;
+          const restored = ConfigurationSchema.safeParse(draft?.configuration);
+          if (restored.success && Number.isInteger(draft?.revision)) {
+            setConfiguration(restored.data);
+            draftRevision.current = draft!.revision!;
+            dirtyRef.current = true;
+            setDirty(true);
+            if (draft!.revision !== data.revision)
+              setError(
+                "The saved draft changed elsewhere. Your unsaved input is preserved; reload the saved draft before editing it again.",
+              );
+          }
+        }
+        return data;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Studio is unavailable.");
+        return null;
       }
-      return data;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Studio is unavailable.");
-      return null;
-    }
-  }, []);
+    },
+    [request, identityAccount, identitySignal, endIdentity],
+  );
   useEffect(() => {
     void fetchState(true);
-    const connected = () => setOnline(navigator.onLine);
-    connected();
+    const connected = () => {
+      setOnline(navigator.onLine);
+      if (navigator.onLine) void fetchState();
+    };
+    setOnline(navigator.onLine);
+    const focused = () => {
+      void fetchState();
+    };
+    window.addEventListener("focus", focused);
     window.addEventListener("online", connected);
     window.addEventListener("offline", connected);
     return () => {
       window.removeEventListener("online", connected);
       window.removeEventListener("offline", connected);
+      window.removeEventListener("focus", focused);
     };
   }, [fetchState]);
   useEffect(() => {
-    if (!state) return;
-    storeDraft(`w2-source:${state.creator.id}`, {
+    if (!state || identitySignal?.aborted) return;
+    storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
       text,
       rights,
@@ -340,18 +517,35 @@ export function CreatorAI({ section }: { section: string }) {
     expiry,
     sourceOrigin,
     state?.creator.id,
+    state?.actorAccountId,
+    identitySignal,
   ]);
   useEffect(() => {
-    if (!state) return;
-    storeDraft(`w2-interview:${state.creator.id}`, { story, boundaries });
-  }, [story, boundaries, state?.creator.id]);
+    if (!state || identitySignal?.aborted) return;
+    storeDraft(`w2-interview:${state.actorAccountId}:${state.creator.id}`, {
+      story,
+      boundaries,
+    });
+  }, [
+    story,
+    boundaries,
+    state?.creator.id,
+    state?.actorAccountId,
+    identitySignal,
+  ]);
   useEffect(() => {
-    if (state && dirty && configuration)
-      storeDraft(`w2-config:${state.creator.id}`, {
+    if (state && dirty && configuration && !identitySignal?.aborted)
+      storeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, {
         revision: draftRevision.current,
         configuration,
       });
-  }, [configuration, dirty, state?.creator.id]);
+  }, [
+    configuration,
+    dirty,
+    state?.creator.id,
+    state?.actorAccountId,
+    identitySignal,
+  ]);
   useEffect(() => {
     if (
       !state?.sources.some((s) => s.state === "processing") &&
@@ -368,13 +562,18 @@ export function CreatorAI({ section }: { section: string }) {
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
     let cancelled = false;
+    const expectedActor = actorKey.current;
     const load = async () => {
       try {
-        const response = await fetch("/api/studio/ai/comparisons", {
+        const response = await request("/api/studio/ai/comparisons", {
           cache: "no-store",
+          headers: expectedActor ? { "X-Studio-Actor": expectedActor } : {},
         });
-        if (response.ok && !cancelled)
-          setComparisons((await response.json()) as typeof comparisons);
+        if (response.ok) {
+          const result = (await response.json()) as typeof comparisons;
+          if (!cancelled && actorKey.current === expectedActor)
+            setComparisons(result);
+        }
       } catch {
         /* Keep the last received comparison during a reconnect. */
       }
@@ -385,22 +584,32 @@ export function CreatorAI({ section }: { section: string }) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [current, state?.creator.id]);
+  }, [current, state?.creator.id, state?.actorAccountId, request]);
   const api = async (path: string, body?: unknown, method = "POST") => {
     if (!navigator.onLine)
       throw new Error(
         "You’re offline. Your input is saved; reconnect before continuing.",
       );
-    const identity = path + JSON.stringify(body ?? {});
+    const expectedActor = actorKey.current;
+    if (!expectedActor)
+      throw new Error("Reload Studio with your current creator session.");
+    const identity = expectedActor + path + JSON.stringify(body ?? {});
     const key = pendingKeys.current.get(identity) ?? crypto.randomUUID();
     pendingKeys.current.set(identity, key);
-    const response = await fetch(`/api/studio/ai/${path}`, {
+    const response = await request(`/api/studio/ai/${path}`, {
       method,
-      headers: { "Content-Type": "application/json", "Idempotency-Key": key },
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": key,
+        "X-Studio-Actor": expectedActor,
+      },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
     const result = (await response.json()) as ErrorBody &
       Record<string, unknown>;
+    identitySignal?.throwIfAborted();
+    if (actorKey.current !== expectedActor)
+      throw new Error("Your Studio session changed. Reload before continuing.");
     if (!response.ok)
       throw new Error(
         result.error?.message ?? "The action did not finish. Try again.",
@@ -439,14 +648,14 @@ export function CreatorAI({ section }: { section: string }) {
     );
     dirtyRef.current = false;
     draftRevision.current = null;
-    storeDraft(`w2-config:${state.creator.id}`, null);
+    storeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, null);
     setDirty(false);
   };
   const actSource = async (source: Source, operation: string) => {
     await api(`sources/${source.id}`, {
       expectedRevision: source.revision,
       action: operation,
-      rightsConfirmed: confirmed[source.id] ?? false,
+      rightsConfirmed: confirmed[`${source.id}:${source.revision}`] ?? false,
     });
   };
   const loadReview = (source: Source) =>
@@ -455,9 +664,13 @@ export function CreatorAI({ section }: { section: string }) {
       setReview(result as typeof review);
     }, "Source opened for review.");
   const sourceRows = state?.sources ?? [];
-  const versionNumber = state?.versions.find(
-    (v) => v.id === state.liveVersionId,
-  )?.number;
+  const versionNumber = state?.liveVersion?.number;
+  const versions = [
+    ...(state?.versions ?? []),
+    ...olderVersions.filter(
+      (v) => !state?.versions.some((current) => current.id === v.id),
+    ),
+  ];
   const titleFor: Record<string, string> = {
     overview: "My AI",
     sources: "What your AI knows",
@@ -480,8 +693,15 @@ export function CreatorAI({ section }: { section: string }) {
     "Earnings",
     "Team",
   ];
-  const destination = (name: string) =>
-    name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
+  const destination = (name: string) => {
+    if (["Notes", "Requests", "Threads"].includes(name)) {
+      const currentCreator = creatorId ?? state?.creator.id;
+      return currentCreator
+        ? `/studio/${encodeURIComponent(currentCreator)}/${name.toLowerCase()}`
+        : "/studio/workspace";
+    }
+    return name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
+  };
   const controlsDisabled = busy || !online;
   const navigate = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -491,6 +711,7 @@ export function CreatorAI({ section }: { section: string }) {
       event.preventDefault();
       setConfirmation({
         title: "Keep your draft changes",
+        confirm: "Save and continue",
         body: "Save these changes before leaving this section.",
         run: async () => {
           await save();
@@ -634,8 +855,9 @@ export function CreatorAI({ section }: { section: string }) {
             {current === "overview" && (
               <>
                 <p className="w2-intro">
-                  Trained on your public voice only. It never says “I feel”, “I
-                  remember you”, or promises your time.
+                  Uses your approved writing and sources. It stays labeled as AI
+                  and never claims human feelings, memories or promises your
+                  time.
                 </p>
                 <section className="w2-live">
                   <div className="w2-between">
@@ -746,7 +968,7 @@ export function CreatorAI({ section }: { section: string }) {
                         !sourceRows.some((s) => s.state === "candidate") ||
                         sourceRows
                           .filter((s) => s.state === "candidate")
-                          .some((s) => !confirmed[s.id])
+                          .some((s) => !confirmed[`${s.id}:${s.revision}`])
                       }
                       onClick={() =>
                         void action(async () => {
@@ -811,8 +1033,8 @@ export function CreatorAI({ section }: { section: string }) {
                           }
                           disabled={
                             controlsDisabled ||
-                            (source.state === "candidate" &&
-                              !confirmed[source.id])
+                            (["candidate", "revoked"].includes(source.state) &&
+                              !confirmed[`${source.id}:${source.revision}`])
                           }
                           onClick={() => {
                             const operation =
@@ -834,6 +1056,10 @@ export function CreatorAI({ section }: { section: string }) {
                                   operation === "revoke"
                                     ? "Revoke this source"
                                     : "Cancel this import",
+                                confirm:
+                                  operation === "revoke"
+                                    ? "Revoke source"
+                                    : "Cancel import",
                                 body: "New replies stop using this source. A live version using it is paused. Historical replies remain, and source access closes.",
                                 run: async () => {
                                   await actSource(source, operation);
@@ -881,6 +1107,7 @@ export function CreatorAI({ section }: { section: string }) {
                             onClick={() =>
                               setConfirmation({
                                 title: "Revoke this source",
+                                confirm: "Revoke source",
                                 body: "This source is removed from future replies and its index is deleted. You can review it again before restoring it.",
                                 run: () => actSource(source, "revoke"),
                               })
@@ -892,11 +1119,15 @@ export function CreatorAI({ section }: { section: string }) {
                         <label>
                           <input
                             type="checkbox"
-                            checked={confirmed[source.id] ?? false}
+                            checked={
+                              confirmed[`${source.id}:${source.revision}`] ??
+                              false
+                            }
                             onChange={(e) =>
                               setConfirmed({
                                 ...confirmed,
-                                [source.id]: e.target.checked,
+                                [`${source.id}:${source.revision}`]:
+                                  e.target.checked,
                               })
                             }
                           />{" "}
@@ -1449,7 +1680,10 @@ export function CreatorAI({ section }: { section: string }) {
                         dirtyRef.current = false;
                         draftRevision.current = null;
                         setDirty(false);
-                        storeDraft(`w2-config:${state.creator.id}`, null);
+                        storeDraft(
+                          `w2-config:${state.actorAccountId}:${state.creator.id}`,
+                          null,
+                        );
                         setMessage("Saved draft reloaded.");
                       }}
                     >
@@ -1478,7 +1712,9 @@ export function CreatorAI({ section }: { section: string }) {
                             DRAFT · REVISION {state.revision}
                           </span>
                           <span className="qv-badge">
-                            {state.evaluation?.state ?? "Not run"}
+                            {state.evaluation && !state.evaluationCurrent
+                              ? `Stale · revision ${state.evaluation.revision}`
+                              : (state.evaluation?.state ?? "Not run")}
                           </span>
                         </div>
                         <ul className="qv-console__list">
@@ -1558,6 +1794,15 @@ export function CreatorAI({ section }: { section: string }) {
                             <p className="qv-console__why">
                               {selectedCase.reason}
                             </p>
+                            {selectedCase.withheld && (
+                              <>
+                                <p className="qv-console__why">
+                                  Withheld before delivery ·{" "}
+                                  {selectedCase.withheld.category}
+                                </p>
+                                <p>{selectedCase.withheld.text}</p>
+                              </>
+                            )}
                           </div>
                         )}
                         <div className="qv-console__foot">
@@ -1657,8 +1902,8 @@ export function CreatorAI({ section }: { section: string }) {
                           <>
                             <AuthorLabel kind="ai" name={state.creator.name} />
                             {preview.sentences.map((sentence, index) => (
-                              <p key={index}>
-                                {sentence.text}
+                              <div key={index}>
+                                <p>{sentence.text}</p>
                                 {sentence.citations.map((id) => (
                                   <details key={id}>
                                     <summary>Open authorized passage</summary>
@@ -1666,13 +1911,13 @@ export function CreatorAI({ section }: { section: string }) {
                                       ?.text ?? "No longer accessible to you"}
                                   </details>
                                 ))}
-                              </p>
+                              </div>
                             ))}
                             <p className="qv-help">
                               Pipeline {preview.durationMs} ms · first approved{" "}
                               {preview.firstApprovedMs ?? "withheld"} ms · cost{" "}
                               {preview.usage.some((u) => u.costMicros === null)
-                                ? "requires reviewed rates"
+                                ? "awaiting provider usage or rate reconciliation"
                                 : `${preview.usage.reduce((sum, u) => sum + (u.costMicros ?? 0), 0)} USD micros`}
                             </p>
                           </>
@@ -1742,7 +1987,7 @@ export function CreatorAI({ section }: { section: string }) {
                         </span>
                       </div>
                     </li>
-                    {state.versions.map((version) => (
+                    {versions.map((version) => (
                       <li
                         key={version.id}
                         className={`qv-version ${version.state === "live" ? "is-live" : ""}`}
@@ -1769,6 +2014,7 @@ export function CreatorAI({ section }: { section: string }) {
                             onClick={() =>
                               setConfirmation({
                                 title: `Roll back to v${version.number}`,
+                                confirm: `Roll back to v${version.number}`,
                                 body: "The prior immutable version is reused after current license, source and creator-authority checks.",
                                 run: async () => {
                                   await api(`versions/${version.id}/rollback`);
@@ -1782,6 +2028,28 @@ export function CreatorAI({ section }: { section: string }) {
                       </li>
                     ))}
                   </ul>
+                  {state.versions.length === 100 && !historyEnd && (
+                    <Button
+                      disabled={busy || !online}
+                      onClick={() =>
+                        void action(async () => {
+                          const before = versions[versions.length - 1]!.number;
+                          const page = (await api(
+                            `versions?before=${before}`,
+                            undefined,
+                            "GET",
+                          )) as { items: Version[]; nextBefore: number | null };
+                          setOlderVersions((current) => [
+                            ...current,
+                            ...page.items,
+                          ]);
+                          setHistoryEnd(page.nextBefore === null);
+                        }, "Earlier versions loaded.")
+                      }
+                    >
+                      Load earlier versions
+                    </Button>
+                  )}
                   <a
                     className="qv-btn qv-btn--quiet"
                     href="/api/studio/ai/export"
@@ -1928,6 +2196,7 @@ export function CreatorAI({ section }: { section: string }) {
                     onClick={() =>
                       setConfirmation({
                         title: "Pause my AI",
+                        confirm: "Pause my AI",
                         body: "Generation stops. Any pending commitments remain visible until their refunds are confirmed.",
                         run: async () => {
                           await api("pause");
@@ -2125,11 +2394,14 @@ export function CreatorAI({ section }: { section: string }) {
       <dialog
         ref={dialog}
         className="w2-dialog"
+        aria-labelledby="w2-confirm-title"
+        aria-describedby="w2-confirm-body"
         onCancel={() => setConfirmation(null)}
         onClose={() => setConfirmation(null)}
       >
-        <h2>{confirmation?.title}</h2>
-        <p>{confirmation?.body}</p>
+        <h2 id="w2-confirm-title">{confirmation?.title}</h2>
+        <p id="w2-confirm-body">{confirmation?.body}</p>
+        {error && <p role="alert">{error}</p>}
         <div className="w2-actions">
           <Button
             disabled={busy}
@@ -2141,7 +2413,7 @@ export function CreatorAI({ section }: { section: string }) {
                 }, "Action saved.");
             }}
           >
-            Continue
+            {confirmation?.confirm}
           </Button>
           <Button variant="quiet" onClick={() => setConfirmation(null)}>
             Cancel

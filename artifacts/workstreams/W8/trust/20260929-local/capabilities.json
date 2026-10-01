@@ -1,0 +1,16 @@
+{
+  "httpStatus": 200,
+  "localDevelopment": true,
+  "identityMode": "synthetic_local",
+  "actorVerification": "configured",
+  "privacyDomains": [
+    "identity",
+    "conversation",
+    "agent",
+    "commerce",
+    "content",
+    "media",
+    "growth",
+    "trust"
+  ]
+}

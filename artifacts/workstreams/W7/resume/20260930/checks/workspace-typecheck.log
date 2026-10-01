@@ -1,0 +1,25 @@
+$ turbo run typecheck
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running typecheck in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/api:typecheck: cache hit, replaying logs 14baa0f3ebd50467
+@qelvora/api:typecheck: $ tsc --noEmit
+@qelvora/brand:typecheck: cache hit, replaying logs 82b6e60a5032143e
+@qelvora/tokens:typecheck: cache hit, replaying logs 53cffeeeea9741bf
+@qelvora/copy:typecheck: cache hit, replaying logs 4bb4130cd778c61d
+@qelvora/brand:typecheck: $ tsc --noEmit
+@qelvora/tokens:typecheck: $ tsc --noEmit
+@qelvora/copy:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: cache miss, executing 8ade44f4d93cd274
+@qelvora/ui-web:typecheck: cache hit, replaying logs f3d427d006a3f7a8
+@qelvora/ui-web:typecheck: $ tsc --noEmit
+@qelvora/web:typecheck: cache miss, executing f4b0684c6c7ce8fb
+@qelvora/web:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: $ tsc --noEmit
+
+ Tasks:    7 successful, 7 total
+Cached:    5 cached, 7 total
+  Time:    4.105s

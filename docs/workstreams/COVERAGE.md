@@ -2,6 +2,8 @@
 
 This is the master navigation map; the research inventories contain the detailed rows and implementation evidence. Every named requirement has an owner even when its release is later. Status at planning time is **not delivered**, except for the narrowly described foundation primitives in the inventories.
 
+W7 continuation2026-09-30: [current matrix](../../artifacts/workstreams/W7/resume/20260930/acceptance.md) separates runnable implementation, actual local UI/DB diagnostics and unmet integrated acceptance. C09/C10/O16–18 have further implementation; no all19-producer, populated13-artboard, production privacy or release gate is closed by this update.
+
 ## Inventory accounting
 
 | Source scope | Coverage location | Completion rule |

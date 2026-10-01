@@ -1,0 +1,205 @@
+{
+  "checkedAt": "2026-09-30T04:43:24.009255+00:00",
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/7",
+  "stoppedServers": {
+    "actions": [
+      {
+        "pid": 36563,
+        "signal": "TERM",
+        "verifiedLease": true
+      },
+      {
+        "pid": 36573,
+        "action": "no signal; process ended or identity changed"
+      },
+      {
+        "pid": 65420,
+        "signal": "TERM",
+        "verifiedLease": true
+      },
+      {
+        "pid": 65818,
+        "signal": "TERM",
+        "verifiedLease": true
+      }
+    ],
+    "ports": ""
+  },
+  "deviceCommands": [
+    {
+      "command": "adb -s emulator-5568 emu kill",
+      "exitCode": 0,
+      "output": "OK: killing emulator, bye bye\nOK\n",
+      "error": ""
+    },
+    {
+      "command": "xcrun simctl shutdown DBA500E9-A3E5-4424-83D6-ED4178991663",
+      "exitCode": 0,
+      "output": "",
+      "error": ""
+    },
+    {
+      "command": "xcrun simctl delete DBA500E9-A3E5-4424-83D6-ED4178991663",
+      "exitCode": 0,
+      "output": "",
+      "error": ""
+    }
+  ],
+  "fileCleanup": {
+    "releasedAt": "2026-09-30T04:41:44.845716+00:00",
+    "removedPaths": [
+      "/private/tmp/creator-w8-backend-typecheck.log",
+      "/private/tmp/creator-w8-android-public-help-build.log",
+      "/private/tmp/w8-handoff-candidates.json",
+      "/private/tmp/w8-shared-whitespace.txt",
+      "/private/tmp/creator-w8-ios-build.log",
+      "/private/tmp/w8-handoff-probes.json",
+      "/private/tmp/creator-w8-android-gradle-cache",
+      "/private/tmp/creator-w8-ios",
+      "/private/tmp/w8-handoff-secret-scan.json",
+      "/private/tmp/w8-appeals.curl",
+      "/private/tmp/creator-w8-ios-release-check.log",
+      "/private/tmp/creator-w8-ios-trust-fixed.png",
+      "/private/tmp/creator-w8-ios-derived",
+      "/private/tmp/creator-w8-web",
+      "/private/tmp/w8-liveness.json",
+      "/private/tmp/w8-handoff-git-before.z",
+      "/private/tmp/w8-deletion-request.json",
+      "/private/tmp/w8-handoff-capture",
+      "/private/tmp/creator-platform-w8-foundation-20260929.tgz",
+      "/private/tmp/w8-public-capabilities.json",
+      "/private/tmp/creator-w8-ios-complete-build.log",
+      "/private/tmp/w8-readiness.json",
+      "/private/tmp/creator-w8-ios-trust.png",
+      "/private/tmp/w8-backend-final-typecheck.log",
+      "/private/tmp/w8-create-handoff-branch.py",
+      "/private/tmp/w8-verification.curl",
+      "/private/tmp/w8-backend-final-lint.log",
+      "/private/tmp/creator-w8-ios-current.png",
+      "/private/tmp/creator-w8-ios-signed-public-help-build.log",
+      "/private/tmp/creator-w8-android-final-build.log",
+      "/private/tmp/creator-w8-android-emulator.log",
+      "/private/tmp/w8-owned-tsconfig.json",
+      "/private/tmp/creator-w8-trust-deploy.mjs",
+      "/private/tmp/w8-handoff-git.index",
+      "/private/tmp/w8-verification-session.json",
+      "/private/tmp/w8-fan.curl",
+      "/private/tmp/w8-restore-current-metadata.json",
+      "/private/tmp/creator-w8-android-current.png",
+      "/private/tmp/creator-w8-android-trust-fixed.png",
+      "/private/tmp/w8-operator.curl",
+      "/private/tmp/creator-w8-android-build",
+      "/private/tmp/w8-handoff-secret-scan-reviewed.json",
+      "/private/tmp/w8-public-help.json",
+      "/private/tmp/creator-w8-android-full-build.log",
+      "/private/tmp/creator-w8-ios-trust-signed.png",
+      "/private/tmp/w8-appeals-session.json",
+      "/private/tmp/creator-w8-ios-crisis.png",
+      "/private/tmp/w8-adopt-growth.sql",
+      "/private/tmp/w8-handoff-processes.json",
+      "/private/tmp/creator-w8-android",
+      "/private/tmp/creator-w8-emulator.log",
+      "/private/tmp/creator-w8-ios-full-build.log",
+      "/private/tmp/creator-w8-ios-public-help-build.log",
+      "/private/tmp/creator-w8-android-trust.png",
+      "/private/tmp/w8-current-creator.curl",
+      "/private/tmp/w8-privacy-ownership-requests.json",
+      "/private/tmp/w8-other_fan-session.json",
+      "/private/tmp/w8-handoff-readiness.json",
+      "/private/tmp/w8-operator-session.json",
+      "/private/tmp/creator-w8-android-complete-build.log",
+      "/private/tmp/w8-growth-actual.sql",
+      "/private/tmp/w8-owned-whitespace.txt",
+      "/private/tmp/creator-w8-android-release-check.log",
+      "/private/tmp/creator-w8-android-crisis.png",
+      "/private/tmp/w8-current-safety.curl",
+      "/private/tmp/w8-safety-session.json",
+      "/private/tmp/w8-growth-reference.sql",
+      "/private/tmp/w8-safety.curl",
+      "/private/tmp/w8-dependency-audit.json",
+      "/private/tmp/w8-reference-migration.log",
+      "/private/tmp/w8-current-fan.curl",
+      "/private/tmp/w8-other_fan.curl",
+      "/private/tmp/creator-w8-android-build.log",
+      "/private/tmp/w8-metrics.json",
+      "/private/tmp/creator-w8-ios-final.png",
+      "/private/tmp/w8-fan-session.json",
+      "/private/tmp/w8-handoff-capture.json",
+      "/private/tmp/creator-w8-ios-final-build.log",
+      "/Users/yingpengwang/.android/avd/CreatorPlatform_W8.ini",
+      "/Users/yingpengwang/.android/avd/CreatorPlatform_W8.avd",
+      "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w8-ios-derived_SourcePackages_Package.resolved.lock",
+      "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_tmp_creator-w8-ios-derived_SourcePackages_Package.resolved.lock",
+      "/private/var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/_private_tmp_creator-w8-ios-derived_SourcePackages_workspace-state.json.lock",
+      "/Users/yingpengwang/Library/Logs/CoreSimulator/DBA500E9-A3E5-4424-83D6-ED4178991663"
+    ],
+    "retainedRecoveryFiles": [
+      "/private/tmp/w8-deletion-journal.json",
+      "/private/tmp/creator-w8-before-deletion.dump",
+      "/private/tmp/w8-handoff-git-receipt.json"
+    ],
+    "allocatedKiBBeforeDeletion": [
+      {
+        "path": "/private/tmp/creator-w8-android-gradle-cache",
+        "allocatedKiB": 1183056
+      },
+      {
+        "path": "/private/tmp/creator-w8-ios",
+        "allocatedKiB": 12044
+      },
+      {
+        "path": "/private/tmp/creator-w8-ios-derived",
+        "allocatedKiB": 518564
+      },
+      {
+        "path": "/private/tmp/creator-w8-web",
+        "allocatedKiB": 49804
+      },
+      {
+        "path": "/private/tmp/w8-handoff-capture",
+        "allocatedKiB": 29364
+      },
+      {
+        "path": "/private/tmp/creator-w8-android-build",
+        "allocatedKiB": 90104
+      },
+      {
+        "path": "/private/tmp/creator-w8-android",
+        "allocatedKiB": 7684
+      },
+      {
+        "path": "/Users/yingpengwang/.android/avd/CreatorPlatform_W8.avd",
+        "allocatedKiB": 1354572
+      }
+    ],
+    "limits": "File allocation sizes are approximate, not measured net free-space change. Shared dependencies/SDKs/runtimes/peer outputs and repository sources untouched. Docker service returned503; W8 container/image/volume removal not performed."
+  },
+  "dockerInspection": [
+    {
+      "request": "/_ping",
+      "status": 503,
+      "response": "Docker Desktop is unable to start\n\n\n"
+    },
+    {
+      "request": "/containers/creator-platform-w8-local/json",
+      "status": 503,
+      "response": "Docker Desktop is unable to start\n\n\n"
+    }
+  ],
+  "avdDeleted": true,
+  "iosDeviceDirectoryDeleted": true,
+  "iosSimulatorAbsentFromRegistry": true,
+  "androidEmulatorAbsent": true,
+  "remainingLeasedListeners": "",
+  "deletedPathsStillPresent": [],
+  "sharedDependenciesRetained": {
+    "nodeModules": true,
+    "androidSDK": true,
+    "repositorySources": true
+  },
+  "cleanupStatus": "W8 servers, simulator/emulator, builds, isolated caches/source copies/temp credentials released; Docker container/image cleanup blocked by global Docker service503",
+  "remainingDockerAction": "After Docker Desktop is recovered by its owner, inspect only creator-platform-w8-local and mounts, preserve needed data/volume or fresh backup, remove that container without volume deletion, and remove only W8-exclusive unreferenced images. The shared pgvector image must remain while peers use it. No W8 trust image was built in the measured run.",
+  "retainedRecovery": "Old synthetic deletion backup and newer journal are mode0600 in /private/tmp, not in Git; live DB state was not exported during cleanup because Docker is unavailable. Container/volumes were not deleted.",
+  "browserInspection": "CUA inventory showed no W8 in-app or Chrome tabs; no shared app was quit",
+  "historicalCheckpointCommit": "0e6083e57ae4c287c4eefe3b4a38a61dd74e202b"
+}

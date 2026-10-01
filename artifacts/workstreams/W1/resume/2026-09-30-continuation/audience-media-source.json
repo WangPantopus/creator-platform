@@ -1,0 +1,185 @@
+{
+  "sourceParent": "0805caad635b6daafcd7bfe1117a2ebe0a6723e5",
+  "producerBaseline": "49e90549f2161cc7a90047b00f9370016ffb6ec4",
+  "publishedProducers": [
+    "4ce525ce3725f576fc458a7023b320d32989a04a",
+    "d15a4519b1c335ff86c6bfe4ed620b192944558e",
+    "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+    "20fb92330429ba84ed1a85d3dbe92b348f6cc7f4",
+    "de17183743a0c2aa3c6fb4ed8e4b0308708b3422"
+  ],
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "e6cdf69df6d20a5adb098003a2dd36a9c05406cc948c6f83f494239768f4fb3b",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "fbc9db61869dc06226cb9c56d45663550336b4c569d5932bbaca93ace877af60",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeVoiceRecorder.kt": "a6933e38a75251d9207440404615ba60f5c0e048d94093c4dde031725224ede1",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "c00db89769b06b7eb51c1f237f34e2daa4d1cbe4e24b8463147c03e69a474d53",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "2d9898514cb30b88c31acd33663adec82fd001bc471d0973b14ec06f89f94aec",
+    "apps/backend/src/modules/media/creator-scope.sql": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+    "apps/backend/src/modules/media/creator-service.ts": "702da0dec4152fc4cc043c11a43507a39320431d565e6cd3cb5bbb8e2d13421d",
+    "apps/backend/src/modules/media/creator-worker.ts": "e092d0574dc96abd24884256e9e5e333284a6fbdba858c4ab1e53c910c2c4e0c",
+    "apps/backend/src/modules/media/lifecycle.ts": "f80f342e2a5d244d503ff23f441c6956d66c0a071dae071ada1dfb29eb38d839",
+    "apps/backend/src/modules/media/registration.ts": "dd2d430e6420587fae57efcd3b02cab6a2ad8ba940d31dba130046435e228024",
+    "apps/backend/src/modules/media/router.ts": "363a28b71c53bf8b2920604c1361bc5fabd8ece56877a10b0600e7c552d0870f",
+    "apps/backend/src/modules/media/storage.ts": "e6c0bc3c178eb976df53bb72637c35f92a5ee3819cebc0e189b1d1c9952e2e9c",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "b655ed72346a9968fbee99a0b9d55652bac23b8cadcb03d270b529b8429499e4",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "ae8156ebfa0048190e7f04c7a28d7b9b1f830b8517b94126b5a3c2790ea9c18a",
+    "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "17d6134ce254db3cd3b65be76c743b03fff786e1b54c105a8d7cd14c5f6a2e67",
+    "apps/web/features/media/VoicePlayer.tsx": "e8e12eb43458e158425d199cae399c80669b62d1ddb1faad44baf4c1e5dfe143",
+    "apps/web/features/media/VoiceRecorder.tsx": "4984b61ed25c70943f68b1a7f107288a3f675ce4ff82de1811bbcf77b78f0bdd",
+    "apps/web/features/media/api.ts": "57fbd8ba4851eec2e34ec6fcb6d14c1915872d7ccd3f730e3dad49229b145e98",
+    "apps/web/features/media/recorder.ts": "6dc610a8dc207c33c2774f79feebff4aa29760362a98f25226b1f282dc9cddca",
+    "packages/api/generated/openapi.json": "d5a22c7059f44e5359d4de01a8043451323d2c2f94911e7ed94cbb9da5468f74",
+    "packages/api/src/media-openapi.ts": "3d36764d70503b83650677f5688d3045cb5c6688e3922c2772ba5587b150b673",
+    "packages/api/src/media.ts": "b9ac6ea889342aa8830af0cf0e31a5fcaa5f0282ae63a79cc86dca4d92fc6f9b"
+  },
+  "canonicalApi": {
+    "operations": 48,
+    "unchangedPriorOperationObjects": 44,
+    "addedOperations": [
+      {
+        "method": "GET",
+        "path": "/v1/w6/creators/{creatorId}/media-policy",
+        "operationId": "readCreatorMediaPolicy"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/w6/creators/{creatorId}/audience-media/{assetId}",
+        "operationId": "readAudienceCreatorMedia"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/w6/creators/{creatorId}/audience-media/{assetId}/playback",
+        "operationId": "audienceCreatorMediaPlayback"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/w6/creators/{creatorId}/audience-media/{assetId}/play",
+        "operationId": "playAudienceCreatorMedia"
+      }
+    ],
+    "schemaChanges": "Five existing creator-media schemas add post_audio; policy schema is additive"
+  },
+  "checks": {
+    "canonicalGeneration": "passed: 48 operations",
+    "generationConsistency": "passed: 48 operations",
+    "backendProductionBuild": "passed",
+    "webProductionBuild": "passed",
+    "normallySignedGenericIOSSimulatorBuild": "passed",
+    "androidAssembleAndExistingUnitPaparazzi": "passed: 19 cases, 0 failures/errors/skipped, 4m 1s",
+    "existingContracts": "9 passed, 2.33s",
+    "existingShared": "2 passed, 1.14s",
+    "affectedLintFormat": "passed",
+    "disposableFolioPreview": "generation/consistency48 + backend/web/normally signed generic iOS Simulator/Android assemble passed"
+  },
+  "androidXml": [
+    {
+      "file": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.DeliveryProtocolTest.xml",
+      "sha256": "db0608b5c423eaac9ef3c83f16bd53cb1048cea2481295e0c7953003a2f90826",
+      "suite": "com.pantopus.qelvora.DeliveryProtocolTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.GeneratedContractTest.xml",
+      "sha256": "c30748f86a93de3c9618d18c3e4048ef4eb609e2bc71fa29fcafdb3390ff4423",
+      "suite": "com.pantopus.qelvora.GeneratedContractTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "/private/tmp/creator-w1-continuation-android-20260930/app-build/test-results/testDebugUnitTest/TEST-com.pantopus.qelvora.NativeSnapshotsTest.xml",
+      "sha256": "d3d47a9b7f4096405868685f6dbe2ed81d127e5d72164318f25dbcf9c6c69b29",
+      "suite": "com.pantopus.qelvora.NativeSnapshotsTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "logsSha256": {
+    "/private/tmp/creator-w1-continuation-audience-media-android.log": "69051777a448d17fba324067478301987523bce950155603982fa40616df9393",
+    "/private/tmp/creator-w1-continuation-audience-media-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-audience-media-contracts.log": "e42d6842716057d54c0f6cea8782eca6ca3ccd04ce002b3d5e9112dd5722842e",
+    "/private/tmp/creator-w1-continuation-audience-media-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "/private/tmp/creator-w1-continuation-audience-media-generate-check.log": "2b7c099f006c9ec898a779ce993a0ba17ecc6d55eb32372bdf6c854f252fbef4",
+    "/private/tmp/creator-w1-continuation-audience-media-generate.log": "14c9029d31d8984b01a2d494bae96e7ba32115809d1a6ac2f278a765d6d49347",
+    "/private/tmp/creator-w1-continuation-audience-media-ios.log": "6960c1515e0b6cc9a74e6a4b8452351935923fb477dafab61b990cb68bfcb0dc",
+    "/private/tmp/creator-w1-continuation-audience-media-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/creator-w1-continuation-audience-media-policy-enum-javap.log": "630454cb7607a1a8df5b2405a3f57de7df7bff47f65dc7b3d3beed260185d8bd",
+    "/private/tmp/creator-w1-continuation-audience-media-rename-android.log": "a75d3226f2308e5d8c5a798bca681f561b0bf963b10fbedd050be6223f3e69e0",
+    "/private/tmp/creator-w1-continuation-audience-media-rename-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-audience-media-rename-ios.log": "58ef982b3370b3d497945af82bc90c0cd202fa1b5fe1fce8449e6dd90abbf101",
+    "/private/tmp/creator-w1-continuation-audience-media-rename-web.log": "5ee9083a1970fc71bcd41892876d245940a066278e5e048cf371071f946197d4",
+    "/private/tmp/creator-w1-continuation-audience-media-rename.log": "b09cf9dd189c70a87b7579d474d9ef188663299dccf4c168206b63a5f41b7eaa",
+    "/private/tmp/creator-w1-continuation-audience-media-shared.log": "06b0638c0f105de00766fbac1891387fd5c416f3804616888c76adaffa15e3af",
+    "/private/tmp/creator-w1-continuation-audience-media-web.log": "7a11bc4cb96a40b8d642f1f59ae0bfbf87227ea7a70fc12ad03841029b95376f"
+  },
+  "buildGeneratedNoise": {
+    "apps/ios/Package.resolved": {
+      "buildWrittenSha256": "1751e9687db9ee9805d9ae66204aa4689473d7e85d298e697b4ce59ba380cfd6",
+      "restoredCommittedSha256": "84c4303864908906c37a4047cc420c4b3afd71454b5c14a7a95a84dd08139c3e",
+      "privateObservedCopy": "/private/tmp/creator-w1-continuation-audience-media-Package.resolved"
+    },
+    "apps/web/next-env.d.ts": {
+      "buildWrittenSha256": "4977aa99004d6920742f195ffedb98408560b266dd9822af715cfe41c90e65f6",
+      "restoredCommittedSha256": "d0f458f50491cf538c328fc7f5e91d1be5b0ecc13ae80ee66966c9675f3efc71",
+      "privateObservedCopy": "/private/tmp/creator-w1-continuation-audience-media-next-env.d.ts"
+    }
+  },
+  "actualDefaultHost": {
+    "health": {
+      "status": "ok",
+      "ready": false,
+      "foundationReady": true,
+      "identity": "configured",
+      "identityMode": "development",
+      "generation": "unconfigured",
+      "registeredFeatures": ["conversation", "media", "content", "studio"],
+      "readinessEndpoint": "/health/ready",
+      "database": "configured",
+      "featureEnabled": true
+    },
+    "capabilities": {
+      "mediaAvailable": false,
+      "creatorMediaAvailable": false,
+      "creatorMediaAudienceAvailable": false,
+      "callsAvailable": false,
+      "aiAudioAvailable": false,
+      "reason": "media_unconfigured"
+    }
+  },
+  "sql": {
+    "path": "apps/backend/src/modules/media/creator-scope.sql",
+    "sha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+    "state": "W6 proposal; unallocated and unapplied; canonical applied registry unchanged"
+  },
+  "preserved": [
+    "W1 request-only current session/creator and audience issuers, denial-context finally restoration",
+    "Canonical BFF origin/current account and abort/mismatch checks",
+    "No older producer root/identity/generator or generated output copied",
+    "No live brand, economics, approved Post duration, provider or purpose-worker authority fabricated"
+  ],
+  "limits": [
+    "Source/types/builds and retained automated checks are supporting evidence; no personally operated microphone/native upload/published media/provider acceptance",
+    "Default runtime remains unconfigured and gated, foundationReady=true/ready=false",
+    "Xcode rewrote app resolution to xctest-dynamic-overlay1.13.1; build observed bytes are archived privately; original Package.resolved restored with no dependency upgrade committed",
+    "All13 web/106 component pairs/12 artboard pairs and earlier18 Swift/110 images/iOSUI2 are qualified prior-source runs; not repeated for this invocation",
+    "No new tests, applied SQL or reference-artboard edits; no release-ready claim"
+  ],
+  "browserObservation": {
+    "documentWidth": 390,
+    "dpr": 1,
+    "height": 844,
+    "text": "Open a saved Note\nChoose a Note in your own Studio before recording its voice note.Open Studio",
+    "theme": "light",
+    "url": "http://localhost:3001/media/voice",
+    "width": 390,
+    "scope": "Actual no-object saved-Note entry, not recording/upload acceptance",
+    "screenshot": "artifacts/workstreams/W1/resume/2026-09-30-continuation/media-saved-note-entry.png",
+    "screenshotSha256": "5bf4b5b583ca646443612776819eb6588c2b72f273f34e509aae3ff8d175ffc2"
+  }
+}

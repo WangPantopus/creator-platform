@@ -1,0 +1,45 @@
+{
+  "environment": "local-development",
+  "release": "uncommitted-w8",
+  "startedAt": "2026-09-30T03:02:41.201Z",
+  "uptimeSeconds": 157.183696834,
+  "memoryBytes": {
+    "rss": 70303744,
+    "heapTotal": 21741568,
+    "heapUsed": 19611232,
+    "external": 5150281,
+    "arrayBuffers": 1157798
+  },
+  "eventLoopLagMs": {
+    "p95": 22.069247,
+    "p99": 22.478847
+  },
+  "signals": {
+    "privacy_queue_count": 0,
+    "privacy_queue_age_seconds": 0,
+    "privacy_blocked_count": 28,
+    "dead_letter_count": 0,
+    "effect_blocked_count": 1,
+    "effect_queue_age_seconds": 0,
+    "safety_urgent_case_age_seconds": 0,
+    "worker_pool_waiting": 0,
+    "worker_pool_total": 2
+  },
+  "http": {
+    "POST:/v1/trust/dev/session:2xx": {
+      "count": 2,
+      "sum": 17.194500000026892,
+      "buckets": [2, 2, 2, 2, 2, 2, 2, 2]
+    },
+    "POST:/v1/trust/privacy/jobs:2xx": {
+      "count": 1,
+      "sum": 45.095000000001164,
+      "buckets": [1, 1, 1, 1, 1, 1, 1, 1]
+    },
+    "GET:/v1/trust/capabilities:2xx": {
+      "count": 1,
+      "sum": 0.9115000000019791,
+      "buckets": [1, 1, 1, 1, 1, 1, 1, 1]
+    }
+  }
+}

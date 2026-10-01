@@ -971,11 +971,16 @@ export function Message(p: MessageProps) {
         "div",
         { className: "qv-draft qv-draft--split" },
         h(
+          "span",
+          { className: "qv-sr" },
+          copy.preparedByAI + " · " + formatCopy("approvedBy", { name }),
+        ),
+        h(
           "div",
           { className: "qv-draft__body" },
           h(
             "div",
-            { className: "qv-author" },
+            { className: "qv-author", "aria-hidden": true },
             h("span", { className: "qv-mark qv-ink-ai" }, G.ring(14)),
             h("span", { className: "qv-ink-ai" }, copy.preparedByAI),
           ),
@@ -990,7 +995,7 @@ export function Message(p: MessageProps) {
           h(Seal, { size: 18, initial: name.charAt(0) }),
           h(
             "span",
-            { className: "qv-ink-maya-accent" },
+            { className: "qv-ink-maya-accent", "aria-hidden": true },
             formatCopy("approvedBy", { name }),
           ),
           h("span", { className: "qv-draft__spacer" }),
@@ -1958,7 +1963,10 @@ export function Button(p: ButtonProps) {
   );
 }
 export function TabBar(p: TabBarProps) {
-  const tabs: [string, (s?: number) => React.ReactElement][] = [
+  const tabs: [
+    NonNullable<TabBarProps["active"]>,
+    (s?: number) => React.ReactElement,
+  ][] = [
     ["Home", G.home],
     ["Discover", G.compass],
     ["Requests", G.inbox],
@@ -1973,7 +1981,7 @@ export function TabBar(p: TabBarProps) {
         "a",
         {
           key: t[0],
-          href: "#",
+          href: p.hrefs?.[t[0]] ?? "#",
           className: cx("qv-tab", active === t[0] && "is-active"),
           "aria-current": active === t[0] ? "page" : undefined,
         },
