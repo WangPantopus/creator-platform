@@ -114,47 +114,42 @@ export class PassPoolJournal {
     return this.service.account(
       actor,
       async (client) => {
+        await this.service.assertCreatorFinancialRead(client, actor, creatorId);
         await this.assertInstalled(client);
-        const creators = await client.query<{ id: string }>(
-          "SELECT id FROM creator.creator_profile WHERE account_id=$1 AND verification='verified' AND NOT recovery_required AND id=$2 LIMIT 1",
-          [actor.accountId, creatorId],
-        );
-        const summaries = [];
-        for (const creator of creators.rows) {
-          // Complete creator-scoped aggregate, independent of overview row limits.
-          // These are recorded slots, not a claim of current provider funding.
-          const current = (
-            await client.query<{
-              cycle: string;
-              observed_at: Date;
-              closes_at: Date;
-              fans: string;
-              slots: string;
-            }>(
-              `SELECT to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS cycle,
+        // Complete creator-scoped aggregate, independent of overview row limits.
+        // These are recorded slots, not a claim of current provider funding.
+        const current = (
+          await client.query<{
+            cycle: string;
+            observed_at: Date;
+            closes_at: Date;
+            fans: string;
+            slots: string;
+          }>(
+            `SELECT to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS cycle,
           now() AS observed_at,
           (date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC' AS closes_at,
           count(DISTINCT fan_id)::text AS fans,count(*)::text AS slots
           FROM creator.commerce_pass_slot WHERE creator_id=$1
           AND state='active' AND grant_id IS NOT NULL AND starts_at<=now() AND ends_at>now()
           AND cycle_start=date_trunc('month',now() AT TIME ZONE 'UTC')::date`,
-              [creator.id],
-            )
-          ).rows[0]!;
-          const posted = await client.query<{
-            cycle: string;
-            currency: string;
-            allocation_minor: string;
-            transferred_minor: string;
-            reversed_minor: string;
-            slot_seconds: string;
-            total_slot_seconds: string;
-            pending_effects: string;
-            unconfirmed_cash: boolean;
-            reversal_pending: boolean;
-            posted_at: Date;
-          }>(
-            `SELECT c.cycle,c.currency,l.amount::text AS allocation_minor,l.created_at AS posted_at,
+            [creatorId],
+          )
+        ).rows[0]!;
+        const posted = await client.query<{
+          cycle: string;
+          currency: string;
+          allocation_minor: string;
+          transferred_minor: string;
+          reversed_minor: string;
+          slot_seconds: string;
+          total_slot_seconds: string;
+          pending_effects: string;
+          unconfirmed_cash: boolean;
+          reversal_pending: boolean;
+          posted_at: Date;
+        }>(
+          `SELECT c.cycle,c.currency,l.amount::text AS allocation_minor,l.created_at AS posted_at,
           l.refs->>'slotSeconds' AS slot_seconds,l.refs->>'totalSlotSeconds' AS total_slot_seconds,
           (SELECT coalesce(sum(amount),0)::text FROM creator.commerce_ledger
             WHERE creator_id=$1 AND kind='payout' AND currency=c.currency
@@ -177,45 +172,40 @@ export class PassPoolJournal {
             ON l.creator_id=$1 AND l.kind='pool_alloc' AND l.currency=c.currency
             AND l.cause='pool:'||c.cycle||':'||$1::text
           ORDER BY c.cycle DESC LIMIT 13`,
-            [creator.id],
+          [creatorId],
+        );
+        for (const cycle of posted.rows)
+          invariant(
+            BigInt(cycle.reversed_minor) <= BigInt(cycle.transferred_minor) &&
+              BigInt(cycle.transferred_minor) <= BigInt(cycle.allocation_minor),
+            "pool_cash_conflict",
+            "Original posted pool cash needs reconciliation.",
           );
-          for (const cycle of posted.rows)
-            invariant(
-              BigInt(cycle.reversed_minor) <= BigInt(cycle.transferred_minor) &&
-                BigInt(cycle.transferred_minor) <=
-                  BigInt(cycle.allocation_minor),
-              "pool_cash_conflict",
-              "Original posted pool cash needs reconciliation.",
-            );
-          summaries.push(
-            PoolEarnings.parse({
-              creatorId: creator.id,
-              cycle: current.cycle,
-              observedAt: current.observed_at.toISOString(),
-              closesAt: current.closes_at.toISOString(),
-              fanCount: Number(current.fans),
-              slotCount: Number(current.slots),
-              historyLimited: posted.rows.length > 12,
-              postedCycles: posted.rows.slice(0, 12).map((c) => ({
-                cycle: c.cycle,
-                currency: c.currency,
-                allocationMinor: c.allocation_minor,
-                transferredMinor: c.unconfirmed_cash
+        return [
+          PoolEarnings.parse({
+            creatorId,
+            cycle: current.cycle,
+            observedAt: current.observed_at.toISOString(),
+            closesAt: current.closes_at.toISOString(),
+            fanCount: Number(current.fans),
+            slotCount: Number(current.slots),
+            historyLimited: posted.rows.length > 12,
+            postedCycles: posted.rows.slice(0, 12).map((c) => ({
+              cycle: c.cycle,
+              currency: c.currency,
+              allocationMinor: c.allocation_minor,
+              transferredMinor: c.unconfirmed_cash ? null : c.transferred_minor,
+              reversedMinor:
+                c.unconfirmed_cash || c.reversal_pending
                   ? null
-                  : c.transferred_minor,
-                reversedMinor:
-                  c.unconfirmed_cash || c.reversal_pending
-                    ? null
-                    : c.reversed_minor,
-                slotSeconds: c.slot_seconds,
-                totalSlotSeconds: c.total_slot_seconds,
-                pendingEffects: Number(c.pending_effects),
-                postedAt: c.posted_at.toISOString(),
-              })),
-            }),
-          );
-        }
-        return summaries;
+                  : c.reversed_minor,
+              slotSeconds: c.slot_seconds,
+              totalSlotSeconds: c.total_slot_seconds,
+              pendingEffects: Number(c.pending_effects),
+              postedAt: c.posted_at.toISOString(),
+            })),
+          }),
+        ];
       },
       { isolation: "repeatable read" },
     );
