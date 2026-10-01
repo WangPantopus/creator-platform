@@ -449,6 +449,12 @@ details[open] > summary:before {
   }
 }
 @media (max-width: 700px) {
+  html:has(.w2-studio) {
+    scroll-padding-block: 16px calc(80px + env(safe-area-inset-bottom));
+  }
+  .w2-main :is(input, textarea, select, button, a, summary) {
+    scroll-margin-block: 16px calc(80px + env(safe-area-inset-bottom));
+  }
   .w2-sidebar {
     display: none;
   }

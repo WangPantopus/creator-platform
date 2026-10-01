@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-10-01T13:07:45.748225+00:00",
+  "supersedesObservation": "creator-earnings/manifest.json checks.nativeEnvironment and preservedFailures overlap wording",
+  "originalEvidenceUnchanged": true,
+  "screen": "360x640dp real Android Welcome Light/Night in retained original PNGs",
+  "correctedObservation": "The body is clipped in its existing vertically scrollable region above the pinned sign-in action. The screenshot does not show text overlapping the action. Earlier overlap diagnosis was inaccurate.",
+  "source": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt already uses weighted BoxWithConstraints and verticalScroll for the normal-text body; whole-page scroll for large text.",
+  "limits": "Native input is disabled in this session. Full copy reachability/scroll behavior and short-device design/a11y acceptance were not personally operated. No speculative layout or reference/test change was made."
+}
