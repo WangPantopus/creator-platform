@@ -146,6 +146,11 @@ export function createCommerceRouter(input: {
   router.post("/pass/purchase", async (req, res) =>
     res.json(await passPurchases().start(await actorFor(req), req.body)),
   );
+  router.post("/pass/purchase-status", async (req, res) =>
+    res.json(
+      await passPurchases().purchaseStatus(await actorFor(req), req.body),
+    ),
+  );
   router.post("/pass/cancel", async (req, res) =>
     res.json(await passPurchases().cancel(await actorFor(req), req.body)),
   );

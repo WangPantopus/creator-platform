@@ -83,7 +83,10 @@ export class PassCommerce {
   async reconcile(
     actor: Actor,
     reference: string,
-    assertCurrent?: (client: PoolClient) => Promise<void>,
+    assertCurrent?: (
+      client: PoolClient,
+      paid?: VerifiedPassPeriod,
+    ) => Promise<void>,
   ) {
     invariant(
       this.billing,
@@ -122,7 +125,7 @@ export class PassCommerce {
       "The current paid pass period could not be verified.",
     );
     return this.service.account(actor, async (client) => {
-      await assertCurrent?.(client);
+      await assertCurrent?.(client, paid);
       const fan = (
         await client.query<{ id: string }>(
           "SELECT id FROM creator.fan_profile WHERE account_id=$1",

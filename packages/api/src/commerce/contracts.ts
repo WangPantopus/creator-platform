@@ -8,6 +8,72 @@ export const MinorUnits = z
   .max(Number.MAX_SAFE_INTEGER);
 export const Currency = z.string().regex(/^[A-Z]{3}$/u);
 export const Money = z.strictObject({ amount: MinorUnits, currency: Currency });
+/** Public consent projection of a real persisted provider pass preview.
+ * Provider/customer references remain on the server's original quote. */
+export const PassPurchaseQuote = z
+  .strictObject({
+    quoteId: z.uuid(),
+    version: z.number().int().positive(),
+    currency: Currency,
+    amount: MinorUnits.positive(),
+    monthlyAmount: MinorUnits.positive(),
+    slotCapacity: z.number().int().positive().max(100),
+    allowance: MinorUnits.max(2147483647),
+    monthlyAllowance: MinorUnits.max(2147483647),
+    termsVersion: z.string().min(1).max(100),
+    budgetPolicyVersion: z.string().min(1).max(100),
+    createdAt: z.iso.datetime({ offset: true }),
+    expiresAt: z.iso.datetime({ offset: true }),
+    periodEndsAt: z.iso.datetime({ offset: true }),
+  })
+  .refine(
+    (quote) => quote.allowance <= quote.monthlyAllowance,
+    "The first-period allowance must fit its reviewed monthly budget.",
+  );
+export type PassPurchaseQuote = z.infer<typeof PassPurchaseQuote>;
+export const PassBillingStatus = z.strictObject({
+  version: z.number().int().positive(),
+  currency: Currency,
+  desiredRenewal: z.boolean(),
+  processing: z.boolean(),
+  effects: z
+    .array(
+      z.strictObject({
+        id: z.uuid(),
+        state: z.enum(["pending", "processing", "unknown"]),
+        operation: z.enum([
+          "start",
+          "activate_renewal",
+          "cancel",
+          "compensate_cancel",
+        ]),
+      }),
+    )
+    .max(50),
+});
+export type PassBillingStatus = z.infer<typeof PassBillingStatus>;
+export const PassPurchaseStatus = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("recorded"),
+    effectId: z.uuid(),
+    processing: z.boolean(),
+  }),
+  z.strictObject({
+    state: z.literal("not_recorded"),
+    effectId: z.null(),
+    processing: z.literal(false),
+  }),
+  z.strictObject({
+    state: z.literal("expired_uncommitted"),
+    effectId: z.null(),
+    processing: z.literal(false),
+  }),
+]);
+export const PassPurchaseEffect = z.strictObject({
+  effectId: z.uuid(),
+  processing: z.boolean(),
+  clientSecret: z.string().min(1).max(2048).optional(),
+});
 export const ModeKind = z.enum([
   "written_reply",
   "voice_note",

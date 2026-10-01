@@ -72,18 +72,28 @@ export const PassRenewalActivation = z.strictObject({
   reference: z.string().regex(/^sub_[A-Za-z0-9]+$/u),
   start: PassPurchaseStart,
 });
-export const VerifiedPassQuote = z.strictObject({
-  configurationHash: original.configurationHash,
-  currency: z.string().regex(/^[A-Z]{3}$/u),
-  amount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
-  monthlyAmount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
-  createdAt: z.iso.datetime({ offset: true }),
-  expiresAt: z.iso.datetime({ offset: true }),
-  periodEndsAt: z.iso.datetime({ offset: true }),
-  providerPreviewReference: z.string().min(1).max(200),
-  customerReference: PassPurchaseStart.shape.customerReference,
-  replacesReference: PassPurchaseStart.shape.replacesReference,
-});
+export const VerifiedPassQuote = z
+  .strictObject({
+    configurationHash: original.configurationHash,
+    currency: z.string().regex(/^[A-Z]{3}$/u),
+    amount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+    monthlyAmount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+    slotCapacity: ApprovedStripePass.shape.slotCapacity,
+    allowance: z.number().int().nonnegative().max(2147483647),
+    monthlyAllowance: z.number().int().nonnegative().max(2147483647),
+    termsVersion: ApprovedStripePass.shape.termsVersion,
+    budgetPolicyVersion: ApprovedPassPurchasePolicy.shape.budgetPolicyVersion,
+    createdAt: z.iso.datetime({ offset: true }),
+    expiresAt: z.iso.datetime({ offset: true }),
+    periodEndsAt: z.iso.datetime({ offset: true }),
+    providerPreviewReference: z.string().min(1).max(200),
+    customerReference: PassPurchaseStart.shape.customerReference,
+    replacesReference: PassPurchaseStart.shape.replacesReference,
+  })
+  .refine(
+    (quote) => quote.allowance <= quote.monthlyAllowance,
+    "The first-period allowance must fit its reviewed monthly budget.",
+  );
 export type PassPurchaseMutation = {
   reference: string;
   customerReference: string;
@@ -142,7 +152,9 @@ export class StripePassPurchases implements PassPeriodVerifier {
     approved: unknown,
     policy: unknown,
     private readonly receipts: StripeMembershipBilling,
-    budgetForPeriod: ConstructorParameters<typeof StripePassPeriods>[4],
+    private readonly budgetForPeriod: ConstructorParameters<
+      typeof StripePassPeriods
+    >[4],
   ) {
     this.options = stripeAccountOptions(collectionAccount);
     this.approved = ApprovedStripePass.parse(approved);
@@ -335,6 +347,15 @@ export class StripePassPurchases implements PassPeriodVerifier {
         currency: this.approved.currency,
         amount: invoice.total,
         monthlyAmount: this.approved.monthlyAmount,
+        slotCapacity: this.approved.slotCapacity,
+        allowance: this.budgetForPeriod({
+          startsAt: start,
+          endsAt: new Date(end * 1000),
+          monthlyAllowance: this.approved.allowance,
+        }),
+        monthlyAllowance: this.approved.allowance,
+        termsVersion: this.approved.termsVersion,
+        budgetPolicyVersion: this.policy.budgetPolicyVersion,
         createdAt: start.toISOString(),
         expiresAt: new Date(expires * 1000).toISOString(),
         periodEndsAt: new Date(end * 1000).toISOString(),

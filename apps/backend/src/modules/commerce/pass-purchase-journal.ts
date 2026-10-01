@@ -6,6 +6,10 @@ import type { PassCommerce } from "./pass.js";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import {
+  PassPurchaseQuote,
+  PassBillingStatus,
+} from "../../../../../packages/api/src/commerce/contracts.js";
+import {
   PassPurchaseStart,
   PassPurchaseCancel,
   PassRenewalActivation,
@@ -216,7 +220,21 @@ export class PassPurchaseJournal {
           ],
         )
       ).rows[0]!;
-      return { quoteId: row.id, version: current.version, ...quote };
+      return PassPurchaseQuote.parse({
+        quoteId: row.id,
+        version: current.version,
+        currency: quote.currency,
+        amount: quote.amount,
+        monthlyAmount: quote.monthlyAmount,
+        slotCapacity: quote.slotCapacity,
+        allowance: quote.allowance,
+        monthlyAllowance: quote.monthlyAllowance,
+        termsVersion: quote.termsVersion,
+        budgetPolicyVersion: quote.budgetPolicyVersion,
+        createdAt: quote.createdAt,
+        expiresAt: quote.expiresAt,
+        periodEndsAt: quote.periodEndsAt,
+      });
     });
   }
   async status(actor: Actor) {
@@ -228,13 +246,13 @@ export class PassPurchaseJournal {
           [account.fan_id],
         )
       ).rows;
-      return {
+      return PassBillingStatus.parse({
         version: account.version,
         currency: account.currency,
         desiredRenewal: account.desired_renewal,
         processing: effects.length > 0,
         effects,
-      };
+      });
     });
   }
   async start(actor: Actor, raw: unknown) {
@@ -324,6 +342,105 @@ export class PassPurchaseJournal {
       ),
     );
     return this.run(actor, effectId);
+  }
+  /** Recover an uncertain HTTP confirmation without creating an effect.
+   * The same original command lock precedes the billing account lock. Only an
+   * expired real quote with no committed command can safely release that draft. */
+  async purchaseStatus(actor: Actor, raw: unknown) {
+    const body = StartCommand.parse(raw);
+    return this.service.account(actor, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`${actor.accountId}:pass.purchase:${body.idempotencyKey}`],
+      );
+      const prior = await this.service.cachedCommand<string>(
+        client,
+        actor,
+        "pass.purchase",
+        body.idempotencyKey,
+        body,
+      );
+      const account = await this.account(client, actor);
+      if (prior.found) {
+        const effectId = z.uuid().parse(prior.response);
+        const effect = (
+          await client.query<{ state: string }>(
+            "SELECT state FROM creator.commerce_pass_billing_effect WHERE id=$1 AND fan_id=$2 AND operation='start' AND quote_id=$3",
+            [effectId, account.fan_id, body.quoteId],
+          )
+        ).rows[0];
+        invariant(
+          effect,
+          "pass_original_request_changed",
+          "The original purchase remains in reconciliation.",
+        );
+        return {
+          state: "recorded" as const,
+          effectId,
+          processing: ["pending", "processing", "unknown"].includes(
+            effect.state,
+          ),
+        };
+      }
+      const retained = (
+        await client.query<{
+          id: string;
+          state: string;
+          request: unknown;
+          request_hash: string;
+          quote_id: string;
+          intent_version: number;
+        }>(
+          "SELECT id,state,request,request_hash,quote_id,intent_version FROM creator.commerce_pass_billing_effect WHERE fan_id=$1 AND operation='start' AND provider_key=$2",
+          [account.fan_id, `pass:${account.fan_id}:${body.idempotencyKey}`],
+        )
+      ).rows[0];
+      if (retained) {
+        const original = PassPurchaseStart.parse(retained.request);
+        invariant(
+          retained.quote_id === body.quoteId &&
+            retained.intent_version === body.version + 1 &&
+            original.fanId === account.fan_id &&
+            original.paymentMethodId === body.paymentMethodId &&
+            contentHash(original) === retained.request_hash,
+          "pass_original_request_changed",
+          "The retained original purchase changed. Keep it in reconciliation.",
+        );
+        return {
+          state: "recorded" as const,
+          effectId: retained.id,
+          processing: ["pending", "processing", "unknown"].includes(
+            retained.state,
+          ),
+        };
+      }
+      const quote = (
+        await client.query<{
+          body: unknown;
+          body_hash: string;
+          account_version: number;
+        }>(
+          "SELECT body,body_hash,account_version FROM creator.commerce_pass_quote WHERE id=$1 AND fan_id=$2",
+          [body.quoteId, account.fan_id],
+        )
+      ).rows[0];
+      invariant(
+        quote &&
+          quote.account_version === body.version &&
+          contentHash(quote.body) === quote.body_hash,
+        "pass_quote_changed",
+        "The original quote needs reconciliation.",
+      );
+      const original = VerifiedPassQuote.parse(quote.body);
+      return {
+        state:
+          new Date(original.expiresAt) <= new Date()
+            ? ("expired_uncommitted" as const)
+            : ("not_recorded" as const),
+        effectId: null,
+        processing: false,
+      };
+    });
   }
   async cancel(actor: Actor, raw: unknown) {
     const body = CancelCommand.parse(raw);
@@ -508,10 +625,54 @@ export class PassPurchaseJournal {
       else result = await this.provider.cancel(actor, effect.request);
       // Access uses actual current provider truth through the existing pass
       // version fence. Financial effects are not proof of an enabled roster.
-      await this.pass.reconcile(actor, result.reference, async (client) => {
-        await this.account(client, actor);
-        await this.fence(client, effect);
-      });
+      await this.pass.reconcile(
+        actor,
+        result.reference,
+        async (client, paid) => {
+          await this.account(client, actor);
+          await this.fence(client, effect);
+          if (
+            paid &&
+            ["active", "cancelled"].includes(paid.state) &&
+            (effect.operation === "start" ||
+              effect.operation === "activate_renewal")
+          ) {
+            const start =
+              effect.operation === "start"
+                ? PassPurchaseStart.parse(effect.request)
+                : PassRenewalActivation.parse(effect.request).start;
+            const row = (
+              await client.query<{ body: unknown; body_hash: string }>(
+                "SELECT q.body,q.body_hash FROM creator.commerce_pass_quote q JOIN creator.commerce_pass_billing_effect e ON e.quote_id=q.id AND e.fan_id=q.fan_id WHERE e.fan_id=$1 AND e.operation='start' AND e.provider_key=$2",
+                [effect.fan_id, start.key],
+              )
+            ).rows[0];
+            invariant(
+              row && contentHash(row.body) === row.body_hash,
+              "pass_quote_changed",
+              "The original purchased benefits need reconciliation.",
+            );
+            const quote = VerifiedPassQuote.parse(row.body);
+            invariant(
+              quote.configurationHash === start.configurationHash &&
+                quote.amount === start.firstInvoiceAmount &&
+                quote.createdAt === start.createdAt &&
+                quote.periodEndsAt === start.periodEndsAt,
+              "pass_quote_changed",
+              "The original purchased terms changed.",
+            );
+            // Later genuine renewals have their own current calendar budget. The
+            // original first period must deliver the exact benefits consented to.
+            if (paid.endsAt.toISOString() === quote.periodEndsAt)
+              invariant(
+                paid.slotCapacity === quote.slotCapacity &&
+                  paid.allowance === quote.allowance,
+                "pass_benefits_changed",
+                "The paid first-period benefits differ from the original quote. Keep the original purchase in reconciliation.",
+              );
+          }
+        },
+      );
       const processing = await this.service.account(actor, async (client) => {
         const account = await this.account(client, actor);
         await this.fence(client, effect);

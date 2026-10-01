@@ -20,6 +20,7 @@ import { brand } from "@qelvora/brand";
 import { SessionSchema, type commerceContracts } from "@qelvora/api";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
+import { PassCheckout } from "./PassCheckout";
 
 type Mode = {
   id: string;
@@ -168,6 +169,7 @@ type Overview = {
   capabilities: {
     paymentsAvailable: boolean;
     membershipAvailable: boolean;
+    passPurchaseAvailable: boolean;
     nativeReplyPurchase: boolean;
     stripePublishableKey: string | null;
   };
@@ -1866,6 +1868,18 @@ function CommerceAccountScreen({
               )}
               {screen === "pass" && (
                 <>
+                  {accountId && data.fan && (
+                    <PassCheckout
+                      key={accountId}
+                      accountId={accountId}
+                      publishableKey={data.capabilities.stripePublishableKey}
+                      available={data.capabilities.passPurchaseAvailable}
+                      disabled={busy || !identityAvailable}
+                      fetchAccount={accountFetch}
+                      refresh={load}
+                      money={money}
+                    />
+                  )}
                   {!data.policy.passEnabled && (
                     <Empty title="The pass is not available yet">
                       Your memberships and existing conversations remain
