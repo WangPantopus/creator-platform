@@ -133,6 +133,14 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     ),
   );
   const creatorRoot = "/creators/:creatorId/media";
+  router.get("/creators/:creatorId/media-policy", async (req, res) =>
+    res.json(
+      await creatorMedia().uploadPolicy(await creatorScope(req), {
+        objectId: req.query.objectId,
+        purpose: req.query.purpose,
+      }),
+    ),
+  );
   router.post(creatorRoot, async (req, res) =>
     res
       .status(201)

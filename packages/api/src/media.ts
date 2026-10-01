@@ -94,6 +94,17 @@ export const CreatorMediaUploadRequestSchema = UploadRequestSchema.extend({
   purpose: CreatorMediaPurposeSchema,
   objectId: z.uuid(),
 });
+/** Current saved-object limits; this read is not upload or publication authority. */
+export const CreatorMediaPolicyViewSchema = z.strictObject({
+  creatorId: z.uuid(),
+  objectId: z.uuid(),
+  purpose: CreatorMediaPurposeSchema,
+  maxBytes: z.number().int().positive().max(268_435_456),
+  maxDurationMs: z.number().int().nonnegative().max(3_600_000),
+});
+export type CreatorMediaPolicyView = z.infer<
+  typeof CreatorMediaPolicyViewSchema
+>;
 export const CreatorMediaAssetSchema = MediaAssetSchema.omit({
   threadId: true,
 }).extend({

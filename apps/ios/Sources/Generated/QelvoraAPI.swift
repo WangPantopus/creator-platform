@@ -681,6 +681,29 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetState: String, Codable, Senda
   case `deleted` = "deleted"
 }
 
+public struct APIMediaCreatorMediaPolicyView: Codable, Sendable {
+  public let `creatorId`: String
+  public let `objectId`: String
+  public let `purpose`: APIMediaCreatorMediaPolicyViewPurpose
+  public let `maxBytes`: Int
+  public let `maxDurationMs`: Int
+  public init(creatorId: String, objectId: String, purpose: APIMediaCreatorMediaPolicyViewPurpose, maxBytes: Int, maxDurationMs: Int) {
+    self.creatorId = creatorId
+    self.objectId = objectId
+    self.purpose = purpose
+    self.maxBytes = maxBytes
+    self.maxDurationMs = maxDurationMs
+  }
+}
+
+public enum APIMediaCreatorMediaPolicyViewPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
+  case `human_note` = "human_note"
+}
+
 public enum APIMediaCreatorMediaPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
@@ -2147,6 +2170,14 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
   case `interrupted` = "interrupted"
 }
 
+public enum ReadCreatorMediaPolicyPurpose: String, Codable, Sendable {
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
+  case `human_note` = "human_note"
+}
+
 public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
 public struct CreatorAPIBinaryResponse: Sendable {
   public let body: Data
@@ -2277,6 +2308,9 @@ public actor CreatorAPIClient {
   }
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])
   }
   public func readAudienceCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
     try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true)

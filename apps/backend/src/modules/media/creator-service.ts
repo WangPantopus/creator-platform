@@ -4,6 +4,7 @@ import type { SignedActCommand } from "@qelvora/api";
 import {
   CreatorMediaAssetSchema,
   CreatorMediaUploadRequestSchema,
+  CreatorMediaPolicyViewSchema,
   ProcessedMediaEvidenceSchema,
   type CreatorMediaAsset,
   type CreatorMediaPurpose,
@@ -226,6 +227,72 @@ export class CreatorMediaService {
     );
     return current;
   }
+  private async configuredUploadPolicy(
+    scope: CreatorScope,
+    client: PoolClient,
+    objectId: string,
+    purpose: CreatorMediaPurpose,
+  ): Promise<MediaPolicy> {
+    await this.allowed(scope, client);
+    const policy = await this.authority.policy(
+      scope,
+      objectId,
+      purpose,
+      "upload",
+      client,
+    );
+    invariant(
+      policy &&
+        Number.isSafeInteger(policy.maxBytes) &&
+        policy.maxBytes > 0 &&
+        policy.maxBytes <= 268435456 &&
+        Number.isSafeInteger(policy.maxDurationMs) &&
+        policy.maxDurationMs >= 0 &&
+        (purpose === "post_photo" || policy.maxDurationMs > 0) &&
+        policy.maxDurationMs <= 3600000 &&
+        Number.isSafeInteger(policy.retentionSeconds) &&
+        policy.retentionSeconds > 0 &&
+        typeof policy.allowTranscript === "boolean",
+      "media_policy_unavailable",
+      "The content's media policy is unavailable.",
+    );
+    return {
+      ...policy,
+      maxDurationMs:
+        purpose === "human_note"
+          ? Math.min(60000, policy.maxDurationMs)
+          : policy.maxDurationMs,
+    };
+  }
+  /** Resolve real current saved-object policy without creating an upload. */
+  async uploadPolicy(scope: CreatorScope, input: unknown) {
+    const body = CreatorMediaUploadRequestSchema.pick({
+      objectId: true,
+      purpose: true,
+    }).parse(input);
+    return this.transaction(scope, async (client) => {
+      await this.identity.authorizeInTransaction(
+        scope,
+        client,
+        ["human_note", "post_audio"].includes(body.purpose)
+          ? "verified"
+          : "owned",
+      );
+      const policy = await this.configuredUploadPolicy(
+        scope,
+        client,
+        body.objectId,
+        body.purpose,
+      );
+      return CreatorMediaPolicyViewSchema.parse({
+        creatorId: scope.creatorId,
+        objectId: body.objectId,
+        purpose: body.purpose,
+        maxBytes: policy.maxBytes,
+        maxDurationMs: policy.maxDurationMs,
+      });
+    });
+  }
   async begin(scope: CreatorScope, input: unknown) {
     const body = CreatorMediaUploadRequestSchema.parse(input);
     return this.transaction(scope, async (client) => {
@@ -236,32 +303,13 @@ export class CreatorMediaService {
           ? "verified"
           : "owned",
       );
-      await this.allowed(scope, client);
-      const policy = await this.authority.policy(
+      const policy = await this.configuredUploadPolicy(
         scope,
+        client,
         body.objectId,
         body.purpose,
-        "upload",
-        client,
       );
-      invariant(
-        policy &&
-          Number.isSafeInteger(policy.maxBytes) &&
-          policy.maxBytes > 0 &&
-          policy.maxBytes <= 268435456 &&
-          Number.isSafeInteger(policy.maxDurationMs) &&
-          policy.maxDurationMs >= 0 &&
-          (body.purpose === "post_photo" || policy.maxDurationMs > 0) &&
-          policy.maxDurationMs <= 3600000 &&
-          Number.isSafeInteger(policy.retentionSeconds) &&
-          policy.retentionSeconds > 0,
-        "media_policy_unavailable",
-        "The content's media policy is unavailable.",
-      );
-      const maxDuration =
-        body.purpose === "human_note"
-          ? Math.min(60000, policy.maxDurationMs)
-          : policy.maxDurationMs;
+      const maxDuration = policy.maxDurationMs;
       const audio = body.mimeType.startsWith("audio/");
       invariant(
         (body.purpose === "post_photo"
