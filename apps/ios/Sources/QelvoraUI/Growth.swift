@@ -103,7 +103,7 @@ public struct GrowthClient: Sendable {
   public let token: @Sendable () async throws -> String?
   public init(
     baseURL: URL,
-    token: @escaping @Sendable () async throws -> String? = { try SecureSessionStorage().read() }
+    token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }
   ) {
     self.baseURL = baseURL
     self.token = token
@@ -167,7 +167,7 @@ public struct GrowthFanFeature: View {
   @Environment(\.colorScheme) private var scheme
   public init(
     baseURL: URL?, destination: String = "/discover",
-    token: @escaping @Sendable () async throws -> String? = { try SecureSessionStorage().read() },
+    token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() },
     onNavigate: ((String) -> Void)? = nil,
     onSignIn: @escaping (String) -> Void = { _ in }
   ) {

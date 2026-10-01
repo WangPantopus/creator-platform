@@ -25,6 +25,10 @@ import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 
 data class ArrivalContext(val source: String, val title: String, val creatorName: String)
@@ -38,17 +42,33 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var busy by mutableStateOf(false)
     var choosingActor by mutableStateOf(false)
     var actors by mutableStateOf<List<APIIdentityCapabilitiesDevelopmentActorsItem>>(emptyList())
+    var localPurgeFailed by mutableStateOf(false); private set
+    var purgingPrivateState by mutableStateOf(false); private set
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
     private var rotatingCredential = false
     private var removedArrivalFor: String? = null
-    private suspend fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
+    suspend fun purge(): Boolean = withContext(NonCancellable) {
+        if (purgingPrivateState) return@withContext false
+        purgingPrivateState = true; localPurgeFailed = true
+        try {
+            generation++; session = null; actors = emptyList(); choosingActor = false; error = ""
+            var cleared = true
+            try { storage.save(null) } catch (_: Exception) { cleared = false }
+            try { com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) } catch (_: Exception) { cleared = false }
+            localPurgeFailed = !cleared
+            if (!cleared) error = QelvoraCopy.text("identityPrivateClearFailed")
+            cleared
+        } finally { purgingPrivateState = false }
+    }
     suspend fun refresh() {
-        if (rotatingCredential) return
+        if (rotatingCredential || purgingPrivateState) return
         val client = api ?: return; val current = generation
-        if (currentToken() == null) { session = null; return }
-        try { val value = client.identitySession(); if (current != generation) return; if (session?.accountId != null && session?.accountId != value.accountId) { purge(); error = "The account changed. Continue with Pantopus again."; return }; session = value; error = "" }
-        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { if (!busy) refreshCredentials() else { purge(); error = "Your session ended. Continue with Pantopus again." } } else error = message(failure) }
+        val token = try { currentToken() } catch (_: Exception) { if (current == generation && purge()) error = QelvoraCopy.text("identitySessionReadFailed"); return }
+        if (current != generation) return
+        if (token == null) { if (session != null) purge(); return }
+        try { val value = client.identitySession(); if (current != generation) return; if (session?.accountId != null && session?.accountId != value.accountId) { if (purge()) error = "The account changed. Continue with Pantopus again."; return }; session = value; error = "" }
+        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { if (!busy) refreshCredentials() else { if (purge()) error = "Your session ended. Continue with Pantopus again." } } else error = message(failure) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
@@ -64,14 +84,20 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     fun removeArrival() { arrival = null; removedArrivalFor = destination.substringBefore('?'); destination = removedArrivalFor!! }
     suspend fun beginSignIn() {
         if (busy) return; busy = true
-        try { val client = api ?: error("unconfigured"); val capability = client.identityCapabilities(); if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT) { actors = capability.developmentActors.orEmpty(); choosingActor = true } else error = "Pantopus account authorization is not connected for this native app. Your destination is kept." }
+        try { if (localPurgeFailed && !purge()) return; val client = api ?: error("unconfigured"); val capability = client.identityCapabilities(); if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT) { actors = capability.developmentActors.orEmpty(); choosingActor = true } else error = "Pantopus account authorization is not connected for this native app. Your destination is kept." }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { error = QelvoraCopy.text("pantopusUnavailable") }
         finally { busy = false }
     }
     suspend fun selectActor(id: String) {
         if (!BuildConfig.DEBUG || busy) return; val client = api ?: return; busy = true
-        try { val continuation = client.continueWithPantopus(APIIdentityContinue(destination)); val result = client.completeIdentity(APICompleteIdentity(continuation.continuationId ?: error("missing continuation"), id)); purge(); storage.save(result.token); destination = result.returnTo; choosingActor = false; refresh() }
+        try {
+            val continuation = client.continueWithPantopus(APIIdentityContinue(destination)); val result = client.completeIdentity(APICompleteIdentity(continuation.continuationId ?: error("missing continuation"), id))
+            if (!purge()) return
+            currentCoroutineContext().ensureActive()
+            try { storage.save(result.token) } catch (_: Exception) { if (purge()) error = QelvoraCopy.text("identitySessionSaveFailed"); return }
+            destination = result.returnTo; choosingActor = false; refresh()
+        }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
@@ -84,7 +110,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         finally { busy = false }
     }
     suspend fun logout(all: Boolean = false) {
-        if (busy) return; val client = api ?: return; busy = true
+        if (busy) return; val client = api ?: run { purge(); return }; busy = true
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
@@ -93,9 +119,13 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     suspend fun refreshCredentials() {
         if (busy) return; val client = api ?: return; busy = true; rotatingCredential = true; generation++; val current = generation
-        try { val result = client.refreshSession(); if (current != generation) return; storage.save(result.token); generation++; rotatingCredential = false; refresh() }
+        try {
+            val result = client.refreshSession(); if (current != generation) return
+            try { storage.save(result.token) } catch (_: Exception) { if (purge()) error = QelvoraCopy.text("identitySessionSaveFailed"); return }
+            generation++; rotatingCredential = false; refresh()
+        }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) purge(); error = message(failure) } }
+        catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
         finally { busy = false; rotatingCredential = false }
     }
@@ -113,6 +143,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (model.session != null) model.refresh() } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
+        if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
         when {
             model.choosingActor -> Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Notice(title = "Development identity", children = "Synthetic isolated accounts. Pantopus production sign-in is not connected.")

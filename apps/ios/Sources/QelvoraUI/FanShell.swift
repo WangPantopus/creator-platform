@@ -11,6 +11,8 @@ public final class FanSession: ObservableObject {
     @Published public var choosingDevelopmentActor = false
     @Published public private(set) var arrival: ArrivalContext?
     @Published public private(set) var actors: [APIIdentityCapabilitiesDevelopmentActorsItem] = []
+    @Published public private(set) var localPurgeFailed = false
+    @Published public private(set) var purgingPrivateState = false
     public let api: CreatorAPIClient?
     private let storage: SecureSessionStorage
     private let baseURL: URL?
@@ -36,25 +38,34 @@ public final class FanSession: ObservableObject {
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
-        guard let api, !rotatingCredential else { return }
+        guard let api, !rotatingCredential, !purgingPrivateState else { return }
         let current = generation
+        let token: String?
+        do { token = try await storage.read() }
+        catch {
+            guard current == generation else { return }
+            if await purge() { error = QelvoraCopy.text("identitySessionReadFailed") }
+            return
+        }
+        guard current == generation else { return }
+        guard token != nil else { if session != nil { await purge() }; return }
         do {
-            guard try await storage.read() != nil else { session = nil; return }
             let value = try await api.identitySession()
             guard current == generation else { return }
-            if let previous = session, previous.accountId != value.accountId { await purge(); error = "The account changed. Continue with Pantopus again."; return }
+            if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
         } catch let failure as CreatorAPIError {
             guard current == generation else { return }
             if failure.status == 401 {
                 if !busy { await refreshCredentials() }
-                else { await purge(); error = "Your session ended. Continue with Pantopus again." }
+                else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
         } catch { guard current == generation else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
+        if localPurgeFailed, !(await purge()) { return }
         guard let api else { error = QelvoraCopy.text("pantopusUnavailable"); return }
         do {
             let capabilities = try await api.identityCapabilities()
@@ -71,7 +82,11 @@ public final class FanSession: ObservableObject {
             let continuation = try await api.continueWithPantopus(body: APIIdentityContinue(returnTo: destination))
             guard let challenge = continuation.continuationId else { throw URLError(.badServerResponse) }
             let result = try await api.completeIdentity(body: APICompleteIdentity(continuationId: challenge, code: id))
-            await purge(); try await storage.save(result.token)
+            guard await purge(), !Task.isCancelled else { return }
+            let installing = generation
+            do { try await storage.save(result.token) }
+            catch { guard installing == generation else { return }; if await purge() { error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
         } catch { self.error = Self.message(error) }
@@ -91,11 +106,32 @@ public final class FanSession: ObservableObject {
     }
     public func refreshCredentials() async {
         guard let api, !busy else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
-        do { let result = try await api.refreshSession(); guard current == generation else { return }; try await storage.save(result.token); generation += 1; rotatingCredential = false; await refresh() }
-        catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { await purge() }; error = Self.message(failure) }
-        catch { self.error = "Session refresh could not complete. Reconnect and try again." }
+        do {
+            let previous = try await storage.read()
+            guard current == generation else { return }
+            guard let previous else { await purge(); return }
+            let result = try await api.refreshSession(); guard current == generation else { return }
+            do { try await storage.save(result.token, replacing: previous) }
+            catch { guard current == generation else { return }; if await purge() { error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            guard current == generation else { return }
+            generation += 1; rotatingCredential = false; await refresh()
+        }
+        catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch { guard current == generation else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
     }
-    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
+    @discardableResult public func purge() async -> Bool {
+        guard !purgingPrivateState else { return false }
+        purgingPrivateState = true; localPurgeFailed = true
+        defer { purgingPrivateState = false }
+        generation += 1; session = nil; actors = []; choosingDevelopmentActor = false; error = ""
+        URLCache.shared.removeAllCachedResponses()
+        var cleared = true
+        do { try await storage.save(nil) } catch { cleared = false }
+        do { try await W3FanFeatures.clearPrivateState() } catch { cleared = false }
+        localPurgeFailed = !cleared
+        if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
+        return cleared
+    }
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
@@ -118,6 +154,9 @@ public struct FanAppShell: View {
         VStack(spacing: 0) {
             if !model.error.isEmpty {
               Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+            }
+            if model.localPurgeFailed {
+                Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
             }
             if model.choosingDevelopmentActor {
                 VStack(spacing: 16) {

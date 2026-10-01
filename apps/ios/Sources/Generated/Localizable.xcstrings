@@ -45,6 +45,50 @@
         }
       }
     },
+    "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again."
+          }
+        }
+      }
+    },
+    "Retry clearing saved private data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry clearing saved private data"
+          }
+        }
+      }
+    },
+    "This device could not read your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not read your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not save your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not save your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
     "Current team access": {
       "extractionState": "manual",
       "localizations": {
