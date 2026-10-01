@@ -57,8 +57,9 @@
     "androidRuntime": "success",
     "androidFoundation": "success",
     "webVisual": "failure;observedcause repaired in existingcapturecalls",
-    "iosFoundation": "queued",
-    "iosReviewAvailable": false
+    "iosFoundation": "failure;110 strict image differences, exact current artifact personally inspected",
+    "iosReviewAvailable": true,
+    "iosReviewArtifactId": 11138602343
   },
   "creatorMigration": "0047 reserved_unapplied; inactive, review pending",
   "availabilityMigration": "0046 reserved_unapplied; inactive",
@@ -261,6 +262,32 @@
       "basis": "Owner actualjourney gates/currentheadCI open; none eligible",
       "pr4DescriptionUpdated": true,
       "pr4PublishedHead": "d52e449cd4690cb8509283fb47a19dbbf40fb077"
+    },
+    "additionalAccessibility": {
+      "ios": "Actual shipping Recorder idle layout at accessibility-large in Light/Night fits; original large restored; owned Simulator shut down",
+      "receipt": "ios-recorder-accessibility.json",
+      "web": "Actual visible Tab focus; zoom attempt unchanged and unproved; viewport reset",
+      "voiceOverTalkBackCaptureAnd200Percent": "not established"
+    },
+    "currentApiLaunch": {
+      "source": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+      "port": 4106,
+      "identity": "unconfigured",
+      "actualCapabilities": {
+        "mediaAvailable": false,
+        "creatorMediaAvailable": false,
+        "creatorMediaAudienceAvailable": false,
+        "callsAvailable": false,
+        "aiAudioAvailable": false,
+        "reason": "media_unconfigured"
+      },
+      "singleRequestTiming": "status=200 seconds=0.002597",
+      "qualified": "one busy-host capability request; no latency distribution/media/provider target"
     }
-  }
+  },
+  "androidApi34DefaultDiscovery": "android-api34-runtime.json",
+  "processingNotice": "processing-notice.json",
+  "sourceCiIosReview": "source-ci-ios-review/review.json",
+  "latestRuntimeSource": "c57a5e840748bb015c09742f61bffac3e494a123",
+  "nativeCaptureRepair": "source-ci-ios-review/layer-repair.json"
 }

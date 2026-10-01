@@ -1,0 +1,42 @@
+{
+  "runId": 36780139572,
+  "jobId": 110108464781,
+  "artifactId": 11138602343,
+  "source": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+  "conclusion": "failure",
+  "imageCount": 110,
+  "dimensions": "All110 current/reference images780x1688 RGBA",
+  "pixels": "All110 differ under unchanged strict comparison; complete image SHA/profile/pixel counts preserved",
+  "personallyInspected": [
+    "Welcome Light current/reference at native resolution: current text visibly blurred, reference sharp; same family/wrapping/overall geometry",
+    "Mark Night current/reference: current heading blurred, shapes/sharp contour largely intact; actual current background20,18,15 vs reference21,18,15",
+    "Both current/reference sRGB and144dpi; reference XMP metadata does not explain decoded pixel differences",
+    "Current Theme.swift SHA equals exact source-run Theme; bundled six font file hashes preserved in review"
+  ],
+  "diagnosis": "Host frame/bounds scaling did not repair SwiftUI cached text resolution. Repair underlying graph/layer rasterization before judging remaining differences; no assumed OS-noise exception.",
+  "pushGate": "Exact source artifact personally inspected; observed cached-text rendering cause corrected in immutable helper; current headless validation remains pending after permitted source push",
+  "referencesOrThresholdsChanged": false,
+  "sourceSHA256": {
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "090616b4bcd2282a41f7228a25293b920f3a9abec8f6bb5605d72addfe440385",
+    "apps/ios/Sources/QelvoraUI/Theme.swift": "f4c5ea37a0bd93f9171509f708c9ebf14a1ba0a875d889dcec2b0d527d6c4132",
+    "apps/ios/Sources/Generated/QelvoraTokens.swift": "7a48b96a3de28460e316083536662d59fa124ac8498e45e7121a1e73d3898ac7",
+    "apps/ios/Sources/Resources/Fonts/Geist.ttf": "73894e0448cae90a92b6c2f8732b7bb9acb7b94c418bff559dad4a18e1de9659",
+    "apps/ios/Sources/Resources/Fonts/Geist-Italic.ttf": "a464348abe41a6392f18d04c0ac2ad3c26619357ff5fdd76aff3059116f45e62",
+    "apps/ios/Sources/Resources/Fonts/GeistMono-Italic.ttf": "70c15be47d55f637197f7e38570dbca16b35777ea647dc3598f61bf3961d2b0d",
+    "apps/ios/Sources/Resources/Fonts/Newsreader-Italic.ttf": "796668611f80b64d5adf182fde3b6f29ed83b4e7cbec7b96937e84ac01364792",
+    "apps/ios/Sources/Resources/Fonts/GeistMono.ttf": "d00e590b8eb3a59acc329b2d044fd143ae935090b7da33199ebee27cc7de8196",
+    "apps/ios/Sources/Resources/Fonts/Newsreader.ttf": "8a08d13f8a6c0d51be379a60af84f945f65369a67e509ee3c3bdcc421254d7c1"
+  },
+  "savedEvidenceSHA256": {
+    "all-image-pixels.json": "1465f6c444b284b3a72a5f4955e047f666a3e33cb26bd0f6701b3ce62b4b258f",
+    "testComponentCatalogThemes.Notice-night.png": "e31013fcda90b9a9409f68c9e363d32eba4f48804f3c8d27c180ebce5184d36a",
+    "testComponentCatalogThemes.Mark-light.png": "8c3ae09147bd1c08a5aa9b2587ab99a2ac74b48a8bef983fd5ad77cb8887c810",
+    "testWelcomeThemes.night.png": "b0b805ef725dae9acc68fee54339de545f630d0392cbfa9fc90a0471b5c2b59c",
+    "ios-job.log": "9068c01302b7d48a6364f52c6d439c0ac57ddc442bb87db77ca396adc506ffc6",
+    "testComponentCatalogThemes.Notice-light.png": "306467de3833c0dc1cb940e4b36150874644fda6cab393a2f17553c5a2bdd981",
+    "testWelcomeThemes.light.png": "72ec810a577f47ee1bd5d279acb241b1468ec3e3bcb31becd104f3fc80114030",
+    "testComponentCatalogThemes.Mark-night.png": "fe4580a2bd363c7ba74f071e3106cdcf3b1e3b0e24499e9faf5e6d16e4e2009b"
+  },
+  "repairSource": "c57a5e840748bb015c09742f61bffac3e494a123",
+  "repairReceipt": "layer-repair.json"
+}

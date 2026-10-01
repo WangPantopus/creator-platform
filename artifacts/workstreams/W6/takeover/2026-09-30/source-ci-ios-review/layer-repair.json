@@ -1,0 +1,1026 @@
+{
+  "recordedAt": "2026-10-01T03:27:48.781518+00:00",
+  "source": "c57a5e840748bb015c09742f61bffac3e494a123",
+  "narrowLease": "W1 capture helper only; original cases/strict assertions/references/thresholds unchanged",
+  "sourceSHA256": "6ae043253bd9eb6a32a09c5774bf67ee482a5377b8ab89ff7ecd3e4f5f523a0b",
+  "observedCause": "Exact a124ad0 artifact:780x1688 text blurred; frame/bounds enlargement did not change SwiftUI cached rasterization",
+  "repair": "390x844 logical SwiftUI graph uses pre-cache scaleEffect2/backing; canvas/bitmap coordinate extent follows it; layers/masks redraw at2; sRGB/equality retained; actual backing/canvas/logical log",
+  "existingLocalCapture": {
+    "buildSeconds": 50.15,
+    "caseCount": 3,
+    "imageCount": 110,
+    "strictFailures": 110,
+    "seconds": 37.032,
+    "observedBackingScale": 2,
+    "canvas": [
+      390,
+      844
+    ],
+    "logical": [
+      390,
+      844
+    ],
+    "images": [
+      780,
+      1688
+    ],
+    "personallyInspected": "Current local Welcome Light remains sharp; decoded pixels exactly equal preceding committed local-host-corrected Welcome Light",
+    "headlessSharpness": "Not yet demonstrated; genuine current-source CI required",
+    "functionalMediaAcceptance": false
+  },
+  "allCurrentCaptures": [
+    {
+      "name": "testAuthorIdentitySurfaces.light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "c24a82db5166c90c611d69c1d089d3d2ff5929912abf4e351a9ed13b44942ddd",
+      "rgbaSHA256": "c10f0ebb826dfc42d0e8279d3836e9a2a258818bcc764ae0aeb5ae39305e275e"
+    },
+    {
+      "name": "testAuthorIdentitySurfaces.night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "35edac11167d695617195f957ce37c243d5b47f0f0d3c690224fb8706144a27d",
+      "rgbaSHA256": "7534a5c213ed72065f87c786aafeb01616616d281b687fd3867f83954923002a"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "3383281d0a3b5886a7c94b6118075924257075ed7d04862f16db25809efae9b4",
+      "rgbaSHA256": "22acd0dc972ee822d6de3a980d845d1bdeb7c0e91a1391d7af486153e5e12e8c"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "de132f300ffc0dc09e7a145ace1b084714c80182509ca3f2c4e443d42ecaafb9",
+      "rgbaSHA256": "ea106628216799afe6f4a707d8274eb484e0e76a7935d1441fe2f09060f9bf55"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "43e4cafcc337def67193765900a67d286705e7f1f958098b0ddacd2fb686b024",
+      "rgbaSHA256": "8528a2870bc7a7a0f25504a1b326eae928665c7ee00c837c13171bedb2f5170c"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "2b09bd5534d3a6e62b45d63510e6a8065942b87e71ad4785791368729f6cc7f1",
+      "rgbaSHA256": "4be1ae58c1e9193116e1f66cae99729ffd9998e332c0ef0485f0d0b5d6491d7f"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b2e4ce24271b0c792a3d96c649451fbeed2f0f01e83533c7115f2133350e2ede",
+      "rgbaSHA256": "d002c226f37edfbe9f641b132dd3913e9cb293d61beefa40d6e2b20f698b3946"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "03d7f963d5ddc8a2c7f587a1dbaf5cc45b79cf2dd477b379e00d719fe99a86d7",
+      "rgbaSHA256": "3ca8de9ca5dab2e12299be1ee85819659cc255d8d6daaf289fd01da250161fa4"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "0107c752a9e58e554868e5a9fe72d9bc17973b123b7f4213a4545bb6e58cbafb",
+      "rgbaSHA256": "cddf366cf209982a093fd81238a965c50f54e004910b3935a1cb695d6bfc8249"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "83432ad579c2626ac9d88f9f7ff920599dba320c2cf4d30a9f65963b42088513",
+      "rgbaSHA256": "b830a635f88f3b2746048f3efcbbec25da7faac57ef2e09cad8ca79e3b968a0d"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "e9adf6895a09a59abfd944d4a543d39a418d8b923b4279ab4769f860dffea33f",
+      "rgbaSHA256": "0f4994165a2c6624a6233592fd612d21c1b0ad595b1cc47395d84008aa5a2e53"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "cd1baf50f308cda5994517992781b95177199d63a4a9866044547562c8c288ea",
+      "rgbaSHA256": "ed0fcab26fa45b8c442ccae46a0a0e52a5764fadcd60ce9def113625b8373f8f"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "aedb607d23fa4dd97a517f7b66fbb90c4c64f2e49c6e292af55aa7bed99acaa6",
+      "rgbaSHA256": "6d792f8f5325798e84483712dfacf8feafbedb562967c46d41b235fcfd6d5f3b"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "d0e10afd5724d72599a752ad9d2f1da6a745b4d38edc809dbc66024b603c6b2f",
+      "rgbaSHA256": "7588f3e87d35c1bea643b7f60485fd14973364d50881e7fd517d3cf3041267bd"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ccbd54ae7daa6d43066fdedc48a19148b9773e4eedc8d4fd33bc26a0187e6d33",
+      "rgbaSHA256": "f687166e67a9c7ca1c57140aa31c16f2a03246a38fd77bd99283943d067bb6ea"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a480d110d9e265814887c506d5054be1c23e14a1ebf59b9c9dd0f1da0d97e5af",
+      "rgbaSHA256": "b552ab35754b7f5e075021d4cb1c07b192f851c519f04a00f156554dc80055c1"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f1f44d4a667808ea3c85d87fcdbb072c56dd66b544c5f94913d553288f3b1e1a",
+      "rgbaSHA256": "b1c9d283d9403333b251fa0c5b45b858bc2c3a844e97a6e73ce0e9af72e70254"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "63ff99788f1070e74cbe897595e9c5aa334e81bcc386815cc0e926687d18cce9",
+      "rgbaSHA256": "2fc9231874b00e7ca3a37cb681e535921be38c5332cae9a9437d53d1809c529c"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "8e57b39094b3fd745b2d9fdd7e0630e1b95fde73c5bf165fe994813db19a1b57",
+      "rgbaSHA256": "ca5e323dc1487518dfb2ce1a12de0fdb96d2dddd90331c01ed8824ffea39e2c4"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "9b5a8dfefc28afea4ff6348d9c782c29f84dcf0160fffb4dcac5911a5b17ffda",
+      "rgbaSHA256": "88c0891709af405cdbda268f8d89bc4bf91b9bf3f12d8288c7458a7d460e7aeb"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "d6a4bc1d052896b8dcc797f43b52727dfa352845e068d0182dc77237468da5cd",
+      "rgbaSHA256": "acfe4d265de7bd8f8ace40433015b1897bdd063c939bd8836d962a4a156d29f8"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "3105655b11ccf7d77b96b3bfd26069aa84d8a4057911768edaa1354d12c9449b",
+      "rgbaSHA256": "ec79af96b69472e956e637409da965e75017e7ea4982a115eae2efac78f3d1be"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "1343b050ec08f42e6c24ba1f8fa053c6e713b0f1a87d710f784ae4cf0b43f392",
+      "rgbaSHA256": "7703c33d0af6126a469a2e61c59a712e25606534ba875c8683e5250bfcebf1db"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "3e3bc222547d3f0da5392897466b299420cbbbfeafd82fc407710981902fe9d2",
+      "rgbaSHA256": "c8fd0455a8ac2a1b324afddbfd5cc3fdd3a67576a94fa8fd523bfa7212479647"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b9f8daf8963be3bd95f8e36676708c3cf1e01996cece014012f5fa07eeb5ab73",
+      "rgbaSHA256": "3f262c85ac494e6ed3e9d5dc218b3e193bcc9f4a4e6a48ba38f7e9ca2ee81565"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "73fd06a95740159f8888c69345d24b3306505546cc40b656cd74e8b02a347f89",
+      "rgbaSHA256": "3526cf3665f4e952ec9930dec5220940be140a462ac41fb0c424dcf5761e0ecf"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "3a5b4e3dc5089a7b7bcabb4dc21ad55ecc1ab0c70ad43c5a546649b44eb609e2",
+      "rgbaSHA256": "0772a6b05267ef23bf5d91e3bf3d71c650f707fb7ff211a9241650f3202630ef"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "4b9a37ace9d50dce452bf0eaf480522fe1adf72d3fef00c0ef39afa5cc0addac",
+      "rgbaSHA256": "adcf6f83f11384501b038adb941d1e76a4c36bc3c5471a5712ad40f66729e5d6"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "9dffc31b9fb5dda3ac3c37dea204525f82fdc65c8d94da322735df5f27ee3794",
+      "rgbaSHA256": "1ae32d6a1b43f2cfeb585d8b737a52398d454973d9a77a87e5b855cb7119d83c"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "658723a895014027648b401c9377356b53b551c0d8b8321dee6d2e1ab9379132",
+      "rgbaSHA256": "f80844e45ccef4b1dd82f516447f9647b237b247898b6d9fab366e1861583d7a"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a4d271f2f819239c0137cd49fc533d458152ccdd023ff2bfe38e8c2cbaff969a",
+      "rgbaSHA256": "37064d0f5d6fefe55302f03894a14e5d637f1d7c7885ebe2366d2de2862b89ba"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "447174203e286d0e67124c00b80e33ca8761a4aa04a78abf06d227c1103adb0a",
+      "rgbaSHA256": "0442f7f7241db65d104b170de8edabdc7526b39c4efdf693a0742a7047a488ce"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "dab0c2be76af17d9fae7dd5c6e71ce53c93f73db351ffc3a0ab434a3831ee617",
+      "rgbaSHA256": "63b316ec821a357b768c564300daa6a759cba5aa2102ad60a1a2f3ebfea50edc"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "90aada41be8aacb8c144010f05cda20672c15718d161b7e0a20df2e213396f38",
+      "rgbaSHA256": "81bef5fc0428ba737ed9871a0c85518f8e630fcb453882a454282e30e3c2750e"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "28ddb2c87d060c99a25c13c0caf4d1af619ca449b31ea1b8f9f583c945aa0da8",
+      "rgbaSHA256": "a48625669906ac0ff88b285a228028518f46744b1656805196035c4d332bbe2b"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "928ce3bbe80b11415f9292156e655d3d311dd7a8f97ccb9a6fdfd29d94056092",
+      "rgbaSHA256": "6e9cfd30898bc1a6c446b6cfb176e83b7e350d8fa11dda886c766aa100a570f1"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "fed2ce53b5826d37c7b90e6141f77bf07c736f70b79f10a93e8d22b33c437f71",
+      "rgbaSHA256": "f4db0bd45ddfd67340175748ef4d40005efbb769820ac97d039f123b4b496009"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "c229c0d771cc843e03d7022d9dab8d1a97c59d23b69af5a66739994f2c32c58d",
+      "rgbaSHA256": "289a0266603c7208096e2f9e8d00994659dd4041a53b2f0352b630f7de6a7bdd"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "6358a8f0bf00b686d589336ab3b7725f1ee30ccb8554e1699e95ce27ab61b15a",
+      "rgbaSHA256": "d29a8ccbbb16f46eda90711ba990725926100b0e0065f2dd1f07a027065fbe4d"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "5ae13b6bf975fa2a8c582e47fdd8d2858e028afaf9f10eed5ab76bba89e2f55f",
+      "rgbaSHA256": "fe9fb6bc2a173d2d989a4c7c720bfde6239551a555ebb0000cba61ad97d927d1"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "81051c7828c57db3625bc3d55563238394ec6cba2a9382f305d49721f9baf7ad",
+      "rgbaSHA256": "6824d120d2c72de933ba12b075240f919798c1294cfd5be265c168c59b70f024"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "732cbc03c815acb306c753c751cccf5cac12b73e3f31f7115f04a8446df5614f",
+      "rgbaSHA256": "e85fc2b5d6c0b77283c54d2711593999c62c17296da1fd7c525b0b4c58c95f65"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "022892c25345b447cd0a68b3971052e14e45e285c7ab7d00e702034138be589c",
+      "rgbaSHA256": "4147f6b1034af77d82a0a1b7fba84c2461ff3f4a8794d06b9189f00d96dd9ead"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "daf44ae88e067bdd5cbd6b8ce3ad7d29753117878388040a88e87c0d88c7cb2f",
+      "rgbaSHA256": "db7100ed977736a18389bb9f82796d463f84096f1b87637e233f3f88040a3389"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a14b54fbe71f2956c2a596edd08695ce649e4b7b0898866d9ab78fb516abb1ff",
+      "rgbaSHA256": "74119d49d533f30c711e2da0ed0c545e1d6524afcf908bb1a0425e4d0f11477a"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "d2f3dcd1fa7a01dad53c101aa45680a7a5d2bc488b813e69973e6146d9f70f38",
+      "rgbaSHA256": "8243e833148870c117032842f0f151a90b20a8b2ed7d07bb5a0f4d6fd3e1407e"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "5389a8cc093a0ef898970598850f45ab2468a49536efae249809565b8cd1a549",
+      "rgbaSHA256": "ecc7ecd24804932e768cc81d7ed36493b5816fc616543a7d2503cb2a524fe6f2"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "2736036e645846675b962d5010fa7937d07c9f5d28611675f9a5aebf16c01478",
+      "rgbaSHA256": "2ba0fc7720e91a324b5e715594d0e06cf22a010c70853c454503d67bd0811f28"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f519329ce2cddc30869c9b2b3ed6ce72fc46c964ec60bc7a627d73db4272c362",
+      "rgbaSHA256": "14756b29c299dc363afc07a60192a9e15c94d6b5d73be72c952bc903ac1bf562"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "836c16318cecf2701bd891011a024686919837f5b1f600dabd0b5269e547c36b",
+      "rgbaSHA256": "5bd4e925a0fd7c855823158f4211b9113e079a9fd8aa3b99219a88dafdf9baa6"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "2c2bb8ce9c60ba8cef2c7fa55757833ef9aed5fbd1e16a56301fb3269a2483f6",
+      "rgbaSHA256": "06c92efb9ee35cb16e92bec1fb3dbb649d76e990d80bc631a48d2e7da63a5b4a"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b15d717c0f3affd3bfcb231b619d87da36fc6c84c58c0a8ec540c574ce25dd50",
+      "rgbaSHA256": "a69acc965249d517cdbb8f12650b1fbd47f85d69ef0f50e0250931c36fee3e73"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "53b5f74db86c9a8f1e6436b27dc90676effdfda2e21f6cc97235bdae09abd9b0",
+      "rgbaSHA256": "056734b92461362f648b8f6921293e5b10b94de1601008945d482a9d90200f6f"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f160fd8a2b3ce6e7e9cd13daa4711d498b37c7123a7013fcc5e0ad24d7f9f8aa",
+      "rgbaSHA256": "5ffbf8e36020c4a1211dd0a581bf18a4dee8ae5d2da212a8c9f3986e81896699"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "2633440cc110ff38284645059e75ef380ea4bf9fc046b7d39c8b111b631e18e3",
+      "rgbaSHA256": "fa858be83c56f49a6f73b4cc7cc44cc42fd291363ab7d10c6f71af81f7849825"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "630e71c931a02ae7ad45045a96749645ab41b909e5433ade4a5b6ca64f0eb310",
+      "rgbaSHA256": "e3951b86c0818652c51336cb515980f7d634575d95f7baff040064d6aa68b135"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "33efcf5f50c89564ec7b35daa35c00b9191464f10a2881adb2c9848524e70878",
+      "rgbaSHA256": "79a1d497b48f562487240cc1cbbf10b28fb9f244bf8d66ab6ae6d75c543af146"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b11e795dacf1a24692815db8a7f61283b02d18c16cd267bb5dca9f0f3c0236ee",
+      "rgbaSHA256": "5ba9618a254941a6c0053f4732c11976de0b6608ae291f23d4903a1ea702d4e8"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f45890408ed1eaa03a549a731c05b078c08dda8b037317e77de6c1bb4dd5d93a",
+      "rgbaSHA256": "37a56aa55662faf95b6b26fb12736b0cd3aba93bac6c3d5f61ec5a5b5b3df900"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "aae02db0f5d56139a9b1b660a76730ed367da4efcb7b5be135cb00c9b7f6851f",
+      "rgbaSHA256": "5cc74295ff165ccd465b2d82d4018ce32f01da23a9f0352ea8b992ab1c9c44d2"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "362ac08774c8b3a0f303184c2250a525223fb0374ea11bb9a6392cc1da1c6b26",
+      "rgbaSHA256": "db4bb8b990bd52008c18f337fd5116bd2c8d9e7343a4b719ff1e65bbd5425f4d"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "adad4cd9f60354b12f72d4e6466b341dce9f579fcb9d44f67cf0487e7efef354",
+      "rgbaSHA256": "463b4d719d8eb5fa549d0308c559688395e686ebc27cc2f20f8650a7fcd70e7b"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ba3b8651d56b32d06034b0d08adad3b0f6948d3c5a9739489a35dd907147b85b",
+      "rgbaSHA256": "f8536fd79576e2dcc3a4e2212e03d32b276219cd1c92d88a7b0d983c4346cb8f"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "306b92a8ca38c3b487dfc1e6ad56761a52dc0cb4ea879ad4161a39605f594ecb",
+      "rgbaSHA256": "4de7ac39fcb6739a11177449e2f934f547c2c658b0c41f8a774d3e9a039c3671"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b30479b8fb24d05a20ca580817072328ff2ad1aca292144f41b7614919e94ab6",
+      "rgbaSHA256": "6d4d8eb114b348e2ca87b21769ff7a1d158a09ac5e2f01e5913ddbb7a9ba644b"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "10402ec52412f8c7f23e34708d9b585304102209eb2ca7d8f54a5ca227a3b226",
+      "rgbaSHA256": "2b60a8eee23733f502b666eead9287c9ae32add6010aa067837d509a600003f3"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a86dd526b6776c06333c000faa6d8d6cb12f5ada9ba4cde1b58633b228952ce7",
+      "rgbaSHA256": "d48022c657d1821f04eb08e23a32735ae7338838af5b4389854db38a8116e55b"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "21f3b73fb380e019078a461c294ba7fe90e129dcd4ed7b122da90579fef67e0e",
+      "rgbaSHA256": "5b8e8297bed8ab499f5569f0a880540dd5bdad3dec3bb515fe2d8e4aacf8ed67"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "98bb6d324f13d167ce5eb127010fefde1df741a4828e7b3f88032482a3f80e7d",
+      "rgbaSHA256": "518b6989e68bcd918d3640e58704afa4c1e00635d6529821ad0734af0224b703"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f1580eb9096d5168a32b1b0e90cf4d04834fcf4a4715262d4276197e9d97a8e3",
+      "rgbaSHA256": "6fc8ca236d5955ffb46e8f1b1becb39892bcf9cde9efe84b2d43a4320a35c166"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "90633772cd29237b9bc45720529e777c76e8f0438af3362bceab0bcc44fa251f",
+      "rgbaSHA256": "ace9b10dd59513bc096c99a6d7dba5947a7cee2a3eb0f79e016436d714612b41"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "cc0468118c68aeb8cd8ac44123b48106d7f8149eb325bfc749ff0e1546dbfc15",
+      "rgbaSHA256": "186896a0e901d22323a0bd24ecb768d75d0f4bc344b29bd367bce181fb40c728"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "67bef317ccb229a415d49d1865c74f3febcc4969d24dfbe43d92055114453a57",
+      "rgbaSHA256": "5d46236d240f7f5edb0af9916df4ac15d0a7463744fc6231424a48408e4ed277"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "acc6bd676bff44c10ce71c4969e31c7a400a09b1bea6380cced27f54f8799b27",
+      "rgbaSHA256": "da9e9f56570e03828042f827dcb8ca7e98614570ce8965931c747becd2b0f578"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ebc2dc7d99caeea51f545f30c373b2fb3c2d7400fdcc7ba47b43611abbec66aa",
+      "rgbaSHA256": "6bb38b99b8f8199e247e4f5db64680737553693192f05b9a78ca3d9d81a9e962"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "95533a65004af83cb42ad9672e7786b754fd6f78b38bf9dfddc45ab67f10a52c",
+      "rgbaSHA256": "e7fa83e21ebfe3dbca1df471e68f6cbc6b3e15ee0271b0c84ee9506367abb946"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "afeb8af8084b3d8e68f9a174293c901ef876544097f98490a048ffce0829f032",
+      "rgbaSHA256": "737a8a9e0dc54398637e48582d16824ad215f00096fee67d7b8c6103c14df38b"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f2421e50e5058c502180325a39bb84105760cb19ac3d212392b1845145c75e3c",
+      "rgbaSHA256": "8c846f2f2c3eb6d11f3dbb4cb380e0e556d126ab1f4e3aa334e69fac8101a2e9"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "7e07d642a8c5da8e0a51e2145183c7600935a5011fe0b24dd7808f3cb1c7fe1f",
+      "rgbaSHA256": "9de70d12494c6f5fede503fabcbb1cdf377acd8deb4b486a8900f3db2ec31549"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "be010a539bc25cc9f81d48038467c2ee3e9bcf6277140daf7867a6565965c73f",
+      "rgbaSHA256": "ff53a323b01f0a87deca54a9f93a8e05ee70b18467c7fa68376368ccae367a57"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "83b91b34b24c9871fc0186df3e662f94200642e03157d2021c59c42cc7d607d6",
+      "rgbaSHA256": "124800e97e1f1981bcf24c8063c912321965eccd0e4e4f8c3d46018170cbf6c3"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "2ff0a9b2d256933d9b03860716609edbcc984a472f9b05334c3d4315648b919c",
+      "rgbaSHA256": "fbb2865964aebd84bd4245276c7d2b474827295aafc69fd358530169a8c3257c"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "7b926f180b73d735838adcc3a417c28317c0550e36d44fb88051c4f30136b9e4",
+      "rgbaSHA256": "b6bc77f8516aa5977853ffa92cf27c5867a2f6bb7ca378ccf62ffc2148f83170"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "e01747baf89dbec0eb966e72daca9785ee46df13fea9955df4d0d3c08250c5d2",
+      "rgbaSHA256": "2e3b00da642670ee13dfeb8319d8ce0b803370a631c234b4bebfada7a4cc38df"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "004ac348c02929cd1cffda7f9124cb7cad878bfb5140936e6d68e3ca0feb05ca",
+      "rgbaSHA256": "a3e2ce9f1133da6e4d77f5e443e3b6cfd43635cb6d33fbd1f4aa22b409f76d3d"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ab684151a5c7a8507a67f1e31235d9d5a239ab3a9a4d9cbba42f9532dc5324c6",
+      "rgbaSHA256": "08af31ea72eb47aa1d662c0e58f7abd355f62cda9bb1e671521cc21c17d41d91"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "8b52221a959b6aeea72a85f0aabf1f3d449b0aa11d82581a2ed0ca7723f1399a",
+      "rgbaSHA256": "3c275a58a6e4e835e1449095c89e7e01f5c8fa5b8f89a5dc017b49a8c22a2eed"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a98884fc48b20654890d34668f2bb2dddeabaa761a1ace0a0d3a95c669f8b415",
+      "rgbaSHA256": "72ee910098b1e8511cf5fd2cf4457d187d38f7556cce833e5a98a780cdd4e576"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "333020a67074293f761670f5b478c451c49ba358cfaa78cd388ab2f2dd1b3115",
+      "rgbaSHA256": "d0bdfb2c915f112cdcfe94e240ce83afeaffba0d532f14dff9817907448d73e1"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ebb7f183a095247cb411503dcde3c4fb374661ff2865ebf92d1916ddb6d75805",
+      "rgbaSHA256": "995048818c5c35f8adab63ea88abcd1d78029f3ceb5c397e80d1c50001d50b8d"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "bd9b3438d46676f491127282e50ec23fb160489802ba37b54aa802d3ce80dcde",
+      "rgbaSHA256": "bbb9776f6f0fa790bcf2b79e337b665e13d74139f7b0679fb6f6901c5d72358c"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ff0f89c8c1d799d1f0bc257a3d9100ac6015997acc8d682d6a8f4541dc2ff2fc",
+      "rgbaSHA256": "a91d6e577eb9fd99a98c445599ef990e154a0884d6154f022871ed0c7f112edb"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ee2d6c414308b2c061856a34722d8a761ea2ce077746a3f61387365c6470a785",
+      "rgbaSHA256": "a272fa34a3f48bc11fb2866b83d2361fb36df26c5f4bf8820f316159915e71f0"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "91294d786a84c0d29d45df469b6e0dc2efbae17d5c665317d60160baebb784ca",
+      "rgbaSHA256": "8d1bb10af00dd75449055f93e86d7f863b7f68aa532ee8e9add317d03cfa0e2d"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a032b129bf61b8ec3a7764cffc871e86b57e1ff340514b851df634111a5d4cc2",
+      "rgbaSHA256": "7131b4142a84a746eb64619754d5d02d3126ac1112ff89f58d73263939d7f593"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "c8f824e1305a6c3fbdf9c79d9249b1ad760f2839880ae71152a34463fa5cf62f",
+      "rgbaSHA256": "178f2921441626244809392cde64cdf91bb7160c75532aac3e568d5d39db7ae2"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "c6261f28d72d7c9046ae9630909ce03b406a4aa5936d3f55cf6352992ddb21f8",
+      "rgbaSHA256": "5eae3b74137ed233b158429977bcaa039f36b609507c9685ea9d8dbccee16ce3"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "0ab69df15206e2e18c8552cf04d87eb24365ccc8595793772e9ffc68009cb1aa",
+      "rgbaSHA256": "d45a8b8b0669cc748ea5b4f1385e06221a58f2dd3b062488d3e498cdd59a39ce"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "ff0feed6d770dc327dd4fa93cb3c26919d5b2f1b8f9dc2569010ce5cb30aa4ba",
+      "rgbaSHA256": "d89045009c10eec2bad29a52ccb431b76f2ba9cddcb79da85b5b6dddf8fa35f2"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "4361e8f5fbdce1ffdd051fc09cd5464bc52990691b88876d4591bb7d54976c2b",
+      "rgbaSHA256": "014b07bac839422a29e70d51f2780c066dc73a229dbb5df1085f9d8130090bd2"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "6de558558eb4862add4221211a2071b67fbdb505db22398c819df84ff32ecdb5",
+      "rgbaSHA256": "bc7e2bcaf8545e92185526360fa71efadf1bcee2f16e96f5e9b908db210cedf9"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "a8d797668a17c74ab237ff216f23cca110eb7b122fc936eb8c42806b3bbfd2ff",
+      "rgbaSHA256": "dc69247ff8611f77f15fc753ffbddf458a1ec6d06067483e765223b9e718620d"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "317091a599da1d50ed037c51c102672049a1ba4e979b5d97bffc2075e1195f1b",
+      "rgbaSHA256": "dee45dcf8b4e1c75a98d39f3cccd92c4d510a86bd1709261d6c0d38c428a6a6b"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "19be1e23a81f49de3e5e3f39400736b0b02b9bdd5607d7561704121876fb04f4",
+      "rgbaSHA256": "af32bf8780723484d1028bb03865031c810df22e76ded59c3ca2f2c81532281f"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f0dc97bdadb21e0aa3a4cba08d9e93f15d37358176f7d094666e20a6e2cbe6b7",
+      "rgbaSHA256": "f0589fc597e41ecc1030ab75fe8b1e0300737eadaeaf3e358dadd5aa1d544c04"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "1b6b77284c2bd53bf027c50b31f3d7a632774af03bdf11a159a5b8bf0b9729c4",
+      "rgbaSHA256": "454aa7726d34c61bc983992d58755586cb18bbc26ca214a013808e9bde025136"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "b96d37b194a555d6fe2c0d32153d693b2144d114081aa9ef81c10b9505c50bdd",
+      "rgbaSHA256": "658b44961a048ea71853242d19ae3c04d65b6e3a7479624828878120e78e4272"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "284082353f7dd162f72898f4ea1a3725551be61ed0cba1ebf48827d09d91c2b6",
+      "rgbaSHA256": "cde2263623b65eccef53665060a0026ff2b155410c84c0a6b70d5dbe72524342"
+    },
+    {
+      "name": "testWelcomeThemes.light.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "f3bf9339e63aaa9fc948bdab0b37bd6a9154cef75e96b2471009b156017413da",
+      "rgbaSHA256": "9cf33319b3e46f09cc901e33c6c04f3147094cc48889c9d67c5c4049db579eba"
+    },
+    {
+      "name": "testWelcomeThemes.night.png",
+      "size": [
+        780,
+        1688
+      ],
+      "pngSHA256": "4f7605caddbbb64627a501e7d4fe1a906ca449c22ebfeeb53b97d13f1bcaa947",
+      "rgbaSHA256": "aa5b819d2d77f8b00b54fa424b210b8df4d613ba0cdc9623105607cbff40b7f4"
+    }
+  ],
+  "referenceEdits": 0,
+  "thresholdEdits": 0,
+  "newCasesOrHarnesses": 0
+}
