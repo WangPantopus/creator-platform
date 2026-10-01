@@ -62,8 +62,8 @@
   "preservationObservedAt": "2026-10-01T00:37:36.953075+00:00",
   "browser": {
     "viewport": [
-      390,
-      844
+      1280,
+      720
     ],
     "theme": "Light",
     "path": "/support/privacy",
@@ -78,6 +78,11 @@
     "screenshot": "privacy-reauthenticated-stream-source-light.jpg",
     "newPrivacyRequest": false,
     "pendingDomainRetried": false,
-    "newCurrentSessionCta": "Source correction uses the existing canonical /api/auth/continue route; current development verification mode does not display this CTA."
+    "newCurrentSessionCta": "Source correction uses the existing canonical /api/auth/continue route; current development verification mode does not display this CTA.",
+    "fullPageImage": [
+      1280,
+      1488
+    ],
+    "viewportCorrection": "Fresh tabs used default1280x720, confirmed by DOM geometry and image; earlier390 claim was corrected."
   }
 }

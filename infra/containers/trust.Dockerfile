@@ -9,11 +9,12 @@ COPY config ./config
 RUN pnpm install --frozen-lockfile --ignore-scripts
 RUN pnpm --filter @qelvora/backend typecheck
 RUN pnpm --filter @qelvora/backend exec esbuild src/operations/deploy.ts --bundle --platform=node --target=node24 --format=esm --external:express --external:pg --external:zod --outfile=dist/trust-deploy.mjs
-RUN pnpm --filter @qelvora/backend deploy --prod --legacy --ignore-scripts /opt/runtime
+RUN pnpm --filter @qelvora/backend deploy --prod --ignore-scripts /opt/runtime
 
 FROM node:24-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6 AS runtime
 WORKDIR /opt/app
 COPY --from=build /opt/runtime/node_modules ./node_modules
+COPY --from=build /opt/runtime/package.json ./package.json
 COPY --from=build /opt/app/apps/backend/dist/trust-deploy.mjs ./apps/backend/dist/trust-deploy.mjs
 ENV NODE_ENV=production PORT=4108
 COPY infra ./infra
