@@ -1,7 +1,7 @@
 {
   "recordedAt": "2026-10-01T14:49:19.000617+00:00",
   "branch": "codex/w3-emulator-sdk-recovery",
-  "base": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+  "base": "ef3619bb35579963c1c86fafa91ad09b3e18552c",
   "workflow": ".github/workflows/ci.yml",
   "workflowSha256": "a32b0dcfe4e7b2f8d82a62f66fad73ac5adc14991f3a59d783b5639d572cb41a",
   "approvedPatchSha256": "16a4a5a592d95b939c0b9a13361f5addad595b6b7078e845313d750bf99631ec",
@@ -132,5 +132,17 @@
     "reviewState": "W1 personally reviewed exact one-line diff and Google launcher source; approved publication, closes upon exact-diff publication",
     "effectiveness": "not accepted until actual new-head hosted executable, boot and completed tests",
     "approvedBeforePublication": true
+  },
+  "sourceBaseline": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+  "initialBaseCorrection": "Actual53c8215 parent is ef3619b (W2 documentation-only PR43), not ancestor a92b047 previously named as branch base. SDK/workflow/application source is identical across that documentation-only base delta.",
+  "latestReviewedIntegration": {
+    "main": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+    "normalMerge": "39e382c6044da9d9cad46b86581bac9a8987f477",
+    "reviewed": "Complete W4 held financial-read guard source and W2 cleanup/pool-recovery receipts",
+    "effects": "Creator financial projections require actual held W8 creator-wide denial; baseline fan receipts remain separately scoped; no missing authority/provider is configured",
+    "incomingW3AndWorkflowDiffBytes": 0,
+    "leasedWorkflowBytesUnchanged": true,
+    "localBuildOrRuntime": false,
+    "currentHeadHostedProof": "Required independently after this source/evidence publication; earlier53/7f runs are not final-head passes"
   }
 }
