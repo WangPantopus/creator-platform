@@ -79,6 +79,7 @@ function Player({
   family: string;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
+  const surface = useRef<HTMLElement | null>(null);
   const loadRequest = useRef<AbortController | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +112,30 @@ function Player({
   useEffect(() => {
     if (!src) return;
     const element = audio.current;
+    const visibility = () => {
+      let hidden = document.hidden;
+      for (let node = surface.current; node; node = node.parentElement) {
+        if (
+          node.hidden ||
+          node.inert ||
+          node.getAttribute("aria-hidden") === "true" ||
+          (node instanceof HTMLDialogElement && !node.open)
+        ) {
+          hidden = true;
+          break;
+        }
+      }
+      if (hidden) element?.pause();
+    };
+    const observer = new MutationObserver(visibility);
+    for (let node = surface.current; node; node = node.parentElement) {
+      observer.observe(node, {
+        attributes: true,
+        attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
+      });
+    }
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
     const abort = new AbortController();
     let checking = false;
     const timer = setInterval(() => {
@@ -147,6 +172,8 @@ function Player({
     return () => {
       abort.abort();
       clearInterval(timer);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
       element?.pause();
       element?.removeAttribute("src");
       element?.load();
@@ -208,6 +235,7 @@ function Player({
   }
   return (
     <article
+      ref={surface}
       className="qv w6-voice-player"
       aria-label={
         ai ? `${creatorName}'s AI voice note` : `Recorded by ${creatorName}`
