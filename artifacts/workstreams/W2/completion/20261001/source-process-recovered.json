@@ -1,0 +1,215 @@
+{
+  "jobs": [
+    {
+      "id": "b120f860-4c33-42d4-9a10-e43ec0767aa8",
+      "error": null,
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:42:44.384075+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 1
+    },
+    {
+      "id": "eb9157b6-ef7d-4965-a056-f406b1c4a1c9",
+      "error": null,
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:45:06.554166+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 2
+    },
+    {
+      "id": "a627e482-5936-4cce-ad3a-41ecebcd7f01",
+      "error": null,
+      "state": "completed",
+      "attempts": 2,
+      "createdAt": "2026-10-01T12:50:17.289084+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 3
+    }
+  ],
+  "usage": [
+    {
+      "id": "0de4de0d-adaa-4ccd-812f-253cc28c30c7",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:44.746505+00:00",
+      "costMicros": 95,
+      "inputTokens": 4728
+    },
+    {
+      "id": "cfd8d7ca-bcf0-4ac9-b23e-0ac0bccd5568",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:46.246923+00:00",
+      "costMicros": 95,
+      "inputTokens": 4731
+    },
+    {
+      "id": "796737c9-b139-45bf-8805-82fa82022f3c",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:47.072869+00:00",
+      "costMicros": 95,
+      "inputTokens": 4727
+    },
+    {
+      "id": "e8b47e4d-cc3f-4d9e-93ca-9a0e35d86447",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:47.663+00:00",
+      "costMicros": 75,
+      "inputTokens": 3708
+    },
+    {
+      "id": "1582afc5-c04a-47fd-a6a2-abb36bbf9cd4",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:06.900639+00:00",
+      "costMicros": 95,
+      "inputTokens": 4728
+    },
+    {
+      "id": "99927dd8-8964-45e5-bec7-1af2c653bba4",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:07.561362+00:00",
+      "costMicros": 95,
+      "inputTokens": 4731
+    },
+    {
+      "id": "46d5c7bd-58b8-407e-a836-8455592ee437",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:07.874828+00:00",
+      "costMicros": 95,
+      "inputTokens": 4727
+    },
+    {
+      "id": "ec01d19c-4619-4c3e-b091-e2fd7b6fa10b",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:08.375786+00:00",
+      "costMicros": 75,
+      "inputTokens": 3708
+    },
+    {
+      "id": "2f4b7b2e-c49a-4056-a90f-85cb3c7b2884",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:51:07.018643+00:00",
+      "costMicros": 94,
+      "inputTokens": 4672
+    },
+    {
+      "id": "f03dced1-f610-408a-bab3-d4f8cd320ae5",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:51:07.660295+00:00",
+      "costMicros": 94,
+      "inputTokens": 4676
+    },
+    {
+      "id": "4bf85bf3-6177-4758-bb23-0ea90e20fecc",
+      "model": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+      "createdAt": "2026-10-01T12:51:08.750062+00:00",
+      "costMicros": null,
+      "inputTokens": 0
+    },
+    {
+      "id": "d7992b1e-1df4-41db-8edd-9792d14ea1d6",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:39.120684+00:00",
+      "costMicros": 94,
+      "inputTokens": 4672
+    },
+    {
+      "id": "e160f42d-8c34-40a8-8b44-a3409aff9ae4",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:40.095801+00:00",
+      "costMicros": 94,
+      "inputTokens": 4676
+    },
+    {
+      "id": "b3940035-84ac-4929-abb1-4fb2ba3ef46e",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:40.795943+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "991e4270-8ed5-4e55-9f59-5864f7733f89",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:41.150862+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "8fec844a-c88e-42c9-a2ff-146056601be8",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:41.695328+00:00",
+      "costMicros": 94,
+      "inputTokens": 4676
+    },
+    {
+      "id": "d6e9cadf-c5c5-4311-8cfd-bf718e37cf63",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:42.224195+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "e6cda771-a6e3-488c-aca4-a34862056812",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:42.608786+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "11007b1e-1254-4281-9932-cbbec60639fb",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:43.046475+00:00",
+      "costMicros": 94,
+      "inputTokens": 4676
+    },
+    {
+      "id": "4ff1204b-1d7d-4c32-bc42-2eba72c6d408",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:43.33831+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "31472531-0e3e-4e2e-9c53-abd181bfddcd",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:43.683789+00:00",
+      "costMicros": 94,
+      "inputTokens": 4678
+    },
+    {
+      "id": "98cdb9a8-9dd6-483c-9692-8bc22d689d01",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:57:44.071082+00:00",
+      "costMicros": 61,
+      "inputTokens": 3046
+    }
+  ],
+  "chunks": {
+    "count": 171,
+    "models": ["text-embedding-3-small"],
+    "lastOffset": 237599,
+    "firstOffset": 0,
+    "exactPassages": true,
+    "currentRevision": true
+  },
+  "source": {
+    "id": "8c97be4b-d47d-4c78-9159-8fc4976da5a3",
+    "hash": "5f750a6f07b255a0a18a266056be0b7609875d044233bc9117bcf0acbd502c59",
+    "state": "approved",
+    "audience": {
+      "kind": "public"
+    },
+    "progress": 100,
+    "revision": 3,
+    "expiresAt": null,
+    "indexState": "ready",
+    "textLength": 237599,
+    "rightsEvidence": "Original synthetic text authored for isolated W2 ingestion interruption/recovery review; permitted local AI indexing for this review only. No real fan data or production replica license."
+  },
+  "workspace": {
+    "paused": true,
+    "revision": 26,
+    "liveVersionId": null
+  },
+  "capturedAt": "2026-10-01T12:58:37.672422+00:00"
+}

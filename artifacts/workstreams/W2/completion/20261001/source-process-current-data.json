@@ -1,0 +1,64 @@
+{
+  "counts": {
+    "usage": 939,
+    "sources": 125,
+    "versions": 105,
+    "migrations": 40,
+    "evaluations": 25
+  },
+  "capturedAt": "2026-10-01T13:40:57.812252+00:00",
+  "workspaceRevisions": [
+    {
+      "paused": true,
+      "revision": 19,
+      "creatorId": "20000000-0000-4000-8000-000000000002",
+      "liveVersionId": null,
+      "dailyCapMicros": 0
+    },
+    {
+      "paused": true,
+      "revision": 27,
+      "creatorId": "20000000-0000-4000-8000-000000000003",
+      "liveVersionId": null,
+      "dailyCapMicros": 0
+    }
+  ],
+  "primaryPreviewUsage": [
+    {
+      "id": "9b0933fc-dae5-4e29-99e0-5f04ac93f516",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "category": "preview",
+      "createdAt": "2026-10-01T13:16:21.230608+00:00",
+      "costMicros": 94,
+      "inputTokens": 139,
+      "outputTokens": 24
+    },
+    {
+      "id": "8cd9b01f-4a2e-4e51-8ef3-cf57e3fdeb06",
+      "model": "text-embedding-3-small",
+      "category": "preview",
+      "createdAt": "2026-10-01T13:16:22.690362+00:00",
+      "costMicros": 1,
+      "inputTokens": 22,
+      "outputTokens": 0
+    },
+    {
+      "id": "a4699e26-6b9c-4023-b9de-04bf04386629",
+      "model": "gpt-4.1-2025-04-14",
+      "category": "preview",
+      "createdAt": "2026-10-01T13:16:24.20182+00:00",
+      "costMicros": 2006,
+      "inputTokens": 747,
+      "outputTokens": 64
+    },
+    {
+      "id": "380b90e6-f087-46a8-abef-19d37aa64026",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "category": "preview",
+      "createdAt": "2026-10-01T13:16:26.285879+00:00",
+      "costMicros": 304,
+      "inputTokens": 682,
+      "outputTokens": 19
+    }
+  ]
+}
