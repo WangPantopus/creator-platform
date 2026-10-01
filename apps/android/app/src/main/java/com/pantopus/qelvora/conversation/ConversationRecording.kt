@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.ui.VoiceNote
+import com.pantopus.qelvora.ui.qColor
 import com.pantopus.qelvora.ui.qText
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
