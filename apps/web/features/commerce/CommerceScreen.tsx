@@ -266,17 +266,26 @@ function requestId(id: string) {
   return `REQ-${id.slice(0, 8).toUpperCase()}`;
 }
 async function commerceFetch(path: string, init: RequestInit = {}) {
-  let response = await fetch(path, { ...init, cache: "no-store" });
-  if (response.status === 401) {
-    const refresh = await fetch("/api/platform/identity/refresh", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "{}",
-    });
-    if (refresh.ok)
-      response = await fetch(path, { ...init, cache: "no-store" });
+  try {
+    let response = await fetch(path, { ...init, cache: "no-store" });
+    if (response.status === 401) {
+      const refresh = await fetch("/api/platform/identity/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      if (refresh.ok)
+        response = await fetch(path, { ...init, cache: "no-store" });
+    }
+    return response;
+  } catch (error) {
+    if (error instanceof TypeError)
+      throw new Error(
+        "The connection is unavailable. Your action is not confirmed. Refresh current state before trying again.",
+        { cause: error },
+      );
+    throw error;
   }
-  return response;
 }
 function Button({
   children,
@@ -2214,7 +2223,7 @@ function LimitForm({
     [none, setNone] = useState(
       limit?.pending_none ?? limit?.explicit_none ?? false,
     ),
-    [reminders, setReminders] = useState(limit?.reminders_on ?? true),
+    [reminders, setReminders] = useState(limit?.reminders_on ?? false),
     [error, setError] = useState("");
   function submit(e: FormEvent) {
     e.preventDefault();

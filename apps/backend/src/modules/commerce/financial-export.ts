@@ -230,6 +230,19 @@ export async function exportCommerceFinancial(
             ["id"],
             [creator],
           );
+          const payoutCustody = (
+            await client.query<{ relation: string | null }>(
+              "SELECT to_regclass('creator.commerce_payout_custody')::text AS relation",
+            )
+          ).rows[0];
+          if (payoutCustody?.relation)
+            await page(
+              "payoutCustody",
+              "SELECT effect_id,creator_id,commitment_id,destination,source_payment,source_transaction,amount,currency,request_hash,created_at FROM creator.commerce_payout_custody",
+              scope,
+              ["effect_id"],
+              [creator],
+            );
           counts.accessGrants = 0;
           await grants(client, page, creator);
         }

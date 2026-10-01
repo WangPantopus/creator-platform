@@ -3,6 +3,8 @@ import type { CommerceService } from "./service.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { PoolClient } from "pg";
 import { allocateSlotDayPool } from "./extended.js";
+import { createHash } from "node:crypto";
+import { PayoutCustody, type PayoutTransferRequest } from "./payout-custody.js";
 
 export interface CreditRules {
   currency: string;
@@ -282,6 +284,10 @@ export type VerifiedTransfer = {
   id: string;
   amount: number;
   currency: string;
+  destination: string;
+  sourcePayment: string;
+  sourceTransaction: string;
+  keyHash: string;
   state: "pending" | "succeeded" | "failed";
   reversed: boolean;
   reversalReceipts?: readonly { reference: string; amount: number }[];
@@ -297,16 +303,11 @@ export interface PayoutProvider {
     netMinor: number;
     currency: string;
     sourcePayment: string;
+    sourceTransaction: string;
     reconciledAt: Date;
     disputeOpen?: boolean;
   }>;
-  transfer(input: {
-    destination: string;
-    amount: number;
-    currency: string;
-    sourcePayment: string;
-    key: string;
-  }): Promise<VerifiedTransfer>;
+  transfer(input: PayoutTransferRequest): Promise<VerifiedTransfer>;
   /** Read-only lookup of the exact original effect, including after provider
    * idempotency expiry. Absence never authorizes a new aged transfer. */
   recoverTransfer?(
@@ -333,29 +334,31 @@ type PayoutEffect = {
 /** Q03/topology and market approval are mandatory injected configuration, never inferred from a build. */
 export class CreatorSettlement {
   get configured() {
-    return Boolean(this.provider && this.countries.length);
+    return Boolean(this.provider && this.countries.length && this.custody);
   }
   constructor(
     private readonly service: CommerceService,
     private readonly countries: readonly string[],
     private readonly provider?: PayoutProvider,
+    private readonly custody?: PayoutCustody,
   ) {}
   async release(actor: Actor, commitmentId: string) {
     invariant(
-      this.provider,
+      this.provider && this.custody,
       "payout_unavailable",
-      "Payout transfers are not connected yet.",
+      "Payout transfers require their provider and immutable original request custody.",
     );
     const record = await this.service.account(
       actor,
       async (client) =>
         (
           await client.query(
-            "SELECT c.creator_id,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1",
+            "SELECT c.creator_id,a.provider_ref,e.id AS effect_id FROM creator.commerce_commitment c LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id LEFT JOIN creator.commerce_payout_effect e ON e.commitment_id=c.id WHERE c.id=$1",
             [commitmentId],
           )
         ).rows[0],
     );
+    if (record?.effect_id) return this.run(actor, record.effect_id);
     invariant(
       record?.provider_ref,
       "payout_account_required",
@@ -378,6 +381,11 @@ export class CreatorSettlement {
           [commitmentId],
         )
       ).rows[0];
+      const prior = await client.query<{ id: string }>(
+        "SELECT id FROM creator.commerce_payout_effect WHERE commitment_id=$1",
+        [commitmentId],
+      );
+      if (prior.rows[0]) return prior.rows[0].id;
       invariant(
         c &&
           c.account_id === actor.accountId &&
@@ -415,10 +423,20 @@ export class CreatorSettlement {
           balance === BigInt(verifiedBalance.netMinor) &&
           verifiedBalance.currency === c.snapshot.currency &&
           verifiedBalance.sourcePayment === c.intent_ref &&
+          verifiedBalance.sourceTransaction.length > 0 &&
           verifiedBalance.disputeOpen !== true &&
           Math.abs(Date.now() - verifiedBalance.reconciledAt.getTime()) < 60000,
         "ledger_reconciliation_required",
         "Provider fees, reserves and available funds must match the ledger before payout.",
+      );
+      const destination = await client.query<{ provider_ref: string }>(
+        "SELECT provider_ref FROM creator.commerce_payout_account WHERE creator_id=$1 FOR SHARE",
+        [c.creator_id],
+      );
+      invariant(
+        destination.rows[0]?.provider_ref === account.reference,
+        "payout_account_changed",
+        "The payout destination changed during review. Refresh before releasing funds.",
       );
       invariant(
         balance > 0n && balance <= BigInt(Number.MAX_SAFE_INTEGER),
@@ -427,7 +445,7 @@ export class CreatorSettlement {
       );
       const effect = (
         await client.query<PayoutEffect>(
-          "INSERT INTO creator.commerce_payout_effect(creator_id,commitment_id,amount,currency,provider_key) VALUES($1,$2,$3,$4,$5) ON CONFLICT(commitment_id) DO UPDATE SET commitment_id=excluded.commitment_id RETURNING *",
+          "INSERT INTO creator.commerce_payout_effect(creator_id,commitment_id,amount,currency,provider_key) VALUES($1,$2,$3,$4,$5) RETURNING *",
           [
             c.creator_id,
             c.id,
@@ -443,15 +461,23 @@ export class CreatorSettlement {
         "payout_amount_changed",
         "The original payout must be reconciled before releasing a changed balance.",
       );
+      await this.custody!.record(client, effect, {
+        destination: account.reference,
+        amount: Number(balance),
+        currency: effect.currency,
+        sourcePayment: verifiedBalance.sourcePayment,
+        sourceTransaction: verifiedBalance.sourceTransaction,
+        key: effect.provider_key,
+      });
       return effect.id;
     });
     return this.run(actor, id);
   }
   async run(actor: Actor, id: string) {
     invariant(
-      this.provider,
+      this.provider && this.custody,
       "payout_unavailable",
-      "Payout transfers are not connected yet.",
+      "Payout transfers require their provider and immutable original request custody.",
     );
     const effect = await this.service.account(
       actor,
@@ -526,12 +552,15 @@ export class CreatorSettlement {
       };
     }
     try {
+      const original = await this.service.account(actor, (client) =>
+        this.custody!.original(client, effect),
+      );
       const current = await this.service.account(
         actor,
         async (client) =>
           (
             await client.query(
-              "SELECT c.dispute_open,c.state,c.packet_id,p.intent_ref,p.payment_state,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND cp.account_id=$2 AND cp.verification='verified' AND NOT cp.recovery_required",
+              "SELECT c.dispute_open,c.state,c.packet_id,p.intent_ref,p.payment_state,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND cp.account_id=$2 AND cp.verification='verified' AND NOT cp.recovery_required",
               [effect.commitment_id, actor.accountId],
             )
           ).rows[0],
@@ -542,14 +571,9 @@ export class CreatorSettlement {
         "Current payout scope is unavailable; provider reconciliation is required.",
       );
       if (!effect.provider_ref && this.provider.recoverTransfer) {
-        const recovered = await this.provider.recoverTransfer({
-          destination: current.provider_ref,
-          amount: Number(effect.amount),
-          currency: effect.currency,
-          sourcePayment: current.intent_ref,
-          key: effect.provider_key,
-        });
+        const recovered = await this.provider.recoverTransfer(original);
         if (recovered) {
+          this.assertTransfer(original, recovered);
           await this.service.account(actor, async (client) => {
             await this.fence(client, effect);
             invariant(
@@ -574,7 +598,9 @@ export class CreatorSettlement {
         effect.provider_ref ||
           (current.state === "delivered" &&
             !current.dispute_open &&
-            current.payment_state === "captured"),
+            current.payment_state === "captured" &&
+            current.provider_ref === original.destination &&
+            current.intent_ref === original.sourcePayment),
         "payout_held",
         "Payout is held while this obligation is unresolved.",
       );
@@ -586,11 +612,11 @@ export class CreatorSettlement {
       );
       if (!effect.provider_ref) {
         const [account, balance] = await Promise.all([
-          this.provider.account(current.provider_ref),
+          this.provider.account(original.destination),
           this.provider.reconciledBalance(effect.commitment_id),
         ]);
         invariant(
-          account.reference === current.provider_ref &&
+          account.reference === original.destination &&
             account.enabled &&
             !account.detailsDue &&
             this.countries.includes(account.country),
@@ -600,7 +626,8 @@ export class CreatorSettlement {
         invariant(
           balance.netMinor === Number(effect.amount) &&
             balance.currency === effect.currency &&
-            balance.sourcePayment === current.intent_ref &&
+            balance.sourcePayment === original.sourcePayment &&
+            balance.sourceTransaction === original.sourceTransaction &&
             balance.disputeOpen !== true &&
             Math.abs(Date.now() - balance.reconciledAt.getTime()) < 60000,
           "payout_amount_changed",
@@ -610,7 +637,7 @@ export class CreatorSettlement {
           await this.fence(client, effect);
           const c = (
             await client.query(
-              "SELECT c.state,c.dispute_open,p.payment_state FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id WHERE c.id=$1 FOR UPDATE OF c,p",
+              "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c,p FOR SHARE OF a",
               [effect.commitment_id],
             )
           ).rows[0];
@@ -624,6 +651,8 @@ export class CreatorSettlement {
             c?.state === "delivered" &&
               !c.dispute_open &&
               c.payment_state === "captured" &&
+              c.provider_ref === original.destination &&
+              c.intent_ref === original.sourcePayment &&
               BigInt(ledger.amount) === BigInt(effect.amount),
             "payout_held",
             "The obligation or available balance changed before transfer.",
@@ -632,13 +661,8 @@ export class CreatorSettlement {
       }
       const transfer = effect.provider_ref
         ? await this.provider.current(effect.provider_ref)
-        : await this.provider.transfer({
-            destination: current.provider_ref,
-            amount: Number(effect.amount),
-            currency: effect.currency,
-            sourcePayment: current.intent_ref,
-            key: effect.provider_key,
-          });
+        : await this.provider.transfer(original);
+      this.assertTransfer(original, transfer);
       invariant(
         transfer.id.length > 0 &&
           transfer.id.length <= 200 &&
@@ -661,12 +685,12 @@ export class CreatorSettlement {
       effect.provider_ref = transfer.id;
       // Store the reference before another provider read. A changed KYC/market
       // gate after transfer requires durable compensation, not a done receipt.
-      const afterAccount = await this.provider.account(current.provider_ref);
+      const afterAccount = await this.provider.account(original.destination);
       const afterBalance = await this.provider.reconciledBalance(
         effect.commitment_id,
       );
       const accountHeld =
-        afterAccount.reference !== current.provider_ref ||
+        afterAccount.reference !== original.destination ||
         !afterAccount.enabled ||
         afterAccount.detailsDue ||
         !this.countries.includes(afterAccount.country);
@@ -674,14 +698,15 @@ export class CreatorSettlement {
         afterBalance.disputeOpen === true ||
         afterBalance.netMinor !== Number(effect.amount) ||
         afterBalance.currency !== effect.currency ||
-        afterBalance.sourcePayment !== current.intent_ref ||
+        afterBalance.sourcePayment !== original.sourcePayment ||
+        afterBalance.sourceTransaction !== original.sourceTransaction ||
         Math.abs(Date.now() - afterBalance.reconciledAt.getTime()) >= 60000;
       // Persist the reference before post-provider eligibility checks; crash retries fetch current truth.
       const held = await this.service.account(actor, async (client) => {
         await this.fence(client, effect);
         const c = (
           await client.query(
-            "SELECT c.state,c.dispute_open,p.payment_state FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id WHERE c.id=$1 FOR UPDATE OF c,p",
+            "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c,p",
             [effect.commitment_id],
           )
         ).rows[0];
@@ -698,6 +723,8 @@ export class CreatorSettlement {
           c.state !== "delivered" ||
           c.dispute_open ||
           c.payment_state !== "captured" ||
+          c.provider_ref !== original.destination ||
+          c.intent_ref !== original.sourcePayment ||
           BigInt(balance.amount) !== BigInt(effect.amount);
         // A confirmed transfer is cash history even if current eligibility
         // requires compensation. Only an eligible unreversed transfer gets a
@@ -804,12 +831,30 @@ export class CreatorSettlement {
       "The original payout claim expired or a newer worker owns recovery.",
     );
   }
+  private assertTransfer(
+    original: PayoutTransferRequest,
+    transfer: VerifiedTransfer,
+  ) {
+    invariant(
+      transfer.amount === original.amount &&
+        transfer.currency === original.currency &&
+        transfer.destination === original.destination &&
+        transfer.sourcePayment === original.sourcePayment &&
+        transfer.sourceTransaction === original.sourceTransaction &&
+        transfer.keyHash ===
+          createHash("sha256").update(original.key).digest("hex"),
+      "payout_reference_conflict",
+      "Provider cash must match the immutable original payout request.",
+    );
+  }
   private async recordTransfer(
     client: PoolClient,
     effect: PayoutEffect & { packet_id: string },
     transfer: VerifiedTransfer,
     eligible: boolean,
   ) {
+    const original = await this.custody!.original(client, effect);
+    this.assertTransfer(original, transfer);
     invariant(
       transfer.id === effect.provider_ref &&
         transfer.state === "succeeded" &&
