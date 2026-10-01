@@ -216,7 +216,7 @@ export function agentPrivacyHook(
               service,
               scopes,
               assertCurrent,
-              (input as typeof input & { signal?: AbortSignal }).signal,
+              input.signal,
             ),
           };
         if (scopes.length)

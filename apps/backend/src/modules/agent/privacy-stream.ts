@@ -4,22 +4,11 @@ import { invariant } from "../../core/errors.js";
 import type { AgentService } from "./service.js";
 import type { CreatorScope } from "./repository.js";
 import { generationJournalInstalled } from "./generation-journal.js";
+import type { PrivacyExportStream } from "../trust/privacy-export.js";
 
-/** Structural consumer of W8's immutable3240da0 PrivacyExportStream, returned
+/** Consumer of W8's immutable3240da0 PrivacyExportStream, returned
  * by PrivacyHook.run. The coordinator owns durable storage/verification/ack. */
-export type AgentPrivacyExportStream = {
-  snapshotRef: string;
-  contentType: "application/octet-stream";
-  chunks: AsyncIterable<{ sequence: number; data: Uint8Array }>;
-  finish(): Promise<{
-    complete: true;
-    sourceExhausted: true;
-    snapshotRef: string;
-    chunks: number;
-    bytes: number;
-    sha256: string;
-  }>;
-};
+export type AgentPrivacyExportStream = PrivacyExportStream;
 
 /** One MVCC source snapshot across every authoritative owned creator. One
  * pending chunk provides backpressure; closing the iterator rolls back. */
