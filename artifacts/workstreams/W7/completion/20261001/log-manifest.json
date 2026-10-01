@@ -274,5 +274,53 @@
     "gzip": "web-document-loopback-runtime.log.gz",
     "sanitized": true,
     "contentSha256": "2dfa23063b248671ad8f34406e675640e9e979495356b42449f51d847e1fcc5f"
+  },
+  "backend-signed-preview-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-signed-preview-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-signed-preview-contracts.log": {
+    "sha256": "3fc193301539c3ce55fb265b55ef1596b3199979eccb2ffbc7912dbf76cbf9af",
+    "gzip": "backend-signed-preview-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "efe9683c0e05825d982c7ee6733796ae8eff91bd450008dccd78a629b9346998"
+  },
+  "backend-provider-outcome-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-provider-outcome-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-provider-device-lint-failed.log": {
+    "sha256": "2824be20c57d9d1610dde34ad0ec270eb6d492eb33ae3e53e231ac86ff554fbe",
+    "gzip": "backend-provider-device-lint-failed.log.gz",
+    "sanitized": true,
+    "contentSha256": "2aed30f52461e38b87f123da10ca22ed3a2106a09e659e9a8ad14aa5828ec8fe"
+  },
+  "backend-provider-device-format.log": {
+    "sha256": "d64010ae55eaddf0a918163db8e4a6821b3d87a770c6df0154973888c7113c59",
+    "gzip": "backend-provider-device-format.log.gz",
+    "sanitized": true,
+    "contentSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "backend-provider-device-lint.log": {
+    "sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+    "gzip": "backend-provider-device-lint.log.gz",
+    "sanitized": true,
+    "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "backend-provider-device-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-provider-device-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-provider-device-contracts.log": {
+    "sha256": "d006311457f4185e59e38851255f108153b3b961bdb7da87849cc0b5e074725e",
+    "gzip": "backend-provider-device-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "ce9c2b4fd1621918509f7aeff8e3325ab1dfd29f8570cc66f6d7b51061af1790"
   }
 }
