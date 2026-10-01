@@ -1,0 +1,12 @@
+{
+  "capturedAt": "2026-10-01T13:11:32.287217+00:00",
+  "evaluationUsage": {
+    "knownRows": 40,
+    "unknownRows": 0,
+    "knownCostMicros": 22813
+  },
+  "activeSourceJobs": 0,
+  "ingestionKnownRows": 21,
+  "ingestionUnknownRows": 1,
+  "ingestionKnownCostMicros": 1909
+}

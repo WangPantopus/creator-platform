@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-10-01T13:40:35.915Z",
+  "creatorRole": "primary companion, canonical development actor one",
+  "submittedRevision": 19,
+  "sourceBase": "1c11b098c3f86ec07740c760b423c4fccc9ec5f7",
+  "evidenceKind": "Personally operated Studio UI and separate durable usage projection; response-body capture unavailable",
+  "actualVisiblePanel": "TEST IT AS A FAN · PUBLIC AUDIENCE\nFan message\nSend to draft AI\n\nDRAFT PREVIEW · REVISION 19\n\nW2 development creator's AI\n\n\"Clay dries slowly. A bisque firing prepares it for glaze.\"\n\nOpen authorized passage\nThis is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.\n\nPipeline 6182 ms · first approved 6134 ms · cost 2405 USD micros",
+  "networkCapture": {
+    "responseBodyCaptured": false,
+    "eventPageTruncated": true
+  },
+  "metrics": {
+    "durationMs": 6182,
+    "firstApprovedMs": 6134,
+    "costMicros": 2405
+  }
+}
