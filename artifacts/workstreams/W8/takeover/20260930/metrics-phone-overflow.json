@@ -1,0 +1,86 @@
+{
+  "observedAt": "2026-10-01T03:23:06.161803+00:00",
+  "sourceParent": "2a765bb2180b6c2c24de167239588029974952cb",
+  "apiSource": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a",
+  "observation": "At actual390x844 Night, fixed mono GET:/v1/conversations/:creatorId/:fanId:4xx text expanded scrollWidth to424 and text right424.",
+  "before": {
+    "viewport": [
+      390,
+      844
+    ],
+    "clientWidth": 390,
+    "scrollWidth": 424,
+    "textLeft": 37,
+    "textRight": 424,
+    "screenshot": "wal-metrics-phone-night.png"
+  },
+  "sourceCorrection": "Owned Metrics main adds trust-metrics class; only its mono spans get overflow-wrap:anywhere. Full route/values/font/copy preserved; no truncation or visual reference change.",
+  "after": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "theme": "light",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "keyboard": "Skip link Enter focuses MAIN#ops-main",
+      "screenshot": "wal-metrics-phone-light-fixed.png"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "theme": "night",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "keyboard": "Skip link Enter focuses MAIN#ops-main",
+      "screenshot": "wal-metrics-phone-night-fixed.png"
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "theme": "light",
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "screenshot": "wal-metrics-desktop-light-fixed-current.jpg"
+    }
+  ],
+  "viewportRestored": true,
+  "verification": {
+    "webTypecheck": "pass",
+    "changedTsxLint": "pass",
+    "changedTsxCssFormatting": "pass",
+    "personallyInspectedNightPixels": true,
+    "personallyInspectedLightPixels": true,
+    "personallyInspectedFullDesktopPixels": true
+  },
+  "sourceHashes": {
+    "apps/web/app/ops/metrics/page.tsx": "8a58f0a154054d2cdbbf7e302716841cfddb7bddbecb046d1dafecc56939e3f4",
+    "apps/web/app/ops/trust.css": "5789791804bda3f69b32014a8342fdbfa7011d7992534c1183b58c3b57a9d378"
+  },
+  "limitations": [
+    "Actual native/reference/pilot/accessibility completeness not inferred",
+    "Phone view is390x844; no true200-percent browser zoom, reduced motion, screen reader or OS system-sheet claim",
+    "WAL counters remain local cluster samples with archiving off, no restore/RPO/RTO"
+  ],
+  "testsGoldensSqlOrGrantsChanged": false,
+  "captureCorrection": {
+    "previousDesktop": "wal-metrics-desktop-light-fixed.png",
+    "previousPixelSize": [
+      416,
+      900
+    ],
+    "status": "Incomplete capture; not desktop visual acceptance",
+    "actualReplacement": "wal-metrics-desktop-light-fixed-current.jpg",
+    "actualPixelSize": [
+      1280,
+      2268
+    ],
+    "format": "Browser API returned JPEG bytes; existing .png-suffixed phone captures also contain JPEG bytes",
+    "capturedAt": "2026-10-01T03:57:48.496925+00:00"
+  }
+}

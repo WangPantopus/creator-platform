@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "sourceBase": "884c35bb3e8725ee9f573531aacfe07c05fde71f",
+  "change": "Scoped .identity-welcome-actions .qv-btn box-sizing:border-box in the existing stylesheet; all auth/copy/arrival behavior preserved.",
+  "personalBrowser": "Same supported IAB browser, current actual web3008; direct generic /auth/continue page, no sign-in submission.",
+  "before": {
+    "viewport": [
+      390,
+      844
+    ],
+    "documentWidth": 408,
+    "button": {
+      "left": 24,
+      "right": 408,
+      "width": 384,
+      "boxSizing": "content-box"
+    },
+    "capture": "welcome-before-box-sizing-phone-light.jpg"
+  },
+  "after": {
+    "viewport": [
+      390,
+      844
+    ],
+    "documentWidth": 390,
+    "button": {
+      "left": 24,
+      "right": 366,
+      "width": 342,
+      "boxSizing": "border-box"
+    },
+    "themes": [
+      "Light",
+      "Night"
+    ],
+    "captures": [
+      "welcome-after-box-sizing-phone-light.jpg",
+      "welcome-after-box-sizing-phone-night.jpg"
+    ]
+  },
+  "verification": [
+    "Actual DOM geometry and screenshots on both themes",
+    "Scoped CSS formatting and git diff check passed",
+    "Next16.3.7 production webpack build passed in .next-w8-build"
+  ],
+  "limits": [
+    "This fixes actual clipping/overflow only; exact contextual Welcome reference/state match and full accessibility/native matrix remain open.",
+    "No new or changed tests, goldens, tolerances, identity authority or peer checkout."
+  ]
+}

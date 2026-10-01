@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-01T02:03:07.562889+00:00",
+  "source": "3746829cee8911f62284576193ad6f157d7178c5",
+  "browser": "Supported in-app browser, normal canonical actor-two continuation; no reload/token injection to recover",
+  "viewport": [
+    1280,
+    720
+  ],
+  "theme": "Light",
+  "signalSentAt": "2026-10-01T01:58:49.036880+00:00",
+  "shutdownRecords": [
+    {
+      "timestamp": "2026-10-01T01:58:49.037Z",
+      "event": "trust_local_shutdown_started",
+      "environment": "local-development",
+      "release": "3746829cee8911f62284576193ad6f157d7178c5",
+      "activeSockets": 1
+    },
+    {
+      "timestamp": "2026-10-01T01:59:13.780Z",
+      "event": "trust_local_shutdown_completed",
+      "environment": "local-development",
+      "release": "3746829cee8911f62284576193ad6f157d7178c5",
+      "durationMs": 24741.8,
+      "activeSockets": 0,
+      "forcedSockets": 0
+    }
+  ],
+  "ticketsAcceptedAfterShutdownStart": 4,
+  "reconnectTickets": [
+    {
+      "timestamp": "2026-10-01T01:59:35.148Z",
+      "status": 200,
+      "correlationId": "245db58e-3b92-4c46-808a-f5b103d6c32a",
+      "durationMs": 52.98
+    }
+  ],
+  "actualUi": {
+    "sameHistoryAndReportReferencesRetained": true,
+    "aiUnavailableSendDisabled": true,
+    "transientReconnectNoticeObserved": true,
+    "noticeClearedAfterSuccessfulSnapshot": true,
+    "noNewMessageOrPaidGeneration": true
+  },
+  "observedDefect": "Local shutdown waits for worker stop before closing HTTP/socket intake, allowing ticket issuance/reconnect while draining. Whole process took24.7418 seconds, despite zero forced sockets. Fix prepared: begin both close operations before waiting on current fenced worker; measure stages.",
+  "preservation": {
+    "observedAt": "2026-10-01T02:02:22.992671+00:00",
+    "source": "3746829cee8911f62284576193ad6f157d7178c5",
+    "preservedDatabase": {
+      "cases": [
+        {
+          "id": "030868cc-e778-4fca-8731-02a4c817fcfa",
+          "state": "resolved",
+          "version": 2
+        },
+        {
+          "id": "27fbf5f9-7e9e-456e-8594-153a3ebcabfd",
+          "state": "open",
+          "version": 1
+        },
+        {
+          "id": "a19ec4ae-aae4-41cf-bae0-a4625aa64e70",
+          "state": "resolved",
+          "version": 4
+        },
+        {
+          "id": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+          "state": "resolved",
+          "version": 2
+        }
+      ],
+      "blocks": 1,
+      "tombstones": 1,
+      "privacyJobs": [
+        {
+          "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+          "kind": "export",
+          "scope": "account",
+          "state": "blocked"
+        },
+        {
+          "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+          "kind": "export",
+          "scope": "account",
+          "state": "blocked"
+        },
+        {
+          "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+          "kind": "delete",
+          "scope": "account",
+          "state": "blocked"
+        }
+      ],
+      "pendingDeletionTasks": 7
+    },
+    "matchesPostAccountSwitch": true,
+    "all40SourceBytesRegistryEntriesDatabaseChecksumsPreserved": true,
+    "operator": "Read-only psql through existing container; no reset, reseed, retry, role or grant mutation."
+  },
+  "screenshots": [
+    {
+      "path": "realtime-drain-before-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "realtime-drain-offline-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "realtime-drain-reconnected-light.jpg",
+      "sha256": "f45dc3e737837b6a92c0ded1d885b06cf063da9b6652dd2f61f5f808d81c4b52"
+    },
+    {
+      "path": "realtime-drain-recovered-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    }
+  ],
+  "limitations": [
+    "One local functional sample; no latency distribution, production/provider/frame/visible/settlement or native interaction acceptance.",
+    "Shutdown stages were not measured in this revision; worker is a suspected contributing wait, not an established timing cause.",
+    "A ticket200 is not subscription proof; shutdown start explicitly observes one active socket."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "observedAt": "2026-10-01T01:39:37.108608+00:00",
+  "sourceParent": "ef5ce33d6e6dec5687498fbb7772b8a1e9c8c0f2",
+  "activeMigrations": 40,
+  "baseline": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4",
+  "allActiveEntriesSqlBytesChecksumsMatch": true,
+  "preservedDatabase": {
+    "cases": [
+      {
+        "id": "030868cc-e778-4fca-8731-02a4c817fcfa",
+        "state": "resolved",
+        "version": 2
+      },
+      {
+        "id": "27fbf5f9-7e9e-456e-8594-153a3ebcabfd",
+        "state": "open",
+        "version": 1
+      },
+      {
+        "id": "a19ec4ae-aae4-41cf-bae0-a4625aa64e70",
+        "state": "resolved",
+        "version": 4
+      },
+      {
+        "id": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+        "state": "resolved",
+        "version": 2
+      }
+    ],
+    "blocks": 1,
+    "tombstones": 1,
+    "privacyJobs": [
+      {
+        "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+        "kind": "delete",
+        "scope": "account",
+        "state": "blocked"
+      }
+    ],
+    "pendingDeletionTasks": 7
+  },
+  "matchesPreSwitchReceipt": true,
+  "newSqlApplied": false,
+  "resetOrReseed": false,
+  "privateEnvKeysOrGrowthCiphertextChanged": false,
+  "backupsPreserved": true
+}

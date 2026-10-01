@@ -1,0 +1,13 @@
+{
+  "observedAt": "2026-10-01T01:44:10.190567+00:00",
+  "url": "https://github.com/WangPantopus/creator-platform/pull/7",
+  "state": "OPEN",
+  "isDraft": true,
+  "headAtReadback": "4f058a0e2c29c179c95c724d0f08064880f81024",
+  "method": "Normal authenticated GitHub CLI body-file update and independent readback",
+  "bodyMatchesIgnoringTrailingNewline": true,
+  "bodySha256": "e3f3c4aa681eda34dfd3dba167da50552545063c86ef3d7183dc70d333fa8cb7",
+  "newPrCreated": false,
+  "mergePerformed": false,
+  "mergeGate": "All required latest-head checks plus full enabled-scope acceptance remain required"
+}

@@ -1,0 +1,53 @@
+{
+  "sources": [
+    {
+      "owner": "W1",
+      "commit": "cf851a5d89a5d412dc70ecb7ed3bc97986b8868d",
+      "file": "apps/web/lib/session.ts",
+      "integration": "Exact development cookie source; W8 BFF and completion follow same names"
+    },
+    {
+      "owner": "W1",
+      "commit": "05e1ef0",
+      "file": "apps/backend/src/db/database.ts",
+      "integration": "Optional typed read/write lock source retains W8 current fan/creator participant restriction; conservative default write for unannotated producer callbacks"
+    },
+    {
+      "owner": "W3",
+      "commit": "bb2c7f84c6fcd5e184f6cbe819f72b6b687fc8d9",
+      "files": [
+        "service.ts",
+        "memory.ts",
+        "wellbeing.ts"
+      ],
+      "integration": "Reviewed conversation source, preserving generation IDs and delivered-prefix settlement; context snapshot additionally batches scoped exclusion/provenance into one query"
+    },
+    {
+      "owner": "W3",
+      "commit": "a0a0025275f5fa4a303da2646e70307fb0b611ff",
+      "files": [
+        "feature.ts",
+        "generation.ts"
+      ],
+      "integration": "Write-lock consumers only, plus published wellbeing consent boundary; existing read callbacks explicitly use read mode"
+    },
+    {
+      "owner": "W7",
+      "commit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0",
+      "files": [
+        "apps/backend/src/modules/growth/configured.ts",
+        "apps/backend/src/modules/growth/database.ts",
+        "apps/backend/src/modules/growth/erasure.ts",
+        "apps/backend/src/modules/growth/lifecycle.ts",
+        "apps/backend/src/modules/growth/privacy-export.ts",
+        "apps/backend/src/modules/growth/runtime.ts",
+        "apps/backend/src/modules/growth/service.ts"
+      ],
+      "integration": "Published streaming/deletion deltas, preserving existing source enumeration and retention copy; W8 binds complete privacyTaskAuthority. Native/CI/test changes excluded."
+    }
+  ],
+  "immutableSqlChanged": false,
+  "rlsOrGrantsChanged": false,
+  "newTests": false,
+  "fixtureException": "Exact five existing files, explicitly authorized by the human"
+}

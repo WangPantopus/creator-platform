@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "operation": "single-host-private-storage-write-and-persisted-byte-verification",
+  "createdAt": "2026-10-01T00:13:50.134Z",
+  "source": "synthetic operator bytes; no actual privacy job or domain export",
+  "artifact": {
+    "format": "privacy-stream-v1",
+    "reference": "08b4ae97-d99a-47c2-bc42-7dffa3ba452b",
+    "jobId": "63a5d8df-b681-4c4a-9b87-a80c58900e7a",
+    "accountId": "b73194eb-e735-4275-8fcb-ad7b05f7f0cf",
+    "domain": "trust",
+    "snapshotRef": "synthetic-storage-operator-20260930",
+    "contentType": "application/octet-stream",
+    "chunks": 64,
+    "bytes": 33554432,
+    "sha256": "229af0289b3b80b1a161ae5b0de223906ceb8f999a2d1713f781e882ed3873bd",
+    "expiresAt": "2026-10-08T00:13:49.949Z"
+  },
+  "writeAndVerifyMs": 333.10664699999995,
+  "observedPeakRss": 124604416,
+  "directoryMode": "700",
+  "binaryMode": "600",
+  "limitations": [
+    "Coordinator/job/lease authority not exercised in this storage-only operation.",
+    "No owner source snapshot, binary/call archive, full C10 completion, system-save or deployment acceptance claim.",
+    "Existing database, jobs and producer configuration unchanged."
+  ],
+  "freshProcessRead": {
+    "observedAt": "2026-10-01T00:14:09.320Z",
+    "bytes": 33554432,
+    "parts": 512,
+    "maxPartBytes": 65536,
+    "sha256": "229af0289b3b80b1a161ae5b0de223906ceb8f999a2d1713f781e882ed3873bd",
+    "verifyAndReadMs": 280.945158
+  },
+  "differentAccount": {
+    "code": "export_artifact_unavailable",
+    "status": 404
+  },
+  "privateOperatorReceipt": "/Users/yingpengwang/.config/creator-platform/w8-local/export-storage-operator/operator-receipt.json",
+  "sourceFiles": {
+    "apps/backend/src/modules/trust/privacy-export.ts": "8785cbcd498057e6a7924ab4c8b2dfff654ecf2b5ded96d85b775a2b1622b433",
+    "apps/backend/src/modules/trust/private-file-artifacts.ts": "e36fa69eb1aa55c5e334d0be54bbc50ce3187e45d7fb7ef192e96f2b04885fad"
+  }
+}

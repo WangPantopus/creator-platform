@@ -104,11 +104,12 @@
     "ios-shipping-signin-light.png": "6107eb3e7f28e693eb5b5eec5384bbe215a477875cfb85627b12d8b4590fd7be",
     "ios-shipping-signin-night.png": "e715d2b9985e8c8d0831ee4964f20f4034c47076cf43aa3610aa5b878a4d0c70",
     "ios-shipping-signin.log": "b532a1b2952043a4b0108f2d7042e76b9c3a30db41a0ca3d1ae2151cc70365b7",
-    "merge-readiness.md": "8805e4114df639075883046110ba5d39a214f74a648d0d353e5ff45911d65e8f",
+    "merge-readiness.md": "b38b2e377822f0e77e872f24a624621d545c9d7913d82db66fffb1656561a0b0",
     "previous-head-android-discover-anr.png": "04beeb42bcc2f7c2087fbcbea8820759f087d5171e885e7ad74c3039aa9bcbc9",
     "previous-head-android-signin.log": "a67d8baf9f82ae80a13b664e038f6a9a9512fa9c6d299a49c15cad89f3d8d58a",
     "previous-head-api34-anr.log": "c5330f0b7ed86e6018b318a3cc24db957aab18ae30efb1f400ecfd76138bcaa9",
     "previous-head-api34-emulator-sanitized.log": "185ba4def593c6d6938282e1fddfff2b1adddadd356660ad437f5269cd2d1eeb",
     "web-production-build.log": "d4559e68b6f18db4e6361b403c0715b8df836c16d8e579b8b8921de6fa6229b1"
-  }
+  },
+  "currentNativeMainContinuation": "native-controls-and-main.json"
 }

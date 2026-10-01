@@ -6,6 +6,8 @@ import express, {
 import { z, ZodError } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import {
   ClaimInput,
   DecisionInput,
@@ -15,6 +17,7 @@ import {
   EffectRetryInput,
   BlockInput,
   Queue,
+  PrivacyDomains,
 } from "./contracts.js";
 import type { TrustService } from "./service.js";
 import type { Readiness } from "../../operations/readiness.js";
@@ -283,6 +286,57 @@ export function createTrustRouter(options: TrustRouterOptions) {
     );
     res.json(await options.service.exportData(await actor(req), id(req)));
   });
+  router.get(
+    "/v1/trust/privacy/jobs/:id/download/:domain",
+    async (req, res) => {
+      const domain = z.enum(PrivacyDomains).parse(req.params.domain);
+      const controller = new AbortController();
+      const closed = () => controller.abort();
+      res.once("close", closed);
+      try {
+        const current = await actor(req);
+        const jobId = id(req);
+        const result = await options.service.exportArtifact(
+          current,
+          jobId,
+          domain,
+          controller.signal,
+        );
+        const extension =
+          result.artifact.contentType === "application/x-ndjson"
+            ? "jsonl"
+            : result.artifact.contentType === "application/zip"
+              ? "zip"
+              : "bin";
+        res.setHeader("Content-Type", result.artifact.contentType);
+        res.setHeader("Content-Length", String(result.artifact.bytes));
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="creator-data-${domain}.${extension}"`,
+        );
+        async function* authorized() {
+          for await (const chunk of result.chunks) {
+            controller.signal.throwIfAborted();
+            const latest = await actor(req);
+            if (latest.accountId !== current.accountId)
+              throw new DomainError(
+                "session_account_changed",
+                "Your account changed. Reconnect before downloading.",
+                409,
+              );
+            await options.service.authorizeExport(latest, jobId);
+            yield chunk;
+          }
+        }
+        await pipeline(Readable.from(authorized()), res, {
+          signal: controller.signal,
+        });
+      } finally {
+        res.off("close", closed);
+        controller.abort();
+      }
+    },
+  );
   router.get("/v1/trust/operations/metrics", async (req, res) => {
     const current = await actor(req);
     await options.service.store.actor(current, async (client) => {
@@ -344,6 +398,11 @@ export function createTrustRouter(options: TrustRouterOptions) {
                 503,
               );
       res.locals.errorCode = value.code;
+      if (res.headersSent) {
+        options.telemetry.increment("privacy_download_interrupted");
+        res.destroy();
+        return;
+      }
       res.status(value.status).json({
         error: {
           code: value.code,

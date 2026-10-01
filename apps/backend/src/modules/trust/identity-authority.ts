@@ -17,6 +17,39 @@ export function trustIdentityAuthority(
   access: AccessService,
   database: Database,
 ): TrustDependencies {
+  const verifySession = async (
+    actor: Parameters<NonNullable<TrustDependencies["verifyExport"]>>[0],
+  ) => {
+    const current = requestAuthority.getStore();
+    if (
+      !current ||
+      current.accountId !== actor.accountId ||
+      identity.sessions.mode !== "pantopus"
+    )
+      throw new DomainError(
+        "fresh_verification_required",
+        "Continue with Pantopus again before requesting data changes.",
+        401,
+      );
+    return identityTransaction(pool, actor.accountId, async (client) => {
+      const row = (
+        await client.query<{ created_at: Date }>(
+          "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode='pantopus' AND revoked_at IS NULL AND expires_at>clock_timestamp()",
+          [current.sessionId, actor.accountId],
+        )
+      ).rows[0];
+      if (!row)
+        throw new DomainError(
+          "fresh_verification_required",
+          "Continue with Pantopus again before requesting data changes.",
+          401,
+        );
+      return {
+        verifiedAt: row.created_at,
+        reference: `w1-session:${current.sessionId}`,
+      };
+    });
+  };
   return {
     privacyVerificationMethod: "current_session",
     async evidence(actor, input) {
@@ -80,37 +113,8 @@ export function trustIdentityAuthority(
         items,
       };
     },
-    async verifyPrivacy(actor) {
-      const current = requestAuthority.getStore();
-      if (
-        !current ||
-        current.accountId !== actor.accountId ||
-        identity.sessions.mode !== "pantopus"
-      )
-        throw new DomainError(
-          "fresh_verification_required",
-          "Continue with Pantopus again before requesting data changes.",
-          401,
-        );
-      return identityTransaction(pool, actor.accountId, async (client) => {
-        const row = (
-          await client.query<{ created_at: Date }>(
-            "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode='pantopus' AND revoked_at IS NULL AND expires_at>clock_timestamp()",
-            [current.sessionId, actor.accountId],
-          )
-        ).rows[0];
-        if (!row)
-          throw new DomainError(
-            "fresh_verification_required",
-            "Continue with Pantopus again before requesting data changes.",
-            401,
-          );
-        return {
-          verifiedAt: row.created_at,
-          reference: `w1-session:${current.sessionId}`,
-        };
-      });
-    },
+    verifyPrivacy: verifySession,
+    verifyExport: verifySession,
     async privacyOwnership(actor) {
       const profiles = await identity.profiles.view(actor);
       return {

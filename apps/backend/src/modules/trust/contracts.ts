@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PrivacyExportStream } from "./privacy-export.js";
 
 export const CaseKind = z.enum([
   "ai_report",
@@ -208,9 +209,11 @@ export type PrivacyHook = {
     threadId: string | null;
     idempotencyKey: string;
     leaseToken?: string;
+    signal?: AbortSignal;
   }): Promise<{
     receipt: Record<string, unknown>;
     data?: unknown;
+    stream?: PrivacyExportStream;
     retained?: { category: string; until: string | null; reason: string }[];
   }>;
 };

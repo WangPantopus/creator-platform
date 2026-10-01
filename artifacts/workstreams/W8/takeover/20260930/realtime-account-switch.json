@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T01:38:20.316931+00:00",
+  "apiSource": "e33a56847fb85b726c55d9226018b17725bdbd77",
+  "webSourceParent": "d1b880d2a22d2a40f42edf4ef8d3c0657aaddc80",
+  "changedWebFile": {
+    "path": "apps/web/app/api/trust/[...path]/route.ts",
+    "sha256": "e200394aabc83d3245867bfe28d85e6f2241bbeea0af78fd3faf5835714a9cee"
+  },
+  "browser": "Supported in-app browser2; actual personal UI actions, no token injection",
+  "viewport": [
+    1280,
+    720
+  ],
+  "theme": "Light",
+  "steps": [
+    "Continue with Pantopus then Development actor two restores retained fan2 history",
+    "Actual Reload creates third accepted subscription; metrics fan access is denied",
+    "Before fix, Use local actor clears private history but old canonical socket remains active (one active at subsequent1088-second process snapshot)",
+    "Owned Trust BFF now invokes W1 current-token-only idempotent logout before clearing canonical cookie during development actor switch/logout",
+    "Fresh ordinary canonical sign-in opens fourth socket; actual Ops supervisor switch sends canonical logout200",
+    "Gateway rejects one replay batch under revoked session, closes fourth socket; active subscriptions/connections/pending all zero",
+    "Conversation displays unavailable/sign-in required with no old message/draft; supervisor metrics remain accessible"
+  ],
+  "beforeFix": {
+    "connectionsOpened": 3,
+    "connectionsClosed": 2,
+    "connectionsActive": 1,
+    "subscriptionsActive": 1,
+    "batchesCompleted": 1737,
+    "processUptimeSeconds": 1088
+  },
+  "afterFix": {
+    "connectionsOpened": 4,
+    "subscriptionsAccepted": 4,
+    "connectionsClosed": 4,
+    "connectionsActive": 0,
+    "subscriptionsActive": 0,
+    "subscriptionsPending": 0,
+    "batchesRefused": 1,
+    "batchesCompleted": 2990,
+    "processUptimeSeconds": 1262,
+    "canonicalLogout": {
+      "timestamp": "2026-10-01T01:37:15.799Z",
+      "route": "/v1/identity/logout",
+      "status": 200,
+      "correlationId": "06f6a89d-8993-457e-a7b4-9161fac0eee2",
+      "durationMs": 15.39,
+      "errorCode": null
+    }
+  },
+  "httpReceipts": [
+    {
+      "timestamp": "2026-10-01T01:18:22.362Z",
+      "route": "/v1/conversations/realtime-ticket",
+      "status": 200,
+      "correlationId": "8319e7fd-47cc-4c71-9803-c969668a978d",
+      "durationMs": 11.12,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:31:29.804Z",
+      "route": "/v1/conversations/realtime-ticket",
+      "status": 200,
+      "correlationId": "394d7bc6-a952-41fb-98cd-f2b2430ab90b",
+      "durationMs": 28.08,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:31:53.925Z",
+      "route": "/v1/conversations/realtime-ticket",
+      "status": 200,
+      "correlationId": "6dff2c5d-fed9-4707-b5f2-7d263b0b2e08",
+      "durationMs": 39.09,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:36:35.572Z",
+      "route": "/v1/conversations/realtime-ticket",
+      "status": 200,
+      "correlationId": "473004f0-4fbf-4efd-9d48-60e96e5990ac",
+      "durationMs": 25.42,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:37:15.799Z",
+      "route": "/v1/identity/logout",
+      "status": 200,
+      "correlationId": "06f6a89d-8993-457e-a7b4-9161fac0eee2",
+      "durationMs": 15.39,
+      "errorCode": null
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "realtime-reloaded-history-light.jpg",
+      "sha256": "4816b10afa67691fe5242c51f1fcd0909041b4b62d401fa26776ba294f51d836"
+    },
+    {
+      "path": "realtime-reconnect-metrics-light.jpg",
+      "sha256": "71b2077d60ddb09555830916ce04120952dc8648cf4945c62c5d729f7944f5e8"
+    },
+    {
+      "path": "realtime-switch-closed-metrics-light.jpg",
+      "sha256": "3701a143a5a2f4e4dc63328524a0263e270d056128a77503e6d41b73abab4822"
+    },
+    {
+      "path": "realtime-switch-cleared-conversation-light.jpg",
+      "sha256": "d6549e3bcd80d96d4a60ea326c189479b07b05d127f813ff53e30b221f78e71d"
+    }
+  ],
+  "verification": {
+    "webTypecheck": "pass",
+    "changedSourceLint": "pass",
+    "changedSourceFormat": "pass",
+    "productionWebBuild": "pass (Next16.3.7)",
+    "existingTestsChanged": false,
+    "newTestsWritten": false
+  },
+  "preservation": {
+    "databaseResetOrReseed": false,
+    "casesBlocksTombstonePrivacyJobsChanged": false,
+    "runtimePoolsPrivateKeysChanged": false,
+    "canonicalOtherSessionsOrPeerPortCookiesRevoked": false,
+    "allSessionRevocation": false,
+    "sqlRolesRlsGrantsChanged": false,
+    "paidCalls": 0
+  },
+  "limitations": [
+    "This proves development canonical history/reload/account-switch transport closure, not real-provider in-flight generation/pause/license/visible/settlement proof",
+    "No measured five-second distribution or process shutdown drain is claimed",
+    "Timeout or failed canonical sign-out refuses local account switch; failure path is source-verified, not independently exercised against an unavailable live identity provider",
+    "Old observations are retained; the initial receipt reconnection limit is superseded only by this actual reload sequence"
+  ]
+}

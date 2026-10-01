@@ -1,0 +1,38 @@
+{
+  "observedAt": "2026-10-01T03:52:14.244486+00:00",
+  "sourcePath": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+  "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc",
+  "state": "reserved_unapplied",
+  "originalDependencies": [
+    {
+      "id": "0044",
+      "sourceCommit": "2dd53adcbaaa0789b9b0a4a0352404bd872ca42f",
+      "sourcePath": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "sha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+    },
+    {
+      "id": "0059",
+      "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+      "sourcePath": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "sha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+    }
+  ],
+  "fullDependencySqlPersonallyRead": true,
+  "exactCopiedPredicates": {
+    "approvalSelectAndCurrentVersionEpochKeyConditions": true,
+    "approvalVersion1AndDeliveredMessageReuseFence": true,
+    "originalNamedActAccountCreatorThreadHashAndTypeChecks": true
+  },
+  "delta": "All approved_draft rows use0044 current exact-version personal Approval before the foundation-only fallback. Existing signed_command/correction/recording combinations remain rejected. Adds approval_id to the three existing terminal AI/correction/recording immutable tuples. Other0059 guard blocks unchanged.",
+  "publishedCommit": "This coherent source increment; resolved by Git history without self-reference",
+  "activeEntriesSqlAndDatabaseChanged": false,
+  "existingRlsGrantsPoliciesChanged": false,
+  "newTestsOrExistingTestsChanged": false,
+  "acceptance": "DDL compilation only. Actual current non-owner approval/signing/consumption, lazy SQL branch plans, fresh complete ordered registry upgrade and W1/W6 private purpose remain required; current creator_w8 untouched.",
+  "closedCloneDdl": "pass; exact source inputs and40-ledger closed clone in composed-signing-closed-clone.json",
+  "activeCanonicalSqlAndLedgerRechecked": {
+    "count": 40,
+    "allChecksumsMatch": true,
+    "activeEntriesEqual61e07b1": true
+  }
+}

@@ -1,10 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sameRequestOrigin } from "../../../../lib/request-origin";
+import { platformFetch, sessionCookie } from "../../../../lib/session";
+import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 const readable =
-  /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download)?|operations\/(metrics|audits))$/i;
+  /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download(\/(identity|conversation|agent|commerce|content|media|growth|trust))?)?|operations\/(metrics|audits))$/i;
 const writable =
   /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
+async function endCanonicalSession(request: NextRequest) {
+  if (!request.cookies.has(sessionCookie)) return;
+  // Cookie removal alone leaves an issued socket token valid. Reuse W1's
+  // current-token-only, idempotent logout before ending this local session.
+  const result = await platformFetch("/v1/identity/logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(request.headers.get("x-correlation-id")
+        ? { "X-Correlation-Id": request.headers.get("x-correlation-id")! }
+        : {}),
+    },
+    body: "{}",
+  });
+  if (!result.ok || (await result.json()).done !== true)
+    throw new Error("Canonical sign-out was not confirmed.");
+}
+function signOutUnavailable() {
+  return NextResponse.json(
+    {
+      error: {
+        code: "signout_unavailable",
+        message:
+          "Sign-out could not be confirmed. Retry before changing your account.",
+      },
+    },
+    { status: 503, headers: { "Cache-Control": "no-store" } },
+  );
+}
 async function forward(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -46,9 +77,14 @@ async function forward(
       { status: 404 },
     );
   if (target === "dev/logout") {
+    try {
+      await endCanonicalSession(request);
+    } catch {
+      return signOutUnavailable();
+    }
     const response = NextResponse.json({ signedOut: true });
-    response.cookies.delete("w8_local_session");
-    response.cookies.delete("qelvora_session");
+    response.cookies.delete(trustLocalSessionCookie);
+    response.cookies.delete(sessionCookie);
     return response;
   }
   const configured = process.env.W8_API_URL;
@@ -89,8 +125,8 @@ async function forward(
   // the same server-held session as the conversation that supplied the report.
   const token =
     (development
-      ? request.cookies.get("w8_local_session")?.value
-      : undefined) || request.cookies.get("qelvora_session")?.value;
+      ? request.cookies.get(trustLocalSessionCookie)?.value
+      : undefined) || request.cookies.get(sessionCookie)?.value;
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   if (
     request.method === "POST" &&
@@ -108,6 +144,9 @@ async function forward(
       { status: 409 },
     );
   try {
+    const streaming = /^privacy\/jobs\/[0-9a-f-]{36}\/download\/[^/]+$/iu.test(
+      target,
+    );
     const body = request.method === "POST" ? await request.text() : undefined;
     if (body && Buffer.byteLength(body) > 65536)
       return NextResponse.json(
@@ -133,19 +172,42 @@ async function forward(
       },
       ...(body ? { body } : {}),
       cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
+      signal: streaming
+        ? AbortSignal.any([request.signal, AbortSignal.timeout(300_000)])
+        : AbortSignal.timeout(10_000),
     });
+    if (streaming && result.ok && result.body) {
+      const headers = new Headers({
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      });
+      for (const name of [
+        "content-type",
+        "content-length",
+        "content-disposition",
+        "x-correlation-id",
+      ]) {
+        const value = result.headers.get(name);
+        if (value) headers.set(name, value);
+      }
+      return new NextResponse(result.body, { status: result.status, headers });
+    }
     const data = await result.json();
     if (target === "dev/session" && result.ok) {
+      try {
+        await endCanonicalSession(request);
+      } catch {
+        return signOutUnavailable();
+      }
       const response = NextResponse.json({ localDevelopment: true });
-      response.cookies.set("w8_local_session", String(data.token), {
+      response.cookies.set(trustLocalSessionCookie, String(data.token), {
         httpOnly: true,
         sameSite: "strict",
         secure: false,
         path: "/",
         maxAge: 3600,
       });
-      response.cookies.delete("qelvora_session");
+      response.cookies.delete(sessionCookie);
       return response;
     }
     const response = NextResponse.json(data, {

@@ -1,0 +1,157 @@
+{
+  "applicationCommit": "97479b70b687f04e73fe597016975f684b0ada8b",
+  "baseMain": "f6802e1f691aeef14052055a41b4d2bfff54c831",
+  "states": [
+    {
+      "height": 844,
+      "loadingDraft": false,
+      "phase": "role-concealment-before-edit",
+      "scrollWidth": 390,
+      "status": "Account status\nReconnect to check your account status. Your unsaved input is kept.\nReconnect to Studio\nYour input is kept in this tab. Studio is hidden until your current account and roles can be checked again.\nCheck connection and roles",
+      "textareas": 0,
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "first-visible-loaded-editor-390-night",
+      "revision": "SAVED · REVISION 15",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "night",
+      "width": 390
+    },
+    {
+      "phase": "unsent-text-after-current-role-refresh",
+      "revision": "SAVED · REVISION 15",
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay."
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "first-visible-reloaded-editor-390-night-revision16",
+      "revision": "SAVED · REVISION 16",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay.",
+      "theme": "night",
+      "width": 390
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "first-visible-loaded-editor-390-light",
+      "revision": "SAVED · REVISION 16",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay.",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "note-text",
+      "height": 720,
+      "phase": "first-visible-loaded-editor-1280-light",
+      "revision": "SAVED · REVISION 16",
+      "scrollWidth": 1280,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay.",
+      "theme": "light",
+      "width": 1280
+    },
+    {
+      "active": "note-text",
+      "height": 720,
+      "phase": "first-visible-loaded-editor-1280-night",
+      "revision": "SAVED · REVISION 16",
+      "scrollWidth": 1280,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay.",
+      "theme": "night",
+      "width": 1280
+    },
+    {
+      "phase": "unavailable-content-read-failure",
+      "scrollWidth": 390,
+      "status": "Qelvora Studio\nW5 development creator\nRefresh role\nCancel\nEdit Note\nAction status\nThis content is unavailable.\nRetry loading draft\nNotes\nRequests\nThreads\nMy AI\nMore",
+      "textareas": 0,
+      "width": 390
+    },
+    {
+      "active": "Retry loading draft",
+      "ariaBusy": "true",
+      "phase": "final-stable-retry-after-unavailable-read",
+      "status": "Qelvora Studio\nW5 development creator\nRefresh role\nCancel\nEdit Note\n\nLoading saved draft…\n\nRetry loading draft\nNotes\nRequests\nThreads\nMy AI\nMore",
+      "textareas": 0
+    },
+    {
+      "phase": "new-note-after-failed-saved-draft",
+      "revision": null,
+      "text": ""
+    },
+    {
+      "active": "note-text",
+      "phase": "final-source-edit-first-visible",
+      "revision": "SAVED · REVISION 16",
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\nW5 loaded-draft recovery check: words entered after opening must stay."
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "final-source-restored-original-after-reload",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "Retry loading draft",
+      "ariaBusy": "false",
+      "phase": "final-main-unavailable-read-retry-completed",
+      "status": "Qelvora Studio\nW5 development creator\nRefresh role\nCancel\nEdit Note\nAction status\nThis content is unavailable.\nRetry loading draft\nNotes\nRequests\nThreads\nMy AI\nMore",
+      "textareas": 0
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "final-main-loaded-390-light",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "final-main-loaded-390-night",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "night",
+      "width": 390
+    },
+    {
+      "active": "note-text",
+      "height": 720,
+      "phase": "final-main-loaded-1280-light",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 1280,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "light",
+      "width": 1280
+    },
+    {
+      "active": "note-text",
+      "height": 720,
+      "phase": "final-main-loaded-1280-night",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 1280,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "night",
+      "width": 1280
+    }
+  ],
+  "outage": "Owned API41055 PID6369 was actually stopped04:38:23Z to04:38:48Z. Current roles concealed before the attempted Edit key action, which therefore found no visible link. That attempt is role-concealment evidence only; no initial draft-read-specific held-response acceptance is claimed.",
+  "unavailableId": "00000000-0000-4000-8000-000000000000 is an intentionally unavailable identifier; no object was created or assumed.",
+  "originalRestored": true,
+  "publicationOrSigning": false
+}

@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-10-01T03:00:15.712582+00:00",
+  "source": "f64f165350a415a21f5c09e82a6cbdb0d9d5227a",
+  "actor": "Synthetic local Ops supervisor reacquired through visible Use local actor; no canonical/native token injection",
+  "browser": "Supported in-app browser, actual Refresh snapshot click and rendered DOM/pixels",
+  "viewport": [
+    1280,
+    720
+  ],
+  "capture": "Full page1280x2166, actual viewport1280x720; Light",
+  "counters": {
+    "wal_sample_available": 1,
+    "wal_samples_completed": 69,
+    "wal_sample_errors": 0,
+    "wal_records_total": 157533,
+    "wal_bytes_total": 18353094,
+    "wal_buffers_full_total": 0,
+    "wal_archived_total": 0,
+    "wal_archive_failures_total": 0,
+    "wal_archive_enabled": 0
+  },
+  "sampledAt": "2026-10-01T02:56:14Z",
+  "statsResetAt": "2026-09-30T23:16:59.443Z",
+  "observerPoolRole": "creator_trust_worker",
+  "nonOwnerNonBypassVerifiedIn": "wal-observer-source.json",
+  "screenshot": {
+    "path": "wal-observer-live.png",
+    "sha256": "6b00a7133ae6151bccf6373f730e30a5b4c6f18257e527f0d6d5b172abc08c38"
+  },
+  "dom": "wal-observer-live.txt",
+  "actualRendered": true,
+  "limitations": [
+    "One dedicated local cluster/current source observation; no current canonical production/staging observer configured",
+    "Archive mode is off and no files are archived; no WAL restore, lag/RPO/RTO acceptance",
+    "track_wal_io_timing is off; no write/sync latency is reported as a successful zero",
+    "No actual view-permission/outage failure was injected; unavailable/error behavior is source-reviewed only",
+    "Existing blocked privacy jobs remain; counters do not prove full C10 or provider generation/settlement"
+  ],
+  "preservationReceipt": "preservation-post-wal.json",
+  "paidCalls": 0,
+  "testsGoldensSqlRlsGrantsChanged": false
+}
