@@ -14,6 +14,9 @@ export type ContentMediaAsset = Readonly<{
   purpose: string;
   version: number;
   sha256: string;
+  bytes: number;
+  mimeType: string;
+  durationMs: number | null;
   signedActId: string | null;
   provenance: Record<string, unknown> | null;
 }>;

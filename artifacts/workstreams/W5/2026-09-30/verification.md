@@ -1,6 +1,21 @@
 # W5 verification — 2026-09-30
 
-## Current handoff ledger
+
+## Media and consent continuation — 2026-10-01 00:16 UTC
+
+W5 personally prepared the exact W6 creator-object media consumer, consuming only W6's4515a6a API additions and49e9054 generic recorder/player/upload sources, plus W1'sabf6543 process-local creator authority. Review signs the immutable document together with all six processed evidence fields (assetId/version/SHA256/bytes/MIME/duration). Publish consumes that W1 act once, attaches W6 in the same transaction and leaves media_pending until the actual current signed association and genuine C2PA producer report ready. Draft ownership remains distinct from verified publication authority. Team text publication remains accurately labeled; Team media requires creator review/signing.
+
+W1 explicitly leased the narrow C08 schema change. Empty drafts can be persisted to obtain the real upload object ID; publication still rejects empty text/media. Duplicate asset IDs are rejected. W1 owns generated/native/OpenAPI regeneration after this immutable checkpoint. The new schema-media-publication.sql is an additive, unallocated and unapplied proposal; W8 must register it and reconcile existing immutable aliases before activation. Text-only paths do not depend on that new media column.
+
+The internal W7 reader is ContentService.publicationProof(actor,creatorId,id), returning null for unavailable publication or {command,signedActId,mediaReady}. It reads the stored complete evidence under current object/role/audience authority; W7 must compare the actual W1 verification hash. No reconstructed document-only media signature or delivery receipt is supplied. The W6 adapter requires the very same W1 creator issuer instance.
+
+The personally implemented photo entry and consumed creator recorder use a real saved content ID and preserve text when media is unavailable. Actual390 Light photo/voice entry saved/reopened the original Note through revision8; no file upload, microphone permission, processing/C2PA/signature or media delivery occurred. Session expiry cleared the private view, and genuine development continuation reopened the saved text. New media screenshots and publishing-thanks-observations.json are under resumption/.
+
+Actual Team post640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3 was published at revision2, found through library search, read by a distinct fan, then unpublished and archived. Anonymous Thanks000d32b0-1b8e-4ec4-85c9-f23bb917d6cc was shared without a handle, then withdrawn at version2. The creator feed now revalidates current consent serially every4s, on focus and with an independent5s expiry. Concurrent withdrawal removed the creator text2017ms after click; unpublish removed the fan title1097ms after click. Each is one local IAB/loopback sample, not p95. Durable consent history records grant/withdraw correctly; W7 effects remain pending with no receipt or Impact completion.
+
+Existing18 backend checks pass (114.96s; original1000thread/10000pair assertions retained). Scoped backend/web lint, backend build, web types and production web build pass. Head10405eb remote web/backend, Android runtime and Trust compile pass; web visual/iOS/Android foundation remain queued. Local strict iOS110 comparisons still fail. No new test code/suite, golden or threshold change; no genuine UV or paid AI. Human requested genuine signing stay blocked. All nine packages remain assigned and incomplete.
+
+## Historical handoff ledger
 
 Application eedf35f is pushed; web/backend and Android runtime pass in run36777448626, macOS jobs queued. Prior7b167fb run36763954818 has4 green jobs including Android foundation and exact web visual; iOS110 strict comparisons fail. Hosted-coordinate repair is unverified on CI and reference/candidate color profiles differ. No Swift/web golden/threshold change. Final resources/remaining work are in handoffs/W5.md and handoff-state.json. Dev servers/own Docker containers/ADB were stopped, viewport reset. Cleanup removed about 2.24 GiB of owned expendable outputs; database volumes were preserved by this cleanup. Final 22:42 UTC recheck found Docker unavailable and all W5 temporary SDK/AVD/Gradle/native scratch/key resources absent; later disappearance is unverified. Source/evidence/Node dependencies and shutdown named iOS simulator remain. Read resource-cleanup.json and updated handoff-state for precise accounting and restart/rebuild limits. PR creation retried403; no PR/merge.
 

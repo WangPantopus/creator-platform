@@ -34,6 +34,8 @@ import type {
   PrivateNoteReply,
 } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
+import { CreatorVoiceRecording } from "../media/VoiceRecorder";
+import { PhotoAttachment } from "./PhotoAttachment";
 import { StudioFailure, studioRequest } from "./api";
 import "./studio.css";
 
@@ -112,6 +114,8 @@ type Packet = {
   share: unknown;
 };
 const key = () => crypto.randomUUID();
+const contentStateLabel = (state: string) =>
+  state === "media_pending" ? "Media processing" : state;
 const time = (value: string | null) =>
   value
     ? new Intl.DateTimeFormat(undefined, {
@@ -572,7 +576,10 @@ function Notes({ creator }: { creator: Creator }) {
                 </Note>
               )}
               <p className="qv-help">
-                {n.state === "published" ? "Broadcast" : n.state} ·{" "}
+                {n.state === "published"
+                  ? "Broadcast"
+                  : contentStateLabel(n.state)}{" "}
+                ·{" "}
                 {n.sourceState === "not_requested"
                   ? "Separate from AI sources"
                   : "AI-source review required"}
@@ -580,6 +587,12 @@ function Notes({ creator }: { creator: Creator }) {
               <Link href={`/studio/${creator.id}/compose/${n.id}`}>
                 Edit draft
               </Link>
+              {n.state === "media_pending" && (
+                <p className="qv-help">
+                  Signed. Delivery waits for verified media credentials. You can
+                  edit or withdraw this publication.
+                </p>
+              )}
             </div>
           ))}
         {!notes.items.some((n) => n.document.kind === "note") &&
@@ -830,6 +843,8 @@ function Compose({
       idempotencyKey: string;
     } | null>(null),
     [schedule, setSchedule] = useState(""),
+    [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
+    [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
     operation = useRef<{ body: string; key: string } | null>(null);
@@ -928,7 +943,7 @@ function Compose({
     setDocument((d) => ({ ...d, ...update }));
     setReview(null);
   };
-  const save = async () => {
+  const save = async (documentOverride = document) => {
     if (pendingPublication)
       throw new Error(
         "Check the pending publication before saving another revision.",
@@ -937,7 +952,7 @@ function Compose({
     const body = {
         id: draftId.current,
         expectedVersion: saved?.version ?? 0,
-        document,
+        document: documentOverride,
       },
       snapshot = JSON.stringify(body);
     if (operation.current?.body !== snapshot)
@@ -1145,10 +1160,12 @@ function Compose({
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
+            disabled={!creator.owned || action.busy || !!pendingPublication}
             onClick={() =>
-              action.setNotice(
-                "Photo uploads for this content are unavailable. You can still save your text draft.",
-              )
+              void action.run(async () => {
+                const current = await save();
+                setPhotoObjectId(current.id);
+              })
             }
           >
             Photo
@@ -1156,10 +1173,17 @@ function Compose({
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
+            disabled={
+              !creator.owned ||
+              action.busy ||
+              !!pendingPublication ||
+              document.kind !== "note"
+            }
             onClick={() =>
-              action.setNotice(
-                "Voice recordings for this content are unavailable. You can still save your text draft.",
-              )
+              void action.run(async () => {
+                const current = await save();
+                setVoiceObjectId(current.id);
+              })
             }
           >
             Voice · up to 60 s
@@ -1236,7 +1260,7 @@ function Compose({
               !canDraft ||
               action.busy ||
               !!pendingPublication ||
-              !document.text.trim() ||
+              (!document.text.trim() && !document.media.length) ||
               (["live", "replay"].includes(document.kind) && !document.live)
             }
             onClick={() =>
@@ -1255,11 +1279,12 @@ function Compose({
             disabled={
               (!creator.owned &&
                 (!creator.roles.includes("publisher") ||
-                  document.kind !== "post")) ||
+                  document.kind !== "post" ||
+                  document.media.length > 0)) ||
               !canDraft ||
               action.busy ||
               !!pendingPublication ||
-              !document.text.trim() ||
+              (!document.text.trim() && !document.media.length) ||
               (["live", "replay"].includes(document.kind) && !document.live)
             }
             onClick={() =>
@@ -1286,7 +1311,7 @@ function Compose({
           >
             {creator.owned
               ? "Review and sign"
-              : document.kind !== "post"
+              : document.kind !== "post" || document.media.length > 0
                 ? "Creator signature required"
                 : !creator.roles.includes("publisher")
                   ? "Publishing role required"
@@ -1378,6 +1403,14 @@ function Compose({
                   "Publish",
                   document.scheduledAt ? time(document.scheduledAt) : "Now",
                 ],
+                ...(document.media.length
+                  ? [
+                      [
+                        "Media",
+                        "Processed attachments. Delivery waits for verified media credentials.",
+                      ] as [string, string],
+                    ]
+                  : []),
               ]}
               onSigned={async (signedActId) => {
                 const command = {
@@ -1403,6 +1436,82 @@ function Compose({
               }}
             />
           )}
+        </Modal>
+      )}
+      {voiceObjectId && (
+        <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
+          <CreatorVoiceRecording
+            creatorId={creator.id}
+            creatorName={creator.display_name}
+            objectId={voiceObjectId}
+            onReady={(asset, evidence) => {
+              edit({
+                media: [
+                  ...document.media.filter((item) => item.assetId !== asset.id),
+                  {
+                    assetId: evidence.assetId,
+                    version: evidence.version,
+                    sha256: evidence.sha256,
+                    kind: "voice",
+                    alt: "",
+                  },
+                ],
+              });
+              action.setNotice(
+                "Processed voice added. Save the draft, then review and sign the complete Note.",
+              );
+            }}
+            beforeDiscard={async (assetId) => {
+              if (!document.media.some((item) => item.assetId === assetId))
+                return;
+              const next = {
+                ...document,
+                media: document.media.filter(
+                  (item) => item.assetId !== assetId,
+                ),
+              };
+              await save(next);
+              edit(next);
+            }}
+          />
+        </Modal>
+      )}
+      {photoObjectId && (
+        <Modal title="Photo" onClose={() => setPhotoObjectId(null)}>
+          <PhotoAttachment
+            creatorId={creator.id}
+            objectId={photoObjectId}
+            onReady={(asset, alt) => {
+              edit({
+                media: [
+                  ...document.media.filter((item) => item.assetId !== asset.id),
+                  {
+                    assetId: asset.id,
+                    version: asset.version,
+                    sha256: asset.sha256,
+                    kind: "photo",
+                    alt,
+                  },
+                ],
+              });
+              setPhotoObjectId(null);
+              action.setNotice(
+                "Processed photo added. Save the draft, then review the complete publication.",
+              );
+            }}
+            beforeDiscard={async (assetId) => {
+              if (!document.media.some((item) => item.assetId === assetId))
+                return;
+              const next = {
+                ...document,
+                media: document.media.filter(
+                  (item) => item.assetId !== assetId,
+                ),
+              };
+              await save(next);
+              edit(next);
+            }}
+          />
         </Modal>
       )}
     </section>
@@ -2103,11 +2212,18 @@ function Library({ creator }: { creator: Creator }) {
         State
         <select value={filter} onChange={(e) => setFilter(e.target.value)}>
           <option value="">All states</option>
-          {["draft", "scheduled", "published", "unpublished", "archived"].map(
-            (s) => (
-              <option key={s}>{s}</option>
-            ),
-          )}
+          {[
+            "draft",
+            "media_pending",
+            "scheduled",
+            "published",
+            "unpublished",
+            "archived",
+          ].map((s) => (
+            <option key={s} value={s}>
+              {contentStateLabel(s)}
+            </option>
+          ))}
         </select>
       </label>
       {page.items.map((item) => (
@@ -2119,7 +2235,8 @@ function Library({ creator }: { creator: Creator }) {
                 : "Untitled post")}
           </h2>
           <p className="qv-meta">
-            {item.state} · REV {item.version} · {item.audienceLabel}
+            {contentStateLabel(item.state)} · REV {item.version} ·{" "}
+            {item.audienceLabel}
           </p>
           <p>{item.document.text}</p>
           <p className="qv-help">
@@ -2155,7 +2272,9 @@ function Library({ creator }: { creator: Creator }) {
                   action.busy ||
                   item.state === "archived" ||
                   (operation === "unpublish" &&
-                    !["published", "scheduled"].includes(item.state))
+                    !["published", "scheduled", "media_pending"].includes(
+                      item.state,
+                    ))
                 }
                 onClick={() =>
                   void action.run(async () => {
@@ -2825,18 +2944,65 @@ function ThanksFeed({ creator }: { creator: Creator }) {
   const [rows, setRows] = useState<
       { id: string; text: string; handle: string | null; created_at: string }[]
     >([]),
-    action = useAction();
+    [error, setError] = useState(""),
+    [freshUntil, setFreshUntil] = useState(0);
   useEffect(() => {
-    void action.run(async () =>
-      setRows(await studioRequest("content", `${creator.id}/studio/thanks`)),
+    let generation = 0,
+      closed = false;
+    const load = async () => {
+      const request = ++generation;
+      try {
+        const current = await studioRequest<typeof rows>(
+          "content",
+          `${creator.id}/studio/thanks`,
+        );
+        if (closed || request !== generation) return;
+        setRows(current);
+        setFreshUntil(Date.now() + 5000);
+        setError("");
+      } catch (failure) {
+        if (closed || request !== generation) return;
+        setRows([]);
+        setFreshUntil(0);
+        setError(
+          failure instanceof Error
+            ? failure.message
+            : "Current sharing permission is unavailable.",
+        );
+      }
+    };
+    setRows([]);
+    setFreshUntil(0);
+    void load();
+    const timer = setInterval(() => void load(), 4000);
+    window.addEventListener("focus", load);
+    return () => {
+      closed = true;
+      clearInterval(timer);
+      window.removeEventListener("focus", load);
+    };
+  }, [creator.id, creator.viewerAccountId]);
+  useEffect(() => {
+    if (!freshUntil) return;
+    const timer = setTimeout(
+      () => {
+        setRows([]);
+        setFreshUntil(0);
+      },
+      Math.max(0, freshUntil - Date.now()),
     );
-  }, [creator.id]);
+    return () => clearTimeout(timer);
+  }, [freshUntil]);
   return (
     <section className="w5-gutter">
       <header className="w5-heading">
         <h1>Thanks</h1>
       </header>
-      <Feedback action={action} />
+      {error && (
+        <Notice tone="error" title="Thanks unavailable">
+          {error}
+        </Notice>
+      )}
       <p className="qv-help">
         Only notes fans consented to share with your digest appear here.
       </p>

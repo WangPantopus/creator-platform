@@ -22,6 +22,8 @@ export function contentSignedSubjects(
         .safeParse(requested.content);
       if (!content.success) return null;
       await service.assertCurrentAllowed(client, actor, creatorId);
+      if (content.data.kind === "content_publication")
+        await service.authorizeMedia(client, actor, creatorId);
       await service.role(client, actor, creatorId);
       if (content.data.kind === "content_reaction") {
         const input = z
@@ -61,8 +63,13 @@ export function contentSignedSubjects(
         )
       ).rows[0];
       const document = ContentDocument.parse(revision?.document);
-      await service.validatePublication(client, actor, row, document);
-      return publicationCommand(row, document);
+      const { mediaEvidence } = await service.validatePublication(
+        client,
+        actor,
+        row,
+        document,
+      );
+      return publicationCommand(row, document, mediaEvidence);
     },
   };
 }

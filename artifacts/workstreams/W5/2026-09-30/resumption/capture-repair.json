@@ -2,14 +2,8 @@
   "command": "swift test --package-path apps/ios --scratch-path /private/tmp/creator-w5-resume-swift --filter NativeSnapshotTests/testWelcomeThemes",
   "platform": "local x86_64 macOS 26.5, Swift target macOS14",
   "result": "compiled; both original strict Welcome comparisons fail",
-  "size": [
-    780,
-    1688
-  ],
-  "logicalSize": [
-    390,
-    844
-  ],
+  "size": [780, 1688],
+  "logicalSize": [390, 844],
   "backingScale": 2,
   "profile": "LG HDR 4K",
   "referenceIccChunkSha256": "06c521d3cfada27c70f94186f48db75d26042da8bcdbc1ab193e57a03b379c08",
