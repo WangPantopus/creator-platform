@@ -1,0 +1,39 @@
+{
+  "recordedAt": "2026-10-01T11:03:06.081Z",
+  "removed": [
+    {
+      "path": "/private/tmp/creator-platform-w1-rename-20261001",
+      "reportedDuKiB": 805304,
+      "confirmedAbsent": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-ios-20261001",
+      "reportedDuKiB": 797704,
+      "confirmedAbsent": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-android-20261001",
+      "reportedDuKiB": 124740,
+      "confirmedAbsent": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/swift-package-20261001",
+      "reportedDuKiB": 313592,
+      "confirmedAbsent": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/apps/web/.next-w1-build-20261001",
+      "reportedDuKiB": 120492,
+      "confirmedAbsent": true
+    }
+  ],
+  "qualification": "Only exact W1-owned expendable paths created during this resume were removed, after product/source/custody digests were retained. du values are directory-reported blocks, not a measurement of physical disk space recovered across shared/cloned content.",
+  "preserved": [
+    "Main final native app/APK and last production web build",
+    "W1 private database volume, runtime configuration, keys and private build logs",
+    "W1 reusable installed-tool copies and owned caches",
+    "Source/history/lockfile/original designs/references",
+    "All peer resources and shared Docker engine"
+  ],
+  "runtime": "Owned API4111/web3011 and W1 database container stopped; no native device created or controlled."
+}

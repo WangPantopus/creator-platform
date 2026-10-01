@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — fresh rename compilation
+
+A fresh disposable application 5425598 clone renamed 799 text files/paths to temporary W1Rename. Frozen offline dependency install, generation/check (96 operations), backend/web and shipping iOS Simulator/Android debug builds pass. Metadata confirms renamed local IDs/display names. All 1,111 binary assets, including 110 original iOS references, remain byte-identical. Current e51213a generators retain all 15 renamed output bytes/mtimes. [Exact source/build/custody and cleanup](../../../artifacts/workstreams/W1/resume/2026-10-01-rename/run.md). Renamed products/copy and redundant W1 scratch output were removed after digest evidence. Main final products, private data/keys and peers remain. H17 fresh rename compilation is now personally established as supporting evidence; native operation, external identities and the full H01–H20 acceptance remain open.
+
 ## October 1 — generation efficiency
 
 Canonical generators now retain unchanged output bytes and modification times, avoiding unnecessary native recompilation after small shared changes. Actual generation/check compared all 15 output files: zero byte or timestamp changes. API types, affected lint/format and both original shared/rename checks pass; no new tests or generated-source edits. [Evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-generation/run.md). No build-speed or broader acceptance claim.
