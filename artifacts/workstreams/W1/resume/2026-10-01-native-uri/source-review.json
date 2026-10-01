@@ -36,5 +36,13 @@
   "approvedExternalOriginsOrAssociationsInvented": false,
   "testsReferenceAssertionsDependenciesMigrationsChanged": false,
   "localRuntimeResourcesRecreated": false,
-  "CodeReviewCI": "not inspected at this new branch"
+  "CodeReviewCI": {
+    "tool": "mcp__code_review__pull_requests_checks",
+    "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/49",
+    "isError": true,
+    "message": "Connect your GitHub account to continue",
+    "headRevisionReturned": null,
+    "accountReturned": null,
+    "passesClaimed": false
+  }
 }
