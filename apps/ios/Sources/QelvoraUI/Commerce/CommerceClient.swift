@@ -5,7 +5,7 @@ struct CommerceOverview: Decodable, Sendable {
     struct Creator: Decodable, Identifiable, Sendable { let id: String; let handle: String; let display_name: String }
     struct Policy: Decodable, Sendable { let currency: String; let limitOptions: [Int64]; let passEnabled: Bool }
     struct Capabilities: Decodable, Sendable { let paymentsAvailable: Bool; let membershipAvailable: Bool; let nativeReplyPurchase: Bool; let storePurchasesAvailable: Bool? }
-    struct Exposure: Decodable, Sendable { let captured: Int64; let held: Int64; let total: Int64; let currency: String }
+    struct Exposure: Decodable, Sendable { let captured: Int64; let held: Int64; let total: Int64; let currency: String; let refunded: Int64?; let month: String? }
     struct Tier: Decodable, Sendable { struct Catalog: Decodable, Sendable { struct StoreProduct: Decodable, Sendable { let productId: String }; let apple: StoreProduct? }; let id: String; let state: String; let catalog: Catalog }
     let fan: Fan?; let creators: [Creator]; let packets: [CommercePacket]; let modes: [CommerceMode]
     let limits: [CommerceLimit]; let memberships: [CommerceMembership]; let slots: [CommerceSlot]

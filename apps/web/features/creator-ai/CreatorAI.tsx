@@ -206,6 +206,7 @@ export function CreatorAI({
   const draftRevision = useRef<number | null>(null);
   const actorKey = useRef<string | null>(null);
   const fetchSequence = useRef(0);
+  const sourceFileSequence = useRef(0);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -320,6 +321,7 @@ export function CreatorAI({
     const sessionKey = `w2-session:${identityAccount}`;
     const purge = () => {
       ++fetchSequence.current;
+      ++sourceFileSequence.current;
       actorKey.current = null;
       pendingKeys.current.clear();
       try {
@@ -388,6 +390,7 @@ export function CreatorAI({
         const nextActor = `${data.actorAccountId}:${data.creator.id}`;
         if (actorKey.current !== nextActor) {
           initial = true;
+          ++sourceFileSequence.current;
           actorKey.current = nextActor;
           dirtyRef.current = false;
           draftRevision.current = null;
@@ -556,8 +559,11 @@ export function CreatorAI({
     return () => clearInterval(timer);
   }, [state, fetchState]);
   useEffect(() => {
-    if (confirmation && !dialog.current?.open) dialog.current?.showModal();
-    else if (!confirmation && dialog.current?.open) dialog.current.close();
+    if (confirmation && !dialog.current?.open) {
+      setError("");
+      setMessage("");
+      dialog.current?.showModal();
+    } else if (!confirmation && dialog.current?.open) dialog.current.close();
   }, [confirmation]);
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
@@ -617,14 +623,17 @@ export function CreatorAI({
     pendingKeys.current.delete(identity);
     return result;
   };
-  const action = async (run: () => Promise<void>, success = "Saved.") => {
+  const action = async (
+    run: () => Promise<void | string>,
+    success = "Saved.",
+  ) => {
     if (busy) return;
     setBusy(true);
     setError("");
     setMessage("");
     try {
-      await run();
-      setMessage(success);
+      const outcome = await run();
+      setMessage(outcome ?? success);
       await fetchState();
     } catch (e) {
       setError(e instanceof Error ? e.message : "The action did not finish.");
@@ -1241,9 +1250,7 @@ export function CreatorAI({
                                 : null,
                             });
                             if (result.duplicate)
-                              setMessage(
-                                "This source already exists; no duplicate was created.",
-                              );
+                              return "This source already exists; no duplicate was created.";
                             else {
                               setTitle("");
                               setText("");
@@ -1260,19 +1267,49 @@ export function CreatorAI({
                             type="file"
                             accept=".txt,.md,.vtt,.csv,text/plain,text/markdown"
                             onChange={(e) => {
+                              const sequence = ++sourceFileSequence.current;
+                              const expectedActor = actorKey.current;
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              setMessage("");
+                              setError("");
+                              // Permit selecting the same file after fixing it.
+                              e.target.value = "";
                               if (file.size > 1_000_000) {
                                 setError(
                                   "This file is too large. Split it into files up to 1 MB.",
                                 );
                                 return;
                               }
-                              void file.text().then((content) => {
-                                setText(content);
-                                setTitle(file.name);
-                                setSourceOrigin("manual_upload");
-                              });
+                              const currentRead = () =>
+                                sourceFileSequence.current === sequence &&
+                                actorKey.current === expectedActor &&
+                                !identitySignal?.aborted;
+                              void file
+                                .arrayBuffer()
+                                .then((bytes) => {
+                                  const content = new TextDecoder("utf-8", {
+                                    fatal: true,
+                                  }).decode(bytes);
+                                  if (!currentRead()) return;
+                                  if (content.length > 250_000) {
+                                    setError(
+                                      "Split this source into files with at most 250,000 characters.",
+                                    );
+                                    return;
+                                  }
+                                  setError("");
+                                  setMessage("");
+                                  setText(content);
+                                  setTitle(file.name);
+                                  setSourceOrigin("manual_upload");
+                                })
+                                .catch(() => {
+                                  if (currentRead())
+                                    setError(
+                                      "This file could not be read as UTF-8 text. Save it as UTF-8 and try again.",
+                                    );
+                                });
                             }}
                           />
                         </Field>
