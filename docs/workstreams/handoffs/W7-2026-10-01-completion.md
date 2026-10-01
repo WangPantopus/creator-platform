@@ -5,8 +5,8 @@ The founder requested this handoff at the next stable checkpoint. This is a tran
 ## Repository and source
 
 - Repository: https://github.com/WangPantopus/creator-platform
-- Exclusive W7 checkout: `/Users/yingpengwang/.codex/worktrees/0546/creator-platform`. Do not edit the ambient `c198` or `2985` checkout.
-- Continue branch `codex/w7-completion-20261001`; inspect cleanliness, ownership and remote state first. The final handoff/evidence commit follows the source commit below; use actual branch HEAD rather than assuming this source SHA is the final pushed head.
+- The previous W7 checkouts (`0546`, `2985`, and `c198`) were clean and are being removed to free local storage. Create a fresh checkout/worktree from `origin/codex/w7-completion-20261001` before continuing. Do not assume any of those absolute paths still exists.
+- Continue branch `codex/w7-completion-20261001`; inspect cleanliness, ownership and remote state first. The final handoff/evidence commit follows the source commit below, as does this checkout-cleanup documentation commit; use actual branch HEAD rather than assuming this source SHA is the final pushed head.
 - Reviewed main: `c1c615e6ece53bff4bc6a47d7f4d332757df1295`, personally integrated as `de1e94e9d47910065d53240a9fea1af16bcd2d32`. Last fetch at handoff still matched this main.
 - Current code source: `d511b446c958783802bd5e64976ad942380da823` (iOS notification permission, serialized registration and fresh notification taps).
 - Previous source: `52d831360240b5b25e32a82660d08b4901c7548d` (device dispatch bound to captured real W1 sessions).

@@ -9,14 +9,14 @@ Create or update real PRs whenever a useful increment is ready, mark them ready 
 Repository and starting point:
 
 - Repository: https://github.com/WangPantopus/creator-platform
-- W7 checkout: /Users/yingpengwang/.codex/worktrees/0546/creator-platform
+- W7 checkout: create a fresh worktree from origin/codex/w7-completion-20261001; the former 0546, 2985 and c198 W7 checkouts were removed after their clean state and remote PR coverage were verified.
 - Continue existing branch: codex/w7-completion-20261001
 - Current non-draft, open PR: https://github.com/WangPantopus/creator-platform/pull/31
 - Latest code source at handoff: d511b446c958783802bd5e64976ad942380da823. The handoff/evidence commit follows it; inspect actual branch HEAD and remote state.
 - Latest personally reviewed and integrated main: c1c615e6ece53bff4bc6a47d7f4d332757df1295. Fetch and personally review any later changes before integrating them.
 - Preserve codex/w7-handoff, afb122baab912354c37c1fd49c687709109b460b and already-merged PR #2 / merge 2f0319dbb6979878c5a9019e68503506902f9ea0. Do not reopen or duplicate those changes.
 - GitHub CLI: /Users/yingpengwang/.local/bin/gh. Verify existing authentication rather than requesting credentials already available.
-- Do not edit the ambient c198 or 2985 checkout. Inspect ownership and changes before reusing the W7 checkout. Do not overwrite a peer's work.
+- Inspect ownership and changes before creating or reusing a checkout. Do not overwrite a peer's work.
 
 Read these first:
 
