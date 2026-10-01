@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — canonical Home composition, draft
+
+The existing merged W7 `canonicalConversationHome` reader is now supplied by the actual server using W3's real account directory, current AccessService/Database and canonical signature verifier. Its existing bounded paging and issued fan scopes remain; a parameterized canonical public handle read supplies navigation. Other Growth owners and licensed generation stay gated. Backend/source checks pass. [Exact implementation and inputs](../../../artifacts/workstreams/W1/resume/2026-10-01-home-host/run.md) distinguish this source composition from the still-unoperated configured Home journey. Growth worker/role/key configuration, stable browser control, history/revocation/privacy acceptance and exact-head CI remain required. No full H09/H13/H20 acceptance or readiness is claimed.
+
 ## October 1 — Team access recovery, draft
 
 Personally observed failed Team access followed by an enabled Create invitation and lost keyboard focus after server denial. W1 adds explicit read states, serial focusable Retry, concealed stale team records, a verified/read-ready Create gate, canonical generated copy and readable Account-link color. [Evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-team/run.md) retains successful development draft/focus retries and two unexplained draft resets during a repeated Fast Refresh/build window. Final production browser navigation is currently refused by the control tool despite server reachability. Stable production retention and phone focus visibility remain open, so this increment stays draft.

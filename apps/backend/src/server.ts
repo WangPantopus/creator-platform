@@ -7,6 +7,7 @@ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { createCommerceRuntime } from "./modules/commerce/runtime.js";
 import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
+import { canonicalConversationHome } from "./modules/growth/home.js";
 import { createConversationRuntime } from "./modules/conversation/runtime.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
@@ -39,13 +40,6 @@ const configured =
         },
         signedSubjectPolicies: [commerceSignedSubjects],
         registerFeatures: async (runtime) => {
-          features.growth = await configureGrowthForBackend({
-            ...runtime,
-            assertAllowed: async (actor, creatorId) =>
-              creatorId
-                ? runtime.assertCreatorAllowed(actor, creatorId)
-                : runtime.assertActorAllowed(actor),
-          });
           const commerceConfiguration = readCommerceEnvironment(runtime.pool);
           const commerce = commerceConfiguration
             ? await createCommerceRuntime({
@@ -84,6 +78,34 @@ const configured =
               ? content.signedSubjects
               : [content.signedSubjects],
           );
+          features.growth = await configureGrowthForBackend({
+            ...runtime,
+            assertAllowed: async (actor, creatorId) =>
+              creatorId
+                ? runtime.assertCreatorAllowed(actor, creatorId)
+                : runtime.assertActorAllowed(actor),
+            ...(runtime.identity
+              ? {
+                  owners: {
+                    home: canonicalConversationHome(
+                      conversation.feature,
+                      runtime.access,
+                      runtime.database,
+                      runtime.identity.signing,
+                      async (creatorId) => {
+                        const result = await runtime.pool.query<{
+                          handle: string;
+                        }>(
+                          "SELECT handle FROM creator.creator_profile WHERE id=$1",
+                          [creatorId],
+                        );
+                        return result.rows[0]?.handle ?? null;
+                      },
+                    ),
+                  },
+                }
+              : {}),
+          });
           return [
             conversation.registration,
             agentFeature({
