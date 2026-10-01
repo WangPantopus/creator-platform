@@ -2,6 +2,10 @@ import type { PoolClient } from "pg";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { CreatorMediaService } from "./creator-service.js";
 import type { CreatorMediaWorkerScope } from "./creator-worker.js";
+import {
+  PlaybackFileSchema,
+  type PlaybackFile,
+} from "../../../../../packages/api/src/media.js";
 
 type PrivacyInput = Parameters<PrivacyHook["run"]>[0];
 export type CreatorArchiveAsset = {
@@ -14,6 +18,8 @@ export type CreatorArchiveAsset = {
   declaredInputSha256: string;
   processedSha256: string | null;
   deliveredSha256: string | null;
+  /** Expected final file identity, distinct from the immutable processed signing tuple. */
+  playbackFile: PlaybackFile | null;
   /** Enumerate every actually retained variant, including partial uploads. Do not
    * treat an expected digest as the hash of a partial/nonexistent file. */
   inspectStorageKinds: readonly ["input", "processed", "output", "manifest"];
@@ -90,8 +96,24 @@ export function createCreatorMediaPrivacyHook(input: {
               assets += rows.length;
               yield {
                 scope,
-                assets: rows.map(
-                  (row): CreatorArchiveAsset => ({
+                assets: rows.map((row): CreatorArchiveAsset => {
+                  const file = PlaybackFileSchema.safeParse(
+                    row.provenance?.c2paVerified === true
+                      ? row.provenance.fileVariant === "credentialed"
+                        ? {
+                            variant: row.provenance.fileVariant,
+                            sha256: row.provenance.fileSha256,
+                            bytes: row.provenance.fileBytes,
+                          }
+                        : null
+                      : {
+                          variant: "processed",
+                          sha256: row.output_sha256,
+                          bytes: Number(row.bytes),
+                        },
+                  );
+                  const playbackFile = file.success ? file.data : null;
+                  return {
                     id: row.id,
                     objectId: row.object_id,
                     state: row.state,
@@ -100,19 +122,16 @@ export function createCreatorMediaPrivacyHook(input: {
                     uploadedBytes: Number(row.uploaded_bytes),
                     declaredInputSha256: row.input_sha256,
                     processedSha256: row.output_sha256,
-                    deliveredSha256:
-                      row.provenance?.c2paVerified === true &&
-                      typeof row.provenance.fileSha256 === "string"
-                        ? row.provenance.fileSha256
-                        : row.output_sha256,
+                    deliveredSha256: playbackFile?.sha256 ?? null,
+                    playbackFile,
                     inspectStorageKinds: [
                       "input",
                       "processed",
                       "output",
                       "manifest",
                     ],
-                  }),
-                ),
+                  };
+                }),
               };
               if (rows.length < 64) break;
               cursor = rows[rows.length - 1]!.id;
