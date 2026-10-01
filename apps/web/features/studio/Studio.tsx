@@ -181,10 +181,12 @@ export function Studio({
       }[]
     >([]),
     [error, setError] = useState(""),
+    [sessionExpired, setSessionExpired] = useState(false),
     [suspended, setSuspended] = useState(false),
     [freshUntil, setFreshUntil] = useState(0),
     [loading, setLoading] = useState(true);
   const generation = useRef(0),
+    roleRequest = useRef<AbortController | null>(null),
     reconnectButton = useRef<HTMLButtonElement>(null),
     previousFocus = useRef<HTMLElement | null>(null),
     router = useRouter();
@@ -195,24 +197,44 @@ export function Studio({
     setSuspended(true);
   }, []);
   const refresh = useCallback(async () => {
+    if (document.hidden) {
+      conceal();
+      return;
+    }
+    if (roleRequest.current) return;
+    const controller = new AbortController();
+    roleRequest.current = controller;
     const current = ++generation.current;
+    const started = performance.now();
     setLoading(true);
     setError("");
     try {
       const result = await studioRequest<{
         creators: Creator[];
         invitations: typeof invitations;
-      }>("studio", "session");
+      }>("studio", "session", undefined, undefined, {
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
+      });
       if (current !== generation.current) return;
+      if (document.hidden || performance.now() >= started + 5000)
+        throw new StudioFailure(
+          503,
+          "authority_expired",
+          "Reconnect to check your current account and roles. Your input is kept.",
+        );
       setCreators(result.creators);
+      setSessionExpired(false);
       setInvitations(result.invitations);
       setCreator(result.creators.find((c) => c.id === creatorId) ?? null);
-      setFreshUntil(Date.now() + 5000);
+      setFreshUntil(started + 5000);
       setSuspended(false);
     } catch (failure) {
       if (current !== generation.current) return;
       setCreators([]);
       setInvitations([]);
+      setSessionExpired(
+        failure instanceof StudioFailure && failure.status === 401,
+      );
       const unavailable =
         failure instanceof StudioFailure && failure.status >= 500;
       // A transport outage cannot prove role removal. Keep the mounted view's
@@ -230,13 +252,17 @@ export function Studio({
         failure instanceof Error ? failure.message : "Studio is unavailable.",
       );
     } finally {
+      if (roleRequest.current === controller) roleRequest.current = null;
       if (current === generation.current) setLoading(false);
     }
   }, [conceal, creatorId]);
   useEffect(() => {
     if (!creator || !freshUntil) return;
     // A slow role request cannot extend the last successful authority check.
-    const timer = setTimeout(conceal, Math.max(0, freshUntil - Date.now()));
+    const timer = setTimeout(
+      conceal,
+      Math.max(0, freshUntil - performance.now()),
+    );
     return () => clearTimeout(timer);
   }, [conceal, creator, freshUntil]);
   useEffect(() => {
@@ -250,18 +276,34 @@ export function Studio({
     void refresh();
     return () => {
       generation.current++;
+      roleRequest.current?.abort();
+      roleRequest.current = null;
     };
   }, [refresh]);
   useEffect(() => {
     const onFocus = () => void refresh();
+    const onVisibility = () => {
+      if (document.hidden) {
+        generation.current++;
+        roleRequest.current?.abort();
+        roleRequest.current = null;
+        setFreshUntil(0);
+        conceal();
+      } else void refresh();
+    };
     window.addEventListener("focus", onFocus);
+    window.addEventListener("pageshow", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
     const timer = setInterval(onFocus, 4000);
     return () => {
       clearInterval(timer);
       window.removeEventListener("focus", onFocus);
+      window.removeEventListener("pageshow", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [refresh]);
+  }, [conceal, refresh]);
   const root = `/studio/${creatorId}`,
+    continuation = `${sessionExpired ? "/api/auth/restore" : "/auth/continue"}?returnTo=${encodeURIComponent(returnTo)}`,
     current = screen[0] ?? "notes";
   const paths: Record<string, string> = {
     Notes: `${root}/notes`,
@@ -344,9 +386,7 @@ export function Studio({
             </button>
           </article>
         ))}
-        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
-          Continue with Pantopus
-        </Link>
+        <a href={continuation}>Continue with Pantopus</a>
         <Link href="/studio/setup">Creator setup</Link>
       </main>
     );
@@ -363,9 +403,7 @@ export function Studio({
           {error || "Your current account has no role in this Studio."}
         </Notice>
         <Link href="/studio/workspace">Choose your Studio</Link>
-        <Link href={`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}>
-          Continue with Pantopus
-        </Link>
+        <a href={continuation}>Continue with Pantopus</a>
       </main>
     );
   return (
