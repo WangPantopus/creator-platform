@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 (evening) — Mac Studio runtime restoration and handoff
+
+A Claude session restored a fresh W1 runtime on the Mac Studio (canonical 40-migration database, API 4111, web 3011, iOS 27 simulator), operated the mobile web identity journey in Mobile Safari, fixed the PR42 format failure (merged forward to PR51), and opened PR59 (Playwright `visualWebURL` CI fix), PR62 (development actors incl. under-18) and PR66 (outage-truthful sessions, adult-only notice, phone viewport fixes). Native builds/journeys were not run. [Run record](../../../artifacts/workstreams/W1/resume/2026-10-01-claude-runtime/run.md) · [continuation handoff](../handoffs/W1-continuation-2026-10-01-claude.md) · [copy-paste prompt](../prompts/W1-continuation-2026-10-01-claude.md).
+
 ## October 1 — publication audit and authorized W1 worktree removal
 
 The founder requested committing/pushing useful uncommitted source, ensuring PR coverage and removing dedicated W1 worktrees. The [audit](../../../artifacts/workstreams/W1/resume/2026-10-01-worktree-audit/source-publication.json) finds no useful uncommitted W1 source and no W1 commit absent from all origin refs. Eleven branch tips match open PRs; two older tips are already in published main. The older `7f32` checkout is removed; `0516` is authorized for removal immediately after this documentation is pushed to existing ready PR51. Generated build products are disposable; peer worktrees/shared primary/private material remain preserved. Future W1 work must create a fresh checkout from the current published `codex/w1-handoff-20261001` tip. Full W1 acceptance remains incomplete.
