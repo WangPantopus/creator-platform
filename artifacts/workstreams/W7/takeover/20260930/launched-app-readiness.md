@@ -1,5 +1,7 @@
 # W7 launched-app continuation and merge boundary
 
+**Current optional-delivery continuation:** [Personally reviewed repairs, actual browser controls and remaining gates](delivery-boundary-review.md) prevent uncertain push receipts from being completed by another device and reread current push/email controls under the account fence before submission. Backend build/source checks and actual settings save/reload/restoration pass; real delivery races/provider outcomes and affected native journeys remain unverified. Own API32371/session4665 replaces84372/session84072; all data/peer resources remain preserved. Final published-head CI and completed review are still required before incremental merging. Entire original W7 acceptance remains open.
+
 The founder reaffirmed incremental merges and clarified the gate: personally launch the shipping apps and verify affected journeys end to end, including iOS simulator and Android emulator where applicable. Builds, unit results, coverage and synthetic diagnostics do not complete those journeys. Current-head repository CI and personal review remain required. The full original W7 assignment, all nineteen actual producer/channel paths and the thirteen-artboard/runtime/accessibility/performance matrix remain open until their actual gates pass. Earlier CI/review-only merge banners are historical and superseded by this instruction. The existing hourly follow-up was updated in place and remains ACTIVE in this takeover chat.
 
 ## Personally operated browser journey and repair

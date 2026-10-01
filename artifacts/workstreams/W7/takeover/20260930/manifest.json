@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-01T03:00:03.123014+00:00",
+  "recordedAt": "2026-10-01T03:31:23.449971+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
     "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "72641d0081aa24baee27fa2cbd82de9db1cb2eff11c27016b8d84beee4a7b00b",
@@ -26,7 +26,9 @@
     "apps/backend/src/integration.ts": "3d8aed10c9a16fee51cda31de25a1edc3e079814fbfdad29d37ba18758eaaf59",
     "apps/backend/src/server.ts": "17afafa33b7e5d05d5d0e6839a017e6d6b89cc6a32066c27846c3c40fab048b1",
     "apps/backend/src/modules/growth/experiments.ts": "fc4744e39ff6e46f416dda6cfe310aae62155aa8820e8a01e7faa69d1fc2aaec",
-    "apps/web/app/you/page.tsx": "6694d70bc93c307c75993cfa51829de21acd91a4a30f329d7af29a804abad5b3"
+    "apps/web/app/you/page.tsx": "6694d70bc93c307c75993cfa51829de21acd91a4a30f329d7af29a804abad5b3",
+    "apps/backend/src/modules/growth/notifications.ts": "fd68e2594780cf2aabd4ae990294e3090630837fa3dadce305d64aeff68762d6",
+    "apps/backend/src/modules/growth/providers.ts": "f6e2d69670f74153c9e8bf56ef4b628427a994cd447023375d88f3590f88519a"
   },
   "nativeReferenceCount": 110,
   "nativeReferenceSetSha256": "a729e6b68ee8bea71fd90a1ba4e60474ede2b4cec69fe79887829b9625594510",
@@ -151,7 +153,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "552c9a89c07cc0ea1f80ca4425b1c2db7287352782861943e0ef4d83a130c051",
+    "README.md": "f46b18c7a6d133f73058e877ba1c021a70a32d8fee6513ffb68b80e4b795733b",
     "account-recovery-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
     "account-recovery-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "account-recovery-production-build-final.log": "ec07544fba56779b8e319eda71b843ab6f98b8138dc02b4078ceacf294380be3",
@@ -177,6 +179,17 @@
     "current-head-you-account.png": "f05e339f13f6400612451e9c1f4c4ad854f1f27f90beaf7ee4ae2cde59ad4928",
     "current-head-you-context-refused.png": "0fc1cd5041c478a3bc655b2d1f3077b616ba9620866ad50e69da59f61cad198f",
     "current-head-you-route-gap.png": "9c4b7054042d308f44bbf7196d18c4c83da4f1218fd524c5194d6a8e165607a5",
+    "delivery-android-default-netsim-anr.log": "598244ae154cd3e7037c98fea4be7395482a01fea1758ef2ae944eb6cc315f15",
+    "delivery-android-default-netsim-launch.log": "d6ef16424bccb03f793c681c923ba02199ddece34a9743079f7653b2135b3a34",
+    "delivery-android-default-netsim.log": "f81ecf47ec823006d3bbcd39fd2aa6072cdde42b50b768a46d0f06a0c4ede8b4",
+    "delivery-boundary-android-default-netsim-discover.png": "60a54e365cc3ccfa0d418945f3ae9a2ea4c7e51b986dd7eddbb37468303c259f",
+    "delivery-boundary-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "delivery-boundary-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "delivery-boundary-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "delivery-boundary-review.md": "79664fdbcdc1ef8ad5a5ec348a3d6c1b8e69a630fcba8fdc4763bc7fa74467ae",
+    "delivery-boundary-settings-restored.png": "1d287962026d3ff849ce13ad24ab3954ae73133acf47ca0c53df41c477e97ba4",
+    "delivery-parent-foundation.json": "e2413ea225552e3333bbc53920d98aeeb66a9428d88f3d1ecfc31cfcbf7169ad",
+    "delivery-parent-trust.json": "c875342e7e97d59928bff229026731911b50e04d5fc18785d456a99b357110d2",
     "discarded-context.log": "b43e8123c172f82f75d78333571e43971c550564fb5a75c102fa3369024951e4",
     "discarded-global-web-style-context.md": "036ce74c6d7b58f507a443722867c77bb9a0dc08bfcadfa6b6f18b005315c0af",
     "discarded-global-web-style.log": "9ce7e9999af7cea1bc4d70e6d059a3e678e30f2afdd9d365aa8525c82ef00a69",
@@ -224,7 +237,7 @@
     "launched-app-duplicate-cancellation.json": "b8e09a1f3854bbfacf74aa4fc637422254f81b983a33277ac77fc81131517bd3",
     "launched-app-parent-foundation.json": "4532f3c5c238b7df6e615a959046af853998d6d65bfea53c8c15c9b336e8ddac",
     "launched-app-parent-trust.json": "05db2deb5a0562deda7b039e91f3b688a907cba38295fc11e64ab635767f63cb",
-    "launched-app-readiness.md": "5e8647c60df159e1afbb85e0c516c274ce3d2c52c42d35a3ad157d74559db2e8",
+    "launched-app-readiness.md": "6f91986c7e1355ae90ac612e32820ab569da9712b7c2805c7af601bab57e9673",
     "layer-swift.log": "f2c18f8ff0ea6ba6c895d8b954592237268d4d212c20658fbcfb572a79bb43fb",
     "mac-welcome-light-baseline-diff.png": "e37c662a53f45fc782d4c22ea84d2c4c661ba32c8fb1d42f10dc25713e0f118c",
     "mac-welcome-light-reference-render.png": "001f6c3a23acb3b575fe6c8eccabc5b6ab1c7648c5deee0c645741231d34e352",
@@ -408,8 +421,8 @@
     "largeObjectAcceptance": false
   },
   "currentRuntime": {
-    "apiProcess": 84372,
-    "apiExecSession": 84072,
+    "apiProcess": 32371,
+    "apiExecSession": 4665,
     "webProcess": 16845,
     "webExecSession": 19476,
     "database": "creator_w7_takeover_20260930",
@@ -427,13 +440,15 @@
     "iosState": "Shutdown",
     "androidAVD": "CreatorPlatform_W7_Takeover_20260930",
     "androidAVDPath": "/private/tmp/creator-w7-takeover-android/avd/CreatorPlatform_W7_Takeover_20260930.avd",
-    "androidState": "stopped; data/app retained",
+    "androidState": "stopped after default netsim diagnostic; data/app retained",
     "androidSDK": "/private/tmp/creator-w7-takeover-tools/sdk",
     "androidDataRoot": "/private/tmp/creator-w7-takeover-android",
     "androidADBProcess": 9981,
     "androidADBPort": 5047,
     "androidEmulatorPortReservation": 5570,
-    "androidNetsimInstanceDiagnostic": 5047
+    "androidNetsimInstanceDiagnostic": "default with NETSIM_INSTANCE unset; own TMPDIR/ANDROID_TMP",
+    "androidNetsimHCIReservation": 15607,
+    "androidNetsimTemporaryRoot": "/private/tmp/creator-w7-takeover-android/netsim-default-tmp"
   },
   "mergeBoundary": {
     "current": "personally verified affected launched shipping-web/iOS-simulator/Android-emulator end-to-end journeys, all exact-current-head repository CI passes and review complete; complete original W7/release acceptance remains gated and tracked",
@@ -1127,5 +1142,42 @@
     "newTestCasesOrSuites": 0,
     "delegatedImplementationOrAcceptance": false,
     "copiedTerminalLogs": "trailing whitespace/CR progress normalized; raw owned logs retained outside checkout; outcomes unchanged"
+  },
+  "latestDeliveryBoundaryIncrement": {
+    "parent": "d9089eb08cb6e1d845072ef278fb058c4d3d5154",
+    "report": "delivery-boundary-review.md",
+    "uncertainRegistrationReceiptNeverCompletedByOtherDevice": true,
+    "currentPushAndDigestPreferencesUnderAccountFence": true,
+    "backendProductionBuildTypecheck": "passed",
+    "changedSourceLintFormat": "passed",
+    "actualBrowserCanonicalRecoveryAndChannelSaveReloadRestore": true,
+    "globalOptionalChannelsEnabled": false,
+    "actualDeliveryRaceOrProviderOutcomeVerified": false,
+    "actualNativePrivateJourneysVerified": false,
+    "newTestsSuitesOrScripts": 0,
+    "implementationOrAcceptanceDelegated": false,
+    "OpenAIOrDeliveryCredentialRead": false,
+    "originalAssignmentAccepted": false,
+    "PR2MergeReady": false,
+    "androidDefaultNetsimDiagnostic": {
+      "bootMs": 60145,
+      "launchStatus": "ok",
+      "coldLaunchMs": 14241,
+      "SystemUIServiceANRWaitMs": 20483,
+      "actualState": "System UI ANR over unavailable Discover",
+      "runtimeAcceptance": false,
+      "emulatorProcess": 33504,
+      "execSession": 38822,
+      "HCI": 15607,
+      "normalShutdownExit": 0,
+      "dataRetained": true
+    },
+    "ownerPublicationsInspected": {
+      "W1": "c6490a05e3bda71bf0273e57ba201a889fecdc52",
+      "W2": "119d26ab5fcb8752eb787a9a69c5faabd3441cf4",
+      "W3": "25d459213b8ac6f69370d0f5f009be282c7596d7",
+      "W8": "2a765bb2180b6c2c24de167239588029974952cb"
+    },
+    "newHeadCI": "inspect the actual final publication head; these snapshots are historical parent checks"
   }
 }
