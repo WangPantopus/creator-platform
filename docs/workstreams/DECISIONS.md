@@ -6,6 +6,14 @@ These are implementation/release dependencies, not requests for the founder to a
 
 Node.js/TypeScript backend, Next.js web, native Swift iOS and Kotlin Android; standalone creator-platform now and Pantopus integration later; exact supplied appearance; replaceable Qelvora name; full build with membership first, human voice before AI voice, pass after sufficient roster; no new test code/coverage in this phase; actual browser/simulator/emulator verification. Older source references to Expo, a thin unselling native shell, five lifetime trial messages, auto-reply after twenty approvals, or a proof-only build do not reopen those choices.
 
+## W1 source conflicts resolved — October 1, 2026
+
+Under the founder's explicit authorization to decide routine UX/security details, W1 follows behavioral-source precedence for DI09 and the interview-duration conflict. Product Design S-F1/S-F5 defers the optional intro offer until after the first useful answer; initial Handle therefore collects only a pseudonymous handle. Existing profiles retain the optional intro editor through You/Account, and per-creator AI use remains a separate explicit choice. Initial profile creation sends an empty intro; hidden input cannot silently become consent. The real later one-time thread offer remains an uncompleted W3/W1 integration, with no generation or participant result inferred.
+
+Product Design S-C14, Second Review A10 and BRIEF S-C14 consistently specify about 20 minutes for the optional voice/text interview. The live setup rail uses that estimate. It adds no timer, required-duration gate or promise of completion, and imported-source-only setup remains valid under the producer's policy. The artboard's 15-minute sample label and all original references remain unchanged.
+
+These decisions resolve timing/copy, not genuine identity, legal terms, native Studio scope, screen-reader/device acceptance or Q12 study thresholds. Actual browser and compiler evidence is recorded with the implementation; native control is currently disabled.
+
 ## Required decisions and confirmation points
 
 | ID | Decision / unresolved input | Owner | Needed before | Work that continues meanwhile |

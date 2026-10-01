@@ -3,6 +3,10 @@
 <resources>
   <string name="app_name">Qelvora</string>
   <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
+  <string name="identity_profile_save_failed" formatted="false">Could not save. Try again.</string>
+  <string name="creator_interview_estimate" formatted="false">About 20 minutes for your interview</string>
   <string name="welcome_title" formatted="false">Her AI answers you now. She answers in person when you ask.</string>
   <string name="welcome_body" formatted="false">Every message says who wrote it: Maya\'s AI, Maya herself, or her team. You\'ll always know which.</string>
   <string name="pantopus_account" formatted="false">One Pantopus account signs you in to every Pantopus app. New here? You\'ll create it in the next step.</string>

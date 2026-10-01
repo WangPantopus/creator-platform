@@ -1,5 +1,13 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — onboarding timing and interview estimate
+
+W1 personally resolves DI09's initial Handle timing through the governing Product Design S-F1/S-F5: new profiles collect only a handle, while an existing profile retains its optional intro editor. Web, Swift and Kotlin follow the same profile-state distinction. The later one-time offer after a useful thread answer remains unfinished; saving an intro grants no per-creator AI permission. The live setup estimate follows S-C14/A10's about 20-minute voice/text interview. [Recorded decision](../DECISIONS.md#w1-source-conflicts-resolved--october-1-2026) preserves original artboards/references and the optional imported-source path.
+
+[Actual browser evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-onboarding/run.md) records fresh canonical Handle → Account, empty initial intro, later edit/save/reload, interrupted save preserving input and keyboard focus, and Light/Night phone/desktop captures. Newly changed copy uses the canonical generator. Shipping iOS/Android compilation is supporting evidence; native operation, secure-storage acceptance and assistive-technology verification remain open because native control APIs are disabled. H01–H20 stay active; this does not complete DI09's later offer, H15, H16 or H17's fresh rename.
+
+The second logical database `creator_w1_onboarding_20261001` is W1-only interactive state in the existing 55451 container. All40 active migrations were applied; no original or peer state was restored/reset. The original proof-recovery database remains retained. No conversation, processor consent, creator approval, passkey or signed act was fabricated. Exact source/build/environment qualifications are in the manifest. Current-head Code Review CI remains unavailable pending a connected GitHub account; no hosted pass or merge is claimed.
+
 ## October 1, 2026 — full W1 resumed after centralized cleanup
 
 The entire original seven-group assignment and H01–H20 remain active. The October1 cleanup supersedes every historical lease/retained-data table below. Current main is `2f0319dbb6979878c5a9019e68503506902f9ea0`; original `5e104cd` is an ancestor. The preferred W1 checkout is absent; this clean `0516` checkout uses `codex/w1-resume-20261001`. No peer checkout was changed. There were zero open PRs at fetch.
