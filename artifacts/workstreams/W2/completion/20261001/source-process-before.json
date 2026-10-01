@@ -1,0 +1,118 @@
+{
+  "jobs": [
+    {
+      "id": "b120f860-4c33-42d4-9a10-e43ec0767aa8",
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:42:44.384075+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 1
+    },
+    {
+      "id": "eb9157b6-ef7d-4965-a056-f406b1c4a1c9",
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:45:06.554166+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 2
+    },
+    {
+      "id": "a627e482-5936-4cce-ad3a-41ecebcd7f01",
+      "state": "running",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:50:17.289084+00:00",
+      "leaseUntil": "2026-10-01T12:54:08.73388+00:00",
+      "sourceRevision": 3
+    }
+  ],
+  "usage": [
+    {
+      "id": "0de4de0d-adaa-4ccd-812f-253cc28c30c7",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:44.746505+00:00",
+      "costMicros": 95,
+      "inputTokens": 4728
+    },
+    {
+      "id": "cfd8d7ca-bcf0-4ac9-b23e-0ac0bccd5568",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:46.246923+00:00",
+      "costMicros": 95,
+      "inputTokens": 4731
+    },
+    {
+      "id": "796737c9-b139-45bf-8805-82fa82022f3c",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:47.072869+00:00",
+      "costMicros": 95,
+      "inputTokens": 4727
+    },
+    {
+      "id": "e8b47e4d-cc3f-4d9e-93ca-9a0e35d86447",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:42:47.663+00:00",
+      "costMicros": 75,
+      "inputTokens": 3708
+    },
+    {
+      "id": "1582afc5-c04a-47fd-a6a2-abb36bbf9cd4",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:06.900639+00:00",
+      "costMicros": 95,
+      "inputTokens": 4728
+    },
+    {
+      "id": "99927dd8-8964-45e5-bec7-1af2c653bba4",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:07.561362+00:00",
+      "costMicros": 95,
+      "inputTokens": 4731
+    },
+    {
+      "id": "46d5c7bd-58b8-407e-a836-8455592ee437",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:07.874828+00:00",
+      "costMicros": 95,
+      "inputTokens": 4727
+    },
+    {
+      "id": "ec01d19c-4619-4c3e-b091-e2fd7b6fa10b",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:45:08.375786+00:00",
+      "costMicros": 75,
+      "inputTokens": 3708
+    },
+    {
+      "id": "2f4b7b2e-c49a-4056-a90f-85cb3c7b2884",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:51:07.018643+00:00",
+      "costMicros": 94,
+      "inputTokens": 4672
+    },
+    {
+      "id": "f03dced1-f610-408a-bab3-d4f8cd320ae5",
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:51:07.660295+00:00",
+      "costMicros": 94,
+      "inputTokens": 4676
+    },
+    {
+      "id": "4bf85bf3-6177-4758-bb23-0ea90e20fecc",
+      "model": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+      "createdAt": "2026-10-01T12:51:08.750062+00:00",
+      "costMicros": null,
+      "inputTokens": 0
+    }
+  ],
+  "chunks": 0,
+  "source": {
+    "id": "8c97be4b-d47d-4c78-9159-8fc4976da5a3",
+    "hash": "5f750a6f07b255a0a18a266056be0b7609875d044233bc9117bcf0acbd502c59",
+    "state": "processing",
+    "progress": 33,
+    "revision": 3,
+    "indexState": "pending",
+    "textLength": 237599
+  },
+  "capturedAt": "2026-10-01T12:51:34.559993+00:00"
+}
