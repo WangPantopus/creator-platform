@@ -1,6 +1,6 @@
 # W4 execution checklist — October 1, 2026
 
-Baseline: consolidated main `2f0319dbb6979878c5a9019e68503506902f9ea0`; PR5 is merged. Current branch is `codex/w4-completion-20261001` in the clean assigned 8ed6 checkout. Historical fa22 source and its untracked resource-release manifest are preserved.
+Baseline: consolidated main `2f0319dbb6979878c5a9019e68503506902f9ea0`; PR5 is merged. PR18 merged the payout/spending increment at `70ba74a7983dc4f5d0fd0ccd6bcfb657576f9a0b`. The pool increment continues from that main on `codex/w4-pass-pool-20261001` in the assigned 8ed6 checkout. Historical fa22 source and its untracked resource-release manifest are preserved.
 
 The founder confirmed that no Stripe sandbox/verified creator configuration exists and requested uninterrupted independent work. No provider acceptance or financial/business approval is inferred. All nine original packages remain in scope. Status below distinguishes source implementation from actual application proof; no row is release-ready.
 
@@ -21,6 +21,24 @@ The founder confirmed that no Stripe sandbox/verified creator configuration exis
 | R13 / 6 Ops/privacy       | C10, O02/03/04/15                             | Complete paged financial exports and purpose-bound hooks exist; preserve original payout custody in exports. Reviewed retention, current job authority and actual artifact completion remain gates. |
 | R14 / all surfaces        | 13 primary artboards, DI11/15                 | Personally inspect functional fan/Studio/Ops routes and native hosts; Light/Night, loading/error/offline/a11y and design comparison remain separately unverified.                                   |
 | R15 / all                 | COVERAGE, OPPORTUNITIES, Architecture targets | Measure affected actual journeys, review source/CI/diff, merge coherent verified increments, then continue from current main. No p95/provider claim from build success.                             |
+
+## Implementation / runtime / integration / verification
+
+Each row retains the detailed source mapping above. "Guarded" means source exists but mandatory installation/configuration prevents its positive journey. Every release-ready value is **no**.
+
+| Rows / original package | Implemented                                                                 | Runnable now                          | Integrated                                                            | Personally verified                                                 |
+| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| R01 / all               | Configured host and truthful gates                                          | Canonical development host            | Production identity/provider/worker graph pending                     | Fresh40 canonical install, readiness, local account/role routes     |
+| R02 / 1                 | Guarded weighted access/offers                                              | Read-only access; paid AI gated       | Same W3 transaction ports; actual0048/0049 graph pending              | Build; positive attributed generation/races pending                 |
+| R03/R04 / 2             | Guarded Stripe/store billing and native clients                             | Membership unavailable state          | Actual sandbox/catalog/store products pending                         | Shipping native builds/entry; purchase/restore pending              |
+| R05 / 3                 | Packet/hold/reauthorization source                                          | Unconfigured/invalid states           | Genuine payment/current capacity graph pending                        | Positive bank/capacity races pending                                |
+| R06/R07 / 4             | Decisions, Approval, W3 delivery/W6 evidence consumers                      | Optional-schema gates                 | Exact0044/0045, signing/media/provider graph pending                  | Genuine signed decision/call journeys pending                       |
+| R08 / 5                 | Original requests, inbox/recovery/lease fencing                             | Restart and guarded workers           | Actual purpose-issued money scopes pending                            | Local API restart; provider crash/aged-unknown proof pending        |
+| R09/R13 / 6             | Guarded payout custody, paged exports and scoped Ops consumers              | Denied fan earnings; optional exports | Migration/current-purpose authority/retention pending                 | DDL rollback and wrong-role web; genuine money/export job pending   |
+| R10 / 7                 | Deliberate cap/reminders, delayed raises/immediate decreases                | Actual development-fan spending       | Canonical durable cap; genuine W7 push/time producer pending          | Light/Night save/pending/none/offline/reconnect/restart web         |
+| R11 / 8                 | Guarded purchase/calendar and new original pool cash journal/Stripe readers | Honest pass gate                      | Exact0054/0055, full authorized population/economics/provider pending | Pool DDL rollback and pass/pool gate; actual transfers pending      |
+| R12 / 9                 | Sharing/qualified-read/credit sources and consumers                         | Configured paths gated                | Genuine eligible publication/group/read/credit policy pending         | Signed/credit/card-cache revocation acceptance pending              |
+| R14/R15 / all           | Functional surfaces and bounded source; design completion ongoing           | Actual web and shipping native entry  | Full design/a11y/performance acceptance pending                       | Browser scope above; iOS signed entry; Android crash-obscured entry |
 
 ## Owned runtime
 
