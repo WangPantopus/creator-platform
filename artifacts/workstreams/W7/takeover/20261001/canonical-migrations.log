@@ -1,0 +1,40 @@
+Already applied: 0001_foundation
+Already applied: 0002_w1_identity
+Already applied: 0003_w2_agent
+Already applied: 0004_commerce
+Already applied: 0006_w6_media_sessions
+Already applied: 0007_growth
+Already applied: 0008_trust_operations
+Already applied: 0010_w8_operational_guardrails
+Already applied: 0011_growth_retention
+Already applied: 0012_w8_crisis_event_rls
+Already applied: 0013_w2_agent_extensions
+Already applied: 0015_w4_reliability
+Already applied: 0016_w4_disclosure
+Already applied: 0017_growth_delivery
+Already applied: 0018_growth_activation
+Already applied: 0019_w2_shadow_jobs
+Already applied: 0020_w2_purge_tombstone
+Already applied: 0021_w4_lifecycle
+Already applied: 0022_w4_lineage
+Already applied: 0023_w8_action_recovery
+Already applied: 0024_growth_insight_versions
+Already applied: 0025_growth_closed_windows
+Already applied: 0026_growth_window_backfill
+Already applied: 0027_w8_privacy_ownership
+Already applied: 0028_w4_membership_history
+Already applied: 0029_w4_recovery_fencing
+Already applied: 0030_w4_spending_notices
+Already applied: 0031_w4_purchase_history
+Already applied: 0032_growth_continuation
+Already applied: 0033_growth_prompt_claims
+Already applied: 0034_growth_erasure_fence
+Applied: 0035_w5_content
+Applied: 0036_w5_content_reconciliation
+Applied: 0037_w5_studio_drafts
+Applied: 0038_w5_content_consent
+Applied: 0039_w5_content_thread_privacy
+Applied: 0040_w5_content_fan_effects
+Applied: 0041_w3_conversations
+Applied: 0042_w3_wellbeing
+Applied: 0043_w8_relationship_backfill

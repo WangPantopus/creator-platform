@@ -1,0 +1,87 @@
+{
+  "base": "6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac",
+  "source": "apps/web/features/identity/account.tsx",
+  "sourceSha256": "7341cd94a0e9699c8c428cc9759f51c837a5186f75e6fc3f0d22cea28d54a170",
+  "originalFailure": "Keyboard Space on Refresh session disabled the focused button, then left AX focus on the page with no success status. Observed live before editing; no failure screenshot retained.",
+  "browser": "Codex in-app browser, actual local web3001/API4101, existing synthetic actor two, pending verification",
+  "observations": [
+    {
+      "flow": "Keyboard refresh",
+      "result": "Session refreshed status; focus returns to enabled Refresh session; aria-busy false",
+      "viewport": "1280x720 DPR2 Light"
+    },
+    {
+      "flow": "Real owned API shutdown then keyboard refresh",
+      "result": "Failure shown in exactly one alert, no nested alert; focus returns to enabled Refresh session; no logout inferred"
+    },
+    {
+      "flow": "Owned API restart then keyboard retry",
+      "result": "Success status replaces error, focus retained, zero account alerts"
+    },
+    {
+      "flow": "Keyboard Sign out on all devices",
+      "result": "Account view removed; original /identity/account return retained. Other actual AI tab removes private form and retains its separate /studio/ai/interview return. Same browser cookie jar; not independent-client proof."
+    },
+    {
+      "flow": "Keyboard Sign out",
+      "result": "Account view removed and exact account return retained; subsequent keyboard development sign-in restores the saved existing account."
+    },
+    {
+      "flow": "Keyboard refresh on phone Night",
+      "result": "Status visible; focused button rect x16 y730.828125 w358 h48; document width390 equals viewport width390",
+      "viewport": "390x844 DPR1 Night"
+    },
+    {
+      "flow": "Final browser reload and keyboard refresh after PR10 integration",
+      "result": "Same saved account, Session refreshed notice and focused enabled Refresh session on current bb3fa45 plus Account patch",
+      "viewport": "390x844 DPR1 Night"
+    }
+  ],
+  "checks": {
+    "affectedEslint": "pass",
+    "affectedPrettier": "pass",
+    "currentWebProductionBuild": "pass",
+    "FolioPreviewWebProductionBuild": "pass",
+    "newTestsOrSuites": false,
+    "integratedMainWebProductionBuild": "pass",
+    "integratedMainFolioPreviewWebProductionBuild": "pass"
+  },
+  "limitations": [
+    "Only actual local synthetic-account web journeys qualify this web-only change.",
+    "No native, passkey, provider or production authority is created.",
+    "Browser zoom shortcuts had no measurable effect; 200% text remains unverified.",
+    "No screen-reader speech or independent-client latency acceptance."
+  ],
+  "frames": [
+    {
+      "file": "all-devices-signed-out.png",
+      "sha256": "0b392dec5499f3089f17d9d86c57d459a1ed0d9b39c46df2117775842d670cb4"
+    },
+    {
+      "file": "refresh-current-main-night.png",
+      "sha256": "e201b099308bc00037996aaa81ca3e9cd977f6742ed8b8d02255049b34264bcb"
+    },
+    {
+      "file": "refresh-night-phone.png",
+      "sha256": "e201b099308bc00037996aaa81ca3e9cd977f6742ed8b8d02255049b34264bcb"
+    },
+    {
+      "file": "refresh-outage.png",
+      "sha256": "d648f96cac8163b4b1189eab457b9c77bfe2f241cb9cace5788fe8842addf97f"
+    },
+    {
+      "file": "refresh-recovered.png",
+      "sha256": "5fdb996470c76cb23c0b8646892f5dcc9cd603387699ad11dd56997d19188056"
+    },
+    {
+      "file": "refresh-success.png",
+      "sha256": "f10036ed9de63841576fd8c3c3443b4e3ce1dea36e847f7745907fb0973f4196"
+    },
+    {
+      "file": "session-signed-out.png",
+      "sha256": "0b392dec5499f3089f17d9d86c57d459a1ed0d9b39c46df2117775842d670cb4"
+    }
+  ],
+  "integrationBase": "bb3fa455ff8ea0527ed87f46d0cc35d5db3c3cf4",
+  "integrationBaseScope": "PR10 adds only Studio role recovery; Account/identity/session/BFF source is unchanged between observed and integrated bases."
+}

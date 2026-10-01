@@ -153,7 +153,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "a0b6c2729010c494ac3919d26cd207087044819f3bd5391e51fc75c5d677eada",
+    "README.md": "02b6b57bc35aedf1a1b99a3c05bb70d9f768398e2346f8ade63e4bdf5d341bfa",
     "account-recovery-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
     "account-recovery-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "account-recovery-production-build-final.log": "ec07544fba56779b8e319eda71b843ab6f98b8138dc02b4078ceacf294380be3",
@@ -432,7 +432,9 @@
     "container": "creator-platform-w7-resume-20260930",
     "managedConfiguration": "/Users/yingpengwang/.config/creator-platform/secrets/w7-takeover-20260930.env",
     "identityMode": "development",
-    "registeredFeatures": ["growth"],
+    "registeredFeatures": [
+      "growth"
+    ],
     "foundationReady": true,
     "ready": false,
     "protectedW8HostConfigured": false,
@@ -1125,7 +1127,11 @@
     "androidIsolatedDiagnostic": "4cores/4096MB/TMPDIR/Netsim5047; network fallback/noBluetooth; boot104665ms; launchStatusOK11609ms; actualSystemUIANR overLoading",
     "androidAVD": "CreatorPlatform_W7_Takeover_20260930",
     "androidAVDState": "stopped after exact-name verification; data/app retained",
-    "androidEmulatorExecSessionsCompleted": [66607, 22404, 74986],
+    "androidEmulatorExecSessionsCompleted": [
+      66607,
+      22404,
+      74986
+    ],
     "androidADBProcess": 9981,
     "androidADBPort": 5047,
     "retainedOwnIOSState": "Shutdown after captures; data/app retained",
@@ -1197,5 +1203,6 @@
       "recordedBeforePublication": true,
       "currentHeadLookup": "git rev-parse HEAD and live PR2 metadata; inspect its exact-head canonical runs"
     }
-  }
+  },
+  "currentMainReconciliation": "../20261001/merge-readiness.json"
 }

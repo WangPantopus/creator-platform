@@ -1,0 +1,42 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "x86_64",
+        "deviceId" : "90934313-E0DD-445C-B8AF-AA8188BD2AC0",
+        "deviceName" : "Creator Platform W7 Resume 20260930",
+        "modelName" : "iPhone 17",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 0,
+      "passedTests" : 1,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "QelvoraApp · Built with macOS 26.7",
+  "expectedFailures" : 0,
+  "failedTests" : 0,
+  "finishTime" : 1790828372.022,
+  "passedTests" : 1,
+  "result" : "Passed",
+  "skippedTests" : 0,
+  "startTime" : 1790827805.232,
+  "statistics" : [
+
+  ],
+  "testFailures" : [
+
+  ],
+  "title" : "Test - QelvoraApp",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 1
+}
