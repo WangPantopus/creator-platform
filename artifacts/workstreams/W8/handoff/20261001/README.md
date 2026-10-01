@@ -1,0 +1,13 @@
+# W8 current handoff — 2026-10-01
+
+The [complete resume prompt](../../../../../docs/workstreams/handoffs/W8-resume-prompt.md) contains the latest human direction and every R1–R10 work item. It replaces obsolete pauses, draft-only dispositions and blanket test/fixture restrictions: no new unit tests or coverage campaign; actual launched web, Android emulator and iOS simulator acceptance; create and merge ready PRs.
+
+[Snapshot](snapshot.json) records the exact observed main, W8 branches, current open PR inventory, immutable 0048 custody, private archive hashes and resource observations. No secrets, raw database rows or private journal contents are included. PR states and local resources must be rechecked on resumption.
+
+The immediate existing W8 work is [PR17](https://github.com/WangPantopus/creator-platform/pull/17), observed head `bc809085e22d997cf868071c5cedab2992187005`, branch `codex/w8-post-cleanup-recovery`. Its [published recovery procedure](https://github.com/WangPantopus/creator-platform/blob/bc809085e22d997cf868071c5cedab2992187005/docs/operations/W8-post-cleanup-recovery.md) and [actual evidence](https://github.com/WangPantopus/creator-platform/blob/bc809085e22d997cf868071c5cedab2992187005/artifacts/workstreams/W8/recovery/20261001/README.md) are reviewed source material, not a new runtime acceptance by this handoff author. Reconcile main, verify affected behavior and finish it through merge. Earlier PR7/PR15/PR8/PR9/PR2 are completed integrations, not current open work.
+
+Original W8 compressed cluster-SQL archives match the private cleanup manifest and decompress successfully. The later private custom checkpoint also exists. PR17's evidence records independent restoration, preserved original rows and traffic closure; no new restore was performed here and survival of its later Docker volume after subsequent cleanup is not established. Old ports had no listeners. Preserve original and newer backups and verify the selected recovery input before rebuilding an isolated runtime.
+
+Remaining integration work includes W3's specific preserved-schema adoption, canonical lineage/accounting/signing rollout with actual privacy and expiry registration, purpose-authorized restart discovery, offline-content authority, and every unfinished original release/pilot demonstration. Treat missing inputs as concrete dependencies to resolve, not permission to fabricate success or stop independent work.
+
+This is a documentation-only handoff. Validation covers Git/source/PR custody, archive hashes and readability, local links, JSON parsing and whitespace. No app code, tests, registry, SQL, privileges, private state or live services were modified, and no new app/provider/native acceptance is claimed.
