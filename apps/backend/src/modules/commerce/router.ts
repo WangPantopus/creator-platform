@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import type { CommerceService } from "./service.js";
+import { CreatorEarningsReader } from "./creator-earnings.js";
 
 export function createCommerceRouter(input: {
   service?: CommerceService;
@@ -10,6 +11,9 @@ export function createCommerceRouter(input: {
   extended?: import("./extended.js").ExtendedCommerce;
 }) {
   const router = Router();
+  const earnings = input.service
+    ? new CreatorEarningsReader(input.service)
+    : undefined;
   const service = () => {
     if (!input.service)
       throw new DomainError(
@@ -54,6 +58,10 @@ export function createCommerceRouter(input: {
       : value.owned.find((c) => c.verification === "verified")?.id;
     res.json({
       ...value,
+      creatorEarnings:
+        req.query.creatorEarnings === "1" && poolCreator
+          ? await earnings!.read(actor, poolCreator)
+          : null,
       poolEarnings:
         req.query.poolEarnings === "1" && poolCreator
           ? ((await input.extended?.poolJournal?.earnings(
@@ -79,6 +87,22 @@ export function createCommerceRouter(input: {
         poolEarningsAvailable: Boolean(input.extended?.poolJournal),
       },
     });
+  });
+  router.get("/creators/:creatorId/earnings", async (req, res) => {
+    service();
+    res.json(
+      await earnings!.ledger(
+        await actorFor(req),
+        id(req.params.creatorId),
+        z
+          .string()
+          .regex(/^[A-Z]{3}$/u)
+          .parse(req.query.currency),
+        req.query.cursor === undefined
+          ? undefined
+          : z.string().min(1).max(512).parse(req.query.cursor),
+      ),
+    );
   });
   router.post("/packets/:packetId/reconcile-money", async (req, res) => {
     if (!input.extended?.money)

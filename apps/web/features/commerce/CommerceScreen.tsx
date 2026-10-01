@@ -17,11 +17,12 @@ import {
 } from "@qelvora/ui-web";
 import { copy, formatCopy } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
-import { SessionSchema, type commerceContracts } from "@qelvora/api";
+import { SessionSchema, commerceContracts } from "@qelvora/api";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
 import { PassCheckout } from "./PassCheckout";
 import { PoolEarnings } from "./PoolEarnings";
+import { CreatorEarnings } from "./CreatorEarnings";
 
 type Mode = {
   id: string;
@@ -136,6 +137,7 @@ type Overview = {
   }[];
   payoutAccounts: { creator_id: string; state: string; details_due: boolean }[];
   poolEarnings: commerceContracts.PoolEarnings[];
+  creatorEarnings: commerceContracts.CreatorEarnings | null;
   limits: Limit[];
   exposure: {
     month: string;
@@ -584,6 +586,7 @@ function CommerceAccountScreen({
       const query = new URLSearchParams();
       if (creatorId) query.set("creatorId", creatorId);
       if (screen === "pool") query.set("poolEarnings", "1");
+      if (screen === "earnings") query.set("creatorEarnings", "1");
       const response = await accountFetch(
         `/api/commerce/overview${query.size ? `?${query}` : ""}`,
         { cache: "no-store" },
@@ -824,13 +827,6 @@ function CommerceAccountScreen({
       c.id === (creatorId ?? data.owned[0]?.id) &&
       c.verification === "verified",
   )?.id;
-  const creatorLedger =
-    data?.ledger.filter(
-      (l) =>
-        l.creator_id === earningsCreator &&
-        l.kind !== "pool_alloc" &&
-        !l.refs?.pool,
-    ) ?? [];
   const poolSummary = data?.poolEarnings?.find(
     (p) => p.creatorId === earningsCreator,
   );
@@ -2156,31 +2152,32 @@ function CommerceAccountScreen({
                     />
                   ) : (
                     <>
-                      <div className="commerce-stats">
-                        {["capture", "refund", "payout"].map((kind) => (
-                          <section className="commerce-card" key={kind}>
-                            <h2>
-                              {kind === "capture"
-                                ? "Requests"
-                                : kind === "refund"
-                                  ? "Refunded"
-                                  : "Paid out"}
-                            </h2>
-                            <span className="commerce-money">
-                              {money(
-                                creatorLedger
-                                  .filter(
-                                    (l) =>
-                                      l.kind === kind &&
-                                      l.currency === currency,
-                                  )
-                                  .reduce((a, l) => a + BigInt(l.amount), 0n),
-                                currency,
-                              )}
-                            </span>
-                          </section>
-                        ))}
-                      </div>
+                      <CreatorEarnings
+                        key={`${earningsCreator}:${data.creatorEarnings?.observedAt ?? "unavailable"}`}
+                        summary={data.creatorEarnings}
+                        money={money}
+                        loadLedger={async (currency, cursor) => {
+                          const query = new URLSearchParams({ currency });
+                          if (cursor) query.set("cursor", cursor);
+                          const response = await accountFetch(
+                            `/api/commerce/creators/${earningsCreator}/earnings?${query}`,
+                            { cache: "no-store" },
+                          );
+                          const body = await response.json();
+                          if (!response.ok)
+                            throw new Error(
+                              body.error?.message ??
+                                "Ledger information is unavailable. Your page has been kept.",
+                            );
+                          const page =
+                            commerceContracts.CreatorLedgerPage.parse(body);
+                          if (page.currency !== currency)
+                            throw new Error(
+                              "The ledger currency changed. Refresh before continuing.",
+                            );
+                          return page;
+                        }}
+                      />
                       <section className="commerce-card">
                         <h2>Payout account</h2>
                         <p>
@@ -2194,22 +2191,6 @@ function CommerceAccountScreen({
                             : ""}
                         </p>
                       </section>
-                      <h2>Ledger</h2>
-                      {creatorLedger.map((l) => (
-                        <div className="commerce-ledger-row" key={l.id}>
-                          <span className="qv-meta">{date(l.created_at)}</span>
-                          <span>{l.kind.replaceAll("_", " ")}</span>
-                          <span>{money(l.amount, l.currency)}</span>
-                          <span>
-                            {l.packet_id ? requestId(l.packet_id) : "—"}
-                          </span>
-                        </div>
-                      ))}
-                      {!creatorLedger.length && (
-                        <Empty title="No ledger entries yet">
-                          Amounts appear after verified provider activity.
-                        </Empty>
-                      )}
                       <p>
                         Payout eligibility starts seven days after delivery and
                         remains held during a dispute. Provider fees, payout

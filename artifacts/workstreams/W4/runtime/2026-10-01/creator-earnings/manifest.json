@@ -1,0 +1,66 @@
+{
+  "recordedAt": "2026-10-01T12:46:05.147088+00:00",
+  "baseline": "2824ed4e0079eb1a30ce177439fb3579be955ef9",
+  "branch": "codex/w4-earnings-history-20261001",
+  "scope": "Complete creator confirmed amounts and bounded owner/currency history; genuine positive money/creator acceptance remains open.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "web": "Next16.3.7 production localhost3004",
+    "api": "compiled final server4104",
+    "database": "creator_w4",
+    "reviewDatabase": "creator_w4_sql_review",
+    "browserActor": "canonical development fan, no owned creator",
+    "providers": "unconfigured, no external provider/OpenAI request",
+    "browserViewport": "1280x900 Light/Night",
+    "iOS": "normally simulator-signed shipping iPhone16Pro/iOS26.5 build; no new native UI operation",
+    "Android": "owned API34/x86_64 emulator5564/ADB5044,720x1280 density320 =>360x640dp, SwiftShader,2 cores/1024MiB"
+  },
+  "checks": {
+    "backendBuild": "passed final held-owner/403 source and compiled executable restarted",
+    "webProductionBuild": "passed final query/schema/native-generation source",
+    "workspaceTypechecks": "7 passed; web repeated after restoring own generated path",
+    "scopedLintFormat": "passed",
+    "generatedConsistency": "12 shared resources/97 API operations pass; currency required in Swift/Kotlin operation",
+    "shippingIOSBuild": "BUILD SUCCEEDED final generated models",
+    "shippingAndroidBuild": "BUILD SUCCESSFUL1m22s,37 tasks4 executed",
+    "exactSQL": "final owner FOR SHARE, per-currency101 row plan and full totals compile under non-owner and roll back;40 canonical migrations, no actors/money rows",
+    "actualBrowser": "Final production fan Earnings1280 Light/Night creator-access-required; Refresh remains denied. Overview200 creatorEarnings:null/owned count0. No amounts fabricated. Screenshots personally inspected.",
+    "nativeEnvironment": "Final APK installed successfully; actual Light cold launch Status ok/3285ms, Night Status ok/2858ms. Both Welcome screenshots personally inspected, no Bluetooth system dialog. Source product defect: body copy overlaps sign-in button at360x640dp; not passed design/commerce acceptance.",
+    "ownedCleanup": "Owned emulator killed normally and isolated5044 ADB server stopped. Peer emulator/5037/netsimd untouched."
+  },
+  "nativeObservation": {
+    "startup": "boot_completed1, reported30.107s",
+    "networkConfig": "Requested documented --instance5564/--hci-port5314 netsim arguments; packet streamer active. Existing peer netsimd remained running. These observations do not establish that arguments caused recovery or created a separate daemon.",
+    "crashLogBytes": 0,
+    "screenState": "real signed-out Welcome, no native input/billing journey"
+  },
+  "preservedFailures": [
+    "Patch context mismatch on formatted web code prevented a partial change; corrected against actual source.",
+    "Browser direct navigation to owner-history API using actual fan resource ID was blocked by client. No bypass attempted; this did not verify direct-route403.",
+    "Actual native entry body copy overlaps the pinned button on short display; repair follows as a separate increment.",
+    "Earlier native Bluetooth crash evidence remains unchanged; current successful entry does not rewrite history."
+  ],
+  "migration": {
+    "registryOrAppliedBytesChanged": false,
+    "canonicalEntries": 40,
+    "newSchema": false,
+    "earlierPayoutPoolReservations": "remain unapplied/inactive"
+  },
+  "limitations": [
+    "No real verified creator, populated cash history, large-ledger/multi-currency/pagination/reversal/provider acceptance.",
+    "Query plans on an empty authorized population do not demonstrate production scale or percentile latency.",
+    "Recorded captures are gross confirmed history, not approved after-fee earnings or a promised payout date.",
+    "No signed-in native input, purchase/restore, VoiceOver/TalkBack or200-percent text proof.",
+    "No new test suites/cases/journey scripts/coverage or reference/assertion edits."
+  ],
+  "sourceHashes": "source-sha256.json",
+  "buildHashes": "build-sha256.json",
+  "webBuildHashes": "web-build-sha256.json",
+  "ddlEvidence": "sql-review-rollback.json",
+  "screenshots": {
+    "android-final-entry-light.png": "f6c9231f7656d306f36ad1f6154032cb709fd94a64defa6a281bd89a2dd2bf5a",
+    "android-final-entry-night.png": "bedfe0eeb54b158fd375fe2b36dd6964f037d7ccf4cc2c1389b31c1fcd812a42",
+    "earnings-final-production-wrong-role-light.jpg": "2ec5c9a0a0795a830297cafffd404258785b062b6cffad6e2204c379e234bf05",
+    "earnings-final-production-wrong-role-night.jpg": "30ad73422cdef2ac8a92e403b571e921063dae435deb87f24f34a8ca775c0d0d"
+  }
+}
