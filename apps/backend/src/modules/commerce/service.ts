@@ -257,6 +257,18 @@ export class CommerceService {
       "INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
       [p.creator_id, p.fan_id, p.id, p.version, type, JSON.stringify(payload)],
     );
+    if (type === "packet_submitted")
+      // Distinct durable cause for the creator's New packet notification. Only
+      // the first actual successful submission qualifies; reauthorization or
+      // a historical provider read must not manufacture another new request.
+      await client.query(
+        `INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload)
+         SELECT $1,$2,$3,$4,'packet_submitted_creator','{}'::jsonb
+         WHERE EXISTS(SELECT 1 FROM creator.commerce_packet WHERE id=$3 AND creator_id=$1 AND fan_id=$2 AND version=$4 AND state='submitted')
+         AND NOT EXISTS(SELECT 1 FROM creator.commerce_event WHERE aggregate_id=$3 AND creator_id=$1 AND fan_id=$2 AND type='packet_submitted' AND aggregate_version<$4)
+         ON CONFLICT DO NOTHING`,
+        [p.creator_id, p.fan_id, p.id, p.version],
+      );
   }
   private async ledger(
     client: PoolClient,
@@ -1217,17 +1229,22 @@ export class CommerceService {
               "signed_act_required",
               "Sign the exact changed offer first.",
             );
-            await consumeSignedAct(client, scope, body.signedActId, {
-              actType: "accept",
-              subjectId: scope.threadId,
-              content: {
-                packetId: p.id,
-                packetVersion: p.version,
-                snapshot: p.snapshot,
-                action: "group_offer",
-                proposedMode: mode,
+            const signedContentHash = await consumeSignedAct(
+              client,
+              scope,
+              body.signedActId,
+              {
+                actType: "accept",
+                subjectId: scope.threadId,
+                content: {
+                  packetId: p.id,
+                  packetVersion: p.version,
+                  snapshot: p.snapshot,
+                  action: "group_offer",
+                  proposedMode: mode,
+                },
               },
-            });
+            );
             await client.query(
               "UPDATE creator.commerce_packet SET state='offer_pending',proposed_mode=$2,version=version+1,updated_at=now() WHERE id=$1",
               [id, JSON.stringify(mode)],
@@ -1236,6 +1253,7 @@ export class CommerceService {
               client,
               { ...p, version: p.version + 1 },
               "packet_offer",
+              { signedActId: body.signedActId, signedContentHash },
             );
             return { effectId: null };
           }

@@ -21,6 +21,10 @@ import {
 import type { CreatorSettlement } from "./accounting.js";
 import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
 import type { GenerationPrivacyConfiguration } from "./generation-privacy.js";
+import {
+  CommerceRequestNotifications,
+  type CommerceNotificationRecipientAuthority,
+} from "./notifications.js";
 import { invariant } from "../../core/errors.js";
 import {
   createCommerceAudience,
@@ -125,6 +129,19 @@ export async function createCommerceRuntime(input: {
     generationAllowanceAvailable: Boolean(generationAllowance),
     generationCostReconciliation,
     generationCostPrivacyReconciliation,
+    // The host enumerates genuine current scopes. This factory cannot mint one
+    // or authorize recipients; no notification source is mounted by default.
+    requestNotifications: (
+      scope: import("../access/scope.js").ThreadScope,
+      assertRecipientAllowed: CommerceNotificationRecipientAuthority,
+      assertPrivacyRegistered: () => Promise<void>,
+    ) =>
+      CommerceRequestNotifications.prepare({
+        database: input.database,
+        scope,
+        assertRecipientAllowed,
+        assertPrivacyRegistered,
+      }),
     audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),
   };

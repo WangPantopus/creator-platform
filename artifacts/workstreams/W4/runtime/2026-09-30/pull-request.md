@@ -14,6 +14,7 @@ Late cost reconciliation is now an identity-bound port from the actual prepared 
 
 Other implemented behavior:
 
+- Bounded persisted request notification source/acknowledgement and independent current-state reader for W7, under genuine current scopes, held recipient authority and registered privacy ownership. Initial creator notifications have a separate durable cause; current creator offers retain actual consumed signature/hash proof. Unsupported pool/slot/public/account-spending events remain unavailable.
 - Account-bound fan web/Swift/Kotlin Access, immutable request disclosures, capacity/spending order, immediate limit lowers and 24-hour delayed raises.
 - Explicit SDK-backed Stripe catalog/Billing/card-cash/refund/Connect/current-money and Apple/Play verification. Provider truth and approved products/economics are required for access or cash movement.
 - Exact AI-provenance Approval, edit invalidation, immutable creator/key authority and atomic W3 message/frame/delivery linkage. Approval, signed paid acceptance and actual promised-mode fulfillment remain distinct.
