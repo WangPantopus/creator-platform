@@ -3,25 +3,69 @@ import type {
   UploadTicket,
 } from "../../../../packages/api/src/media";
 
+export class MediaRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+  }
+}
+
+type MediaIdentity = {
+  accountId: string;
+  signal: AbortSignal;
+  end: () => void;
+};
+let identity: MediaIdentity | undefined;
+/** W1 attaches the current account boundary before mounting private media. */
+export function configureMediaRequests(current: MediaIdentity) {
+  identity = current;
+  return () => {
+    if (identity === current) identity = undefined;
+  };
+}
+
 export async function mediaRequest<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
+  const current = identity;
+  const headers = new Headers(init.headers);
+  if (!headers.has("Content-Type"))
+    headers.set("Content-Type", "application/json");
+  if (current) headers.set("X-Qelvora-Expected-Account", current.accountId);
+  const signal = current
+    ? AbortSignal.any([current.signal, ...(init.signal ? [init.signal] : [])])
+    : init.signal;
+  signal?.throwIfAborted();
   const response = await fetch(`/api/w6/${path}`, {
     ...init,
     credentials: "same-origin",
     cache: "no-store",
-    headers: { "Content-Type": "application/json", ...init.headers },
+    headers,
+    signal,
   });
+  signal?.throwIfAborted();
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
-    throw new Error(
+    if (
+      response.status === 409 &&
+      error?.error?.code === "session_account_changed"
+    )
+      current?.end();
+    throw new MediaRequestError(
       error?.error?.message ?? "Media is unavailable. Try again.",
+      response.status,
+      error?.error?.code,
     );
   }
-  return response.json() as Promise<T>;
+  const result = (await response.json()) as T;
+  signal?.throwIfAborted();
+  return result;
 }
 export async function uploadRecording(input: {
   creatorId: string;

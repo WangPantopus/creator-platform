@@ -644,6 +644,22 @@ public enum APIMediaMediaState: String, Codable, Sendable {
   case `deleted` = "deleted"
 }
 
+public struct APIMediaPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
+}
+
 public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
   public let `assetId`: String
   public let `version`: Int
@@ -1835,6 +1851,49 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
   case `interrupted` = "interrupted"
 }
 
+public struct APIConversationConversationRecordingInput: Codable, Sendable {
+  public let `evidence`: APIConversationConversationRecordingInputEvidence
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(evidence: APIConversationConversationRecordingInputEvidence, signedActId: String, idempotencyKey: String) {
+    self.evidence = evidence
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIConversationConversationRecordingInputEvidence: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `mimeType`: APIConversationConversationRecordingInputEvidenceMimeType
+  public let `durationMs`: Int
+  public let `bytes`: Int
+  public init(assetId: String, version: Int, sha256: String, mimeType: APIConversationConversationRecordingInputEvidenceMimeType, durationMs: Int, bytes: Int) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.mimeType = mimeType
+    self.durationMs = durationMs
+    self.bytes = bytes
+  }
+}
+
+public enum APIConversationConversationRecordingInputEvidenceMimeType: String, Codable, Sendable {
+  case `audio_mp4` = "audio/mp4"
+}
+
+public struct APIConversationConversationRecordingResult: Codable, Sendable {
+  public let `messageId`: String
+  public let `threadId`: String
+  public let `signedActId`: String
+  public init(messageId: String, threadId: String, signedActId: String) {
+    self.messageId = messageId
+    self.threadId = threadId
+    self.signedActId = signedActId
+  }
+}
+
 public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
 
 public actor CreatorAPIClient {
@@ -1948,6 +2007,9 @@ public actor CreatorAPIClient {
   }
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
+    try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
 }
 

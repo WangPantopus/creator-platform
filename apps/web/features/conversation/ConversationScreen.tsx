@@ -25,6 +25,7 @@ import type {
 } from "../../../../packages/api/src/conversation/contracts";
 import { useConversationRequest, ConversationError } from "./api";
 import { formatCopy } from "@qelvora/copy";
+import { VoicePlayer } from "../media/VoicePlayer";
 import "./conversation.css";
 
 type Pending = {
@@ -735,6 +736,29 @@ export function ConversationScreen({
                 )}
               </div>
             )}
+            {message.recording &&
+              (message.recording.state === "available" &&
+              message.threadId === page.threadId &&
+              message.recording.asset.threadId === page.threadId &&
+              message.recording.asset.state === "ready" &&
+              message.recording.asset.mimeType === "audio/mp4" &&
+              message.recording.asset.purpose === "human_reply" &&
+              message.authorKind === "human_creator" &&
+              message.signedActId != null &&
+              message.recording.asset.signedActId === message.signedActId ? (
+                <VoicePlayer
+                  asset={message.recording.asset}
+                  creatorId={creatorId}
+                  fanId={fanId}
+                  creatorName={page.creatorName}
+                  time={message.createdAt}
+                  expectedAccountId={accountId}
+                />
+              ) : (
+                <p className="qv-help" role="status">
+                  This recording is unavailable for this conversation.
+                </p>
+              ))}
             {message.authorKind === "fan" &&
               (message.offTheRecord ? (
                 <span className="qv-help">Not used for memory</span>

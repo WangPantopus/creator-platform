@@ -488,6 +488,19 @@ enum class APIMediaMediaState {
 }
 
 @Serializable
+data class APIMediaPlaybackFile(
+  val `variant`: APIMediaPlaybackFileVariant,
+  val `sha256`: String,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIMediaPlaybackFileVariant {
+  @SerialName("processed") PROCESSED,
+  @SerialName("credentialed") CREDENTIALED
+}
+
+@Serializable
 data class APIMediaProcessedMediaEvidence(
   val `assetId`: String,
   val `version`: Long,
@@ -1411,6 +1424,35 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
   @SerialName("interrupted") INTERRUPTED
 }
 
+@Serializable
+data class APIConversationConversationRecordingInput(
+  val `evidence`: APIConversationConversationRecordingInputEvidence,
+  val `signedActId`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIConversationConversationRecordingInputEvidence(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `mimeType`: APIConversationConversationRecordingInputEvidenceMimeType,
+  val `durationMs`: Long,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIConversationConversationRecordingInputEvidenceMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4
+}
+
+@Serializable
+data class APIConversationConversationRecordingResult(
+  val `messageId`: String,
+  val `threadId`: String,
+  val `signedActId`: String
+)
+
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 
 class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
@@ -1461,6 +1503,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
 }
 
 object ApplicationDestination {

@@ -143,6 +143,17 @@ export const ConversationRecordingViewSchema = z.discriminatedUnion("state", [
   }),
   z.strictObject({ state: z.literal("unavailable") }),
 ]);
+export const ConversationRecordingResultSchema = z.strictObject({
+  messageId: IdSchema,
+  threadId: IdSchema,
+  signedActId: IdSchema,
+});
+export type ConversationRecordingInput = z.infer<
+  typeof ConversationRecordingInputSchema
+>;
+export type ConversationRecordingResult = z.infer<
+  typeof ConversationRecordingResultSchema
+>;
 export const ConversationMessageSchema = MessageSchema.extend({
   citations: z.array(IdSchema),
   createdAt: z.string(),

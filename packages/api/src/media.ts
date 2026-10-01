@@ -76,10 +76,18 @@ export type UploadTicket = {
   expiresAt: string;
   chunkBytes: number;
 };
+/** Bytes actually served. Credentials may change the file without changing the signed processed tuple. */
+export const PlaybackFileSchema = z.strictObject({
+  variant: z.enum(["processed", "credentialed"]),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+  bytes: z.number().int().positive().max(268_435_456),
+});
+export type PlaybackFile = z.infer<typeof PlaybackFileSchema>;
 export type PlaybackTicket = {
   url: string;
   expiresAt: string;
   asset: MediaAsset;
+  playbackFile: PlaybackFile;
 };
 
 /** Exact immutable processed bytes reviewed by the creator before W1 signs the publication. */

@@ -1,8 +1,17 @@
-import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import {
+  createHash,
+  createHmac,
+  randomUUID,
+  timingSafeEqual,
+} from "node:crypto";
 import { mkdir, open, readFile, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
+import {
+  PlaybackFileSchema,
+  type PlaybackFile,
+} from "../../../../../packages/api/src/media.js";
 
 const TicketSchema = z.strictObject({
   assetId: z.uuid(),
@@ -13,6 +22,7 @@ const TicketSchema = z.strictObject({
   version: z.number().int().positive(),
   expires: z.number().int(),
   nonce: z.uuid(),
+  playbackFile: PlaybackFileSchema.optional(),
 });
 type Ticket = z.infer<typeof TicketSchema>;
 export class MediaTickets {
@@ -97,6 +107,7 @@ export class MediaTickets {
       value.accountId !== accountId ||
       value.assetId !== assetId ||
       value.operation !== operation ||
+      (operation === "play" && !value.playbackFile) ||
       value.expires <= Math.floor(Date.now() / 1000)
     )
       throw new DomainError(
@@ -134,7 +145,18 @@ export class PrivateMediaStorage {
     try {
       // Rewriting at the committed offset recovers a crash between fsync and DB commit.
       await handle.truncate(offset);
-      await handle.write(bytes, 0, bytes.length, offset);
+      let written = 0;
+      while (written < bytes.length) {
+        const result = await handle.write(
+          bytes,
+          written,
+          bytes.length - written,
+          offset + written,
+        );
+        if (!result.bytesWritten)
+          throw new Error("media_storage_write_incomplete");
+        written += result.bytesWritten;
+      }
       await handle.sync();
     } finally {
       await handle.close();
@@ -153,6 +175,45 @@ export class PrivateMediaStorage {
   }
   async size(assetId: string, kind: "input" | "output" = "output") {
     return (await stat(this.file(assetId, kind))).size;
+  }
+  /** Validate bounded actual bytes and keep the same descriptor for the response.
+   * Atomic credential writes cannot switch an already verified preview or range. */
+  async openPlayback(assetId: string, expected: PlaybackFile) {
+    const proof = PlaybackFileSchema.parse(expected);
+    const file = this.file(
+      assetId,
+      proof.variant === "processed" ? "processed" : "output",
+    );
+    const handle = await open(file, "r");
+    try {
+      const before = await handle.stat();
+      if (!before.isFile() || before.size !== proof.bytes)
+        throw new Error("media_file_changed");
+      const hash = createHash("sha256");
+      let bytes = 0;
+      for await (const chunk of handle.createReadStream({
+        start: 0,
+        autoClose: false,
+        signal: AbortSignal.timeout(5000),
+      })) {
+        bytes += chunk.length;
+        if (bytes > proof.bytes) throw new Error("media_file_changed");
+        hash.update(chunk);
+      }
+      const after = await handle.stat();
+      if (
+        bytes !== proof.bytes ||
+        hash.digest("hex") !== proof.sha256 ||
+        after.size !== before.size ||
+        after.mtimeMs !== before.mtimeMs ||
+        after.ctimeMs !== before.ctimeMs
+      )
+        throw new Error("media_file_changed");
+      return { file, size: proof.bytes, handle };
+    } catch (error) {
+      await handle.close();
+      throw error;
+    }
   }
   async put(
     assetId: string,

@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
+import {
+  ConversationRecordingInputSchema,
+  ConversationRecordingResultSchema,
+} from "./conversation/contracts.ts";
+const recordingSchemas = {
+  ConversationConversationRecordingInput: ConversationRecordingInputSchema,
+  ConversationConversationRecordingResult: ConversationRecordingResultSchema,
+};
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const json = (name: string) => ({ "application/json": { schema: ref(name) } });
@@ -209,6 +217,14 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      "/v1/conversations/{creatorId}/{fanId}/recordings": {
+        parameters: pair,
+        post: operation(
+          "deliverConversationRecording",
+          "ConversationConversationRecordingResult",
+          "ConversationConversationRecordingInput",
+        ),
+      },
     },
     components: {
       securitySchemes: {
@@ -220,10 +236,12 @@ export function createOpenApi() {
         },
       },
       schemas: Object.fromEntries(
-        Object.entries(publicSchemas).map(([name, schema]) => [
-          name,
-          z.toJSONSchema(schema, { target: "draft-2020-12" }),
-        ]),
+        Object.entries({ ...publicSchemas, ...recordingSchemas }).map(
+          ([name, schema]) => [
+            name,
+            z.toJSONSchema(schema, { target: "draft-2020-12" }),
+          ],
+        ),
       ),
     },
   };
