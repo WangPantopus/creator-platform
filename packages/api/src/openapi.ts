@@ -230,6 +230,14 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      "/v1/conversations/{creatorId}/{fanId}/recordings": {
+        parameters: pair,
+        post: operation(
+          "deliverConversationRecording",
+          "ConversationConversationRecordingResult",
+          "ConversationConversationRecordingInput",
+        ),
+      },
       ...mediaPaths,
     },
     components: {

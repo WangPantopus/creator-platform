@@ -26,6 +26,7 @@ import type { ConversationWellbeing } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationCorrections } from "./corrections.js";
+import type { ConversationRecordings } from "./recordings.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -45,6 +46,7 @@ export class ConversationFeature {
     readonly firstConversation?: Pick<CommerceService, "openTrial">,
     readonly lineage?: ConversationLineage,
     readonly corrections?: ConversationCorrections,
+    readonly recordings?: ConversationRecordings,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -59,6 +61,7 @@ export class ConversationFeature {
         this.generationAvailable &&
         Boolean(this.policy?.verified),
       correctionsAvailable: Boolean(this.corrections),
+      recordingDeliveryAvailable: Boolean(this.recordings),
       accessDisclosure,
     };
   }
@@ -541,6 +544,21 @@ export function conversationFeature(
             IdSchema.parse(req.params.creatorId),
             IdSchema.parse(req.params.fanId),
             IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/recordings", async (req, res) => {
+        invariant(
+          feature.recordings,
+          "recording_unavailable",
+          "Signed recording delivery is not connected yet.",
+        );
+        res.json(
+          await feature.recordings.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
             req.body,
           ),
         );

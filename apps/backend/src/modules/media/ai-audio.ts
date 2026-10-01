@@ -149,6 +149,8 @@ export class LicensedAudioIngestor {
               spokenLabelVerified: true,
               verificationReference: marked.verificationReference,
               fileSha256: Media.digest(marked.bytes),
+              fileBytes: marked.bytes.length,
+              fileVariant: "credentialed",
               transformsVerified: [marked.transform],
             }),
           ],

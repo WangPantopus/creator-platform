@@ -4,6 +4,7 @@ import { invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
 import type { ConversationLineage } from "./lineage.js";
+import type { ConversationRecordings } from "./recordings.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 function authorLabel(kind: AuthorKind, name: string, member: string | null) {
@@ -81,6 +82,7 @@ export function conversationPrivacyHook(input: {
   authority: ConversationPrivacyAuthority;
   retention?: ConversationPrivacyRetention;
   lineage?: ConversationLineage;
+  recordings?: ConversationRecordings;
 }): PrivacyHook {
   return {
     domain: "conversation",
@@ -94,6 +96,15 @@ export function conversationPrivacyHook(input: {
         !lineageSchema || input.lineage,
         "conversation_lineage_unavailable",
         "This data request needs the prepared lineage export and deletion adapter.",
+      );
+      input.recordings?.assertPool(input.pool);
+      const recordingSchema = await input.pool.query(
+        "SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('creator.message') AND attname='recording_asset_id' AND NOT attisdropped",
+      );
+      invariant(
+        recordingSchema.rowCount === 0 || input.recordings,
+        "conversation_recordings_unavailable",
+        "This data request needs the prepared recording association adapter.",
       );
       const families = await input.authority.families(job);
       invariant(
@@ -216,6 +227,14 @@ export function conversationPrivacyHook(input: {
               ...(input.lineage
                 ? {
                     lineage: await input.lineage.exportMetadata(client, family),
+                  }
+                : {}),
+              ...(input.recordings
+                ? {
+                    recordings: await input.recordings.exportMetadata(
+                      client,
+                      family,
+                    ),
                   }
                 : {}),
               messages: messages.map((message) => ({

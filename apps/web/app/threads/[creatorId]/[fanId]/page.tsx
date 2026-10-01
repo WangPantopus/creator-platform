@@ -4,6 +4,7 @@ import { IdentitySessionBoundary } from "../../../../features/identity/session-b
 import { currentSession } from "../../../../lib/session";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
 import { ConversationScreen } from "../../../../features/conversation/ConversationScreen";
+import { MediaSession } from "../../../../features/media/session";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function ThreadPage({
@@ -32,11 +33,13 @@ export default async function ThreadPage({
       initial={session}
       returnTo={`/threads/${creatorId}/${fanId}`}
     >
-      <ConversationScreen
-        creatorId={creatorId}
-        fanId={fanId}
-        accountId={session.accountId}
-      />
+      <MediaSession>
+        <ConversationScreen
+          creatorId={creatorId}
+          fanId={fanId}
+          accountId={session.accountId}
+        />
+      </MediaSession>
     </IdentitySessionBoundary>
   );
 }

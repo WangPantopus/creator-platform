@@ -5,6 +5,10 @@ import type { MediaService } from "./service.js";
 import type { SessionService } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
 import {
+  PlaybackFileSchema,
+  type PlaybackFile,
+} from "../../../../../packages/api/src/media.js";
+import {
   validateProviderState,
   validateRecordingDeletion,
 } from "../session/provider.js";
@@ -73,11 +77,13 @@ type ArchiveAsset = {
   /** Expected digest only; partial uploads have no verified whole-file hash. */
   sha256: string | null;
   mimeType: string;
-  storageKind: "input" | "output" | null;
+  storageKind: "input" | "processed" | "output" | null;
   state: string;
   declaredOrProcessedBytes: number;
   uploadedBytes: number;
   processedSha256: string | null;
+  /** Expected file metadata only; the protected archive must verify actual retained bytes. */
+  playbackFile: PlaybackFile | null;
   inspectStorageKinds: readonly [
     "input",
     "processed",
@@ -98,22 +104,34 @@ type AssetRow = {
 };
 const batchSize = 64;
 function archiveAsset(asset: AssetRow): ArchiveAsset {
-  const delivered =
+  const file = PlaybackFileSchema.safeParse(
     asset.provenance?.c2paVerified === true
-      ? typeof asset.provenance.fileSha256 === "string"
-        ? asset.provenance.fileSha256
+      ? asset.provenance.fileVariant === "credentialed"
+        ? {
+            variant: asset.provenance.fileVariant,
+            sha256: asset.provenance.fileSha256,
+            bytes: asset.provenance.fileBytes,
+          }
         : null
-      : asset.output_sha256;
+      : {
+          variant: "processed",
+          sha256: asset.output_sha256,
+          bytes: Number(asset.bytes),
+        },
+  );
+  const playbackFile = file.success ? file.data : null;
   return {
     id: asset.id,
     sha256: asset.output_sha256
-      ? delivered
+      ? (playbackFile?.sha256 ?? null)
       : Number(asset.uploaded_bytes) === Number(asset.bytes)
         ? asset.input_sha256
         : null,
     mimeType: asset.mime_type,
     storageKind: asset.output_sha256
-      ? "output"
+      ? playbackFile?.variant === "processed"
+        ? "processed"
+        : "output"
       : Number(asset.uploaded_bytes) > 0
         ? "input"
         : null,
@@ -121,6 +139,7 @@ function archiveAsset(asset: AssetRow): ArchiveAsset {
     declaredOrProcessedBytes: Number(asset.bytes),
     uploadedBytes: Number(asset.uploaded_bytes),
     processedSha256: asset.output_sha256,
+    playbackFile,
     // The protected adapter must inspect/archive every actual retained variant;
     // state and expected digest never assert that a deleted/rejected file exists.
     inspectStorageKinds: [

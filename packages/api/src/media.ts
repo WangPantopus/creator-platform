@@ -76,10 +76,18 @@ export type UploadTicket = {
   expiresAt: string;
   chunkBytes: number;
 };
+/** Bytes actually served. Credentials may change the file without changing the signed processed tuple. */
+export const PlaybackFileSchema = z.strictObject({
+  variant: z.enum(["processed", "credentialed"]),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+  bytes: z.number().int().positive().max(268_435_456),
+});
+export type PlaybackFile = z.infer<typeof PlaybackFileSchema>;
 export type PlaybackTicket = {
   url: string;
   expiresAt: string;
   asset: MediaAsset;
+  playbackFile: PlaybackFile;
 };
 
 /** Creator-owned objects use real W5 content/W2 source or interview IDs, never a fabricated fan thread. */
@@ -120,7 +128,9 @@ export const CreatorMediaUploadTicketSchema = z.strictObject({
   chunkBytes: z.number().int().positive().max(1048576),
 });
 export const CreatorMediaPlaybackTicketSchema =
-  CreatorMediaUploadTicketSchema.omit({ chunkBytes: true });
+  CreatorMediaUploadTicketSchema.omit({ chunkBytes: true }).extend({
+    playbackFile: PlaybackFileSchema,
+  });
 export const MediaRevocationSchema = z.strictObject({
   state: z.literal("revoked"),
   deletion: z.literal("pending"),

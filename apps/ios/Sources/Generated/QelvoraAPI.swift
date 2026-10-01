@@ -617,10 +617,12 @@ public struct APIMediaCreatorMediaPlaybackTicket: Codable, Sendable {
   public let `asset`: APIMediaCreatorMediaPlaybackTicketAsset
   public let `url`: String
   public let `expiresAt`: String
-  public init(asset: APIMediaCreatorMediaPlaybackTicketAsset, url: String, expiresAt: String) {
+  public let `playbackFile`: APIMediaCreatorMediaPlaybackTicketPlaybackFile
+  public init(asset: APIMediaCreatorMediaPlaybackTicketAsset, url: String, expiresAt: String, playbackFile: APIMediaCreatorMediaPlaybackTicketPlaybackFile) {
     self.asset = asset
     self.url = url
     self.expiresAt = expiresAt
+    self.playbackFile = playbackFile
   }
 }
 
@@ -679,6 +681,22 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetState: String, Codable, Senda
   case `rejected` = "rejected"
   case `revoked` = "revoked"
   case `deleted` = "deleted"
+}
+
+public struct APIMediaCreatorMediaPlaybackTicketPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaCreatorMediaPlaybackTicketPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
 }
 
 public struct APIMediaCreatorMediaPolicyView: Codable, Sendable {
@@ -921,6 +939,22 @@ public enum APIMediaMediaState: String, Codable, Sendable {
   case `rejected` = "rejected"
   case `revoked` = "revoked"
   case `deleted` = "deleted"
+}
+
+public struct APIMediaPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
 }
 
 public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
@@ -2389,8 +2423,9 @@ public struct APIConversationConversationMessage: Codable, Sendable {
   public let `version`: Int
   public let `agentVersion`: APIConversationConversationMessageAgentVersion?
   public let `feedback`: APIConversationConversationMessageFeedback?
+  public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationMessageCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationMessageAgentVersion? = nil, feedback: APIConversationConversationMessageFeedback? = nil, correction: APIConversationConversationMessageCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationMessageAgentVersion? = nil, feedback: APIConversationConversationMessageFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationMessageCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2407,6 +2442,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.version = version
     self.agentVersion = agentVersion
     self.feedback = feedback
+    self.recording = recording
     self.correction = correction
   }
 }
@@ -2520,8 +2556,9 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
   public let `version`: Int
   public let `agentVersion`: APIConversationConversationPageMessagesItemAgentVersion?
   public let `feedback`: APIConversationConversationPageMessagesItemFeedback?
+  public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationPageMessagesItemCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationPageMessagesItemFeedback? = nil, correction: APIConversationConversationPageMessagesItemCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationPageMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2538,6 +2575,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.version = version
     self.agentVersion = agentVersion
     self.feedback = feedback
+    self.recording = recording
     self.correction = correction
   }
 }
@@ -2594,6 +2632,85 @@ public struct APIConversationConversationPageFeedbackPolicy: Codable, Sendable {
   }
 }
 
+public struct APIConversationConversationRecordingCommand: Codable, Sendable {
+  public let `actType`: APIConversationConversationRecordingCommandActType
+  public let `subjectId`: String
+  public let `content`: APIConversationConversationRecordingCommandContent
+  public init(actType: APIConversationConversationRecordingCommandActType, subjectId: String, content: APIConversationConversationRecordingCommandContent) {
+    self.actType = actType
+    self.subjectId = subjectId
+    self.content = content
+  }
+}
+
+public enum APIConversationConversationRecordingCommandActType: String, Codable, Sendable {
+  case `reply` = "reply"
+}
+
+public struct APIConversationConversationRecordingCommandContent: Codable, Sendable {
+  public let `mediaAssetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `mimeType`: APIConversationConversationRecordingCommandContentMimeType
+  public let `durationMs`: Int
+  public let `bytes`: Int
+  public init(mediaAssetId: String, version: Int, sha256: String, mimeType: APIConversationConversationRecordingCommandContentMimeType, durationMs: Int, bytes: Int) {
+    self.mediaAssetId = mediaAssetId
+    self.version = version
+    self.sha256 = sha256
+    self.mimeType = mimeType
+    self.durationMs = durationMs
+    self.bytes = bytes
+  }
+}
+
+public enum APIConversationConversationRecordingCommandContentMimeType: String, Codable, Sendable {
+  case `audio_mp4` = "audio/mp4"
+}
+
+public struct APIConversationConversationRecordingInput: Codable, Sendable {
+  public let `evidence`: APIConversationConversationRecordingInputEvidence
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(evidence: APIConversationConversationRecordingInputEvidence, signedActId: String, idempotencyKey: String) {
+    self.evidence = evidence
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIConversationConversationRecordingInputEvidence: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `mimeType`: APIConversationConversationRecordingInputEvidenceMimeType
+  public let `durationMs`: Int
+  public let `bytes`: Int
+  public init(assetId: String, version: Int, sha256: String, mimeType: APIConversationConversationRecordingInputEvidenceMimeType, durationMs: Int, bytes: Int) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.mimeType = mimeType
+    self.durationMs = durationMs
+    self.bytes = bytes
+  }
+}
+
+public enum APIConversationConversationRecordingInputEvidenceMimeType: String, Codable, Sendable {
+  case `audio_mp4` = "audio/mp4"
+}
+
+public struct APIConversationConversationRecordingResult: Codable, Sendable {
+  public let `messageId`: String
+  public let `threadId`: String
+  public let `signedActId`: String
+  public init(messageId: String, threadId: String, signedActId: String) {
+    self.messageId = messageId
+    self.threadId = threadId
+    self.signedActId = signedActId
+  }
+}
+
 public struct APIConversationConversationTimeline: Codable, Sendable {
   public let `threadId`: String
   public let `creatorId`: String
@@ -2640,8 +2757,9 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
   public let `version`: Int
   public let `agentVersion`: APIConversationConversationTimelineMessagesItemAgentVersion?
   public let `feedback`: APIConversationConversationTimelineMessagesItemFeedback?
+  public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationTimelineMessagesItemCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationTimelineMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationTimelineMessagesItemAgentVersion? = nil, feedback: APIConversationConversationTimelineMessagesItemFeedback? = nil, correction: APIConversationConversationTimelineMessagesItemCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationTimelineMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationTimelineMessagesItemAgentVersion? = nil, feedback: APIConversationConversationTimelineMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationTimelineMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2658,6 +2776,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     self.version = version
     self.agentVersion = agentVersion
     self.feedback = feedback
+    self.recording = recording
     self.correction = correction
   }
 }
@@ -3682,17 +3801,20 @@ public actor CreatorAPIClient {
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
+  public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
+    try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
   public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
     try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])
   }
-  public func readAudienceCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
-    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true)
+  public func readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func audienceCreatorMediaPlayback(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaPlaybackTicket {
-    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/playback", method: "POST", authenticated: true)
+  public func audienceCreatorMediaPlayback(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaCreatorMediaPlaybackTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/playback", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil) async throws -> CreatorAPIBinaryResponse {
-    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Range": range].compactMapValues { $0 })
+  public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil, xQelvoraExpectedAccount: String? = nil, expectedAccountId: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket), URLQueryItem(name: "expectedAccountId", value: expectedAccountId)], headers: ["Range": range, "x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
     try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)

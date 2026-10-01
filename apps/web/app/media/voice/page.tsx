@@ -24,6 +24,18 @@ export default async function VoicePage({
     (objectId !== undefined && !IdSchema.safeParse(objectId).success)
   )
     notFound();
+  if (
+    (creatorId !== undefined || objectId !== undefined) &&
+    (creatorId === undefined || objectId === undefined)
+  )
+    return (
+      <main className="qv">
+        <Notice title="This recording link is incomplete">
+          Open a saved Note in your Studio to choose where the recording
+          belongs. <Link href="/studio/workspace">Choose a Note</Link>
+        </Notice>
+      </main>
+    );
   const returnTo =
     typeof creatorId === "string" && typeof objectId === "string"
       ? `/media/voice?creatorId=${creatorId}&objectId=${objectId}`

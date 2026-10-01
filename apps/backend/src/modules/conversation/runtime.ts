@@ -16,6 +16,7 @@ import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationCorrections } from "./corrections.js";
+import type { ConversationRecordings } from "./recordings.js";
 import { invariant } from "../../core/errors.js";
 
 export function createConversationRuntime(input: {
@@ -32,6 +33,7 @@ export function createConversationRuntime(input: {
   /** Prepared only from registered schema bytes and current owner policies. */
   lineage?: ConversationLineage;
   corrections?: ConversationCorrections;
+  recordings?: ConversationRecordings;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -45,6 +47,15 @@ export function createConversationRuntime(input: {
     "correction_lineage_unavailable",
     "Signed corrections require the prepared original-message lineage projection.",
   );
+  invariant(
+    !input.recordings || input.lineage,
+    "recording_lineage_unavailable",
+    "Recordings require their actual prepared message lineage projection.",
+  );
+  if (input.recordings) {
+    input.recordings.assertRuntime(input.database, input.access);
+    input.lineage!.configureRecordings(input.recordings);
+  }
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
@@ -86,6 +97,7 @@ export function createConversationRuntime(input: {
     input.firstConversation,
     input.lineage,
     input.corrections,
+    input.recordings,
   );
   return {
     feature,
@@ -93,9 +105,10 @@ export function createConversationRuntime(input: {
     memory,
     wellbeing,
     processor,
-    signedSubjectPolicies: input.corrections
-      ? [input.corrections.signedSubjectPolicy()]
-      : [],
+    signedSubjectPolicies: [
+      ...(input.corrections ? [input.corrections.signedSubjectPolicy()] : []),
+      ...(input.recordings ? [input.recordings.signedSubjectPolicy()] : []),
+    ],
     close: () => processor?.close(),
   };
 }

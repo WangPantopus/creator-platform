@@ -31,6 +31,8 @@ const binary = {
 };
 const playback = (operationId: string) => ({
   operationId,
+  description:
+    "Serve the exact playbackFile variant, SHA-256 and byte count pinned by the current playback ticket. This file can differ from the immutable processed signing tuple.",
   security: [{ PantopusSession: [] }],
   parameters: [
     {
@@ -54,6 +56,22 @@ const playback = (operationId: string) => ({
   },
 });
 const owner = [path("creatorId"), path("assetId")];
+const expectedAccountHeader = {
+  in: "header",
+  name: "x-qelvora-expected-account",
+  required: false,
+  description:
+    "Pin to the original account. Must match the actual current session; never grants authority.",
+  schema: { type: "string", format: "uuid" },
+};
+const expectedAccountQuery = {
+  in: "query",
+  name: "expectedAccountId",
+  required: false,
+  description:
+    "Account pin for media elements. Must match the actual session and any account header.",
+  schema: { type: "string", format: "uuid" },
+};
 const fan = [path("creatorId"), path("fanId"), path("assetId")];
 const creator = "/v1/w6/creators/{creatorId}/media";
 const thread = "/v1/w6/threads/{creatorId}/{fanId}/creator-media";
@@ -83,11 +101,11 @@ export const mediaPaths = {
     },
   },
   [`${audience}/{assetId}`]: {
-    parameters: owner,
+    parameters: [...owner, expectedAccountHeader],
     get: operation("readAudienceCreatorMedia", "MediaCreatorMediaAsset"),
   },
   [`${audience}/{assetId}/playback`]: {
-    parameters: owner,
+    parameters: [...owner, expectedAccountHeader],
     post: operation(
       "audienceCreatorMediaPlayback",
       "MediaCreatorMediaPlaybackTicket",
@@ -95,7 +113,14 @@ export const mediaPaths = {
   },
   [`${audience}/{assetId}/play`]: {
     parameters: owner,
-    get: playback("playAudienceCreatorMedia"),
+    get: {
+      ...playback("playAudienceCreatorMedia"),
+      parameters: [
+        ...playback("playAudienceCreatorMedia").parameters,
+        expectedAccountHeader,
+        expectedAccountQuery,
+      ],
+    },
   },
   "/v1/w6/creators/{creatorId}/call-availability": {
     parameters: [path("creatorId")],

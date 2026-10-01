@@ -109,6 +109,7 @@ export class CreatorMediaWorker {
         if (
           !claimed.signed_act_id ||
           !claimed.output_sha256 ||
+          processed.length !== Number(claimed.bytes) ||
           MediaService.digest(processed) !== claimed.output_sha256
         )
           throw new Error("processed_media_integrity_invalid");
@@ -148,6 +149,8 @@ export class CreatorMediaWorker {
         const provenance = JSON.stringify({
           ...manifest,
           fileSha256: MediaService.digest(signed.bytes),
+          fileBytes: signed.bytes.length,
+          fileVariant: "credentialed",
         });
         await update(
           "UPDATE creator.creator_media_asset SET provenance=$3,manifest_pending=false,job_lease_until=NULL,job_token=NULL,failure_code=NULL WHERE id=$1 AND creator_id=$2",

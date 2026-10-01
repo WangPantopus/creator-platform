@@ -7,6 +7,7 @@ import type {
   CreatorMediaAsset,
   CreatorMediaPlaybackTicket,
 } from "../../../../packages/api/src/media";
+import { PlaybackFileSchema } from "../../../../packages/api/src/media";
 import { mediaRequest } from "./api";
 import "./media.css";
 
@@ -18,12 +19,14 @@ type VoicePlayerProps = {
   transcript?: string;
   /** W3/W5 supply the persisted publication time; the player never invents it. */
   time?: string;
+  /** Current account is a mismatch precondition; the server supplies authority. */
+  expectedAccountId?: string;
 };
 export function VoicePlayer(props: VoicePlayerProps) {
   const family = `threads/${props.creatorId}/${props.fanId}/media`;
   return (
     <Player
-      key={`${family}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      key={`${props.expectedAccountId ?? ""}/${family}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
       {...props}
       family={family}
     />
@@ -59,7 +62,7 @@ export function CreatorVoicePlayer(
     );
   return (
     <Player
-      key={`${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
+      key={`${props.expectedAccountId ?? ""}/${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
       {...props}
       family={family}
     />
@@ -71,14 +74,17 @@ function Player({
   transcript,
   time,
   family,
+  expectedAccountId,
 }: {
   asset: MediaAsset | CreatorMediaAsset;
   creatorName: string;
   transcript?: string;
   time?: string;
   family: string;
+  expectedAccountId?: string;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
+  const surface = useRef<HTMLElement | null>(null);
   const loadRequest = useRef<AbortController | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +118,30 @@ function Player({
   useEffect(() => {
     if (!src) return;
     const element = audio.current;
+    const visibility = () => {
+      let hidden = document.hidden;
+      for (let node = surface.current; node; node = node.parentElement) {
+        if (
+          node.hidden ||
+          node.inert ||
+          node.getAttribute("aria-hidden") === "true" ||
+          (node instanceof HTMLDialogElement && !node.open)
+        ) {
+          hidden = true;
+          break;
+        }
+      }
+      if (hidden) element?.pause();
+    };
+    const observer = new MutationObserver(visibility);
+    for (let node = surface.current; node; node = node.parentElement) {
+      observer.observe(node, {
+        attributes: true,
+        attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
+      });
+    }
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
     const abort = new AbortController();
     let checking = false;
     const timer = setInterval(() => {
@@ -119,7 +149,12 @@ function Player({
       checking = true;
       void mediaRequest<MediaAsset | CreatorMediaAsset>(
         `${family}/${asset.id}`,
-        { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]) },
+        {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(1000)]),
+          ...(expectedAccountId
+            ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+            : {}),
+        },
       )
         .then((current) => {
           if (
@@ -148,11 +183,13 @@ function Player({
     return () => {
       abort.abort();
       clearInterval(timer);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
       element?.pause();
       element?.removeAttribute("src");
       element?.load();
     };
-  }, [src, family, asset.id, asset.version, asset.sha256]);
+  }, [src, family, asset.id, asset.version, asset.sha256, expectedAccountId]);
   async function load() {
     if (loadRequest.current) return;
     const abort = new AbortController();
@@ -165,20 +202,41 @@ function Player({
         method: "POST",
         body: "{}",
         signal: abort.signal,
+        ...(expectedAccountId
+          ? { headers: { "x-qelvora-expected-account": expectedAccountId } }
+          : {}),
       });
       const url = new URL(ticket.url);
+      const proof = PlaybackFileSchema.parse(ticket.playbackFile);
       // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.
       const path = `${family}/${asset.id}/play`;
       if (
         url.pathname !== `/v1/w6/${path}` ||
         ticket.asset.id !== asset.id ||
         ticket.asset.version !== asset.version ||
-        ticket.asset.sha256 !== asset.sha256
+        ticket.asset.sha256 !== asset.sha256 ||
+        ticket.asset.bytes !== asset.bytes ||
+        ticket.asset.mimeType !== asset.mimeType ||
+        ticket.asset.durationMs !== asset.durationMs ||
+        !Number.isFinite(Date.parse(ticket.expiresAt)) ||
+        Date.parse(ticket.expiresAt) <= Date.now() ||
+        (proof.variant === "processed"
+          ? proof.sha256 !== ticket.asset.sha256 ||
+            proof.bytes !== ticket.asset.bytes ||
+            ticket.asset.provenance?.c2paVerified === true
+          : ticket.asset.provenance?.c2paVerified !== true ||
+            ticket.asset.provenance.fileVariant !== "credentialed" ||
+            ticket.asset.provenance.fileSha256 !== proof.sha256 ||
+            ticket.asset.provenance.fileBytes !== proof.bytes) ||
+        !url.searchParams.has("ticket") ||
+        [...url.searchParams.keys()].some((name) => name !== "ticket")
       )
         throw new Error("The playback link is unavailable for this recording.");
       if (abort.signal.aborted) return;
       audio.current?.pause();
       setPlaying(false);
+      if (expectedAccountId)
+        url.searchParams.set("expectedAccountId", expectedAccountId);
       setSrc(`/api/w6/${path}${url.search}`);
       setPosition(0);
       setError(null);
@@ -209,6 +267,7 @@ function Player({
   }
   return (
     <article
+      ref={surface}
       className="qv w6-voice-player"
       aria-label={
         ai ? `${creatorName}'s AI voice note` : `Recorded by ${creatorName}`

@@ -36,6 +36,8 @@ import {
 } from "./identity.ts";
 import {
   ConversationTimelineSchema,
+  ConversationRecordingInputSchema,
+  ConversationRecordingResultSchema,
   type ConversationTimeline,
 } from "./conversation/contracts.ts";
 
@@ -220,6 +222,17 @@ export class CreatorApiClient {
       `${this.thread(creatorId, fanId)}/human-replies`,
       MessageSchema,
       HumanReplySchema.parse(body),
+    );
+  }
+  deliverConversationRecording(
+    creatorId: string,
+    fanId: string,
+    body: z.input<typeof ConversationRecordingInputSchema>,
+  ) {
+    return this.request(
+      `/v1/conversations/${encodeURIComponent(creatorId)}/${encodeURIComponent(fanId)}/recordings`,
+      ConversationRecordingResultSchema,
+      ConversationRecordingInputSchema.parse(body),
     );
   }
   private thread(creatorId: string, fanId: string): string {
