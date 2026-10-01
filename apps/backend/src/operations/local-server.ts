@@ -675,9 +675,21 @@ const stop = async () => {
     for (const connection of sockets.clients) connection.terminate();
   }, 5000);
   drain.unref();
-  await worker.stop();
-  await new Promise<void>((resolve) => server.close(() => resolve()));
-  await new Promise<void>((resolve) => sockets.close(() => resolve()));
+  const elapsed = () => Number((performance.now() - started).toFixed(2));
+  const stages = { httpMs: 0, socketsMs: 0, workerMs: 0, poolsMs: 0 };
+  // Stop intake before waiting for the current fenced worker task. Otherwise
+  // polling clients can keep obtaining tickets while shutdown is already active.
+  await Promise.all([
+    new Promise<void>((resolve) => server.close(() => resolve())).then(() => {
+      stages.httpMs = elapsed();
+    }),
+    new Promise<void>((resolve) => sockets.close(() => resolve())).then(() => {
+      stages.socketsMs = elapsed();
+    }),
+    worker.stop().then(() => {
+      stages.workerMs = elapsed();
+    }),
+  ]);
   clearTimeout(drain);
   telemetry.close();
   await Promise.all([
@@ -686,15 +698,17 @@ const stop = async () => {
     conversationPool.end(),
     ...growthPools.map((current) => current.end()),
   ]);
+  stages.poolsMs = elapsed();
   telemetry.write(
     JSON.stringify({
       timestamp: new Date().toISOString(),
       event: "trust_local_shutdown_completed",
       environment: telemetry.environment,
       release: telemetry.release,
-      durationMs: Number((performance.now() - started).toFixed(2)),
+      durationMs: elapsed(),
       activeSockets: sockets.clients.size,
       forcedSockets,
+      stages,
     }),
   );
 };

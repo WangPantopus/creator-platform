@@ -4,9 +4,9 @@
   "sourceParent": "8e3ae716c4f2c735fd450d0754a13398dd13e559",
   "source": {
     "path": "apps/backend/src/operations/local-server.ts",
-    "sha256": "d1c165d49234b04727601674073804e730beacac30c1a72337e67ff7e1612e5f"
+    "sha256": "b1520dcf42abb11f0c387aa1e9cc7ae480a55c54bf2706a6396755cc9f9cb258"
   },
-  "change": "Fixed aggregate shutdown start/completion records and forced-socket counter around the existing 1001 close/five-second drain; no socket authorization or timing policy change.",
+  "change": "Begin server/socket close before awaiting the current fenced worker so shutdown stops new HTTP/ticket intake; preserve five-second socket termination and worker lease completion. Fixed aggregate shutdown stage timings distinguish HTTP/socket/worker/pool delay.",
   "fields": [
     "timestamp",
     "event",
@@ -14,7 +14,8 @@
     "release",
     "activeSockets",
     "durationMs",
-    "forcedSockets"
+    "forcedSockets",
+    "stages"
   ],
   "verification": {
     "backendBuild": "pass",
@@ -23,10 +24,13 @@
     "newTestsWritten": false,
     "existingTestsChanged": false
   },
-  "acceptance": "Actual process drain/reconnect pending; compilation is not launched-app acceptance.",
+  "acceptance": "First actual restart retained history but observed24.7418-second drain/four late tickets; corrected-source launched-app repeat remains pending.",
   "preservation": {
     "sqlRolesRlsGrantsChanged": false,
     "runtimeCredentialsChanged": false,
     "paidCalls": 0
-  }
+  },
+  "continuedAt": "2026-10-01T02:04:53.846939+00:00",
+  "continuationSourceParent": "3746829cee8911f62284576193ad6f157d7178c5",
+  "observedDefectReceipt": "realtime-first-drain.json"
 }

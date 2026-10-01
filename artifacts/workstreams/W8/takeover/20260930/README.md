@@ -1,6 +1,6 @@
 # W8 takeover evidence — 2026-09-30
 
-[Shutdown observability source](realtime-shutdown-source.json) adds fixed aggregate records around the existing local drain. Launched-browser process restart acceptance follows separately; no provider, SLO or native acceptance is inferred from a build.
+[First actual launched-browser drain](realtime-first-drain.json) retained history/reconnected and preserved all40 migrations/cases/jobs, but exposed24.7418-second completion and four post-start tickets. [Shutdown source correction](realtime-shutdown-source.json) begins HTTP/socket close before waiting on the fenced worker and adds fixed stage timings. Corrected-source acceptance follows; no provider, SLO or native acceptance is inferred from a build.
 
 [Read-only repository queue diagnosis](ci-queue-diagnosis.json) distinguishes actual queued checks from source/test failures. Foundation has no serializing concurrency block and its hosted labels are valid; hosted capacity/account cause remains unverified. No run, runner, billing, check or workflow was changed.
 
