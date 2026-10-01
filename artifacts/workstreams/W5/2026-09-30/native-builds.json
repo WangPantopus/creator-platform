@@ -6,7 +6,9 @@
     "device": "iPhone17",
     "uuid": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
     "api": "http://127.0.0.1:4105",
-    "isolatedOutputs": "/private/tmp/creator-w5-ios-derived"
+    "isolatedOutputs": "/private/tmp/creator-w5-ios-derived",
+    "hostNonSnapshotTests": "15 passed",
+    "hostSnapshotVerification": "Local26.5 snapshot comparisons remain different; current2x capture plumbing preserves strict unchanged goldens; remote27 run required"
   },
   "android": {
     "build": "BUILD SUCCESSFUL",
@@ -17,8 +19,10 @@
     "adbServerPort": 5045,
     "explicitTransport": "127.0.0.1:5591",
     "api": "http://10.0.2.2:4105",
-    "apkSha256": "11cf844a8b2a4cae2b6731e79973076e75353e48854bb38238e209e132af11eb",
+    "apkSha256": "a4698671321d3709c62daade37fc078471623f13b39a0cae56963968154d7fea",
     "isolatedOutputs": "/private/tmp/creator-w5-android/app-build",
-    "sdkLicense": "Existing installed SDK/license files copied read-only; no new license accepted."
-  }
+    "sdkLicense": "Existing installed SDK/license files copied read-only; no new license accepted.",
+    "unitAndSnapshotVerification": "PASS; four retained-Step-In composer captures aligned with BUILD_PROMPT section9"
+  },
+  "contractOperations": 78
 }

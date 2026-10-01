@@ -1,0 +1,22 @@
+# PR9 reconciliation and operated acceptance
+
+Final application source: `3caabeb012bc6496df30ea3cb9de13d15a31efd1`, on original branch `codex/w5-studio-content`, reconciled with main `ebb24c7e640d972933ca907a673bb879b8190a56`. The 68 source conflicts are resolved; original W5 and peer evidence are preserved. This directory records acceptance of the current merge increment, not full W5 or production release readiness.
+
+Current main's W1 session/origin/account protections, W3 audited canonical timeline, W4 offer-pending decisions and W8 exact reply-review schema checks remain alongside W5 draft, media, publication-proof, current-role and privacy consumers. Canonical generation retains all 96 operations. The native collection alias repair makes both shipping builds compile. Package.swift, Package.resolved and next-env.d.ts match main.
+
+## Personally operated apps
+
+- Browser on actual persisted API: canonical sign-in; saved draft reload; 390/1280 Light/Night with keyboard focus and no horizontal overflow; real API outage conceals Studio/modal and restores exact input/focus; account replacement clears previous private input; pending-creator reads show unavailable rather than false emptiness; library no-match; unsigned Team publication; private Thanks save/reload and consented creator feed.
+- Shipping Android on retained API35 emulator: sign-in, Team post read, complete keyboard entry and continued focus across refreshes, private save/cold Night reload, explicit text/handle sharing reflected in creator web feed. Actual operation exposed a refresh cadence bug; 3caabeb repairs both native loops without relaxing the independent five-second expiry. The failure and successful focused retry are both retained.
+- Shipping iOS on retained iOS26.5 simulator: canonical sign-in, exact web-saved private Thanks, anonymous text sharing and cold Night reload/withdrawal; final source keyboard entry/save/cold Light readback. The initial unsigned local artifact failed Keychain storage; a normal ad-hoc signed simulator build passed signature verification and operated correctly without resetting data or changing source entitlements.
+- Final source on both native devices: the actual API paused for 25.226 seconds. Both hid post/Thanks fields, then restored each account's exact saved text and consent after recovery. Browser Unpublish made both open apps hide the post while retaining withdrawal controls. Actual withdrawals removed those controls and emptied the creator feed. The local Team acceptance post was archived through Studio; the original Note wording remains restored at revision21.
+
+The screenshots named `final-outage`, `unpublished`, `withdrawn-after-unpublish`, `focused-after-refresh-repair`, `creator-final-thanks-withdrawn` and `acceptance-post-archived` show final outcomes. Earlier failed Back, keyboard-dismiss, unsigned packaging and emulator observations are explicitly qualified in reconciliation.json and prior evidence; they are not counted as passes.
+
+## Data custody and checks
+
+The exact W8 adoption operator was first exercised on an independently restored copy, then on the original database with traffic closed and a second fresh independently restored backup. All 35 old migration records and all 281 pre-existing rows across 136 tables were preserved. The ledger now has 48 rows; the ordinary runner recognizes all 40 canonical migrations without replaying aliased SQL. Private backups, fingerprints, credentials and operator receipts stay outside Git. Reserved future migration0051 is unapplied.
+
+Backend/web production builds, types, canonical generated consistency, scoped lint and final shipping native builds pass. Application3caabeb hosted web/backend and Android runtime passed; hosted visual and native foundation jobs are queued, not passed. No new test code/files/suites, weaker assertions, new goldens or bypassed branch protection were introduced. Readiness follows the human's latest instruction to operate apps before merging; this record does not claim every hosted check passed.
+
+Genuine creator signing remains blocked by the user's choice. Actual provider-backed approval/payment/media/C2PA/live/replay/delivery/Impact/privacy, the signed Note/two-fan reply/reaction journey, physical devices and production latency/cost/release gates remain unverified. No identity, passkey/UV, approval, payment, media, delivery or privacy receipt was fabricated. AI-source removal after unpublish/archive remains pending, not acknowledged.

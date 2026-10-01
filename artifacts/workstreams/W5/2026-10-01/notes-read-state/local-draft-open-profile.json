@@ -1,0 +1,174 @@
+{
+  "profile": "Local warm saved-draft open, in-app browser, 390×844 Light",
+  "application": "f28959eca29ac7a1866ef3993583d972ce80772e",
+  "origin": "http://localhost:3005",
+  "api": "http://127.0.0.1:4105",
+  "samples": [
+    {
+      "sample": 1,
+      "elapsedMs": 348,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 2,
+      "elapsedMs": 334,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 3,
+      "elapsedMs": 381,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 4,
+      "elapsedMs": 454,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 5,
+      "elapsedMs": 401,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 6,
+      "elapsedMs": 356,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 7,
+      "elapsedMs": 349,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 8,
+      "elapsedMs": 329,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 9,
+      "elapsedMs": 363,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 10,
+      "elapsedMs": 367,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 11,
+      "elapsedMs": 353,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 12,
+      "elapsedMs": 456,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 13,
+      "elapsedMs": 383,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 14,
+      "elapsedMs": 350,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 15,
+      "elapsedMs": 344,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 16,
+      "elapsedMs": 333,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 17,
+      "elapsedMs": 403,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 18,
+      "elapsedMs": 457,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 19,
+      "elapsedMs": 375,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    },
+    {
+      "sample": 20,
+      "elapsedMs": 487,
+      "focus": "note-text",
+      "scroll": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    }
+  ],
+  "p50Ms": 365,
+  "p95NearestRankMs": 457,
+  "maxMs": 487,
+  "measurement": "Wall time from actual Edit draft click through visible loaded textarea and read-only DOM observation; includes browser automation overhead. Every sample returned exact saved text, note-text focus and 390px document width. Cancel returned to Notes between samples. No Save/sign/publication or fixture mutation.",
+  "limits": "Small local warm-loop sample; not production, cross-region, cold-start, signing, media or provider acceptance. Refresh-role control has no observable completion state, so this measures completed draft opening instead.",
+  "paidProviderCalls": 0
+}

@@ -1,0 +1,225 @@
+{
+  "recordedAt": "2026-10-01T03:44:35.861257+00:00",
+  "sourceParent": "e10a55ba5ff5369b89f834c93d36fee8ef8e0f73",
+  "sourceSha256": {
+    "packages/api/src/media.ts": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
+    "packages/api/generated/openapi.json": "476295b7c9d2fa162b8778b4d6b5fbf43032e2c51a5d373164fdfe593eaa1639",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "1de9ed5bda3c8847678f795e830897d21d37d5e234d0b538033b5abe3cd93165",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "e2202b67b635e2bfcdf5311e5aacfe6aeccd7625a24c5fa2d3fc43fb8d3e2e50",
+    "apps/web/features/media/VoicePlayer.tsx": "941e4874a8678f82e67bf672119169fc6d0e73575a79c4ab6afded4df7c5ebfa",
+    "apps/web/features/content/MediaAttachments.tsx": "9bd92b0e886a8493e7e9a1dfec35eb3a5cc7a8d05a5c00e8f00d86ff54342b44",
+    "apps/web/features/studio/Studio.tsx": "567d31614128b4b9a2107d0f885dc347039377667fa8474ad182f901feccebac",
+    "apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift": "2b416fa7cffae899b4baaa1ffbc2b82bab04e7633fb8aeedcc4dc7fddcea7a22",
+    "apps/ios/Sources/QelvoraUI/Content/ContentAttachments.swift": "165cb565b42a12bac2b9b10b3b3c677498a7da365c13544b86a3cdf7bec64cdc",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentFeature.kt": "e9e23940ccdea0f2492fc9240568ce6d92accfba19d4f856111f8b351e9e360f",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentAttachments.kt": "f588d9aae30809f7b276538ea2ee6fc2995d7a0da11d6b2d65427b410d6d8bb4"
+  },
+  "producer": {
+    "immutableLocalSource": "682766cdec3318a70aa949eda93a9834845f5f05",
+    "apiMediaFileIdentical": true,
+    "consumption": "Only exact PlaybackFile/mandatory ticket contract; no whole producer graph, storage, worker, root assembly or migrations imported",
+    "proof": "Actual served-file variant/SHA256/byte-count is distinct from immutable processed signing tuple; audience consumers require credentialed proof and genuine coherent provenance",
+    "mountedLocally": false,
+    "compatibilityReview": "W6 personally reviewed e099538 transport/range/hash/account/lifecycle compatible; exact a7a5c865 required-nullable followup personally re-reviewed and finding closed. Source review, not authenticated media acceptance.",
+    "requiredNullableCompatibilityReview": "W6 personally re-reviewed immutable a7a5c865f986b6435d8fca0f183506e49d5e6d35 and confirmed explicit required-nullable decoder closes the e099 finding; source review only, no actual authenticatedmedia proof."
+  },
+  "generated": {
+    "operations": 78,
+    "completeOperationObjectsUnchangedFromParent": true,
+    "swiftAndKotlinCompleteClientSuffixUnchanged": true,
+    "navigationFilesUnchanged": true
+  },
+  "web": {
+    "finalTypesLintFormatProductionBuildExitCode": 0,
+    "log": "/private/tmp/creator-w5-final-file-web-audience.log",
+    "actualRoleRefreshCapture": "pending-composer-role-refresh-1280-light.jpg",
+    "mediaPlaybackVerified": false,
+    "recorderRecoveryCopy": {
+      "producerSource": "e1ce8cf7ae185a6ab2b7701cd091f4aec5580ae5",
+      "compatibleAdaptation": "Exact canonical Processing is unavailable. literal in older leaf without copy binding; rejected branch retains existing distinct recovery. Internal failure code is not rendered.",
+      "initialMissingCopyBindingCompileFailed": true,
+      "finalTypesLintFormatProductionBuildExitCode": 0,
+      "buildLog": "/private/tmp/creator-w5-recorder-recovery-copy-corrected-build.log",
+      "actualAuthenticatedProcessingFailureVerified": false
+    }
+  },
+  "ios": {
+    "buildExitCode": 0,
+    "buildLog": "/private/tmp/creator-w5-native-audience-host/build-required-nullable.log",
+    "host": "actual shipping FanAppShell normal root; no replacement test harness",
+    "simulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
+    "device": "iPhone17 / iOS26.5",
+    "capturePixels": [
+      1206,
+      2622
+    ],
+    "logicalPoints": [
+      402,
+      874
+    ],
+    "registeredDestination": "/content/50000000-0000-0000-0000-000000000001/640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+    "launch": "Installed actual signed shipping simulator app; visibly genuine Pantopus sign-in in Light and Night",
+    "captures": [
+      "native-fan-final-file-light.png",
+      "native-fan-final-file-night.png"
+    ],
+    "authenticatedContentOrBytesVerified": false,
+    "resourceDisposition": "Own simulator gracefully shutdown after captures; data preserved. Actual own launchctl identified mediaanalysisdPID7373 consuming343.6% CPU; no W5 lingering native compiler found.",
+    "requiredNullableRepair": "Explicit keyed Decodable requires presence of durationMs, processedMediaDurationMs, signedActId and provenance while accepting canonical JSON null. Synthesized optional decoding previously allowed missing photo duration keys; repaired after W6 review. Final shipping rebuild passed0; generated dependencies restored after build.",
+    "launchSource": "e099538 before required-nullable decoder repair; the repair is rebuilt, not operated authenticated media",
+    "currentRequiredNullableLaunch": {
+      "source": "a7a5c865f986b6435d8fca0f183506e49d5e6d35",
+      "buildExitCode": 0,
+      "codesignStrictVerified": true,
+      "installExitCode": 0,
+      "lightLaunchExitCode": 0,
+      "lightAppPid": 40425,
+      "nightLaunchExitCode": 0,
+      "nightAppPid": 40844,
+      "actualRegisteredDestination": "/content/50000000-0000-4000-8000-000000000001/640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "captures": [
+        "native-fan-required-nullable-light.png",
+        "native-fan-required-nullable-night.png"
+      ],
+      "actualObservation": "Both actual shipping app Light/Night screenshots personally inspected: genuine Pantopus sign-in, no system dialog. Only sign-in launch, no authenticated content/bytes.",
+      "authenticatedContentOrBytesVerified": false,
+      "resourceDisposition": "Own simulator gracefully shutdown exit0 after both screenshots; data preserved; peers untouched."
+    }
+  },
+  "android": {
+    "buildExitCode": 0,
+    "buildSeconds": 280,
+    "buildLog": "/private/tmp/creator-w5-native-file-proof-corrected-apk.log",
+    "apkSha256": "7cb4a2aaa07b2a99769376c94a1199ea3cad646bfda45b6b4e3cdda15b8f92c7",
+    "ownedAVD": "CreatorPlatform_W5_Continuation",
+    "apiLevel": 35,
+    "adbPort": 5045,
+    "emulatorPort": 5590,
+    "netsimInstance": 5,
+    "install": "Actual final APK installed successfully on own AVD",
+    "bootProperty": "sys.boot_completed=1",
+    "lightColdLaunch": {
+      "status": "ok",
+      "totalTimeMs": 19897,
+      "waitTimeMs": 20016,
+      "capture": "native-fan-android-cold-start-light.png",
+      "limitation": "First capture raced cold-start and shows splash only"
+    },
+    "nightColdLaunch": {
+      "status": "timeout",
+      "waitTimeMs": 26354,
+      "shellExitCode": 0,
+      "capture": "native-fan-android-content-system-anr-night.png",
+      "observation": "Actual genuine Pantopus sign-in behind System UI is not responding dialog"
+    },
+    "runtimeAcceptance": false,
+    "authenticatedContentOrBytesVerified": false,
+    "environment": "Own SDK overlay of verified readonly W6 emulator/image/platformtools; own AVD/userdata/tmp/ADB5045/5590/netsim5. NETSIM_INSTANCE5 retry still reports CPU hangs and netsim gRPC/Wifi fallback; SystemUI ANR retained, no dismissal/input workaround.",
+    "resourceDisposition": "Own API35 emulator gracefully stopped after failed capture; AVD/userdata preserved. W6 is provisioning officialAPI34 CI-profile image; no W5 SDK download/writes.",
+    "api34Recovery": {
+      "image": "Official Google APIsAPI34x86_64r14; W6 vendor installcompleted0; readonly lease verified",
+      "packageXmlSha256": "214f88f2639afd1c1d4fca11acd22a6bea9881dc0325e1699c6c458e662740f8",
+      "sourcePropertiesSha256": "bd7597e0dfa855335194fbafaf63bde93aa86bc3b56cea73cd54635715e77abc",
+      "kernelRanchuSha256": "b1e5cd842220175a4c07be9a2bcf5beb7b336794b00cf9b7b53abf35557b24df",
+      "ownedAVD": "CreatorPlatform_W5_API34",
+      "avdCreateExitCode": 0,
+      "ownEmulatorSession": null,
+      "state": "First API34 boot/install success but actual Bluetooth keeps stopping dialog; later fresh default-client boot/install/Light/Night statusok still actual Process system ANR. Not runtime acceptance.",
+      "ownTemporaryDirectory": "/private/tmp/creator-w5-native-authority/runtime-api34-tmp",
+      "peerSDKChanges": false,
+      "resourceDisposition": "All owned emulator attempts gracefully stopped; all AVD data retained; HCI15605 no listener after final stop. Only serial5590 was mutated; vendor own ADB discovery may list peer serials, never operated."
+    },
+    "api35Historical": true,
+    "api34Attempts": [
+      {
+        "avd": "CreatorPlatform_W5_API34",
+        "configuration": "NETSIM_INSTANCE5/instance5; own TMPDIR, then both TMPDIR+ANDROID_TMP",
+        "bootProperty": "1",
+        "installExitCode": 0,
+        "lightColdLaunchStatus": "ok",
+        "lightTotalTimeMs": 3438,
+        "lightWaitTimeMs": 3495,
+        "capture": "native-fan-api34-bluetooth-failure-light.png",
+        "actualObservation": "Genuine sign-in behind Bluetooth keeps stopping; gRPC initialization failed",
+        "runtimeAcceptance": false
+      },
+      {
+        "avd": "CreatorPlatform_W5_API34",
+        "configuration": "Default client/helper1, both own TMPDIR+ANDROID_TMP, private HCI15605",
+        "wifiBluetoothInitialized": true,
+        "actualObservation": "Guest remained ADBoffline; normal targeted reconnect/own ADB recovery did not establish boot acceptance; preserved old userdata",
+        "runtimeAcceptance": false,
+        "log": "/private/tmp/creator-w5-native-authority/emulator-api34-default-client.log"
+      },
+      {
+        "avd": "CreatorPlatform_W5_API34_Matched",
+        "configuration": "Fresh owned AVD; default1 from FIRST boot; own TMPDIR+ANDROID_TMP, HCI15605, ADB5045 scanmax5591; cores2/memory2048/GPUhost/no snapshot, visible emulator",
+        "avdCreateExitCode": 0,
+        "bootProperty": "1",
+        "bootTimeMs": 214237,
+        "wifiBluetoothInitialized": true,
+        "installExitCode": 0,
+        "apkSha256": "7cb4a2aaa07b2a99769376c94a1199ea3cad646bfda45b6b4e3cdda15b8f92c7",
+        "lightColdLaunch": {
+          "status": "ok",
+          "totalTimeMs": 9356,
+          "waitTimeMs": 9456,
+          "capture": "native-fan-api34-process-system-anr-light.png"
+        },
+        "nightColdLaunch": {
+          "status": "ok",
+          "totalTimeMs": 7488,
+          "waitTimeMs": 7608,
+          "capture": "native-fan-api34-process-system-anr-night.png"
+        },
+        "actualObservation": "Both actual sign-in screens behind Process system isn\u2019t responding dialog. Captured event log includes SystemUI/system and Google app startup ANRs; no Qelvora app ANR/crash in that captured event log. No clean runtime or content acceptance.",
+        "log": "/private/tmp/creator-w5-native-authority/emulator-api34-fresh.log",
+        "events": "/private/tmp/creator-w5-native-authority/api34-fresh-anr-crash-events.log",
+        "runtimeAcceptance": false,
+        "resourceDisposition": "Normal own emu kill succeeded; data preserved; private helper stopped with emulator."
+      }
+    ],
+    "netsimDiagnosis": {
+      "actualRadioRecovery": true,
+      "finding": "C++ client GetServerAddress() uses default1; numbered Rust helper discovers netsim_N.ini. Private default1 roots plus HCI15605 recovered actual WiFi/Bluetooth initialization. NETSIM_INSTANCE5 did not align this vendor C++ client.",
+      "sources": [
+        "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/src/backend/packet_streamer_client.cc",
+        "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/src/util/os_utils.h",
+        "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/src/util/os_utils.cc",
+        "https://android.googlesource.com/platform/tools/netsim/+/refs/heads/main/rust/common/src/util/os_utils.rs"
+      ],
+      "peerDiscoveryFilesModified": false
+    }
+  },
+  "failedObservationsPreserved": {
+    "invalidDestination": "Earlier web-like /creators/{id}/posts/{id} launch is not registered native route. Old captures renamed invalid-destination; no acceptance inferred",
+    "compileCorrection": "First web compile assumed absent ContentBody attachment bytes/MIME/duration fields and failed. Removed that assumption; full actual producer metadata is compared; final build passed. Logs preserved.",
+    "interruptedNativeBuilds": "Initial file-proof builds interrupted130 to correct source; later corrected final native builds passed; no interrupted build claimed passing",
+    "earlierIOSCaptures": {
+      "native-fan-host-light-launch.png": "Earlier transition, not screen acceptance",
+      "native-fan-host-light-current.png": "Earlier sign-in-only observation",
+      "native-fan-final-file-invalid-destination-light.png": "Unregistered earlierCLI destination; no intended-route acceptance",
+      "native-fan-final-file-invalid-destination-night.png": "Unregistered earlierCLI destination; no intended-route acceptance"
+    },
+    "historicalNativeCreatorParameter": "Earlier native destinations use the registered /content/{creator}/{content} pattern but creator literal50000000-0000-0000-0000-000000000001 is not the preserved actual creator50000000-0000-4000-8000-000000000001. Their sign-in-only pixels are retained, never authenticated content proof. New required-nullable iOS launches use actual preserved creator UUID."
+  },
+  "ci": {
+    "currentPR9Parent": "a7a5c865f986b6435d8fca0f183506e49d5e6d35",
+    "inspectedCounts": {
+      "success": 5,
+      "queued": 6
+    },
+    "queuedCause": "Unverified; repo actions/runners lists self-hosted only, cannot infer hosted eligibility",
+    "hostedLabelPrimaryReference": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+    "workflowChanged": false
+  },
+  "validationLimits": {
+    "newTestCodeFilesSuites": false,
+    "unitTestsRunThisContinuation": false,
+    "genuineSigning": "Human explicitly instructed keep blocked; no UV/passkey/identity fabrication",
+    "productionMediaProviderProof": false,
+    "endToEndMergeGatePassed": false,
+    "prMerged": false,
+    "paidAICalls": 0
+  }
+}

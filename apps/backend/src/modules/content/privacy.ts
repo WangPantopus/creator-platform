@@ -177,6 +177,27 @@ export function contentPrivacyHook(
           "signature_retention_unconfigured",
           "The scoped retention decision must cover immutable signature proof retained by identity.",
         );
+        const quoted = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.content_index WHERE quote_reply_id=ANY($1::uuid[]) ORDER BY id",
+            [replies.map((row) => row.id)],
+          )
+        ).rows;
+        for (const id of [
+          ...new Set([
+            ...revisions.map((row) => row.content_id as string),
+            ...quoted.map((row) => row.id),
+          ]),
+        ].sort())
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`content:${id}`],
+          );
+        for (const id of replies.map((row) => row.id as string).sort())
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`content.quote:${id}`],
+          );
         for (const draft of drafts)
           await client.query(
             "DELETE FROM creator.studio_reply_draft WHERE creator_id=$1 AND fan_id=$2 AND account_id=$3",

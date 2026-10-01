@@ -19,7 +19,10 @@ export function configureStudioRequests(
     for (const key of Object.keys(sessionStorage))
       if (
         key.startsWith("w5.pendingPublication:") ||
-        key.startsWith("w5.queue.")
+        key.startsWith("w5.queue.") ||
+        key.startsWith("w5.queue:") ||
+        key.startsWith("w5.approval:") ||
+        key.startsWith("w5.team-reply:")
       )
         sessionStorage.removeItem(key);
   };
@@ -32,7 +35,7 @@ export function configureStudioRequests(
   };
 }
 export async function studioRequest<T>(
-  domain: "studio" | "content" | "commerce-approvals",
+  domain: "studio" | "content" | "commerce-approvals" | "conversations",
   path: string,
   body?: unknown,
   expectedAccountId?: string,
@@ -67,7 +70,12 @@ export async function studioRequest<T>(
       headers: {
         "Content-Type": "application/json",
         ...(expectedAccountId
-          ? { "x-qelvora-expected-account": expectedAccountId }
+          ? {
+              "x-qelvora-expected-account": expectedAccountId,
+              ...(domain === "conversations"
+                ? { "X-Expected-Account-Id": expectedAccountId }
+                : {}),
+            }
           : {}),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -89,6 +97,12 @@ export async function studioRequest<T>(
   try {
     value = await response.json();
   } catch {
+    if (response.status === 404)
+      throw new StudioFailure(
+        404,
+        "producer_unavailable",
+        "This service is not connected in the current workspace. Your input is kept.",
+      );
     throw new StudioFailure(
       503,
       "response_unknown",

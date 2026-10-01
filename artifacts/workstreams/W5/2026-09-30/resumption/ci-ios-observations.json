@@ -1,0 +1,52 @@
+{
+  "run": 36777448626,
+  "job": 110098820029,
+  "artifact": 11130927907,
+  "commit": "eedf35fc82544ab9216384896b84e376f2c323f4",
+  "screenScale": 1,
+  "hostTransform": 2,
+  "loggedBacking": [780, 1688],
+  "comparisons": [
+    {
+      "theme": "light",
+      "width": 780,
+      "height": 1688,
+      "differentRawPixels": 110599,
+      "samples": [
+        {
+          "at": [10, 10],
+          "reference": [243, 242, 238, 255],
+          "actual": [243, 242, 238, 255]
+        },
+        {
+          "at": [150, 1000],
+          "reference": [243, 242, 238, 255],
+          "actual": [243, 242, 238, 255]
+        }
+      ]
+    },
+    {
+      "theme": "night",
+      "width": 780,
+      "height": 1688,
+      "differentRawPixels": 138542,
+      "samples": [
+        {
+          "at": [10, 10],
+          "reference": [20, 18, 15, 255],
+          "actual": [20, 18, 15, 255]
+        },
+        {
+          "at": [150, 1000],
+          "reference": [20, 18, 15, 255],
+          "actual": [20, 18, 15, 255]
+        }
+      ]
+    }
+  ],
+  "referenceProfile": "LG HDR 4K",
+  "actualProfile": "sRGB IEC61966-2.1",
+  "visualObservation": "Personally viewed Welcome: all content present, but text remains visibly blurred versus original reference. Backing dimensions alone do not prove true 2x glyph rasterization.",
+  "strictAssertionsUnchanged": true,
+  "remaining": "Capture and documented common color encoding; genuine source/layout mismatches must remain failures."
+}

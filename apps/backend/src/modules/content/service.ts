@@ -19,6 +19,7 @@ import {
 } from "../../../../../packages/api/src/content.js";
 import type { Actor } from "../identity/adapter.js";
 import { identityTransaction } from "../identity/transaction.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
 import {
   consumeCreatorSignedAct,
   setSignatureVisibility,
@@ -27,6 +28,50 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { consentEnvelope } from "../identity/consent.js";
+import {
+  ProcessedMediaEvidenceSchema,
+  type ProcessedMediaEvidence,
+} from "../../../../../packages/api/src/media.js";
+
+export interface ContentPublicationMedia {
+  /** The host uses W6's shared W1 issuer on this transaction before domain locks. */
+  authorize(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    requirement: "owned" | "verified",
+  ): Promise<void>;
+  evidence(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    objectId: string,
+    assetId: string,
+  ): Promise<ProcessedMediaEvidence>;
+  attach(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    objectId: string,
+    signedActId: string,
+    command: SignedActCommand,
+    evidence: readonly ProcessedMediaEvidence[],
+  ): Promise<void>;
+  ready(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    objectId: string,
+    evidence: ProcessedMediaEvidence,
+    signedActId: string,
+  ): Promise<boolean>;
+  withdraw(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    objectId: string,
+  ): Promise<void>;
+}
 
 type Index = {
   id: string;
@@ -41,6 +86,16 @@ type Index = {
   quote_consent_version: number | null;
   packet_id: string | null;
 };
+/** Withdrawal only; W1 separately verifies consumed signature/registry state. */
+export type ContentSignatureWithdrawal = Readonly<{
+  creatorId: string;
+  objectId: string;
+  version: number;
+  signedActId: string;
+  signerAccountId: string;
+  command: SignedActCommand;
+  withdrawn: true;
+}>;
 export interface ContentDependencies {
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
@@ -48,21 +103,27 @@ export interface ContentDependencies {
     accountId: string,
     creatorId: string,
   ) => Promise<boolean>;
+  /** W4 current paid/group rights, with W1/W8 denial locks on this client. */
+  paidAudience?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    audience: Audience,
+  ) => Promise<boolean>;
   audienceCount?: (
     client: PoolClient,
     creatorId: string,
     audience: Audience,
   ) => Promise<number | null>;
-  media?: (
+  mediaPublication?: ContentPublicationMedia;
+  /** W1 withdrawal-only registry. Must verify this exact consumed act and
+   * persist a durable audit for the actual publisher on this held client.
+   * It cannot issue signing authority or disclose a new public command. */
+  withdrawPublicationSignature?: (
     client: PoolClient,
     actor: Actor,
-    creatorId: string,
-    media: ContentBody["media"][number],
-  ) => Promise<{
-    ready: boolean;
-    durationMs: number | null;
-    humanRecorded: boolean;
-  }>;
+    input: ContentSignatureWithdrawal,
+  ) => Promise<void>;
   publicPacket?: (
     client: PoolClient,
     actor: Actor,
@@ -125,6 +186,7 @@ export interface ContentDependencies {
 export function publicationCommand(
   row: Index,
   document: ContentBody,
+  mediaEvidence: readonly ProcessedMediaEvidence[] = [],
 ): SignedActCommand {
   return {
     actType: document.kind === "note" ? "broadcast" : "reply",
@@ -134,6 +196,7 @@ export function publicationCommand(
       creatorId: row.creator_id,
       version: row.version,
       document,
+      ...(mediaEvidence.length ? { mediaEvidence: [...mediaEvidence] } : {}),
     },
   };
 }
@@ -262,11 +325,37 @@ export class ContentService {
     creatorId: string,
     permitted: string[] = [],
   ) {
-    // Current W5 role locks match W1 invitation/removal order and survive the
-    // domain commit. Holding a team grant never confers creator authority.
-    await client.query(
-      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-      [creatorId, actor.accountId],
+    // Match W1's creator -> team removal lock order. Hold current ownership or
+    // the actor's membership through the domain commit, including role changes
+    // made by invitation acceptance. No team actor acquires creator authority.
+    const owner = (
+      await client.query<{ account_id: string }>(
+        "SELECT account_id FROM creator.creator_profile WHERE id=$1",
+        [creatorId],
+      )
+    ).rows[0];
+    invariant(owner, "creator_role_required", "This Studio is unavailable.");
+    // A Team actor's UPDATE RLS cannot lock the public creator row. Match W1's
+    // scoped read-lock pattern, then restore the actual request account before
+    // checking membership or performing any domain operation.
+    await client.query("SELECT set_config('app.account_id',$1,true)", [
+      owner.account_id,
+    ]);
+    let currentCreator;
+    try {
+      currentCreator = await client.query(
+        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+        [creatorId, owner.account_id],
+      );
+    } finally {
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        actor.accountId,
+      ]);
+    }
+    invariant(
+      currentCreator.rowCount === 1,
+      "creator_role_required",
+      "Current creator verification and recovery are required.",
     );
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `team:${creatorId}:${actor.accountId}`,
@@ -295,6 +384,64 @@ export class ContentService {
       "Your current role does not allow this action.",
     );
     return { ...row, creator: row.account_id === actor.accountId };
+  }
+  private async requireMediaSchema(client: PoolClient) {
+    const schema = await client.query(
+      "SELECT 1 FROM information_schema.columns WHERE table_schema='creator' AND table_name='content_publication' AND column_name='media_evidence'",
+    );
+    invariant(
+      schema.rowCount === 1,
+      "media_migration_required",
+      "Media publication is unavailable until its canonical migration is applied.",
+    );
+  }
+  async authorizeMedia(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    requirement: "owned" | "verified" = "verified",
+  ) {
+    await this.dependencies.mediaPublication?.authorize(
+      client,
+      actor,
+      creatorId,
+      requirement,
+    );
+  }
+  private async authorizeOwnedMedia(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) {
+    if (!this.dependencies.mediaPublication) return;
+    if (
+      (
+        await client.query(
+          "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2",
+          [creatorId, actor.accountId],
+        )
+      ).rowCount
+    )
+      await this.authorizeMedia(client, actor, creatorId, "owned");
+  }
+  private async withdrawMedia(
+    client: PoolClient,
+    actor: Actor,
+    row: Index,
+    document: ContentBody,
+  ) {
+    if (!document.media.length) return;
+    invariant(
+      this.dependencies.mediaPublication,
+      "media_withdrawal_unconfigured",
+      "Current media withdrawal authority is required before changing this publication.",
+    );
+    await this.dependencies.mediaPublication.withdraw(
+      client,
+      actor,
+      row.creator_id,
+      row.id,
+    );
   }
   async command<T>(
     client: PoolClient,
@@ -331,6 +478,12 @@ export class ContentService {
     return result;
   }
   async index(client: PoolClient, creatorId: string, id: string, lock = false) {
+    // Fan RLS deliberately cannot FOR SHARE an index row. Shared object locks
+    // fence reads against all W5 mutations without widening its UPDATE policy.
+    await client.query(
+      `SELECT ${lock ? "pg_advisory_xact_lock" : "pg_advisory_xact_lock_shared"}(hashtextextended($1,0))`,
+      [`content:${id}`],
+    );
     const row = (
       await client.query<Index>(
         `SELECT * FROM creator.content_index WHERE id=$1 AND creator_id=$2${lock ? " FOR UPDATE" : ""}`,
@@ -360,6 +513,10 @@ export class ContentService {
     )
       return false;
     if (row.quote_reply_id) {
+      await client.query(
+        "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
+        [`content.quote:${row.quote_reply_id}`],
+      );
       const consent = (
         await client.query(
           "SELECT share_text,version FROM creator.content_quote_permission WHERE reply_id=$1",
@@ -405,23 +562,13 @@ export class ContentService {
           row.creator_id,
         )) ?? false
       );
-    await client.query("SELECT set_config('app.fan_id',$1,true)", [fan.id]);
-    const rows = (
-      await client.query<{
-        tier_id: string;
-        capabilities: string[];
-        catalog: { contentGroups?: string[] };
-      }>(
-        `SELECT m.tier_id,t.capabilities,t.catalog FROM creator.commerce_membership m JOIN creator.commerce_tier t ON t.id=m.tier_id AND t.creator_id=m.creator_id JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.period_start<=now() AND ((m.state='active' AND m.period_end>now()) OR (m.state='grace' AND m.grace_end>now())) AND g.source='membership' AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now()`,
-        [row.creator_id, fan.id],
-      )
-    ).rows;
-    const audience = row.audience;
-    if (audience.kind === "members") return rows.length > 0;
-    if (audience.kind === "tiers")
-      return rows.some((m) => audience.ids.includes(m.tier_id));
-    return rows.some((m) =>
-      audience.ids.some((id) => (m.catalog.contentGroups ?? []).includes(id)),
+    return (
+      (await this.dependencies.paidAudience?.(
+        client,
+        actor,
+        row.creator_id,
+        row.audience,
+      )) ?? false
     );
   }
   async authorizeRead(
@@ -556,6 +703,7 @@ export class ContentService {
   async save(actor: Actor, creatorId: string, raw: unknown) {
     const input = SaveContent.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, [
         "drafter",
         "publisher",
@@ -632,6 +780,12 @@ export class ContentService {
           const version = input.expectedVersion + 1;
           if (existing) {
             const previous = await this.view(client, actor, existing);
+            await this.withdrawMedia(
+              client,
+              actor,
+              existing,
+              previous.document,
+            );
             if (previous.document.aiUseIntent)
               await this.dependencies.revokeSource?.(
                 actor,
@@ -691,6 +845,11 @@ export class ContentService {
     row: Index,
     document: ContentBody,
   ) {
+    invariant(
+      document.text.length > 0 || document.media.length > 0,
+      "content_empty",
+      "Write something or attach processed media before publishing.",
+    );
     if (document.showAudienceCount) {
       const count = await this.dependencies.audienceCount?.(
         client,
@@ -749,31 +908,48 @@ export class ContentService {
         "public_packet_consent_required",
         "The current public request or accepted group conversion is required.",
       );
-    for (const attachment of document.media) {
-      const media = await this.dependencies.media?.(
-        client,
-        actor,
-        row.creator_id,
-        attachment,
-      );
+    const mediaEvidence: ProcessedMediaEvidence[] = [];
+    if (document.media.length && this.dependencies.mediaPublication)
+      await this.requireMediaSchema(client);
+    for (const attachment of [...document.media].sort((a, b) =>
+      a.assetId.localeCompare(b.assetId),
+    )) {
+      const media = this.dependencies.mediaPublication
+        ? ProcessedMediaEvidenceSchema.parse(
+            await this.dependencies.mediaPublication.evidence(
+              client,
+              actor,
+              row.creator_id,
+              row.id,
+              attachment.assetId,
+            ),
+          )
+        : null;
       invariant(
-        media?.ready,
+        media &&
+          media.assetId === attachment.assetId &&
+          media.version === attachment.version &&
+          media.sha256 === attachment.sha256 &&
+          (attachment.kind === "photo"
+            ? media.mimeType === "image/png"
+            : attachment.kind === "voice" && media.mimeType === "audio/mp4"),
         "media_not_ready",
         "Wait for the owned media revision to finish processing.",
       );
       if (attachment.kind === "voice")
         invariant(
-          media.humanRecorded &&
-            media.durationMs !== null &&
+          media.durationMs !== null &&
             (document.kind !== "note" || media.durationMs <= 60000),
           "human_voice_required",
           "A Note needs processed human-recorded voice of at most 60 seconds.",
         );
+      mediaEvidence.push(media);
     }
-    return { quotedText, quotedHandle };
+    return { quotedText, quotedHandle, mediaEvidence };
   }
   async review(actor: Actor, creatorId: string, id: string) {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.authorizeMedia(client, actor, creatorId);
       await this.role(client, actor, creatorId);
       const row = await this.index(client, creatorId, id),
         view = await this.view(client, actor, row);
@@ -782,8 +958,16 @@ export class ContentService {
         "draft_required",
         "Save a new draft before signing.",
       );
-      await this.validatePublication(client, actor, row, view.document);
-      return { command: publicationCommand(row, view.document), view };
+      const { mediaEvidence } = await this.validatePublication(
+        client,
+        actor,
+        row,
+        view.document,
+      );
+      return {
+        command: publicationCommand(row, view.document, mediaEvidence),
+        view,
+      };
     });
   }
   async publish(
@@ -797,6 +981,7 @@ export class ContentService {
       ? ContentVersionCommand.parse(raw)
       : PublishContent.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      if (!team) await this.authorizeMedia(client, actor, creatorId);
       const role = await this.role(
         client,
         actor,
@@ -828,6 +1013,11 @@ export class ContentService {
             "creator_signing_required",
             "Notes, answers, quotes and reactions need the creator's personal signature.",
           );
+          invariant(
+            !team || !document.media.length,
+            "creator_media_signing_required",
+            "The creator must review and sign recorded media before it can be published.",
+          );
           const quote = await this.validatePublication(
             client,
             actor,
@@ -838,15 +1028,37 @@ export class ContentService {
             "signedActId" in input && typeof input.signedActId === "string"
               ? input.signedActId
               : null;
+          const command = publicationCommand(
+            row,
+            document,
+            quote.mediaEvidence,
+          );
           if (signature)
             await consumeCreatorSignedAct(
               client,
               actor,
               creatorId,
               signature,
-              publicationCommand(row, document),
+              command,
             );
           const scheduled = document.scheduledAt !== null;
+          const mediaPending = quote.mediaEvidence.length > 0;
+          if (mediaPending) {
+            invariant(
+              signature && this.dependencies.mediaPublication,
+              "creator_media_signing_required",
+              "A genuine creator signature is required for this media.",
+            );
+            await this.dependencies.mediaPublication.attach(
+              client,
+              actor,
+              creatorId,
+              id,
+              signature,
+              command,
+              quote.mediaEvidence,
+            );
+          }
           const label = team
             ? `${role.display_name}'s team${role.member_handle ? ` · @${role.member_handle}` : ""}`
             : document.kind === "note"
@@ -868,14 +1080,27 @@ export class ContentService {
               label,
               quote.quotedText,
               quote.quotedHandle,
-              scheduled,
+              scheduled || mediaPending,
             ],
           );
+          if (mediaPending)
+            await client.query(
+              "UPDATE creator.content_publication SET media_evidence=$3 WHERE content_id=$1 AND version=$2",
+              [id, row.version, JSON.stringify(quote.mediaEvidence)],
+            );
           await client.query(
             "UPDATE creator.content_index SET state=$2,published_at=CASE WHEN $3 THEN NULL ELSE now() END,withdrawn_at=NULL WHERE id=$1",
-            [id, scheduled ? "scheduled" : "published", scheduled],
+            [
+              id,
+              mediaPending
+                ? "media_pending"
+                : scheduled
+                  ? "scheduled"
+                  : "published",
+              scheduled || mediaPending,
+            ],
           );
-          if (!scheduled) {
+          if (!scheduled && !mediaPending) {
             await this.effect(client, row, "published");
             if (document.aiUseIntent)
               await this.effect(client, row, "source_candidate");
@@ -884,7 +1109,11 @@ export class ContentService {
           return {
             id,
             version: row.version,
-            state: scheduled ? "scheduled" : "published",
+            state: mediaPending
+              ? "media_pending"
+              : scheduled
+                ? "scheduled"
+                : "published",
             signedActId: signature,
           };
         },
@@ -900,6 +1129,7 @@ export class ContentService {
   ) {
     const input = ContentVersionCommand.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.authorizeOwnedMedia(client, actor, creatorId);
       await this.role(client, actor, creatorId, ["publisher"]);
       return this.command(
         client,
@@ -915,6 +1145,7 @@ export class ContentService {
             "This content changed. Refresh first.",
           );
           const previous = await this.view(client, actor, row);
+          await this.withdrawMedia(client, actor, row, previous.document);
           if (previous.document.aiUseIntent)
             await this.dependencies.revokeSource?.(
               actor,
@@ -945,14 +1176,12 @@ export class ContentService {
   ) {
     const publication = (
       await client.query(
-        "SELECT signed_act_id,author_account_id FROM creator.content_publication WHERE content_id=$1 AND version=$2",
+        "SELECT * FROM creator.content_publication WHERE content_id=$1 AND version=$2",
         [row.id, row.version],
       )
     ).rows[0];
-    if (
-      publication?.signed_act_id &&
-      publication.author_account_id === actor.accountId
-    )
+    if (!publication?.signed_act_id) return;
+    if (publication.author_account_id === actor.accountId) {
       await setSignatureVisibility(
         client,
         actor,
@@ -960,6 +1189,120 @@ export class ContentService {
         false,
         true,
       );
+      return;
+    }
+    // A Team edit/withdrawal cannot silently leave the creator's old public
+    // signature visible. Require the current publisher and W1's real registry;
+    // never substitute a fabricated signer Actor for this request account.
+    const role = await this.role(client, actor, row.creator_id, ["publisher"]);
+    invariant(
+      !role.creator && publication.author_account_id === role.account_id,
+      "publication_signature_unavailable",
+      "The stored publication signature is unavailable.",
+    );
+    invariant(
+      this.dependencies.withdrawPublicationSignature,
+      "publication_withdrawal_unconfigured",
+      "Current publisher signature withdrawal authority is required before changing this publication.",
+    );
+    const revision = (
+      await client.query(
+        "SELECT document FROM creator.content_revision WHERE content_id=$1 AND version=$2",
+        [row.id, row.version],
+      )
+    ).rows[0];
+    const document = ContentDocument.parse(revision?.document),
+      evidence = z
+        .array(ProcessedMediaEvidenceSchema)
+        .max(10)
+        .parse(publication.media_evidence ?? []);
+    invariant(
+      evidence.length === document.media.length,
+      "publication_evidence_unavailable",
+      "The exact stored publication evidence is required for withdrawal.",
+    );
+    const input: ContentSignatureWithdrawal = {
+      creatorId: row.creator_id,
+      objectId: row.id,
+      version: row.version,
+      signedActId: publication.signed_act_id,
+      signerAccountId: publication.author_account_id,
+      command: publicationCommand(row, document, evidence),
+      withdrawn: true,
+    };
+    await this.authorizePublicationSignatureWithdrawal(client, actor, input);
+    await this.dependencies.withdrawPublicationSignature(client, actor, input);
+  }
+  /** Held-client W5 policy for W1's withdrawal-only registry. This validates
+   * the exact current subject/revision; it does not update signer-only tables,
+   * consume an act, issue a scope, or manufacture a signing account/session.
+   * W1 must separately prove the consumed act/hash, current held denial and
+   * W8-custodied registry authority, then audit this actual actor atomically. */
+  async authorizePublicationSignatureWithdrawal(
+    client: PoolClient,
+    actor: Actor,
+    input: ContentSignatureWithdrawal,
+  ): Promise<void> {
+    const context = (
+      await client.query<{ account_id: string; creator_id: string }>(
+        "SELECT current_setting('app.account_id',true) AS account_id,current_setting('app.creator_id',true) AS creator_id",
+      )
+    ).rows[0];
+    invariant(
+      input.withdrawn === true &&
+        context?.account_id === actor.accountId &&
+        context.creator_id === input.creatorId,
+      "publication_withdrawal_scope_required",
+      "Current publisher withdrawal authority is required.",
+    );
+    await assertCurrentSession(client, actor.accountId);
+    await this.assertCurrentAllowed(client, actor, input.creatorId);
+    const role = await this.role(client, actor, input.creatorId, ["publisher"]);
+    const row = await this.index(client, input.creatorId, input.objectId, true);
+    const publication = (
+      await client.query(
+        "SELECT * FROM creator.content_publication WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+        [input.objectId, input.creatorId, input.version],
+      )
+    ).rows[0];
+    invariant(
+      row.version === input.version &&
+        publication?.signed_act_id === input.signedActId &&
+        publication.author_account_id === input.signerAccountId &&
+        role.account_id === input.signerAccountId,
+      "publication_signature_changed",
+      "The current signed publication changed. Refresh before withdrawal.",
+    );
+    const revision = (
+      await client.query(
+        "SELECT document FROM creator.content_revision WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+        [input.objectId, input.creatorId, input.version],
+      )
+    ).rows[0];
+    const document = ContentDocument.parse(revision?.document),
+      evidence = z
+        .array(ProcessedMediaEvidenceSchema)
+        .max(10)
+        .parse(publication.media_evidence ?? []);
+    invariant(
+      evidence.length === document.media.length &&
+        new Set(evidence.map((item) => item.assetId)).size ===
+          evidence.length &&
+        document.media.every((item) =>
+          evidence.some(
+            (value) =>
+              value.assetId === item.assetId &&
+              value.version === item.version &&
+              value.sha256 === item.sha256 &&
+              value.mimeType ===
+                (item.kind === "photo" ? "image/png" : "audio/mp4"),
+          ),
+        ) &&
+        contentHash(publicationCommand(row, document, evidence)) ===
+          contentHash(input.command),
+      "publication_evidence_changed",
+      "The exact stored publication and processed evidence are required for withdrawal.",
+    );
   }
   async effect(
     client: PoolClient,
@@ -976,6 +1319,65 @@ export class ContentService {
       const row = await this.index(client, creatorId, id);
       await this.authorizeRead(client, actor, row, studio);
       return this.view(client, actor, row);
+    });
+  }
+  /** Internal W7 proof port. Read the actual stored evidence, never reconstruct
+   * a media signature from a document-only projection or return a stale command.
+   */
+  async publicationProof(actor: Actor, creatorId: string, id: string) {
+    return this.transaction(actor, creatorId, async (client) => {
+      await this.authorizeOwnedMedia(client, actor, creatorId);
+      const role = await this.role(client, actor, creatorId, ["publisher"]);
+      const row = await this.index(client, creatorId, id);
+      await this.authorizeRead(client, actor, row);
+      if (row.state !== "published") return null;
+      const current = await this.view(client, actor, row);
+      const publication = (
+        await client.query(
+          "SELECT * FROM creator.content_publication WHERE content_id=$1 AND version=$2",
+          [id, row.version],
+        )
+      ).rows[0];
+      if (!publication) return null;
+      const evidence = z
+        .array(ProcessedMediaEvidenceSchema)
+        .max(10)
+        .parse(publication.media_evidence ?? []);
+      const command = publicationCommand(row, current.document, evidence);
+      let mediaReady =
+        current.document.media.length === 0 && evidence.length === 0;
+      if (
+        role.creator &&
+        current.document.media.length > 0 &&
+        this.dependencies.mediaPublication &&
+        publication.signed_act_id
+      ) {
+        const processed = await this.validatePublication(
+          client,
+          actor,
+          row,
+          current.document,
+        );
+        mediaReady =
+          contentHash(processed.mediaEvidence) === contentHash(evidence);
+        for (const item of evidence)
+          if (
+            !(await this.dependencies.mediaPublication.ready(
+              client,
+              actor,
+              creatorId,
+              id,
+              item,
+              publication.signed_act_id,
+            ))
+          )
+            mediaReady = false;
+      }
+      return {
+        command,
+        signedActId: publication.signed_act_id as string | null,
+        mediaReady,
+      };
     });
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {
@@ -1669,15 +2071,30 @@ export class ContentService {
   }
   async runScheduled(actor: Actor, creatorId: string) {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.authorizeOwnedMedia(client, actor, creatorId);
       await this.role(client, actor, creatorId, ["publisher"]);
-      const rows = (
-        await client.query<Index>(
-          "SELECT * FROM creator.content_index WHERE creator_id=$1 AND state='scheduled' AND scheduled_at<=now() ORDER BY scheduled_at,id LIMIT 20 FOR UPDATE SKIP LOCKED",
+      const candidates = (
+        await client.query<{ id: string }>(
+          "SELECT id FROM creator.content_index WHERE creator_id=$1 AND (state='media_pending' OR (state='scheduled' AND scheduled_at<=now())) ORDER BY scheduled_at NULLS FIRST,id LIMIT 20",
           [creatorId],
         )
       ).rows;
       let published = 0;
-      for (const row of rows) {
+      for (const candidate of candidates) {
+        const locked = (
+          await client.query<{ acquired: boolean }>(
+            "SELECT pg_try_advisory_xact_lock(hashtextextended($1,0)) AS acquired",
+            [`content:${candidate.id}`],
+          )
+        ).rows[0]?.acquired;
+        if (!locked) continue;
+        const row = await this.index(client, creatorId, candidate.id, true);
+        if (
+          !["media_pending", "scheduled"].includes(row.state) ||
+          (row.state === "scheduled" &&
+            (!row.scheduled_at || row.scheduled_at.getTime() > Date.now()))
+        )
+          continue;
         const view = await this.view(client, actor, row),
           publication = (
             await client.query(
@@ -1685,11 +2102,16 @@ export class ContentService {
               [row.id, row.version],
             )
           ).rows[0];
-        if (publication.author_account_id !== actor.accountId) continue;
+        if (!publication || publication.author_account_id !== actor.accountId)
+          continue;
+        const storedEvidence = z
+          .array(ProcessedMediaEvidenceSchema)
+          .max(10)
+          .parse(publication.media_evidence ?? []);
         if (publication.signed_act_id) {
           const proof = (
             await client.query(
-              "SELECT key_revoked,creator_revoked,withdrawn FROM creator.signed_verification WHERE id=$1",
+              "SELECT key_revoked,creator_revoked,withdrawn,content_hash FROM creator.signed_verification WHERE id=$1",
               [publication.signed_act_id],
             )
           ).rows[0];
@@ -1697,11 +2119,53 @@ export class ContentService {
             !proof ||
             proof.key_revoked ||
             proof.creator_revoked ||
-            proof.withdrawn
+            proof.withdrawn ||
+            proof.content_hash !==
+              contentHash(
+                publicationCommand(row, view.document, storedEvidence),
+              )
           )
             continue;
         }
-        await this.validatePublication(client, actor, row, view.document);
+        const { mediaEvidence } = await this.validatePublication(
+          client,
+          actor,
+          row,
+          view.document,
+        );
+        if (mediaEvidence.length) {
+          if (
+            !publication.signed_act_id ||
+            !this.dependencies.mediaPublication ||
+            contentHash(mediaEvidence) !== contentHash(storedEvidence)
+          )
+            continue;
+          let ready = true;
+          for (const evidence of storedEvidence)
+            if (
+              !(await this.dependencies.mediaPublication.ready(
+                client,
+                actor,
+                creatorId,
+                row.id,
+                evidence,
+                publication.signed_act_id,
+              ))
+            )
+              ready = false;
+          if (!ready) continue;
+        } else if (row.state === "media_pending") continue;
+        if (
+          row.state === "media_pending" &&
+          row.scheduled_at &&
+          row.scheduled_at.getTime() > Date.now()
+        ) {
+          await client.query(
+            "UPDATE creator.content_index SET state='scheduled' WHERE id=$1",
+            [row.id],
+          );
+          continue;
+        }
         await client.query(
           "UPDATE creator.content_index SET state='published',published_at=now() WHERE id=$1",
           [row.id],

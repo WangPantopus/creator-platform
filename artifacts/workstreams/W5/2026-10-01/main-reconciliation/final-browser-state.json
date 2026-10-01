@@ -1,0 +1,5 @@
+{
+  "recordedAt": "2026-10-01T07:49:46.834Z",
+  "url": "http://localhost:3005/studio/50000000-0000-4000-8000-000000000001/thanks",
+  "state": "- alert\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - generic: W5 development creator\n  - button \"Refresh role\"\n  - heading \"Thanks\" [level=1]\n  - paragraph: Only notes fans consented to share with your digest appear here.\n- navigation \"Studio\":\n  - link \"Notes\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/notes\n    - text: Notes\n  - link \"Requests\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/requests\n    - text: Requests\n  - link \"Threads\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/threads\n    - text: Threads\n  - link \"My AI\":\n    - /url: /studio/ai\n    - text: My AI\n  - link \"More\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/more\n    - text: More"
+}

@@ -1,0 +1,133 @@
+{
+  "recordedAt": "2026-09-30T21:17:00Z",
+  "applicationHead": "eedf35fc82544ab9216384896b84e376f2c323f4",
+  "runs": [
+    {
+      "runId": 36763954818,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36763954818",
+      "jobs": [
+        {
+          "name": "web-visual",
+          "id": 110053267690,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "android-runtime",
+          "id": 110053267722,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "android-foundation",
+          "id": 110053267827,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "ios-foundation",
+          "id": 110053267858,
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "web-and-backend",
+          "id": 110053267964,
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "runId": 36775600495,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36775600495",
+      "jobs": [
+        {
+          "name": "android-runtime",
+          "id": 110092591543,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "web-and-backend",
+          "id": 110092591664,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "web-visual",
+          "id": 110092591882,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "ios-foundation",
+          "id": 110092591919,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "android-foundation",
+          "id": 110092592031,
+          "status": "queued",
+          "conclusion": null
+        }
+      ]
+    },
+    {
+      "runId": 36777448626,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36777448626",
+      "jobs": [
+        {
+          "name": "web-and-backend",
+          "id": 110098819762,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "ios-foundation",
+          "id": 110098820029,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "web-visual",
+          "id": 110098820044,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "android-runtime",
+          "id": 110098820192,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "android-foundation",
+          "id": 110098820196,
+          "status": "queued",
+          "conclusion": null
+        }
+      ]
+    }
+  ],
+  "pullRequest": {
+    "created": false,
+    "lastAttempt": "403 Resource not accessible by integration on draft creation at eedf35f",
+    "connectorLogin": "wypgitt",
+    "installationAccounts": ["wypgitt", "Pantopus"],
+    "repositoryOwner": "WangPantopus",
+    "sshPush": "success",
+    "merge": false
+  },
+  "nativeSnapshot": {
+    "latestFailureRun": 36763954818,
+    "job": 110053267858,
+    "artifact": 11124533610,
+    "assertions": 110,
+    "failures": 110,
+    "nonSnapshotMethodsPassed": 15,
+    "nextAction": "Verify eedf35f hosted-coordinate repair on1x CI; investigate LG HDR4K/sRGB color-space difference with W1 before any reviewed golden update. Strict assertions unchanged."
+  },
+  "handoffPushCreatesNewRun": true
+}

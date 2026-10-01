@@ -25,6 +25,8 @@ public enum APIJSONValue: Codable, Sendable {
   }
 }
 
+public typealias APIAgentAgentAudience = APIJSONValue
+
 public struct APIAgentCorrectionRequest: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `paraphrasedPrompt`: String
@@ -233,6 +235,8 @@ public struct APIAgentPublishRequest: Codable, Sendable {
   }
 }
 
+public typealias APIAgentRevision = Int
+
 public struct APIAgentSourceAction: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `action`: APIAgentSourceActionAction
@@ -340,6 +344,8 @@ public enum APICommerceCommitmentState: String, Codable, Sendable {
   case `resolved` = "resolved"
 }
 
+public typealias APICommerceCurrency = String
+
 public struct APICommerceDecidePacket: Codable, Sendable {
   public let `action`: APICommerceDecidePacketAction
   public let `version`: Int
@@ -413,6 +419,10 @@ public struct APICommerceFulfillmentCommand: Codable, Sendable {
     self.messageId = messageId
   }
 }
+
+public typealias APICommerceIdempotencyKey = String
+
+public typealias APICommerceMinorUnits = Int
 
 public enum APICommerceModeKind: String, Codable, Sendable {
   case `written_reply` = "written_reply"
@@ -548,6 +558,8 @@ public struct APICommercePassPurchaseQuote: Codable, Sendable {
     self.periodEndsAt = periodEndsAt
   }
 }
+
+public typealias APICommercePassPurchaseStatus = APIJSONValue
 
 public enum APICommercePaymentState: String, Codable, Sendable {
   case `authorization_pending` = "authorization_pending"
@@ -1585,6 +1597,2213 @@ public enum APICallSessionState: String, Codable, Sendable {
   case `ending` = "ending"
   case `ended` = "ended"
   case `cancelled` = "cancelled"
+}
+
+public typealias APIContentAudience = APIJSONValue
+
+public struct APIContentConsentResult: Codable, Sendable {
+  public let `version`: Int
+  public let `share_text`: Bool
+  public let `show_handle`: Bool
+  public init(version: Int, share_text: Bool, show_handle: Bool) {
+    self.version = version
+    self.share_text = share_text
+    self.show_handle = show_handle
+  }
+}
+
+public struct APIContentDocument: Codable, Sendable {
+  public let `kind`: APIContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentDocumentLive?
+  public init(kind: APIContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
+}
+
+public enum APIContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+  }
+}
+
+public struct APIContentEffectsResult: Codable, Sendable {
+  public let `processed`: Int
+  public init(processed: Int) {
+    self.processed = processed
+  }
+}
+
+public typealias APIContentKey = String
+
+public struct APIContentList: Codable, Sendable {
+  public let `items`: [APIContentListItemsItem]
+  public let `nextCursor`: String?
+  public let `serverTime`: String
+  public init(items: [APIContentListItemsItem], nextCursor: String? = nil, serverTime: String) {
+    self.items = items
+    self.nextCursor = nextCursor
+    self.serverTime = serverTime
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextCursor`
+    case `serverTime`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIContentListItemsItem].self, forKey: .items)
+    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
+    self.serverTime = try container.decode(String.self, forKey: .serverTime)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextCursor, forKey: .nextCursor)
+    try container.encode(serverTime, forKey: .serverTime)
+  }
+}
+
+public struct APIContentListItemsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentListItemsItemAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentListItemsItemDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentListItemsItemSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentListItemsItemAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentListItemsItemDocument, audienceCount: Int? = nil, sourceState: APIContentListItemsItemSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `creatorId`
+    case `creatorName`
+    case `creatorHandle`
+    case `teamMember`
+    case `displayText`
+    case `version`
+    case `state`
+    case `authorKind`
+    case `authorLabel`
+    case `audienceLabel`
+    case `signedActId`
+    case `publishedAt`
+    case `document`
+    case `audienceCount`
+    case `sourceState`
+    case `quotedText`
+    case `quotedHandle`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.creatorHandle = try container.decode(String.self, forKey: .creatorHandle)
+    self.teamMember = try container.decode(String?.self, forKey: .teamMember)
+    self.displayText = try container.decode(String.self, forKey: .displayText)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.state = try container.decode(String.self, forKey: .state)
+    self.authorKind = try container.decode(APIContentListItemsItemAuthorKind.self, forKey: .authorKind)
+    self.authorLabel = try container.decode(String.self, forKey: .authorLabel)
+    self.audienceLabel = try container.decode(String.self, forKey: .audienceLabel)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.publishedAt = try container.decode(String?.self, forKey: .publishedAt)
+    self.document = try container.decode(APIContentListItemsItemDocument.self, forKey: .document)
+    self.audienceCount = try container.decode(Int?.self, forKey: .audienceCount)
+    self.sourceState = try container.decode(APIContentListItemsItemSourceState.self, forKey: .sourceState)
+    self.quotedText = try container.decode(String?.self, forKey: .quotedText)
+    self.quotedHandle = try container.decode(String?.self, forKey: .quotedHandle)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(creatorHandle, forKey: .creatorHandle)
+    try container.encode(teamMember, forKey: .teamMember)
+    try container.encode(displayText, forKey: .displayText)
+    try container.encode(version, forKey: .version)
+    try container.encode(state, forKey: .state)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(authorLabel, forKey: .authorLabel)
+    try container.encode(audienceLabel, forKey: .audienceLabel)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(publishedAt, forKey: .publishedAt)
+    try container.encode(document, forKey: .document)
+    try container.encode(audienceCount, forKey: .audienceCount)
+    try container.encode(sourceState, forKey: .sourceState)
+    try container.encode(quotedText, forKey: .quotedText)
+    try container.encode(quotedHandle, forKey: .quotedHandle)
+  }
+}
+
+public enum APIContentListItemsItemAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentListItemsItemDocument: Codable, Sendable {
+  public let `kind`: APIContentListItemsItemDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentListItemsItemDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentListItemsItemDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentListItemsItemDocumentLive?
+  public init(kind: APIContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, live: APIContentListItemsItemDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentListItemsItemDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentListItemsItemDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentListItemsItemDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentListItemsItemDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
+}
+
+public enum APIContentListItemsItemDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentListItemsItemDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentListItemsItemDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentListItemsItemDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentListItemsItemDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentListItemsItemDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentListItemsItemDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+  }
+}
+
+public enum APIContentListItemsItemSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
+}
+
+public struct APIContentLiveCatalog: Codable, Sendable {
+  public let `available`: Bool
+  public let `items`: [APIContentLiveCatalogItemsItem]
+  public init(available: Bool, items: [APIContentLiveCatalogItemsItem]) {
+    self.available = available
+    self.items = items
+  }
+}
+
+public struct APIContentLiveCatalogItemsItem: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public let `replayReady`: Bool
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil, replayReady: Bool) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+    self.replayReady = replayReady
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+    case `replayReady`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+    self.replayReady = try container.decode(Bool.self, forKey: .replayReady)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+    try container.encode(replayReady, forKey: .replayReady)
+  }
+}
+
+public struct APIContentMedia: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentMediaKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentMediaKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentMediaKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentMuteCommand: Codable, Sendable {
+  public let `muted`: Bool
+  public init(muted: Bool) {
+    self.muted = muted
+  }
+}
+
+public struct APIContentPage: Codable, Sendable {
+  public let `cursor`: String?
+  public let `limit`: Int
+  public let `state`: APIContentPageState?
+  public let `query`: String?
+  public init(cursor: String? = nil, limit: Int, state: APIContentPageState? = nil, query: String? = nil) {
+    self.cursor = cursor
+    self.limit = limit
+    self.state = state
+    self.query = query
+  }
+}
+
+public enum APIContentPageState: String, Codable, Sendable {
+  case `draft` = "draft"
+  case `media_pending` = "media_pending"
+  case `scheduled` = "scheduled"
+  case `published` = "published"
+  case `unpublished` = "unpublished"
+  case `archived` = "archived"
+}
+
+public struct APIContentPreference: Codable, Sendable {
+  public let `accountId`: String
+  public let `muted`: Bool
+  public init(accountId: String, muted: Bool) {
+    self.accountId = accountId
+    self.muted = muted
+  }
+}
+
+public struct APIContentReactionResult: Codable, Sendable {
+  public let `replyId`: String
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(replyId: String, kind: String, signedActId: String) {
+    self.replyId = replyId
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentReplyList: Codable, Sendable {
+  public let `items`: [APIContentReplyListItemsItem]
+  public let `nextCursor`: String?
+  public init(items: [APIContentReplyListItemsItem], nextCursor: String? = nil) {
+    self.items = items
+    self.nextCursor = nextCursor
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextCursor`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIContentReplyListItemsItem].self, forKey: .items)
+    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextCursor, forKey: .nextCursor)
+  }
+}
+
+public struct APIContentReplyListItemsItem: Codable, Sendable {
+  public let `safetyState`: APIContentReplyListItemsItemSafetyState
+  public let `safetyReviewAvailable`: Bool
+  public let `read`: Bool
+  public let `id`: String
+  public let `contentId`: String
+  public let `fanId`: String
+  public let `handle`: String
+  public let `text`: String
+  public let `version`: Int
+  public let `createdAt`: String
+  public let `consent`: APIContentReplyListItemsItemConsent
+  public let `reaction`: APIContentReplyListItemsItemReaction?
+  public init(safetyState: APIContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
+    self.safetyState = safetyState
+    self.safetyReviewAvailable = safetyReviewAvailable
+    self.read = read
+    self.id = id
+    self.contentId = contentId
+    self.fanId = fanId
+    self.handle = handle
+    self.text = text
+    self.version = version
+    self.createdAt = createdAt
+    self.consent = consent
+    self.reaction = reaction
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `safetyState`
+    case `safetyReviewAvailable`
+    case `read`
+    case `id`
+    case `contentId`
+    case `fanId`
+    case `handle`
+    case `text`
+    case `version`
+    case `createdAt`
+    case `consent`
+    case `reaction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.safetyState = try container.decode(APIContentReplyListItemsItemSafetyState.self, forKey: .safetyState)
+    self.safetyReviewAvailable = try container.decode(Bool.self, forKey: .safetyReviewAvailable)
+    self.read = try container.decode(Bool.self, forKey: .read)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.contentId = try container.decode(String.self, forKey: .contentId)
+    self.fanId = try container.decode(String.self, forKey: .fanId)
+    self.handle = try container.decode(String.self, forKey: .handle)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.consent = try container.decode(APIContentReplyListItemsItemConsent.self, forKey: .consent)
+    self.reaction = try container.decode(APIContentReplyListItemsItemReaction?.self, forKey: .reaction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(safetyState, forKey: .safetyState)
+    try container.encode(safetyReviewAvailable, forKey: .safetyReviewAvailable)
+    try container.encode(read, forKey: .read)
+    try container.encode(id, forKey: .id)
+    try container.encode(contentId, forKey: .contentId)
+    try container.encode(fanId, forKey: .fanId)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(text, forKey: .text)
+    try container.encode(version, forKey: .version)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(consent, forKey: .consent)
+    try container.encode(reaction, forKey: .reaction)
+  }
+}
+
+public enum APIContentReplyListItemsItemSafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
+}
+
+public struct APIContentReplyListItemsItemConsent: Codable, Sendable {
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `version`: Int
+  public init(shareText: Bool, showHandle: Bool, version: Int) {
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.version = version
+  }
+}
+
+public struct APIContentReplyListItemsItemReaction: Codable, Sendable {
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(kind: String, signedActId: String) {
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentReplyPage: Codable, Sendable {
+  public let `cursor`: String?
+  public let `limit`: Int
+  public let `filter`: APIContentReplyPageFilter
+  public init(cursor: String? = nil, limit: Int, filter: APIContentReplyPageFilter) {
+    self.cursor = cursor
+    self.limit = limit
+    self.filter = filter
+  }
+}
+
+public enum APIContentReplyPageFilter: String, Codable, Sendable {
+  case `all` = "all"
+  case `unread` = "unread"
+  case `reacted` = "reacted"
+  case `flagged` = "flagged"
+}
+
+public struct APIContentReplyReadResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `read`: APIContentReplyReadResultRead
+  public init(id: String, version: Int, read: APIContentReplyReadResultRead) {
+    self.id = id
+    self.version = version
+    self.read = read
+  }
+}
+
+public struct APIContentReplyReadResultRead: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIContentReplyReviewResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `safetyState`: APIContentReplyReviewResultSafetyState
+  public init(id: String, version: Int, safetyState: APIContentReplyReviewResultSafetyState) {
+    self.id = id
+    self.version = version
+    self.safetyState = safetyState
+  }
+}
+
+public enum APIContentReplyReviewResultSafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
+}
+
+public struct APIContentResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `signedActId`: String?
+  public init(id: String, version: Int, state: String, signedActId: String? = nil) {
+    self.id = id
+    self.version = version
+    self.state = state
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIContentRevisionResult: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public init(id: String, version: Int) {
+    self.id = id
+    self.version = version
+  }
+}
+
+public struct APIContentScheduledResult: Codable, Sendable {
+  public let `published`: Int
+  public init(published: Int) {
+    self.published = published
+  }
+}
+
+public typealias APIContentThanksFeed = [APIContentThanksFeedValueItem]
+
+public struct APIContentThanksFeedValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `target_kind`: APIContentThanksFeedValueItemTargetKind
+  public let `target_id`: String
+  public let `text`: String
+  public let `handle`: String?
+  public let `created_at`: String
+  public init(id: String, version: Int, target_kind: APIContentThanksFeedValueItemTargetKind, target_id: String, text: String, handle: String? = nil, created_at: String) {
+    self.id = id
+    self.version = version
+    self.target_kind = target_kind
+    self.target_id = target_id
+    self.text = text
+    self.handle = handle
+    self.created_at = created_at
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `version`
+    case `target_kind`
+    case `target_id`
+    case `text`
+    case `handle`
+    case `created_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.target_kind = try container.decode(APIContentThanksFeedValueItemTargetKind.self, forKey: .target_kind)
+    self.target_id = try container.decode(String.self, forKey: .target_id)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.created_at = try container.decode(String.self, forKey: .created_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(version, forKey: .version)
+    try container.encode(target_kind, forKey: .target_kind)
+    try container.encode(target_id, forKey: .target_id)
+    try container.encode(text, forKey: .text)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(created_at, forKey: .created_at)
+  }
+}
+
+public enum APIContentThanksFeedValueItemTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public struct APIContentThanksQuery: Codable, Sendable {
+  public let `targetKind`: APIContentThanksQueryTargetKind
+  public let `targetId`: String
+  public init(targetKind: APIContentThanksQueryTargetKind, targetId: String) {
+    self.targetKind = targetKind
+    self.targetId = targetId
+  }
+}
+
+public enum APIContentThanksQueryTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public typealias APIContentThanksView = APIContentThanksViewValue?
+
+public struct APIContentThanksViewValue: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `text`: String
+  public let `shareWithCreatorDigest`: Bool
+  public let `showIdentity`: Bool
+  public let `withdrawn`: Bool
+  public init(id: String, version: Int, text: String, shareWithCreatorDigest: Bool, showIdentity: Bool, withdrawn: Bool) {
+    self.id = id
+    self.version = version
+    self.text = text
+    self.shareWithCreatorDigest = shareWithCreatorDigest
+    self.showIdentity = showIdentity
+    self.withdrawn = withdrawn
+  }
+}
+
+public struct APIContentVersionCommand: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public init(version: Int, idempotencyKey: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIContentView: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentViewAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentViewDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentViewSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentViewAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentViewDocument, audienceCount: Int? = nil, sourceState: APIContentViewSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `creatorId`
+    case `creatorName`
+    case `creatorHandle`
+    case `teamMember`
+    case `displayText`
+    case `version`
+    case `state`
+    case `authorKind`
+    case `authorLabel`
+    case `audienceLabel`
+    case `signedActId`
+    case `publishedAt`
+    case `document`
+    case `audienceCount`
+    case `sourceState`
+    case `quotedText`
+    case `quotedHandle`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.creatorHandle = try container.decode(String.self, forKey: .creatorHandle)
+    self.teamMember = try container.decode(String?.self, forKey: .teamMember)
+    self.displayText = try container.decode(String.self, forKey: .displayText)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.state = try container.decode(String.self, forKey: .state)
+    self.authorKind = try container.decode(APIContentViewAuthorKind.self, forKey: .authorKind)
+    self.authorLabel = try container.decode(String.self, forKey: .authorLabel)
+    self.audienceLabel = try container.decode(String.self, forKey: .audienceLabel)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.publishedAt = try container.decode(String?.self, forKey: .publishedAt)
+    self.document = try container.decode(APIContentViewDocument.self, forKey: .document)
+    self.audienceCount = try container.decode(Int?.self, forKey: .audienceCount)
+    self.sourceState = try container.decode(APIContentViewSourceState.self, forKey: .sourceState)
+    self.quotedText = try container.decode(String?.self, forKey: .quotedText)
+    self.quotedHandle = try container.decode(String?.self, forKey: .quotedHandle)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(creatorHandle, forKey: .creatorHandle)
+    try container.encode(teamMember, forKey: .teamMember)
+    try container.encode(displayText, forKey: .displayText)
+    try container.encode(version, forKey: .version)
+    try container.encode(state, forKey: .state)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(authorLabel, forKey: .authorLabel)
+    try container.encode(audienceLabel, forKey: .audienceLabel)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(publishedAt, forKey: .publishedAt)
+    try container.encode(document, forKey: .document)
+    try container.encode(audienceCount, forKey: .audienceCount)
+    try container.encode(sourceState, forKey: .sourceState)
+    try container.encode(quotedText, forKey: .quotedText)
+    try container.encode(quotedHandle, forKey: .quotedHandle)
+  }
+}
+
+public enum APIContentViewAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentViewDocument: Codable, Sendable {
+  public let `kind`: APIContentViewDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentViewDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentViewDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentViewDocumentLive?
+  public init(kind: APIContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentViewDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentViewDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentViewDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentViewDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentViewDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
+}
+
+public enum APIContentViewDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentViewDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentViewDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentViewDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentViewDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentViewDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentViewDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+  }
+}
+
+public enum APIContentViewSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
+}
+
+public struct APIContentWithdrawResult: Codable, Sendable {
+  public let `id`: String
+  public let `withdrawn`: APIContentWithdrawResultWithdrawn
+  public init(id: String, withdrawn: APIContentWithdrawResultWithdrawn) {
+    self.id = id
+    self.withdrawn = withdrawn
+  }
+}
+
+public struct APIContentWithdrawResultWithdrawn: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIPrivateNoteReply: Codable, Sendable {
+  public let `safetyState`: APIPrivateNoteReplySafetyState
+  public let `safetyReviewAvailable`: Bool
+  public let `read`: Bool
+  public let `id`: String
+  public let `contentId`: String
+  public let `fanId`: String
+  public let `handle`: String
+  public let `text`: String
+  public let `version`: Int
+  public let `createdAt`: String
+  public let `consent`: APIPrivateNoteReplyConsent
+  public let `reaction`: APIPrivateNoteReplyReaction?
+  public init(safetyState: APIPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
+    self.safetyState = safetyState
+    self.safetyReviewAvailable = safetyReviewAvailable
+    self.read = read
+    self.id = id
+    self.contentId = contentId
+    self.fanId = fanId
+    self.handle = handle
+    self.text = text
+    self.version = version
+    self.createdAt = createdAt
+    self.consent = consent
+    self.reaction = reaction
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `safetyState`
+    case `safetyReviewAvailable`
+    case `read`
+    case `id`
+    case `contentId`
+    case `fanId`
+    case `handle`
+    case `text`
+    case `version`
+    case `createdAt`
+    case `consent`
+    case `reaction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.safetyState = try container.decode(APIPrivateNoteReplySafetyState.self, forKey: .safetyState)
+    self.safetyReviewAvailable = try container.decode(Bool.self, forKey: .safetyReviewAvailable)
+    self.read = try container.decode(Bool.self, forKey: .read)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.contentId = try container.decode(String.self, forKey: .contentId)
+    self.fanId = try container.decode(String.self, forKey: .fanId)
+    self.handle = try container.decode(String.self, forKey: .handle)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.consent = try container.decode(APIPrivateNoteReplyConsent.self, forKey: .consent)
+    self.reaction = try container.decode(APIPrivateNoteReplyReaction?.self, forKey: .reaction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(safetyState, forKey: .safetyState)
+    try container.encode(safetyReviewAvailable, forKey: .safetyReviewAvailable)
+    try container.encode(read, forKey: .read)
+    try container.encode(id, forKey: .id)
+    try container.encode(contentId, forKey: .contentId)
+    try container.encode(fanId, forKey: .fanId)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(text, forKey: .text)
+    try container.encode(version, forKey: .version)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(consent, forKey: .consent)
+    try container.encode(reaction, forKey: .reaction)
+  }
+}
+
+public enum APIPrivateNoteReplySafetyState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `allowed` = "allowed"
+  case `flagged` = "flagged"
+}
+
+public struct APIPrivateNoteReplyConsent: Codable, Sendable {
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `version`: Int
+  public init(shareText: Bool, showHandle: Bool, version: Int) {
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.version = version
+  }
+}
+
+public struct APIPrivateNoteReplyReaction: Codable, Sendable {
+  public let `kind`: String
+  public let `signedActId`: String
+  public init(kind: String, signedActId: String) {
+    self.kind = kind
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIPublishContent: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIQuoteConsent: Codable, Sendable {
+  public let `version`: Int
+  public let `shareText`: Bool
+  public let `showHandle`: Bool
+  public let `idempotencyKey`: String
+  public init(version: Int, shareText: Bool, showHandle: Bool, idempotencyKey: String) {
+    self.version = version
+    self.shareText = shareText
+    self.showHandle = showHandle
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIReactToReply: Codable, Sendable {
+  public let `version`: Int
+  public let `kind`: APIReactToReplyKind
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(version: Int, kind: APIReactToReplyKind, signedActId: String, idempotencyKey: String) {
+    self.version = version
+    self.kind = kind
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIReactToReplyKind: String, Codable, Sendable {
+  case `heart` = "heart"
+  case `thanks` = "thanks"
+  case `helpful` = "helpful"
+}
+
+public struct APIReplyToNote: Codable, Sendable {
+  public let `text`: String
+  public let `idempotencyKey`: String
+  public init(text: String, idempotencyKey: String) {
+    self.text = text
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APISaveContent: Codable, Sendable {
+  public let `id`: String
+  public let `expectedVersion`: Int
+  public let `document`: APISaveContentDocument
+  public let `idempotencyKey`: String
+  public init(id: String, expectedVersion: Int, document: APISaveContentDocument, idempotencyKey: String) {
+    self.id = id
+    self.expectedVersion = expectedVersion
+    self.document = document
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APISaveContentDocument: Codable, Sendable {
+  public let `kind`: APISaveContentDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APISaveContentDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APISaveContentDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APISaveContentDocumentLive?
+  public init(kind: APISaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APISaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APISaveContentDocumentQuote? = nil, packetId: String? = nil, live: APISaveContentDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APISaveContentDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APISaveContentDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APISaveContentDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APISaveContentDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
+}
+
+public enum APISaveContentDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APISaveContentDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APISaveContentDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APISaveContentDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APISaveContentDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APISaveContentDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APISaveContentDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+  }
+}
+
+public struct APIThanksCommand: Codable, Sendable {
+  public let `targetKind`: APIThanksCommandTargetKind
+  public let `targetId`: String
+  public let `text`: String
+  public let `shareWithCreatorDigest`: Bool
+  public let `showIdentity`: Bool
+  public let `withdrawn`: Bool
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(targetKind: APIThanksCommandTargetKind, targetId: String, text: String, shareWithCreatorDigest: Bool, showIdentity: Bool, withdrawn: Bool, expectedVersion: Int, idempotencyKey: String) {
+    self.targetKind = targetKind
+    self.targetId = targetId
+    self.text = text
+    self.shareWithCreatorDigest = shareWithCreatorDigest
+    self.showIdentity = showIdentity
+    self.withdrawn = withdrawn
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public enum APIThanksCommandTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
+}
+
+public struct APIStudioInvite: Codable, Sendable {
+  public let `handle`: String
+  public let `roles`: [APIStudioInviteRolesItem]
+  public init(handle: String, roles: [APIStudioInviteRolesItem]) {
+    self.handle = handle
+    self.roles = roles
+  }
+}
+
+public enum APIStudioInviteRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioQueueQuery: Codable, Sendable {
+  public let `cursor`: String?
+  public let `filter`: APIStudioQueueQueryFilter
+  public let `limit`: Int
+  public init(cursor: String? = nil, filter: APIStudioQueueQueryFilter, limit: Int) {
+    self.cursor = cursor
+    self.filter = filter
+    self.limit = limit
+  }
+}
+
+public enum APIStudioQueueQueryFilter: String, Codable, Sendable {
+  case `all` = "all"
+  case `due` = "due"
+  case `decide` = "decide"
+  case `more_info` = "more_info"
+}
+
+public struct APIStudioSaveReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `expectedVersion`: Int
+  public let `idempotencyKey`: String
+  public init(text: String, expectedVersion: Int, idempotencyKey: String) {
+    self.text = text
+    self.expectedVersion = expectedVersion
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioSendReplyDraft: Codable, Sendable {
+  public let `version`: Int
+  public let `idempotencyKey`: String
+  public let `signedActId`: String
+  public init(version: Int, idempotencyKey: String, signedActId: String) {
+    self.version = version
+    self.idempotencyKey = idempotencyKey
+    self.signedActId = signedActId
+  }
+}
+
+public struct APIStudioCorrection: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public let `expectedRevision`: Int
+  public let `paraphrasedPrompt`: String
+  public let `rule`: String
+  public let `unacceptableAnswer`: String
+  public init(idempotencyKey: String, expectedRevision: Int, paraphrasedPrompt: String, rule: String, unacceptableAnswer: String) {
+    self.idempotencyKey = idempotencyKey
+    self.expectedRevision = expectedRevision
+    self.paraphrasedPrompt = paraphrasedPrompt
+    self.rule = rule
+    self.unacceptableAnswer = unacceptableAnswer
+  }
+}
+
+public struct APIStudioRevision: Codable, Sendable {
+  public let `revision`: Int
+  public init(revision: Int) {
+    self.revision = revision
+  }
+}
+
+public struct APIStudioDraftVersion: Codable, Sendable {
+  public let `version`: Int
+  public init(version: Int) {
+    self.version = version
+  }
+}
+
+public struct APIStudioReplyDraft: Codable, Sendable {
+  public let `text`: String
+  public let `version`: Int
+  public let `sentMessageId`: String?
+  public init(text: String, version: Int, sentMessageId: String? = nil) {
+    self.text = text
+    self.version = version
+    self.sentMessageId = sentMessageId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `text`
+    case `version`
+    case `sentMessageId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.sentMessageId = try container.decode(String?.self, forKey: .sentMessageId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(text, forKey: .text)
+    try container.encode(version, forKey: .version)
+    try container.encode(sentMessageId, forKey: .sentMessageId)
+  }
+}
+
+public struct APIStudioSession: Codable, Sendable {
+  public let `creators`: [APIStudioSessionCreatorsItem]
+  public let `invitations`: [APIStudioSessionInvitationsItem]
+  public let `serverTime`: String
+  public init(creators: [APIStudioSessionCreatorsItem], invitations: [APIStudioSessionInvitationsItem], serverTime: String) {
+    self.creators = creators
+    self.invitations = invitations
+    self.serverTime = serverTime
+  }
+}
+
+public struct APIStudioSessionCreatorsItem: Codable, Sendable {
+  public let `id`: String
+  public let `display_name`: String
+  public let `handle`: String
+  public let `verification`: String
+  public let `owned`: Bool
+  public let `roles`: [APIStudioSessionCreatorsItemRolesItem]
+  public let `memberHandle`: String?
+  public let `viewerAccountId`: String
+  public init(id: String, display_name: String, handle: String, verification: String, owned: Bool, roles: [APIStudioSessionCreatorsItemRolesItem], memberHandle: String? = nil, viewerAccountId: String) {
+    self.id = id
+    self.display_name = display_name
+    self.handle = handle
+    self.verification = verification
+    self.owned = owned
+    self.roles = roles
+    self.memberHandle = memberHandle
+    self.viewerAccountId = viewerAccountId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `display_name`
+    case `handle`
+    case `verification`
+    case `owned`
+    case `roles`
+    case `memberHandle`
+    case `viewerAccountId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.display_name = try container.decode(String.self, forKey: .display_name)
+    self.handle = try container.decode(String.self, forKey: .handle)
+    self.verification = try container.decode(String.self, forKey: .verification)
+    self.owned = try container.decode(Bool.self, forKey: .owned)
+    self.roles = try container.decode([APIStudioSessionCreatorsItemRolesItem].self, forKey: .roles)
+    self.memberHandle = try container.decode(String?.self, forKey: .memberHandle)
+    self.viewerAccountId = try container.decode(String.self, forKey: .viewerAccountId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(display_name, forKey: .display_name)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(verification, forKey: .verification)
+    try container.encode(owned, forKey: .owned)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(memberHandle, forKey: .memberHandle)
+    try container.encode(viewerAccountId, forKey: .viewerAccountId)
+  }
+}
+
+public enum APIStudioSessionCreatorsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioSessionInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `roles`: [APIStudioSessionInvitationsItemRolesItem]
+  public let `expiresAt`: String
+  public init(id: String, creatorId: String, creatorName: String, roles: [APIStudioSessionInvitationsItemRolesItem], expiresAt: String) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.roles = roles
+    self.expiresAt = expiresAt
+  }
+}
+
+public enum APIStudioSessionInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioAudiences: Codable, Sendable {
+  public let `audienceCountsAvailable`: Bool
+  public let `tiers`: [APIStudioAudiencesTiersItem]
+  public let `groups`: [APIStudioAudiencesGroupsItem]
+  public init(audienceCountsAvailable: Bool, tiers: [APIStudioAudiencesTiersItem], groups: [APIStudioAudiencesGroupsItem]) {
+    self.audienceCountsAvailable = audienceCountsAvailable
+    self.tiers = tiers
+    self.groups = groups
+  }
+}
+
+public struct APIStudioAudiencesTiersItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioAudiencesGroupsItem: Codable, Sendable {
+  public let `id`: String
+  public let `name`: String
+  public init(id: String, name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+public struct APIStudioInvitation: Codable, Sendable {
+  public let `id`: String
+  public let `roles`: [APIStudioInvitationRolesItem]
+  public let `creatorId`: String?
+  public let `accountId`: String?
+  public let `expiresAt`: String?
+  public let `accepted`: Bool?
+  public init(id: String, roles: [APIStudioInvitationRolesItem], creatorId: String? = nil, accountId: String? = nil, expiresAt: String? = nil, accepted: Bool? = nil) {
+    self.id = id
+    self.roles = roles
+    self.creatorId = creatorId
+    self.accountId = accountId
+    self.expiresAt = expiresAt
+    self.accepted = accepted
+  }
+}
+
+public enum APIStudioInvitationRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public typealias APIStudioCommerceProjection = APIJSONValue
+
+public struct APIStudioTeam: Codable, Sendable {
+  public let `members`: [APIStudioTeamMembersItem]
+  public let `invitations`: [APIStudioTeamInvitationsItem]
+  public init(members: [APIStudioTeamMembersItem], invitations: [APIStudioTeamInvitationsItem]) {
+    self.members = members
+    self.invitations = invitations
+  }
+}
+
+public struct APIStudioTeamMembersItem: Codable, Sendable {
+  public let `account_id`: String
+  public let `roles`: [APIStudioTeamMembersItemRolesItem]
+  public let `revoked_at`: String?
+  public let `handle`: String?
+  public init(account_id: String, roles: [APIStudioTeamMembersItemRolesItem], revoked_at: String? = nil, handle: String? = nil) {
+    self.account_id = account_id
+    self.roles = roles
+    self.revoked_at = revoked_at
+    self.handle = handle
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `account_id`
+    case `roles`
+    case `revoked_at`
+    case `handle`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.account_id = try container.decode(String.self, forKey: .account_id)
+    self.roles = try container.decode([APIStudioTeamMembersItemRolesItem].self, forKey: .roles)
+    self.revoked_at = try container.decode(String?.self, forKey: .revoked_at)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(account_id, forKey: .account_id)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(revoked_at, forKey: .revoked_at)
+    try container.encode(handle, forKey: .handle)
+  }
+}
+
+public enum APIStudioTeamMembersItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioTeamInvitationsItem: Codable, Sendable {
+  public let `id`: String
+  public let `account_id`: String
+  public let `handle`: String?
+  public let `roles`: [APIStudioTeamInvitationsItemRolesItem]
+  public let `expires_at`: String
+  public let `accepted_at`: String?
+  public let `revoked_at`: String?
+  public init(id: String, account_id: String, handle: String? = nil, roles: [APIStudioTeamInvitationsItemRolesItem], expires_at: String, accepted_at: String? = nil, revoked_at: String? = nil) {
+    self.id = id
+    self.account_id = account_id
+    self.handle = handle
+    self.roles = roles
+    self.expires_at = expires_at
+    self.accepted_at = accepted_at
+    self.revoked_at = revoked_at
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `account_id`
+    case `handle`
+    case `roles`
+    case `expires_at`
+    case `accepted_at`
+    case `revoked_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.account_id = try container.decode(String.self, forKey: .account_id)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.roles = try container.decode([APIStudioTeamInvitationsItemRolesItem].self, forKey: .roles)
+    self.expires_at = try container.decode(String.self, forKey: .expires_at)
+    self.accepted_at = try container.decode(String?.self, forKey: .accepted_at)
+    self.revoked_at = try container.decode(String?.self, forKey: .revoked_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(account_id, forKey: .account_id)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(roles, forKey: .roles)
+    try container.encode(expires_at, forKey: .expires_at)
+    try container.encode(accepted_at, forKey: .accepted_at)
+    try container.encode(revoked_at, forKey: .revoked_at)
+  }
+}
+
+public enum APIStudioTeamInvitationsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIStudioControlCommand: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public init(idempotencyKey: String) {
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIStudioThreadEntries: Codable, Sendable {
+  public let `items`: [APIStudioThreadEntriesItemsItem]
+  public let `nextCursor`: String?
+  public let `coverage`: APIStudioThreadEntriesCoverage
+  public init(items: [APIStudioThreadEntriesItemsItem], nextCursor: String? = nil, coverage: APIStudioThreadEntriesCoverage) {
+    self.items = items
+    self.nextCursor = nextCursor
+    self.coverage = coverage
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextCursor`
+    case `coverage`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIStudioThreadEntriesItemsItem].self, forKey: .items)
+    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
+    self.coverage = try container.decode(APIStudioThreadEntriesCoverage.self, forKey: .coverage)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextCursor, forKey: .nextCursor)
+    try container.encode(coverage, forKey: .coverage)
+  }
+}
+
+public struct APIStudioThreadEntriesItemsItem: Codable, Sendable {
+  public let `fanId`: String
+  public let `handle`: String
+  public let `sources`: [APIStudioThreadEntriesItemsItemSourcesItem]
+  public let `updatedAt`: String
+  public init(fanId: String, handle: String, sources: [APIStudioThreadEntriesItemsItemSourcesItem], updatedAt: String) {
+    self.fanId = fanId
+    self.handle = handle
+    self.sources = sources
+    self.updatedAt = updatedAt
+  }
+}
+
+public enum APIStudioThreadEntriesItemsItemSourcesItem: String, Codable, Sendable {
+  case `note_reply` = "note_reply"
+  case `request` = "request"
+}
+
+public enum APIStudioThreadEntriesCoverage: String, Codable, Sendable {
+  case `notes_and_requests` = "notes_and_requests"
+}
+
+public struct APIContentReview: Codable, Sendable {
+  public let `command`: APIContentReviewCommand
+  public let `view`: APIContentReviewView
+  public init(command: APIContentReviewCommand, view: APIContentReviewView) {
+    self.command = command
+    self.view = view
+  }
+}
+
+public struct APIContentReviewCommand: Codable, Sendable {
+  public let `actType`: APIContentReviewCommandActType
+  public let `subjectId`: String
+  public let `content`: APIJSONValue
+  public init(actType: APIContentReviewCommandActType, subjectId: String, content: APIJSONValue) {
+    self.actType = actType
+    self.subjectId = subjectId
+    self.content = content
+  }
+}
+
+public enum APIContentReviewCommandActType: String, Codable, Sendable {
+  case `reply` = "reply"
+  case `approved_draft` = "approved_draft"
+  case `broadcast` = "broadcast"
+  case `reaction` = "reaction"
+  case `accept` = "accept"
+  case `correction` = "correction"
+}
+
+public struct APIContentReviewView: Codable, Sendable {
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `creatorHandle`: String
+  public let `teamMember`: String?
+  public let `displayText`: String
+  public let `version`: Int
+  public let `state`: String
+  public let `authorKind`: APIContentReviewViewAuthorKind
+  public let `authorLabel`: String
+  public let `audienceLabel`: String
+  public let `signedActId`: String?
+  public let `publishedAt`: String?
+  public let `document`: APIContentReviewViewDocument
+  public let `audienceCount`: Int?
+  public let `sourceState`: APIContentReviewViewSourceState
+  public let `quotedText`: String?
+  public let `quotedHandle`: String?
+  public init(id: String, creatorId: String, creatorName: String, creatorHandle: String, teamMember: String? = nil, displayText: String, version: Int, state: String, authorKind: APIContentReviewViewAuthorKind, authorLabel: String, audienceLabel: String, signedActId: String? = nil, publishedAt: String? = nil, document: APIContentReviewViewDocument, audienceCount: Int? = nil, sourceState: APIContentReviewViewSourceState, quotedText: String? = nil, quotedHandle: String? = nil) {
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.creatorHandle = creatorHandle
+    self.teamMember = teamMember
+    self.displayText = displayText
+    self.version = version
+    self.state = state
+    self.authorKind = authorKind
+    self.authorLabel = authorLabel
+    self.audienceLabel = audienceLabel
+    self.signedActId = signedActId
+    self.publishedAt = publishedAt
+    self.document = document
+    self.audienceCount = audienceCount
+    self.sourceState = sourceState
+    self.quotedText = quotedText
+    self.quotedHandle = quotedHandle
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `creatorId`
+    case `creatorName`
+    case `creatorHandle`
+    case `teamMember`
+    case `displayText`
+    case `version`
+    case `state`
+    case `authorKind`
+    case `authorLabel`
+    case `audienceLabel`
+    case `signedActId`
+    case `publishedAt`
+    case `document`
+    case `audienceCount`
+    case `sourceState`
+    case `quotedText`
+    case `quotedHandle`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.creatorHandle = try container.decode(String.self, forKey: .creatorHandle)
+    self.teamMember = try container.decode(String?.self, forKey: .teamMember)
+    self.displayText = try container.decode(String.self, forKey: .displayText)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.state = try container.decode(String.self, forKey: .state)
+    self.authorKind = try container.decode(APIContentReviewViewAuthorKind.self, forKey: .authorKind)
+    self.authorLabel = try container.decode(String.self, forKey: .authorLabel)
+    self.audienceLabel = try container.decode(String.self, forKey: .audienceLabel)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.publishedAt = try container.decode(String?.self, forKey: .publishedAt)
+    self.document = try container.decode(APIContentReviewViewDocument.self, forKey: .document)
+    self.audienceCount = try container.decode(Int?.self, forKey: .audienceCount)
+    self.sourceState = try container.decode(APIContentReviewViewSourceState.self, forKey: .sourceState)
+    self.quotedText = try container.decode(String?.self, forKey: .quotedText)
+    self.quotedHandle = try container.decode(String?.self, forKey: .quotedHandle)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(creatorHandle, forKey: .creatorHandle)
+    try container.encode(teamMember, forKey: .teamMember)
+    try container.encode(displayText, forKey: .displayText)
+    try container.encode(version, forKey: .version)
+    try container.encode(state, forKey: .state)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(authorLabel, forKey: .authorLabel)
+    try container.encode(audienceLabel, forKey: .audienceLabel)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(publishedAt, forKey: .publishedAt)
+    try container.encode(document, forKey: .document)
+    try container.encode(audienceCount, forKey: .audienceCount)
+    try container.encode(sourceState, forKey: .sourceState)
+    try container.encode(quotedText, forKey: .quotedText)
+    try container.encode(quotedHandle, forKey: .quotedHandle)
+  }
+}
+
+public enum APIContentReviewViewAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+  case `human_creator` = "human_creator"
+  case `team` = "team"
+}
+
+public struct APIContentReviewViewDocument: Codable, Sendable {
+  public let `kind`: APIContentReviewViewDocumentKind
+  public let `title`: String
+  public let `text`: String
+  public let `audience`: APIJSONValue
+  public let `media`: [APIContentReviewViewDocumentMediaItem]
+  public let `nameToken`: Bool
+  public let `showAudienceCount`: Bool
+  public let `aiUseIntent`: Bool
+  public let `scheduledAt`: String?
+  public let `quote`: APIContentReviewViewDocumentQuote?
+  public let `packetId`: String?
+  public let `live`: APIContentReviewViewDocumentLive?
+  public init(kind: APIContentReviewViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentReviewViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentReviewViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentReviewViewDocumentLive? = nil) {
+    self.kind = kind
+    self.title = title
+    self.text = text
+    self.audience = audience
+    self.media = media
+    self.nameToken = nameToken
+    self.showAudienceCount = showAudienceCount
+    self.aiUseIntent = aiUseIntent
+    self.scheduledAt = scheduledAt
+    self.quote = quote
+    self.packetId = packetId
+    self.live = live
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `kind`
+    case `title`
+    case `text`
+    case `audience`
+    case `media`
+    case `nameToken`
+    case `showAudienceCount`
+    case `aiUseIntent`
+    case `scheduledAt`
+    case `quote`
+    case `packetId`
+    case `live`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.kind = try container.decode(APIContentReviewViewDocumentKind.self, forKey: .kind)
+    self.title = try container.decode(String.self, forKey: .title)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.audience = try container.decode(APIJSONValue.self, forKey: .audience)
+    self.media = try container.decode([APIContentReviewViewDocumentMediaItem].self, forKey: .media)
+    self.nameToken = try container.decode(Bool.self, forKey: .nameToken)
+    self.showAudienceCount = try container.decode(Bool.self, forKey: .showAudienceCount)
+    self.aiUseIntent = try container.decode(Bool.self, forKey: .aiUseIntent)
+    self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
+    self.quote = try container.decode(APIContentReviewViewDocumentQuote?.self, forKey: .quote)
+    self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.live = try container.decodeIfPresent(APIContentReviewViewDocumentLive.self, forKey: .live)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(kind, forKey: .kind)
+    try container.encode(title, forKey: .title)
+    try container.encode(text, forKey: .text)
+    try container.encode(audience, forKey: .audience)
+    try container.encode(media, forKey: .media)
+    try container.encode(nameToken, forKey: .nameToken)
+    try container.encode(showAudienceCount, forKey: .showAudienceCount)
+    try container.encode(aiUseIntent, forKey: .aiUseIntent)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(quote, forKey: .quote)
+    try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(live, forKey: .live)
+  }
+}
+
+public enum APIContentReviewViewDocumentKind: String, Codable, Sendable {
+  case `note` = "note"
+  case `post` = "post"
+  case `public_answer` = "public_answer"
+  case `quote_reply` = "quote_reply"
+  case `live` = "live"
+  case `replay` = "replay"
+}
+
+public struct APIContentReviewViewDocumentMediaItem: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `kind`: APIContentReviewViewDocumentMediaItemKind
+  public let `alt`: String
+  public init(assetId: String, version: Int, sha256: String, kind: APIContentReviewViewDocumentMediaItemKind, alt: String) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.kind = kind
+    self.alt = alt
+  }
+}
+
+public enum APIContentReviewViewDocumentMediaItemKind: String, Codable, Sendable {
+  case `photo` = "photo"
+  case `voice` = "voice"
+  case `video` = "video"
+}
+
+public struct APIContentReviewViewDocumentQuote: Codable, Sendable {
+  public let `replyId`: String
+  public let `consentVersion`: Int
+  public init(replyId: String, consentVersion: Int) {
+    self.replyId = replyId
+    self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentReviewViewDocumentLive: Codable, Sendable {
+  public let `sessionId`: String
+  public let `startsAt`: String
+  public let `endsAt`: String
+  public let `replayContentId`: String?
+  public init(sessionId: String, startsAt: String, endsAt: String, replayContentId: String? = nil) {
+    self.sessionId = sessionId
+    self.startsAt = startsAt
+    self.endsAt = endsAt
+    self.replayContentId = replayContentId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `sessionId`
+    case `startsAt`
+    case `endsAt`
+    case `replayContentId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.startsAt = try container.decode(String.self, forKey: .startsAt)
+    self.endsAt = try container.decode(String.self, forKey: .endsAt)
+    self.replayContentId = try container.decode(String?.self, forKey: .replayContentId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(startsAt, forKey: .startsAt)
+    try container.encode(endsAt, forKey: .endsAt)
+    try container.encode(replayContentId, forKey: .replayContentId)
+  }
+}
+
+public enum APIContentReviewViewSourceState: String, Codable, Sendable {
+  case `not_requested` = "not_requested"
+  case `candidate_pending` = "candidate_pending"
+  case `candidate` = "candidate"
+  case `revocation_pending` = "revocation_pending"
+  case `revoked` = "revoked"
 }
 
 public struct APIConsentEnvelope: Codable, Sendable {
@@ -3614,6 +5833,8 @@ public struct APIConversationConversationRecordingResult: Codable, Sendable {
   }
 }
 
+public typealias APIConversationConversationRecordingView = APIJSONValue
+
 public struct APIConversationConversationTimeline: Codable, Sendable {
   public let `threadId`: String
   public let `creatorId`: String
@@ -4064,6 +6285,8 @@ public enum APIConversationTranslationLabel: String, Codable, Sendable {
   case `Translated___original_available` = "Translated · original available"
 }
 
+public typealias APIContentContentAudience = APIJSONValue
+
 public struct APIContentContentConsentResult: Codable, Sendable {
   public let `version`: Int
   public let `share_text`: Bool
@@ -4226,6 +6449,8 @@ public struct APIContentContentEffectsResult: Codable, Sendable {
     self.processed = processed
   }
 }
+
+public typealias APIContentContentKey = String
 
 public struct APIContentContentList: Codable, Sendable {
   public let `items`: [APIContentContentListItemsItem]
@@ -4607,6 +6832,7 @@ public struct APIContentContentPage: Codable, Sendable {
 
 public enum APIContentContentPageState: String, Codable, Sendable {
   case `draft` = "draft"
+  case `media_pending` = "media_pending"
   case `scheduled` = "scheduled"
   case `published` = "published"
   case `unpublished` = "unpublished"
@@ -4838,6 +7064,61 @@ public struct APIContentContentScheduledResult: Codable, Sendable {
   public init(published: Int) {
     self.published = published
   }
+}
+
+public typealias APIContentContentThanksFeed = [APIContentContentThanksFeedValueItem]
+
+public struct APIContentContentThanksFeedValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `target_kind`: APIContentContentThanksFeedValueItemTargetKind
+  public let `target_id`: String
+  public let `text`: String
+  public let `handle`: String?
+  public let `created_at`: String
+  public init(id: String, version: Int, target_kind: APIContentContentThanksFeedValueItemTargetKind, target_id: String, text: String, handle: String? = nil, created_at: String) {
+    self.id = id
+    self.version = version
+    self.target_kind = target_kind
+    self.target_id = target_id
+    self.text = text
+    self.handle = handle
+    self.created_at = created_at
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `version`
+    case `target_kind`
+    case `target_id`
+    case `text`
+    case `handle`
+    case `created_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.target_kind = try container.decode(APIContentContentThanksFeedValueItemTargetKind.self, forKey: .target_kind)
+    self.target_id = try container.decode(String.self, forKey: .target_id)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.created_at = try container.decode(String.self, forKey: .created_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(version, forKey: .version)
+    try container.encode(target_kind, forKey: .target_kind)
+    try container.encode(target_id, forKey: .target_id)
+    try container.encode(text, forKey: .text)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(created_at, forKey: .created_at)
+  }
+}
+
+public enum APIContentContentThanksFeedValueItemTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
 }
 
 public struct APIContentContentThanksQuery: Codable, Sendable {
@@ -5536,6 +7817,8 @@ public struct APIStudioStudioAudiencesGroupsItem: Codable, Sendable {
   }
 }
 
+public typealias APIStudioStudioCommerceProjection = APIJSONValue
+
 public struct APIStudioStudioControlCommand: Codable, Sendable {
   public let `idempotencyKey`: String
   public init(idempotencyKey: String) {
@@ -5973,6 +8256,147 @@ public actor CreatorAPIClient {
     return CreatorAPIBinaryResponse(body: data, status: response.statusCode, contentType: response.value(forHTTPHeaderField: "Content-Type"), contentRange: response.value(forHTTPHeaderField: "Content-Range"), acceptRanges: response.value(forHTTPHeaderField: "Accept-Ranges"))
   }
   private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }
+  public func contentList(creatorId: String, cursor: String? = nil, limit: Int? = nil, state: String? = nil, query: String? = nil) async throws -> APIContentList {
+    try await request("/v1/content/\(segment(creatorId))", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "state", value: state), URLQueryItem(name: "query", value: query)])
+  }
+  public func studioContentList(creatorId: String, cursor: String? = nil, limit: Int? = nil, state: String? = nil, query: String? = nil) async throws -> APIContentList {
+    try await request("/v1/content/\(segment(creatorId))/studio", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "state", value: state), URLQueryItem(name: "query", value: query)])
+  }
+  public func studioLiveCatalog(creatorId: String) async throws -> APIContentLiveCatalog {
+    try await request("/v1/content/\(segment(creatorId))/studio/live", method: "GET", authenticated: true)
+  }
+  public func saveContent(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APISaveContent) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/drafts", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  }
+  public func studioContentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  }
+  public func contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIQuoteConsent) async throws -> APIContentConsentResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/consent", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentReplyReaction(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIReactToReply) async throws -> APIContentReactionResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/reaction", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentWithdrawResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/withdraw", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentPreference(creatorId: String) async throws -> APIContentPreference {
+    try await request("/v1/content/\(segment(creatorId))/mute", method: "GET", authenticated: true)
+  }
+  public func muteContent(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APIContentMuteCommand) async throws -> APIContentMuteCommand {
+    try await request("/v1/content/\(segment(creatorId))/mute", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func myContentThanks(creatorId: String) async throws -> APIContentThanksView {
+    try await request("/v1/content/\(segment(creatorId))/thanks", method: "GET", authenticated: true)
+  }
+  public func saveContentThanks(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APIThanksCommand) async throws -> APIContentRevisionResult {
+    try await request("/v1/content/\(segment(creatorId))/thanks", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioThanksFeed(creatorId: String) async throws -> APIContentThanksFeed {
+    try await request("/v1/content/\(segment(creatorId))/studio/thanks", method: "GET", authenticated: true)
+  }
+  public func runScheduledContent(creatorId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIContentScheduledResult {
+    try await request("/v1/content/\(segment(creatorId))/studio/scheduled/run", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func runContentEffects(creatorId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIContentEffectsResult {
+    try await request("/v1/content/\(segment(creatorId))/studio/effects/run", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentView(creatorId: String, id: String) async throws -> APIContentView {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))", method: "GET", authenticated: true)
+  }
+  public func studioContentView(creatorId: String, id: String) async throws -> APIContentView {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/studio", method: "GET", authenticated: true)
+  }
+  public func reviewContent(creatorId: String, id: String) async throws -> APIContentReview {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/review", method: "GET", authenticated: true)
+  }
+  public func publishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIPublishContent) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/publish", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func teamPublishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/team-publish", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func unpublishContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/unpublish", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func archiveContent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/archive", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func replyToNote(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIReplyToNote) async throws -> APIContentReplyReviewResult {
+    try await request("/v1/content/\(segment(creatorId))/\(segment(id))/replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentReplyReview(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentReplyReviewResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/review", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func contentReplyRead(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIContentVersionCommand) async throws -> APIContentReplyReadResult {
+    try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/read", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioThreadEntries(creatorId: String, cursor: String? = nil, limit: Int? = nil) async throws -> APIStudioThreadEntries {
+    try await request("/v1/studio/\(segment(creatorId))/threads", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) })])
+  }
+  public func studioSession() async throws -> APIStudioSession {
+    try await request("/v1/studio/session", method: "GET", authenticated: true)
+  }
+  public func acceptStudioInvitation(id: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIDone {
+    try await request("/v1/studio/invitations/\(segment(id))/accept", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func inviteStudioMember(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioInvite) async throws -> APIStudioInvitation {
+    try await request("/v1/studio/\(segment(creatorId))/team/invite", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioTeam(creatorId: String) async throws -> APIStudioTeam {
+    try await request("/v1/studio/\(segment(creatorId))/team", method: "GET", authenticated: true)
+  }
+  public func studioAudiences(creatorId: String) async throws -> APIStudioAudiences {
+    try await request("/v1/studio/\(segment(creatorId))/audiences", method: "GET", authenticated: true)
+  }
+  public func studioCorrectionRevision(creatorId: String) async throws -> APIStudioRevision {
+    try await request("/v1/studio/\(segment(creatorId))/corrections", method: "GET", authenticated: true)
+  }
+  public func submitStudioCorrection(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioCorrection) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/corrections", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioQueue(creatorId: String, cursor: String? = nil, filter: String? = nil, limit: Int? = nil) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/queue", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "filter", value: filter), URLQueryItem(name: "limit", value: limit.map { String($0) })])
+  }
+  public func studioPacket(creatorId: String, packetId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))", method: "GET", authenticated: true)
+  }
+  public func studioDecidePacket(creatorId: String, packetId: String, xQelvoraExpectedAccount: String? = nil, body: APICommerceDecidePacket) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/decide", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioPacketDeliveries(creatorId: String, packetId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/deliveries", method: "GET", authenticated: true)
+  }
+  public func studioDeliverPacket(creatorId: String, packetId: String, xQelvoraExpectedAccount: String? = nil, body: APICommerceFulfillmentCommand) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/packets/\(segment(packetId))/deliver", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioThread(creatorId: String, fanId: String) async throws -> APIStudioCommerceProjection {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))", method: "GET", authenticated: true)
+  }
+  public func studioTakeover(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioControlCommand) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/takeover", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioHandback(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioControlCommand) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/handback", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioPause(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioControlCommand) async throws -> APIFrame {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/pause", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioHumanReply(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIHumanReply) async throws -> APIMessage {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/reply", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func studioReplyDraft(creatorId: String, fanId: String) async throws -> APIStudioReplyDraft {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/draft", method: "GET", authenticated: true)
+  }
+  public func saveStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioSaveReplyDraft) async throws -> APIStudioDraftVersion {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/draft", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioSendReplyDraft) async throws -> APIMessage {
+    try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/send-draft", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
   public func health() async throws -> APIHealth {
     try await request("/health", method: "GET", authenticated: false)
   }

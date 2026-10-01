@@ -1,0 +1,24 @@
+{
+  "applicationCommit": "bdf13c4fabca5f75829aa36058b0f92f488f7eb8",
+  "states": [
+    {
+      "active": "note-text",
+      "height": 844,
+      "phase": "original-3005-first-visible-loaded-draft",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 390,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "",
+      "phase": "original-3005-unsent-input-after-opening",
+      "scrollWidth": 390,
+      "text": "W5 original branch loading check. This unsent text should survive a current-role refresh.",
+      "width": 390
+    }
+  ],
+  "session": "Original 3005 session expiry exposed canonical restore. Continue with Pantopus restored actual creator workspace, then Notes/Edit succeeded.",
+  "qualification": "An attempted Refresh role selector was absent in the original app and failed. It is not role-refresh acceptance. Actual loaded field and later unsent text observations are retained; no database save, signing or publication performed in this original-host check."
+}

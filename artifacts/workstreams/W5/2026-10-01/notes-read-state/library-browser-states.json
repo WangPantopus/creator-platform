@@ -1,0 +1,44 @@
+[
+  {
+    "stage": "failed-read",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nPublish\nNew post\nAction status\nCurrent creator verification and recovery are required.\n\nAudience controls who can see it. AI-source approval is separate.\n\nSearch your library\nState\nAll states\ndraft\nMedia processing\nscheduled\npublished\nunpublished\narchived",
+      "width": 390
+    }
+  },
+  {
+    "stage": "populated-library",
+    "facts": {
+      "articles": 4,
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nPublish\nNew post\n\nAudience controls who can see it. AI-source approval is separate.\n\nSearch your library\nState\nAll states\ndraft\nMedia processing\nscheduled\npublished\nunpublished\narchived\nW5 library and Thanks verification\n\nARCHIVED · REV 5 · PUBLIC\n\nDevelopment verification: this public post is written by the current team member. AI source use remains off.\n\nAI source removal pending\n\nEdit and review again\nUnpublish\nArchive\nUntitled Note\n\nDRAFT · REV 17 · FOLLOWERS\n\nW5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nSeparate from AI sources\n\nEdit and review again\nUnpublish\nArchive\nW5 count availability boundary\n\nDRAFT · REV 2 · PUBLIC\n\nUnavailable audience size cannot be promised.\n\nSeparate from AI sources\n\nEdit and review again\nUnpublish\nArchive\nW5 development publication\n\nUNPUBLISHED · REV 1 · PUBLIC\n\nLocal development post. This is published by the permitted team.\n\nAI use is off\n\nEdit and review again\nUnpublish\nArchive",
+      "width": 390
+    }
+  },
+  {
+    "stage": "no-matching-search",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nPublish\nNew post\n\nAudience controls who can see it. AI-source approval is separate.\n\nSearch your library\nState\nAll states\ndraft\nMedia processing\nscheduled\npublished\nunpublished\narchived\nNo matching items\n\nTry another search or choose All states.",
+      "width": 390
+    }
+  },
+  {
+    "stage": "no-matching-state",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nPublish\nNew post\n\nAudience controls who can see it. AI-source approval is separate.\n\nSearch your library\nState\nAll states\ndraft\nMedia processing\nscheduled\npublished\nunpublished\narchived\nNo matching items\n\nTry another search or choose All states.",
+      "width": 390
+    }
+  },
+  {
+    "stage": "filters-cleared",
+    "facts": {
+      "articles": 4,
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nPublish\nNew post\n\nAudience controls who can see it. AI-source approval is separate.\n\nSearch your library\nState\nAll states\ndraft\nMedia processing\nscheduled\npublished\nunpublished\narchived\nW5 library and Thanks verification\n\nARCHIVED · REV 5 · PUBLIC\n\nDevelopment verification: this public post is written by the current team member. AI source use remains off.\n\nAI source removal pending\n\nEdit and review again\nUnpublish\nArchive\nUntitled Note\n\nDRAFT · REV 17 · FOLLOWERS\n\nW5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nSeparate from AI sources\n\nEdit and review again\nUnpublish\nArchive\nW5 count availability boundary\n\nDRAFT · REV 2 · PUBLIC\n\nUnavailable audience size cannot be promised.\n\nSeparate from AI sources\n\nEdit and review again\nUnpublish\nArchive\nW5 development publication\n\nUNPUBLISHED · REV 1 · PUBLIC\n\nLocal development post. This is published by the permitted team.\n\nAI use is off\n\nEdit and review again\nUnpublish\nArchive",
+      "width": 390
+    }
+  }
+]

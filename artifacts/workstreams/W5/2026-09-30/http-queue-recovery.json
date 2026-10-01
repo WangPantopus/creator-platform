@@ -1,0 +1,17 @@
+{
+  "surface": "genuine W1 synthetic HTTP session; own W5 loopback non-owner runtime",
+  "begin": 200,
+  "complete": 200,
+  "observations": [
+    {
+      "path": "queue?filter=more_info",
+      "status": 200,
+      "itemCount": 0
+    },
+    {
+      "path": "queue?filter=all&cursor=90000000-0000-4000-8000-000000000001",
+      "status": 409,
+      "errorCode": "queue_changed"
+    }
+  ]
+}

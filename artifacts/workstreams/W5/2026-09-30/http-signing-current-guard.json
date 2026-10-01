@@ -1,0 +1,11 @@
+{
+  "surface": "actual HTTP; W1 genuine development continuation; isolated W5 runtime; no substituted signature",
+  "begin": 200,
+  "complete": 200,
+  "review": 200,
+  "reviewVersion": 3,
+  "signingBegin": 403,
+  "errorCode": "passkey_required",
+  "signatureCreated": false,
+  "publicationCreated": false
+}

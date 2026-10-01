@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-10-01T03:57:21.424892+00:00",
+  "parent": "414e2c5e5d6e5a9007990ca526ad9de50c495340",
+  "sourceSha256": {
+    "apps/web/app/media/voice/page.tsx": "803082eb56fa1c1819ee77c9c10f9b11a55cc9ba2cb37e99368cff35451ef12f",
+    "apps/web/features/media/SignRecording.tsx": "bf8ee150420ccf7a158bfe8c9e2ba98ca5dd29562ff7abc4d686e51d9c09bffe",
+    "apps/web/features/media/VoiceRecorder.tsx": "81f0f20c09f739ebfe2fe7b8f73646ec7ced6964b043d2d8dec49c72116db2e3",
+    "apps/web/features/media/api.ts": "17db3bf0b22b07432817732173476c3583b75ab5d3986d69c41b07f398fd32a9",
+    "apps/web/features/studio/PhotoAttachment.tsx": "1d474dfd1c3d5f7de8f02bded1d6764910c5476947456ea6cef175cffbf3a6dd",
+    "apps/web/features/studio/PostVoiceAttachment.tsx": "6efcaf03ef2987a548b29f3c48c659a705d8c5cd0bede5a933e93e619b17c8cf",
+    "apps/web/features/studio/Studio.tsx": "787ca2ab598bc76be4bd1c8c4d21152bc4c5d2fb9d2b709ed9a11836df6930f4"
+  },
+  "producerSource": "076dda86ca8c7e3fef49d53ec4aa6891757696f8, narrow W6 web media leaves personally reconciled; own opening-account hosts and final capabilities selector",
+  "accountSource": "Studio creator.viewerAccountId from actual current studio session; standalone Voice currentSession().accountId. Selectors remain preconditions, never actor authority.",
+  "scope": "No native helpers, backend roots, migrations, copy catalogs or signing authority imported. Canonical W1 platform passkey requests unchanged.",
+  "actualBrowser": {
+    "route": "http://localhost:3005/studio/50000000-0000-4000-8000-000000000001/compose/a9181632-d598-49f5-9be8-49a66184081c",
+    "actor": "Existing explicitly synthetic development creator 10000000-0000-4000-8000-000000000001",
+    "viewport": [
+      390,
+      844
+    ],
+    "scrollWidth": 390,
+    "themes": [
+      "light",
+      "night"
+    ],
+    "journey": "Reopen existing saved Note. Open Voice (actual draft save). Tab from Close to Record, Enter starts unresolved permission request; same action remains focused as Cancel permission request. Enter cancels; focus stays on Record. No audio nodes/recording file or upload. Close retains text. Open Photo: current capability unavailable, file/upload disabled; text draft saved. Night hard navigation restores same actual saved draft and words; repeat keyboard permission cancellation.",
+    "permission": "Unresolved request canceled, not denial or microphone acceptance",
+    "captures": [
+      "media-keyboard-cancel-390-light.jpg",
+      "media-keyboard-cancel-390-night.jpg",
+      "media-photo-unavailable-390-light.jpg"
+    ]
+  },
+  "administrativeReadOnlyDraft": {
+    "id": "a9181632-d598-49f5-9be8-49a66184081c",
+    "creatorId": "50000000-0000-4000-8000-000000000001",
+    "version": 12,
+    "state": "draft",
+    "mediaCount": 0,
+    "publications": 0
+  },
+  "checks": {
+    "lint": 0,
+    "types": 0,
+    "productionWeb": 0
+  },
+  "unverified": [
+    "Actual account switch during upload/sign/playback",
+    "Microphone recording/processing/final bytes",
+    "Authenticated native content operation",
+    "Genuine signing explicitly held by human"
+  ],
+  "mergePriority": "Finish existing changes only. W1 owns first foundation PR6 merge. Full PR9 remains incomplete; prepare independently verified scoped recovery increment against final merged foundation rather than importing divergent producer branches."
+}

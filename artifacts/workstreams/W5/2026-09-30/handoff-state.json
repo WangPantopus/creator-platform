@@ -1,0 +1,229 @@
+{
+  "recordedAt": "2026-09-30T22:42:34Z",
+  "workspace": "/Users/yingpengwang/.codex/worktrees/35e3/creator-platform",
+  "branch": "codex/w5-studio-content",
+  "applicationCheckpoint": "eedf35fc82544ab9216384896b84e376f2c323f4",
+  "documentation": "subsequent handoff commit; inspect actual HEAD",
+  "main": "2e337a1; fetched/included, already up to date",
+  "devServers": {
+    "web": {
+      "port": 3005,
+      "previousPid": 61338,
+      "previousSession": 90116,
+      "status": "gracefully stopped exit130; listener/PID absence verified"
+    },
+    "backend": {
+      "port": 4105,
+      "previousPid": 74746,
+      "previousSession": 1199,
+      "status": "gracefully stopped exit130; listener/PID absence verified"
+    }
+  },
+  "retained": {
+    "docker": [
+      {
+        "name": "creator-platform-w5-local",
+        "running": false,
+        "port": 55435,
+        "databases": [
+          "creator_w5",
+          "creator_w5_upgrade"
+        ],
+        "lastVerifiedStatus": "exited after own docker stop",
+        "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
+      },
+      {
+        "name": "creator-platform-w5-ci",
+        "running": false,
+        "port": 51360,
+        "databases": [
+          "creator_foundation"
+        ],
+        "lastVerifiedStatus": "exited after own docker stop",
+        "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
+      }
+    ],
+    "privateDevelopmentKey": {
+      "path": "/private/tmp/creator-w5-session-key",
+      "existsAtFinalRecheck": false,
+      "requiredMode": "0600",
+      "contentsNeverPrinted": true,
+      "restart": "Isolated development host creates a new private key if absent; sign in through development continuation again."
+    },
+    "outputs": [],
+    "ios": {
+      "name": "Creator Platform W5",
+      "id": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
+      "model": "iPhone17",
+      "runtime": "iOS26.5",
+      "state": "Shutdown; named simulator present on final recheck"
+    },
+    "android": {
+      "avd": "CreatorPlatform_W5",
+      "emulatorPort": 5590,
+      "emulatorListening": false,
+      "adbPort": 5045,
+      "adb": "own daemon stopped; no listener; former SDK/AVD/Gradle directories absent on final recheck",
+      "transport": "127.0.0.1:5591",
+      "previousAdbPid": 60626,
+      "avdExistsAtFinalRecheck": false
+    },
+    "sourceEvidenceDependenciesPresent": true
+  },
+  "browser": {
+    "temporaryViewportReset": true,
+    "cookieLossUnresolved": true,
+    "nativeInputAvailable": false,
+    "openW5Tabs": 0
+  },
+  "PR": {
+    "exists": false,
+    "creation": "connector403",
+    "sshPush": true
+  },
+  "OpenAI": {
+    "keyLoaded": false,
+    "paidCalls": 0
+  },
+  "unverified": [
+    "real signing/two-fan replies/reaction",
+    "native content/media/provider/a11y/device/performance acceptance",
+    "headless capture/profile repair",
+    "current W3/W4/W6/W7/W8 producer integrations",
+    "W7/W5 immutable migration reconciliation"
+  ],
+  "peers": {
+    "sourceProcessesDatabasesDevicesOutputsPreserved": true
+  },
+  "resourceCleanup": {
+    "record": "resource-cleanup.json",
+    "allocatedBytesRemovedByThisCleanup": 2407641088,
+    "noListenersVerified": [
+      3005,
+      3006,
+      3105,
+      4105,
+      5045,
+      55435,
+      51360,
+      5590
+    ],
+    "laterEnvironmentChange": "All W5 /private/tmp resources absent on final recheck; cause unverified. Docker daemon unavailable; do not assume containers or data are accessible."
+  },
+  "absentAtFinalRecheck": [
+    "/private/tmp/creator-w5-swift",
+    "/private/tmp/creator-w5-ci-host-transform-full",
+    "/private/tmp/creator-w5-host-transform-full.log",
+    "/private/tmp/creator-w5-ios-packages",
+    "/private/tmp/creator-w5-ios-project",
+    "/private/tmp/creator-w5-tools",
+    "/private/tmp/creator-w5-android",
+    "/private/tmp/creator-w5-session-key",
+    "/private/tmp/creator-w1-resume-tools/jdk-x64/jdk-17.0.20.1+1/Contents/Home"
+  ],
+  "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
+  "currentContinuation": {
+    "recordedAt": "2026-10-01T03:46:08.441369+00:00",
+    "branch": "codex/w5-studio-content",
+    "lastPushedCheckpoint": "5a3e9114d426202178b76f80559db44ab2dc8f66 source committed; accompanying documentation checkpoint inspect actualHEAD",
+    "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
+    "PRState": "draft; incomplete; not merged",
+    "runtime": {
+      "primary": {
+        "webPort": 3005,
+        "webSession": 67790,
+        "apiPort": 4105,
+        "apiSession": 68408,
+        "apiPid": 6359
+      },
+      "secondary": {
+        "webPort": 30055,
+        "webSession": 89623,
+        "apiPort": 41055,
+        "apiSession": 7899,
+        "apiPid": 6369
+      },
+      "developmentDatabase": {
+        "container": "creator-platform-w5-local",
+        "port": 55435,
+        "database": "creator_w5",
+        "running": true,
+        "appliedLedgerRows": 35,
+        "preserved": true
+      },
+      "existingChecksDatabase": {
+        "container": "creator-platform-w5-ci",
+        "port": 49812,
+        "database": "creator_foundation",
+        "running": true,
+        "disposableTestsOnly": true,
+        "volumePreserved": true
+      }
+    },
+    "browser": {
+      "tabs": [
+        "1",
+        "3",
+        "5",
+        "6"
+      ],
+      "nativeInputAvailable": false,
+      "cookieNamespaceConsumed": "cf851a5",
+      "focused390LightNightVerified": true,
+      "modalSuspendRecoveryVerified": true,
+      "savedNoteRevision": 9,
+      "fanInputSuspendRecoveryVerified": true,
+      "fanFinal3901280BothThemesVerified": true,
+      "temporaryPostRestored": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3 archived revision5; Thanks remains withdrawnv2; unsent text never submitted",
+      "postVoiceUnavailablePolicyVerified": true,
+      "countBoundaryDraftRevision": 2,
+      "realSessionExpiryAndBoundReadRenewalVerified": true,
+      "correctionCurrentDirectoryEmptyVerified": true,
+      "pendingCreatorControlsBothWidthsThemesVerified": true,
+      "pendingCreatorId": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+      "accountAliasCurrentAndScopedUnavailableVerified": true,
+      "pendingRoleRefreshVerified": true,
+      "sessionRecovery": "Canonical actual expired3005 restoration returned same creator/Threads; normal15minuteaccess expiry independently observed, not all cookie failures explained.",
+      "serializedRoleOutageRecoveryVerified": true,
+      "currentConsentedThanksEmptyVerified": true
+    },
+    "mediaMigration": "W8 reserved0051_w5_media_publication at0742900 / SHA256f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e; unapplied pending immutable aliases/fresh+upgrade custody",
+    "signing": "Human instructed keep genuine signing blocked; no UV/passkey simulation",
+    "OpenAI": {
+      "keyLoaded": false,
+      "paidCalls": 0
+    },
+    "verification": "Final actual source web types/lint/format/production build0; no units/newtests. Current a7 iOS signed app install/launch both themes genuineSignInonly; fresh API34 installed APK/current launched pixels systemANRfail. Complete appE2E/current required merge checks remain open.",
+    "unverified": [
+      "Genuine signed Note/two-fan reply/reaction",
+      "Real media/C2PA and live/replay",
+      "W3/W4/W7/W8 current assemblies and actual delivery/privacy receipts",
+      "Populated queue/packet/provider/native content/physical-device/p95 acceptance"
+    ],
+    "replyConsumers": "Personal W4 exact approval and W3 Team UI/BFF implemented; actual producer write-purpose/denial/migration assemblies absent; no approval/delivery proof",
+    "signatureWithdrawal": "Published held-client ContentSignatureWithdrawal + authorizePublicationSignatureWithdrawal exact domain/revision/full-command policy. W1 consumed registry/current held W8 denial/durable real publisher audit + W8 RLS remain required and absent.",
+    "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
+    "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
+    "audienceMedia": "Final mandatory served-file proof consumed exactly fromW6 682766c, distinct original processed signing tuple; personal native bounded ranges/hash/private cleanup and web audience credentialed proof; no actual mounted producer/bytes/playback acceptance.",
+    "mediaLifecycle": "Exact c425/de171 plus personal e1ce8cfcompatibleprocessingcopy; new W6 076dda86expectedaccount source awaits narrow personalreconciliation.",
+    "nativeAuthority": "Personal final audience attachments/currentviewer+publication+asset binding/serial monotonic5s/scene expiry; actualnativeauth/mediaoperation remains blocked/unverified",
+    "nativeBuildResources": {
+      "owned": "/private/tmp/creator-w5-native-authority",
+      "jdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/jdk-x64/jdk-21.0.12.1+1/Contents/Home",
+      "sdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/sdk",
+      "androidBuild": "Final APK7cb4a2aa installedAPI35/API34. Fresh API34default1 radiosinitialized/boot214237ms; Light9356ms/Night7488ms Statusok but actualProcesssystemANRboth. Runtime acceptancefalse.",
+      "iosBuild": "Current a7 required-nullable build0/codesignStrict/install0 and normal Light/Night SignInonly; actual preserved creator route; no authenticatedmedia.",
+      "ownCachesPreserved": true,
+      "iosOwned": "/private/tmp/creator-w5-native-audience-host",
+      "iosSimulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27 normal shutdown0 after latest screenshots; data preserved",
+      "xcodegenReadonlyLease": "/private/tmp/creator-w1-continuation-tools-20260930/xcodegen/bin/xcodegen",
+      "runtimeEmulatorLease": "Readonly official37.1.11/API35+API34r14; ownAPI35,API34 andfreshAPI34_Matched dataretained after normalstops. Default1 own TMPDIR+ANDROID_TMP/HCI15605 radioinit recovered; HCIreleased. Own5045/5590 only mutated; no peerSDK changes."
+    },
+    "corrections": "Personal strict3cda401 command/input/UI/BFF; exact source version/current account, bounded expiry, original retry, real five-field receipt plus full delivered metadata readback. Original directory empty; genuine UV held; producer/migration/unallocated lineage and audited timeline metadata integration still required. Pending reload recovery unverified.; exact16162 contracts consumed, newest100 query only; genuine lineage port/current missing message columns await W3/W8; actual correction label/exact original-version opener prepared.",
+    "hostedCI": "Last a7 PR9fiveSUCCESS/sixQUEUED; current pushedheadmustbechecked. No completeappE2E/merge readiness. No workflow changes or bypasses.",
+    "preparedStudioRead": "Exact W3 37f727eb type-only port and personal bounded same-pool held-client consumer committed cea5e07. Unmounted pending actual canonical base columns, W8 alias/fresh-upgrade custody and genuine prepared owner instance.",
+    "creatorVerification": "Actual pending creator locally typed butremoteactionsdisabled; serial monotonicrolechecks/outageinputfocusrecovery verified. Actual currentaccountexpiryrestoration remains W1canonical.",
+    "accountAlias": "Explicit W1 lease: unscoped protected identity/account redirect; any query preserved with unavailable notice and deliberate general-account navigation.",
+    "migrationAudit": "Readonly35local/ledger matching checksums; canonical40 aliases six0032\u20130037\u21920035\u20130040 plus applied0038reply-review\u2192reserved0045 identical current SQL. Earlier different-reserved-bytes claim retracted. No SQL/ledger/checksum changes; see migration-alias-observations.json. Exact3685 runner audit rejects unknownapplied aliases before producerVersionand executesSQLbeforealiasdelete; no supported preservedW5upgrade custody yet."
+  }
+}

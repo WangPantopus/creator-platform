@@ -5,6 +5,8 @@ import * as commerce from "./commerce/contracts.ts";
 import * as media from "./media.ts";
 import * as calls from "./session.ts";
 import { ConsentEnvelopeSchema } from "./consent.ts";
+import * as content from "./content.ts";
+import { studioSchemas } from "./studio.ts";
 
 const namespacedSchemas = Object.fromEntries(
   [
@@ -200,6 +202,14 @@ export type Health = z.infer<typeof HealthSchema>;
 
 export const publicSchemas = {
   ...namespacedSchemas,
+  ...Object.fromEntries(
+    Object.entries(content).filter(([, value]) => value instanceof z.ZodType),
+  ),
+  ...studioSchemas,
+  ContentReview: z.strictObject({
+    command: SignedActCommandSchema,
+    view: content.ContentView,
+  }),
   ConsentEnvelope: ConsentEnvelopeSchema,
   ...identitySchemas,
   AuthorKind: AuthorKindSchema,
