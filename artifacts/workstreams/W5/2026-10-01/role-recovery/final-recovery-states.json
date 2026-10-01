@@ -1,0 +1,56 @@
+[
+  {
+    "view": "390-light",
+    "disabledControls": [
+      "Voice · up to 60 s",
+      "Photo",
+      "Save draft",
+      "Review and sign"
+    ],
+    "focusId": "note-text",
+    "focusTag": "TEXTAREA",
+    "height": 844,
+    "hidden": false,
+    "inert": null,
+    "note": "W5 final Light phone recovery. These words stay local.",
+    "scrollWidth": 390,
+    "theme": "light",
+    "width": 390
+  },
+  {
+    "view": "390-night",
+    "disabledControls": [
+      "Voice · up to 60 s",
+      "Photo",
+      "Save draft",
+      "Review and sign"
+    ],
+    "focusId": "note-text",
+    "focusTag": "TEXTAREA",
+    "height": 844,
+    "hidden": false,
+    "inert": null,
+    "note": "W5 final Night phone recovery. These words stay local.",
+    "scrollWidth": 390,
+    "theme": "night",
+    "width": 390
+  },
+  {
+    "view": "1280-light",
+    "disabledControls": [
+      "Voice · up to 60 s",
+      "Photo",
+      "Save draft",
+      "Review and sign"
+    ],
+    "focusId": "note-text",
+    "focusTag": "TEXTAREA",
+    "height": 720,
+    "hidden": false,
+    "inert": null,
+    "note": "W5 final Light desktop recovery. These words stay local.",
+    "scrollWidth": 1280,
+    "theme": "light",
+    "width": 1280
+  }
+]
