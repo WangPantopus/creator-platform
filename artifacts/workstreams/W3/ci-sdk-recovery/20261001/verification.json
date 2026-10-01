@@ -3,7 +3,7 @@
   "branch": "codex/w3-emulator-sdk-recovery",
   "base": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
   "workflow": ".github/workflows/ci.yml",
-  "workflowSha256": "943596db0f7899b3d279945bf461c27fc4d001ef486cdcc7ae7fa6f18d6eae21",
+  "workflowSha256": "a32b0dcfe4e7b2f8d82a62f66fad73ac5adc14991f3a59d783b5639d572cb41a",
   "approvedPatchSha256": "16a4a5a592d95b939c0b9a13361f5addad595b6b7078e845313d750bf99631ec",
   "lease": {
     "owner": "W1",
@@ -25,7 +25,7 @@
     "maximumInstallAttempts": 2,
     "retryCondition": "First installer fails and its captured actual log contains the exact observed archive error; all other failures terminate",
     "logs": "First installer log is printed verbatim; retry output remains in hosted job log",
-    "verification": "Final installation must exit0 and installed emulator -version must exit0 before existing pinned action",
+    "verification": "Final installation must exit0 and installed emulator -no-window -noaudio -version must exit0 before existing pinned action",
     "appBootAndTestRetries": 0,
     "continueOnError": false,
     "localSDKExecuted": false
@@ -87,7 +87,11 @@
     "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/README.md",
     "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/action.yml",
     "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/sdk-installer.ts",
-    "https://developer.android.com/tools/sdkmanager"
+    "https://developer.android.com/tools/sdkmanager",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/main.ts",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/lib/main.js",
+    "https://android.googlesource.com/platform/external/qemu/%2B/emu-master-dev/android/emulator/main-emulator.cpp",
+    "https://developer.android.com/studio/run/emulator-commandline"
   ],
   "limits": [
     "An emulator-build input alone cannot bypass sdk-installer.ts unconditional install that precedes its optional pinned-build branch.",
@@ -95,5 +99,38 @@
     "No local heavy runtime/build/SDK installation during confirmed human cleanup.",
     "Existing hosted tests do not constitute full W3 first-conversation/privacy/production acceptance.",
     "All required checks must be green for normal merge; no queued context counted as passed."
-  ]
+  ],
+  "initialWorkflowSha256": "943596db0f7899b3d279945bf461c27fc4d001ef486cdcc7ae7fa6f18d6eae21",
+  "observedVerificationFailure": {
+    "head": "53c82158d8676e8f204fc8a079ed34c761a517fa",
+    "jobs": [
+      110427410043,
+      110427881679
+    ],
+    "sdkInstall": "both completed and unpacked100% without observed archive retry",
+    "phase": "new version check selected GUI qemu-system-x86_64 before pinned action",
+    "error": "libpulse.so.0: cannot open shared object file; exit127",
+    "appBootOrTestsRun": false,
+    "causedByThisIncrement": true,
+    "logs": [
+      {
+        "file": "gui-verification-failed-pr.log",
+        "sha256": "21461f5056e482a2835f252709cb77c5c6f701c0e1b05aad2f537b7e8adc821e"
+      },
+      {
+        "file": "gui-verification-failed-push.log",
+        "sha256": "9afa41c6db9984e7f76973c4144559d3a4a45c1b82a7959afdf290cf9d0c9cc3"
+      }
+    ]
+  },
+  "headlessFollowup": {
+    "diffFile": "W1-headless-followup.diff",
+    "diffSha256": "d803b2dccc36b110dcebdf84c8796c2503adb316b312554897d23a40a29006fc",
+    "fromHead": "53c82158d8676e8f204fc8a079ed34c761a517fa",
+    "onlySourceChange": "Add -no-window -noaudio to the retained fatal executable version verification, matching existing runner mode",
+    "W1SeparateReviewRequired": true,
+    "reviewState": "W1 personally reviewed exact one-line diff and Google launcher source; approved publication, closes upon exact-diff publication",
+    "effectiveness": "not accepted until actual new-head hosted executable, boot and completed tests",
+    "approvedBeforePublication": true
+  }
 }

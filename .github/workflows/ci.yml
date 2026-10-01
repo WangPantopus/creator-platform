@@ -140,7 +140,7 @@ jobs:
           else
             cat "$w3_install_log"
           fi
-          "${ANDROID_HOME}/emulator/emulator" -version
+          "${ANDROID_HOME}/emulator/emulator" -no-window -noaudio -version
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
