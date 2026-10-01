@@ -1,0 +1,68 @@
+{
+  "observedAt": "2026-10-01T05:31:08.287627+00:00",
+  "sourceCheckpoint": "23d1eba1f1d0059f21b85414ce6e22d27f377118",
+  "main": "705215955415332e601adf5c42a2169cd0d173a5",
+  "url": "http://127.0.0.1:3002/studio/ai/test",
+  "operation": "Actual UI send; approved public-clay response and citation disclosure personally inspected",
+  "pipelineMs": 5172,
+  "firstApprovedMs": 5160,
+  "uiCostMicros": 2315,
+  "persistedSumMicros": 2315,
+  "usage": [
+    {
+      "id": "5b914e95-0013-4b1d-979c-50ef3ef2a786",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 599,
+      "output_tokens": 19,
+      "cost_micros": 270,
+      "category": "preview",
+      "duration_ms": 1377,
+      "created_at": "2026-10-01T05:27:25.03359+00:00"
+    },
+    {
+      "id": "0a7c13f1-5756-4bd4-89ed-8225993802aa",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-2025-04-14",
+      "input_tokens": 653,
+      "output_tokens": 81,
+      "cost_micros": 1954,
+      "category": "preview",
+      "duration_ms": 2363,
+      "created_at": "2026-10-01T05:27:24.05953+00:00"
+    },
+    {
+      "id": "4715ea90-ca89-479c-8b14-0de6f1be3db9",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 11,
+      "output_tokens": 0,
+      "cost_micros": 1,
+      "category": "preview",
+      "duration_ms": 719,
+      "created_at": "2026-10-01T05:27:23.328426+00:00"
+    },
+    {
+      "id": "cd282593-6595-4c23-928e-2a84c6d806d4",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 128,
+      "output_tokens": 24,
+      "cost_micros": 90,
+      "category": "preview",
+      "duration_ms": 2072,
+      "created_at": "2026-10-01T05:27:21.253515+00:00"
+    }
+  ],
+  "savedRecords": {
+    "sources": 123,
+    "immutableVersions": 105,
+    "draftRevision": 18,
+    "evaluationCases": 7,
+    "evaluationState": "passed",
+    "publication": "disabled"
+  },
+  "performanceAcceptance": false,
+  "releaseReady": false,
+  "scope": "Synthetic draft preview; authentic licensed fan delivery remains gated"
+}

@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -171,8 +172,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("meta"))
-            LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md")); SelectionContainer { BasicText(passage.second, style = qText("body")) } } }
+            BasicText("Original source", style = qText("meta").copy(color = qColor("ink")))
+            LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
             Button("Close", variant = ButtonVariant.QUIET) { source = null }
         }
     } }
@@ -186,7 +187,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
             IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption")) }
+                item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
                 if (offline) item { Notice(title = "You're offline", children = "You're seeing the last loaded conversation. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
                 if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch {
@@ -212,7 +213,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                         var expanded by remember(message.id) { mutableStateOf(false) }
                         Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET) { expanded = !expanded }
                         if (expanded) {
-                            BasicText(policy.notice, style = qText("caption"))
+                            BasicText(policy.notice, style = qText("caption").copy(color = qColor("ink")))
                             val respond: (String?) -> Unit = { rating -> scope.launch {
                                 if (!busy && !offline && foreground) {
                                     busy = true
@@ -229,19 +230,19 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "helpful") "Selected" else "Not selected" }) { respond("helpful") }
                             Button("Not helpful", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "not_helpful") "Selected" else "Not selected" }) { respond("not_helpful") }
                             if (message.feedback != null) {
-                                BasicText("Your response is saved.", style = qText("caption"))
+                                BasicText("Your response is saved.", style = qText("caption").copy(color = qColor("ink")))
                                 Button("Remove my response", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { respond(null) }
                             }
                         }
                     }
                 }
-                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption")); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption")); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
+                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
             }
             Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI" }.background(qColor("surface")).padding(12.dp), textStyle = qText("body"), maxLines = 5)
+                    BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI" }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
                     Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
                 }
                 Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
@@ -262,13 +263,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
             else if (kind != null) {
                 Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
-                if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label")); Button("Original AI reply · version ${message.correction.originalVersion}", variant = ButtonVariant.QUIET, onClick = onOriginal) }
-                if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText("Reply unavailable · your allowance was released", style = qText("caption"))
+                if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label").copy(color = qColor("ink"))); Button("Original AI reply · version ${message.correction.originalVersion}", variant = ButtonVariant.QUIET, onClick = onOriginal) }
+                if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText("Reply unavailable · your allowance was released", style = qText("caption").copy(color = qColor("ink")))
                 if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
-                if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption")) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
+                if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption").copy(color = qColor("ink"))) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
             } else {
-                BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label"))
-                BasicText(message.text, style = qText("body"))
+                BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label").copy(color = qColor("ink")))
+                BasicText(message.text, style = qText("body").copy(color = qColor("ink")))
                 if (message.signedActId != null) SignedMarker(name = name, onClick = onVerify)
             }
         }
@@ -306,39 +307,39 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Consent could not be saved." } finally { busy = false }
     }
     provenance?.let { message -> Dialog(onDismissRequest={provenance=null}) { Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-        BasicText("Where this came from",style=qText("title"));BasicText(message.authorLabel(name),style=qText("label"))
-        LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body")) } } }
-        BasicText(message.createdAt,style=qText("data-sm"));Button("Close",variant=ButtonVariant.QUIET) {provenance=null}
+        BasicText("Where this came from",style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
+        LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body").copy(color = qColor("ink"))) } } }
+        BasicText(message.createdAt,style=qText("data-sm").copy(color = qColor("ink")));Button("Close",variant=ButtonVariant.QUIET) {provenance=null}
     } } }
     LaunchedEffect(root) { refresh() }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxSize().background(qColor("ground"))) {
-        item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title")); if (error.isNotEmpty()) Notice(title = "Privacy status", children = error) }
-        item { BasicText("What $name's AI remembers", style = qText("display-md")); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body")) }
+        item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) Notice(title = "Privacy status", children = error) }
+        item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("meta"))
-            if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body")); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body"))
-            if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption"))
+            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("meta").copy(color = qColor("ink")))
+            if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
+            if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
             Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { try { provenance=client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}")) } catch(failure:Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "This source message is unavailable." } } }
             Row { if (item.state == "proposed") Button("Remember", variant = ButtonVariant.SECONDARY, disabled = busy || memory?.offTheRecord == true) { scope.launch { decide(item, "accept") } }; Button("Edit", variant = ButtonVariant.QUIET, disabled = busy) { editing = item.id; text = item.text }; Button(if (item.state == "proposed") "Don't remember" else "Delete", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "delete") } } }
             if (item.kind == "open_loop" && item.state == "remembered") Button("Resolved", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "resolve") } }
         } }
         item {
-            BasicText("Off the record", style = qText("display-md"))
-            BasicText("The AI keeps no memory from it. It remains visible to the creator and their team, and you can delete it.", style = qText("body"))
+            BasicText("Off the record", style = qText("display-md").copy(color = qColor("ink")))
+            BasicText("The AI keeps no memory from it. It remains visible to the creator and their team, and you can delete it.", style = qText("body").copy(color = qColor("ink")))
             Button(if (memory?.offTheRecord == true) "Turn off off-the-record" else "Turn on off-the-record", variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
             Button(if (memory?.introShared == true) "Stop sharing my intro" else "Share my intro with this creator's AI", variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
-            BasicText("AI providers", style = qText("display-md"))
+            BasicText("AI providers", style = qText("display-md").copy(color = qColor("ink")))
             policy?.providers?.providers?.forEach { provider ->
                 Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption"))
+                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
             }
-            if (policy?.providers == null) BasicText("AI providers and verified processing terms are not configured yet.", style = qText("body"))
+            if (policy?.providers == null) BasicText("AI providers and verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
             Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || policy?.providers?.verified != true) { scope.launch { consent() } }
         }
-        item { BasicText("Time with this creator's AI",style=qText("display-md"));usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption"));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body"));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body")) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption")) } }
-        item { BasicText("Who opened your conversations", style = qText("display-md")); if (audit.isEmpty()) BasicText("No logged openings.", style = qText("body")) }
-        items(audit, key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body")) }
-        item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption")); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData) }
+        item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink")));usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
+        item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit.isEmpty()) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
+        items(audit, key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
+        item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption").copy(color = qColor("ink"))); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData) }
     }
 }
 
@@ -361,18 +362,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     val name = creator?.optString("name").orEmpty().ifBlank { "the creator" }
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg")) }
+        item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
         item {
-            BasicText("WHO RUNS IT",style=qText("meta"))
+            BasicText("WHO RUNS IT",style=qText("meta").copy(color = qColor("ink")))
             val policy = capabilities?.providers
-            if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body"))
+            if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
             policy?.providers?.forEach { provider ->
-                BasicText("This AI is powered by ${provider.name}.",style=qText("body"))
+                BasicText("This AI is powered by ${provider.name}.",style=qText("body").copy(color = qColor("ink")))
                 Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption"))
+                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
             }
-            BasicText("WHO CAN READ IT",style=qText("meta")); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body"))
-            BasicText("WHAT IT REMEMBERS",style=qText("meta")); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body"))
+            BasicText("WHO CAN READ IT",style=qText("meta").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHAT IT REMEMBERS",style=qText("meta").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
         if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
@@ -403,15 +404,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LaunchedEffect(session.session?.accountId) { refresh() }
     val fan=account?.get("fan")?.jsonObject
     LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { BasicText("You",style=qText("title")); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
-        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content.orEmpty(),style=qText("display-md"));BasicText(fan?.get("intro")?.jsonPrimitive?.contentOrNull ?: "Your intro is private until you choose to share it.",style=qText("body"));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
+        item { BasicText("You",style=qText("title").copy(color = qColor("ink"))); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
+        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content.orEmpty(),style=qText("display-md").copy(color = qColor("ink")));BasicText(fan?.get("intro")?.jsonPrimitive?.contentOrNull ?: "Your intro is private until you choose to share it.",style=qText("body").copy(color = qColor("ink")));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
         item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce/requests") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/spending") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
-        item { BasicText("Me and privacy",style=qText("display-md"));BasicText("Memory and conversation access by creator",style=qText("body")) }
+        item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item { Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") } }
         }
         item {
-            if (loading) BasicText("Loading your conversations…",style=qText("caption"))
+            if (loading) BasicText("Loading your conversations…",style=qText("caption").copy(color = qColor("ink")))
             account?.get("nextCursor")?.jsonPrimitive?.contentOrNull?.let { next -> Button("More conversations",variant=ButtonVariant.QUIET,disabled=loading || error.isNotEmpty()) { scope.launch { refresh(next) } } }
             if (cursor != null) Button("Back to first page",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
             if (error.isNotEmpty()) Button("Try again",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }

@@ -74,17 +74,8 @@
   },
   "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
-  "preservedPeerPorts": [
-    3001,
-    4101,
-    55431,
-    55435,
-    55438,
-    55443,
-    55444,
-    55447
-  ],
-  "git": "Existing PR1 is ready for review; authenticated local GitHub CLI metadata works. Complete exact-head checks and actual app verification govern merge; no duplicate or forced push.",
+  "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
+  "git": "Existing ready PR1 only; final real Studio/iOS/Android operations passed. Repository main has no required checks/rulesets; latest founder prioritizes actual E2E over unit/coverage. Preserve every CI job/assertion and disclose queued macOS checks; normal merge only, no admin bypass.",
   "nativeVerificationTools": {
     "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
     "location": "tmp/w2-native-20260930",
@@ -104,10 +95,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 61358,
-      "executionSession": 15346
+      "pid": 88089,
+      "executionSession": 95811
     },
-    "observedAt": "2026-10-01T04:42:11.900016+00:00",
+    "observedAt": "2026-10-01T05:46:44.376150+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -140,24 +131,20 @@
     "record": "resource-cleanup.md",
     "allocatedKiBRemoved": 4744680,
     "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
-    "privateRuntimeFiles": [
-      "runtime.env",
-      "provider.env",
-      "postgres.env"
-    ],
+    "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-10-01T04:42:11.900016+00:00",
+    "observedAt": "2026-10-01T05:46:44.376150+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener PID61358/session15346; reconciled W2 journal/accounting/session source, saved18/current evaluation unchanged",
+    "apiPort4102": "Loopback listener PID88089/session95811; current main protected privacy/operations and W2 source, saved18/current evaluation unchanged",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
     "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
     "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
     "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-    "nextAction": "Personally complete launched-app/native acceptance; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full final-head CI pending"
+    "nextAction": "Merge verified guarded increment under latest founder actual-app criterion and repository required-check policy; retain all queued CI jobs and original release gates"
   },
   "availabilityHistory": [
     {
@@ -188,44 +175,45 @@
     }
   ],
   "temporaryVisualVerification": {
-    "ports": [
-      3012,
-      3112
-    ],
+    "ports": [3012, 3112],
     "state": "Stopped after existing suite/followup; reference PNGs/assertions/tolerances unchanged; next-env drift restored",
     "receipt": "visual-origin-followup.json"
   },
   "nativeVerification": {
-    "state": "Current native source: signed iOS2/2 pass0fail41.046s; officialAOSP35 clean shipping launch, originalAndroid4/4pass0fail19.235s + Night shipping sign-in4.378s and cleanpostUIlaunch3967ms; actualcanonicallicensedfanjourneysunavailable",
+    "state": "Final current source: signed iOS2/2 zero failures34.863s; AOSP35 Android4/4 zero failures6.650s plus Night shipping case1.831s and clean Light/Night cold launches2084/1835ms; authentic licensed fan delivery unavailable",
     "simulator": {
       "name": "Creator Platform W2 Resume 20260930",
       "id": "09FA41B1-C300-4970-9F09-26F7CB884425",
       "runtime": "iOS26.5",
-      "state": "Rebuilt signed actual current source, both originalUIcasesPASS0fail41.046s Light/Night; own simulator shut down normally; data retained",
+      "state": "Final originalUI2/2 passed34.863s; normally shut down/app-data retained",
       "peerDevices": "All preserved",
       "evidence": [
-        "ios-welcome-launched.png",
-        "ios-signin-night-operated.png"
+        "final-ios-welcome.png",
+        "final-ios-signin-night.png",
+        "final-ios-catalog-identities.png"
       ]
     },
     "android": {
       "emulatorPort": 5562,
       "adbServerPort": 5042,
-      "state": "CurrentAPK cleanofficialAOSP35launch and all4originalUIcasesPASS0fail19.235s; Night shipping sign-inPASS4.378s; cleanposttestshippinglaunch3967ms; ownAOSP emulatornormallystopped/dataretained",
+      "state": "Final4/4+Night passed; personally inspected clean Light/Night shipping Welcome; original debug-key installs preserve data; normally stopped",
       "evidence": [
-        "merged-android-aosp-welcome.png",
-        "merged-android-aosp-night.png",
-        "merged-android-google-image-startup-failure.png"
+        "final-android-light.png",
+        "final-android-night.png",
+        "final-android-ui.log",
+        "final-android-night-ui.log",
+        "final-android-signing-incompatible.log"
       ],
       "previousExecutionSession": 21120,
       "nextAvd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
       "networkDiscovery": "Own netsim-aosp35 TMPDIR/ANDROID_TMP; default isolated discovery; HCI15602; peers unchanged",
-      "observedAt": "2026-10-01T04:42:11.900016+00:00",
-      "executionSession": 82381,
-      "pid": 35646,
+      "observedAt": "2026-10-01T05:46:44.376150+00:00",
+      "executionSession": 7274,
+      "pid": 92867,
       "nextNetworkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api34-clean TMPDIR/ANDROID_TMP, default netsim instance; HCI15602 reused only after own API35 stopped"
     },
     "ownedDirectory": "tmp/w2-native-20260930",
-    "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse"
+    "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse",
+    "receipt": "final-app-verification.json"
   }
 }
