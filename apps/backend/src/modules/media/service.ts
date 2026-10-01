@@ -12,9 +12,13 @@ import {
 } from "../../../../../packages/api/src/media.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { consumeSignedAct } from "../identity/signed-acts.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+} from "../identity/request-authority.js";
 import { contentHash } from "../../core/canonical.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { MediaTickets, PrivateMediaStorage } from "./storage.js";
@@ -499,6 +503,55 @@ export class MediaService {
     return this.db.withThread(scope, async (client) =>
       this.command(scope, client, await this.row(scope, client, id)),
     );
+  }
+  /** W3 prepares the first signature on its held client using a genuinely issued
+   * creator ThreadScope with the actual family RLS context. CreatorScope alone
+   * cannot substitute for this scope. This neither consumes nor publishes an act. */
+  async signingCommandInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    expected: ProcessedMediaEvidence,
+  ): Promise<SignedActCommand> {
+    assertThreadScope(scope);
+    const current = requestAuthority.getStore();
+    if (!current || current.accountId !== scope.actorAccountId)
+      throw new DomainError(
+        "creator_session_required",
+        "Reopen this recording with your current creator account.",
+        401,
+      );
+    invariant(
+      scope.authority === "creator" &&
+        scope.actorAccountId === scope.creatorAccountId,
+      "creator_required",
+      "Only the verified creator can sign this recording.",
+    );
+    await assertCurrentSession(client, scope.actorAccountId);
+    const owner = await client.query(
+      "SELECT 1 FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL AND cp.account_id=$4 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF t,cp",
+      [scope.threadId, scope.creatorId, scope.fanId, scope.actorAccountId],
+    );
+    invariant(
+      owner.rowCount === 1,
+      "media_signing_authority_unavailable",
+      "Current creator and conversation authority could not be confirmed.",
+    );
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const row = await this.row(scope, client, proof.assetId, true);
+    invariant(
+      row.owner_account_id === scope.actorAccountId &&
+        row.purpose === "human_reply" &&
+        row.state === "ready" &&
+        !row.signed_act_id &&
+        row.version === proof.version &&
+        row.output_sha256 === proof.sha256 &&
+        Number(row.bytes) === proof.bytes &&
+        row.mime_type === proof.mimeType &&
+        row.duration_ms === proof.durationMs,
+      "media_not_signable",
+      "This exact unsigned recording is no longer ready for signing.",
+    );
+    return this.command(scope, client, row);
   }
   /** W3 associates already-signed audio in its own transaction, without consuming its act twice. */
   async publishedRecording(
