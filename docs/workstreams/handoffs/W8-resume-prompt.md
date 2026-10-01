@@ -32,7 +32,7 @@ Ask the human to copy them, then verify the hashes before any restore. Never res
      - development Ops actors;
      - actor/scope/in-transaction denials.
    - Add 0053 as a SECURITY DEFINER participant-bounded deny check executable by `creator_runtime`, plus `trustScopeRestrictionInTransaction()`.
-   - Then send W1 the export names and `server.ts` lines. W1 wires `server.ts`.
+   - Then publish the exact export names and the 6–8 `server.ts` lines in the PR description and in `docs/workstreams/coordination/W8-contracts.md`, and message the new W1 session. The previous W1 session has ended. Its successor works from `codex/w1-session-truth-20261001` (PR66), and its handoff records this contract. W1 wires `server.ts`.
 3. **Open the single registry activation PR.** Inputs and hashes are in the snapshot.
    - Review and merge W4 PR61 first, since it changes the 0049/0054 bytes.
    - Activate ready entries in ascending waves and renumber unready ones above the wave.

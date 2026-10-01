@@ -183,6 +183,7 @@
   "peerHandoffs": {
     "W3": "docs/workstreams/handoffs/W3-mac-studio-2026-10-01.md on PR63",
     "W6": "docs/workstreams/handoffs/W6-2026-10-01-runtime.md on PR67",
-    "W4": "PR64 evening handoff"
+    "W4": "PR64 evening handoff",
+    "W1": "Successor continues from codex/w1-session-truth-20261001 (PR66); docs/workstreams/handoffs/W1-continuation-2026-10-01-claude.md records W8's trust plan; W8 must publish export names and server.ts lines in its PR description and W8-contracts.md"
   }
 }
