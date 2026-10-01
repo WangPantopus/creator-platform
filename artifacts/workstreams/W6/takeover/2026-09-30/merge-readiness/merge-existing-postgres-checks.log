@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/backend
+
+ ✓ tests/postgres.integration.test.ts (9 tests) 377423ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads  374734ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once  340ms
+ ✓ tests/contracts.test.ts (9 tests) 203ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  21:30:18
+   Duration  381.77s (transform 783ms, setup 0ms, collect 2.90s, tests 377.63s, environment 1ms, prepare 323ms)
+
