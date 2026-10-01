@@ -684,6 +684,7 @@ export class GrowthService {
     );
   }
   async createShare(actor: Actor, grantId: string) {
+    z.uuid().parse(grantId);
     const supplied = await this.owners.shareSource(actor, grantId);
     if (!supplied)
       throw new DomainError(
@@ -691,63 +692,91 @@ export class GrowthService {
         copy.growthErrorSharingUnavailable,
       );
     const source = ShareSourceRecord.parse(supplied);
-    const current = await this.owners.shareStatus(grantId, source);
-    if (!current.valid)
-      throw new DomainError(
-        "sharing_unavailable",
-        copy.growthErrorSharingUnavailable,
-      );
     // Canonical W1/W4/W5 adapter attests exact delivered version, creator permission and fan choice.
-    return this.db.actor(actor, null, async (client) => {
-      const result = await client.query(
-        "INSERT INTO growth.share(account_id,grant_id,source_version,source) VALUES($1,$2,$3,$4) ON CONFLICT(grant_id,source_version) DO NOTHING RETURNING id",
-        [actor.accountId, grantId, source.version, source],
-      );
-      if (result.rowCount) return { id: result.rows[0].id };
-      const prior = await client.query(
-        "SELECT id,source FROM growth.share WHERE grant_id=$1 AND source_version=$2",
-        [grantId, source.version],
-      );
-      if (
-        !prior.rowCount ||
-        contentHash(prior.rows[0].source) !== contentHash(source)
-      )
-        throw new DomainError(
-          "share_version_conflict",
-          copy.growthErrorShareVersionConflict,
-          409,
+    return this.db.actor(
+      actor,
+      null,
+      async (client) => {
+        // Hold the account/creator negative erasure fences through the final
+        // owner read and persistence, while the canonical session is current.
+        const current = await this.owners.shareStatus(grantId, source);
+        if (!current.valid)
+          throw new DomainError(
+            "sharing_unavailable",
+            copy.growthErrorSharingUnavailable,
+          );
+        const result = await client.query(
+          "INSERT INTO growth.share(account_id,grant_id,source_version,source) VALUES($1,$2,$3,$4) ON CONFLICT(grant_id,source_version) DO NOTHING RETURNING id",
+          [actor.accountId, grantId, source.version, source],
         );
-      return { id: prior.rows[0].id };
-    });
+        if (result.rowCount) return { id: result.rows[0].id };
+        const prior = await client.query(
+          "SELECT id,source FROM growth.share WHERE grant_id=$1 AND source_version=$2",
+          [grantId, source.version],
+        );
+        if (
+          !prior.rowCount ||
+          contentHash(prior.rows[0].source) !== contentHash(source)
+        )
+          throw new DomainError(
+            "share_version_conflict",
+            copy.growthErrorShareVersionConflict,
+            409,
+          );
+        return { id: prior.rows[0].id };
+      },
+      source.creatorId,
+    );
   }
   async share(id: string) {
-    const result = await this.db.worker.query(
-      "SELECT id,grant_id,source FROM growth.share WHERE id=$1",
-      [id],
-    );
-    if (!result.rowCount) return null;
-    const source = ShareSourceRecord.parse(result.rows[0].source);
-    const status = await this.owners.shareStatus(
-      result.rows[0].grant_id,
-      source,
-    );
-    return status.valid
-      ? {
-          id,
-          source: {
-            ...source,
-            correction: z
-              .string()
-              .max(20000)
-              .nullable()
-              .parse(status.correction),
-          },
-          verificationURL: this.verificationOrigin
-            ? `${this.verificationOrigin}/share/${id}`
-            : null,
-          state: "valid" as const,
-        }
-      : { id, state: "withdrawn" as const };
+    z.uuid().parse(id);
+    return this.db.transaction(this.db.worker, async (client) => {
+      // Read only negative scope metadata before taking the erasure fences.
+      // Acquire them before any row lock to preserve deletion's lock order.
+      const binding = (
+        await client.query<{
+          account_id: string;
+          creator_id: string;
+        }>(
+          "SELECT account_id,source->>'creatorId' AS creator_id FROM growth.share WHERE id=$1",
+          [id],
+        )
+      ).rows[0];
+      if (!binding) return null;
+      const accountId = z.uuid().parse(binding.account_id);
+      const creatorId = z.uuid().parse(binding.creator_id);
+      if (!(await this.erasure.subjects(client, [accountId], [creatorId])))
+        return { id, state: "withdrawn" as const };
+      const row = (
+        await client.query<{
+          grant_id: string;
+          source: unknown;
+        }>(
+          "SELECT grant_id,source FROM growth.share WHERE id=$1 AND account_id=$2 AND source->>'creatorId'=$3",
+          [id, accountId, creatorId],
+        )
+      ).rows[0];
+      if (!row) return { id, state: "withdrawn" as const };
+      const source = ShareSourceRecord.parse(row.source);
+      const status = await this.owners.shareStatus(row.grant_id, source);
+      return status.valid
+        ? {
+            id,
+            source: {
+              ...source,
+              correction: z
+                .string()
+                .max(20000)
+                .nullable()
+                .parse(status.correction),
+            },
+            verificationURL: this.verificationOrigin
+              ? `${this.verificationOrigin}/share/${id}`
+              : null,
+            state: "valid" as const,
+          }
+        : { id, state: "withdrawn" as const };
+    });
   }
   async shareExport(id: string) {
     // Recheck the canonical grant/source on the export action, rather than
@@ -1265,11 +1294,16 @@ export class GrowthService {
           );
         }
         await client.query(
-          "UPDATE growth.event_inbox SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-          [accountId],
-        );
-        await client.query(
-          "UPDATE growth.event_inbox e SET envelope='{\"erased\":true}'::jsonb WHERE NOT EXISTS(SELECT 1 FROM growth.notification n WHERE n.event_id=e.id)",
+          // Only this verified subject's envelopes are affected. An unrelated
+          // event awaiting its first notification is not an erased event.
+          `UPDATE growth.event_inbox SET envelope=CASE
+           WHEN envelope->>'creatorId'=ANY($2::text[])
+             OR NOT EXISTS(SELECT 1 FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1)
+           THEN '{"erased":true}'::jsonb
+           ELSE jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) END
+           WHERE envelope->>'creatorId'=ANY($2::text[])
+             OR envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))`,
+          [accountId, ownedCreatorIds],
         );
         await client.query("DELETE FROM growth.invite WHERE created_by=$1", [
           accountId,
@@ -1306,12 +1340,16 @@ export class GrowthService {
             [ownedCreatorIds],
           );
         await client.query(
-          "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-          [accountId],
+          // Delete this creator's relays or this account's last-recipient
+          // relays before stripping it from the remaining shared envelopes.
+          `DELETE FROM growth.producer_relay WHERE creator_id=ANY($2::uuid[])
+           OR (envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))
+             AND NOT EXISTS(SELECT 1 FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1))`,
+          [accountId, ownedCreatorIds],
         );
         await client.query(
-          "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
-          [ownedCreatorIds],
+          "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+          [accountId],
         );
         await client.query(
           "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",

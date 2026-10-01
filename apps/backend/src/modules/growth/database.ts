@@ -76,6 +76,8 @@ export class GrowthDatabase {
     actor: Actor,
     creatorId: string | null,
     work: (client: PoolClient) => Promise<T>,
+    /** Negative erasure fencing only; never installed as a runtime creator GUC. */
+    negativeCreatorFence?: string,
   ): Promise<T> {
     if (!actor.adultEligible)
       throw new DomainError(
@@ -96,7 +98,11 @@ export class GrowthDatabase {
       });
     if (!this.actorFence) return perform();
     return this.transaction(this.worker, async (client) => {
-      await this.actorFence!(client, actor.accountId, creatorId);
+      await this.actorFence!(
+        client,
+        actor.accountId,
+        creatorId ?? negativeCreatorFence ?? null,
+      );
       return perform();
     });
   }

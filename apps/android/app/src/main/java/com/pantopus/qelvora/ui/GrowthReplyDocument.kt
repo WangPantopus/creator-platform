@@ -37,7 +37,7 @@ class GrowthReplyFileProvider : FileProvider() {
             !name.matches(Regex("reply-v[1-9][0-9]*-[a-f0-9-]{36}\\.pdf"))) throw FileNotFoundException()
         val file = File(requireNotNull(context).cacheDir, "growth-replies/$name")
         if (!file.isFile || System.currentTimeMillis() - file.lastModified() >= 86_400_000) throw FileNotFoundException()
-        return super.openFile(uri, mode)
+        return super.openFile(uri, mode) ?: throw FileNotFoundException()
     }
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = throw SecurityException("Read-only reply export")
 }
