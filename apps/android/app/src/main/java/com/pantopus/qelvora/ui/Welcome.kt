@@ -30,18 +30,23 @@ fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider 
     var connecting by remember { mutableStateOf(false) }
     var unavailable by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val ai = qColor("ai-ink"); val plate = qColor("maya-surface"); val accent = qColor("maya-accent")
     val largeText = LocalDensity.current.fontScale > 1.3f
     val scroll = rememberScrollState()
     Column(Modifier.fillMaxSize().background(qColor("ground")).then(if (largeText) Modifier.verticalScroll(scroll) else Modifier).padding(start = QelvoraTokens.space6, end = QelvoraTokens.space6, top = QelvoraTokens.welcomeTop, bottom = QelvoraTokens.welcomeBottom)) {
         BasicText(QelvoraCopy.brandName, style = wordmarkStyle().copy(color = qColor("ink")))
-        Column((if (largeText) Modifier.padding(vertical = QelvoraTokens.space6) else Modifier.weight(1f)).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.welcomeGap, Alignment.CenterVertically)) {
-            Canvas(Modifier.size(QelvoraTokens.welcomeMarkWidth, QelvoraTokens.welcomeMarkHeight)) {
-                val s = this.size.height / 56f
-                drawCircle(ai,22f*s, Offset(28f*s,28f*s),style = Stroke(2f*s)); drawCircle(ai,5f*s,Offset(28f*s,28f*s)); drawCircle(plate,26f*s,Offset(80f*s,28f*s)); drawCircle(accent,12f*s,Offset(80f*s,28f*s))
+        if (largeText) {
+            Column(Modifier.padding(vertical = QelvoraTokens.space6).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.welcomeGap, Alignment.CenterVertically)) {
+                WelcomeBody(bodyCopy)
             }
-            BasicText(QelvoraCopy.text("welcomeTitle"), style = welcomeTitleStyle().copy(color = qColor("ink")))
-            BasicText(bodyCopy ?: QelvoraCopy.text("welcomeBody"), style = qText("body").copy(color = qColor("ink-muted")))
+        } else {
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                // Keep the original centered composition when it fits. On a
+                // short display, the body scrolls within the space above the
+                // sign-in action instead of drawing underneath that action.
+                Column(Modifier.fillMaxWidth().verticalScroll(scroll).heightIn(min = maxHeight), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.welcomeGap, Alignment.CenterVertically)) {
+                    WelcomeBody(bodyCopy)
+                }
+            }
         }
         Column(verticalArrangement = Arrangement.spacedBy(QelvoraTokens.messagePadding)) {
             if (hasContext) ContextCard(contextSource ?: QelvoraCopy.text("welcomeSource"), contextTitle ?: QelvoraCopy.text("welcomeContext")) { hasContext = false; onRemoveContext?.invoke() }
@@ -56,6 +61,17 @@ fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider 
             if (unavailable) BasicText(QelvoraCopy.text("pantopusUnavailable"), style = qText("caption").copy(color = qColor("alert")))
         }
     }
+}
+
+@Composable
+private fun WelcomeBody(bodyCopy: String?) {
+    val ai = qColor("ai-ink"); val plate = qColor("maya-surface"); val accent = qColor("maya-accent")
+    Canvas(Modifier.size(QelvoraTokens.welcomeMarkWidth, QelvoraTokens.welcomeMarkHeight)) {
+        val s = this.size.height / 56f
+        drawCircle(ai,22f*s, Offset(28f*s,28f*s),style = Stroke(2f*s)); drawCircle(ai,5f*s,Offset(28f*s,28f*s)); drawCircle(plate,26f*s,Offset(80f*s,28f*s)); drawCircle(accent,12f*s,Offset(80f*s,28f*s))
+    }
+    BasicText(QelvoraCopy.text("welcomeTitle"), style = welcomeTitleStyle().copy(color = qColor("ink")))
+    BasicText(bodyCopy ?: QelvoraCopy.text("welcomeBody"), style = qText("body").copy(color = qColor("ink-muted")))
 }
 
 @Preview(name = "4A Welcome Light", widthDp = 390, heightDp = 844)

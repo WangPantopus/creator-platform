@@ -1,0 +1,71 @@
+{
+  "scope": "Source/build/foundation checks only; no genuine Approval, paid provider, native Studio interaction or release acceptance.",
+  "checks": [
+    {
+      "name": "backend production build",
+      "status": "passed"
+    },
+    {
+      "name": "Next production build including scoped Studio/Content/Approval BFF",
+      "status": "passed",
+      "output": ".next-w4-studio-build"
+    },
+    {
+      "name": "workspace typechecks",
+      "status": "passed",
+      "tasks": 7
+    },
+    {
+      "name": "full lint",
+      "status": "passed"
+    },
+    {
+      "name": "full format check",
+      "status": "passed"
+    },
+    {
+      "name": "generated consistency",
+      "status": "passed",
+      "sharedResources": 12,
+      "nativeOperations": 31
+    },
+    {
+      "name": "existing shared-resource tests",
+      "status": "passed",
+      "cases": 2
+    },
+    {
+      "name": "existing backend tests",
+      "status": "passed",
+      "cases": 18,
+      "durationSeconds": 342.04,
+      "disposableDatabase": "creator_foundation_test",
+      "port": 55445,
+      "localTestTimeoutSeconds": 600
+    },
+    {
+      "name": "current audience and Approval-source SQL planning",
+      "status": "passed",
+      "role": "creator_runtime",
+      "transaction": "rolled back",
+      "acceptance": "No actual scoped actor/source/payment fixture created."
+    },
+    {
+      "name": "actual Studio browser view",
+      "status": "observed gated",
+      "route": "/studio/workspace",
+      "copy": "Studio is not available here yet.",
+      "acceptance": "No false no-role/paid/signing success."
+    },
+    {
+      "name": "six canonical W5 schema files plus reply-review/Approval proposal DDL",
+      "status": "passed transactionally",
+      "database": "creator_foundation_test",
+      "outcome": "ROLLBACK",
+      "acceptance": "No migration registration, activation, application DB write, actor or provider fixture."
+    }
+  ],
+  "paidProviderRequests": 0,
+  "newTestCases": 0,
+  "schemaProposalsApplied": []
+}

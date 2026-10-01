@@ -1,0 +1,1550 @@
+{
+  "revision": "3ca155a3aa65d63fbbf8c02054a962a8ed31b988",
+  "runId": 36756099064,
+  "artifactId": 11117323689,
+  "artifactZipSha256": "2bb99cd73b7a6a23056696ea00a716df59af1204b6d0a903d020ee55169d0c7e",
+  "pairedCount": 110,
+  "dimensionMismatchCount": 110,
+  "pairs": [
+    {
+      "name": "testAuthorIdentitySurfaces.light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "9c92dd1472ac2dd7ca2aa577fdbd48d21412db604bf7ac660a1ddd1465f30e97",
+      "referenceSha256": "ba318d5f30eb80031ae1d703160a279415f41f2b1805533f14055e0b6cf11892",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testAuthorIdentitySurfaces.night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "5b93c33d1b7076ebc76d222673e8e7f7f571b258c9205ddaac8d3a6f36bd91c2",
+      "referenceSha256": "cc461b5f7e2516b47909d9ff2b7aa30edf70e7ddc33bdae6a6fb7ac8da24c4d4",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "62ce61c9e1f5f253876fe4ee37aa439eb5191c71ec0632c04ead22b5a41d753d",
+      "referenceSha256": "4b0a4edf3aa2c67a6f1ad11ed47e7e616220e64972cfd88af1030bfce65cd784",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "31c579ed14e07cdbb6c5e945ce8858c86e935970c8037db9d6fb1c458ee818f4",
+      "referenceSha256": "96393e2d76a4ee9ab80dd9d38e54cdd7bafc633c9a163f7ea2874847cb0e95b3",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "519e45f5fca7bb9d25ba0c4cca471522cf12b611ea01cebfeb3077d5f276f2a8",
+      "referenceSha256": "7fc2936c10ba6fe044ec5bf5be5c7d38b5aeb3f11f3092a8b8cf676002d389b3",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "94eaadf4b5fbc89630132940a81223faaee02164644ad61862ffa47b95c78ad0",
+      "referenceSha256": "ddecb066f9619dc54e0e7aa6ad2c33f2e3c3d8200ec7f12930f67409a9ec6db2",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e17cae2fc0c32cd41e7d1150d647d71dab8735b5ded16489c91cf4642eb0a498",
+      "referenceSha256": "d448cd75318c741b0c516a0a5d276446524c1e2062ce5ea0fb6a560e5d488d86",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "96b247d8fb46a60289c9a7c2b11af063b974f52d670e6e19a9359a8831bb62d3",
+      "referenceSha256": "e5998b185fc420a47a0d07afdb05b4d9c978659aa592d00662ccde327a5b5fdc",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e016b6df07d50f1f09aa57c8e3856ff75c8afd1260e7a35973d78b140bbc6e4e",
+      "referenceSha256": "317edf4eb1cd25d1afd90cdf0c4374d8b5239592e5c296e61d78d2009a957724",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "dda440b4935b5a5adf47fd8fb622f4bffa4e3efa5fc59a3a22df9f8a34b98bed",
+      "referenceSha256": "300e18c32e969559252a6b95edb359e4159fd4f2df1ace47f57ffc2d98330a41",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e3ee2fb80fdd73b5de08f59e23e40491118e432b7f9e26fcb2dd1d8119dc1830",
+      "referenceSha256": "020546c667440d5bd4f9296db771e0b567f04e1fceed65d0710db25859d1dd35",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "2ad65cc59865ef245d08c32136f58fa760189758d6fdbdd994d1c92dafe10036",
+      "referenceSha256": "2259aaec5149550828ef2e3cebe1c1794a6e368f3fd6eac4efb59622b5461e74",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "ae095edecd65ce46e09a8a38a476a03ec68e0088d0e48c2e6bf9d593f0e22af9",
+      "referenceSha256": "8096d07c4a87f92e162cf35002d4bd0c5b983ba265ab083f9e346225b52c9287",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "44a7124636f6df31ae879f2c04d1dc9f275247ad754ff8238e6f3a9a897de96a",
+      "referenceSha256": "1090ab059843973cb67ca081c2b3f9ba72aecf1b262d6bcdd56b2eac1c687af8",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "f3f906852be08676863561e406d1b852ff79fc9bc83fea028aaaa4584d8bb8e2",
+      "referenceSha256": "b8a14fb1ac6eec2cc5428855f885ed9817987343c857761206f308215366304a",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "01a13af1a6e552a3798d01899d936322cd4556008511de25817a362c8b321e8b",
+      "referenceSha256": "e81888da4768feb4e7f32029f508be258a4add7937f5a2e4faa6744e229c349b",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "ddf2ee1df4827ec63e387c1b42663554b7d728a1918c7ab184f1cad5124a512e",
+      "referenceSha256": "edca614627ae7564d4a677d4e2e0c178fa4692d73aaa68d9f5f03d8b9c7b75bd",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "62fd00c7c119d474a4a5f1c6db13750b1a92dd2c0fdac70bf35275e55d0367d3",
+      "referenceSha256": "c4ce2fee0a6e5f6c9d60a3a18ca9f4d45fa455b816e7bacc62b65e6a54419364",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "7c6f2f51ae2e29219c2464a3971e5b60486d4fcff6b496dfdfbb0eb61d7009cc",
+      "referenceSha256": "194137b653398fcbef6ad7b6783bb8b322df08c9c666e1fec5a4f3b869cc195c",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "bdcb6a88e9e6cfe6d8c107f076d0b54ae73efac271d2f975dc7707b678fc3462",
+      "referenceSha256": "4a8be135e1499db5fb89cf9121bc93351314b10d013492a16f2956f013f9db31",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "5016fd821ffce08c96d02ea26f81de4a11c09b45378e945104ab40be74e79dfe",
+      "referenceSha256": "adb3c3c15630d487ef489ff408ae7f10ffb275536c3091ff7e86189060618c3a",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "2c00afc0352207cc00a37554f67ca52a22034b3a04191de644a8bdc98466fecc",
+      "referenceSha256": "2b5bee22c7276502ddeb15dfee87bfeefac47962b02137b4fc04e25d5fed6bf4",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a6013569927cfdefc292f4d26ea7ba2bf7c49997aae6278962a8402b29e9390b",
+      "referenceSha256": "a6f61275d075fcebdb206e4727487cfe580999bc44d0c89d9b6696ebeb2c61df",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "b62820710161018f078c46d4145402295b77c9bf9c2f580f6b53ac33da1132aa",
+      "referenceSha256": "5e50ed170f66918a730e4aea74848a5cb04351c73f16f4e1ab40bd83b0842fad",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "9bbd2b7cbfc826ccc84042b471f3d7325b5ac7b8ae392a8193dc329d900ec630",
+      "referenceSha256": "635c63a62a4dde54705bd8b93a92c7cf2b0986f547c5c82673a45fe870b9ecd6",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a950df7e156347e3db8e4bb2f2a225f1aee900a9acb1fdf266dea4982f0c2908",
+      "referenceSha256": "b62bb48f25cb39e798cb9d5f8ae4916ff0b20acf5a80c1bae583d6d841914b0c",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e24c4f45ab8d7e0c19d941bb8c1e4abda10da91510285154e8f8ae7608275167",
+      "referenceSha256": "03761e85bb267047511325a878a477dc30d9f10a3c3ed9ecf2a6889842d097ef",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "ed9ffc514fc8ea8379acd9f5ce4884eee7ba384e5c4cc89ad2f3262aab015fe3",
+      "referenceSha256": "fbdcd195e6027a55061fe5875d41bb7c09f2799d566936a1d71052fa607891a9",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "fc4fe83233bfbb5501ac7c63f21194763116ca695e672f65f41ae87fd0e135ce",
+      "referenceSha256": "381fd2b789949b4f11f52ad32b57ea00d3e4b6444962a5492b1deb8869569858",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "56318a735958514c9b9a1ed2196dd90dcc1f34235fb6ced8af19f4f6610240f3",
+      "referenceSha256": "63df49f0b5b5e99191c6f0604cafbbfe50178f6f8b01e63ada313f987549acce",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "06d25e35e50406107b618e07153aa64ffc925bdec5def7a1ff69dd5c0269617b",
+      "referenceSha256": "53ceaf4bbe2413a1ae1f37ae110dedaff4cdafe85e205641fc0b74e1f01f1206",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "187581b9fe23ab82942360f4227808c99ede54128f0db0c2a552f05a9db33e06",
+      "referenceSha256": "ba6a86d5aedbd0f7877d047a7916ffa503b9fabadbb9c1e40d694a702ba89ddb",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "54b306591555e83a14ee6c861a361b132c2ff483f5f987de0c08183028e2a847",
+      "referenceSha256": "376647bb88e4fda91d23a595266b70774b2d9607cb4ce896a942e04c6c4c14b4",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "93dcb9ad692fdeb60712256bc540dea437da6ed434b048ff037f2e4faa81aa19",
+      "referenceSha256": "2dd449e21438c3af0234b9e8b36a364fb595ca77ad0328e5bed7de9bd259f86d",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "0447a267578ec5d87590ed773da8f478a3ba0093d67406b69c4862260ae18dcf",
+      "referenceSha256": "b76b6ef583be97277612f3c814855e8b64f9ad07e6796e54e19e80b0270bce52",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "1b5ca4d4f345c8df54f93b986e51722a37f4117fd7265406eead56e1cf3401ef",
+      "referenceSha256": "a8b01217771e01da0f4212d79c762fabb1ff3b2e9238b3a8f8f935fb940b034f",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "9f9f9b9f3835ffc9322cf52d314689758e42f635d2ea7451d7f46c2422dfcdfe",
+      "referenceSha256": "3c01e7db05502153537a1d9fee5dc010671fe059b0f377d34ff7b0d5ada42895",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "c1ef399613cd7333198618a350629dc9136cc8ba1efb2159d7a1abd0ac9090bf",
+      "referenceSha256": "e41d530c8aba6f4339ef5c6b3c628bd3d6c5f33b154aebcb0c89064f71aa12b8",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "1b1a2d1aa6c82d1e2b0d47620b07c6576f1caa39ff3e3754474b4f818810696f",
+      "referenceSha256": "03e81a9ffc08117cc0b670bc2babfa252e077f12b320b27ecf65b1a4ba189cf0",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "8e609d2690dcc1f8687831e3150817b413180b6d9dd31afc647c8fd46b56d4db",
+      "referenceSha256": "3e2ed629c993d4a2087a11285ca11379072919e06a1dfeb4420cc22c8a56bcba",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "1d39f28657d69df93c7ac3d167623e530d93e3e552a3972515429ab5d6868d32",
+      "referenceSha256": "0789e6f2e516b0566a371bbfd1ca0af3b9ff75e42b71643094b7e2db1cb961ee",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "b66d3fd289a0415a8df241a9c32f113c6e9223c825d5b22308c16fc3379ac3ba",
+      "referenceSha256": "20408506bc1b3821d87812d5af072356e93cb351a331c10f4d50d2dc21a5ef1d",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e92deb3d1ecdb5595819d019b7438e62136d6afde0be7a2351a551d231c73219",
+      "referenceSha256": "30c4eb91bbb04b2d8ac308ade871baebbd17b82ff9aac92b7fba90ff89e2962b",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a2d5ff81e0e8317cde3fcb0878574039d21b0652abfa002cd2e6224085eff669",
+      "referenceSha256": "d759bb221c7a0bd36ea32ce98c582bed8076255e4c8950fcdbb646e69675a794",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "b78ff5c98e1e7f2d12956167a9ffb8964109c15c382e65ec304f7a2455994753",
+      "referenceSha256": "f3460f05f830f394b0f13d13d5c3c392bf15dde37d4a7ad377eff536fade7fbb",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "faf50a523042cc20ff314d41413898bd91409771e517fbca59021064754450e8",
+      "referenceSha256": "b8322a98e3e38b5a8c58004b9fc7f737e1aac811782d892235045af2e0487a94",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "1c49924d98ede4729eade40bdcb99d91b84ce26abd918ab0aaa8f6a471593c18",
+      "referenceSha256": "4de03126ad88e0087d943b708a05f2433719cb40c2017bd6b8010feccc81861a",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "7355457f520d37efcb0f0ed22f886ca211c03d641b8001b31945d99d16fbf89f",
+      "referenceSha256": "7001caddd2b0753d99ebc49365dffe9cef7c7c78c1179d0f76bc72436c567530",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "72e2b875fe605e7d072a17c446f783b86adf0442f82c861fe936867c42470560",
+      "referenceSha256": "f669839c6a36bb23daa2ef88fa3edf876b1e92c7ef56a8b00728df166b1af6b4",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e86cc6d9f1be3994a46769612c16b7129a3b3eb3ea9cb733077e7a6b5030a2ff",
+      "referenceSha256": "861cb0b293c70a3fb46617f92872ca8c5b0af199d4032f609050b4dfd4058e88",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "cf108711e0280e1a1d3fe564584958fad2e4ef30bd66c373b270413c8ce8d8e7",
+      "referenceSha256": "fc60c9d68cefdf5f62e6fff7b4f79b69ffba399b330b4d048dc3ff417264c380",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "c6f4f745083d8f9e5748ea87554e3e4b0a695af3aed4572bcf997f9eaa2c6298",
+      "referenceSha256": "560d600718970ff5ed03be6441c426d5efbb01e4748c1b8de545912862635e22",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "345faa07f17ee1d60fa0cc4b627bf72598ecf6a11943cf5bb3521bf04470ca2b",
+      "referenceSha256": "51def05404d5e405533bd4abc67e1368635d2bc71a2fa7243fa9100093958499",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "3b35c31cd609bc72e2e7fdb9b4387c8c4e3699ff48d8d207499135d12b022c0e",
+      "referenceSha256": "f61197da11ca5938c7b321eca367557e387764376a3f759a3fc0d88e29ad20d9",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "4c70c7d78c74d56708bff35a94d7ce36f0cb19880db45fb00c95fcecdccb8c55",
+      "referenceSha256": "dd529e3eb09a5c903f498f571e74de00e97f2a192a78b3121277a184881a744e",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "8ea7c0f8a639dafb59edd8f14731ce280e510c760f346e3da125c2cf61983a79",
+      "referenceSha256": "955f31c90014f9046493288f1ca61b03d507b476474d5400d72610594736ec0f",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "ad4051ff4ac8055cd389b9235328502acda6ca13850c6ec79cce18daeb991d35",
+      "referenceSha256": "4597820b7449c9eb91625fcde6d2124fb89b21ca2b4ec8f705f894a487c3c3d1",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "bcc0bcdc74230a6cb23c98395b8ebffdfa6176e91da5c2c493a299a68b49a4a0",
+      "referenceSha256": "7aed54d97ae26b1a8fc2b9ac489b35a4bc32ce77c6532ae61731dfe8fbe2f6e2",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "2fb1070b48dc861440b13059134bf2a9099b3fbb8e1ddccd22beca0f476d3718",
+      "referenceSha256": "0c781446ec3dda198c67e8f29b446ee5554c2ce449459aee0ec641660bc267a1",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a0e4a496a73ed1f7c08179ddceeed47c2e79edc903ec18a8accfe40a8fb8b124",
+      "referenceSha256": "1e0c71a496a9d7c9b38ec63ad42ba59235a6da488362282090cf5573dc2aee87",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "4ad75c6cc60bb8a1c8827618db90fac2516e0c6549e5a62d8920cca05585da3c",
+      "referenceSha256": "f8801706eaf05ba0538d3c9286b8921352356c6cd13acbb691a5f87134021a51",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "d113f682065b12091a5645a69801a3be41223b793fe17040ddc6a2c6a8f2f9c6",
+      "referenceSha256": "c8614dc830936f7a697ee900661fa1ca486e1c8e134281e58ef4e4e245bbaab7",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "2117ad1ca7640ee2d35b9a1aee87fcc0027de87521870252b6a177e9ab97fc9a",
+      "referenceSha256": "4c62f87ec2e19bdf72b9988e8ae19d9018794955effdb38f8f20d9acf9b34a86",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "51fc64b22cca9b15b53a55cd765cb404d94af14a878e448041ad03a0eb9aba8b",
+      "referenceSha256": "dbb14ad1c604aa728852c3e62df5336388b2484cf982561b874aa716c30c9d65",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "9686b92647359a99b41d87efe7667218063f1b98a564bb98bc782e823779d248",
+      "referenceSha256": "f5e9686f8ebdc6da887b26ce0ecd4bb5f724b72d049b046762f8ceb15af2d703",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "66f38bd649891b81b36e6eb94466f3fcc3c1faa0c9aa5f8792ad8a24ba504b02",
+      "referenceSha256": "022311cb983bfdd8c9f8515a931b634315dbc03f0f7546f55041a789af165722",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "2c3c6fde5dfe05c8ed9ce9eeaca2d782f26944805a18cb6f8bd70e13cad0c690",
+      "referenceSha256": "d6aff71031d5082034e56fb9ff0153940386d4471515123c20232e479243439a",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "4460cc2dea4d62abbbc48a5ef6c5920c2c43a9ddb5683f66249c043b530fb81f",
+      "referenceSha256": "baebfee12440f2848dc6f82e8249218b0b141256c69b5ee567b5606343bfe8ca",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "0b7cc91dcebf1f142bf70a2f8072e0575567c89632e9fba06a3ab82b33bfdc54",
+      "referenceSha256": "2ab7ab465f1edf17d2765415b3e91996452bf465663c1313fa08970e8fb63253",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "30d523a1be47f6ce42bb6c05d0bf9764d150108a061e17c516b4d630213172f6",
+      "referenceSha256": "909f829629cf61f60a1fba7206ca818cc7eab050b801a2fda0dc5700768088db",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "826609d163b2d10c54140b9517e3e2f171638f00808bd7e99f87976e8f3cb72b",
+      "referenceSha256": "50b5fa925ef2f755b82e9e4e93aa5085ead381ad2d039d450af549cfb888a561",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "05a269c0cd18cfa17b5222906b09d9f07b3791c8eb4afb595b3575cddbbca6bd",
+      "referenceSha256": "9a920cb1cac5b6221112f48ec2ea034ad20b80edefea4003252e65c6ac242a00",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "0b5e86e20c24d4a5aee57ee2f742676808eb5b870237f725383900f47bf2f619",
+      "referenceSha256": "d2331157e714b74a6f7f32ac87ca9b432be01a352d8fadf98ea6e293e1966937",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "d6f22fbf455a71d6588b78234a651847bea480fc3c76217754b902161221c77c",
+      "referenceSha256": "3d05e0e41be88c2d2b2664307d24a027d9059b64a7a5dbb1f0f5e12709bf861e",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "003067115f6d737e1635394dc9c5885f26c9508611dc2f0662aa8a7aaccaf39d",
+      "referenceSha256": "b54ff2baa43a91f8e2e68637aa56c5322eacdd8b4e7262118085eb572eb8708f",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "e665dfcc0dd3b4a4b29a5fda54f1b91f1fd6fbe93e55894420719e993b603165",
+      "referenceSha256": "9454f339c9f64c8dcda432d88197b43578ff990942b7a917c1360d56777d9f74",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "cac2f7119f5eb31e39f11d855762049a1075507bcb029d67b98dd5b3dfe479f2",
+      "referenceSha256": "7b5ae8347e1f826924ad201c3ff90a9b00a000d36b8b6c002fbb68e3805107d5",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "c60c2f982a7c366e3a2e7610de9313b8802a3e1f84a14c89344f6eedd08aed87",
+      "referenceSha256": "3dfa7933107cbd57a4d41b4e1f95394df31b910ff88b0ee4d606a4d966d1c1af",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "06ffea7117bf9a861eff0683ec1e928b3d45952cbd6e8751c4b8c01e82068926",
+      "referenceSha256": "22df28e3c049667d026343a5b4bd42cc5e354224ca34bef98e37a3d7f451817b",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "349cde0440fbeb809e73e4d43be90d1973ffa394ee8523b99d601da77e92601a",
+      "referenceSha256": "877c56edec02dc1508aeae2e4b9919c8855114f7a64ccfe3b53f78b71b030bcd",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "23bc081b3941a17ba27be549d371e72920c8a26686a9dc646e8533c9bced243e",
+      "referenceSha256": "d07a19238ffa5123d466efbd36d195c0673bc76d5fe7beb21f162ef875e2494f",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "b86eb560a441ce919cc7080e60128c76ee0b94a32b5cf25bf7a617647685e21e",
+      "referenceSha256": "53563e1ab16d65e779afc7486700b97a18966a35de11fdec9914e06b6b89093c",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "92b70ef8ac5aeadc42121756480075d117110d8ff093f68e0f798a344d04d2d8",
+      "referenceSha256": "bf6cce6eeb6b053000fdcd33a26943a94f959e1e1ed8e00f7d4ea8f53274ca64",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "ec908ee9bada69a32bdcb1e916809ac6f395b54a93bd6d185f167583283bb88b",
+      "referenceSha256": "47d83e47f4fca64db4d1b90c659647f94b584fca775dc8a6e82e39349265ff66",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "051411c995bc70ee92f8f0e21620adcae4f68e3d34744fe3af17f5a3868decd9",
+      "referenceSha256": "cb2d9b8ff67af448b3c6141e3492ea8cb1fc11117b74339a40b372688b384f27",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "6012439bd02f4f470df792b40a6116e666d2ff004bdc85fd6fbe6f8ee5560926",
+      "referenceSha256": "8b3577b37f57e94ed7ad7f28c48a203a7e1cfa1ddf6b9d056ec3b1855c2a5019",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "3545a29c2b034b333049abd9e5a8b4bbc74eae4d1b3fc50fc7a5f239a2132502",
+      "referenceSha256": "256a46f5b2416d5709c6265710b5b8ebd752d4111c42c37bad588a61cba8a43a",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "3822715e4f1ba44cd3fb1cf3dca2bca0ea75dd2386ec559f7825b87427421916",
+      "referenceSha256": "c47423e791833d77ab70aef59285b29d9cc12aa0a3cb533950b2af94aa011a45",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "50b2cf772d95d40e3bac9dd9da3aa5107c91378fd2f5cf5ad90d1dbab62e4c79",
+      "referenceSha256": "ec099b292e370bd9bd000d522ce68d8de27025ec50ad4d69e5aaf293fbb4441e",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "d575394c891fcab0ead27d85d1ec739016d4e4c7f3f9c258904ced962f46cf45",
+      "referenceSha256": "864d03d94b9cc0ceba5d56a24932f5a54db8f7cbfce53f62489cd49f9776cf97",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "63a1a30387291affca7185e17aef2e547200724e7f64d85c49e1ce25ef8071bd",
+      "referenceSha256": "ef4404386af1e02be99a6947a3206fe09adb46112c38df93798bca808f65aa39",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "134c4961815fb38d84cd38747a50f709c49729abe6bb41fcd8cf6de1dc8f2595",
+      "referenceSha256": "8838d82ba55567626b0dad5a2748180c9305abb50da73a18927b2beec19f469f",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "af30fa8717af993545f22f3ef16185119bda4359c2ffff03d77df783d8f2356c",
+      "referenceSha256": "89ff312bfe50bdd9d40cf32db0ce07cd1b79ad32faa100bea3ca7b9adcd42b25",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "085859428c78f88afdb4f540b27f56e18f01771f1050f4b1aef788f5d108dc7a",
+      "referenceSha256": "ff590164c1ceb12eba55f96fe35081edffc250c78816709b3fa8e449331ed28b",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "8eb7a90da316d3d77e3d3c13e5a38cf8162a9215258d3454574de945184ae4aa",
+      "referenceSha256": "f12c93c44ef76a5fef00407cf531273b89f8f161acd3ae0b7f64c884ed160066",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "07646b980048983b4d4c5d715cb7920934fa45d4413916919559b81feca8ee3d",
+      "referenceSha256": "841ca93ef9a45fec6913a18a0d820d2e2386a797c97d065353be154c52faba07",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "cefcc8ed18500678ace3028e63c219e039792ac793568a6c644a8c90b841be4f",
+      "referenceSha256": "757537a4d53df327fbd8b10ba7ce9a2fea09395fbc006b53d16a9a1159b983c0",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "39462a947e3d0b1a9499eee8b82b5371d02d478298f7352cd1e3751d9ff7d38d",
+      "referenceSha256": "4845f8c872b3cd4769be97dfc23934160f460e8e60ecd2e0201da6b4d2e3221d",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "82f97e10daf3335b9abdfbae64466ef43b1796a87407fa68a61c561a95433d0f",
+      "referenceSha256": "cc221bb3fd79d6c61224acf7145728211d20db205fbcaa27df2e879d0879475e",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "9925fb9e2c311b3d6ef6c001b4fcb3825b7e13a1e144d27077874d85961a9459",
+      "referenceSha256": "266f100e944571c176eecfef4368f7acaee3af167786b3ca0ae3886e624bddd1",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "43da1b59bdf094c5688bb6b8f6ca4951ab4bed8379052d00fe1529c25a8bd3be",
+      "referenceSha256": "bf2b89f1c7338650eb939dbf38b5dbf07a82e32cde464b916749d513428b6858",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "baa46d4e1d2112aefb65892888f56a7f0d34f01e1752e1f83c080bda820effd4",
+      "referenceSha256": "b0d77cfcfb258ae229aa00557f8ee5976e84af86f4f4fdffcf94659a23a93c6c",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a6a12abc852d752cb7b152d5dc053ee0101834de98774638a334449713d555e8",
+      "referenceSha256": "047af89ebbdf48f7054a9d31677cd9ca39760057d6230580d0c5bd7567bfd269",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "03c4a31cc2ea86434869c6a523ac503b5d78e9bb372c0c8cb0e71e5d831042ea",
+      "referenceSha256": "95bf327c89061bdd346cf1d8a8816a40dfd84342e376af7bfd2a371ee5d55589",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "524f514afa2cbcc001f00d890e44ac9dc05b057a6c87992951e13c1fa5ebf1cc",
+      "referenceSha256": "359baaee82ba5345d855144153b91c70ff01e7dfb6ede6e61192e44514eadeeb",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "8b9957e45e8c019eac29e950dae0e88ea8d795412473fbccbd70b5e38136c139",
+      "referenceSha256": "3ef64d45a7acdb3908ac45bd9b9aab0bf0b905a782d875b46a99e522020d9d22",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "d44552a01d2112dc0e52281d960764574e8620d03c27974cae7c9b1129917037",
+      "referenceSha256": "71a5dc4fcc457e5cbbd171a4fb899850c3a609b14932ce72d30a8979eb87eead",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "a2e01db93d128b37c94a2736ebf2213ed036af9c22849add5f0aee26464192bf",
+      "referenceSha256": "6bb568d344bac5c55e6a79b5b26af15d8721277978d25a6046a7651d0dc40510",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testWelcomeThemes.light.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "50892fc58fddf9a8167bddc4655d8e5d2634fb13c238cf7af5bf4a5419959cde",
+      "referenceSha256": "b7b3b094e96f6712c088593bfdb63fdad567d1d0989974003b3413d91b0f7382",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    },
+    {
+      "name": "testWelcomeThemes.night.png",
+      "capturePixels": [
+        390,
+        844
+      ],
+      "referencePixels": [
+        780,
+        1688
+      ],
+      "captureSha256": "1f6e4f90de231abca540ad39a3ece37aab567f64d0307e7930c1262b50597fc5",
+      "referenceSha256": "bf959e57b158234f1015469ba24b06b5f12d32f2b50c096681b238cbd9db5f78",
+      "referenceProfileSha256": "737cf3ec71b28b83fd1b3444612ae42833633636ca76f173346c62672e201109"
+    }
+  ]
+}

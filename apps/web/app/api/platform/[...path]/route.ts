@@ -129,6 +129,7 @@ async function proxy(
         ...cookieOptions,
         maxAge: 7 * 86400,
       });
+    // A late expired response must not erase a newer sign-in from another tab.
     if (renewedToken)
       response.cookies.set(sessionCookie, renewedToken, {
         ...cookieOptions,

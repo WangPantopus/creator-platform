@@ -26,7 +26,7 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceAccessSource(val id: String, val source: String, val validUntil: String)
 @Serializable data class CommerceAccess(val version: String, val creatorId: String, val fanId: String, val validUntil: String?, val capabilities: List<String>, val allowance: CommerceAllowance, val sources: List<CommerceAccessSource>)
 @Serializable data class CommerceMembership(val id: String, val creator_id: String, val name: String, val provider: String, val state: String, val period_end: String, val cancel_at_end: Boolean)
-@Serializable data class CommercePass(val id:String,val version:Int,val slot_capacity:Int,val cycle_start:String,val cycle_end:String,val allowance:Int,val used:Int,val reserved:Int)
+@Serializable data class CommercePass(val id:String,val state:String,val version:Int,val slot_capacity:Int,val cycle_start:String,val cycle_end:String,val allowance:Int,val used:Int,val reserved:Int)
 @Serializable data class CommercePassCandidate(val id:String,val display_name:String)
 @Serializable data class CommercePassChoices(val creators:List<CommercePassCandidate> = emptyList(),val replaceableSlotIds:List<String> = emptyList())
 @Serializable data class CommerceSpendingNotice(val id:String,val threshold:Int,val created_at:String)

@@ -236,8 +236,6 @@ describe.skipIf(!adminUrl)(
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
-      // Ten thousand real scoped transactions include current identity locks.
-      // Keep every pair/assertion; allow slower Docker/CI hosts to finish.
     }, 600000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {

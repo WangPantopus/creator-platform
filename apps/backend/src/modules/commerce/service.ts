@@ -26,6 +26,7 @@ import {
   capabilitySnapshot,
   sourceAudienceSnapshot,
 } from "../access/commerce.js";
+import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
@@ -283,6 +284,18 @@ export class CommerceService {
       "INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
       [p.creator_id, p.fan_id, p.id, p.version, type, JSON.stringify(payload)],
     );
+    if (type === "packet_submitted")
+      // Distinct durable cause for the creator's New packet notification. Only
+      // the first actual successful submission qualifies; reauthorization or
+      // a historical provider read must not manufacture another new request.
+      await client.query(
+        `INSERT INTO creator.commerce_event(creator_id,fan_id,aggregate_id,aggregate_version,type,payload)
+         SELECT $1,$2,$3,$4,'packet_submitted_creator','{}'::jsonb
+         WHERE EXISTS(SELECT 1 FROM creator.commerce_packet WHERE id=$3 AND creator_id=$1 AND fan_id=$2 AND version=$4 AND state='submitted')
+         AND NOT EXISTS(SELECT 1 FROM creator.commerce_event WHERE aggregate_id=$3 AND creator_id=$1 AND fan_id=$2 AND type='packet_submitted' AND aggregate_version<$4)
+         ON CONFLICT DO NOTHING`,
+        [p.creator_id, p.fan_id, p.id, p.version],
+      );
   }
   private async ledger(
     client: PoolClient,
@@ -380,7 +393,7 @@ export class CommerceService {
       const pass = fan
         ? (
             await client.query(
-              "SELECT * FROM creator.commerce_pass WHERE fan_id=$1",
+              "SELECT *,cycle_start::text AS cycle_start,cycle_end::text AS cycle_end FROM creator.commerce_pass WHERE fan_id=$1",
               [fan.id],
             )
           ).rows
@@ -388,7 +401,7 @@ export class CommerceService {
       const slots = fan
         ? (
             await client.query(
-              "SELECT s.*,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY cycle_start DESC,position LIMIT 100",
+              "SELECT s.*,s.cycle_start::text AS cycle_start,cp.display_name FROM creator.commerce_pass_slot s JOIN creator.creator_profile cp ON cp.id=s.creator_id WHERE fan_id=$1 ORDER BY s.cycle_start DESC,position LIMIT 100",
               [fan.id],
             )
           ).rows
@@ -445,7 +458,27 @@ export class CommerceService {
         [fanId, currency],
       )
     ).rows[0]!;
-    const heldTotal = BigInt(held.amount) + BigInt(billing.amount);
+    const passSchema = (
+      await client.query<{ count: string }>(
+        "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+      )
+    ).rows[0]!;
+    invariant(
+      passSchema.count === "0" || passSchema.count === "4",
+      "pass_schema_incomplete",
+      "Pass billing needs complete schema reconciliation before spending can continue.",
+    );
+    const passPending =
+      passSchema.count === "4"
+        ? (
+            await client.query<{ amount: string }>(
+              "SELECT coalesce(sum(q.amount),0)::text AS amount FROM creator.commerce_pass_billing_effect e JOIN creator.commerce_pass_quote q ON q.id=e.quote_id AND q.fan_id=e.fan_id WHERE e.fan_id=$1 AND q.currency=$2 AND e.operation='start' AND e.state IN('pending','processing','unknown') AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.fan_id=e.fan_id AND l.kind='capture' AND l.refs->>'effectId'=e.id::text)",
+              [fanId, currency],
+            )
+          ).rows[0]!.amount
+        : "0";
+    const heldTotal =
+      BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
       total <= BigInt(Number.MAX_SAFE_INTEGER),
@@ -730,10 +763,13 @@ export class CommerceService {
       capabilitySnapshot(client, scope),
     );
   }
-  /** Already-issued W1/W3 authority is revalidated inside the scoped transaction. */
-  async sourceAudienceFor(scope: import("../access/scope.js").ThreadScope) {
+  /** Current W2/W3 audience on an already-issued canonical thread scope. */
+  async sourceAudienceFor(
+    scope: import("../access/scope.js").ThreadScope,
+    groups?: VerifiedGroupAudience,
+  ) {
     return this.db.withThread(scope, (client) =>
-      sourceAudienceSnapshot(client, scope),
+      commerceAudience(client, scope, groups),
     );
   }
   async packetDisclosure(actor: Actor, creatorId: string, fanId: string) {
@@ -1249,17 +1285,22 @@ export class CommerceService {
               "signed_act_required",
               "Sign the exact changed offer first.",
             );
-            await consumeSignedAct(client, scope, body.signedActId, {
-              actType: "accept",
-              subjectId: scope.threadId,
-              content: {
-                packetId: p.id,
-                packetVersion: p.version,
-                snapshot: p.snapshot,
-                action: "group_offer",
-                proposedMode: mode,
+            const signedContentHash = await consumeSignedAct(
+              client,
+              scope,
+              body.signedActId,
+              {
+                actType: "accept",
+                subjectId: scope.threadId,
+                content: {
+                  packetId: p.id,
+                  packetVersion: p.version,
+                  snapshot: p.snapshot,
+                  action: "group_offer",
+                  proposedMode: mode,
+                },
               },
-            });
+            );
             await client.query(
               "UPDATE creator.commerce_packet SET state='offer_pending',proposed_mode=$2,version=version+1,updated_at=now() WHERE id=$1",
               [id, JSON.stringify(mode)],
@@ -1268,6 +1309,7 @@ export class CommerceService {
               client,
               { ...p, version: p.version + 1 },
               "packet_offer",
+              { signedActId: body.signedActId, signedContentHash },
             );
             return { effectId: null };
           }
@@ -1713,6 +1755,53 @@ export class CommerceService {
             "signed_delivery_required",
             "A delivered exact creator-signed reply is required.",
           );
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`commerce.delivery:${message.id}`],
+          );
+          const reused = await client.query(
+            "SELECT id FROM creator.commerce_commitment WHERE delivered_message_id=$1 AND id<>$2 LIMIT 1",
+            [message.id, c.id],
+          );
+          invariant(
+            reused.rowCount === 0,
+            "delivery_already_used",
+            "This reply already fulfilled another paid commitment. Deliver the promised reply for this request.",
+          );
+          if (message.author_kind === "approved_draft") {
+            const available = (
+              await client.query<{ relation: string | null }>(
+                "SELECT to_regclass('creator.commerce_approval')::text AS relation",
+              )
+            ).rows[0]?.relation;
+            invariant(
+              available,
+              "approval_unconfigured",
+              "Exact-version personal Approval must be connected before an approved draft fulfills this request.",
+            );
+            const approval = await client.query(
+              `SELECT a.id FROM creator.commerce_approval a JOIN creator.message m ON m.approval_id=a.id
+               JOIN creator.commerce_reply_draft d ON d.id=a.draft_id
+               JOIN creator.creator_profile cp ON cp.id=a.creator_id
+               JOIN creator.signed_act sa ON sa.id=a.signed_act_id JOIN creator.passkey_credential pc ON pc.id=sa.credential_id
+               WHERE m.id=$1 AND a.delivered_message_id=m.id AND a.thread_id=$2 AND a.creator_id=$3 AND a.fan_id=$4
+               AND a.approver_account_id=$5 AND a.text=m.text AND a.signed_act_id=m.signed_act_id
+               AND a.content_hash=m.signed_content_hash AND a.invalidated_at IS NULL
+               AND a.creator_epoch=cp.commerce_approval_epoch AND a.key_epoch=pc.commerce_approval_epoch`,
+              [
+                message.id,
+                scope.threadId,
+                scope.creatorId,
+                scope.fanId,
+                scope.creatorAccountId,
+              ],
+            );
+            invariant(
+              approval.rowCount === 1,
+              "approval_invalidated",
+              "This reply needs its exact personal Approval before fulfilling the request.",
+            );
+          }
           await client.query(
             `UPDATE creator.commerce_commitment SET state='delivered',delivered_at=now(),delivered_message_id=$2,evidence=$3,payout_release_at=now()+interval '7 days',version=version+1 WHERE id=$1`,
             [

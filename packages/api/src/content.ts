@@ -145,41 +145,150 @@ export const ContentPage = z.strictObject({
     .optional(),
   query: z.string().trim().max(180).optional(),
 });
+export const ContentReplyPage = ContentPage.pick({
+  cursor: true,
+  limit: true,
+}).extend({
+  filter: z.enum(["all", "unread", "reacted", "flagged"]).default("all"),
+});
+export const ContentReplyReviewResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+  safetyState: z.enum(["pending", "allowed", "flagged"]),
+});
+export const ContentReplyReadResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+  read: z.literal(true),
+});
 export type Audience = z.infer<typeof ContentAudience>;
 export type ContentBody = z.infer<typeof ContentDocument>;
-export type ContentView = {
-  id: string;
-  creatorId: string;
-  creatorName: string;
-  creatorHandle: string;
-  teamMember: string | null;
-  displayText: string;
-  version: number;
-  state: string;
-  authorKind: "human_broadcast" | "human_creator" | "team";
-  authorLabel: string;
-  audienceLabel: string;
-  signedActId: string | null;
-  publishedAt: string | null;
-  document: ContentBody;
-  audienceCount: number | null;
-  sourceState:
-    | "not_requested"
-    | "candidate_pending"
-    | "candidate"
-    | "revocation_pending"
-    | "revoked";
-  quotedText: string | null;
-  quotedHandle: string | null;
-};
-export type PrivateNoteReply = {
-  id: string;
-  contentId: string;
-  fanId: string;
-  handle: string;
-  text: string;
-  version: number;
-  consent: { shareText: boolean; showHandle: boolean; version: number };
-  createdAt: string;
-  reaction: { kind: string; signedActId: string } | null;
-};
+export const ContentView = z.strictObject({
+  id: z.uuid(),
+  creatorId: z.uuid(),
+  creatorName: z.string(),
+  creatorHandle: z.string(),
+  teamMember: z.string().nullable(),
+  displayText: z.string(),
+  version: z.int().positive(),
+  state: z.string(),
+  authorKind: z.enum(["human_broadcast", "human_creator", "team"]),
+  authorLabel: z.string(),
+  audienceLabel: z.string(),
+  signedActId: z.uuid().nullable(),
+  publishedAt: z.iso.datetime({ offset: true }).nullable(),
+  document: ContentDocument,
+  audienceCount: z.int().nonnegative().nullable(),
+  sourceState: z.enum([
+    "not_requested",
+    "candidate_pending",
+    "candidate",
+    "revocation_pending",
+    "revoked",
+  ]),
+  quotedText: z.string().nullable(),
+  quotedHandle: z.string().nullable(),
+});
+export const PrivateNoteReply = z.strictObject({
+  safetyState: z.enum(["pending", "allowed", "flagged"]),
+  safetyReviewAvailable: z.boolean(),
+  read: z.boolean(),
+  id: z.uuid(),
+  contentId: z.uuid(),
+  fanId: z.uuid(),
+  handle: z.string(),
+  text: z.string(),
+  version: z.int().positive(),
+  createdAt: z.iso.datetime({ offset: true }),
+  consent: z.strictObject({
+    shareText: z.boolean(),
+    showHandle: z.boolean(),
+    version: z.int().positive(),
+  }),
+  reaction: z
+    .strictObject({ kind: z.string(), signedActId: z.uuid() })
+    .nullable(),
+});
+export const ContentList = z.strictObject({
+  items: z.array(ContentView),
+  nextCursor: z.uuid().nullable(),
+  serverTime: z.iso.datetime({ offset: true }),
+});
+export const ContentReplyList = z.strictObject({
+  items: z.array(PrivateNoteReply),
+  nextCursor: z.uuid().nullable(),
+});
+export const ContentResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+  state: z.string(),
+  signedActId: z.uuid().nullable().optional(),
+});
+export const ContentRevisionResult = z.strictObject({
+  id: z.uuid(),
+  version: z.int().positive(),
+});
+export const ContentConsentResult = z.strictObject({
+  version: z.int().positive(),
+  share_text: z.boolean(),
+  show_handle: z.boolean(),
+});
+export const ContentWithdrawResult = z.strictObject({
+  id: z.uuid(),
+  withdrawn: z.literal(true),
+});
+export const ContentReactionResult = z.strictObject({
+  replyId: z.uuid(),
+  kind: z.string(),
+  signedActId: z.uuid(),
+});
+export const ContentMuteCommand = z.strictObject({ muted: z.boolean() });
+export const ContentPreference = z.strictObject({
+  accountId: z.uuid(),
+  muted: z.boolean(),
+});
+export const ContentThanksQuery = z.strictObject({
+  targetKind: z.enum(["content", "message"]),
+  targetId: z.uuid(),
+});
+export const ContentThanksView = z
+  .strictObject({
+    id: z.uuid(),
+    version: z.int().positive(),
+    text: z.string(),
+    shareWithCreatorDigest: z.boolean(),
+    showIdentity: z.boolean(),
+    withdrawn: z.boolean(),
+  })
+  .nullable();
+export const ContentThanksFeed = z.array(
+  z.strictObject({
+    id: z.uuid(),
+    version: z.int().positive(),
+    target_kind: z.enum(["content", "message"]),
+    target_id: z.uuid(),
+    text: z.string(),
+    handle: z.string().nullable(),
+    created_at: z.iso.datetime({ offset: true }),
+  }),
+);
+export const ContentLiveCatalog = z.strictObject({
+  available: z.boolean(),
+  items: z.array(
+    z.strictObject({
+      sessionId: z.uuid(),
+      startsAt: z.iso.datetime({ offset: true }),
+      endsAt: z.iso.datetime({ offset: true }),
+      replayContentId: z.uuid().nullable(),
+      replayReady: z.boolean(),
+    }),
+  ),
+});
+export const ContentScheduledResult = z.strictObject({
+  published: z.int().nonnegative(),
+});
+export const ContentEffectsResult = z.strictObject({
+  processed: z.int().nonnegative(),
+});
+export type ContentView = z.infer<typeof ContentView>;
+export type PrivateNoteReply = z.infer<typeof PrivateNoteReply>;

@@ -8,6 +8,7 @@ import { createCommerceRuntime } from "./modules/commerce/runtime.js";
 import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { createConversationRuntime } from "./modules/conversation/runtime.js";
+import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { createAgentDomain } from "./modules/agent/integration.js";
@@ -55,17 +56,34 @@ const configured =
           const conversation = createConversationRuntime(runtime);
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
           const agent = createAgentDomain({ pool: runtime.pool, model: null });
-          const content = createContentStudio({
-            pool: runtime.pool,
-            owners: {
-              commerce: commerce?.service,
-              conversation: runtime.conversation,
-              access: runtime.access,
-              profiles: runtime.identity?.profiles,
-            },
-            dependencies: { assertAllowed: runtime.assertCreatorAllowed },
-          });
-          runtime.configureSignedSubjects([content.signedSubjects]);
+          const content = runtime.assertScopeAllowedInTransaction
+            ? await createCommerceStudio({
+                assertScopeAllowedInTransaction:
+                  runtime.assertScopeAllowedInTransaction,
+                pool: runtime.pool,
+                owners: {
+                  commerce: commerce?.service,
+                  conversation: runtime.conversation,
+                  access: runtime.access,
+                  profiles: runtime.identity?.profiles,
+                },
+                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+              })
+            : createContentStudio({
+                pool: runtime.pool,
+                owners: {
+                  commerce: commerce?.service,
+                  conversation: runtime.conversation,
+                  access: runtime.access,
+                  profiles: runtime.identity?.profiles,
+                },
+                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+              });
+          runtime.configureSignedSubjects(
+            Array.isArray(content.signedSubjects)
+              ? content.signedSubjects
+              : [content.signedSubjects],
+          );
           return [
             conversation.registration,
             agentFeature({
@@ -75,7 +93,7 @@ const configured =
             }),
             mediaFeature({}),
             ...(commerce ? [commerce.feature] : []),
-            ...content.features,
+            ...(content ? content.features : []),
             ...(features.growth ? [features.growth.feature] : []),
           ];
         },

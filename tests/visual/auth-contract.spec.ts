@@ -11,6 +11,8 @@ const invalidPaths = [
   "/creators/maya/nested\tdraft",
   "/creators/maya/nested\r\ndraft",
   "/" + "x".repeat(2048),
+  "/creators/maya/requests?draft=" + "x".repeat(1200),
+  "/creators/maya?context=kiln",
 ];
 
 function authURL(path: string, returnTo: string) {
@@ -38,7 +40,7 @@ test("auth seam rejects external, nested backslash and control-character context
   }
 });
 
-test("welcome and auth seam use the same context contract and preserve a registered context", async ({
+test("welcome and auth seam preserve an opaque context without draft content", async ({
   page,
   request,
 }) => {

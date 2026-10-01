@@ -1,0 +1,15 @@
+Scope: 7 of 8 workspace projects
+packages/api typecheck$ tsc --noEmit
+packages/brand typecheck$ tsc --noEmit
+packages/copy typecheck$ tsc --noEmit
+packages/tokens typecheck$ tsc --noEmit
+packages/brand typecheck: Done
+packages/tokens typecheck: Done
+packages/copy typecheck: Done
+packages/ui-web typecheck$ tsc --noEmit
+packages/api typecheck: Done
+apps/backend typecheck$ tsc --noEmit
+packages/ui-web typecheck: Done
+apps/web typecheck$ tsc --noEmit
+apps/web typecheck: Done
+apps/backend typecheck: Done
