@@ -1,0 +1,127 @@
+{
+  "scope": "Personally operated launched shipping entry and existing native UI flows; no paid or signed-in acceptance.",
+  "source_base": "71282ffb8129b9df06ed64011738834f1fa7fe85",
+  "source_corrections": [
+    "apps/backend/src/integration.ts",
+    "apps/web/features/identity/welcome.tsx",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt"
+  ],
+  "web": {
+    "origin": "http://localhost:3004",
+    "api": "http://localhost:4104",
+    "viewport": [
+      390,
+      844
+    ],
+    "themes": [
+      "light",
+      "night"
+    ],
+    "journey": "Real Welcome link click and Enter activation return identity_unconfigured, preserve /commerce/pass, show unavailable message.",
+    "bounds": {
+      "before": {
+        "left": 24,
+        "right": 408,
+        "width": 384,
+        "documentWidth": 408,
+        "boxSizing": "content-box"
+      },
+      "after": {
+        "left": 24,
+        "right": 366,
+        "width": 342,
+        "documentWidth": 390,
+        "boxSizing": "border-box"
+      }
+    },
+    "viewport_reset": true
+  },
+  "ios": {
+    "device": "1969609B-BC02-4C25-B36B-DE0BA1EC7437",
+    "model": "iPhone 17",
+    "os": "iOS 26.5",
+    "architecture": "x86_64",
+    "displayPoints": [
+      402,
+      874
+    ],
+    "existingCases": 2,
+    "failures": 0,
+    "seconds": 23.041,
+    "log": "/private/tmp/creator-w4-launched-ios-runtime-notice-20260930.log",
+    "xcresult": "/private/tmp/creator-w4-native-flow-notice-20260930.xcresult",
+    "limits": "The signed-out shipping Welcome flow covers both themes; the catalog provenance case is an explicit component fixture. Earlier unchanged test failed on missing app notice identifier; application identifier corrected, assertions untouched."
+  },
+  "android": {
+    "serial": "emulator-5564",
+    "adbPort": 5044,
+    "os": "API 34 Google APIs x86_64",
+    "displayDp": [
+      390,
+      844
+    ],
+    "existingCases": 4,
+    "failures": 0,
+    "seconds": 42.593,
+    "log": "/private/tmp/creator-w4-entry-scroll-android-runtime-20260930.log",
+    "shortDisplay": {
+      "dp": [
+        320,
+        640
+      ],
+      "existingCases": 4,
+      "failures": 0,
+      "seconds": 39.641,
+      "log": "/private/tmp/creator-w4-entry-scroll-android-short-runtime-20260930.log",
+      "heroScrollBounds": "[24,110][296,480]",
+      "signInTextBounds": "[66,498][253,519]",
+      "limits": "Actual hierarchy exposes separate scroll area above the pinned button; manual scroll gesture has not been verified. am start timed out at short display, but actual screenshot/hierarchy and subsequent instrumentation pass. Display restored to 390x844 dp."
+    },
+    "limits": "Shipping unavailable sign-in is real; arrival/catalog/dialog cases use existing component fixtures. No store system purchase or paid flow."
+  },
+  "providerRequests": 0,
+  "newTestsOrJourneys": false,
+  "modifiedAssertionsOrGoldens": false,
+  "checks": {
+    "backendBuild": "passed",
+    "nextProductionBuild": "passed",
+    "iosExistingUI": "passed",
+    "androidExistingUI": "passed",
+    "sevenWorkspaceTypechecks": "passed",
+    "generatedConsistency": "passed",
+    "format": "passed",
+    "repositoryLint": "passed"
+  },
+  "images": [
+    {
+      "path": "web-light.jpg",
+      "sha256": "51ba1fd3172714fb04e57a1f518e46791a42835414c73ee0d05d68267a6646d5"
+    },
+    {
+      "path": "web-night.jpg",
+      "sha256": "d0f8531611db320a0b8004b96d04e79b9cf9dfa9e036ab1fc63fc4fe051d9417"
+    },
+    {
+      "path": "ios-unavailable-light.png",
+      "sha256": "1ba2975c1f464e46590945be7c1778d189d37d8e832c72ebd5050554122efc10"
+    },
+    {
+      "path": "ios-unavailable-night.png",
+      "sha256": "5aebb6d740a881bd772498656b38e657417780afbd9c8c242707127666aa6ffa"
+    },
+    {
+      "path": "android-welcome-light.png",
+      "sha256": "a98822a1f4ebedfa8ca0cc94ef0d67c10f5ac874a6aaa65258989dfe65329ed9"
+    },
+    {
+      "path": "android-welcome-night.png",
+      "sha256": "4a7eb7b335d12c91aa56962d45fdc28b4778219ae31e0f5e6ec68b166b44beb9"
+    },
+    {
+      "path": "android-welcome-short.png",
+      "sha256": "4a25e2cfcb8b8925625bbdcb1deba3b20ce3f58c41091a31e35e19b0d9d02baf"
+    }
+  ],
+  "remaining": "All original nine packages/R01-R15 remain open. Q03/Q04/Q08/Q10/Q16 approved inputs, canonical reserved installation, actual denial/private worker composition and full provider/native/design/a11y/performance acceptance remain required."
+}

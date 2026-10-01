@@ -320,7 +320,7 @@ const agentService = new AgentService(
 );
 const commerceConfiguration = readCommerceEnvironment(conversationPool);
 const commerceRuntime = commerceConfiguration
-  ? createCommerceRuntime({
+  ? await createCommerceRuntime({
       pool: conversationPool,
       database: db,
       access,

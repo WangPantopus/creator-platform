@@ -48,6 +48,7 @@ export class ExtendedCommerce {
     readonly tiers?: import("./tiers.js").CommerceTiers,
     readonly money?: import("./reconciliation.js").MoneyReconciliation,
     readonly settlement?: import("./accounting.js").CreatorSettlement,
+    readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
   ) {}
   async storePurchase(
     actor: Actor,
@@ -278,6 +279,7 @@ export class ExtendedCommerce {
       "pass_billing_unconfigured",
       "The current pass renewal cannot be verified.",
     );
+    const recovered = await this.passPurchases?.drain(actor);
     const reference = await this.service.account(
       actor,
       async (client) =>
@@ -287,6 +289,13 @@ export class ExtendedCommerce {
           )
         ).rows[0]?.provider_ref,
     );
+    if (!reference && this.passPurchases) {
+      const status = await this.passPurchases.status(actor);
+      return {
+        processing: status.processing,
+        recovered: recovered?.length ?? 0,
+      };
+    }
     invariant(
       reference,
       "pass_required",

@@ -47,6 +47,7 @@ export function CardEntry({
   title = "A hold, not a charge",
   description = "Your bank may show a pending hold for a few days. Charged only when the creator accepts.",
   returnLabel = "Return to your request",
+  confirmationDisabled = false,
 }: {
   publishableKey: string;
   busy: boolean;
@@ -56,6 +57,7 @@ export function CardEntry({
   title?: string;
   description?: string;
   returnLabel?: string;
+  confirmationDisabled?: boolean;
 }) {
   const mount = useRef<HTMLDivElement>(null),
     client = useRef<StripeClient | null>(null),
@@ -126,7 +128,7 @@ export function CardEntry({
       {error && <p role="alert">{error}</p>}
       <button
         className="qv qv-btn qv-btn--secondary qv-btn--lg"
-        disabled={!ready || busy || sending}
+        disabled={!ready || busy || sending || confirmationDisabled}
         onClick={async () => {
           if (!client.current || !card.current) return;
           setSending(true);

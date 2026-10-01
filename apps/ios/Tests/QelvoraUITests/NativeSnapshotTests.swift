@@ -7,9 +7,23 @@
 
   @MainActor
   final class NativeSnapshotTests: XCTestCase {
+    private final class CaptureWindow: NSWindow {
+      override var backingScaleFactor: CGFloat { 2 }
+    }
     private let size = CGSize(width: 390, height: 844)
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
+    }
+    private var captureColorSpace: NSColorSpace {
+      // All 110 original references have the same embedded profile. Use its
+      // encoding metadata, never its pixels, so strict comparisons do not
+      // inherit whichever display happens to be attached to the test host.
+      let reference = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .appendingPathComponent("__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png")
+      guard let data = try? Data(contentsOf: reference),
+        let representation = NSBitmapImageRep(data: data)
+      else { return .sRGB }
+      return representation.colorSpace
     }
 
     func testWelcomeThemes() async {
@@ -70,62 +84,37 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
-      let window = NSWindow(
-        contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
-        backing: .buffered, defer: false)
-      window.colorSpace = .sRGB
-      window.isReleasedWhenClosed = false
-      // Scale the SwiftUI graph before its layers are cached. Changing only
-      // AppKit frame/bounds enlarges the headless display's cached 1x text.
-      let captureScale = 2 / window.backingScaleFactor
-      let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
       let host = NSHostingView(
-        rootView: view.environment(\.displayScale, 2)
-          .transaction { $0.disablesAnimations = true }.frame(
-            width: size.width, height: size.height)
-          .scaleEffect(captureScale, anchor: .topLeading)
-          .frame(width: canvas.width, height: canvas.height, alignment: .topLeading))
-      host.frame = NSRect(origin: .zero, size: canvas)
-      window.setContentSize(canvas)
+        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }.frame(
+          width: size.width, height: size.height))
+      host.frame = NSRect(origin: .zero, size: size)
+      let window = CaptureWindow(
+        contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+      let colorSpace = captureColorSpace
+      window.colorSpace = colorSpace
       window.contentView = host
-      defer {
-        window.contentView = nil
-        window.close()
-      }
+      host.viewDidChangeBackingProperties()
       host.layoutSubtreeIfNeeded()
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      func prepareLayer(_ layer: CALayer) {
-        layer.contentsScale = 2
-        layer.rasterizationScale = 2
-        layer.setNeedsDisplay()
-        for child in layer.sublayers ?? [] { prepareLayer(child) }
-        if let mask = layer.mask { prepareLayer(mask) }
-        layer.displayIfNeeded()
-      }
-      if let layer = host.layer { prepareLayer(layer) }
-      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas), logical=\(size)")
-      // Match the existing 2x references independently of a runner's attached display.
-      guard let context = CGContext(
-        data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
-        bitsPerComponent: 8, bytesPerRow: 0,
-        space: CGColorSpace(name: CGColorSpace.sRGB)!,
-        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-      ), let pixels = context.makeImage() else {
-        XCTFail("Snapshot bitmap could not be allocated.", file: file, line: line)
-        return
-      }
-      let bitmap = NSBitmapImageRep(cgImage: pixels)
-      bitmap.size = canvas
-      host.cacheDisplay(in: host.bounds, to: bitmap)
+      // The references use 2x pixels. CI's headless screen is 1x; letting
+      // AppKit choose its bitmap size makes every reference incomparable.
+      let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
+        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
+        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+        bytesPerRow: 0, bitsPerPixel: 0
+      )!.retagging(with: colorSpace)!
       bitmap.size = size
-      let snapshot = NSImage(size: size)
-      snapshot.addRepresentation(bitmap)
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      let image = NSImage(size: size)
+      image.addRepresentation(bitmap)
       assertSnapshot(
-        of: snapshot, as: .image, named: name, record: record, file: file,
+        of: image, as: .image, named: name, record: record, file: file,
         testName: testName, line: line)
+      window.contentView = nil
     }
   }
 #endif

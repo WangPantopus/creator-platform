@@ -21,19 +21,9 @@ class NativeAcceptanceTest {
     }
 
     @Test fun arrivalContextCanBeRemoved() {
-        // Supply the scoped Welcome fixture explicitly, as the shipping shell
-        // cannot invent a public creator projection when its API is absent.
-        compose.activity.runOnUiThread {
-            compose.activity.setContent {
-                QelvoraTheme(false) {
-                    Welcome(
-                        returnTo = "/creators/maya?context=00000000-0000-4000-8000-000000000001",
-                        contextSource = "You came from Maya's page",
-                        contextTitle = "Maya · Ceramics · Kiln Club"
-                    )
-                }
-            }
-        }
+        // Arrival metadata is a component input, never fabricated by the shipping host.
+        compose.activity.runOnUiThread { compose.activity.setContent { QelvoraTheme(false) { Welcome(contextSource = "You came from Maya's page", contextTitle = "Maya · Ceramics · Kiln Club") } } }
+        compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertIsDisplayed()
         compose.onNodeWithContentDescription("Remove this post from your first message").performClick()
         compose.onNodeWithText("Maya · Ceramics · Kiln Club").assertDoesNotExist()
     }

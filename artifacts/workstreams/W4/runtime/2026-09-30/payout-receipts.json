@@ -1,0 +1,28 @@
+{
+  "sourceBase": "f33a7a6cf342cc53af369e5ec41117053e6f5faf",
+  "sourceFiles": [
+    "apps/backend/src/modules/commerce/accounting.ts",
+    "apps/backend/src/modules/commerce/stripe-connect.ts"
+  ],
+  "change": "Confirmed original transfers enter the existing cash ledger even when current eligibility requires compensation; complete actual full reversal receipts commit before terminal compensation. Current amount/currency/reference and unexpired original attempt are checked.",
+  "validation": {
+    "backendBuild": "passed",
+    "sevenWorkspaceTypechecks": "passed",
+    "scopedLint": "passed",
+    "fullFormat": "passed",
+    "actualNonOwnerSqlPlans": 8,
+    "sqlWritesExecuted": 0,
+    "sqlTransaction": "rolled back"
+  },
+  "logs": [
+    "/private/tmp/creator-w4-payout-receipts-build-final-20260930.log",
+    "/private/tmp/creator-w4-payout-receipts-typecheck-final-20260930.log",
+    "/private/tmp/creator-w4-payout-receipts-lint-final-20260930.log",
+    "/private/tmp/creator-w4-payout-receipts-format-final-20260930.log",
+    "/private/tmp/creator-w4-payout-receipts-sql-20260930.log"
+  ],
+  "providerRequests": 0,
+  "newTests": false,
+  "modifiedMigrationsOrLedgerHistory": false,
+  "limits": "No genuine transfer/reversal, provider restart or paid end-to-end proof. Q03/Q10, actual current scoped worker authority and original destination/source custody are still needed before live payout readiness."
+}

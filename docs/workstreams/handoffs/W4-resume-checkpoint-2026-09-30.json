@@ -1,0 +1,148 @@
+{
+  "workstream": "W4",
+  "checkpointDate": "2026-09-30",
+  "branch": "codex/w4-commerce-handoff",
+  "repository": "WangPantopus/creator-platform",
+  "sourceCommit": "a16558c70d725ce72a99e390c990018335203405",
+  "mainCommit": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+  "pr": {
+    "number": 5,
+    "url": "https://github.com/WangPantopus/creator-platform/pull/5",
+    "state": "open draft",
+    "merged": false,
+    "metadataUpdate": "403 Resource not accessible by integration",
+    "preparedBody": "artifacts/workstreams/W4/runtime/2026-09-30/pull-request.md"
+  },
+  "sourceHashes": [
+    "artifacts/workstreams/W4/runtime/2026-09-30/source-sha256-studio-integration.txt",
+    "artifacts/workstreams/W4/runtime/2026-09-30/source-sha256-approval.txt",
+    "artifacts/workstreams/W4/runtime/2026-09-30/source-sha256-pass-approval-import.txt"
+  ],
+  "hashScope": "Studio manifest pins this source. Earlier manifests pin their dated source commits; do not expect a changed earlier file to retain its historical hash.",
+  "latestCheckedPeers": {
+    "W8": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+    "W5": "edf1b447f521a68254d67fa864ae5ddccb7f9186",
+    "W3": "b334ca6d23fc29c86bb83896128dc7a5896c42f5"
+  },
+  "migrations": {
+    "localRegisteredCount": 28,
+    "localLast": "0031_w4_purchase_history",
+    "W8CanonicalCount": 40,
+    "W8CanonicalLast": "0043_w8_relationship_backfill",
+    "unallocated": [
+      "apps/backend/src/modules/commerce/schema-approval.sql",
+      "apps/backend/src/modules/content/schema-reply-review.sql"
+    ],
+    "unallocatedApplied": false,
+    "canonicalByteProof": "artifacts/workstreams/W4/runtime/2026-09-30/studio-migration-custody.json"
+  },
+  "checks": "artifacts/workstreams/W4/runtime/2026-09-30/studio-checks.json",
+  "ciObservation": {
+    "sourceCommit": "a16558c70d725ce72a99e390c990018335203405",
+    "foundation": {
+      "runId": 36777916200,
+      "status": "queued",
+      "jobs": [
+        {
+          "name": "web-and-backend",
+          "jobId": 110100511430,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "android-runtime",
+          "jobId": 110100511590,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "web-visual",
+          "jobId": 110100511760,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "ios-foundation",
+          "jobId": 110100511848,
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "name": "android-foundation",
+          "jobId": 110100511854,
+          "status": "queued",
+          "conclusion": null
+        }
+      ]
+    },
+    "trust": {
+      "runId": 36777916255,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "priorSwiftScaleFix": {
+      "commit": "5e644095d569d051acec597661564fa1e243be75",
+      "runId": 36769762534,
+      "iosJobId": 110072870922,
+      "iosStatus": "queued",
+      "webVisualJobId": 110072871107,
+      "webVisualStatus": "queued"
+    },
+    "instruction": "Refresh latest documentation head CI before ready/merge. Checked-source Trust, web/backend and Android runtime passed; queued native/visual jobs are not final green status.",
+    "observedAtUtc": "2026-09-30T21:22:48+00:00"
+  },
+  "runtime": {
+    "checkout": "/Users/yingpengwang/.codex/worktrees/fa22/creator-platform",
+    "api": {
+      "port": 4104,
+      "lastVerifiedPid": 47095,
+      "providers": "unconfigured",
+      "StudioApproval": "inactive",
+      "source": "earlier running host; rebuild/restart verified owned process for latest source"
+    },
+    "web": {
+      "port": 3004,
+      "lastVerifiedPid": 50193,
+      "apiUrl": "http://localhost:4104",
+      "devOutput": ".next-w4-pass-preview",
+      "productionBuildOutput": ".next-w4-studio-build"
+    },
+    "appDatabase": {
+      "container": "creator-platform-w4-resume-20260930",
+      "port": 55444,
+      "database": "creator_w4",
+      "role": "creator_runtime"
+    },
+    "disposableChecksDatabase": {
+      "container": "creator-platform-w4-ci-20260930",
+      "port": 55445,
+      "database": "creator_foundation_test"
+    },
+    "privateConfig": {
+      "path": "/private/tmp/creator-platform-w4-resume.env",
+      "mode": "0600",
+      "contents": "Never print/commit/copy into artifacts."
+    },
+    "iosSimulator": "1969609B-BC02-4C25-B36B-DE0BA1EC7437",
+    "androidAVD": "CreatorPlatform_W4_Resume_20260930",
+    "androidSerial": "emulator-5564",
+    "instruction": "Verify current ownership/existence; no new cleanup requested. Preserve peers and shared runtimes.",
+    "lastVerifiedAtUtc": "2026-09-30T21:20:26Z"
+  },
+  "externalInputs": [
+    "Q03 approved Stripe/Connect topology/markets/fees/tax",
+    "Q04 native asynchronous paid-reply distribution policy",
+    "Q08 economics/catalog/cost/pass/credit configuration",
+    "Q10 actual provider/store projects/products/credentials and verified creator/passkey",
+    "Q16 reviewed financial/consent/signature retention and deletion consequences",
+    "W8 canonical additive allocation/composition custody",
+    "GitHub write access and available matching CI runners"
+  ],
+  "paidProviderRequests": 0,
+  "OpenAIKeyLoaded": false,
+  "newTestCases": 0,
+  "releaseReady": false,
+  "scope": "All original nine packages and R01–R15 remain binding; source/build proof does not close paid/native/a11y/performance acceptance.",
+  "handoff": "docs/workstreams/handoffs/W4-resume-checkpoint-2026-09-30.md",
+  "nextAgentPrompt": "docs/workstreams/prompts/W4-next-agent-2026-09-30.md"
+}

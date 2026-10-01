@@ -118,6 +118,35 @@ export async function exportCommerceFinancial(
           ["id"],
           parameters,
         );
+        const approvalSchema = (
+          await client.query<{
+            drafts: string | null;
+            approvals: string | null;
+          }>(
+            "SELECT to_regclass('creator.commerce_reply_draft')::text AS drafts,to_regclass('creator.commerce_approval')::text AS approvals",
+          )
+        ).rows[0]!;
+        invariant(
+          Boolean(approvalSchema.drafts) === Boolean(approvalSchema.approvals),
+          "approval_schema_incomplete",
+          "Draft approval history needs schema reconciliation before this export can complete.",
+        );
+        if (approvalSchema.approvals) {
+          await page(
+            "replyDrafts",
+            "SELECT * FROM creator.commerce_reply_draft",
+            packetScope,
+            ["id"],
+            parameters,
+          );
+          await page(
+            "approvals",
+            "SELECT * FROM creator.commerce_approval",
+            packetScope,
+            ["id"],
+            parameters,
+          );
+        }
         await page(
           "authorizationHistory",
           "SELECT packet_id,attempt,snapshot,created_at FROM creator.commerce_authorization_lineage",
@@ -205,6 +234,41 @@ export async function exportCommerceFinancial(
           await grants(client, page, creator);
         }
         if (input.scope === "account") {
+          const passSchema = (
+            await client.query<{ count: string }>(
+              "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+            )
+          ).rows[0]!;
+          invariant(
+            passSchema.count === "0" || passSchema.count === "4",
+            "pass_schema_incomplete",
+            "The complete pass billing history is required before publishing this export.",
+          );
+          if (passSchema.count === "4") {
+            for (const [name, select, keys] of [
+              [
+                "passBillingAccounts",
+                "SELECT retention_policy_version,fan_id,currency,desired_renewal,version FROM creator.commerce_pass_billing_account",
+                ["fan_id"],
+              ],
+              [
+                "passQuotes",
+                "SELECT retention_policy_version,id,fan_id,account_version,currency,amount,monthly_amount,quoted_at,expires_at,period_end FROM creator.commerce_pass_quote",
+                ["id"],
+              ],
+              [
+                "passBillingEffects",
+                "SELECT retention_policy_version,id,fan_id,operation,intent_version,quote_id,state,attempt,error_code,created_at,updated_at FROM creator.commerce_pass_billing_effect",
+                ["id"],
+              ],
+              [
+                "passReceipts",
+                "SELECT retention_policy_version,id,fan_id,subscription_ref,invoice_ref,line_ref,payment_ref,paid_minor,currency,period_start,period_end,paid_at,created_at FROM creator.commerce_pass_receipt",
+                ["id"],
+              ],
+            ] as const)
+              await page(name, select, "true", keys);
+          }
           for (const [name, select, keys] of [
             [
               "spendingLimits",

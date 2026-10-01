@@ -1,0 +1,225 @@
+{
+  "workstream": "W4",
+  "date": "2026-09-29",
+  "removed": [
+    {
+      "path": "/Users/yingpengwang/.android/avd/CreatorPlatform_W4.avd",
+      "allocatedKiBBeforeRemoval": 1400456
+    },
+    {
+      "path": "/Users/yingpengwang/.android/avd/CreatorPlatform_W4.ini",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/Users/yingpengwang/Library/Developer/CoreSimulator/Devices/515D9143-0553-4FB6-BECC-7FBB8FC715CE",
+      "allocatedKiBBeforeRemoval": 2190716,
+      "method": "simctl delete leased W4 device"
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-android",
+      "allocatedKiBBeforeRemoval": 7652
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-android-build.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-backend-check.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-clang",
+      "allocatedKiBBeforeRemoval": 59892
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-commit-handoff.py",
+      "allocatedKiBBeforeRemoval": 8
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-derived",
+      "allocatedKiBBeforeRemoval": 518068
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-finish-commit.py",
+      "allocatedKiBBeforeRemoval": 8
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-gradle",
+      "allocatedKiBBeforeRemoval": 89232
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-gradle-cache",
+      "allocatedKiBBeforeRemoval": 1883272
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-handoff-yl2sj_j5",
+      "allocatedKiBBeforeRemoval": 28612
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-ios",
+      "allocatedKiBBeforeRemoval": 12040
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-ios-build.log",
+      "allocatedKiBBeforeRemoval": 84
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-prepare-handoff.py",
+      "allocatedKiBBeforeRemoval": 8
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-publication-state.json",
+      "allocatedKiBBeforeRemoval": 76
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-stage-checkpoint.py",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-swift",
+      "allocatedKiBBeforeRemoval": 377472
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-swift.log",
+      "allocatedKiBBeforeRemoval": 28
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-web-check.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4.env",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/creator-w4-web",
+      "allocatedKiBBeforeRemoval": 103924
+    },
+    {
+      "path": "/private/tmp/creator-w4-workspace",
+      "allocatedKiBBeforeRemoval": 609316
+    },
+    {
+      "path": "/private/tmp/w4-android-current.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-android-latest.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-backend-current.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-backend-latest.log",
+      "allocatedKiBBeforeRemoval": 0
+    },
+    {
+      "path": "/private/tmp/w4-format-current.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-format-operations.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-format-pass.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-format-surfaces.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-generation-check.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-ios-current.log",
+      "allocatedKiBBeforeRemoval": 52
+    },
+    {
+      "path": "/private/tmp/w4-ios-latest.log",
+      "allocatedKiBBeforeRemoval": 72
+    },
+    {
+      "path": "/private/tmp/w4-lint-current.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-pull-request.md",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-web-current.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-web-format.log",
+      "allocatedKiBBeforeRemoval": 4
+    },
+    {
+      "path": "/private/tmp/w4-web-latest.log",
+      "allocatedKiBBeforeRemoval": 0
+    },
+    {
+      "path": "/Users/yingpengwang/Library/Logs/CoreSimulator/515D9143-0553-4FB6-BECC-7FBB8FC715CE",
+      "allocatedKiBBeforeRemoval": 568
+    }
+  ],
+  "removedDirectoryAllocatedKiB": 7281628,
+  "pending": [
+    {
+      "resource": "creator-platform-w4-local Docker container and associated exclusive volumes/images",
+      "reason": "Docker inspect/ps/images and exact container removal/verification timed out. Direct socket ping returned Docker Desktop is unable to start. Removal is not confirmed. The shared Docker service was not restarted."
+    }
+  ],
+  "preserved": [
+    "repository source and committed runtime evidence",
+    "shared node_modules/pnpm store",
+    "shared SDKs, tools and OS runtimes",
+    "other workstream resources",
+    "shared Docker images/volumes whose ownership or current use could not be verified",
+    "peer containers/devices/caches/processes",
+    "existing system packages, Java/Node/pnpm, Android SDK and iOS runtimes"
+  ],
+  "dockerAttempts": [
+    {
+      "action": "Remove only W4 container and anonymous volumes",
+      "result": "timeout after 20 seconds"
+    },
+    {
+      "action": "Verify W4 container removal",
+      "result": "timeout after 20 seconds"
+    }
+  ],
+  "sourceCheckpointCommit": "9800bb3376b5f9f76763a5554c273dc454b1290b",
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/5",
+  "stoppedProcesses": {
+    "web": {
+      "port": 3004,
+      "pids": [99002, 98296]
+    },
+    "api": {
+      "port": 4104,
+      "pids": [27057, 27065]
+    },
+    "android": {
+      "serial": "emulator-5564",
+      "port": 5564
+    },
+    "ios": {
+      "uuid": "515D9143-0553-4FB6-BECC-7FBB8FC715CE"
+    }
+  },
+  "verification": {
+    "portListeners3004_4104_55444_5564": "none observed after cleanup",
+    "dedicatedAndroidAVD": "data and ini removed after emulator stop",
+    "dedicatedIOSSimulator": "shutdown and deleted through simctl; private logs removed",
+    "inAppBrowserTabs": "no tabs remained",
+    "repositorySourceAndEvidence": "preserved",
+    "providerAcceptance": "unchanged; incomplete"
+  },
+  "sizeNote": "Sum of pre-removal du allocated sizes, approximately 6.94 GiB. Actual free-space change can differ due shared hardlinks/APFS and concurrent work."
+}

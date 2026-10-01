@@ -117,11 +117,7 @@ public struct FanAppShell: View {
     public var body: some View {
         VStack(spacing: 0) {
             if !model.error.isEmpty {
-              Notice(
-                tone: .error, title: "Account status", children: model.error,
-                accessibilityIdentifier: model.error == QelvoraCopy.text("pantopusUnavailable")
-                  ? "pantopus-unavailable" : nil
-              ).padding(16)
+              Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
             }
             if model.choosingDevelopmentActor {
                 VStack(spacing: 16) {
