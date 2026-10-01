@@ -127,7 +127,8 @@
       "tests": 2,
       "failures": 0
     },
-    "functionalAcceptance": false
+    "functionalAcceptance": false,
+    "sourceRevision": "70acd86e43a2f35dd0384ff78e5108685c075976"
   },
   "migrationReservations": {
     "producer": "3e1a42fbce377614156fdb37571c0e48a81efc99",
@@ -137,7 +138,12 @@
     "activeOrApplied": false,
     "availabilitySourceSHA256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
     "creatorMediaReviewSourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a",
-    "creatorMediaReviewSourceSHA256": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5"
+    "creatorMediaReviewSourceSHA256": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+    "latestCreatorMediaReview": {
+      "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
+      "sourceSHA256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+      "state": "reserved_unapplied; W8 review/application pending"
+    }
   },
   "nativeRecoveryFollowup": {
     "evidence": "native-recovery.json",
@@ -162,7 +168,8 @@
     "macOSLibrary": "passed15.12s",
     "iosSimulatorLibrary": "passed28.32s",
     "sqlApplied": false,
-    "functionalAcceptance": false
+    "functionalAcceptance": false,
+    "sourceRevision": "99b4d2992a3910bbb8526bfaa93caeccfafa8cc3"
   },
   "publicationAudienceFollowup": {
     "evidence": "publication-audience.json",
@@ -188,6 +195,8 @@
     "sourceBaseRevision": "a4d63f95d56d169726f655b7147a857a6afe661b",
     "operations": 47,
     "sqlActiveOrApplied": false,
-    "actualMediaCallHardwareAcceptance": false
+    "actualMediaCallHardwareAcceptance": false,
+    "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
+    "finalAndroidAPK": "passed345s;47 operations"
   }
 }

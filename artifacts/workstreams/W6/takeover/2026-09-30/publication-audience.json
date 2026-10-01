@@ -43,7 +43,13 @@
       "skipped": 0,
       "result": "passed6m after Post purpose/publication binding; predates creator uploader addition and three audience API operations"
     },
-    "androidCreatorUploaderAPK": "passed333s; actual compiled uploader confirmed with javap; final47-operation packaging pending"
+    "androidCreatorUploaderAPK": "passed333s; compiled creator uploader confirmed with javap; final47-operation APK subsequently passed345s",
+    "androidFinal47OperationAPK": "passed345s; fresh generated47 methods and creator uploader present in compiled bytecode; no install/device/provider journey",
+    "androidAPK": {
+      "path": "/tmp/qelvora-w6-native-recovery-20260930/app-build/outputs/apk/debug/app-debug.apk",
+      "bytes": 12004190,
+      "sha256": "6702f5275c09e75b5abdb443e327441ee08d78321980d15f58a39a53a78b757d"
+    }
   },
   "runtimeCapabilities": {
     "media": false,
@@ -63,5 +69,7 @@
   "realMediaProviderHardwareAcceptance": false,
   "physicalDeviceReadOnlyInventory": "devicectl reports no attached devices; no ADB listener; no device or emulator operated",
   "sdkEvaluation": "sdk-release-evaluation.json",
-  "resourceCleanup": "resource-followup.json"
+  "resourceCleanup": "resource-followup.json",
+  "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
+  "finalValidationAt": "2026-10-01T00:52:49.306939+00:00"
 }
