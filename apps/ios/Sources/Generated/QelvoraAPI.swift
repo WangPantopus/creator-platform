@@ -439,6 +439,87 @@ public enum APICommercePacketState: String, Codable, Sendable {
   case `withdrawn` = "withdrawn"
 }
 
+public struct APICommercePassBillingStatus: Codable, Sendable {
+  public let `version`: Int
+  public let `currency`: String
+  public let `desiredRenewal`: Bool
+  public let `processing`: Bool
+  public let `effects`: [APICommercePassBillingStatusEffectsItem]
+  public init(version: Int, currency: String, desiredRenewal: Bool, processing: Bool, effects: [APICommercePassBillingStatusEffectsItem]) {
+    self.version = version
+    self.currency = currency
+    self.desiredRenewal = desiredRenewal
+    self.processing = processing
+    self.effects = effects
+  }
+}
+
+public struct APICommercePassBillingStatusEffectsItem: Codable, Sendable {
+  public let `id`: String
+  public let `state`: APICommercePassBillingStatusEffectsItemState
+  public let `operation`: APICommercePassBillingStatusEffectsItemOperation
+  public init(id: String, state: APICommercePassBillingStatusEffectsItemState, operation: APICommercePassBillingStatusEffectsItemOperation) {
+    self.id = id
+    self.state = state
+    self.operation = operation
+  }
+}
+
+public enum APICommercePassBillingStatusEffectsItemState: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `processing` = "processing"
+  case `unknown` = "unknown"
+}
+
+public enum APICommercePassBillingStatusEffectsItemOperation: String, Codable, Sendable {
+  case `start` = "start"
+  case `activate_renewal` = "activate_renewal"
+  case `cancel` = "cancel"
+  case `compensate_cancel` = "compensate_cancel"
+}
+
+public struct APICommercePassPurchaseEffect: Codable, Sendable {
+  public let `effectId`: String
+  public let `processing`: Bool
+  public let `clientSecret`: String?
+  public init(effectId: String, processing: Bool, clientSecret: String? = nil) {
+    self.effectId = effectId
+    self.processing = processing
+    self.clientSecret = clientSecret
+  }
+}
+
+public struct APICommercePassPurchaseQuote: Codable, Sendable {
+  public let `quoteId`: String
+  public let `version`: Int
+  public let `currency`: String
+  public let `amount`: Int
+  public let `monthlyAmount`: Int
+  public let `slotCapacity`: Int
+  public let `allowance`: Int
+  public let `monthlyAllowance`: Int
+  public let `termsVersion`: String
+  public let `budgetPolicyVersion`: String
+  public let `createdAt`: String
+  public let `expiresAt`: String
+  public let `periodEndsAt`: String
+  public init(quoteId: String, version: Int, currency: String, amount: Int, monthlyAmount: Int, slotCapacity: Int, allowance: Int, monthlyAllowance: Int, termsVersion: String, budgetPolicyVersion: String, createdAt: String, expiresAt: String, periodEndsAt: String) {
+    self.quoteId = quoteId
+    self.version = version
+    self.currency = currency
+    self.amount = amount
+    self.monthlyAmount = monthlyAmount
+    self.slotCapacity = slotCapacity
+    self.allowance = allowance
+    self.monthlyAllowance = monthlyAllowance
+    self.termsVersion = termsVersion
+    self.budgetPolicyVersion = budgetPolicyVersion
+    self.createdAt = createdAt
+    self.expiresAt = expiresAt
+    self.periodEndsAt = periodEndsAt
+  }
+}
+
 public enum APICommercePaymentState: String, Codable, Sendable {
   case `authorization_pending` = "authorization_pending"
   case `requires_action` = "requires_action"

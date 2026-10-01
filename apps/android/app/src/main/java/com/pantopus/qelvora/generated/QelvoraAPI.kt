@@ -330,6 +330,61 @@ enum class APICommercePacketState {
 }
 
 @Serializable
+data class APICommercePassBillingStatus(
+  val `version`: Long,
+  val `currency`: String,
+  val `desiredRenewal`: Boolean,
+  val `processing`: Boolean,
+  val `effects`: List<APICommercePassBillingStatusEffectsItem>
+)
+
+@Serializable
+data class APICommercePassBillingStatusEffectsItem(
+  val `id`: String,
+  val `state`: APICommercePassBillingStatusEffectsItemState,
+  val `operation`: APICommercePassBillingStatusEffectsItemOperation
+)
+
+@Serializable
+enum class APICommercePassBillingStatusEffectsItemState {
+  @SerialName("pending") PENDING,
+  @SerialName("processing") PROCESSING,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
+enum class APICommercePassBillingStatusEffectsItemOperation {
+  @SerialName("start") START,
+  @SerialName("activate_renewal") ACTIVATE_RENEWAL,
+  @SerialName("cancel") CANCEL,
+  @SerialName("compensate_cancel") COMPENSATE_CANCEL
+}
+
+@Serializable
+data class APICommercePassPurchaseEffect(
+  val `effectId`: String,
+  val `processing`: Boolean,
+  val `clientSecret`: String? = null
+)
+
+@Serializable
+data class APICommercePassPurchaseQuote(
+  val `quoteId`: String,
+  val `version`: Long,
+  val `currency`: String,
+  val `amount`: Long,
+  val `monthlyAmount`: Long,
+  val `slotCapacity`: Long,
+  val `allowance`: Long,
+  val `monthlyAllowance`: Long,
+  val `termsVersion`: String,
+  val `budgetPolicyVersion`: String,
+  val `createdAt`: String,
+  val `expiresAt`: String,
+  val `periodEndsAt`: String
+)
+
+@Serializable
 enum class APICommercePaymentState {
   @SerialName("authorization_pending") AUTHORIZATION_PENDING,
   @SerialName("requires_action") REQUIRES_ACTION,
