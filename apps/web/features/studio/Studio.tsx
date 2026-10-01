@@ -603,7 +603,7 @@ function Notes({ creator }: { creator: Creator }) {
               {n.state === "draft" ? (
                 <article className="w5-card">
                   <p className="qv-meta">Draft · not signed or sent</p>
-                  <p>{n.document.text}</p>
+                  <p className="w5-content-text">{n.document.text}</p>
                 </article>
               ) : (
                 <Note
