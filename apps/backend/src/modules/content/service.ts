@@ -19,6 +19,7 @@ import {
 } from "../../../../../packages/api/src/content.js";
 import type { Actor } from "../identity/adapter.js";
 import { identityTransaction } from "../identity/transaction.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
 import {
   consumeCreatorSignedAct,
   setSignatureVisibility,
@@ -85,6 +86,16 @@ type Index = {
   quote_consent_version: number | null;
   packet_id: string | null;
 };
+/** Withdrawal only; W1 separately verifies consumed signature/registry state. */
+export type ContentSignatureWithdrawal = Readonly<{
+  creatorId: string;
+  objectId: string;
+  version: number;
+  signedActId: string;
+  signerAccountId: string;
+  command: SignedActCommand;
+  withdrawn: true;
+}>;
 export interface ContentDependencies {
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
@@ -111,15 +122,7 @@ export interface ContentDependencies {
   withdrawPublicationSignature?: (
     client: PoolClient,
     actor: Actor,
-    input: Readonly<{
-      creatorId: string;
-      objectId: string;
-      version: number;
-      signedActId: string;
-      signerAccountId: string;
-      command: SignedActCommand;
-      withdrawn: true;
-    }>,
+    input: ContentSignatureWithdrawal,
   ) => Promise<void>;
   publicPacket?: (
     client: PoolClient,
@@ -1198,7 +1201,7 @@ export class ContentService {
       "publication_evidence_unavailable",
       "The exact stored publication evidence is required for withdrawal.",
     );
-    await this.dependencies.withdrawPublicationSignature(client, actor, {
+    const input: ContentSignatureWithdrawal = {
       creatorId: row.creator_id,
       objectId: row.id,
       version: row.version,
@@ -1206,7 +1209,80 @@ export class ContentService {
       signerAccountId: publication.author_account_id,
       command: publicationCommand(row, document, evidence),
       withdrawn: true,
-    });
+    };
+    await this.authorizePublicationSignatureWithdrawal(client, actor, input);
+    await this.dependencies.withdrawPublicationSignature(client, actor, input);
+  }
+  /** Held-client W5 policy for W1's withdrawal-only registry. This validates
+   * the exact current subject/revision; it does not update signer-only tables,
+   * consume an act, issue a scope, or manufacture a signing account/session.
+   * W1 must separately prove the consumed act/hash, current held denial and
+   * W8-custodied registry authority, then audit this actual actor atomically. */
+  async authorizePublicationSignatureWithdrawal(
+    client: PoolClient,
+    actor: Actor,
+    input: ContentSignatureWithdrawal,
+  ): Promise<void> {
+    const context = (
+      await client.query<{ account_id: string; creator_id: string }>(
+        "SELECT current_setting('app.account_id',true) AS account_id,current_setting('app.creator_id',true) AS creator_id",
+      )
+    ).rows[0];
+    invariant(
+      input.withdrawn === true &&
+        context?.account_id === actor.accountId &&
+        context.creator_id === input.creatorId,
+      "publication_withdrawal_scope_required",
+      "Current publisher withdrawal authority is required.",
+    );
+    await assertCurrentSession(client, actor.accountId);
+    await this.assertCurrentAllowed(client, actor, input.creatorId);
+    const role = await this.role(client, actor, input.creatorId, ["publisher"]);
+    const row = await this.index(client, input.creatorId, input.objectId, true);
+    const publication = (
+      await client.query(
+        "SELECT * FROM creator.content_publication WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+        [input.objectId, input.creatorId, input.version],
+      )
+    ).rows[0];
+    invariant(
+      row.version === input.version &&
+        publication?.signed_act_id === input.signedActId &&
+        publication.author_account_id === input.signerAccountId &&
+        role.account_id === input.signerAccountId,
+      "publication_signature_changed",
+      "The current signed publication changed. Refresh before withdrawal.",
+    );
+    const revision = (
+      await client.query(
+        "SELECT document FROM creator.content_revision WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+        [input.objectId, input.creatorId, input.version],
+      )
+    ).rows[0];
+    const document = ContentDocument.parse(revision?.document),
+      evidence = z
+        .array(ProcessedMediaEvidenceSchema)
+        .max(10)
+        .parse(publication.media_evidence ?? []);
+    invariant(
+      evidence.length === document.media.length &&
+        new Set(evidence.map((item) => item.assetId)).size ===
+          evidence.length &&
+        document.media.every((item) =>
+          evidence.some(
+            (value) =>
+              value.assetId === item.assetId &&
+              value.version === item.version &&
+              value.sha256 === item.sha256 &&
+              value.mimeType ===
+                (item.kind === "photo" ? "image/png" : "audio/mp4"),
+          ),
+        ) &&
+        contentHash(publicationCommand(row, document, evidence)) ===
+          contentHash(input.command),
+      "publication_evidence_changed",
+      "The exact stored publication and processed evidence are required for withdrawal.",
+    );
   }
   async effect(
     client: PoolClient,

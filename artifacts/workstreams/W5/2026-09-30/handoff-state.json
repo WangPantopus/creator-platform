@@ -125,7 +125,7 @@
   "currentContinuation": {
     "recordedAt": "2026-10-01T01:18:51.606443Z",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "1c90032fcfa28a9a87d703851f10c54daaa97926; audience/Post continuation follows, inspect HEAD",
+    "lastPushedCheckpoint": "9d29e8caaf08551e8fe871e7a2d06e5981229714; withdrawal policy follows, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -190,7 +190,7 @@
       "Populated queue/packet/provider/native content/physical-device/p95 acceptance"
     ],
     "replyConsumers": "Personal W4 exact approval and W3 Team UI/BFF implemented; actual producer write-purpose/denial/migration assemblies absent; no approval/delivery proof",
-    "signatureWithdrawal": "W1 withdrawal-only exact stored command/current publisher/durable actual-actor audit port proposed; absent blocks Team mutation of creator-signed publication",
+    "signatureWithdrawal": "Published held-client ContentSignatureWithdrawal + authorizePublicationSignatureWithdrawal exact domain/revision/full-command policy. W1 consumed registry/current held W8 denial/durable real publisher audit + W8 RLS remain required and absent.",
     "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
     "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
     "audienceMedia": "Personal current tuple/C2PA/ticket consumer on actual no-Thread W1 audience route; real media producer unmounted/unverified",
