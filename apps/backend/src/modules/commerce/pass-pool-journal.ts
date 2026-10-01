@@ -14,6 +14,7 @@ import { allocateSlotDayPool } from "./extended.js";
 import {
   PayoutTransferRequestSchema,
   type PayoutTransferRequest,
+  type PayoutClaim,
 } from "./payout-custody.js";
 
 const Original = z.strictObject({
@@ -49,9 +50,13 @@ export type PoolTransferProvider = Pick<
   PayoutProvider,
   "account" | "transfer" | "current"
 > & {
-  reverseOriginal(request: OriginalPoolReversal): Promise<void>;
+  reverseOriginal(
+    request: OriginalPoolReversal & { original: PayoutTransferRequest },
+    claim: PayoutClaim,
+  ): Promise<void>;
   recoverTransfer(
     request: PayoutTransferRequest,
+    claim: PayoutClaim,
   ): Promise<VerifiedTransfer | undefined>;
 };
 type Effect = {
@@ -409,6 +414,57 @@ export class PassPoolJournal {
       "A newer worker owns this pool recovery.",
     );
   }
+  /** Use through the genuine current account/purpose transaction. It retains
+   * original recovery authority separately from current funding eligibility. */
+  async assertProviderRequest(
+    client: PoolClient,
+    claim: PayoutClaim,
+    request: PayoutTransferRequest,
+    reversal?: OriginalPoolReversal,
+  ) {
+    await this.assertInstalled(client);
+    const body = PayoutTransferRequestSchema.parse(request);
+    const effect = (
+      await client.query<Effect>(
+        "SELECT * FROM creator.commerce_pool_effect WHERE provider_key=$1 AND id=$2 AND attempt=$3 AND state='processing' AND lease_until>clock_timestamp() FOR SHARE",
+        [body.key, claim.effectId, claim.attempt],
+      )
+    ).rows[0];
+    invariant(
+      effect &&
+        contentHash(this.original(effect).transfer) === contentHash(body),
+      "pool_original_changed",
+      "Current original pool provider custody is required.",
+    );
+    if (reversal)
+      invariant(
+        effect.compensation_required &&
+          reversal.reference === effect.provider_ref &&
+          contentHash(Reversal.parse(effect.compensation_request)) ===
+            contentHash(Reversal.parse(reversal)),
+        "pool_reversal_conflict",
+        "Provider compensation must use the exact frozen original pool request.",
+      );
+  }
+  async assertProviderReference(
+    client: PoolClient,
+    claim: PayoutClaim,
+    reference: string,
+  ) {
+    await this.assertInstalled(client);
+    const effect = (
+      await client.query<Effect>(
+        "SELECT * FROM creator.commerce_pool_effect WHERE id=$1 AND attempt=$2 AND provider_ref=$3 AND state='processing' AND lease_until>clock_timestamp() FOR SHARE",
+        [claim.effectId, claim.attempt, reference],
+      )
+    ).rows[0];
+    invariant(
+      effect,
+      "pool_lease_lost",
+      "Current original pool reference custody is required.",
+    );
+    this.original(effect);
+  }
   private async eligibility(actor: Actor, original: OriginalPoolTransfer) {
     const truth = await this.funding.current(actor, original);
     invariant(
@@ -567,11 +623,12 @@ export class PassPoolJournal {
       ).rows[0];
     });
     if (!effect) return { processing: true };
+    const claim = { effectId: effect.id, attempt: effect.attempt };
     try {
       const original = this.original(effect);
       let cash = effect.provider_ref
-        ? await this.provider.current(effect.provider_ref)
-        : await this.provider.recoverTransfer(original.transfer);
+        ? await this.provider.current(effect.provider_ref, claim)
+        : await this.provider.recoverTransfer(original.transfer, claim);
       if (!cash) {
         invariant(
           Date.now() - effect.created_at.getTime() >= -60000 &&
@@ -588,7 +645,7 @@ export class PassPoolJournal {
         await this.service.account(actor, (client) =>
           this.fence(client, effect),
         );
-        cash = await this.provider.transfer(original.transfer);
+        cash = await this.provider.transfer(original.transfer, claim);
       }
       this.transferTruth(original, cash);
       await this.service.account(actor, async (client) => {
@@ -621,7 +678,12 @@ export class PassPoolJournal {
         });
         return { processing: false, state: "failed" };
       }
-      const eligible = await this.eligibility(actor, original);
+      // A durable compensation cause or actual partial reversal cannot become
+      // eligible again. Recover its frozen reversal even if funding reads fail.
+      const eligible =
+        !effect.compensation_required && !cash.reversalReceipts?.length
+          ? await this.eligibility(actor, original)
+          : false;
       const compensate =
         effect.compensation_required ||
         !eligible ||
@@ -652,8 +714,11 @@ export class PassPoolJournal {
         await this.service.account(actor, (client) =>
           this.fence(client, effect),
         );
-        await this.provider.reverseOriginal(reversal);
-        cash = await this.provider.current(cash.id);
+        await this.provider.reverseOriginal(
+          { ...reversal, original: original.transfer },
+          claim,
+        );
+        cash = await this.provider.current(cash.id, claim);
         this.transferTruth(original, cash);
       }
       const finalCash = cash;

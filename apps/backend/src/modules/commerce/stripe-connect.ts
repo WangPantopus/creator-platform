@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { createHash } from "node:crypto";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { stripeOperation } from "../payments/stripe.js";
 import type {
   MoneyStatementProvider,
@@ -8,6 +8,13 @@ import type {
 } from "./reconciliation.js";
 import type { PayoutProvider } from "./accounting.js";
 import type { PoolTransferProvider } from "./pass-pool-journal.js";
+import {
+  PayoutReversalRequestSchema,
+  PayoutTransferRequestSchema,
+  type PayoutReversalRequest,
+  type PayoutTransferRequest,
+  type PayoutClaim,
+} from "./payout-custody.js";
 
 const reference = (value: string | { id: string } | null | undefined) =>
   typeof value === "string" ? value : value?.id;
@@ -375,6 +382,13 @@ export class StripeConnectTransfers {
       assertAccount(reference: string): Promise<void>;
       assertTransfer(
         input: Parameters<PayoutProvider["transfer"]>[0],
+        claim: PayoutClaim,
+      ): Promise<void>;
+      assertCurrent(reference: string, claim: PayoutClaim): Promise<void>;
+      assertReversal?(
+        request: PayoutReversalRequest,
+        original: PayoutTransferRequest,
+        claim: PayoutClaim,
       ): Promise<void>;
     },
   ) {
@@ -457,19 +471,23 @@ export class StripeConnectTransfers {
       })),
     };
   }
-  async transfer(input: Parameters<PayoutProvider["transfer"]>[0]) {
-    return this.transferOriginal(input, true);
+  async transfer(
+    input: Parameters<PayoutProvider["transfer"]>[0],
+    claim: PayoutClaim,
+  ) {
+    return this.transferOriginal(input, claim, true);
   }
   /** Pool allocations may be exact slices of a charge's reviewed net budget.
    * Both paths still require original-effect authority, current cash/account
    * truth and exact original source charge; the default remains whole-net. */
   protected async transferOriginal(
     input: Parameters<PayoutProvider["transfer"]>[0],
+    claim: PayoutClaim,
     wholeNet: boolean,
   ) {
     return stripeOperation(async () => {
-      await this.authority.assertTransfer(input);
-      const prior = await this.recoverTransfer(input);
+      await this.authority.assertTransfer(input, claim);
+      const prior = await this.recoverTransfer(input, claim);
       if (prior) return prior;
       invariant(
         Number.isSafeInteger(input.amount) && input.amount > 0,
@@ -508,7 +526,7 @@ export class StripeConnectTransfers {
         "The original source charge changed; funds require reconciliation.",
       );
       const key = createHash("sha256").update(input.key).digest("hex");
-      await this.authority.assertTransfer(input);
+      await this.authority.assertTransfer(input, claim);
       return this.truth(
         await this.stripe.transfers.create(
           {
@@ -528,12 +546,15 @@ export class StripeConnectTransfers {
       );
     });
   }
-  async recoverTransfer(input: Parameters<PayoutProvider["transfer"]>[0]) {
+  async recoverTransfer(
+    input: Parameters<PayoutProvider["transfer"]>[0],
+    claim: PayoutClaim,
+  ) {
     return stripeOperation(async () => {
       // This authority validates immutable effect/owner terms, not current
       // payout eligibility. Recovery must still discover an already-made
       // transfer when a dispute or account restriction now requires reversal.
-      await this.authority.assertTransfer(input);
+      await this.authority.assertTransfer(input, claim);
       const key = createHash("sha256").update(input.key).digest("hex");
       const prior = (
         await collect(
@@ -563,23 +584,91 @@ export class StripeConnectTransfers {
       return this.truth(row);
     });
   }
-  async current(id: string) {
-    return stripeOperation(async () =>
-      this.truth(await this.stripe.transfers.retrieve(id)),
-    );
-  }
-  protected async reverseRemaining(id: string, key: string) {
+  async current(id: string, claim: PayoutClaim) {
     return stripeOperation(async () => {
-      const current = await this.stripe.transfers.retrieve(id);
-      await this.truth(current);
-      if (current.reversed) return { id, reversed: true };
-      await this.stripe.transfers.createReversal(
-        id,
-        { amount: current.amount - current.amount_reversed },
-        { idempotencyKey: key },
+      await this.authority.assertCurrent(id, claim);
+      return this.truth(await this.stripe.transfers.retrieve(id));
+    });
+  }
+  protected async reverseFrozen(
+    request: PayoutReversalRequest,
+    transfer: PayoutTransferRequest,
+    claim: PayoutClaim,
+    marker: "payout_reversal" | "pool_reversal",
+  ) {
+    return stripeOperation(async () => {
+      const input = PayoutReversalRequestSchema.parse(request);
+      const original = PayoutTransferRequestSchema.parse(transfer);
+      const suffix = marker === "pool_reversal" ? ":reverse" : ":compensate";
+      invariant(
+        this.authority.assertReversal &&
+          input.key === original.key + suffix &&
+          input.amount <= original.amount,
+        "payout_original_reversal_required",
+        "Reversal requires its exact immutable request authority.",
       );
-      const confirmed = await this.current(id);
-      return { id, reversed: confirmed.reversed };
+      await this.authority.assertTransfer(original, claim);
+      await this.authority.assertReversal(input, original, claim);
+      const current = await this.stripe.transfers.retrieve(input.reference);
+      const cash = await this.truth(current);
+      invariant(
+        cash.amount === original.amount &&
+          cash.currency === original.currency &&
+          cash.destination === original.destination &&
+          cash.sourcePayment === original.sourcePayment &&
+          cash.sourceTransaction === original.sourceTransaction &&
+          cash.keyHash ===
+            createHash("sha256").update(original.key).digest("hex"),
+        "payout_reversal_conflict",
+        "The reversal must belong to its exact original transferred cash.",
+      );
+      const hash = createHash("sha256").update(input.key).digest("hex");
+      const prior = (
+        await collect(
+          this.stripe.transfers.listReversals(input.reference, { limit: 100 }),
+        )
+      ).filter(
+        (r) =>
+          r.metadata?.commerce === marker && r.metadata.commerce_key === hash,
+      );
+      invariant(
+        prior.length <= 1 &&
+          prior.every(
+            (r) =>
+              reference(r.transfer) === input.reference &&
+              r.amount === input.amount &&
+              r.currency === current.currency &&
+              r.metadata?.commerce_transfer === input.reference,
+          ),
+        "payout_reversal_conflict",
+        "Original reversal receipts require reconciliation.",
+      );
+      if (prior.length || cash.reversed) return;
+      const age = Date.now() - Date.parse(input.createdAt);
+      invariant(
+        Number.isFinite(age) && age >= -60000 && age < 23 * 3600000,
+        "payout_reversal_aged_unknown",
+        "An aged unknown reversal needs original provider evidence before another write.",
+      );
+      invariant(
+        current.amount - current.amount_reversed === input.amount,
+        "payout_reversal_amount_changed",
+        "The original reversal amount cannot be reconstructed from changed cash.",
+      );
+      await this.authority.assertTransfer(original, claim);
+      await this.authority.assertReversal(input, original, claim);
+      await this.stripe.transfers.createReversal(
+        input.reference,
+        {
+          amount: input.amount,
+          metadata: {
+            commerce: marker,
+            commerce_key: hash,
+            commerce_transfer: input.reference,
+          },
+        },
+        { idempotencyKey: input.key },
+      );
     });
   }
 }
@@ -595,8 +684,15 @@ export class StripeConnectPayout
       assertAccount(reference: string): Promise<void>;
       assertTransfer(
         input: Parameters<PayoutProvider["transfer"]>[0],
+        claim: PayoutClaim,
       ): Promise<void>;
+      assertCurrent(reference: string, claim: PayoutClaim): Promise<void>;
       paymentForCommitment(commitmentId: string): Promise<string>;
+      assertReversal(
+        request: PayoutReversalRequest,
+        original: PayoutTransferRequest,
+        claim: PayoutClaim,
+      ): Promise<void>;
       onboardingReturnUrl: string;
       onboardingRefreshUrl: string;
     },
@@ -638,8 +734,18 @@ export class StripeConnectPayout
       disputeOpen: current.disputeOpen,
     };
   }
-  async reverse(id: string, key: string) {
-    return this.reverseRemaining(id, key);
+  async reverse(): Promise<{ id: string; reversed: boolean }> {
+    throw new DomainError(
+      "payout_original_reversal_required",
+      "Use the prepared original reversal request; changed remaining cash cannot create a new body.",
+    );
+  }
+  async reverseOriginal(
+    input: PayoutReversalRequest & { original: PayoutTransferRequest },
+    claim: PayoutClaim,
+  ) {
+    const { original, ...request } = input;
+    return this.reverseFrozen(request, original, claim, "payout_reversal");
   }
 }
 
@@ -659,88 +765,36 @@ export class StripePassPoolTransfers
       assertAccount(reference: string): Promise<void>;
       assertTransfer(
         input: Parameters<PayoutProvider["transfer"]>[0],
+        claim: PayoutClaim,
+      ): Promise<void>;
+      assertCurrent(reference: string, claim: PayoutClaim): Promise<void>;
+      assertReversal(
+        request: PayoutReversalRequest,
+        original: PayoutTransferRequest,
+        claim: PayoutClaim,
       ): Promise<void>;
     },
   ) {
     super(stripe, money, authority);
   }
-  override async transfer(input: Parameters<PayoutProvider["transfer"]>[0]) {
-    return this.transferOriginal(input, false);
+  override async transfer(
+    input: Parameters<PayoutProvider["transfer"]>[0],
+    claim: PayoutClaim,
+  ) {
+    return this.transferOriginal(input, claim, false);
   }
   async reverseOriginal(
-    input: import("./pass-pool-journal.js").OriginalPoolReversal,
+    input: import("./pass-pool-journal.js").OriginalPoolReversal & {
+      original: PayoutTransferRequest;
+    },
+    claim: PayoutClaim,
   ) {
-    return stripeOperation(async () => {
-      invariant(
-        input.key.endsWith(":reverse") &&
-          Number.isSafeInteger(input.amount) &&
-          input.amount > 0,
-        "pool_reversal_invalid",
-        "An exact original pool reversal is required.",
-      );
-      const current = await this.stripe.transfers.retrieve(input.reference);
-      const cash = await this.truth(current);
-      const originalKey = input.key.slice(0, -":reverse".length);
-      invariant(
-        cash.keyHash === createHash("sha256").update(originalKey).digest("hex"),
-        "pool_reversal_conflict",
-        "The reversal belongs to a different original transfer.",
-      );
-      const original = {
-        destination: cash.destination,
-        amount: cash.amount,
-        currency: cash.currency,
-        sourcePayment: cash.sourcePayment,
-        sourceTransaction: cash.sourceTransaction,
-        key: originalKey,
-      };
-      await this.authority.assertTransfer(original);
-      const hash = createHash("sha256").update(input.key).digest("hex");
-      const prior = (
-        await collect(
-          this.stripe.transfers.listReversals(input.reference, { limit: 100 }),
-        )
-      ).filter(
-        (r) =>
-          r.metadata?.commerce === "pool_reversal" &&
-          r.metadata.commerce_key === hash,
-      );
-      invariant(
-        prior.length <= 1 &&
-          prior.every(
-            (r) =>
-              reference(r.transfer) === input.reference &&
-              r.amount === input.amount &&
-              r.metadata?.commerce_transfer === input.reference,
-          ),
-        "pool_reversal_conflict",
-        "Original reversal receipts require reconciliation.",
-      );
-      if (prior.length || current.reversed) return;
-      const age = Date.now() - Date.parse(input.createdAt);
-      invariant(
-        Number.isFinite(age) && age >= -60000 && age < 23 * 3600000,
-        "pool_reversal_aged_unknown",
-        "An aged unknown reversal requires original provider evidence before another write.",
-      );
-      invariant(
-        current.amount - current.amount_reversed === input.amount,
-        "pool_reversal_amount_changed",
-        "The original reversal amount cannot be reconstructed from changed cash.",
-      );
-      await this.authority.assertTransfer(original);
-      await this.stripe.transfers.createReversal(
-        input.reference,
-        {
-          amount: input.amount,
-          metadata: {
-            commerce: "pool_reversal",
-            commerce_key: hash,
-            commerce_transfer: input.reference,
-          },
-        },
-        { idempotencyKey: input.key },
-      );
-    });
+    invariant(
+      input.key.endsWith(":reverse"),
+      "pool_reversal_invalid",
+      "An original pool reversal is required.",
+    );
+    const { original, ...request } = input;
+    return this.reverseFrozen(request, original, claim, "pool_reversal");
   }
 }
