@@ -78,6 +78,8 @@ jobs:
       - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
       - name: Check native package and exact snapshots
         if: ${{ !cancelled() }}
+        # Keep stalled captures from holding the job and its failure artifacts for hours.
+        timeout-minutes: 20
         run: swift test --package-path apps/ios
       - uses: actions/upload-artifact@v4
         if: always()

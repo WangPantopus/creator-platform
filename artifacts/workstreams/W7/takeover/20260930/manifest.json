@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-01T00:02:20.927521+00:00",
+  "recordedAt": "2026-10-01T00:12:41.393929+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
     "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "774495a67c77952b0a7abb8dd9fdacea047bd59bb0c339875d4219f1c8d2bb0a",
@@ -14,7 +14,9 @@
     "apps/backend/src/modules/growth/retention.ts": "4d3470b2f35910932412a02c70765bb8cb11bcecd30d5c71e15383ae502cacb3",
     "apps/web/features/growth/preferences.tsx": "a86d9748dadef0fb8617f147dff8c07da79ab506289ab044e99a409e8989c334",
     "apps/web/lib/trust-session.ts": "c3eff172600f810c8b8aca449e25331fe5d76838f66fb23b2f551d34894f388d",
-    "apps/web/app/api/auth/complete/route.ts": "1f26cf1f142460c6b3e076c7e9e73f8ce91d8d2dd49a2c7498ba2c71390abcd2"
+    "apps/web/app/api/auth/complete/route.ts": "1f26cf1f142460c6b3e076c7e9e73f8ce91d8d2dd49a2c7498ba2c71390abcd2",
+    ".github/workflows/ci.yml": "0082580c9c284095c13fe86bef7d970460c7c7a59fd5603e9ea6edc4fa873258",
+    "apps/backend/src/modules/growth/content.ts": "98f8d86ef35c624a403a7a08f48a268b35cb7628aa8a9cf0f9f19a42cb87614a"
   },
   "nativeReferenceCount": 110,
   "nativeReferenceSetSha256": "a729e6b68ee8bea71fd90a1ba4e60474ede2b4cec69fe79887829b9625594510",
@@ -139,7 +141,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "1d6b759aaaa703e06de901fa9cd36f08823f197206a39067f8f1e77120dea2d3",
+    "README.md": "21858728063c20a4bd01779d810f629e0eb4895b9e5655bf040d4bb2eeed4b7d",
     "approved-input-search.json": "edee150a6bab7cc43cf2b97795402098b9f2869c9a53dbb01448074b5c2e0e08",
     "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend-contracts.log": "00c68520c2ce4f9bdbdc93c60e9a39d2e8539abb81dbefb6c2793ae199647e4c",
@@ -167,7 +169,19 @@
     "web-catalog-and-mac-baselines.log": "708e23ee94a79a3e7324a22e520b14ac59225a5ee9a46ec4bf7be2152378ce39",
     "web-foundation-caret.log": "f13a9591c11407820284f0534acf2bdef22f28c408cdf1caf2e3680c9caa14ee",
     "web-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "web-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "web-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-contracts.log": "9787f018b6f2e332eb6300615fc92f60ae8fadcfa6b7949d5e437f4a435b269c",
+    "media-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "media-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "media-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "ios-ui-Native-Message-identities.png": "ef4c3ba8c097679cb9d22d2aabb010c7dd07581d22536ca54cdd19e449d882fa",
+    "ios-ui-SignIn-unconfigured-Dark.png": "ed73fae1309e87b0d22f968fd3573b8f7aa18111673df9a8f669671d460823c3",
+    "ios-ui-Welcome-Dark.png": "14820d96a0b2252e1484179c41109f4236ba9eca036bacd9606fa9e7d617b670",
+    "ios-ui-SignIn-unconfigured-Light.png": "e549e9c434efa7d3348f2b4be5400409e193c4b4bd22f4a7af0dfabb1c4db0d2",
+    "ios-ui-summary.json": "ca7e8510b261fc57721eda36823efa38dd09dc5695dfcbe1d532a1088b66c3ed",
+    "ios-ui.log": "c148440871bb494eedbba5494bb94b071d6ebf0c867cfa00ddb2f1a292865fa8",
+    "ios-ui-Welcome-Light.png": "d1455ffa45a4add0189a8df19def9b307df0a3d7699ca3473d065f11001fb7e6"
   },
   "managedSecretScan": "no complete managed key or connection URL appears in text evidence",
   "verification": {
@@ -210,5 +224,25 @@
     "build": "passed",
     "currentEndpoint": "503 trust_unconfigured",
     "configuredHostAcceptance": "unverified"
+  },
+  "nativeStepTimeoutMinutes": 20,
+  "mediaPublicationBoundary": {
+    "actualOwnerReview": "10405eb",
+    "status": "current-publication media proof unavailable; public media retracted and effect remains pending",
+    "newTestCases": 0,
+    "backendBuild": "pass",
+    "backendTypecheck": "pass",
+    "backendLint": "pass",
+    "existingContractChecks": 9
+  },
+  "existingIOSUIReproduction": {
+    "tests": 2,
+    "passed": 2,
+    "failed": 0,
+    "seconds": 25.193,
+    "device": "90934313-E0DD-445C-B8AF-AA8188BD2AC0",
+    "deviceStateAfter": "Shutdown",
+    "erasedOrReset": false,
+    "actualCreatorOrAccessibilityAcceptance": false
   }
 }

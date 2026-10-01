@@ -29,6 +29,7 @@ export interface ContentPublicationReader {
       audience: { kind: string };
       quote: { replyId: string; consentVersion: number } | null;
       packetId: string | null;
+      media?: readonly unknown[];
     };
   }>;
 }
@@ -117,15 +118,23 @@ export function contentPublicProjection(
       }
     }
     // Quote/packet retractions originate in separate fan/commerce outboxes.
-    // Their dependent-publication mapper must be connected before projection.
-    if (publicState && (current.document.quote || current.document.packetId)) {
+    // Media signing also binds owner processing evidence outside the document.
+    // Keep these effects pending until their current owner adapters are bound.
+    if (
+      publicState &&
+      (current.document.quote ||
+        current.document.packetId ||
+        Boolean(current.document.media?.length))
+    ) {
       await growth.withdrawContent(
         current.creatorId,
         current.id,
         current.version,
       );
       throw new DomainError(
-        "content_retraction_adapter_required",
+        current.document.media?.length
+          ? "content_media_proof_adapter_required"
+          : "content_retraction_adapter_required",
         copy.growthErrorContentEffectUnconfigured,
         503,
       );
