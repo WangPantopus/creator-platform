@@ -120,6 +120,8 @@ export function TrustSession() {
   const { data } = useTrust<{ localDevelopment: boolean }>("capabilities");
   const session = useTrust<{ accountId: string }>("session");
   const [actor, setActor] = useState("fan");
+  const actorChoice = useRef<HTMLSelectElement | null>(null);
+  const observedAccount = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [returnTo, setReturnTo] = useState<string | null>(null);
@@ -151,6 +153,10 @@ export function TrustSession() {
   }, [session.refresh]);
   useEffect(() => {
     if (!data?.localDevelopment || !session.data) return;
+    // A periodic refresh clears data while loading. Preserve the pending
+    // selection unless the verified account actually changes.
+    if (observedAccount.current === session.data.accountId) return;
+    observedAccount.current = session.data.accountId;
     const accountActors: Record<string, string> = {
       "10000000-0000-4000-8000-000000000001": "fan",
       "10000000-0000-4000-8000-000000000002": "other_fan",
@@ -179,6 +185,7 @@ export function TrustSession() {
       <label htmlFor="local-actor">Switch to local actor</label>
       <select
         id="local-actor"
+        ref={actorChoice}
         value={actor}
         onChange={(event) => setActor(event.target.value)}
       >
@@ -201,7 +208,9 @@ export function TrustSession() {
         onClick={async () => {
           setBusy(true);
           try {
-            await trustApi("dev/session", { actor });
+            await trustApi("dev/session", {
+              actor: actorChoice.current?.value ?? actor,
+            });
             invalidateSession();
             const channel = new BroadcastChannel("trust-account");
             channel.postMessage("changed");
