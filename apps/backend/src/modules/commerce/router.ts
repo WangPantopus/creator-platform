@@ -44,6 +44,8 @@ export function createCommerceRouter(input: {
       passEnabled: input.extended?.pass?.configured ?? false,
       passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
+      payoutOnboardingAvailable:
+        input.extended?.settlement?.onboardingConfigured ?? false,
       poolEarningsAvailable: Boolean(input.extended?.poolJournal),
     }),
   );
@@ -85,6 +87,8 @@ export function createCommerceRouter(input: {
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
         poolEarningsAvailable: Boolean(input.extended?.poolJournal),
+        payoutOnboardingAvailable:
+          input.extended?.settlement?.onboardingConfigured ?? false,
       },
     });
   });
@@ -101,6 +105,23 @@ export function createCommerceRouter(input: {
         req.query.cursor === undefined
           ? undefined
           : z.string().min(1).max(512).parse(req.query.cursor),
+      ),
+    );
+  });
+  router.post("/creators/:creatorId/payout-onboarding", async (req, res) => {
+    const actor = await actorFor(req);
+    service();
+    if (!input.extended?.settlement)
+      throw new DomainError(
+        "payout_onboarding_unavailable",
+        "Payout verification is not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.settlement.onboarding.start(
+        actor,
+        id(req.params.creatorId),
+        req.body,
       ),
     );
   });
