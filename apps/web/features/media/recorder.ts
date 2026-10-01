@@ -111,6 +111,7 @@ export class VoiceRecorder {
         });
       };
       recorder.onerror = () => {
+        if (generation !== this.generation) return;
         this.publish({
           reason:
             "Recording was interrupted. Preview what was saved or record again.",
@@ -119,6 +120,7 @@ export class VoiceRecorder {
       };
       stream.getAudioTracks().forEach((track) => {
         track.onended = () => {
+          if (generation !== this.generation) return;
           this.publish({
             reason:
               "The microphone was disconnected. Preview what was saved or record again.",
@@ -135,8 +137,8 @@ export class VoiceRecorder {
         if (durationMs >= this.maxDurationMs) this.stop();
       }, 100);
     } catch (error) {
-      this.release();
       if (generation !== this.generation) return;
+      this.release();
       const denied =
         error instanceof DOMException &&
         ["NotAllowedError", "SecurityError"].includes(error.name);
@@ -151,6 +153,18 @@ export class VoiceRecorder {
     }
   }
   pause(interrupted = false) {
+    if (interrupted && this.snapshot.state === "requesting") {
+      // A late permission response must not start capture on a hidden screen.
+      // The existing start generation fence stops any subsequently issued stream.
+      this.generation++;
+      this.release();
+      this.publish({
+        state: "idle",
+        reason:
+          "Microphone request cancelled while you left this screen. Record when you return.",
+      });
+      return;
+    }
     if (this.recorder?.state !== "recording") return;
     this.elapsed = this.duration();
     this.recorder.pause();
