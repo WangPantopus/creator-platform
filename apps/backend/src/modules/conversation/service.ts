@@ -104,6 +104,7 @@ export class ConversationService {
     reconciliation?: GenerationCostReconciliation;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
+    delivery.lineage?.assertPool(this.db.pool);
     this.delivery = delivery;
   }
   /** Revalidate the current configured policy before every remote fan-text call.

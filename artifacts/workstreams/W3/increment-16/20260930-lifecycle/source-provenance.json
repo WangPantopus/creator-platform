@@ -1,0 +1,63 @@
+{
+  "workstream": "W3",
+  "increment": 16,
+  "predecessor": "16162c4f778c2c0dd6e49ab658acadbda05c1bee",
+  "implementation": "personal; no delegation, new tests, applied SQL or reference-image edits",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/access/commerce.ts",
+      "sha256": "58d6614c7534b277f8e933a19e980eb1af4c1007a11dc605474882df1e2458b3",
+      "gitBlob": "e7835f35e3c1aa38d0d4bf20ed5043b923aae158",
+      "exactProducer": "33ce683a4ed6d248f7b02eaf0f20dd80a2cb390d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/attributed-cost-policy.ts",
+      "sha256": "83045cd42c17c44c214790b821a54bb36492ba5e92388b86530cd23810607f86",
+      "gitBlob": "8e0cab418368726dced9d05250b0870a51bca100",
+      "exactProducer": "33ce683a4ed6d248f7b02eaf0f20dd80a2cb390d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-allowance.ts",
+      "sha256": "83e1fce16cf598baddf93a99c4451028dd3d400931e97fd8f4f7f47d9d6b3a7d",
+      "gitBlob": "14b12af35316641402563111a0c6e460b5614fe8",
+      "exactProducer": "33ce683a4ed6d248f7b02eaf0f20dd80a2cb390d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-privacy.ts",
+      "sha256": "9273606eb367143157c21c17927fda720692c85299a09987af099993fc25f8a7",
+      "gitBlob": "b64b6ed0947c55845b9520a6d5d8d0a54c95ace3",
+      "exactProducer": "33ce683a4ed6d248f7b02eaf0f20dd80a2cb390d"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage.ts",
+      "sha256": "488ccf8b48407bd165f761a6b7b34cebfd68a1f86b8016b235fd4774dc4b6d6e",
+      "gitBlob": "260de69e33cd85a9da2cc1e8fe055e3cc3e3a958"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage-projection.ts",
+      "sha256": "a00b45f52fe87d891fd2edb7c0fb4bcc98d03429c5cad55da877763c86e940eb",
+      "gitBlob": "f70eb3c76eec43f407c221ca5c41ad291feabb9a"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/privacy.ts",
+      "sha256": "25a5e0abb9ccd583e5e1bfca1cb73966fc03d9fd273ab02e73dd83170dbd3375",
+      "gitBlob": "24b4f53d6d734ef83292b7cdfbed56cb6bf360f1"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "sha256": "230e2cd0bcb4e274211f644c83248c9131a876d56bd1b401eb4fe86b79152fd6",
+      "gitBlob": "3e823c3cb6f30ff38b3fc9d007f6957af75a5229"
+    },
+    {
+      "path": "apps/web/app/creators/[handle]/chat/page.tsx",
+      "sha256": "ab77a03314f2193489a85452f6b593d745c339796fd1ca3ed217ff259ab9788f",
+      "gitBlob": "4e20527fc66dff6fb0f9b0fae2d98fbc28d1048b"
+    }
+  ],
+  "lease": {
+    "owner": "W1",
+    "path": "apps/web/app/creators/[handle]/chat/page.tsx",
+    "scope": "Own W3 branch only: move currentSession outside domain catch; preserve newer return destination only with the actual complete restoration graph; expires on publication"
+  },
+  "runtimeLimit": "No genuine financial privacy job, licensed fan generation or interactive native journey is claimed. The founder requires actual launched-app end-to-end acceptance before merge."
+}

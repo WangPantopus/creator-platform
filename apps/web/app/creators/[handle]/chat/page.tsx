@@ -37,6 +37,9 @@ export default async function ContextualChat({
   const returnTo = ReturnTargetSchema.safeParse(requestedEntry).success
     ? requestedEntry
     : directEntry;
+  // Session restoration may redirect. Keep that control flow outside the
+  // domain-error boundary so the canonical host can resume this destination.
+  const session = await currentSession();
   try {
     if (
       context !== undefined &&
@@ -61,7 +64,6 @@ export default async function ContextualChat({
         "This post is unavailable for AI context. Remove it to open the conversation.",
       );
     }
-    const session = await currentSession();
     if (session && creator.state === "published")
       return (
         <IdentitySessionBoundary

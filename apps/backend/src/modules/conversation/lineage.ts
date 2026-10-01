@@ -4,6 +4,7 @@ import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
+import type { ConversationLineageProjection } from "./lineage-projection.js";
 import {
   ReplyFeedbackInputSchema,
   ReplyFeedbackPolicySchema,
@@ -39,6 +40,19 @@ export class ConversationLineage {
     private readonly feedbackAuthority?: ReplyFeedbackAuthority,
     private readonly feedbackConsentReady = false,
   ) {}
+  assertPool(pool: Database["pool"]) {
+    invariant(
+      pool === this.db.pool,
+      "lineage_pool_mismatch",
+      "Message lineage requires its actual prepared database pool.",
+    );
+  }
+  projection(): ConversationLineageProjection {
+    return Object.freeze({
+      assertPool: this.assertPool.bind(this),
+      enrich: this.enrich.bind(this),
+    });
+  }
   /** The host passes W8's real allocated versions/checksums. Catalog readiness
    * and registered bytes are checked before new columns are ever queried. */
   static async prepare(input: {

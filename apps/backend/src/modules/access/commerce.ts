@@ -3,6 +3,12 @@ import type { CapabilitySnapshot } from "../../../../../packages/api/src/commerc
 import { assertThreadScope, type ThreadScope } from "./scope.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import {
+  assertGenerationPrivacyFamily,
+  type GenerationPrivacyAuthority,
+  type GenerationPrivacyFamily,
+  type GenerationPrivacyJob,
+} from "../commerce/generation-privacy.js";
 
 export type CostAllowanceSettlement = {
   policyVersion: string;
@@ -196,6 +202,43 @@ export async function settleCostAllowance(
   outcome: boolean | CostAllowanceSettlement,
 ) {
   assertThreadScope(scope);
+  return settleVerifiedCostAllowance(client, scope, id, outcome);
+}
+
+/** Lifecycle settlement does not issue an interactive ThreadScope. Actual W8
+ * family authority and the durable generation/grant/key are checked before and
+ * after the shared accounting operation. Unknown usage cannot authorize purge. */
+export async function settleCostAllowanceForPrivacy(
+  client: PoolClient,
+  job: GenerationPrivacyJob,
+  family: GenerationPrivacyFamily,
+  authority: GenerationPrivacyAuthority,
+  generationId: string,
+  id: string,
+  outcome: Extract<CostAllowanceSettlement, { state: "final" }>,
+) {
+  await assertGenerationPrivacyFamily(client, job, family, authority);
+  const bound = await client.query(
+    `SELECT r.id FROM creator.generation g JOIN creator.commerce_allowance_reservation r
+     ON r.creator_id=g.creator_id AND r.fan_id=g.fan_id AND r.grant_id=g.grant_id AND r.key='generation:'||g.id::text
+     WHERE g.id=$1 AND g.thread_id=$2 AND g.creator_id=$3 AND g.fan_id=$4 AND r.id=$5`,
+    [generationId, family.threadId, family.creatorId, family.fanId, id],
+  );
+  invariant(
+    bound.rowCount === 1 && outcome.state === "final",
+    "privacy_reservation_mismatch",
+    "The settled allowance must belong to this exact durable generation family.",
+  );
+  await settleVerifiedCostAllowance(client, family, id, outcome);
+  await assertGenerationPrivacyFamily(client, job, family, authority);
+}
+
+async function settleVerifiedCostAllowance(
+  client: PoolClient,
+  scope: Pick<ThreadScope, "creatorId" | "fanId">,
+  id: string,
+  outcome: boolean | CostAllowanceSettlement,
+) {
   const weighted = typeof outcome !== "boolean";
   const row = (
     await client.query<{
@@ -360,7 +403,7 @@ export async function recordCostAllowanceOutput(
 }
 async function markAllowanceFirstUse(
   client: PoolClient,
-  scope: ThreadScope,
+  scope: Pick<ThreadScope, "creatorId" | "fanId">,
   grantId: string,
   reservationId: string,
 ) {
