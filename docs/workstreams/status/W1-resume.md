@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — founder release of holds and next-agent handoff
+
+The latest direct founder instruction lifts the previous resource/native-verification holds: restore necessary resources and personally launch/operate web, Android emulator and iOS simulator end to end. No new unit tests or coverage-expansion requirement; affected coverage may be limited. Create ready PRs and merge normally whenever their work and validation are ready, without another permission request. The older pending resource-resumption question and cleanup-hold statements below are historical. Missing real inputs/tool capability remain factual dependencies, with independent work continuing.
+
+Use [the current handoff](../handoffs/W1-resume-2026-10-01.md) and [complete copy-paste prompt](../prompts/W1-resume-2026-10-01.md). Full application checkpoint is `c74c95166675d96221e2e9551bda827dfd79cd32`; all ten implementation PRs remain open at preparation. Current compilation, actual app journeys, CI and full H01–H20 acceptance remain unfinished. No new runtime/build/acceptance was performed while preparing this documentation handoff.
+
 ## October 1 — native origin validation and build configuration source
 
 Application `73c9983e` validates complete release HTTPS/debug loopback API origins and rejects app-link ports. Canonical iOS project source now supplies empty-default API/link-host build settings to the keys read by the app; generated plist is untouched and still needs XcodeGen/build validation. Swift syntax/YAML/diff checks pass only. [Exact source and outstanding acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-uri/run.md). No external identity, association, provider or readiness is created; original references/API/generator inputs/authority remain unchanged.
