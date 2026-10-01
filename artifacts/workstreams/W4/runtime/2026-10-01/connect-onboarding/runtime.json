@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-01T13:34:13.257Z",
+  "database": "creator_w4",
+  "accountContext": "none; visible RLS rows only",
+  "role": {
+    "runtime_role": "creator_runtime",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "owns_creator_relation": false,
+    "migrations": 40,
+    "visible_payout_accounts": 0,
+    "visible_financial_rows": 0
+  },
+  "health": {
+    "status": "ok",
+    "ready": false,
+    "foundationReady": true,
+    "identity": "configured",
+    "identityMode": "development",
+    "generation": "unconfigured",
+    "registeredFeatures": [
+      "conversation",
+      "creator-ai",
+      "media",
+      "commerce",
+      "content",
+      "studio"
+    ],
+    "readinessEndpoint": "/health/ready",
+    "database": "configured",
+    "featureEnabled": true
+  },
+  "capabilities": {
+    "configured": true,
+    "paymentsAvailable": false,
+    "nativeReplyPurchase": false,
+    "membershipAvailable": false,
+    "passEnabled": false,
+    "passPurchaseAvailable": false,
+    "payoutsAvailable": false,
+    "payoutOnboardingAvailable": false,
+    "poolEarningsAvailable": false
+  }
+}

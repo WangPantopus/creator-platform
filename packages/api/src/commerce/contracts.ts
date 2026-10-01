@@ -73,6 +73,37 @@ export const CreatorEarnings = z.strictObject({
   ledger: CreatorLedgerPage,
 });
 export type CreatorEarnings = z.infer<typeof CreatorEarnings>;
+/** Ephemeral provider link; no account/provider reference or command history. */
+export const PayoutOnboardingCommand = z.strictObject({
+  version: z.int().positive(),
+});
+export const PayoutOnboardingResult = z
+  .strictObject({
+    creatorId: z.uuid(),
+    state: z.enum(["onboarding", "restricted", "enabled"]),
+    detailsDue: z.boolean(),
+    version: z.int().positive(),
+    url: z
+      .url()
+      .max(4096)
+      .refine((value) => {
+        const url = new URL(value);
+        return (
+          url.protocol === "https:" &&
+          !url.username &&
+          !url.password &&
+          !url.hash
+        );
+      })
+      .nullable(),
+    expiresAt: z.iso.datetime({ offset: true }).nullable(),
+  })
+  .refine((value) =>
+    value.state === "enabled"
+      ? value.url === null && value.expiresAt === null
+      : value.url !== null && value.expiresAt !== null,
+  );
+export type PayoutOnboardingResult = z.infer<typeof PayoutOnboardingResult>;
 /** Public consent projection of a real persisted provider pass preview.
  * Provider/customer references remain on the server's original quote. */
 export const PassPurchaseQuote = z
