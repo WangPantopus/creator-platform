@@ -1,0 +1,65 @@
+{
+  "recordedAt": "2026-10-01T00:28:52.989051+00:00",
+  "sourceSHA256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "5e8fb93f47d37a480aca291bb607172533847773457bbf93b65a5a1971303a82",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "a6e025ad68ee8693e9551eec60c506ea4862dbbfd13ebbbd56ee167f7feee1fb",
+    "apps/backend/src/modules/media/creator-service.ts": "e526c430e742c66889335b74e8f305c0f0ee8fd3eeebaf026edd93700c15c30e",
+    "apps/backend/src/modules/media/creator-scope.sql": "14867edda9930f31b83e0969ad80f72cc4326e421f47a681c2598c66b548f348",
+    "apps/backend/src/modules/media/lifecycle.ts": "f80f342e2a5d244d503ff23f441c6956d66c0a071dae071ada1dfb29eb38d839",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "2d9898514cb30b88c31acd33663adec82fd001bc471d0973b14ec06f89f94aec"
+  },
+  "toolchain": {
+    "jdkRelease": "21.0.12.1+1",
+    "jdkSHA256": "44db0f08196daf19a47f90d13388b0c943b67663cb537f998fe29e836fa842ce",
+    "jdkSource": "https://github.com/adoptium/temurin21-binaries/releases/tag/jdk-21.0.12.1%2B1",
+    "androidToolsSource": "https://dl.google.com/android/repository/commandlinetools-mac_x86_64-16111833_latest.zip",
+    "androidToolsRepositorySHA1": "112cf9618794a997ff273537d55bee02c22abffe",
+    "androidToolsSHA256": "7e601c04e7173754b3d051a87bb4c3a8243c65a9d7bfa9356ed6499fb8953fa3",
+    "jdkArchitecture": "x86_64"
+  },
+  "android": {
+    "result": "assembleDebug/testDebugUnitTest/verifyPaparazziDebug passed",
+    "durationSeconds": 217,
+    "tests": 19,
+    "failures": 0,
+    "suites": [
+      {
+        "suite": "com.pantopus.qelvora.DeliveryProtocolTest",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.pantopus.qelvora.GeneratedContractTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.pantopus.qelvora.NativeSnapshotsTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "outputRoot": "/tmp/qelvora-w6-native-recovery-20260930/app-build",
+    "newGoldenImages": 0,
+    "newCases": 0
+  },
+  "swift": {
+    "macOSQelvoraUI": "passed15.12s",
+    "iosSimulatorQelvoraUI": "passed28.32s; x86_64 iOS17 target with Simulator SDK26.5",
+    "dependencyLock": "incidental transitive rewrite inspected/restored; no requested dependency change",
+    "functionalOrHardwareAcceptance": false
+  },
+  "backend": "production build/lint passed after async-family refinement;9 existing contract cases passed after final SQL/async-family source (890ms runner,89ms cases)",
+  "sql": "0047 reserved_unapplied; latest SQL review/application pending",
+  "newTestsOrHarnesses": 0,
+  "providerOrSignerCredentialsAccessed": false,
+  "paidRequests": 0,
+  "realMediaPipelineAcceptance": false,
+  "privacy": "one media-domain parent requires verified creator-owned and thread/call contributions; both owned-family iterables fully exhausted; current W8 job/task custody and protected archive/retention still required"
+}

@@ -218,7 +218,8 @@ export class CreatorMediaService {
           policy.maxBytes > 0 &&
           policy.maxBytes <= 268435456 &&
           Number.isSafeInteger(policy.maxDurationMs) &&
-          policy.maxDurationMs > 0 &&
+          policy.maxDurationMs >= 0 &&
+          (body.purpose === "post_photo" || policy.maxDurationMs > 0) &&
           policy.maxDurationMs <= 3600000 &&
           Number.isSafeInteger(policy.retentionSeconds) &&
           policy.retentionSeconds > 0,
@@ -234,7 +235,7 @@ export class CreatorMediaService {
         (body.purpose === "post_photo"
           ? body.mimeType.startsWith("image/")
           : audio) &&
-          (!audio || body.durationMs) &&
+          (audio ? body.durationMs : body.durationMs === undefined) &&
           body.bytes <= policy.maxBytes &&
           (!body.durationMs || body.durationMs <= maxDuration),
         "media_limit_exceeded",

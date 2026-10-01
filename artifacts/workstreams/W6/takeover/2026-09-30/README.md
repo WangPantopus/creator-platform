@@ -12,7 +12,7 @@ The [creator-media producer contract](../../../../../docs/implementation/W6-crea
 - Current macOS `QelvoraUI` target compiles, including generated models, in10.46s. This is library compilation, not an iOS app/provider/physical-device journey. Existing Trust.swift unnecessary-await warnings remain.
 - Preserved exact source CI36780139572/a124ad0 passes backend/web, Android runtime and Android foundation. Web visual/iOS remain queued; `ios-review` does not yet exist. Both Android review artifacts are available. No current capture pixels were guessed, new references accepted or useful run cancelled by a push.
 
-The [manifest](manifest.json) records source hashes and limits. New creator and availability SQL remains unallocated/unapplied. The fixture was used only for existing checks; no peer database/process/device or original shared checkout was changed. OpenAI secrets were not read; no paid request was made.
+The [manifest](manifest.json) records source hashes and limits. W8 reserves creator and availability SQL as0047/0046; both remain inactive/unapplied. The fixture was used only for existing checks; no peer database/process/device or original shared checkout was changed. OpenAI secrets were not read; no paid request was made.
 
 ## Acceptance still open
 
@@ -31,3 +31,9 @@ Added `CreatorVoiceRecording` and `CreatorVoicePlayer` exports in the existing w
 Consumed W1 `dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564` narrowly: generic native generator, media same-issuer guard, origin helper/BFF and only media OpenAPI/feature-root additions. This branch now generates 44 operations from its actual schema set; unrelated newer peer domain/server source is preserved outside this consumption. Generation consistency, backend production build/lint/format and web typecheck pass. Swift QelvoraUI compiles in 14.13 seconds; existing shared-resource tests pass 2/2. These are compilation/contracts, not actual native product acceptance.
 
 W8 `3e1a42fbce377614156fdb37571c0e48a81efc99` reserves 0046 availability and 0047 creator media under reserved_unapplied. Neither is active or applied; no registry/SQL was imported into a peer database. Availability checksum matches the pinned owner receipt. The latest creator SQL checksum is recorded separately for review. W8 current task custody, snapshot-continuous protected export and retention remain unconfigured. Local recorder/player producer is `49e90549f2161cc7a90047b00f9370016ffb6ec4`.
+
+## Native recovery and privacy composition
+
+Native recovery now handles a lost initial response after processing changes the asset digest/bytes, validates exact ticket routes and acknowledged offsets, and bounds files/duration. Creator photo limits accept zero audio duration; photo requests omit duration. Draft0047 additionally checks consumed command content and complete evidence, with strict JSON boolean C2PA truth. One W8 media task can combine both actual stores; it attempts both contributions and acknowledges only verified results. Asynchronous owned-family pages are exhausted, with bounded asset/room pages and bounded legacy archive fallback.
+
+[Native recovery evidence](native-recovery.json) records current source hashes, verified isolated Intel JDK/SDK metadata, Android APK/19 unchanged cases, macOS15.12s and iOS Simulator28.32s library compilation, and final nine backend contract cases890ms. No new tests, golden refresh, provider/signing requests or physical-device acceptance. The necessary new toolchain/output root is `/tmp/qelvora-w6-native-recovery-20260930`; historical toolchains lost in the restart remain absent. Only W6-owned resources were created. Current family snapshot/task custody, protected archive, approved retention and migration activation remain owner integration gates.

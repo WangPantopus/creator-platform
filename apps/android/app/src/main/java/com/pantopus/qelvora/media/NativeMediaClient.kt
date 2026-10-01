@@ -36,30 +36,34 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
         } finally { connection.disconnect() }
     }
     suspend fun upload(file: File, path: String, uploadedBytes: Long, progress: suspend (Double) -> Unit) = withContext(Dispatchers.IO) {
+        val size = file.length(); require(size in 1..268_435_456 && uploadedBytes in 0..size)
         RandomAccessFile(file, "r").use { handle ->
             var offset = uploadedBytes; handle.seek(offset)
-            while (offset < handle.length()) {
+            while (offset < size) {
                 coroutineContext.ensureActive()
-                val data = ByteArray(minOf(1_048_576L, handle.length() - offset).toInt()); handle.readFully(data)
-                request(path, "PUT", data, "application/octet-stream", offset)
-                offset += data.size; progress(offset.toDouble() / handle.length())
+                val data = ByteArray(minOf(1_048_576L, size - offset).toInt()); handle.readFully(data)
+                val acknowledged = asset(JSONObject(request(path, "PUT", data, "application/octet-stream", offset).toString(Charsets.UTF_8)))
+                require(acknowledged.uploadedBytes == offset + data.size)
+                offset = acknowledged.uploadedBytes; progress(offset.toDouble() / size)
             }
         }
     }
     suspend fun uploadRecording(file: File, creatorId: UUID, fanId: UUID, purpose: String, durationMs: Long, idempotencyKey: String, resume: NativeUploadTicket? = null, ticketChanged: suspend (NativeUploadTicket) -> Unit, progress: suspend (Double) -> Unit): NativeMediaAsset = withContext(Dispatchers.IO) {
         require(purpose in listOf("human_note", "human_reply", "fan_attachment", "source_audio", "interview_audio"))
-        require(idempotencyKey.length in 8..128)
+        require(idempotencyKey.length in 8..128 && durationMs in 1..3_600_000)
         val root = "/v1/w6/threads/$creatorId/$fanId/media"
         val size = file.length(); require(size in 1..268_435_456)
-        val digest = MessageDigest.getInstance("SHA-256")
-        file.inputStream().use { input -> val buffer = ByteArray(1_048_576); while (true) { coroutineContext.ensureActive(); val length = input.read(buffer); if (length < 0) break; digest.update(buffer, 0, length) } }
+        val digest = MessageDigest.getInstance("SHA-256"); var observed = 0L
+        file.inputStream().use { input -> val buffer = ByteArray(1_048_576); while (true) { coroutineContext.ensureActive(); val length = input.read(buffer); if (length < 0) break; observed += length; require(observed <= 268_435_456); digest.update(buffer, 0, length) } }
+        require(observed == size)
         val hash = digest.digest().joinToString("") { "%02x".format(it.toInt() and 255) }
         var current = resume ?: ticket(request(root, "POST", JSONObject().put("purpose", purpose).put("mimeType", "audio/mp4").put("bytes", size).put("durationMs", durationMs).put("sha256", hash).put("idempotencyKey", idempotencyKey).toString().toByteArray()))
-        require(current.asset.sha256 == hash && current.asset.bytes == size && current.asset.uploadedBytes in 0..size)
+        require((current.asset.state != "uploading" || (current.asset.sha256 == hash && current.asset.bytes == size)) && current.asset.uploadedBytes in 0..size)
         ticketChanged(current)
         val saved = asset(JSONObject(request("$root/${current.asset.id}").toString(Charsets.UTF_8)))
         require(saved.id == current.asset.id)
         if (saved.state in listOf("quarantined", "processing", "ready", "rejected")) return@withContext saved
+        require(saved.state == "uploading")
         RandomAccessFile(file, "r").use { handle ->
             var offset = current.asset.uploadedBytes
             while (offset < size) {
@@ -67,13 +71,15 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
                 val assetId = current.asset.id
                 current = ticket(request("$root/$assetId/resume", "POST", "{}".toByteArray())); offset = current.asset.uploadedBytes; require(current.asset.id == assetId && current.asset.sha256 == hash && current.asset.bytes == size && offset in 0..size && current.chunkBytes in 1..1_048_576); ticketChanged(current)
                 if (offset == size) break
-                val url = current.url; require(url.protocol == base.protocol && url.host == base.host && url.port == base.port)
+                val url = current.url; require(url.protocol == base.protocol && url.host == base.host && url.port == base.port && url.path == "$root/$assetId/upload" && url.ref == null)
                 handle.seek(offset); val bytes = ByteArray(minOf(current.chunkBytes.toLong(), size-offset).toInt()); handle.readFully(bytes)
                 val acknowledged = asset(JSONObject(request(url.path + (url.query?.let { "?$it" } ?: ""), "PUT", bytes, "application/octet-stream", offset).toString(Charsets.UTF_8)))
                 require(acknowledged.id == current.asset.id && acknowledged.uploadedBytes == offset + bytes.size)
                 offset = acknowledged.uploadedBytes; progress(offset.toDouble()/size)
             }
         }
-        asset(JSONObject(request("$root/${current.asset.id}/finish", "POST", "{}".toByteArray()).toString(Charsets.UTF_8)))
+        val finished = asset(JSONObject(request("$root/${current.asset.id}/finish", "POST", "{}".toByteArray()).toString(Charsets.UTF_8)))
+        require(finished.id == current.asset.id && finished.state in listOf("quarantined", "processing", "ready", "rejected"))
+        finished
     }
 }

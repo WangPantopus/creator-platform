@@ -10,6 +10,59 @@ import {
 } from "../session/provider.js";
 
 type PrivacyInput = Parameters<PrivacyHook["run"]>[0];
+/** W8 installs one media-domain task covering both actual stores. A failure in
+ * either contribution keeps the parent pending while the other can still drain. */
+export function combineMediaPrivacyHooks(input: {
+  threadAndCalls: PrivacyHook;
+  creatorOwned: PrivacyHook;
+}): PrivacyHook {
+  if (
+    input.threadAndCalls === input.creatorOwned ||
+    input.threadAndCalls.domain !== "media" ||
+    input.creatorOwned.domain !== "media"
+  )
+    throw new Error("media_lifecycle_composition_invalid");
+  return {
+    domain: "media",
+    async run(job) {
+      const results: Partial<
+        Record<keyof typeof input, Awaited<ReturnType<PrivacyHook["run"]>>>
+      > = {};
+      const failures: unknown[] = [];
+      for (const key of ["creatorOwned", "threadAndCalls"] as const) {
+        try {
+          const result = await input[key].run(job);
+          if (
+            result.receipt.jobId !== job.jobId ||
+            result.receipt.verified !== true
+          )
+            throw new Error("media_lifecycle_contribution_unconfirmed");
+          results[key] = result;
+        } catch (error) {
+          failures.push(error);
+        }
+      }
+      if (failures.length)
+        throw new AggregateError(failures, "media_lifecycle_incomplete");
+      const creator = results.creatorOwned!;
+      const thread = results.threadAndCalls!;
+      return {
+        receipt: {
+          jobId: job.jobId,
+          verified: true,
+          creatorOwned: creator.receipt,
+          threadAndCalls: thread.receipt,
+        },
+        ...(creator.data !== undefined || thread.data !== undefined
+          ? {
+              data: { creatorOwned: creator.data, threadAndCalls: thread.data },
+            }
+          : {}),
+        retained: [...(creator.retained ?? []), ...(thread.retained ?? [])],
+      };
+    },
+  };
+}
 /** W8 must verify these family references against the current privacy task; they confer no interactive authority. */
 export type MediaLifecycleScope = Pick<
   ThreadScope,
@@ -95,7 +148,12 @@ function verifiedArchive(archive: {
 export function createMediaPrivacyHook(input: {
   media: MediaService;
   sessions?: SessionService;
-  scopesFor: (job: PrivacyInput) => Promise<MediaLifecycleScope[]>;
+  /** Exhaust current-job owned family pages; arrays remain compatible. */
+  scopesFor: (
+    job: PrivacyInput,
+  ) => Promise<
+    Iterable<MediaLifecycleScope> | AsyncIterable<MediaLifecycleScope>
+  >;
   /** Validate current job/account/family in the transaction, with scoped non-owner RLS.
    * Interactive Database.withThread cannot authorize cleanup after account/thread revocation. */
   withLifecycleScope?: <T>(
@@ -141,15 +199,17 @@ export function createMediaPrivacyHook(input: {
       if (
         job.kind === "export" &&
         !input.exportArchiveStream &&
+        Array.isArray(scopes) &&
         scopes.length > 1000
       )
         throw new Error("media_lifecycle_batch_required");
       const exported: ArchiveAsset[] = [];
+      const legacyScopes: MediaLifecycleScope[] = [];
       if (job.kind === "export" && input.exportArchiveStream) {
         let assets = 0;
         let complete = false;
         const pages = async function* () {
-          for (const scope of scopes) {
+          for await (const scope of scopes) {
             let cursor: string | null = null;
             do {
               const rows: AssetRow[] = await transaction(
@@ -188,7 +248,12 @@ export function createMediaPrivacyHook(input: {
       const retained: NonNullable<
         Awaited<ReturnType<PrivacyHook["run"]>>["retained"]
       > = [];
-      for (const scope of scopes) {
+      for await (const scope of scopes) {
+        if (job.kind === "export") {
+          if (legacyScopes.length >= 1000)
+            throw new Error("media_lifecycle_batch_required");
+          legacyScopes.push(scope);
+        }
         if (job.kind === "delete")
           await transaction(scope, async (client) => {
             // Deny the whole family before a bounded cleanup page can fail/retry.
@@ -351,7 +416,7 @@ export function createMediaPrivacyHook(input: {
         if (!input.exportArchive)
           throw new Error("binary_media_export_unconfigured");
         const archive = verifiedArchive(
-          await input.exportArchive(job, exported, scopes),
+          await input.exportArchive(job, exported, legacyScopes),
         );
         return {
           receipt: {

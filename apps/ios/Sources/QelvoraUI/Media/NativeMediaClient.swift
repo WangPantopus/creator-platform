@@ -45,11 +45,12 @@ public struct NativeMediaClient: Sendable {
     }
     public func uploadRecording(file: URL, creatorID: UUID, fanID: UUID, purpose: String, durationMilliseconds: Int, idempotencyKey: String, resume: NativeUploadTicket? = nil, ticketChanged: @Sendable (NativeUploadTicket) async -> Void, progress: @Sendable (Double) async -> Void) async throws -> NativeMediaAsset {
         guard ["human_note", "human_reply", "fan_attachment", "source_audio", "interview_audio"].contains(purpose) else { throw URLError(.unsupportedURL) }
-        guard (8...128).contains(idempotencyKey.count) else { throw URLError(.badURL) }
+        guard (8...128).contains(idempotencyKey.count), (1...3_600_000).contains(durationMilliseconds) else { throw URLError(.badURL) }
         let root = "/v1/w6/threads/\(creatorID.uuidString.lowercased())/\(fanID.uuidString.lowercased())/media"
         let handle = try FileHandle(forReadingFrom: file); defer { try? handle.close() }
         var hasher = SHA256(); var size = 0
         while let bytes = try handle.read(upToCount: 1_048_576), !bytes.isEmpty { try Task.checkCancellation(); size += bytes.count; guard size <= 268_435_456 else { throw CocoaError(.fileReadTooLarge) }; hasher.update(data: bytes) }
+        guard size > 0 else { throw CocoaError(.fileReadCorruptFile) }
         let digest = hasher.finalize().map { String(format: "%02x", $0) }.joined()
         let decoder = JSONDecoder(); var ticket: NativeUploadTicket
         if let resume { ticket = resume }
@@ -57,12 +58,13 @@ public struct NativeMediaClient: Sendable {
             let body: [String: Any] = ["purpose": purpose, "mimeType": "audio/mp4", "bytes": size, "durationMs": durationMilliseconds, "sha256": digest, "idempotencyKey": idempotencyKey]
             ticket = try decoder.decode(NativeUploadTicket.self, from: await request(path: root, method: "POST", body: JSONSerialization.data(withJSONObject: body)))
         }
-        guard ticket.asset.sha256 == digest, ticket.asset.bytes == size, (0...size).contains(ticket.asset.uploadedBytes), (1...1_048_576).contains(ticket.chunkBytes) else { throw URLError(.badServerResponse) }
+        guard (ticket.asset.state != "uploading" || (ticket.asset.sha256 == digest && ticket.asset.bytes == size)), (0...size).contains(ticket.asset.uploadedBytes), (1...1_048_576).contains(ticket.chunkBytes) else { throw URLError(.badServerResponse) }
         await ticketChanged(ticket)
         let assetID = ticket.asset.id
         let current = try decoder.decode(NativeMediaAsset.self, from: await request(path: "\(root)/\(ticket.asset.id)"))
         guard current.id == ticket.asset.id else { throw URLError(.badServerResponse) }
         if ["quarantined", "processing", "ready", "rejected"].contains(current.state) { return current }
+        guard current.state == "uploading" else { throw URLError(.resourceUnavailable) }
         var offset = ticket.asset.uploadedBytes; try handle.seek(toOffset: UInt64(offset))
         while offset < size {
             try Task.checkCancellation()
@@ -70,23 +72,26 @@ public struct NativeMediaClient: Sendable {
             guard ticket.asset.id == assetID, ticket.asset.sha256 == digest, ticket.asset.bytes == size, (0...size).contains(ticket.asset.uploadedBytes), (1...1_048_576).contains(ticket.chunkBytes) else { throw URLError(.badServerResponse) }
             offset = ticket.asset.uploadedBytes; await ticketChanged(ticket); try handle.seek(toOffset: UInt64(offset))
             if offset >= size { break }
-            guard ticket.url.host == baseURL.host, ticket.url.scheme == baseURL.scheme, ticket.url.port == baseURL.port, let components = URLComponents(url: ticket.url, resolvingAgainstBaseURL: false), let bytes = try handle.read(upToCount: min(ticket.chunkBytes, size-offset)), !bytes.isEmpty else { throw URLError(.badServerResponse) }
+            guard ticket.url.host == baseURL.host, ticket.url.scheme == baseURL.scheme, ticket.url.port == baseURL.port, let components = URLComponents(url: ticket.url, resolvingAgainstBaseURL: false), components.percentEncodedPath == "\(root)/\(assetID)/upload", components.fragment == nil, let bytes = try handle.read(upToCount: min(ticket.chunkBytes, size-offset)), !bytes.isEmpty else { throw URLError(.badServerResponse) }
             let path = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
             let acknowledged = try decoder.decode(NativeMediaAsset.self, from: await request(path: path, method: "PUT", body: bytes, contentType: "application/octet-stream", offset: offset))
             guard acknowledged.id == ticket.asset.id, acknowledged.uploadedBytes == offset + bytes.count else { throw URLError(.badServerResponse) }
             offset = acknowledged.uploadedBytes; await progress(Double(offset)/Double(size))
         }
-        return try decoder.decode(NativeMediaAsset.self, from: await request(path: "\(root)/\(ticket.asset.id)/finish", method: "POST", body: Data("{}".utf8)))
+        let finished = try decoder.decode(NativeMediaAsset.self, from: await request(path: "\(root)/\(ticket.asset.id)/finish", method: "POST", body: Data("{}".utf8)))
+        guard finished.id == assetID, ["quarantined", "processing", "ready", "rejected"].contains(finished.state) else { throw URLError(.badServerResponse) }
+        return finished
     }
     public func uploadChunks(file: URL, path: String, uploadedBytes: Int, totalBytes: Int, progress: @Sendable (Double) async -> Void) async throws {
-        guard totalBytes > 0, (0...totalBytes).contains(uploadedBytes) else { throw URLError(.badServerResponse) }
+        guard (1...268_435_456).contains(totalBytes), (0...totalBytes).contains(uploadedBytes) else { throw URLError(.badServerResponse) }
         let handle = try FileHandle(forReadingFrom: file); defer { try? handle.close() }
         var offset = uploadedBytes; try handle.seek(toOffset: UInt64(offset))
         while offset < totalBytes {
             try Task.checkCancellation()
             guard let bytes = try handle.read(upToCount: min(1_048_576, totalBytes - offset)), !bytes.isEmpty else { throw CocoaError(.fileReadCorruptFile) }
-            _ = try await request(path: path, method: "PUT", body: bytes, contentType: "application/octet-stream", offset: offset)
-            offset += bytes.count; await progress(Double(offset) / Double(totalBytes))
+            let acknowledged = try JSONDecoder().decode(NativeMediaAsset.self, from: await request(path: path, method: "PUT", body: bytes, contentType: "application/octet-stream", offset: offset))
+            guard acknowledged.uploadedBytes == offset + bytes.count else { throw URLError(.badServerResponse) }
+            offset = acknowledged.uploadedBytes; await progress(Double(offset) / Double(totalBytes))
         }
     }
 }

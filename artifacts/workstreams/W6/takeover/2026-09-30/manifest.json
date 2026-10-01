@@ -137,5 +137,30 @@
     "availabilitySourceSHA256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
     "creatorMediaReviewSourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a",
     "creatorMediaReviewSourceSHA256": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5"
+  },
+  "nativeRecoveryFollowup": {
+    "evidence": "native-recovery.json",
+    "sourceSHA256": {
+      "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "5e8fb93f47d37a480aca291bb607172533847773457bbf93b65a5a1971303a82",
+      "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "a6e025ad68ee8693e9551eec60c506ea4862dbbfd13ebbbd56ee167f7feee1fb",
+      "apps/backend/src/modules/media/creator-service.ts": "e526c430e742c66889335b74e8f305c0f0ee8fd3eeebaf026edd93700c15c30e",
+      "apps/backend/src/modules/media/creator-scope.sql": "14867edda9930f31b83e0969ad80f72cc4326e421f47a681c2598c66b548f348",
+      "apps/backend/src/modules/media/lifecycle.ts": "f80f342e2a5d244d503ff23f441c6956d66c0a071dae071ada1dfb29eb38d839",
+      "apps/backend/src/modules/media/creator-lifecycle.ts": "2d9898514cb30b88c31acd33663adec82fd001bc471d0973b14ec06f89f94aec"
+    },
+    "backendContracts": {
+      "tests": 9,
+      "failures": 0,
+      "runnerDurationMs": 890
+    },
+    "androidChecks": {
+      "tests": 19,
+      "failures": 0,
+      "newCases": 0
+    },
+    "macOSLibrary": "passed15.12s",
+    "iosSimulatorLibrary": "passed28.32s",
+    "sqlApplied": false,
+    "functionalAcceptance": false
   }
 }
