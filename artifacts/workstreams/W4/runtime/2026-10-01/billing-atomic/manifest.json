@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-01T13:07:45.748225+00:00",
+  "baseline": "1c11b098c3f86ec07740c760b423c4fccc9ec5f7",
+  "branch": "codex/w4-billing-custody-20261001",
+  "scope": "Confirmed membership cash/access and original effect completion commit atomically; cancellation refund obligation is retained in the same transaction. Credit read dedupe/cap periods use UTC.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "api": "compiled API4104 restarted from final source",
+    "web": "existing Next16.3.7 production on3004, BUILD_ID rsMGFGbLvIsJYf8ACiyr7 (PR33 web build, unchanged by this increment)",
+    "actor": "canonical development fan; no owned verified creator",
+    "providers": "unconfigured; no external provider/OpenAI requests",
+    "viewport": "390x844 Light/Night"
+  },
+  "checks": {
+    "backendBuild": "passed final source",
+    "scopedLintFormat": "passed",
+    "SQL": "Exact4 source statements EXPLAIN under creator_runtime in separate review DB; transaction rolled back, no data executed/inserted",
+    "runtime": "40 canonical migrations; actual non-owner/no bypass/no creator-table ownership; accountless RLS reads0 visible billing/ledger rows; health ready:false",
+    "actualBrowser": "Membership Light/Night unavailable purchase/restore; actual Refresh returns same result. Spending after API restart retains10.00USD cap, reminders off, currentOctober month, confirmed capture/held/refund amounts0 from actual overview.",
+    "native": "No native source/model changes or new native input acceptance; PR33 actual entry/build evidence is separately retained."
+  },
+  "limitations": [
+    "No genuine confirmed purchase/cancellation/refund/crash-between-provider-and-commit/concurrency acceptance.",
+    "Unknown billing still remains pending/held; this closes the split commit for confirmed starts, not unknown money.",
+    "Already-persisted historical split effects require genuine current provider recovery; no legacy cash/body/receipt backfill.",
+    "No populated credit issuance/month-boundary/anti-farming/credit checkout proof.",
+    "No new test suites/cases/scripts/coverage or test/reference/assertion edits."
+  ],
+  "migrationChanges": false,
+  "sourceHashes": {
+    "apps/backend/src/modules/commerce/billing.ts": "953755e6b0f3192a17aa119f6b51d5c475de45a21ec45dfe964408be83fe5777",
+    "apps/backend/src/modules/commerce/extended.ts": "989f13c3115c9bb7c06a9382406d4bbde6efcbef82708d18520f719fff6df418"
+  },
+  "buildHashes": {
+    "backend/server.mjs": "17047fa7b3898d38833fedacf46c6c8253c954e68ccdfe2bace616c3e3da966e",
+    "backend/integration.mjs": "45ab5415eb1ec285d50cb1aa7c48b1c1e824f756e9a8d5a5821218c430bf902d",
+    "billing-atomic-final-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "screenshots": {
+    "spending-after-restart.jpg": "54b5dde4b012ca867fbf352d49de9e6bad3f7e24f28d3f2580af46887b70bdcb",
+    "membership-light.jpg": "781fc7e74d251401b869a79d6d686312e7dca443eb043ca6fb4d923092d38612",
+    "membership-night.jpg": "73a63d8da96768f85ef70c7c49e5bbb3603f1225057784aeb38436c76d85b013"
+  }
+}

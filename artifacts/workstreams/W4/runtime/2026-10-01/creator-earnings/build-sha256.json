@@ -1,0 +1,18 @@
+{
+  "backend/server.mjs": "7534a8bbe3ada94843d1eb3c542807d0f2378142f6541ab6ec6296bc1ff9abb2",
+  "backend/integration.mjs": "45ab5415eb1ec285d50cb1aa7c48b1c1e824f756e9a8d5a5821218c430bf902d",
+  "ios/QelvoraApp": "15c270eebb2a5e1d98bf059953316d46d6ddfe1228f1b930c0f23028ebc595a8",
+  "android/app-debug.apk": "bc9a55310107a30ffe321f2748a6f3e003e00ee09115deb0f1f1d0c04c3a9cd9",
+  "web/BUILD_ID": "rsMGFGbLvIsJYf8ACiyr7",
+  "web/server-static-file-count": 1288,
+  "web/server-static-manifest-sha256": "b92a43c42447b3a242f1faea07fc08487b0fb8e930fed8f0698363c02a5c45ed",
+  "logs": {
+    "web-earnings-production-build.log": "bb36ba669143e64a0c1a87e8e4fe2605e128a03a243a87609f45b04a55b1de86",
+    "ios-earnings-final-build.log": "1bc6304ecca6b700baa66abf0aa8ae4837943117aea84cf49ced57fb132b0ae4",
+    "android-earnings-final-build.log": "f92bb10086a43ecd12f60896a46557f9f8a73318482fc70ad46c12f9b642987e",
+    "android-emulator-isolated-netsim.log": "1dc8f187201b8fe0aac6c5975d748d97dff4283ec2a92cae0360984034c77869",
+    "android-earnings-launch-light.log": "c6b51ee06fe5afd965b9b8fd4c270a0effc6386d4d8a4c8cb362612cb662bcd9",
+    "android-earnings-launch-night.log": "767eabcdbf232dd907ac550dbc98d06202ec53ee34661884f52bd73898bd3ffa",
+    "android-earnings-crash.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

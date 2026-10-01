@@ -36,6 +36,43 @@ export const PoolEarnings = z.strictObject({
     .max(12),
 });
 export type PoolEarnings = z.infer<typeof PoolEarnings>;
+export const CreatorLedgerPage = z.strictObject({
+  currency: Currency,
+  entries: z
+    .array(
+      z.strictObject({
+        id: z.uuid(),
+        packetId: z.uuid().nullable(),
+        kind: z.string().min(1).max(40),
+        amount: IntegerText,
+        currency: Currency,
+        createdAt: z.iso.datetime({ offset: true }),
+      }),
+    )
+    .max(100),
+  nextCursor: z.string().max(512).nullable(),
+});
+export type CreatorLedgerPage = z.infer<typeof CreatorLedgerPage>;
+export const CreatorEarnings = z.strictObject({
+  creatorId: z.uuid(),
+  observedAt: z.iso.datetime({ offset: true }),
+  currencies: z
+    .array(
+      z.strictObject({
+        currency: Currency,
+        capturedMinor: IntegerText,
+        requestMinor: IntegerText,
+        membershipMinor: IntegerText,
+        refundedMinor: IntegerText,
+        transferredMinor: IntegerText.nullable(),
+        reversedMinor: IntegerText.nullable(),
+        pendingPayouts: MinorUnits,
+      }),
+    )
+    .max(676),
+  ledger: CreatorLedgerPage,
+});
+export type CreatorEarnings = z.infer<typeof CreatorEarnings>;
 /** Public consent projection of a real persisted provider pass preview.
  * Provider/customer references remain on the server's original quote. */
 export const PassPurchaseQuote = z
