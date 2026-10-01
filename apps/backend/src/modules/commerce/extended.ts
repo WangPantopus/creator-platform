@@ -423,7 +423,11 @@ export function allocateSlotDayPool(
     }))
     .sort((a, b) =>
       a.remainder === b.remainder
-        ? a.creatorId.localeCompare(b.creatorId)
+        ? a.creatorId < b.creatorId
+          ? -1
+          : a.creatorId > b.creatorId
+            ? 1
+            : 0
         : a.remainder > b.remainder
           ? -1
           : 1,
