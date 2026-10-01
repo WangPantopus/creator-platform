@@ -1,0 +1,37 @@
+{
+  "recordedAt": "2026-10-01T08:04:27.986976+00:00",
+  "acceptedMain": "ad56fc75c4c54e1474d54a4856aabc6afce31f27",
+  "localMerge": "bd71a962e9136933f3d326c54289fdab1606ef0b",
+  "branch": "codex/w7-handoff",
+  "pr": 2,
+  "conflicts": 0,
+  "w7ImplementationDeltaFrom8214bed": [],
+  "personallyOperated": "web Save acknowledgment; iOS0\u21921 Save/cold1; Android reads1/restores0 Save/cold0; final iOS/Chrome read0",
+  "builds": "backend, production web, signed iOS, Android PASS",
+  "generator": "12 resources/96 operations PASS",
+  "api": {
+    "pid": 36029,
+    "session": 23284,
+    "port": 4107
+  },
+  "devices": "owned909 and5570 normal stop; data retained",
+  "fullW7Acceptance": "open",
+  "newHeadCI": "required after publication",
+  "evidenceSha256": {
+    "w7-ad56-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "w7-ad56-web-build.log": "0d7b9a75b91de8647380a987d3632eccbcb0e680b9ecb31617c95ccc0469d555",
+    "w7-ad56-ios-build.log": "e447b85c324f864d0b18b0fcfa72e3ef76edf2cddf39de690ca86162ab2500d6",
+    "w7-ad56-android-build.log": "f5e5389375a163c6890420d8b82f1e69b4fe1d02e004e832f431feb28b081052",
+    "w7-ad56-generate-check.log": "866b1675bc417aeb25643d4839fea6e1146deb8e7636d675c3a66158949e138f",
+    "w7-ad56-android-install.log": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+    "w7-ad56-android-lastanr.log": "42cf4931006fd0ff42d3522af31f9346431b409aa22a793ecc16b5aedeed28a1",
+    "w7-ad56-web-save.png": "42872945364f16eedbd4eeda778b0fe5479ac25d8e03f9983f5645b47a8aac5e",
+    "w7-ad56-web-restored.png": "edeef8708e03cc38317d869b8b8c19f972dab2e15e2a73a79b63319611516323",
+    "w7-ad56-ios-changed-save-night.png": "6e3ef755b80530942e4851bdea9e5a68199dc54e2311aca99f60bc956bc22a92",
+    "w7-ad56-ios-changed-cold-light.png": "fc98e53ac45509bd22c6f9da0e69fbb68943584c2ec631d314fb57e0578189af",
+    "w7-ad56-ios-restored-cold-light.png": "33a710b78bb816bf57a2b83224ddfb9e055bedf5f03113fcd7b0e763707ad167",
+    "w7-ad56-android-ios-value-light.png": "1ad55225a16ebc035002f8a56230ae974c9b03828e02ef3e8500dc0c0058fd64",
+    "w7-ad56-android-restored-save-light.png": "05e57b7218a62c182c43d536c51e4a3ad565d7e5f8dadcfd5652c98ff8650c80",
+    "w7-ad56-android-restored-cold-night.png": "c5ad8aa147cb0443a8aff2a03710074622e89a18c9ff30b68da615f9240fe126"
+  }
+}
