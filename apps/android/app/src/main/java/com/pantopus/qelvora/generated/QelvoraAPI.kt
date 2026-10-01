@@ -474,6 +474,30 @@ enum class APICommercePaymentState {
 }
 
 @Serializable
+data class APICommercePayoutOnboardingCommand(
+  val `version`: Long
+)
+
+@Serializable
+data class APICommercePayoutOnboardingResult(
+  val `creatorId`: String,
+  val `state`: APICommercePayoutOnboardingResultState,
+  val `detailsDue`: Boolean,
+  val `version`: Long,
+  @Required
+  val `url`: String? = null,
+  @Required
+  val `expiresAt`: String? = null
+)
+
+@Serializable
+enum class APICommercePayoutOnboardingResultState {
+  @SerialName("onboarding") ONBOARDING,
+  @SerialName("restricted") RESTRICTED,
+  @SerialName("enabled") ENABLED
+}
+
+@Serializable
 data class APICommercePoolEarnings(
   val `creatorId`: String,
   val `cycle`: String,
@@ -4522,6 +4546,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
   suspend fun creatorEarningsLedger(creatorId: String, currency: String, cursor: String? = null): APICommerceCreatorLedgerPage = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/earnings", "GET", authenticated = true, query = listOf("currency" to currency, "cursor" to cursor)))
+  suspend fun creatorPayoutOnboarding(creatorId: String, xCommerceAccountId: String? = null, body: APICommercePayoutOnboardingCommand): APICommercePayoutOnboardingResult = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/payout-onboarding", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-commerce-account-id" to xCommerceAccountId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
