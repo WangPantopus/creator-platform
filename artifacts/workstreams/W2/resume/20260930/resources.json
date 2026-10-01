@@ -26,7 +26,15 @@
       "avd": "CreatorPlatform_W2_Resume_20260930",
       "serial": "emulator-5562",
       "adbServerPort": 5042,
-      "state": "Fourth scoped recovery in progress;4existing UI interactions verified, clean launch still unverified"
+      "state": "Stopped after four scoped API34 recoveries; app and AVD data retained; clean launch not verified"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_API35_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "hciPort": 15602,
+      "state": "Stopped after actual installed/visible MainActivity launch with SystemUI ANR; own API35 app/data retained, peer resources unchanged"
     }
   ],
   "provider": {
@@ -87,10 +95,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 97035,
-      "executionSession": 74107
+      "pid": 37692,
+      "executionSession": 41342
     },
-    "observedAt": "2026-10-01T02:43:39.166900+00:00",
+    "observedAt": "2026-10-01T03:38:20.103227+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -133,7 +141,7 @@
   "latestAvailability": {
     "observedAt": "2026-10-01T02:12:23.278087+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener,PID97035/session74107; current createAgentDomain plus agentFeature registration mounted; saved companion18/current evaluation retained",
+    "apiPort4102": "loopback listener, PID37692/session41342; private actual-admission usage completion plus W3 exclusion consumer source loaded; saved companion18 retained",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
@@ -194,12 +202,18 @@
     "android": {
       "emulatorPort": 5562,
       "adbServerPort": 5042,
-      "state": "Existing4 UI casesPASS144.28s. Post-run relaunch and fourth hostGPU recovery still showSystemUIANR; fourth boot89.206s/launchstatusok11.363s is not clean. Own same5562/5042/data; targeted existing sign-in case rerun in progress, no new suites.",
+      "state": "API34 four existing UI cases and targeted sign-in passed but dirty launch retained. Separate API35 installed/visibly launched, cold26150ms; SystemUI ANR still covers Welcome. Own API35 emulator stopped to release host load, app/data retained.",
       "evidence": [
         "android-systemui-failure.png",
-        "android-systemui-after-ui.png"
+        "android-systemui-after-ui.png",
+        "android-api35-systemui-failure.png"
       ],
-      "executionSession": 21120
+      "previousExecutionSession": 21120,
+      "nextAvd": "CreatorPlatform_W2_Resume_API35_20260930",
+      "networkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api35 TMPDIR and ANDROID_TMP; default netsim instance and unused HCI15602. No peer/global daemon changes.",
+      "observedAt": "2026-10-01T03:43:29.051267+00:00",
+      "executionSession": 94208,
+      "pid": 35646
     },
     "ownedDirectory": "tmp/w2-native-20260930",
     "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse"
