@@ -203,6 +203,16 @@ export class SignedActService {
       "Adult eligibility is required.",
     );
     return this.accountTransaction(actor.accountId, async (client) => {
+      // Recovery locks the owned profile before credentials/challenges. Keep
+      // that order and hold current creator authority through verification.
+      const owner = await client.query<{
+        id: string;
+        verification: string;
+        recovery_required: boolean;
+      }>(
+        "SELECT id,verification,recovery_required FROM creator.creator_profile WHERE account_id=$1 FOR SHARE",
+        [actor.accountId],
+      );
       const found = await client.query<{
         id: string;
         account_id: string;
@@ -221,12 +231,11 @@ export class SignedActService {
         "assertion_expired",
         "This signing request is unavailable.",
       );
-      const owner = await client.query(
-        "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification=$3 AND NOT recovery_required",
-        [challenge.creator_id, actor.accountId, "verified"],
-      );
+      const profile = owner.rows[0];
       invariant(
-        owner.rowCount === 1,
+        profile?.id === challenge.creator_id &&
+          profile.verification === "verified" &&
+          !profile.recovery_required,
         "creator_required",
         "Creator authority changed before signing.",
       );
