@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-10-01T01:21:39.989102+00:00",
+  "sourceManifest": "privacy-stream-source-sha256.json",
+  "passed": [
+    "backend build including tsc --noEmit",
+    "changed seven-source-file ESLint",
+    "changed seven-source-file Prettier",
+    "git diff --check"
+  ],
+  "existingChecks": "No new engineering test code/suite/script; full18-case backend run is passing predecessor/exact-head CI proof, not a new family/stream exercise",
+  "actualSourceExport": "expanded-export-followup.json;HTTP200/complete72355946-byteJSON/105versions",
+  "savedData": {
+    "sources": 123,
+    "versions": 105,
+    "canonicalLedgerRows": 28,
+    "currentRevision": 18,
+    "currentMode": "companion"
+  },
+  "schema": "0048 byte-identical reserved source; not registered/applied/exercised on saved DB",
+  "activation": "Prepared journal/family lifecycle/coordinator stream remain host opt-in and unregistered; genuine original financial disposition/Q16 needed",
+  "notEstablished": [
+    "W8 protected job/store/fresh download",
+    "journal runtime/cache-counter SQL persistence after installation",
+    "actual canonical licensed fan/late settlement/family export/purge",
+    "native/accessibility/p95/release readiness"
+  ]
+}

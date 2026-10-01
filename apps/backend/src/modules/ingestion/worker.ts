@@ -3,6 +3,7 @@ import { bump, event } from "../agent/repository.js";
 import type { AgentModel } from "../agent/model.js";
 import { DomainError } from "../../core/errors.js";
 import { chunkText } from "./chunking.js";
+import { withProviderUsage } from "../agent/provider-usage.js";
 
 /** Creator-keyed durable work with a lease; abandoned jobs are reclaimed after restart. */
 export class IngestionWorker {
@@ -69,9 +70,18 @@ export class IngestionWorker {
         for (let offset = 0; offset < chunks.length; offset += 16) {
           signal.throwIfAborted();
           const batch = chunks.slice(offset, offset + 16);
-          const embedded = await this.model.embed(
-            batch.map((c) => c.text),
+          const embedded = await withProviderUsage(
+            this.repository,
+            scope,
+            this.model,
+            job.source_id,
+            "ingestion",
             signal,
+            () =>
+              this.model!.embed(
+                batch.map((c) => c.text),
+                signal,
+              ),
           );
           batch.forEach((chunk, index) =>
             vectorById.set(chunk.id, embedded.vectors[index]!),
@@ -79,18 +89,6 @@ export class IngestionWorker {
           const valid = await this.repository.transaction(
             scope,
             async (client) => {
-              await client.query(
-                "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,$5,$6,$7,'ingestion',0)",
-                [
-                  scope.creatorId,
-                  job.source_id,
-                  embedded.usage.provider,
-                  embedded.usage.model,
-                  embedded.usage.inputTokens,
-                  0,
-                  embedded.usage.costMicros,
-                ],
-              );
               const owned = await client.query(
                 "UPDATE creator.ai_ingestion SET lease_until=now()+interval '3 minutes' WHERE id=$1 AND creator_id=$2 AND state='running' AND attempts=$3 AND lease_until>now() RETURNING id",
                 [job.id, scope.creatorId, job.attempts],

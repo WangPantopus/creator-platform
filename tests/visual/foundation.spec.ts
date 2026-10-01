@@ -1,6 +1,10 @@
-import { visualWebURL, visualReferenceURL } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
-import { compareCatalog } from "./compare";
+const origin = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
+const referenceOrigin =
+  process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
+
+// Approved artboards are catalog fixtures. Runtime routes depend on real public
+// creator/arrival authority and must never fabricate Maya to satisfy snapshots.
 const foundations = [
   {
     name: "welcome",
@@ -29,9 +33,7 @@ const foundations = [
 ];
 for (const theme of ["light", "night"] as const)
   for (const screen of foundations) {
-    // Explicit foundation fixtures use production components. A public route cannot
-    // invent Maya or arrival data when the identity/growth providers are absent.
-    test(`${screen.name} foundation fixture matches approved design in ${theme}`, async ({
+    test(`${screen.name} catalog matches approved design in ${theme}`, async ({
       page,
       context,
     }) => {
@@ -48,7 +50,7 @@ for (const theme of ["light", "night"] as const)
         height: screen.height,
       });
       await reference.goto(
-        `${visualReferenceURL}/${screen.group}/${screen.id}.dc.html`,
+        `${referenceOrigin}/${screen.group}/${screen.id}.dc.html`,
       );
       await reference.locator("x-dc").getByRole("heading").first().waitFor();
       await reference.evaluate((mode) => {
@@ -60,12 +62,10 @@ for (const theme of ["light", "night"] as const)
         caret: "initial",
       });
       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
-        // Allow two isolated rasterization pixels across Chromium host builds.
-        // The fresh source/implementation comparison below remains stricter.
-        maxDiffPixels: 2,
+        maxDiffPixels: 0,
       });
       await page.goto(
-        `${visualWebURL}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
+        `${origin}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,
       );
       await page.getByRole("heading").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -74,9 +74,6 @@ for (const theme of ["light", "night"] as const)
         animations: "disabled",
         caret: "initial",
       });
-      // Hiding a caret mutates inline input styles while Next hydrates this
-      // server-rendered fixture and can create an actual hydration error badge.
-      // These captures have no focused editor, so preserve its original style.
       const actual = await page.screenshot({
         animations: "disabled",
         caret: "initial",
@@ -88,32 +85,36 @@ for (const theme of ["light", "night"] as const)
         .info()
         .attach("reference", { body: expected, contentType: "image/png" });
       expect(
-        compareCatalog(actual, expected).pixels,
+        Buffer.compare(actual, expected),
         "Implementation pixels must match the independent reference exactly",
       ).toBe(0);
       await reference.close();
     });
   }
-test("unconfigured Pantopus sign-in does not create a local identity or arrival and preserves destination", async ({
+test("unconfigured Pantopus sign-in does not create a local identity and preserves arrival", async ({
   page,
 }) => {
-  await page.goto("/auth/continue");
-  await expect(page.getByText("Maya · Ceramics · Kiln Club")).toHaveCount(0);
+  await page.goto(`${origin}/auth/continue`);
+  await expect(
+    page.getByRole("button", {
+      name: "Remove this post from your first message",
+    }),
+  ).toHaveCount(0);
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
     .click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "Pantopus sign-in",
-  );
+  await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
-  await page.goto("/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests");
+  await page.goto(
+    `${origin}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
+  );
   await page
     .getByRole("link", { name: "Continue with Pantopus", exact: true })
     .click();
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
     "/creators/maya/requests",
   );
-  await page.goto(`${visualWebURL}/onboarding/handle`);
+  await page.goto(`${origin}/onboarding/handle`);
   await expect(page).toHaveURL(/auth\/continue/);
 });

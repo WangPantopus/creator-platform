@@ -1,5 +1,6 @@
 import { indexStyleExamples } from "./style-index.js";
 import { withProviderUsage } from "./provider-usage.js";
+import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -1079,84 +1080,237 @@ export class AgentService {
     write: (part: string) => Promise<void>,
     signal: AbortSignal = new AbortController().signal,
   ) {
-    return this.repository.transaction(scope, async (client, workspace) => {
-      const emit = async (value: string) => {
-        signal.throwIfAborted();
-        await write(value);
-        signal.throwIfAborted();
-      };
-      const header = {
-        schemaVersion: 1,
-        exportedAt: new Date().toISOString(),
-        configuration: workspace.configuration,
-        interview: workspace.interview,
-        status: workspace.current_status,
-        license: await licenseRow(client, scope.creatorId),
-      };
-      await emit(JSON.stringify(header).slice(0, -1));
-      const array = async (
-        name: string,
-        page: (cursor: string | null) => Promise<{ id: string }[]>,
-      ) => {
-        await emit(`,"${name}":[`);
-        let cursor: string | null = null;
-        let first = true;
-        for (;;) {
-          const rows = await page(cursor);
-          if (!rows.length) break;
-          for (const row of rows) {
-            await emit(`${first ? "" : ","}${JSON.stringify(row)}`);
-            first = false;
-          }
-          cursor = rows[rows.length - 1]!.id;
-        }
-        await emit("]");
-      };
-      await array(
-        "sources",
-        async (after) =>
-          (
-            await client.query(
-              "SELECT id,title,origin,origin_reference,audience,rights_evidence,expires_at,revision,state,text_content FROM creator.ai_source WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 8",
-              [scope.creatorId, after],
-            )
-          ).rows,
-      );
-      await emit(',"versions":[');
-      let before: number | null = null;
+    return this.repository.transaction(scope, (client, workspace) =>
+      this.writeExportSnapshot(scope, client, workspace, write, signal),
+    );
+  }
+  /** W8's owner stream holds one repeatable-read transaction across ALL creator
+   * scopes. This does not begin a nested transaction or infer absent ownership. */
+  async exportInTransaction(
+    scope: CreatorScope,
+    client: PoolClient,
+    write: (part: string) => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    signal.throwIfAborted();
+    const owner = await client.query(
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2",
+      [scope.creatorId, scope.accountId],
+    );
+    const workspace = (
+      await client.query<Workspace>(
+        "SELECT * FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+        [scope.creatorId],
+      )
+    ).rows[0];
+    invariant(
+      owner.rowCount,
+      "export_owner_unavailable",
+      "Current creator ownership is required; absence cannot complete an export.",
+    );
+    return this.writeExportSnapshot(scope, client, workspace, write, signal);
+  }
+  private async writeExportSnapshot(
+    scope: CreatorScope,
+    client: PoolClient,
+    workspace: Workspace | undefined,
+    write: (part: string) => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    const emit = async (value: string) => {
+      signal.throwIfAborted();
+      await write(value);
+      signal.throwIfAborted();
+    };
+    const header = {
+      schemaVersion: 2,
+      state: workspace?.deleted_at
+        ? "deleted"
+        : workspace
+          ? "configured"
+          : "not_configured",
+      workspace: workspace ?? null,
+      exportedAt: new Date().toISOString(),
+      configuration: workspace?.configuration ?? null,
+      interview: workspace?.interview ?? null,
+      status: workspace?.current_status ?? null,
+      license: await licenseRow(client, scope.creatorId),
+    };
+    await emit(JSON.stringify(header).slice(0, -1));
+    const array = async (
+      name: string,
+      page: (cursor: string | null) => Promise<{ id: string }[]>,
+    ) => {
+      await emit(`,"${name}":[`);
+      let cursor: string | null = null;
       let first = true;
       for (;;) {
-        const rows = await versionRows(client, scope.creatorId, before);
+        const rows = await page(cursor);
         if (!rows.length) break;
         for (const row of rows) {
           await emit(`${first ? "" : ","}${JSON.stringify(row)}`);
           first = false;
         }
-        before = rows[rows.length - 1]!.number;
+        cursor = rows[rows.length - 1]!.id;
       }
       await emit("]");
+    };
+    await array(
+      "sources",
+      async (after) =>
+        (
+          await client.query(
+            "SELECT * FROM creator.ai_source WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 8",
+            [scope.creatorId, after],
+          )
+        ).rows,
+    );
+    await emit(',"versions":[');
+    let before: number | null = null;
+    let first = true;
+    for (;;) {
+      const rows: { id: string; number: number }[] = (
+        await client.query(
+          "SELECT * FROM creator.ai_version WHERE creator_id=$1 AND ($2::integer IS NULL OR number<$2) ORDER BY number DESC LIMIT 50",
+          [scope.creatorId, before],
+        )
+      ).rows;
+      if (!rows.length) break;
+      for (const row of rows) {
+        await emit(`${first ? "" : ","}${JSON.stringify(row)}`);
+        first = false;
+      }
+      before = rows[rows.length - 1]!.number;
+    }
+    await emit("]");
+    await array(
+      "sponsors",
+      async (after) =>
+        (
+          await client.query(
+            "SELECT * FROM creator.ai_sponsor WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 20",
+            [scope.creatorId, after],
+          )
+        ).rows,
+    );
+    await array(
+      "regressions",
+      async (after) =>
+        (
+          await client.query(
+            "SELECT * FROM creator.ai_regression WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+            [scope.creatorId, after],
+          )
+        ).rows,
+    );
+    await array(
+      "usage",
+      async (after) =>
+        (
+          await client.query(
+            "SELECT * FROM creator.ai_usage WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+            [scope.creatorId, after],
+          )
+        ).rows,
+    );
+    for (const table of [
+      "ai_evaluation",
+      "ai_shadow_sample",
+      "ai_shadow_evaluation",
+      "ai_ingestion",
+      "ai_event",
+      "ai_cost_hold",
+      "ai_chunk",
+    ]) {
       await array(
-        "sponsors",
+        table,
         async (after) =>
           (
             await client.query(
-              'SELECT id,brand,aliases,expires_at AS "expiresAt",active FROM creator.ai_sponsor WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 20',
+              `SELECT * FROM creator.${table} WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 8`,
               [scope.creatorId, after],
             )
           ).rows,
       );
+    }
+    for (const [table, key] of [
+      ["ai_command", "account_id::text||':'||key"],
+      ["ai_style_embedding", "example_id::text||':'||text_hash||':'||model"],
+    ]) {
+      await emit(`,"${table}":[`);
+      let cursor: string | null = null;
+      let firstRow = true;
+      for (;;) {
+        const rows: { cursor: string; document: unknown }[] = (
+          await client.query(
+            `SELECT ${key} AS cursor,to_jsonb(t) AS document FROM creator.${table} t WHERE creator_id=$1 AND ($2::text IS NULL OR ${key}>$2) ORDER BY cursor LIMIT 8`,
+            [scope.creatorId, cursor],
+          )
+        ).rows;
+        if (!rows.length) break;
+        for (const row of rows) {
+          await emit(`${firstRow ? "" : ","}${JSON.stringify(row.document)}`);
+          firstRow = false;
+        }
+        cursor = rows[rows.length - 1]!.cursor;
+      }
+      await emit("]");
+    }
+    const licenseRecord =
+      (
+        await client.query(
+          "SELECT to_jsonb(t) AS document FROM creator.ai_license t WHERE creator_id=$1",
+          [scope.creatorId],
+        )
+      ).rows[0]?.document ?? null;
+    const tombstone =
+      (
+        await client.query(
+          "SELECT to_jsonb(t) AS document FROM creator.ai_tombstone t WHERE creator_id=$1",
+          [scope.creatorId],
+        )
+      ).rows[0]?.document ?? null;
+    await emit(
+      `,"licenseRecord":${JSON.stringify(licenseRecord)},"tombstone":${JSON.stringify(tombstone)}`,
+    );
+    if (await generationJournalInstalled(client)) {
       await array(
-        "regressions",
+        "generationReceipts",
         async (after) =>
           (
             await client.query(
-              "SELECT id,paraphrased_prompt,rule,unacceptable_answer FROM creator.ai_regression WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+              "SELECT * FROM creator.ai_generation_receipt WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
               [scope.creatorId, after],
             )
           ).rows,
       );
-      await emit("}");
-    });
+      // Composite-key tables use a durable lexical cursor, without truncating
+      // the account's complete set to a display-page limit.
+      for (const table of [
+        "ai_generation_admission",
+        "ai_generation_attempt",
+      ]) {
+        await emit(`,"${table}":[`);
+        let cursor: string | null = null;
+        let firstRow = true;
+        for (;;) {
+          const rows: { cursor: string; document: unknown }[] = (
+            await client.query<{ cursor: string; document: unknown }>(
+              `SELECT generation_id::text${table === "ai_generation_attempt" ? "||':'||attempt_id::text" : ""} AS cursor,to_jsonb(t) AS document FROM creator.${table} t WHERE creator_id=$1 AND ($2::text IS NULL OR generation_id::text${table === "ai_generation_attempt" ? "||':'||attempt_id::text" : ""}>$2) ORDER BY cursor LIMIT 50`,
+              [scope.creatorId, cursor],
+            )
+          ).rows;
+          if (!rows.length) break;
+          for (const row of rows) {
+            await emit(`${firstRow ? "" : ","}${JSON.stringify(row.document)}`);
+            firstRow = false;
+          }
+          cursor = rows[rows.length - 1]!.cursor;
+        }
+        await emit("]");
+      }
+    }
+    await emit("}");
   }
   async export(scope: CreatorScope) {
     const parts: string[] = [];

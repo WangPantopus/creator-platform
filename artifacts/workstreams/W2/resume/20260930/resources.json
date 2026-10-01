@@ -4,14 +4,48 @@
   "sourceBranch": "codex/w2-creator-ai-handoff",
   "foundation": "22aa088",
   "workspace": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform",
-  "ports": { "web": 3002, "api": 4102, "postgres": 55442 },
+  "ports": {
+    "web": 3002,
+    "api": 4102,
+    "postgres": 55442
+  },
   "database": "creator_w2_resume",
   "runtimeRole": "creator_runtime (non-owner, forced RLS)",
-  "migrations": "canonical 0001–0031; immutable histories preserved",
+  "migrations": "canonical 0001\u20130031; immutable histories preserved",
   "container": "creator-platform-w2-resume-20260930",
   "queue": "w2-resume-20260930",
-  "builds": "isolated worktree .next and backend dist",
-  "nativeDevices": [],
+  "builds": "Active apps/web/.next-w2-review retained; own backend dist recreated by source verification; peer outputs/devices unchanged",
+  "nativeDevices": [
+    {
+      "workstream": "W2",
+      "simulator": "09FA41B1-C300-4970-9F09-26F7CB884425",
+      "state": "Current signed UI2/2passed; shut down normally/data retained"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "hciPort": 15602,
+      "state": "Stopped; savedapp/data/failurelogsretained"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_API35_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "hciPort": 15602,
+      "state": "GoogleimageSystemUIANRbeforeapp atlauncher; stoppednormally/dataretained"
+    },
+    {
+      "workstream": "W2",
+      "avd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
+      "serial": "emulator-5562",
+      "adbServerPort": 5042,
+      "hciPort": 15602,
+      "state": "OfficialAOSP35clean shipping andUI4/4+Nightverified; stoppednormally/dataretained"
+    }
+  ],
   "provider": {
     "name": "OpenAI",
     "secretReference": "/Users/yingpengwang/.config/creator-platform/secrets/openai.env",
@@ -20,21 +54,164 @@
     "largeModel": "gpt-4.1-2025-04-14",
     "embeddingModel": "text-embedding-3-small",
     "authorization": "Founder-authorized isolated synthetic verification",
-    "productionPolicy": "unapproved; store:false is not zero-retention proof",
-    "publication": "disabled: no reviewed license/current verification, cap zero"
+    "productionPolicy": "Founder explicitly deferred processor/retention choice to release backlog; synthetic review only, store:false is not zero-retention approval",
+    "publication": "Disabled pending authentic license/current verification/cap; human deferred licensing decision to release backlog",
+    "adapter": "responses-v3-cache-routing",
+    "modelFingerprint": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+    "rates": "Explicit synthetic ordinary/output/cache-read/cache-write prices in private provider.env; no production approval",
+    "recoveredPolicyReference": "founder-authorized-synthetic-review-recovery-20260930"
   },
-  "privateRuntimeDirectory": "/private/tmp/creator-w2-resume-20260930 (env files mode 600)",
-  "reviewRuntime": "Own web/API/database left running for review; stop only these named resources when released",
+  "privateRuntimeDirectory": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/tmp/w2-runtime-20260930 (ignored, mode700; files600)",
+  "reviewRuntime": "Recovered owned saved PostgreSQL, API and Studio; external fan publication disabled.",
   "existingTestCluster": {
     "container": "creator-platform-w2-checks-20260930",
     "port": 55449,
-    "database": "creator_w2_test",
+    "database": "creator_w2_foundation_test",
     "purpose": "Existing tests reset schema/runtime password; isolated from Studio and peers",
     "disposable": true,
-    "state": "removed after existing-test evidence captured"
+    "state": "Removed again after unchanged deadlock reproduction and full 18-case/10,000-pair verification; port 55449 released",
+    "latestVerification": "deadlock-remediation.json"
   },
-  "preflight": "Ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved.",
+  "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
   "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
-  "git": "Existing PR #1 draft; checkpoint pushes work, metadata update 403; no merge with failed checks/open gates"
+  "git": "Existing ready PR1 only; final real Studio/iOS/Android operations passed. Repository main has no required checks/rulesets; latest founder prioritizes actual E2E over unit/coverage. Preserve every CI job/assertion and disclose queued macOS checks; normal merge only, no admin bypass.",
+  "nativeVerificationTools": {
+    "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
+    "location": "tmp/w2-native-20260930",
+    "state": "Fresh scoped official XcodeGen2.46.0, Temurin21.0.12.1, AndroidCLI15859902 and emulator37.1.11 installed; owned SDK/AVD/Gradle/DerivedData only",
+    "isolated": "Own SDK and Gradle home; no peer devices or caches used",
+    "formerLocation": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930",
+    "historicalCleanupState": "Permanently removed at founder request after handoff; reinstall scoped official tools for future local native acceptance"
+  },
+  "temporaryIngestionWorker": {
+    "port": 4202,
+    "creatorId": "20000000-0000-4000-8000-000000000003",
+    "state": "Stopped after genuine import/process-loss/reclaim receipts; port released"
+  },
+  "processes": {
+    "web": {
+      "pid": 28947,
+      "executionSession": 93852
+    },
+    "api": {
+      "pid": 98687,
+      "executionSession": 94732
+    },
+    "observedAt": "2026-10-01T06:04:24.500280+00:00",
+    "warning": "Inspect current listener identity before any restart; PIDs are observations."
+  },
+  "currentDraft": {
+    "revision": 18,
+    "mode": "companion",
+    "evaluationId": "4173b485-8ff1-4943-ab01-cc3b27153824",
+    "evaluationFingerprint": "7730898f4a558fc127d31b8ec48e03cd7dee2054cd43beed8e6cc80a1f2dcf0c",
+    "state": "passed",
+    "cases": 7,
+    "verification": "pending",
+    "activeLicense": false,
+    "dailyCostCapMicros": 0,
+    "observedAt": "2026-09-30T23:37:39.457036+00:00",
+    "note": "Current Responses-v3 cache-routing receipt; companion configuration restored, historical revision16 and expert17 retained."
+  },
+  "webLaunch": {
+    "cwd": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web",
+    "environment": {
+      "W2_DEVELOPMENT_MODE": "true",
+      "W2_DEVELOPMENT_SESSION": "development:10000000-0000-4000-8000-000000000001",
+      "W2_CREATOR_ID": "20000000-0000-4000-8000-000000000002",
+      "W2_API_URL": "http://127.0.0.1:4102",
+      "CREATOR_NEXT_OUTPUT": ".next-w2-review",
+      "WEB_ORIGIN": "http://127.0.0.1:3002"
+    },
+    "command": "node node_modules/next/dist/bin/next dev --webpack -H 127.0.0.1 -p 3002"
+  },
+  "cleanup": {
+    "receipt": "resource-cleanup.json",
+    "record": "resource-cleanup.md",
+    "allocatedKiBRemoved": 4744680,
+    "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
+    "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
+    "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
+  },
+  "latestAvailability": {
+    "observedAt": "2026-10-01T06:04:24.500280+00:00",
+    "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
+    "apiPort4102": "Loopback PID98687/session94732, current c4b4a4f reconciliation; saved18/sevenPASS and publicationdisabled",
+    "postgresPort55442": "loopback Docker listener",
+    "docker": "Shared engine already available when rechecked; no engine restart/prune",
+    "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
+    "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
+    "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
+    "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
+    "nextAction": "Merge verified guarded increment under latest founder actual-app criterion and repository required-check policy; retain all queued CI jobs and original release gates"
+  },
+  "availabilityHistory": [
+    {
+      "observedAt": "2026-09-30T22:45:06.756Z",
+      "webPort3002": "no listener",
+      "apiPort4102": "no listener",
+      "postgresPort55442": "no listener",
+      "docker": "Daemon unavailable at configured desktop socket; no engine restart/prune/delete attempted",
+      "privateRuntimeConfiguration": "runtime.env, provider.env and postgres.env previously verified retained are now absent",
+      "openAISecretReference": "Exists; never printed/copied",
+      "liveWebOutput": "Still exists",
+      "removedTargets": "All 23 remain absent",
+      "sourceHashManifest": "All 63 entries unchanged",
+      "volumeOwnershipCleanup": "Not verifiable while daemon offline; no volume deletion attempted",
+      "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
+    },
+    {
+      "observedAt": "2026-10-01T00:23:25.011767+00:00",
+      "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
+      "apiPort4102": "loopback listener,PID42986; restarted741d8dd provider admission/hold source",
+      "postgresPort55442": "loopback Docker listener",
+      "docker": "Shared engine already available when rechecked; no engine restart/prune",
+      "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
+      "savedData": "123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
+      "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
+      "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
+      "nextAction": "W8 exact0048 source custody/registration and canonical rollout; W3 acceptance fence, original W4 weighting and current C10 fan-accounting registration; complete final-head CI/native/visual acceptance remain pending"
+    }
+  ],
+  "temporaryVisualVerification": {
+    "ports": [3012, 3112],
+    "state": "Stopped after existing suite/followup; reference PNGs/assertions/tolerances unchanged; next-env drift restored",
+    "receipt": "visual-origin-followup.json"
+  },
+  "nativeVerification": {
+    "state": "Current c4b4a4f source: signed iOS2/2 zero failures28.407s; Android4/4 zero failures4.425s plus Night1.318s; personally inspected clean Light and settledNight shipping, cost2,374micros matchesactualusage",
+    "simulator": {
+      "name": "Creator Platform W2 Resume 20260930",
+      "id": "09FA41B1-C300-4970-9F09-26F7CB884425",
+      "runtime": "iOS26.5",
+      "state": "Currentc4b original2/2 PASS28.407s; normallyShutdown/dataretained",
+      "peerDevices": "All preserved",
+      "evidence": [
+        "w4-merge-ios-signin-night.png",
+        "w4-merge-ios-identities.png"
+      ]
+    },
+    "android": {
+      "emulatorPort": 5562,
+      "adbServerPort": 5042,
+      "state": "Currentc4b original4/4 andNightPASS; ownQEMU99414 normalTERM/exit0 verified, saveddataretained",
+      "evidence": [
+        "w4-merge-android-light.png",
+        "w4-merge-android-night-settled.png",
+        "w4-merge-android-ui.log",
+        "w4-merge-android-night-ui.log"
+      ],
+      "previousExecutionSession": 21120,
+      "nextAvd": "CreatorPlatform_W2_Resume_AOSP35_20260930",
+      "networkDiscovery": "Own netsim-aosp35 TMPDIR/ANDROID_TMP; default isolated discovery; HCI15602; peers unchanged",
+      "observedAt": "2026-10-01T06:04:24.500280+00:00",
+      "executionSession": 16128,
+      "pid": 99414,
+      "nextNetworkDiscovery": "Separate own tmp/w2-native-20260930/netsim-api34-clean TMPDIR/ANDROID_TMP, default netsim instance; HCI15602 reused only after own API35 stopped"
+    },
+    "ownedDirectory": "tmp/w2-native-20260930",
+    "tooling": "Verified official XcodeGen2.46 SHA256, Android Intel CLI SHA256, Temurin21.0.12.1 SHA256; no peer tools/cache/build reuse",
+    "receipt": "w4-merge-app-verification.json"
+  }
 }

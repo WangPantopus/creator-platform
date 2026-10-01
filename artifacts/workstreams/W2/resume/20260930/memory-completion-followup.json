@@ -1,0 +1,133 @@
+{
+  "observedAt": "2026-10-01T03:43:29.051267+00:00",
+  "sourceBase": "119d26ab5fcb8752eb787a9a69c5faabd3441cf4",
+  "verification": "Personal source integration and launched Studio/native operations; no new engineering tests/scripts",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/conversation-adapter.ts": "15e10ca6fd1f861658d5d31e89eeda64f366adf7afced5d78aadece561716158",
+    "apps/backend/src/modules/agent/memory-exclusions.ts": "e87cd410ba4e045b43925a6599583bf52fae3aa4b7b34140fcf6be60a9f0cb2a",
+    "apps/backend/src/modules/agent/model.ts": "adb10cc91f16ee3b2f5b953f65d87b107fa4ab8f6c6832e8e3ed0b6360369a84",
+    "apps/backend/src/modules/agent/provider-usage.ts": "c18f412e8a1bcc6906f6a8fc0b833fc83c2cc09bf636a77397f8af7be5d9f0a3"
+  },
+  "W3Producer": {
+    "exclusions": "63c61a95f765635a1087006d4aeb8b7b74ea9330",
+    "constructedGenerator": "25d459213b8ac6f69370d0f5f009be282c7596d7",
+    "inspection": "Actual bounded opaque snapshot and original-ref commit validation personally read; W3 constructor checks exact pool and db.withThread citation custody"
+  },
+  "memory": {
+    "maxCandidates": 5,
+    "maxExclusions": 1000,
+    "maxComparisonUtf8Bytes": 64000,
+    "modelComparisons": 1,
+    "deletedText": "NULL remains unavailable; no reconstruction and no candidate admitted",
+    "uncertainVerdict": "candidate rejected",
+    "originalSnapshotReference": "passed unchanged to actual W3 commitMemory",
+    "providerAdmissionsMaximum": 22,
+    "maxModelOutputTokens": 42000,
+    "activated": false
+  },
+  "completion": {
+    "authority": "Private closure captured only after actual usage admission commit; exact id/creator/version/model/category and prepared generation/attempt/purpose checked",
+    "ownerCommands": "No current-session bypass, arbitrary callback, profile/configuration write or workspace creation",
+    "unknown": "Missing final usage stays null cost; missing/purged admission refuses completion, no row recreated",
+    "verifiedBoundary": "Actual non-journal Studio preview persisted four known rows; canonical revoked-session/late-journal fan completion remains unverified"
+  },
+  "runtime": {
+    "web": 3002,
+    "api": 4102,
+    "postgres": 55442,
+    "apiPID": 37692,
+    "apiSession": 41342,
+    "revision": 18,
+    "mode": "companion",
+    "sources": 123,
+    "versions": 105,
+    "canonicalLedgerEntries": 28,
+    "liveVersion": null,
+    "publishAvailable": false,
+    "currentEvaluation": "4173b485-8ff1-4943-ab01-cc3b27153824"
+  },
+  "preview": {
+    "message": "What can Maya share from her approved public clay notes?",
+    "pipelineMs": 5210,
+    "firstApprovedMs": 5184,
+    "costMicros": 2273,
+    "usageIds": [
+      "222ef5d6-fdd1-416a-ba90-ac9b8955a194",
+      "f743d75d-9634-4cb8-879e-82f37fe6d22c",
+      "a5c409fb-174c-49e4-b85d-a0ab91aa0bab",
+      "bfeeb0fb-29c7-4c03-b35e-f0b60c5377de"
+    ],
+    "usage": [
+      {
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 128,
+        "outputTokens": 24,
+        "costMicros": 90,
+        "durationMs": 2054
+      },
+      {
+        "model": "text-embedding-3-small",
+        "inputTokens": 11,
+        "outputTokens": 0,
+        "costMicros": 1,
+        "durationMs": 1011
+      },
+      {
+        "model": "gpt-4.1-2025-04-14",
+        "inputTokens": 653,
+        "outputTokens": 76,
+        "costMicros": 1914,
+        "durationMs": 2111
+      },
+      {
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 594,
+        "outputTokens": 19,
+        "costMicros": 268,
+        "durationMs": 667
+      }
+    ],
+    "costMatchesStoredRows": true,
+    "performanceAcceptance": false,
+    "screenshot": "usage-completion-preview.png"
+  },
+  "native": {
+    "avd": "CreatorPlatform_W2_Resume_API35_20260930",
+    "image": "android-35/google_apis/x86_64",
+    "sameOldApi34DataRetained": true,
+    "serial": "emulator-5562",
+    "adbPort": 5042,
+    "hciPort": 15602,
+    "netsim": "Own shared TMPDIR+ANDROID_TMP with default instance/NETSIM_INSTANCE unset; WiFi and Bluetooth initialized, no abort",
+    "shippingInstall": "Success",
+    "instrumentationInstall": "Success",
+    "actualShippingLaunch": {
+      "status": "ok",
+      "state": "COLD",
+      "totalMs": 26150,
+      "waitMs": 26780,
+      "resumedActivity": "com.pantopus.qelvora/.MainActivity",
+      "screen": "SystemUI ANR over Welcome; clean launch not verified"
+    },
+    "eventBuffer": "SystemUI keyguard, phone and Google service startup ANRs; no W2 app ANR in inspected buffer",
+    "hostLoad": [
+      896.66,
+      789.22,
+      465.37
+    ],
+    "causation": "Not proved",
+    "state": "Own API35 emulator stopped, app/data retained",
+    "screenshot": "android-api35-systemui-failure.png"
+  },
+  "CI": {
+    "head": "119d26ab5fcb8752eb787a9a69c5faabd3441cf4",
+    "trust": 36808519982,
+    "PRFoundation": 36808520061,
+    "pushFoundation": 36808516326,
+    "passed": 5,
+    "queued": 6,
+    "mergeEligible": false,
+    "freshHeadRequired": true
+  },
+  "scope": "All nine original packages/R01\u2013R14 and C05/C08/C09/C10 preserved; authentic licensing/verification, actual policy/custody/financial/privacy/feed/media/accessibility/performance gates remain disabled or unverified."
+}

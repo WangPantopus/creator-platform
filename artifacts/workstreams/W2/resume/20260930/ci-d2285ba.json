@@ -1,0 +1,120 @@
+{
+  "observedAt": "2026-10-01T00:08:27.407490+00:00",
+  "head": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+  "mergePermitted": false,
+  "reason": "Six native/visual contexts remain queued; all required checks must pass on the final head.",
+  "runs": [
+    {
+      "runId": 36793743545,
+      "headSha": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+      "status": "queued",
+      "conclusion": "",
+      "jobs": [
+        {
+          "databaseId": 110152312922,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743545/job/110152312922",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152313174,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743545/job/110152313174",
+          "completedAt": "2026-09-30T23:59:46Z"
+        },
+        {
+          "databaseId": 110152313220,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743545/job/110152313220",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152313222,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743545/job/110152313222",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152313275,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743545/job/110152313275",
+          "completedAt": "2026-10-01T00:03:37Z"
+        }
+      ]
+    },
+    {
+      "runId": 36793739753,
+      "headSha": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+      "status": "queued",
+      "conclusion": "",
+      "jobs": [
+        {
+          "databaseId": 110152300840,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793739753/job/110152300840",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152301001,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793739753/job/110152301001",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152301041,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": "",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793739753/job/110152301041",
+          "completedAt": "0001-01-01T00:00:00Z"
+        },
+        {
+          "databaseId": 110152301111,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793739753/job/110152301111",
+          "completedAt": "2026-10-01T00:03:40Z"
+        },
+        {
+          "databaseId": 110152301171,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793739753/job/110152301171",
+          "completedAt": "2026-10-01T00:01:01Z"
+        }
+      ]
+    },
+    {
+      "runId": 36793743769,
+      "headSha": "d2285ba60b3fd6ee4eace83dfa6c735fb45f17c5",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "databaseId": 110152310380,
+          "name": "compile",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36793743769/job/110152310380",
+          "completedAt": "2026-09-30T23:59:01Z"
+        }
+      ]
+    }
+  ]
+}

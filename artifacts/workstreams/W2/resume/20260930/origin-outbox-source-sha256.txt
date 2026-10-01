@@ -1,0 +1,3 @@
+77ac2e4d00531f88bf5260eca5470be96d55aa56aa1a0e816d6d2c865c265410  apps/web/app/api/studio/ai/[...path]/route.ts
+77b8e76204a9abd7e796bc0520ad68c5643d076525f4aad4c0413119b36f4c84  apps/web/lib/request-origin.ts
+3ee9c416034d16cc062a06bb27e6cc1465cfb4263cc37fa4e300792a7722c7a8  apps/backend/src/modules/agent/lifecycle.ts

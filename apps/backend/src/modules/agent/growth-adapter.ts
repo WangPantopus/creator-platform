@@ -109,7 +109,7 @@ const Publish = z.object({
   publishedAt: z.iso.datetime(),
   versionHash: z.string().min(1),
 });
-/** At-least-once outbox delivery. Downstream effects must deduplicate the stable ID.
+/** At-least-once publication delivery. Downstream effects deduplicate the stable ID.
  * An unavailable/failing consumer leaves the durable event unacknowledged. */
 export async function relayAgentEvents(input: {
   service: AgentService;
@@ -131,7 +131,13 @@ export async function relayAgentEvents(input: {
     "Production event delivery requires current creator ownership.",
   );
   let delivered = 0;
-  for (const row of await input.lifecycle.pendingEvents(input.scope)) {
+  // Filter before the bound: other domain consumers retain their private cost,
+  // lifecycle and refund events until their own authoritative commit.
+  for (const row of await input.lifecycle.pendingEvents(
+    input.scope,
+    100,
+    "ai.version_published",
+  )) {
     if (row.type === "ai.version_published") {
       const published = Publish.parse(row.payload);
       await input.service.repository.transaction(
