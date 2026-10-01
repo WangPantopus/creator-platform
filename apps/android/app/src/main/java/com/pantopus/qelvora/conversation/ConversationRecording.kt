@@ -126,8 +126,10 @@ internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, cre
     var position by remember(key) { mutableStateOf(0L) }
     var failure by remember(key) { mutableStateOf("") }
     var load by remember(key) { mutableStateOf<Job?>(null) }
+    var revision by remember(key) { mutableStateOf(0L) }
     val currentActive by rememberUpdatedState(active)
     fun clear() {
+        revision += 1
         load?.cancel(); load = null
         player?.release(); player = null; source?.close(); source = null; proof = null
         loading = false; prepared = false; playing = false; position = 0
@@ -138,12 +140,13 @@ internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, cre
         while (isActive) {
             delay(1000)
             val current = player; val file = proof
+            val attempt = revision
             if (current != null && file != null) try {
                 client.assertCurrent(asset, file)
-                ensureActive(); if (prepared && player === current) { position = current.currentPosition.toLong(); playing = current.isPlaying }
+                ensureActive(); if (revision == attempt && prepared && player === current) { position = current.currentPosition.toLong(); playing = current.isPlaying }
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
-                clear(); failure = "This recording is unavailable. Reopen the conversation to try again."
+                if (revision == attempt && player === current) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
             }
         }
     }
@@ -154,23 +157,27 @@ internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, cre
                 if (currentActive) {
                     val current = player
                     if (current != null) { if (current.isPlaying) current.pause() else current.start(); playing = current.isPlaying }
-                    else if (load == null) load = scope.launch {
+                    else if (load == null) {
+                        val attempt = revision
+                        load = scope.launch {
                         loading = true; failure = ""
+                        var pendingBytes: ByteArray? = null
                         try {
-                            val audio = client.audio(asset); ensureActive()
-                            if (!currentActive) { audio.bytes.fill(0); return@launch }
-                            val data = RecordingDataSource(audio.bytes); source = data; proof = audio.proof
+                            val audio = client.audio(asset); pendingBytes = audio.bytes; ensureActive()
+                            if (!currentActive || revision != attempt) return@launch
+                            val data = RecordingDataSource(audio.bytes); source = data; pendingBytes = null; proof = audio.proof
                             val next = MediaPlayer(); player = next
                             next.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
                             next.setDataSource(data)
-                            next.setOnPreparedListener { if (currentActive && player === it) { prepared = true; it.start(); playing = true; loading = false } else clear() }
-                            next.setOnCompletionListener { playing = false; position = asset.durationMs ?: 0 }
-                            next.setOnErrorListener { _, _, _ -> clear(); failure = "Playback could not start. Try again."; true }
+                            next.setOnPreparedListener { if (revision == attempt && player === it) { if (currentActive) { prepared = true; it.start(); playing = true; loading = false } else clear() } }
+                            next.setOnCompletionListener { if (revision == attempt && player === it) { playing = false; position = asset.durationMs ?: 0 } }
+                            next.setOnErrorListener { failed, _, _ -> if (revision == attempt && player === failed) { clear(); failure = "Playback could not start. Try again." }; true }
                             next.prepareAsync()
                         } catch (error: Exception) {
                             if (error is CancellationException) throw error
-                            clear(); failure = "Audio access could not be confirmed. Try again."
-                        } finally { load = null; if (player == null) loading = false }
+                            if (revision == attempt) { clear(); failure = "Audio access could not be confirmed. Try again." }
+                        } finally { pendingBytes?.fill(0); if (revision == attempt) { load = null; if (player == null) loading = false } }
+                        }
                     }
                 }
             })

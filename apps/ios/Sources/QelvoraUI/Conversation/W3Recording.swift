@@ -230,14 +230,16 @@ private final class W3RecordingPlayback: ObservableObject {
     }
   }
   func recheck() async {
-    guard player != nil, let proof else { return }
+    guard let observedPlayer = player, let proof else { return }
+    let attempt = revision
     do {
       try await client.assertCurrent(asset, file: proof)
       try Task.checkCancellation()
-      position = player?.currentTime ?? 0
-      playing = player?.isPlaying ?? false
+      guard attempt == revision && player === observedPlayer else { return }
+      position = observedPlayer.currentTime
+      playing = observedPlayer.isPlaying
     } catch {
-      if !Task.isCancelled {
+      if !Task.isCancelled && attempt == revision && player === observedPlayer {
         clear()
         failure = "This recording is unavailable. Reopen the conversation to try again."
       }
