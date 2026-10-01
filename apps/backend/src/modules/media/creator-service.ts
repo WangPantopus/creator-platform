@@ -14,7 +14,7 @@ import type {
   CreatorIdentityAuthority,
   CreatorScope,
 } from "../identity/creator-scope.js";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
@@ -89,6 +89,25 @@ export function creatorAssetView(row: CreatorAssetRow): CreatorMediaAsset {
 }
 function account(scope: CreatorMediaReadScope) {
   return "accountId" in scope ? scope.accountId : scope.actorAccountId;
+}
+function verifiedProvenance(row: CreatorAssetRow) {
+  const provenance = row.provenance;
+  return Boolean(
+    row.signed_act_id &&
+      provenance?.c2paVerified === true &&
+      provenance.assetId === row.id &&
+      provenance.assetVersion === row.version &&
+      provenance.creatorId === row.creator_id &&
+      provenance.objectId === row.object_id &&
+      provenance.accountId === row.owner_account_id &&
+      provenance.signedActId === row.signed_act_id &&
+      provenance.processedMediaSha256 === row.output_sha256 &&
+      provenance.processedMediaBytes === Number(row.bytes) &&
+      provenance.processedMediaMimeType === row.mime_type &&
+      provenance.processedMediaDurationMs === row.duration_ms &&
+      typeof provenance.fileSha256 === "string" &&
+      /^[a-f0-9]{64}$/u.test(provenance.fileSha256),
+  );
 }
 export class CreatorMediaService {
   readonly chunkBytes = 1024 * 1024;
@@ -433,7 +452,7 @@ export class CreatorMediaService {
       "The exact content and media review changed.",
     );
     const publication = await client.query(
-      "SELECT sa.id FROM creator.signed_act sa JOIN creator.signed_act_consumption sac ON sac.signed_act_id=sa.id AND sac.account_id=sa.account_id JOIN creator.signed_publication sp ON sp.signed_act_id=sa.id AND sp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.subject_id=$4 AND sa.content_hash=$5 AND sp.command=$6::jsonb AND sp.withdrawn_at IS NULL",
+      "SELECT sa.id FROM creator.signed_act sa JOIN creator.signed_act_consumption sac ON sac.signed_act_id=sa.id AND sac.account_id=sa.account_id JOIN creator.signed_publication sp ON sp.signed_act_id=sa.id AND sp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.subject_id=$4 AND sa.content_hash=$5 AND sp.command=$6::jsonb AND sp.withdrawn_at IS NULL AND sa.act_type=$7",
       [
         signedActId,
         scope.accountId,
@@ -441,6 +460,7 @@ export class CreatorMediaService {
         objectId,
         contentHash(command),
         JSON.stringify(command),
+        command.actType,
       ],
     );
     invariant(
@@ -470,7 +490,7 @@ export class CreatorMediaService {
         "This content's exact media changed.",
       );
       await client.query(
-        "INSERT INTO creator.creator_media_publication(asset_id,creator_id,object_id,account_id,signed_act_id,evidence) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(asset_id,signed_act_id) DO NOTHING",
+        "INSERT INTO creator.creator_media_publication(asset_id,creator_id,object_id,account_id,signed_act_id,evidence,command_hash) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(asset_id,signed_act_id) DO NOTHING",
         [
           proof.assetId,
           scope.creatorId,
@@ -478,6 +498,7 @@ export class CreatorMediaService {
           scope.accountId,
           signedActId,
           JSON.stringify(proof),
+          contentHash(command),
         ],
       );
       await client.query(
@@ -506,17 +527,57 @@ export class CreatorMediaService {
     client: PoolClient,
     objectId: string,
     expected: ProcessedMediaEvidence,
+    signedActId: string,
   ) {
     const proof = ProcessedMediaEvidenceSchema.parse(expected);
     const current = await this.evidence(scope, client, objectId, proof.assetId);
     if (contentHash(current) !== contentHash(proof)) return false;
+    if (
+      !(await this.publicationMatches(
+        scope,
+        client,
+        objectId,
+        signedActId,
+        proof,
+      ))
+    )
+      return false;
     const row = await this.row(scope, client, proof.assetId);
-    return Boolean(
-      row.signed_act_id &&
-        row.provenance?.c2paVerified === true &&
-        row.provenance.processedMediaSha256 === proof.sha256 &&
-        row.provenance.signedActId === row.signed_act_id,
+    return verifiedProvenance(row);
+  }
+  /** W5 calls inside its already-authorized transaction/current object lock.
+   * Current reuse association is distinct from the original C2PA recording act;
+   * do not call row/currentAssetRead here, which would recurse into W5 policy. */
+  async publicationMatches(
+    scope: CreatorMediaReadScope,
+    client: PoolClient,
+    objectId: string,
+    signedActId: string,
+    expected: ProcessedMediaEvidence,
+  ) {
+    if ("accountId" in scope)
+      await this.identity.authorizeInTransaction(scope, client, "owned");
+    else {
+      assertThreadScope(scope);
+      invariant(
+        scope.authority !== "triage",
+        "media_participant_required",
+        "This media is unavailable.",
+      );
+    }
+    await this.allowed(scope, client);
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const result = await client.query(
+      "SELECT 1 FROM creator.creator_media_publication p JOIN creator.signed_verification sv ON sv.id=p.signed_act_id AND sv.account_id=p.account_id AND sv.creator_id=p.creator_id AND sv.content_hash=p.command_hash WHERE p.asset_id=$1 AND p.creator_id=$2 AND p.object_id=$3 AND p.signed_act_id=$4 AND p.evidence=$5::jsonb AND NOT sv.withdrawn AND NOT sv.creator_revoked AND sv.act_type IN('broadcast','reply')",
+      [
+        proof.assetId,
+        scope.creatorId,
+        objectId,
+        signedActId,
+        JSON.stringify(proof),
+      ],
     );
+    return result.rowCount === 1;
   }
   async playback(scope: CreatorMediaReadScope, id: string) {
     return this.transaction(scope, async (client) => {
@@ -528,7 +589,7 @@ export class CreatorMediaService {
       );
       if (row.owner_account_id !== account(scope))
         invariant(
-          row.signed_act_id && row.provenance?.c2paVerified === true,
+          verifiedProvenance(row),
           "media_provenance_pending",
           "This media is awaiting its signature and content credentials.",
         );
@@ -565,8 +626,7 @@ export class CreatorMediaService {
       const row = await this.row(scope, client, id);
       invariant(
         row.state === "ready" &&
-          (row.owner_account_id === account(scope) ||
-            (row.signed_act_id && row.provenance?.c2paVerified === true)),
+          (row.owner_account_id === account(scope) || verifiedProvenance(row)),
         "media_not_ready",
         "This media is unavailable.",
       );
@@ -597,8 +657,7 @@ export class CreatorMediaService {
         row.state === "ready" &&
           row.version === version &&
           row.access_epoch === accessEpoch &&
-          (row.owner_account_id === account(scope) ||
-            (row.signed_act_id && row.provenance?.c2paVerified === true)),
+          (row.owner_account_id === account(scope) || verifiedProvenance(row)),
         "media_version_changed",
         "This media is no longer available.",
       );

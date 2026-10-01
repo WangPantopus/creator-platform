@@ -78,5 +78,21 @@
     "native transport/incoming and physical iPhone/Android",
     "W2 licensed marked later-gate audio",
     "measured latency/cost"
-  ]
+  ],
+  "sourceRevision": "4515a6a0ac16423f15f2cfb961489744ebc93033",
+  "publicationClosureFollowup": {
+    "recordedAt": "2026-10-01T00:00:35.621707+00:00",
+    "sourceSHA256": {
+      "apps/backend/src/modules/media/creator-service.ts": "f1d5ead38d14d189123b0e13dde3f79dcab48b05a9ce67bdc3822e1dff90d3bf",
+      "apps/backend/src/modules/media/creator-scope.sql": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5",
+      "apps/backend/src/modules/session/service.ts": "188432f3337354e5da1f036b0729ab9b8e4b4b2da324a235ebcec35fba043bbc",
+      "apps/web/features/media/api.ts": "dabf63160180bf04520ee98369d56ba5e5733ec9217aa221741160068864f688",
+      "apps/web/features/calls/AvailabilityEditor.tsx": "7800433484134e9657d001a0f87337da422ea506faa348ddeaf910f7a88723bb"
+    },
+    "backendBuildAndLint": "passed",
+    "webTypecheckAndLint": "passed",
+    "databaseChecks": "18-case result above predates follow-up",
+    "sqlApplied": false,
+    "functionalAcceptance": false
+  }
 }

@@ -1,6 +1,9 @@
 import type {
   MediaAsset,
   UploadTicket,
+  CreatorMediaAsset,
+  CreatorMediaPurpose,
+  CreatorMediaUploadTicket,
 } from "../../../../packages/api/src/media";
 
 export class MediaRequestError extends Error {
@@ -35,7 +38,7 @@ export async function mediaRequest<T>(
   }
   return response.json() as Promise<T>;
 }
-export async function uploadRecording(input: {
+export type RecordingUploadInput = {
   creatorId: string;
   fanId: string;
   purpose: "human_note" | "human_reply" | "interview_audio";
@@ -47,8 +50,79 @@ export async function uploadRecording(input: {
   progress: (ratio: number) => void;
   resumed?: UploadTicket;
   onTicket: (ticket: UploadTicket) => void;
-}) {
-  const family = `threads/${input.creatorId}/${input.fanId}/media`;
+};
+
+export function uploadRecording(input: RecordingUploadInput) {
+  return uploadBinary<MediaAsset>({
+    ...input,
+    family: `threads/${input.creatorId}/${input.fanId}/media`,
+    declaration: { purpose: input.purpose },
+  });
+}
+export function uploadCreatorMedia(
+  input: Omit<
+    RecordingUploadInput,
+    "fanId" | "purpose" | "durationMs" | "resumed" | "onTicket"
+  > & {
+    objectId: string;
+    purpose: CreatorMediaPurpose;
+    durationMs?: number;
+    resumed?: CreatorMediaUploadTicket;
+    onTicket: (ticket: CreatorMediaUploadTicket) => void;
+  },
+) {
+  const verify = (ticket: CreatorMediaUploadTicket) => {
+    if (
+      ticket.asset.creatorId !== input.creatorId ||
+      ticket.asset.objectId !== input.objectId ||
+      ticket.asset.purpose !== input.purpose
+    )
+      throw new Error(
+        "This upload does not belong to the current content. Refresh before continuing.",
+      );
+    input.onTicket(ticket);
+  };
+  return uploadBinary<CreatorMediaAsset>({
+    ...input,
+    onTicket: verify,
+    family: `creators/${input.creatorId}/media`,
+    declaration: { objectId: input.objectId, purpose: input.purpose },
+  });
+}
+type BinaryTicket<A> = Omit<UploadTicket, "asset"> & { asset: A };
+async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
+  family: string;
+  declaration: Record<string, string>;
+  blob: Blob;
+  durationMs?: number;
+  idempotencyKey: string;
+  signal: AbortSignal;
+  progress: (ratio: number) => void;
+  resumed?: BinaryTicket<A>;
+  onTicket: (ticket: BinaryTicket<A>) => void;
+}): Promise<A> {
+  const family = input.family;
+  if (
+    !Number.isSafeInteger(input.blob.size) ||
+    input.blob.size <= 0 ||
+    input.blob.size > 268_435_456 ||
+    ![
+      "audio/webm",
+      "audio/mp4",
+      "audio/ogg",
+      "audio/wav",
+      "image/png",
+      "image/jpeg",
+    ].includes(input.blob.type) ||
+    (input.durationMs !== undefined &&
+      (!Number.isSafeInteger(input.durationMs) ||
+        input.durationMs <= 0 ||
+        input.durationMs > 3_600_000))
+  )
+    throw new Error(
+      "Choose a supported file within the content's media limit.",
+    );
+  input.signal.throwIfAborted();
   const digest = Array.from(
     new Uint8Array(
       await crypto.subtle.digest("SHA-256", await input.blob.arrayBuffer()),
@@ -56,12 +130,13 @@ export async function uploadRecording(input: {
   )
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("");
+  input.signal.throwIfAborted();
   let ticket =
     input.resumed ??
-    (await mediaRequest<UploadTicket>(family, {
+    (await mediaRequest<BinaryTicket<A>>(family, {
       method: "POST",
       body: JSON.stringify({
-        purpose: input.purpose,
+        ...input.declaration,
         mimeType: input.blob.type,
         bytes: input.blob.size,
         durationMs: input.durationMs,
@@ -72,8 +147,9 @@ export async function uploadRecording(input: {
     }));
   const validateTicket = () => {
     if (
-      ticket.asset.sha256 !== digest ||
-      ticket.asset.bytes !== input.blob.size ||
+      (ticket.asset.state === "uploading" &&
+        (ticket.asset.sha256 !== digest ||
+          ticket.asset.bytes !== input.blob.size)) ||
       !Number.isSafeInteger(ticket.asset.uploadedBytes) ||
       ticket.asset.uploadedBytes < 0 ||
       ticket.asset.uploadedBytes > input.blob.size ||
@@ -89,19 +165,16 @@ export async function uploadRecording(input: {
   const assetId = ticket.asset.id;
   input.onTicket(ticket);
   // A finish response may be lost after the worker has already claimed or processed the asset.
-  const current = await mediaRequest<MediaAsset>(
-    `${family}/${ticket.asset.id}`,
-    {
-      signal: input.signal,
-    },
-  );
+  const current = await mediaRequest<A>(`${family}/${ticket.asset.id}`, {
+    signal: input.signal,
+  });
   if (current.id !== assetId)
     throw new Error("The saved upload could not be confirmed.");
   if (
     ["quarantined", "processing", "ready", "rejected"].includes(current.state)
   )
     return current;
-  ticket = await mediaRequest<UploadTicket>(
+  ticket = await mediaRequest<BinaryTicket<A>>(
     `${family}/${ticket.asset.id}/resume`,
     {
       method: "POST",
@@ -117,7 +190,7 @@ export async function uploadRecording(input: {
   input.progress(offset / input.blob.size);
   while (offset < input.blob.size) {
     if (Date.parse(ticket.expiresAt) <= Date.now() + 5000) {
-      ticket = await mediaRequest<UploadTicket>(
+      ticket = await mediaRequest<BinaryTicket<A>>(
         `${family}/${ticket.asset.id}/resume`,
         { method: "POST", body: "{}", signal: input.signal },
       );
@@ -129,7 +202,7 @@ export async function uploadRecording(input: {
     }
     const url = new URL(ticket.url);
     const next = Math.min(input.blob.size, offset + ticket.chunkBytes);
-    const asset = await mediaRequest<MediaAsset>(
+    const asset = await mediaRequest<A>(
       `${family}/${ticket.asset.id}/upload${url.search}`,
       {
         method: "PUT",
@@ -148,7 +221,7 @@ export async function uploadRecording(input: {
     offset = asset.uploadedBytes;
     input.progress(offset / input.blob.size);
   }
-  return mediaRequest<MediaAsset>(`${family}/${ticket.asset.id}/finish`, {
+  return mediaRequest<A>(`${family}/${ticket.asset.id}/finish`, {
     method: "POST",
     body: "{}",
     signal: input.signal,

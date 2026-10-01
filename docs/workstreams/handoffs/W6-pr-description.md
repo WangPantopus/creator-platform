@@ -1,34 +1,29 @@
-# Current PR #4 description
-
-Title: **W6: resumable media and server-backed call lifecycle**
-
-GitHub CLI write access is verified as `WangPantopus`; the live PR title/body have been updated. Current text follows.
-
----
-
-Add W6's scoped media pipeline and web/Swift/Kotlin call workflows. Upload retries preserve the original upload after a lost response; consent, complete provider history and authorization changes drive durable capture/recording cleanup.
+Add scoped media upload/sign/playback and server-backed call recovery, preserving exact identity, consent, history and W4 settlement authority. Creator-owned media uses real content/source objects; the current primary-owner continuation is committed locally and awaiting the preserved iOS artifact before publication.
 
 ## Implementation
 
-- Resumable quarantined media, bounded processing/provenance/privacy contracts, exact-media signing, browser/native recording and secure playback.
-- Versioned availability and signed time offers, W4 scheduling/settlement and retained post-call authority, server interval clocks, independent consent, summary jobs and reconciliation.
-- Recovery fixes for completed uploads, chunk acknowledgements, partial filesystem writes, infrastructure failures, incomplete history/no-shows, revoked rooms, actual recording occurrence during revocation and stale client transports.
-- Post-call recording/purpose revocation remains available to previously consenting actors on all three clients, and web summary output requires both current grants. Consume W1's exact bundled-italic token-size correction.
-- Cancellation retains a durable room-close effect; late denied join responses renew the lease-fenced closure intent. Explicit/deadline closure proceeds while provider history is unavailable; malformed provider truth cannot become absence/recording/deletion evidence, and ambiguous rejected effects remain pending for privacy drain.
-- Authorized foundation CI repairs for current identity contracts, migration setup and native compilation; corrected Android ended Composer with its required request action and reviewed four-image refresh; portable iOS color-profile normalization of existing references, preserving strict equality.
+- Stable resumable quarantine/checksum/offset recovery, bounded ingestion and exact-media signature/provenance ports, browser/Swift/Kotlin record/play workflows.
+- Signed offers and versioned availability, actual W4 captured-commitment/retained authority, complete-history interval clocks and cumulative180-second reconnect budget.
+- Independent purpose consent and immutable recording occurrence; explicit/deadline closure proceeds during history outages. Ambiguous external effects and unconfirmed deletion remain pending.
+- Durable cancellation/late-denied-join cleanup and post-call grant revocation; stale browser/native transport fences.
+- Authorized Foundation setup/compile repairs, Android ended Composer correction and four reviewed images, existing Swift sRGB/explicit2×/host-coordinate capture with unchanged strict equality.
 
-Prerequisite commit `1a94db3` preserves shared app foundations/peer work and is not W6-authored completion. `2485828` contains original W6 implementation; `a96ecbb` incorporates main's newer W5 handoff. Later W6 recovery and CI repairs preserve those source boundaries.
+The branch retains shared prerequisite1a94db3 and main incorporationa96ecbb. The entire diff againstmain is not W6-authored completion.
 
-## Validation
+## Primary-owner local continuation
 
-Remote web/backend checks pass all18 genuine PostgreSQL/contracts plus generation, TypeScript, lint, format and production build. Web visual, Android emulator and trust compilation checks pass. Local isolated Android APK build and all19 existing unit/snapshot checks pass after the Composer correction. No new cases/suites/harnesses, weakened limits or paid AI requests.
+Local4515a6a adds real W1-issued creator scope and same-client authorization, exact immutable processed snapshots/new publication associations, current object/asset/audience reads, separate access epochs for withdrawal and permitted reuse, leased creator processing, creator-only availability and paginated privacy/archive/deletion ports. It contains unallocated/unapplied append-only creator SQL and exported OpenAPI paths for W1's owner composition; it is not yet the remote PR head. W5 pending publisher and W8 custody/retention/registry/runtime remain open.
 
-The additional consent controls pass web TypeScript/lint/format, Android APK compilation and the complete QelvoraUI iOS Simulator target. Genuine post-call revocation/retained-asset deletion remains an integration acceptance gate.
+The next local follow-up requires current publication binding independently of original C2PA occurrence, guards immutable processed evidence and publication associations in draft SQL, provides creator-only web upload/availability ports, and waits for recording off/participants drained before C07 evidence. Backend/web changed-source checks pass; these paths have no observed complete functional acceptance.
 
-iOS compiles and its15 non-snapshot checks pass; all110 strict local reference comparisons still differ. The existing capture uses sRGB and existing references were ColorSync-converted with dimensions/alpha preserved; no new iOS render is accepted as a baseline. Headless macOS27 produced390×844 images against780×1688 references. Capture now explicitly supplies2× pixel density/sRGB bitmap allocation and consumes W5's narrow host-coordinate correction after inspecting genuine CI's blurred enlargement of a1× raster. References and strict equality remain intact; matching-runner sharpness/pixel verification is pending. The queued predecessor at `9b193d2` passes backend/web, Android runtime and Trust; inspect the current head's checks separately. Actual browser recorder permission cancellation/retry was operated at390×844; successful real microphone capture and complete native W6 journeys remain unverified.
+The founder approved LiveKit Cloud evaluation only. Official capabilities still do not establish provider one-use JWT admission; webhooks may lose events, Analytics history requires Scale or higher, and recording stop is not storage deletion. No purchase, credentials or enablement is implied. Positive late grace, both-absent and cancellation/rescheduling remain undecided;180 seconds is reconnect budget only.
 
-## Integration gates — draft
+## Validation and remaining gates
 
-All media/call/AI-audio capabilities remain false. Genuine storage/scanner/C2PA and current media authority, availability allocation/bootstrap wiring, supported provider/single-use admission/history/SDKs, W3/W7/W2 effects, approved grace/reschedule/both-absent/retention policies and physical-phone/full functional acceptance remain open. The founder confirmed that provider, positive grace, both-absent and cancellation/rescheduling decisions have not been made; they are documented as open choices. W4's exact retained-authority producer is integrated but its post-settlement receipt/summary journey remains unverified. CI success alone does not close W6 acceptance or merge readiness.
+Latest local production build, changed-source lint, canonical generation and macOS QelvoraUI library compilation pass. All18 existing backend cases pass116.70s against a verified W6-only fixture, including10,000 isolation pairs. No new test cases/files/suites/harnesses, weakened assertions, new iOS goldens or paid requests.
 
-[Current native CI evidence](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/native-ci/2026-09-30/README.md) · [Current status](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/status/W6.md) · [Complete handoff](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/handoffs/W6-2026-09-30.md) · [Resume prompt](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/prompts/W6-resume.md)
+Preserved source run36780139572 at a124ad0 passes backend/web, Android runtime and Android foundation; Trust36780139685 passes. Web visual and iOS remain queued with no ios-review artifact. Local110 strict pixel differences remain unresolved; references/thresholds are preserved. Local commits are held from push so that this useful capture is not cancelled. Remote documentation headd52e449 is not a new source-CI pass.
+
+All current media/call/AI-audio capabilities remainfalse. No complete real human pipeline, two-party provider/outcome/receipt, actual archive/purge/approved retention, native incoming/physical-device acceptance or measured latency/cost passed. Foundation/library compilation is distinct from those gates. PR remainsdraft and is not merge-ready.
+
+[Current published native evidence](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/artifacts/workstreams/W6/native-ci/2026-09-30/README.md) · [Preserved source CI](https://github.com/WangPantopus/creator-platform/actions/runs/36780139572) · [Published handoff](https://github.com/WangPantopus/creator-platform/blob/codex/w6-calls-media-handoff/docs/workstreams/handoffs/W6-2026-09-30.md)
