@@ -38,30 +38,30 @@ public final class FanSession: ObservableObject {
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
-        guard let api, !rotatingCredential, !purgingPrivateState else { return }
+        guard let api, !rotatingCredential, !purgingPrivateState, !Task.isCancelled else { return }
         let current = generation
         let token: String?
         do { token = try await storage.read() }
         catch {
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             if await purge() { error = QelvoraCopy.text("identitySessionReadFailed") }
             return
         }
-        guard current == generation else { return }
+        guard current == generation, !Task.isCancelled else { return }
         guard token != nil else { if session != nil { await purge() }; return }
         do {
             let value = try await api.identitySession()
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
         } catch let failure as CreatorAPIError {
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             if failure.status == 401 {
                 if !busy { await refreshCredentials() }
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
-        } catch { guard current == generation else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        } catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
@@ -105,19 +105,21 @@ public final class FanSession: ObservableObject {
         catch { self.error = "Sign-out could not reach the server. Retry to revoke the session." }
     }
     public func refreshCredentials() async {
-        guard let api, !busy else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
+        guard let api, !busy, !Task.isCancelled else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
         do {
             let previous = try await storage.read()
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             guard let previous else { await purge(); return }
-            let result = try await api.refreshSession(); guard current == generation else { return }
+            let result = try await api.refreshSession()
+            // Persist a completed rotation even if its foreground read was cancelled.
+            guard current == generation else { return }
             do { try await storage.save(result.token, replacing: previous) }
             catch { guard current == generation else { return }; if await purge() { error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
-        catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
-        catch { guard current == generation else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
     }
     @discardableResult public func purge() async -> Bool {
         guard !purgingPrivateState else { return false }
@@ -149,6 +151,7 @@ public struct FanAppShell: View {
     @StateObject private var model: FanSession
     private let features: [FanFeatureRegistration]
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.scenePhase) private var scenePhase
     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
     public var body: some View {
         VStack(spacing: 0) {
@@ -198,7 +201,15 @@ public struct FanAppShell: View {
                 }
             }
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task { await model.refresh(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if model.session != nil { await model.refresh() } } }
+            .task(id: scenePhase) {
+                guard scenePhase == .active else { return }
+                await model.refresh()
+                while !Task.isCancelled {
+                    do { try await Task.sleep(for: .seconds(4)) } catch { return }
+                    guard !Task.isCancelled else { return }
+                    if model.session != nil { await model.refresh() }
+                }
+            }
             .task(id: model.destination) { await model.loadArrival() }
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
