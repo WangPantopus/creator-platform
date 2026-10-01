@@ -1,6 +1,6 @@
 # W3 offline content: required canonical authority
 
-Read-only consumer proposal at integrated main `1c11b098c3f86ec07740c760b423c4fccc9ec5f7`. This does not implement a cache, grant offline access, select a retention period or approve a capacity.
+Read-only consumer proposal at integrated main `3de0f14ba82139c9d694ddd3cd676216103a036c`. This does not implement a cache, grant offline access, select a retention period or approve a capacity.
 
 Current web `ConversationScreen.tsx` stores cursor/epoch metadata in sessionStorage. Swift `W3ResumeStorage.swift` stores bounded account/scope-digested cursor/epoch metadata in Keychain; Android `ConversationResumeStorage.kt` encrypts the equivalent metadata through Android Keystore. Current sockets resume from a newly authorized page. These stores contain no conversation content and do not satisfy package H. Existing account purge hooks must remain in the same canonical sign-out/account-change path.
 

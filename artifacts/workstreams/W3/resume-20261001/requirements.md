@@ -1,6 +1,6 @@
 # W3 requirement → source → current live evidence
 
-Current integrated main: `1c11b098c3f86ec07740c760b423c4fccc9ec5f7`, normally merged into the privacy continuation at `94ad7211303dbc22bff11f0aeb3ecd35be1c3438`. PR8 is merged. Account PR24 remains at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1` with web/backend and Android runtime success and six queued macOS jobs; it is unmerged. The privacy continuation at source30cc2b0 is prepared for independent publication and review, with populated-memory/security acceptance still open. This register drives personal implementation and must not be read as completion.
+Current integrated main: `3de0f14ba82139c9d694ddd3cd676216103a036c`, normally merged into the privacy continuation at `eb7dc7e8180daa95365aa4bcba6938f349509cd8`. PR8 is merged. Account PR24 remains at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1` with web/backend and Android runtime success and six queued macOS jobs; it is unmerged. The privacy continuation at source30cc2b0 is published for independent review as draftPR36 at initial checkpoint23c74a29345f41a81ec08814da7caf49b38ed9cc, with populated-memory/security acceptance still open. This register drives personal implementation and must not be read as completion.
 
 | Package | Current W3 source / canonical producers | Current live evidence and next boundary |
 |---|---|---|

@@ -1,6 +1,6 @@
 # W3 autonomous recovery: consumer requirements for canonical producers
 
-This is a read-only requirements proposal against main `1c11b098c3f86ec07740c760b423c4fccc9ec5f7`, normally integrated at `94ad7211303dbc22bff11f0aeb3ecd35be1c3438`. The W3 generation, access and database source relevant to this proposal is unchanged through the incoming W2/W4 integration; zero-byte incoming contract diffs are preserved in privacy-refresh. It grants no authority, defines no new issuer or runtime interface, and changes no database policy. W1 confirms that no applicable published worker/current-check contract exists. W3 must not turn an interactive session scope into autonomous worker authority.
+This is a read-only requirements proposal against main `3de0f14ba82139c9d694ddd3cd676216103a036c`, normally integrated at `eb7dc7e8180daa95365aa4bcba6938f349509cd8`. The W3 generation, access and database source relevant to this proposal is unchanged through the incoming W2/W4 integration; zero-byte incoming contract diffs are preserved in privacy-refresh. It grants no authority, defines no new issuer or runtime interface, and changes no database policy. W1 confirms that no applicable published worker/current-check contract exists. W3 must not turn an interactive session scope into autonomous worker authority.
 
 ## Existing durable work and consumer behavior
 

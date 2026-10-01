@@ -1,6 +1,6 @@
 # W3 privacy revalidation and Android restoration — personal operation
 
-Source commit `49c7126c42363104556df2eca5d9f6c96e248469` on `codex/w3-privacy-revalidation`; latest integrated main `1c11b098c3f86ec07740c760b423c4fccc9ec5f7`, normal integration commit `94ad7211303dbc22bff11f0aeb3ecd35be1c3438`. This continues account PR24 at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1`. PR8 remains merged. No full W3 completion or production readiness is claimed.
+Source commit `49c7126c42363104556df2eca5d9f6c96e248469` on `codex/w3-privacy-revalidation`; latest integrated main `3de0f14ba82139c9d694ddd3cd676216103a036c`, normal integration commit `eb7dc7e8180daa95365aa4bcba6938f349509cd8`. This continues account PR24 at `a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1`. PR8 remains merged. No full W3 completion or production readiness is claimed.
 
 ## Source changes
 
@@ -78,3 +78,11 @@ Final restore observation412 captured launcher during cold-start transition and 
 Only owned runtime resources were stopped normally: API4103, web3003, Postgres containercreator-platform-w3-recovery-20261001, iOS52CCD549, Android5572/5573 and official MCP relays/viewer. Browser-owned tabs closed after settings restored. Private ADB5043's kill-server command hung after the emulator exited; it was interrupted and the verified owned serverPID76938 received ordinary SIGTERM. Shared5037PID45315 and peer5051/5047 servers remained untouched; only the W3 endpoint was disconnected from5037. Peer containers remain running. No owned port3003/4103/55443/5572/5573/5043/9999 listener remains. Private database volume/export/configuration, tools, devices' saved data, original Maya material and user Package.resolved bytes are preserved. No global Docker/ADB/device cleanup or retained-data reset.
 
 Publication remains a draft for populated privacy acceptance; account PR24 remains ready but unmerged under six queued macOS checks. No general exception is inherited from PR8/W7. No W3 completeness or production-readiness claim. The full requirement register and concrete producer packets remain the operative next boundary.
+
+## Post-publication billing-main reconciliation
+
+Initial published privacy checkpoint23c74a29345f41a81ec08814da7caf49b38ed9cc opened draftPR36. W1 personally reviewed its exact three-file leased diff and closed all three leases at that immutable head, with no shared-source blocker and no populated/privacy/CI waiver.
+
+While PR36 was being published, W4 PR34 merged as main3de0f14ba82139c9d694ddd3cd676216103a036c. Personally read its full143-line actual source diff and held account/version/effect fence: membership access/cash/recovery/refund completion now commit together; qualified-read accounting uses explicit UTC month bounds. Normally merged into W3 at eb7dc7e8180daa95365aa4bcba6938f349509cd8 and backend TypeScript passes (`backend-billing-main-types.log`). Incoming W3/backend realtime/API/web/native contract diff is zero bytes. All seven W3 source hashes remain exactly the final30cc2b0 hashes in verification.json. Personally operated binary/first-conversation evidence stays tied to its stated source30cc2b0/main1c11 boundary; no billing transaction, payment or qualified-read acceptance is newly claimed. No native rebuild or repeated UI operation was needed for unchanged affected code.
+
+Source/docs whitespace check passes with original raw tool logs/diffs excluded. Unfiltered Git whitespace check reports tool-emitted trailing spaces/new blank lines in those original outputs; their bytes are deliberately preserved and they are not rewritten to suppress that report. No source whitespace finding or check-source alteration.
