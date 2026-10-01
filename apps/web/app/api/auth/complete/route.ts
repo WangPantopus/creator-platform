@@ -80,10 +80,11 @@ async function complete(
     );
     if (!response.ok) {
       const failure = await response.json();
+      const code = failure.error?.code;
       return retry(
         request,
-        failure.error?.code === "continuation_expired"
-          ? "continuation_expired"
+        code === "continuation_expired" || code === "adult_eligibility_required"
+          ? code
           : "continuation_failed",
       );
     }

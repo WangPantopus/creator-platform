@@ -115,6 +115,12 @@
   <string name="welcome_context" formatted="false">Maya · Ceramics · Kiln Club</string>
   <string name="pantopus_unavailable" formatted="false">Pantopus sign-in is not connected in this local build.</string>
   <string name="pantopus_unavailable_title" formatted="false">Pantopus sign-in is unavailable</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="adult_only_title" formatted="false">This app is for adults</string>
+  <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>

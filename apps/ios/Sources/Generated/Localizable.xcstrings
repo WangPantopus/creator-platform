@@ -1233,6 +1233,72 @@
         }
       }
     },
+    "We can't reach your account right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't reach your account right now"
+          }
+        }
+      }
+    },
+    "Your session is kept on this device. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session is kept on this device. Try again in a moment."
+          }
+        }
+      }
+    },
+    "This page didn't load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This page didn't load"
+          }
+        }
+      }
+    },
+    "Nothing you saved was changed. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing you saved was changed. Try again in a moment."
+          }
+        }
+      }
+    },
+    "This app is for adults": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app is for adults"
+          }
+        }
+      }
+    },
+    "This app is available to adults aged 18 and over.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app is available to adults aged 18 and over."
+          }
+        }
+      }
+    },
     "Home": {
       "extractionState": "manual",
       "localizations": {
