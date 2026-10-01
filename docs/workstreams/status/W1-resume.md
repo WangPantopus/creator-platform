@@ -6,6 +6,8 @@ Application `5a987db6` aligns the actual web `/verify/:id` page with the new nat
 
 This follow-up is uncompiled and unoperated under the same cleanup restriction. Source review/diff checks establish no browser, layout, accessibility or revoke-to-deny acceptance. PR42 now covers public-verification integration across clients and remains draft. Current consumer builds, rename, app/provider/device journeys and exact-head W1 CI remain outstanding; original seven groups/H01–H20 stay assigned.
 
+Rendering application `69f802ff` subsequently uses the existing correction label/`voice-md` in all three public readers, the Verify source's ground-colored native seal check and combined Android metadata semantics. Complete actual handoff tokens and the relevant supplied component/source contracts were read. The linked manifest preserves both exact checkpoints. This remains source-only work with all compilation, visual and assistive-technology acceptance pending.
+
 ## October 1 — current main integration, source checks only
 
 Application `c46c5de` normally integrates main `ef3619b` through all eight owned W1 branches, including W4's payout-onboarding contracts/98th operation and W2's ingestion-recovery and cleanup corrections. W1 reviewed the changed source and owner receipts; owner app/CI receipts retain their original authors and revisions. Current canonical source checks pass for 12 shared resources and 98 Swift/Kotlin operations. [Exact integration and remaining checks](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md). W2's pool-error follow-up PR40 is still separate and unmerged in this checkpoint.

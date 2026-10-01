@@ -61,5 +61,32 @@
   "hostedCi": "Last W1 Code Review discovery requires GitHub connection; no provider head or pass.",
   "newTestsOrScripts": false,
   "originalReferencesChanged": false,
-  "fullW1Acceptance": "open"
+  "fullW1Acceptance": "open",
+  "renderingFollowup": {
+    "recordedAt": "2026-10-01T15:09:58.537738+00:00",
+    "applicationSourceRevision": "69f802ff705b6e976a2af7440b231c6ca5b0c5be",
+    "sourceFiles": [
+      {
+        "path": "apps/web/app/verify/[id]/page.tsx",
+        "sha256": "8484749c81f81ed9230de0ec81f3ac8b1384b3c33c3affeb0cfd2639535f6929",
+        "bytes": 8496
+      },
+      {
+        "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
+        "sha256": "1e417c2ce06c9d3b8b931af98a7c3c0aa4fae066c5ce4adfd158b15ba5bc058e",
+        "bytes": 11800
+      },
+      {
+        "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
+        "sha256": "6797ddec2d3b250cbe00a74b448723600f1c9b6af5d6e51269a4bce7eff0b48e",
+        "bytes": 12514
+      }
+    ],
+    "sourceChanges": "Correction label and voice-md across clients; native seal check uses ground; Android metadata labels/values merge semantics.",
+    "sourceReading": "Complete actual design/handoff/tokens.json; Verify artboard; Correction README/preview; current generated glyph and author/rendering contracts.",
+    "supportingChecks": "Personal source comparison and git diff --check only. Shared/API inputs and generated outputs unchanged.",
+    "compilationAndAppAcceptance": "not run; cleanup restriction",
+    "originalReferenceChanges": false,
+    "newTestsOrScripts": false
+  }
 }
