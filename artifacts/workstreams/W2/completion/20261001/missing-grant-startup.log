@@ -1,0 +1,15 @@
+/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/src/modules/agent/repository.ts:85
+      throw new DomainError(
+            ^
+
+DomainError: Creator AI requires its complete schema, canonical runtime grants and non-owner forced row security.
+    at AgentRepository.checkRuntimeRole (/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/src/modules/agent/repository.ts:85:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.registerFeatures (/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/src/modules/agent/development-server.ts:53:5)
+    at async createConfiguredBackend (/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/src/integration.ts:270:17)
+    at async <anonymous> (/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/src/modules/agent/development-server.ts:43:17) {
+  code: 'unsafe_agent_storage',
+  status: 503
+}
+
+Node.js v24.19.0

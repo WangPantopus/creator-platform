@@ -1,0 +1,42 @@
+{
+  "recordedAt": "2026-10-01T12:11:20.489Z",
+  "purpose": "One personally operated local production overview refresh; no percentile/load/provider acceptance.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "web": "Next16.3.7 production localhost3004",
+    "api": "compiled server4104",
+    "database": "local pgvector17 oneCPU/256MiB 40 canonical migrations, zero ledger/packet rows",
+    "identity": "canonical development fan",
+    "network": "loopback, no throttling",
+    "viewport": "320x900",
+    "theme": "Night"
+  },
+  "status": 200,
+  "fromDiskCache": false,
+  "timing": {
+    "connectEnd": -1,
+    "connectStart": -1,
+    "dnsEnd": -1,
+    "dnsStart": -1,
+    "proxyEnd": -1,
+    "proxyStart": -1,
+    "pushEnd": 0,
+    "pushStart": 0,
+    "receiveHeadersEnd": 171.203,
+    "receiveHeadersStart": 171.156,
+    "requestTime": 48876.091494,
+    "sendEnd": 0.456,
+    "sendStart": 0.305,
+    "sslEnd": -1,
+    "sslStart": -1,
+    "workerFetchStart": -1,
+    "workerReady": -1,
+    "workerRespondWithSettled": -1,
+    "workerStart": -1
+  },
+  "encodedDataLength": 1268,
+  "eventLogComplete": true,
+  "observedEventDeltaMs": -0.7699999987380579,
+  "responseToFinishedMs": null,
+  "timingLimit": "Debugger event timestamps returned a negative response/finish delta; that delta is unusable as elapsed duration. receiveHeadersEnd is a single observed timing only."
+}
