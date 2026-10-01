@@ -46,7 +46,7 @@
     "changedFromParent": [],
     "aggregateSha256": "3b40afc30ad17273e927890418a7cc14f97ad80b3a4781b1cf3d4773468a5bf8"
   },
-  "compilerAndFormatChecks": "not run under cleanup restriction",
+  "compilerAndFormatChecks": "Type checking, app builds and formatting not run under cleanup restriction",
   "actualAppAcceptance": "not run; native controls disabled",
   "renameAcceptance": "not run at this revision",
   "CI": {
@@ -84,5 +84,26 @@
     "sourceOnly": true,
     "actualForegroundBackgroundRotationRevocationAcceptance": "not run",
     "p95OrRevocationBoundClaimed": false
+  },
+  "swiftSyntaxOnly": {
+    "sourceRevision": "d8cc32e7",
+    "compiler": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+    "version": "Apple Swift 6.3.2 (swiftlang-6.3.2.1.108 clang-2100.1.1.101), x86_64-apple-macosx26.0",
+    "arguments": [
+      "-frontend",
+      "-parse",
+      "apps/ios/Sources/QelvoraUI/SessionStorage.swift",
+      "apps/ios/Sources/QelvoraUI/FanShell.swift",
+      "apps/ios/Sources/QelvoraUI/Growth.swift",
+      "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "apps/ios/Sources/QelvoraUI/Conversation/W3ResumeStorage.swift",
+      "apps/ios/Sources/QelvoraUI/PublicVerification.swift"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "",
+    "typeChecking": false,
+    "appBuild": false,
+    "newToolchainOrDependencyInstall": false
   }
 }

@@ -8,6 +8,8 @@ This remains an uncompiled/unoperated draft under the controlling cleanup restri
 
 Follow-up `1a722a8b` on the same draft PR48 uses the existing native lifecycle APIs to start a fresh identity read on foreground and stop the four-second loop when inactive. Cancelled Swift reads cannot update account state; a completed credential rotation still persists under its account/credential guard. Canonical checks still pass 12/98. No measured resource/latency/revocation or actual native acceptance is claimed.
 
+The retained system Swift6.3.2 frontend passes parse-only syntax for the six reviewed Swift sources, including public verification; type/module/API checks and app builds are still unrun. No package/toolchain/runtime/device is restored. Kotlin compiler is absent. A resource-resumption question is pending; local heavy work stays off unless the human explicitly resumes it.
+
 ## October 1 — current public integrity and held-read integration
 
 Application `4fda909e` normally integrates main `c1c615e6` through all eight W1 branches, including W4's held creator financial-read guard. No genuine held producer is invented or bound; owner money remains unavailable without it. Current canonical resource/native API checks pass for 12 outputs/98 operations. [Current source/branch qualification](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md).
