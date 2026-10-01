@@ -1,0 +1,135 @@
+{
+  "recordedAt": "2026-10-01T13:03:16.577Z",
+  "database": "creator_w4_sql_review",
+  "role": "creator_runtime",
+  "mode": "EXPLAIN only; no query execution/actors/financial rows",
+  "queries": [
+    {
+      "name": "completion",
+      "sql": "UPDATE creator.commerce_billing_effect SET state=$3,provider_ref=$2,lease_until=NULL,next_at=now()+interval '30 seconds',error_code=NULL WHERE id=$1 AND attempt=$4 AND state='processing'",
+      "plan": {
+        "Plan": {
+          "Node Type": "ModifyTable",
+          "Operation": "Update",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "commerce_billing_effect",
+          "Alias": "commerce_billing_effect",
+          "Startup Cost": 0,
+          "Total Cost": 0,
+          "Plan Rows": 0,
+          "Plan Width": 0,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 118,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "originalRefund",
+      "sql": "INSERT INTO creator.commerce_billing_effect(fan_id,operation,provider_key,request) VALUES($1,'refund',$2,$3) ON CONFLICT(provider_key) DO UPDATE SET provider_key=excluded.provider_key RETURNING id",
+      "plan": {
+        "Plan": {
+          "Node Type": "ModifyTable",
+          "Operation": "Insert",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "commerce_billing_effect",
+          "Alias": "commerce_billing_effect",
+          "Startup Cost": 0,
+          "Total Cost": 0.02,
+          "Plan Rows": 1,
+          "Plan Width": 260,
+          "Conflict Resolution": "UPDATE",
+          "Conflict Arbiter Indexes": [
+            "commerce_billing_effect_provider_key_key"
+          ],
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0.02,
+              "Plan Rows": 1,
+              "Plan Width": 260
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "readMonth",
+      "sql": "INSERT INTO creator.commerce_qualified_read(creator_id,fan_id,commitment_id,reader_account_id,evidence_id,period,credited) VALUES($1,$2,$3,$4,$5,date_trunc('month',now() AT TIME ZONE 'UTC')::date,$6) ON CONFLICT DO NOTHING RETURNING id",
+      "plan": {
+        "Plan": {
+          "Node Type": "ModifyTable",
+          "Operation": "Insert",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "commerce_qualified_read",
+          "Alias": "commerce_qualified_read",
+          "Startup Cost": 0,
+          "Total Cost": 0.02,
+          "Plan Rows": 1,
+          "Plan Width": 117,
+          "Conflict Resolution": "NOTHING",
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0.02,
+              "Plan Rows": 1,
+              "Plan Width": 117
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "monthlyCreditCap",
+      "sql": "SELECT coalesce(sum(amount),0)::text AS amount FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND kind='credit_issue' AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'",
+      "plan": {
+        "Plan": {
+          "Node Type": "Aggregate",
+          "Strategy": "Plain",
+          "Partial Mode": "Simple",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 0,
+          "Total Cost": 0.02,
+          "Plan Rows": 1,
+          "Plan Width": 32,
+          "Plans": [
+            {
+              "Node Type": "Result",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0,
+              "Total Cost": 0,
+              "Plan Rows": 0,
+              "Plan Width": 0,
+              "One-Time Filter": "false"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "rolledBack": true
+}
