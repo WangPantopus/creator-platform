@@ -983,9 +983,7 @@ function Compose({
           <span />
         </header>
         <Feedback action={action} />
-        {!action.error && (
-          <p role="status">Loading saved draft…</p>
-        )}
+        {!action.error && <p role="status">Loading saved draft…</p>}
         <button
           className="qv-btn qv-btn--secondary"
           aria-busy={action.busy}
