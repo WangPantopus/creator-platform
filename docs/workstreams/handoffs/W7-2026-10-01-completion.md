@@ -1,5 +1,7 @@
 # W7 completion handoff — 2026-10-01
 
+**Mac Studio checkpoint, 2026-10-01 (supersedes machine/resource/CI statements below):** [Current handoff](W7-2026-10-01-macstudio.md) and [successor prompt](../prompts/W7-macstudio-handoff-2026-10-01.md). The hosted iOS failure is root-caused (1x hosted backing) and fixed in `c2d3ece2` by adopting W4 PR #53's helper verbatim; W1 PR #59's `visualWebURL` fix is carried; `ios-foundation` is back on main's `xcode-27`. Locally 18 Swift checks/110 original comparisons pass; hosted Mac jobs were still queued at handoff. W7 resources moved to this Mac Studio (empty DB `creator-platform-w7-macstudio-20261001` on 55447, simulator `FAB31883-2F36-4E50-83B3-D9654B60FF00`, AVD `Qelvora_W7_API34`); iMac-era resources are absent here. No journey was operated on this machine. W7 is not complete.
+
 The founder requested this handoff at the next stable checkpoint. This is a transfer of the **entire unfinished original W7 assignment**, not a completion declaration. The outgoing primary personally wrote, reviewed and checked the source; no implementation or acceptance was delegated. No new tests or saved UI flows were written. Read the [copy-paste continuation prompt](../prompts/W7-completion-handoff-2026-10-01.md) and [complete original acceptance matrix](../../../artifacts/workstreams/W7/resume/20260930/acceptance.md).
 
 ## Repository and source
