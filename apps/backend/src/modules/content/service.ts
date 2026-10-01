@@ -203,6 +203,25 @@ export class ContentService {
       [actor.accountId, creatorId, subjectId, subjectKind, version, type],
     );
   }
+  private async replyReviewInstalled(client: PoolClient): Promise<boolean> {
+    const installed = await client.query<{ ready: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2) AND (SELECT count(*)=2 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator' AND c.relname=ANY($3::text[]) AND c.relrowsecurity AND c.relforcerowsecurity) AS ready`,
+      [
+        "0045_w5_reply_review",
+        "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+        ["content_reply_review", "content_reply_read"],
+      ],
+    );
+    return installed.rows[0]?.ready === true;
+  }
+  async assertReplyReviewInstalled(client: PoolClient) {
+    if (!(await this.replyReviewInstalled(client)))
+      throw new DomainError(
+        "reply_review_unconfigured",
+        "Private reply review is unavailable until its complete registered schema is installed.",
+        503,
+      );
+  }
   async assertCurrentAllowed(
     client: PoolClient,
     actor: Actor,
@@ -700,6 +719,7 @@ export class ContentService {
     let quotedText: string | null = null,
       quotedHandle: string | null = null;
     if (document.quote) {
+      await this.assertReplyReviewInstalled(client);
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`content.quote:${document.quote.replyId}`],
@@ -1004,6 +1024,7 @@ export class ContentService {
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {
     const input = ReplyToNote.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       const row = await this.index(client, creatorId, id);
       await this.authorizeRead(client, actor, row);
       invariant(
@@ -1107,6 +1128,7 @@ export class ContentService {
         input.idempotencyKey,
         { creatorId, replyId, ...input },
         async () => {
+          await this.assertReplyReviewInstalled(client);
           const reply = (
             await client.query(
               "SELECT r.* FROM creator.content_reply r JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND f.account_id=$3 AND r.withdrawn_at IS NULL FOR UPDATE OF r",
@@ -1163,6 +1185,7 @@ export class ContentService {
   ) {
     const input = ContentVersionCommand.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       await this.role(client, actor, creatorId, ["triage"]);
       return this.command(
         client,
@@ -1194,6 +1217,7 @@ export class ContentService {
   async replies(actor: Actor, creatorId: string, raw: unknown, studio = false) {
     const page = ContentReplyPage.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       if (studio) await this.role(client, actor, creatorId, ["triage"]);
       else
         invariant(
@@ -1389,10 +1413,11 @@ export class ContentService {
             "UPDATE creator.content_reply SET text='[Reply withdrawn]',withdrawn_at=now(),version=version+1 WHERE id=$1",
             [replyId],
           );
-          await client.query(
-            "UPDATE creator.content_reply_review SET withdrawn_at=now(),reply_version=$2 WHERE reply_id=$1",
-            [replyId, reply.version + 1],
-          );
+          if (await this.replyReviewInstalled(client))
+            await client.query(
+              "UPDATE creator.content_reply_review SET withdrawn_at=now(),reply_version=$2 WHERE reply_id=$1",
+              [replyId, reply.version + 1],
+            );
           await this.fanEffect(
             client,
             actor,
@@ -1410,6 +1435,7 @@ export class ContentService {
   async react(actor: Actor, creatorId: string, replyId: string, raw: unknown) {
     const input = ReactToReply.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       await this.role(client, actor, creatorId);
       return this.command(
         client,

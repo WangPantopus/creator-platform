@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import {
   createHash,
   generateKeyPairSync,
@@ -86,27 +85,7 @@ describe.skipIf(!adminUrl)(
           timeout: 60000,
         },
       );
-      await admin.query(
-        await readFile(
-          new URL("../migrations/0002_w1_identity.sql", import.meta.url),
-          "utf8",
-        ),
-      );
-      // The shipping conversation and memory consumers depend on W8's
-      // allocated 0041/0042 extensions, even when generation is unconfigured.
-      for (const migration of [
-        "pending_w3_conversations",
-        "pending_w3_wellbeing",
-      ])
-        await admin.query(
-          await readFile(
-            new URL(
-              `../src/modules/conversation/migrations/${migration}.sql`,
-              import.meta.url,
-            ),
-            "utf8",
-          ),
-        );
+      // The canonical checksum runner installs0002 and0041/0042 exactly once.
       await admin.query(
         "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
       );
