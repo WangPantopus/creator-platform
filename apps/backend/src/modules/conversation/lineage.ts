@@ -5,7 +5,10 @@ import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
 import type { ConversationRecordings } from "./recordings.js";
+import type { ConversationLineageProjection } from "./lineage-projection.js";
+import { IdSchema } from "@qelvora/api";
 import {
+  ConversationMessageSchema,
   ReplyFeedbackInputSchema,
   ReplyFeedbackPolicySchema,
   type ReplyFeedbackPolicy,
@@ -50,6 +53,20 @@ export class ConversationLineage {
     private readonly feedbackAuthority?: ReplyFeedbackAuthority,
     private readonly feedbackConsentReady = false,
   ) {}
+  assertPool(pool: Database["pool"]) {
+    invariant(
+      pool === this.db.pool,
+      "lineage_pool_mismatch",
+      "Message lineage requires its actual prepared database pool.",
+    );
+  }
+  projection(): ConversationLineageProjection {
+    return Object.freeze({
+      assertPool: this.assertPool.bind(this),
+      project: this.project.bind(this),
+      enrich: this.enrich.bind(this),
+    });
+  }
   /** The host passes W8's real allocated versions/checksums. Catalog readiness
    * and registered bytes are checked before new columns are ever queried. */
   static async prepare(input: {
@@ -65,6 +82,15 @@ export class ConversationLineage {
       )
     ).rows[0];
     if (!relation?.migration || !relation.feedback) return undefined;
+    const base = (
+      await pool.query<{ ready: boolean }>(
+        `SELECT count(*)=5 AS ready FROM information_schema.columns
+         WHERE table_schema='creator' AND table_name='message'
+         AND (column_name,data_type) IN (('citations','ARRAY'),('off_the_record','boolean'),
+          ('team_member','text'),('version','integer'),('created_at','timestamp with time zone'))`,
+      )
+    ).rows[0];
+    if (!base?.ready) return undefined;
     const migration = await pool.query(
       "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
       [input.migrationVersion, lineageChecksum],
@@ -194,6 +220,43 @@ export class ConversationLineage {
     if (scope.authority !== "fan" || !this.feedbackAuthority) return null;
     const policy = await this.feedbackAuthority.current(scope, client);
     return policy ? ReplyFeedbackPolicySchema.parse(policy) : null;
+  }
+  /** Studio can supply its actual bounded page IDs without inventing metadata
+   * absent from its older Message type. This reads only the prepared schema on
+   * its existing scoped client, retaining page order and complete visibility. */
+  async project(
+    scope: ThreadScope,
+    client: PoolClient,
+    messageIds: readonly string[],
+  ): Promise<ConversationMessage[]> {
+    assertThreadScope(scope);
+    invariant(
+      messageIds.length <= 100 &&
+        new Set(messageIds).size === messageIds.length,
+      "bounded_lineage_required",
+      "Load a bounded distinct message page.",
+    );
+    for (const id of messageIds) IdSchema.parse(id);
+    if (!messageIds.length) return [];
+    const rows = await client.query(
+      `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,
+       delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,
+       signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,
+       created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version
+       FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3
+       AND id=ANY($4::uuid[]) ORDER BY array_position($4::uuid[],id)`,
+      [scope.threadId, scope.creatorId, scope.fanId, messageIds],
+    );
+    invariant(
+      rows.rowCount === messageIds.length,
+      "lineage_page_changed",
+      "Refresh this conversation's current visible message page.",
+    );
+    return this.enrich(
+      scope,
+      client,
+      rows.rows.map((row) => ConversationMessageSchema.parse(row)),
+    );
   }
   async enrich(
     scope: ThreadScope,

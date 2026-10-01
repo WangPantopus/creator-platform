@@ -126,7 +126,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) Notice(title = "Development identity", children = "Synthetic account · actual local API.")
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     val feature = features.firstOrNull { it.matches(model.destination) }
-                    if (model.destination == "/you" || model.destination == "/identity/account") Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    if (model.destination == "/identity/account" || (model.destination == "/you" && feature == null)) Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         BasicText("Your account", style = qText("display-md").copy(color = qColor("ink")))
                         BasicText("@" + model.session?.fan?.handle.orEmpty(), style = qText("body").copy(color = qColor("ink")))
                         Button("Edit public profile", ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }

@@ -1,0 +1,26 @@
+{
+  "observedAt": "2026-10-01T04:03:17.387051+00:00",
+  "baseHead": "f03b24c324c495106586881541678590ea78156d",
+  "sources": {
+    "apps/ios/Sources/QelvoraUI/Conversation/W3Recording.swift": "3313eea32c2c9ba2a1716ab14b91cfb36d932fb28022b2b90f6d99a5f410f8b3",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRecording.kt": "e73fb19aea665ec91f14c3d19735a8407194dca65d5cce67d4a1d16e0775f2e2"
+  },
+  "checks": {
+    "merge-ios-build.log": "a3f965d027359e37e0a6f8e4719863a17f930cd2bdd9faa74a6804015a096c1e",
+    "merge-ios-signature.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "merge-android-build.log": "36b5269f91e449a9ac7e80bd7e5676737c813e28b243a591fe53581f6c09367b",
+    "merge-android-certificate.log": "dbca6d9b852f3fc28ac2c3126e5391d1d880fff97830caef46d7431e52e9ca85",
+    "merge-android-install.log": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+    "merge-android-launch.log": "68e8de4b46e1cecf58e795085d7715fae7ec5ce7e5feee28be9286ee0000cd1a",
+    "merge-android-relaunch.log": "2d4e0aaebf77975868d95a04267c54bbe609015592ef103f34247a9d9c5b914f"
+  },
+  "androidApk": {
+    "sha256": "d60b54bddb26b1fe996fa0f7aed3075892b5140c23c5f66e4d06b20cf12b4cd3",
+    "originalInstalledCertificateMatches": true,
+    "dataReset": false
+  },
+  "iosExecutableSha256": "4021b1bf702fd13c54041b7c24e2d4a8528963d8a924fee275d71073c6475f1c",
+  "interactiveNativeAcceptance": false,
+  "testsAddedOrRun": false,
+  "dataReset": false
+}

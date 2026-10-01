@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import type { Database } from "../../db/database.js";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import {
@@ -12,6 +13,9 @@ import type { ThreadSnapshot } from "../agent/pipeline.js";
 import type { MemoryProposalPort } from "../agent/memory-proposals.js";
 
 export interface SemanticExclusionPort {
+  /** Set only for a reviewed local/existing-vector matcher. Matching may not
+   * call providers or open another transaction while W3 holds its client. */
+  readonly transactionSafe?: true;
   /** Retain only the canonical exclusion vector/reference, under the same scope
    * and transaction. This must use an existing embedding, with no provider call. */
   retain(
@@ -24,6 +28,13 @@ export interface SemanticExclusionPort {
     exclusions: readonly { key: string; text: string | null }[],
   ): Promise<boolean>;
 }
+const exclusionSnapshotBrand: unique symbol = Symbol("MemoryExclusionSnapshot");
+export type MemoryExclusionSnapshot = Readonly<{
+  [exclusionSnapshotBrand]: true;
+  revision: number;
+  digest: string;
+  exclusions: readonly Readonly<{ key: string; text: string | null }>[];
+}>;
 const normalized = (text: string) =>
   text
     .normalize("NFKC")
@@ -37,11 +48,18 @@ const pair = (scope: ThreadScope) => [
 ];
 
 export class MemoryService {
+  private readonly issuedExclusions = new WeakMap<
+    object,
+    { family: string; revision: number; digest: string }
+  >();
   constructor(
     private readonly db: Database,
     private readonly semantics?: SemanticExclusionPort,
   ) {}
   async context(scope: ThreadScope): Promise<ThreadSnapshot> {
+    const matcher = this.semantics?.transactionSafe
+      ? this.semantics
+      : undefined;
     return this.db.withThread(
       scope,
       async (client) => {
@@ -87,14 +105,13 @@ export class MemoryService {
         for (const row of tail) {
           if (
             exclusions.length &&
-            (!this.semantics ||
-              (await this.semantics.matches(row.text, exclusions)))
+            (!matcher || (await matcher.matches(row.text, exclusions)))
           )
             continue;
           messages.push(`${row.author_kind}: ${row.text}`);
         }
         const candidates =
-          thread.off_the_record || (exclusions.length > 0 && !this.semantics)
+          thread.off_the_record || (exclusions.length > 0 && !matcher)
             ? []
             : (
                 await client.query<{ text: string }>(
@@ -106,10 +123,7 @@ export class MemoryService {
               ).rows.map((row) => row.text);
         const memory: string[] = [];
         for (const text of candidates) {
-          if (
-            exclusions.length &&
-            (await this.semantics!.matches(text, exclusions))
-          )
+          if (exclusions.length && (await matcher!.matches(text, exclusions)))
             continue;
           memory.push(text);
         }
@@ -126,7 +140,7 @@ export class MemoryService {
         if (
           intro &&
           exclusions.length &&
-          (!this.semantics || (await this.semantics.matches(intro, exclusions)))
+          (!matcher || (await matcher.matches(intro, exclusions)))
         )
           intro = null;
         invariant(
@@ -213,69 +227,151 @@ export class MemoryService {
     );
     return this.db.withThread(
       scope,
-      async (client) => {
-        const current = await client.query(
-          "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR UPDATE",
-          [...pair(scope), revision],
-        );
-        if (!current.rowCount) return { written: 0, revision: null };
-        const exclusions = (
-          await client.query<{ key: string; text: string | null }>(
-            "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
-            pair(scope),
-          )
-        ).rows;
-        if (exclusions.length > 1000) return { written: 0, revision };
-        let written = 0;
-        for (const proposal of proposals) {
-          const key = normalized(proposal.semanticKey);
-          if (
-            !key ||
-            exclusions.some(
-              (e) => e.key === key || e.key === contentHash(key),
-            ) ||
-            (exclusions.length &&
-              (!this.semantics ||
-                (await this.semantics.matches(proposal.text, exclusions))))
-          )
-            continue;
-          const provenance = await client.query(
-            "SELECT id FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 AND author_kind='fan' AND NOT off_the_record",
-            [proposal.provenanceMessageId, ...pair(scope)],
-          );
-          invariant(
-            provenance.rowCount === 1,
-            "provenance_unavailable",
-            "The memory source is unavailable.",
-          );
-          const prior = await client.query(
-            "SELECT id FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND semantic_key=$4",
-            [...pair(scope), key],
-          );
-          if (prior.rowCount) continue;
-          await client.query(
-            "INSERT INTO creator.memory(thread_id,creator_id,fan_id,kind,text,semantic_key,provenance_message_id,thread_revision_at_write,sensitive_category,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'proposed')",
-            [
-              ...pair(scope),
-              proposal.kind,
-              proposal.text,
-              key,
-              proposal.provenanceMessageId,
-              revision,
-              proposal.sensitiveCategory ?? null,
-            ],
-          );
-          written++;
-        }
-        if (written)
-          await client.query(
-            "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
-            pair(scope),
-          );
-        return { written, revision: revision + (written ? 1 : 0) };
-      },
+      (client) => this.writeProposalsInTransaction(scope, client, proposals),
       "write",
     );
+  }
+  /** Actual bounded exclusion custody for W2 classification after this held
+   * transaction commits. A deleted text's null value is never reconstructed. */
+  async exclusionSnapshotInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    revision: number,
+  ): Promise<MemoryExclusionSnapshot> {
+    assertThreadScope(scope);
+    await assertCurrentSession(client, scope.actorAccountId);
+    const current = await client.query(
+      "SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR SHARE",
+      [...pair(scope), revision],
+    );
+    invariant(
+      current.rowCount === 1,
+      "memory_changed",
+      "The memory exclusion snapshot changed.",
+    );
+    const rows = (
+      await client.query<{ key: string; text: string | null }>(
+        "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY semantic_key LIMIT 1001",
+        pair(scope),
+      )
+    ).rows;
+    invariant(
+      rows.length <= 1000,
+      "memory_exclusions_capacity",
+      "Memory exclusions need a bounded processing job before this AI can continue.",
+    );
+    const exclusions = Object.freeze(
+      rows.map((row) => Object.freeze({ key: row.key, text: row.text })),
+    );
+    const digest = contentHash(exclusions);
+    const snapshot: MemoryExclusionSnapshot = Object.freeze({
+      [exclusionSnapshotBrand]: true as const,
+      revision,
+      digest,
+      exclusions,
+    });
+    this.issuedExclusions.set(snapshot, {
+      family: contentHash(pair(scope)),
+      revision,
+      digest,
+    });
+    return snapshot;
+  }
+  /** The actual GenerationExecution.commitMemory supplies its fenced client.
+   * This helper issues no scope and opens no transaction. W2's current licensed
+   * authority must be locked on that client before the atomic proposal batch. */
+  async writeProposalsInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    raws: readonly unknown[],
+    exclusionSnapshot?: MemoryExclusionSnapshot,
+  ): Promise<{ written: number; revision: number | null }> {
+    assertThreadScope(scope);
+    await assertCurrentSession(client, scope.actorAccountId);
+    invariant(
+      raws.length <= 5,
+      "memory_batch_large",
+      "Shorten this memory proposal batch.",
+    );
+    const proposals = raws.map((raw) => MemoryProposalSchema.parse(raw));
+    if (!proposals.length) return { written: 0, revision: null };
+    const revision = proposals[0]!.expectedRevision;
+    invariant(
+      proposals.every((p) => p.expectedRevision === revision),
+      "memory_batch_changed",
+      "Memory proposals must use one current snapshot.",
+    );
+    const current = await client.query(
+      "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR UPDATE",
+      [...pair(scope), revision],
+    );
+    if (!current.rowCount) return { written: 0, revision: null };
+    const exclusions = (
+      await client.query<{ key: string; text: string | null }>(
+        "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY semantic_key LIMIT 1001",
+        pair(scope),
+      )
+    ).rows;
+    if (exclusions.length > 1000) return { written: 0, revision };
+    if (exclusionSnapshot) {
+      const issued = this.issuedExclusions.get(exclusionSnapshot);
+      invariant(
+        issued &&
+          issued.family === contentHash(pair(scope)) &&
+          issued.revision === revision &&
+          issued.digest === contentHash(exclusions),
+        "memory_exclusions_changed",
+        "The classified memory exclusions changed before commit.",
+      );
+    }
+    const matcher = this.semantics?.transactionSafe
+      ? this.semantics
+      : undefined;
+    let written = 0;
+    for (const proposal of proposals) {
+      const key = normalized(proposal.semanticKey);
+      if (
+        !key ||
+        exclusions.some((e) => e.key === key || e.key === contentHash(key)) ||
+        (exclusions.length &&
+          !exclusionSnapshot &&
+          (!matcher || (await matcher.matches(proposal.text, exclusions))))
+      )
+        continue;
+      const provenance = await client.query(
+        "SELECT id FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 AND author_kind='fan' AND NOT off_the_record",
+        [proposal.provenanceMessageId, ...pair(scope)],
+      );
+      invariant(
+        provenance.rowCount === 1,
+        "provenance_unavailable",
+        "The memory source is unavailable.",
+      );
+      const prior = await client.query(
+        "SELECT id FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND semantic_key=$4",
+        [...pair(scope), key],
+      );
+      if (prior.rowCount) continue;
+      await client.query(
+        "INSERT INTO creator.memory(thread_id,creator_id,fan_id,kind,text,semantic_key,provenance_message_id,thread_revision_at_write,sensitive_category,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'proposed')",
+        [
+          ...pair(scope),
+          proposal.kind,
+          proposal.text,
+          key,
+          proposal.provenanceMessageId,
+          revision,
+          proposal.sensitiveCategory ?? null,
+        ],
+      );
+      written++;
+    }
+    if (written)
+      await client.query(
+        "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+        pair(scope),
+      );
+    return { written, revision: revision + (written ? 1 : 0) };
   }
   async requestConsentOnce(
     scope: ThreadScope,

@@ -1,0 +1,141 @@
+{
+  "predecessor": "aef138374818e0d218d8e03bb81c061cfb62b4d7",
+  "scope": "increment11 intentional source checkpoint; not acceptance or peer ownership",
+  "producers": {
+    "W2DeliveryActor": "823e02025c53993800f127b8958d18a2d7f5d3c6",
+    "W2MainPreCallJournal": "35ec7de1f408a49a91ce88183b9027ca3120d83d",
+    "W4OutputHook": "2dd53adcbaaa0789b9b0a4a0352404bd872ca42f"
+  },
+  "files": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "gitBlob": "1ccfa83578a4e3269f8cc3ac9d66694540e6bf86",
+      "sha256": "f990f510cf22476c9dfe18dc4eb2ce2889618ba0c394bd49aa56acdee4669735"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "gitBlob": "bf6a5c6caf7995843e4e9ede5fe7dd64e8629349",
+      "sha256": "b1a717ce32c8e2050e0544b19aa6f7d52d3e5bee6d9bedba973a21a858f1e87a"
+    },
+    {
+      "path": "apps/backend/src/modules/access/scope.ts",
+      "gitBlob": "eb4bf09966b7362c606ab7d76ae3360f72e3bc04",
+      "sha256": "8c17383e382ce51e4dc180a153e46c91ecc7d524ab5d276e9a2d688f78ffafb9"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/delivery-authority.ts",
+      "gitBlob": "8719da923c2b48690e2f794902fe34af58393fc9",
+      "sha256": "2f15002d1d27b21b41328f7492647528bd1f8430ad9ac5817a40a52ce5706686"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/model.ts",
+      "gitBlob": "eb3511650142a2fe153fb5debb5b7d833618f471",
+      "sha256": "7b6eeb57dfa37549948953dfc984964fc6a7763203ccf8d64ac1e2a9ffe1af5b"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/pipeline.ts",
+      "gitBlob": "cb22ce1186654ac46a1126cf7b9c5b48aef7dab0",
+      "sha256": "69a14faad779addf3af52f751021855d1f9fe32bc4ad74e9ec694a1cdc1f399c"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/provider-usage.ts",
+      "gitBlob": "27cccfae21316704dec291fbc974c91a13c74478",
+      "sha256": "7ef8b552fd2f2ed28136b1d82225540880be68a2fb8ac9d16561a5324ff36b1b"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "gitBlob": "b056840b70017dd594a7198088ed7fd311eee12d",
+      "sha256": "fdde1984abfb2f879b033f952f78cdebe574e5651200bea923c3ea22841f4230"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/service.ts",
+      "gitBlob": "fb6ee90356521b36b379382396bd0b08515ca056",
+      "sha256": "e2c19054837fbc73f2d8e81d5c5d8d7e77e4381bdf6292f9357f11ba3fd0b298"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/streaming.ts",
+      "gitBlob": "c2f18c5cbaa62a86bbbce63eba2e368b5054ae7b",
+      "sha256": "0557804f9ac82c5ccbb933543de9a301a0d3115cc74f5dc604c27ef4b2456b8c"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/approved-generator.ts",
+      "gitBlob": "ce9e24cc0c038cd18d75dd0f5819a3b9376b8b1a",
+      "sha256": "ccd348c929fdff4da3e661fb0b7962cdca9a544deab718523cceb07458517a5c"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "gitBlob": "4fdce247693f75f7be6a71d77eb6cf082c649b8a",
+      "sha256": "8c88b3bb0ed8785e75f14161658570647c1edd618cab66f969dca261353159bb"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/generation.ts",
+      "gitBlob": "0f1a0a21ec07b4ba9a1977e80d99c0ccdd24799e",
+      "sha256": "8661370d09abfb91884df55f01ac49f079cda690ce8bb4930fde9275ff3acada"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/memory.ts",
+      "gitBlob": "eb408ae512ef519c628c3563aece8fc365408851",
+      "sha256": "21f74a25ef2db46a769b9b2aca00d6bf962aa90d8906494721d4b96ef12e2b20"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "gitBlob": "ff006664d582a3b31ca081d4129ec3f4e7e56f1a",
+      "sha256": "b106ef4e9201c6c5c3f8232ee6f50889ffb4e7a31ca52711b292bfd3cbee754e"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "gitBlob": "39b8f706abaffb875c3e3dd7b5b4cf867bd99f2e",
+      "sha256": "48562d8c24d6ad09deeb53756525d849383bf71e7f61d253a0695c5120e58f67"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "gitBlob": "92f4769a69da0e837e868c2cee09971992c16886",
+      "sha256": "c84ea0ec9da78a2428461788c615610cf689c0ece5d680c937a054b27ced0419"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+      "gitBlob": "55716276c181744405e83166e2da9f46a9727754",
+      "sha256": "340bdd960b5f3db3024cb803f7d40ed4ecde4b8d36dcd29899c8856d0210e902"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "gitBlob": "c69e023091fcd18408ddd6cdde5c8972c9f2e8f4",
+      "sha256": "4540c864714d0bb14e521fcf9ed66c0fffb5989dbc7b98ceec878b30fd3a7ebc"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3Realtime.swift",
+      "gitBlob": "f83917685f33cf173e6f8ece660be410b9629f8d",
+      "sha256": "eafd50414beb4556563d9d7762f6b182fedec0cfde851f597ebc9465d738703f"
+    },
+    {
+      "path": "apps/web/app/api/conversations/[...path]/route.ts",
+      "gitBlob": "8a7cb8eb754763cb0c1706432d8f6e04d60c1be5",
+      "sha256": "b2c4ffc7c2e8c8363326f6a202733946bbc94d881f6509e89714090155a0997f"
+    },
+    {
+      "path": "apps/web/app/api/studio/ai/[...path]/route.ts",
+      "gitBlob": "dbe92958749fdbc59981609f466d89c9b4d5eba0",
+      "sha256": "b254795d1d05bd37fb8b09a2e04ca8e1a478b41001ffe6ae3877607c8b01798d"
+    },
+    {
+      "path": "apps/web/features/conversation/ConversationScreen.tsx",
+      "gitBlob": "4bad573d7d0a550ce9471f22be4f4e312e0b0acd",
+      "sha256": "594b9057549c38496d2256793760137a8528e25422bed6474ddc0db8aeb7cd5e"
+    },
+    {
+      "path": "apps/web/features/creator-ai/CreatorAI.tsx",
+      "gitBlob": "a75d569b9b9424bff535fc7c09f3cb1ee16e9060",
+      "sha256": "a3cd0fb1f10a9c7937118876436f592e0fc3c23e788a343bd7797da2fd9e6668"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "gitBlob": "9a8b065b2c54b538ead5817e88ce25d9424cf5c5",
+      "sha256": "415187322e6bc95012b6e590d0654ed140e95d3f767aca026e1ad013f2ff6c85"
+    },
+    {
+      "path": "packages/api/src/schemas.ts",
+      "gitBlob": "71f568e3e38323ece6f8fe5d9181df032486ecc1",
+      "sha256": "cc044d4f954d987272ffa5c8f00341fe9d4653f0fa5fe6f23406967234400340"
+    }
+  ]
+}

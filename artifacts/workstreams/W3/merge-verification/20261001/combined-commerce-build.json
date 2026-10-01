@@ -1,0 +1,30 @@
+{
+  "sourceCommit": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+  "at": "2026-10-01T05:59:42.885911+00:00",
+  "nativeLaunched": false,
+  "logs": {
+    "backend-build": {
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "web-build": {
+      "sha256": "c46b685e7036c043c91aa7f159094004f9bbf4d0d4ca607aaca2094ddf503519"
+    },
+    "generate": {
+      "sha256": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e"
+    },
+    "ios-build": {
+      "sha256": "185e3fae6419ac4d2f5ac9ad526e16fb27564471cea0dab4c00824c9a964418c"
+    },
+    "android-build": {
+      "sha256": "14761daef041235281b5c44309f6c05fb34decb194d9d5df3c4f62a1cd69df59"
+    },
+    "ios-signature": {
+      "sha256": "797ad89bdd91393daf875d5313a6e7e7173d6f6453b7b0195e6a6f8ad0a4e14f"
+    },
+    "android-signature": {
+      "sha256": "e095c0d045eab7b585845fcea123d02075f02c186cf90d97c89460f2406ca78c"
+    }
+  },
+  "iosBinarySHA256": "731a4671d739b93a76531c85aeff82768327dbbcdad860410b155a831d5022ef",
+  "androidAPKSHA256": "9eee87deb4c6d048c18964bd16ae2c42851ed1dfd1ba86fec651a7719d16274b"
+}

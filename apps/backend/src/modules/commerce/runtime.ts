@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
-import type { AccessService } from "../access/scope.js";
+import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { PaymentProvider } from "../payments/provider.js";
 import { CommerceService, type CommercePolicy } from "./service.js";
 import {
@@ -38,6 +38,8 @@ export async function createCommerceRuntime(input: {
   database: Database;
   access: AccessService;
   policy: Omit<CommercePolicy, "costAllowanceIntegrated">;
+  /** Legacy units-only activation is rejected; retained only for a clear host error. */
+  generationCostUnits?: (scope: ThreadScope) => number;
   generationCostPolicy?: GenerationCostPolicy;
   generationPrivacy?: GenerationPrivacyConfiguration;
   /** Actual prepared W3 readiness/current W2 license/source/budget authority,
@@ -62,6 +64,11 @@ export async function createCommerceRuntime(input: {
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
 }) {
+  invariant(
+    !input.generationCostUnits,
+    "weighted_allowance_policy_required",
+    "Generation allowance needs its reviewed attributed policy and registered schema; units alone cannot enable it.",
+  );
   const generationAllowance = input.generationCostPolicy
     ? await CommerceGenerationAllowance.prepare(
         input.pool,
@@ -140,6 +147,7 @@ export async function createCommerceRuntime(input: {
     passPurchases,
   );
   return {
+    ...(generationAllowance ? { allowance: generationAllowance } : {}),
     service,
     billing,
     extended,

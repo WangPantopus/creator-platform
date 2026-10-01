@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
+import { recognizedAdoptionVersions } from "./migration-custody.js";
 
 if (!process.env.DATABASE_MIGRATION_URL)
   throw new Error(
@@ -61,8 +62,14 @@ try {
         )
       ).rows
     : [];
+  const historical = localLegacy
+    ? new Set<string>()
+    : await recognizedAdoptionVersions(applied);
   for (const row of applied)
-    if (!files.some((file) => file.version === row.version))
+    if (
+      !files.some((file) => file.version === row.version) &&
+      !historical.has(row.version)
+    )
       throw new Error(
         `Applied migration ${row.version} is absent from this revision.`,
       );

@@ -159,7 +159,7 @@ fun Correction(text: String, name: String = "Maya", aiText: String = "", aiTime:
 
 enum class VoiceKind { HUMAN, AI }
 @Composable
-fun VoiceNote(kind: VoiceKind = VoiceKind.HUMAN, name: String = "Maya", time: String? = null, duration: String = "0:42", transcript: String? = null, playing: Boolean = false, playbackAvailable: Boolean = false, onPlayPause: () -> Unit = {}, onVerify: () -> Unit = {}) {
+fun VoiceNote(kind: VoiceKind = VoiceKind.HUMAN, name: String = "Maya", time: String? = null, duration: String = "0:42", transcript: String? = null, playing: Boolean = false, playbackAvailable: Boolean = false, waveform: List<Double>? = null, position: Double? = null, onPlayPause: () -> Unit = {}, onVerify: () -> Unit = {}) {
     val human = kind == VoiceKind.HUMAN
     val ink = qColor(if (human) "maya-accent" else "ai-ink")
     Column(Modifier.widthIn(max = T.skeletonWidth), verticalArrangement = Arrangement.spacedBy(T.authorGap)) {
@@ -168,8 +168,14 @@ fun VoiceNote(kind: VoiceKind = VoiceKind.HUMAN, name: String = "Maya", time: St
             if (human) AuthorLabel(AuthorKind.HUMAN_CREATOR, name, time = time, onMaya = true) else TextLine(copy("aiVoiceDisclosure", "name" to name), "caption", "ai-ink", true)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(T.composerGap)) {
                 Box(Modifier.size(T.touchTarget).background(ink, CircleShape).clickable(enabled = playbackAvailable, role = Role.Button, onClick = onPlayPause).semantics { contentDescription = copy(if (playing) "pauseVoiceNote" else "playVoiceNote") }, contentAlignment = Alignment.Center) { Glyph(if (playing) "pause" else "play", T.space4, qColor(if (human) "on-maya-accent" else "on-ai")) }
-                val bars = listOf(8,14,22,12,18,26,16,10,20,24,14,8,18,22,12,16,26,20,10,14,18,8,12,20,16,10)
-                Canvas(Modifier.weight(1f).height(T.welcomeGap)) { val total = bars.size * T.waveBarWidth.toPx() + (bars.size - 1) * T.waveGap.toPx(); val scale = size.width / total; bars.forEachIndexed { index, value -> val h = value.dp.toPx(); drawRoundRect(ink.copy(alpha = .55f), Offset(index * (T.waveBarWidth.toPx() + T.waveGap.toPx()) * scale, (size.height-h)/2), Size(T.waveBarWidth.toPx()*scale,h), androidx.compose.ui.geometry.CornerRadius(T.waveRadius.toPx())) } }
+                val bars = waveform?.let { samples ->
+                    val count = minOf(26, samples.size)
+                    if (count == 0) emptyList() else (0 until count).map { index ->
+                        val step = samples.size.toDouble() / count
+                        samples.subList((index * step).toInt(), minOf(samples.size, kotlin.math.ceil((index + 1) * step).toInt())).maxOfOrNull { if (it.isFinite()) it.coerceIn(0.0, 1.0) * 26 else 0.0 } ?: 0.0
+                    }
+                } ?: listOf(8,14,22,12,18,26,16,10,20,24,14,8,18,22,12,16,26,20,10,14,18,8,12,20,16,10).map { it.toDouble() }
+                Canvas(Modifier.weight(1f).height(T.welcomeGap)) { val total = bars.size * T.waveBarWidth.toPx() + maxOf(0, bars.size - 1) * T.waveGap.toPx(); val scale = if (total == 0f) 0f else size.width / total; bars.forEachIndexed { index, value -> val h = if (waveform == null) value.toFloat().dp.toPx() else maxOf(T.hairline.toPx(), value.toFloat().dp.toPx()); val opacity = if (position != null && index.toDouble() / maxOf(1, bars.size) < position) 1f else .55f; drawRoundRect(ink.copy(alpha = opacity), Offset(index * (T.waveBarWidth.toPx() + T.waveGap.toPx()) * scale, (size.height-h)/2), Size(T.waveBarWidth.toPx()*scale,h), androidx.compose.ui.geometry.CornerRadius(T.waveRadius.toPx())) } }
                 BasicText(duration, style = qText("mono-caption").copy(color = ink))
             }
             transcript?.let { TextLine(it, if (human) "transcript-human" else "transcript-ai", if (human) "on-maya" else "ink") }

@@ -67,7 +67,7 @@ actor W3Realtime {
             request.timeoutInterval = 10
             request.setValue("Bearer " + credential, forHTTPHeaderField: "Authorization")
             request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
-            request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
+        request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
             let socket = session.webSocketTask(with: request)
             socket.maximumMessageSize = 1_000_000
             connection = Connection(key: key, credential: credential, socket: socket)

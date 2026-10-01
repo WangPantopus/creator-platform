@@ -1,0 +1,138 @@
+{
+  "observedAt": "2026-10-01T06:36:00.391113+00:00",
+  "scope": "Actual migration-operator end-to-end rehearsal against a restored copy of the preserved35-row W5 database. Original databases and app resources were not upgraded or stopped.",
+  "profile": "w5-20260930",
+  "sourceEvidenceCommit": "e0995381cf3621d1bf862732d95e4029ef6b0f92",
+  "originalReplySqlCommit": "15730d79c0c3da7076b7ac517a82d3e8ec2873cc",
+  "originalReadOnlyBackup": {
+    "observedAt": "2026-10-01T06:23:12.329063+00:00",
+    "sourceContainer": "creator-platform-w5-local",
+    "sourceDatabase": "creator_w5",
+    "ledgerCount": 35,
+    "dumpBytes": 531798,
+    "dumpSha256": "cc430be900af25becc2553e16dc85711869de5956564c848481a9a30caa4377e",
+    "sourceAction": "read-only consistent pg_dump; no source database, credentials, process or connection settings changed"
+  },
+  "privateArtifactsDirectory": "/Users/yingpengwang/.config/creator-platform/w8-local/alias-upgrade-20261001",
+  "closedDatabases": {
+    "container": "creator-platform-w8-foundation-20260930-takeover",
+    "port": 55448,
+    "freshOriginal": "creator_w8_alias_reference_20261001",
+    "freshCanonical": "creator_w8_alias_canonical_20261001",
+    "firstPreservedRestore": "creator_w8_alias_preserved_20261001",
+    "finalPreservedRestore": "creator_w8_alias_final_20261001",
+    "connectionLimit": 0,
+    "trafficOpened": false
+  },
+  "independentSchemaCustody": {
+    "postgresMajor": 17,
+    "legacyFreshAndActualRestoreMatch": true,
+    "legacySha256": "7f2ce84bc5be309376db13ebbb38b707d372f399c1ccb735d3c5ff1b04ef9c1f",
+    "canonicalPlusHistoricalReplyReviewSha256": "509282efe4c7a4ec63f0d086086416c0e61a5b90322243a16af21410ac2797d4",
+    "scope": "Catalog metadata including schema/relation ownership and ACLs, columns/defaults, constraints/indexes, policies, functions/triggers, relevant roles and memberships. Original data is not included in the catalog hash.",
+    "freshCanonicalDefaultActiveCount": 40,
+    "historicalReplySqlExecutedOnlyOnEmptyReference": true,
+    "freshCanonicalReplyReviewLedgerReady": false
+  },
+  "operator": {
+    "defaultReadOnlyPlanPassed": true,
+    "finalPlanSha256": "791896046f91f896a5dbfc5870ed29284f5098fc1992187cb8b59aea346d6465",
+    "stalePlanRefusedBeforeReceipt": true,
+    "actualUpgrade": "committed",
+    "receiptStates": [
+      "started",
+      "committed"
+    ],
+    "receiptMode": "0600 append-only JSONL; exclusive creation",
+    "backupHash": "cc430be900af25becc2553e16dc85711869de5956564c848481a9a30caa4377e",
+    "beforeLedgerRows": 35,
+    "afterLedgerRows": 48,
+    "originalLedgerVersionChecksumTimestampPreserved": true,
+    "canonicalAliasesAdded": 7,
+    "aliasedMigrationSqlReplayed": false,
+    "missingExistingCanonicalFilesApplied": [
+      "0032_growth_continuation",
+      "0033_growth_prompt_claims",
+      "0034_growth_erasure_fence",
+      "0041_w3_conversations",
+      "0042_w3_wellbeing",
+      "0043_w8_relationship_backfill"
+    ],
+    "postSchemaMatchesIndependentFreshReference": true,
+    "canonicalRunnerAlreadyApplied": 40,
+    "completedReadOnlyPlanRecognizesAdoptedCohort": true
+  },
+  "dataPreservation": {
+    "originalTables": 136,
+    "originalRows": 277,
+    "allOriginalColumnValuesAndRowMultiplicitiesUnchanged": true,
+    "method": "Private per-table ordered original-column COPY digests before/after, omitting only the migration ledger whose original rows/timestamps are separately compared. Newly added columns/tables are checked by the canonical catalog fingerprint."
+  },
+  "nonOwnerGuard": {
+    "role": "creator_runtime",
+    "actualCurrentReplyReviewInstalledLookup": true,
+    "checksum": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+    "forcedRlsRelations": 2,
+    "unscopedReplyReviews": 0,
+    "unscopedReplyReads": 0,
+    "guardOrGrantsEdited": false,
+    "database": "creator_w8_alias_preserved_20261001"
+  },
+  "originalDatabasePreservation": {
+    "w5LedgerRows": 35,
+    "w5LedgerByteIdenticalToReadOnlyCapture": true,
+    "w8LedgerRows": 40,
+    "all40AppliedSqlBytesMatch61e07b1": true,
+    "credentialChanges": false,
+    "resetOrReseed": false,
+    "migrationOrDomainDataMutationsByW8": false,
+    "ordinaryW8IdentitySessionRefresh": true
+  },
+  "actualBrowserContinuity": {
+    "url": "http://localhost:3008/support/privacy",
+    "ownTab": "10",
+    "expiredSessionReturnedReference": "E89FBD42-42B8-47FD-A747-A0B287DB7B87",
+    "ordinaryUseLocalActorSucceeded": true,
+    "actor": "Fan @kilnfire",
+    "retainedOriginalExport": "seven complete, content blocked",
+    "newJobOrRetrySubmitted": false,
+    "downloadVisible": false,
+    "screenshot": "migration-adoption-retained-privacy.jpg"
+  },
+  "verification": {
+    "backendTypecheck": "passed",
+    "backendBuild": "passed from apps/backend",
+    "scopedEslint": "passed",
+    "originalTestGoldenToleranceEdits": false,
+    "newTests": false,
+    "nativeSourceChanged": false,
+    "existingNativeEvidence": "final-merge-acceptance.json; no new native acceptance claim",
+    "operatorInvocationCorrections": [
+      "createdb has no connection-limit option; used CREATE DATABASE CONNECTION LIMIT0 before any database existed",
+      "backend build script first invoked from repository root; corrected to its package directory and passed"
+    ],
+    "paidCallsByW8": 0
+  },
+  "limits": [
+    "No original W5 upgrade or traffic reopening occurred. Its owner must quiesce and execute the reviewed plan against the exact target with fresh backup/restore evidence.",
+    "No PR9 product merge or final combined browser/native acceptance is established.",
+    "Global reserved0045 and other reserved migrations remain inactive. Historical ledger identity does not activate fresh database capabilities.",
+    "Authentic retention/licensing/provider and full R1-R10 release gates remain open."
+  ],
+  "sourceParent": "f46d3f2285bbec5736b2d9282acdad8969a9e1e1",
+  "sourceSha256": {
+    "apps/backend/scripts/adopt-w5-migrations.ts": "496490788dbf35e80eb0c308b1242afe1f4aded491d582070176da0a32b93c7b",
+    "apps/backend/scripts/migration-custody.ts": "660556572e895946b8b71025e3590143c90dad82186a8a577d0683fa0b974748",
+    "apps/backend/scripts/migrate-trust.ts": "c4b8eaec3198cfcc219f79c0bbff5e8b1c16a04d784f34ef30e6a4556c90ae6d",
+    "infra/migrations/adoptions/w5-20260930.json": "03d9b7cdb1fb9377772ef888648d0e9bc0939834156d9152a365404a5682572b",
+    "infra/migrations/history/0045_w5_reply_review.sql": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+  },
+  "applicationSourceUnchangedAgainstAcceptedPR7": {
+    "apps/backend/src": true,
+    "apps/web": true,
+    "apps/ios": true,
+    "apps/android": true,
+    "packages": true,
+    "config": true
+  }
+}

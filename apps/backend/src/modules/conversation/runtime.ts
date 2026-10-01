@@ -14,10 +14,11 @@ import type { ConversationAllowance } from "./allowance.js";
 import type { ProviderPolicy } from "../../../../../packages/api/src/conversation/contracts.js";
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
-import type { ConversationLineage } from "./lineage.js";
-import type { ConversationCorrections } from "./corrections.js";
-import type { ConversationRecordings } from "./recordings.js";
 import { invariant } from "../../core/errors.js";
+import type { ConversationLineage } from "./lineage.js";
+import type { ConversationRecordings } from "./recordings.js";
+import type { ConversationCorrections } from "./corrections.js";
+import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -27,10 +28,16 @@ export function createConversationRuntime(input: {
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
-  firstConversation?: Pick<CommerceService, "openTrial">;
+  /** W4's prepared port proves the exact configured AccessService identity.
+   * Keep allowance absent to select its single canonical generation path. */
+  generationCostReconciliation?: GenerationCostReconciliation;
+  firstConversation?: Pick<
+    CommerceService,
+    "pool" | "firstConversationAvailable" | "openTrialInTransaction"
+  >;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
-  /** Prepared only from registered schema bytes and current owner policies. */
+  /** Prepared only after W8's real migration/checksum and lifecycle policy. */
   lineage?: ConversationLineage;
   corrections?: ConversationCorrections;
   recordings?: ConversationRecordings;
@@ -43,9 +50,20 @@ export function createConversationRuntime(input: {
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
   invariant(
+    !(input.allowance && input.generationCostReconciliation),
+    "allowance_conflict",
+    "Configure one generation allowance path.",
+  );
+  invariant(
     !input.corrections || input.lineage,
     "correction_lineage_unavailable",
     "Signed corrections require the prepared original-message lineage projection.",
+  );
+  invariant(
+    !input.firstConversation ||
+      input.firstConversation.pool === input.database.pool,
+    "trial_pool_mismatch",
+    "First-conversation admission must use this actual conversation database pool.",
   );
   invariant(
     !input.recordings || input.lineage,
@@ -59,6 +77,7 @@ export function createConversationRuntime(input: {
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
+  generator?.journal?.assertPool(input.database.pool);
   const processor = generator
     ? new ConversationGenerationProcessor(
         input.database,
@@ -71,10 +90,14 @@ export function createConversationRuntime(input: {
     wellbeing,
     ...(input.policy ? { policyVersion: input.policy.version } : {}),
     ...(input.allowance ? { allowance: input.allowance } : {}),
+    ...(input.generationCostReconciliation
+      ? { reconciliation: input.generationCostReconciliation }
+      : {}),
     ...(input.assertReady ? { assertReady: input.assertReady } : {}),
     ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
     ...(input.citation ? { citation: input.citation } : {}),
     ...(input.lineage ? { lineage: input.lineage } : {}),
+    ...(generator?.journal ? { journal: generator.journal } : {}),
   });
   const feature = new ConversationFeature(
     input.database,
@@ -84,7 +107,10 @@ export function createConversationRuntime(input: {
     input.policy,
     Boolean(
       generator &&
-        input.allowance &&
+        generator.executionAttributed &&
+        generator.journal &&
+        generator.seal &&
+        (input.allowance || input.generationCostReconciliation) &&
         input.citation &&
         input.assertReady &&
         input.assertApproved &&
@@ -95,8 +121,26 @@ export function createConversationRuntime(input: {
     input.citation,
     wellbeing,
     input.firstConversation,
+    generator?.routeSafety
+      ? (scope, text, signal, deliver) =>
+          generator.routeSafety!(
+            scope,
+            text,
+            {
+              current: (current) => memory.context(current),
+              assertProcessorConsent: (current) =>
+                input.conversation.assertProcessorConsent(current),
+              assertDeliveryCurrent: (current, expected) =>
+                input.conversation.assertSafetyCurrent(current, expected),
+            },
+            signal,
+            deliver,
+          )
+      : undefined,
+    (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
     input.lineage,
     input.corrections,
+    input.assertReady,
     input.recordings,
   );
   return {

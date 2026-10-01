@@ -538,12 +538,16 @@ public struct VoiceNote: View {
   public var time: String?
   public var name: String
   public var playing: Bool
+  public var playbackAvailable: Bool
+  public var waveform: [Double]?
+  public var position: Double?
   public var onPlayPause: () -> Void
   public var onVerify: () -> Void
   @Environment(\.colorScheme) private var scheme
   public init(
     kind: VoiceNoteKind = .human, duration: String = "0:42", transcript: String? = nil,
     time: String? = nil, name: String = "Maya", playing: Bool = false,
+    playbackAvailable: Bool = true, waveform: [Double]? = nil, position: Double? = nil,
     onPlayPause: @escaping () -> Void = {}, onVerify: @escaping () -> Void = {}
   ) {
     self.kind = kind
@@ -552,6 +556,9 @@ public struct VoiceNote: View {
     self.time = time
     self.name = name
     self.playing = playing
+    self.playbackAvailable = playbackAvailable
+    self.waveform = waveform
+    self.position = position
     self.onPlayPause = onPlayPause
     self.onVerify = onVerify
   }
@@ -560,6 +567,24 @@ public struct VoiceNote: View {
       "8", "14", "22", "12", "18", "26", "16", "10", "20", "24", "14", "8", "18", "22", "12", "16",
       "26", "20", "10", "14", "18", "8", "12", "20", "16", "10",
     ]
+  }
+  private var peaks: [Double]? {
+    guard let waveform else { return nil }
+    let count = min(26, waveform.count)
+    guard count > 0 else { return [] }
+    let step = Double(waveform.count) / Double(count)
+    var result: [Double] = []
+    for index in 0..<count {
+      let start = Int(Double(index) * step)
+      let end = min(waveform.count, Int(ceil(Double(index + 1) * step)))
+      var peak: Double = 0
+      for value in waveform[start..<end] {
+        let bounded: Double = value.isFinite ? min(1, max(0, value)) : 0
+        peak = max(peak, bounded)
+      }
+      result.append(peak)
+    }
+    return result
   }
   public var body: some View {
     VStack(alignment: .leading, spacing: QelvoraTokens.token("author-gap")) {
@@ -584,17 +609,23 @@ public struct VoiceNote: View {
               width: QelvoraTokens.token("touch-target"),
               height: QelvoraTokens.token("touch-target")
             ).background(qColor(kind == .human ? "maya-accent" : "ai-ink", scheme), in: Circle())
-          }.buttonStyle(.plain).accessibilityLabel(
+          }.buttonStyle(.plain).disabled(!playbackAvailable).accessibilityLabel(
             QelvoraCopy.text(playing ? "pauseVoiceNote" : "playVoiceNote"))
           HStack(spacing: QelvoraTokens.token("wave-gap")) {
-            ForEach(Array(bars.enumerated()), id: \.offset) { _, height in
+            if let peaks {
+              ForEach(Array(peaks.enumerated()), id: \.offset) { index, peak in
+                RoundedRectangle(cornerRadius: QelvoraTokens.token("wave-radius")).fill(
+                  qColor(kind == .human ? "maya-accent" : "ai-ink", scheme).opacity(position.map { Double(index) / Double(max(1, peaks.count)) < $0 ? 1 : Double(QelvoraTokens.token("wave-opacity")) } ?? Double(QelvoraTokens.token("wave-opacity")))
+                ).frame(width: QelvoraTokens.token("wave-bar-width"), height: max(QelvoraTokens.token("hairline"), CGFloat(peak) * QelvoraTokens.token("wave-bar-26")))
+              }
+            } else { ForEach(Array(bars.enumerated()), id: \.offset) { _, height in
               RoundedRectangle(cornerRadius: QelvoraTokens.token("wave-radius")).fill(
                 qColor(kind == .human ? "maya-accent" : "ai-ink", scheme).opacity(
                   Double(QelvoraTokens.token("wave-opacity")))
               ).frame(
                 width: QelvoraTokens.token("wave-bar-width"),
                 height: QelvoraTokens.token("wave-bar-" + height))
-            }
+            } }
           }.frame(maxWidth: .infinity, alignment: .leading).frame(
             height: QelvoraTokens.token("note-fold")
           ).accessibilityHidden(true)
