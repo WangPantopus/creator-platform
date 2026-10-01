@@ -20,6 +20,7 @@ import {
 } from "./reconciliation.js";
 import type { CreatorSettlement } from "./accounting.js";
 import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
+import type { GenerationPrivacyConfiguration } from "./generation-privacy.js";
 import { invariant } from "../../core/errors.js";
 import {
   createCommerceAudience,
@@ -34,6 +35,7 @@ export async function createCommerceRuntime(input: {
   access: AccessService;
   policy: Omit<CommercePolicy, "costAllowanceIntegrated">;
   generationCostPolicy?: GenerationCostPolicy;
+  generationPrivacy?: GenerationPrivacyConfiguration;
   groupAudience?: GroupAudienceReader;
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
@@ -61,6 +63,18 @@ export async function createCommerceRuntime(input: {
   const generationCostReconciliation = generationAllowance?.reconciliation(
     input.access,
   );
+  invariant(
+    !input.generationPrivacy || generationAllowance,
+    "generation_privacy_unconfigured",
+    "Financial lifecycle requires the same successfully prepared cost adapter.",
+  );
+  const generationCostPrivacyReconciliation =
+    input.generationPrivacy && generationAllowance
+      ? await generationAllowance.privacyReconciliation(
+          input.access,
+          input.generationPrivacy,
+        )
+      : undefined;
   const service = new CommerceService(
     input.pool,
     input.database,
@@ -110,6 +124,7 @@ export async function createCommerceRuntime(input: {
     // configure a second allowance/reservation path or infer it from keys.
     generationAllowanceAvailable: Boolean(generationAllowance),
     generationCostReconciliation,
+    generationCostPrivacyReconciliation,
     audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),
   };
