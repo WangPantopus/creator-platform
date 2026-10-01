@@ -11,6 +11,10 @@ import {
   type PayoutClaim,
 } from "./payout-custody.js";
 import type { PassPoolJournal } from "./pass-pool-journal.js";
+import {
+  CreatorPayoutOnboarding,
+  type PayoutOnboardingAuthority,
+} from "./payout-onboarding.js";
 
 export interface CreditRules {
   currency: string;
@@ -356,6 +360,7 @@ export type VerifiedTransfer = {
   reversalReceipts?: readonly { reference: string; amount: number }[];
 };
 export interface PayoutProvider {
+  onboarding?(reference: string): Promise<{ url: string; expiresAt: Date }>;
   account(reference: string): Promise<{
     reference: string;
     country: string;
@@ -406,6 +411,10 @@ type PayoutEffect = {
 };
 /** Q03/topology and market approval are mandatory injected configuration, never inferred from a build. */
 export class CreatorSettlement {
+  get onboardingConfigured() {
+    return this.onboarding.configured;
+  }
+  readonly onboarding: CreatorPayoutOnboarding;
   get configured() {
     return Boolean(
       this.provider?.reverseOriginal &&
@@ -419,7 +428,15 @@ export class CreatorSettlement {
     private readonly countries: readonly string[],
     private readonly provider?: PayoutProvider,
     private readonly custody?: PayoutCustody,
-  ) {}
+    onboardingAuthority?: PayoutOnboardingAuthority,
+  ) {
+    this.onboarding = new CreatorPayoutOnboarding(
+      service,
+      countries,
+      provider,
+      onboardingAuthority,
+    );
+  }
   async release(actor: Actor, commitmentId: string) {
     invariant(
       this.provider?.reverseOriginal &&
