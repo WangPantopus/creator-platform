@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Notice } from "@qelvora/ui-web";
 import { announceSessionEnd, useIdentityRequest } from "./session-boundary";
 
@@ -7,11 +7,27 @@ export function AccountPanel() {
   const identity = useIdentityRequest();
   const session = identity.session;
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const act = async (path: string) => {
+  const actionFocus = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
     if (busy) return;
+    const button = actionFocus.current;
+    actionFocus.current = null;
+    if (
+      button?.isConnected &&
+      !identity.signal.aborted &&
+      !document.hidden &&
+      document.activeElement === document.body
+    )
+      button.focus();
+  }, [busy, identity.signal]);
+  const act = async (path: string, button: HTMLButtonElement) => {
+    if (busy) return;
+    actionFocus.current = document.activeElement === button ? button : null;
     setBusy(true);
     setError("");
+    setMessage("");
     try {
       const response = await identity.request(path, {
         method: "POST",
@@ -23,7 +39,9 @@ export function AccountPanel() {
         setError("Could not complete this action. Reconnect and try again.");
         return;
       }
-      if (path !== "refresh") {
+      if (path === "refresh") {
+        setMessage("Session refreshed.");
+      } else {
         announceSessionEnd();
         identity.end();
       }
@@ -36,7 +54,7 @@ export function AccountPanel() {
     }
   };
   return (
-    <section className="account-panel">
+    <section className="account-panel" aria-busy={busy}>
       <h1>Your account</h1>
       {session.mode === "development" && (
         <Notice title="Development identity">
@@ -82,31 +100,29 @@ export function AccountPanel() {
           ))}
         </section>
       )}
-      {error && (
-        <div role="alert">
-          <Notice title="Account status" tone="error">
-            {error}
-          </Notice>
-        </div>
+      {(error || message) && (
+        <Notice title="Account status" tone={error ? "error" : undefined}>
+          {error || message}
+        </Notice>
       )}
       <button
         className="qv-btn qv-btn--secondary"
         disabled={busy}
-        onClick={() => act("refresh")}
+        onClick={(event) => act("refresh", event.currentTarget)}
       >
         Refresh session
       </button>
       <button
         className="qv-btn qv-btn--secondary"
         disabled={busy}
-        onClick={() => act("logout")}
+        onClick={(event) => act("logout", event.currentTarget)}
       >
         Sign out
       </button>
       <button
         className="qv-btn qv-btn--quiet"
         disabled={busy}
-        onClick={() => act("revoke-sessions")}
+        onClick={(event) => act("revoke-sessions", event.currentTarget)}
       >
         Sign out on all devices
       </button>
