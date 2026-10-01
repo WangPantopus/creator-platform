@@ -30,6 +30,20 @@
         "generation.ts"
       ],
       "integration": "Write-lock consumers only, plus published wellbeing consent boundary; existing read callbacks explicitly use read mode"
+    },
+    {
+      "owner": "W7",
+      "commit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0",
+      "files": [
+        "apps/backend/src/modules/growth/configured.ts",
+        "apps/backend/src/modules/growth/database.ts",
+        "apps/backend/src/modules/growth/erasure.ts",
+        "apps/backend/src/modules/growth/lifecycle.ts",
+        "apps/backend/src/modules/growth/privacy-export.ts",
+        "apps/backend/src/modules/growth/runtime.ts",
+        "apps/backend/src/modules/growth/service.ts"
+      ],
+      "integration": "Published streaming/deletion deltas, preserving existing source enumeration and retention copy; W8 binds complete privacyTaskAuthority. Native/CI/test changes excluded."
     }
   ],
   "immutableSqlChanged": false,

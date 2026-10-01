@@ -3,6 +3,27 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import type { GrowthService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
 import { z } from "zod";
+import {
+  growthAccountExport,
+  type GrowthPrivacyExportStream,
+} from "./privacy-export.js";
+
+type GrowthPrivacyInput = Parameters<PrivacyHook["run"]>[0] & {
+  leaseToken?: string;
+  signal?: AbortSignal;
+};
+/** W8's privacyTaskAuthority verifies the exact live task, binding and captured
+ * ownership. The legacy account/job snapshot callback alone cannot grant a lease. */
+export type GrowthPrivacyTaskAuthority = (
+  input: GrowthPrivacyInput & { leaseToken: string; signal: AbortSignal },
+) => Promise<readonly string[]>;
+export type GrowthPrivacyHook = Omit<PrivacyHook, "run"> & {
+  run(input: GrowthPrivacyInput): Promise<
+    Awaited<ReturnType<PrivacyHook["run"]>> & {
+      stream?: GrowthPrivacyExportStream;
+    }
+  >;
+};
 
 /** Resolve a durable verified job snapshot, never client-supplied creator IDs or post-delete absence. */
 export type GrowthPrivacyScope = (input: {
@@ -12,7 +33,8 @@ export type GrowthPrivacyScope = (input: {
 export function growthPrivacyHook(
   service: GrowthService,
   scope?: GrowthPrivacyScope,
-): PrivacyHook {
+  taskAuthority?: GrowthPrivacyTaskAuthority,
+): GrowthPrivacyHook {
   return {
     domain: "growth",
     run: async (input) => {
@@ -22,10 +44,26 @@ export function growthPrivacyHook(
           copy.growthErrorGrowthScopeAdapterRequired,
           503,
         );
-      const resolved = await scope?.({
-        jobId: input.jobId,
-        accountId: input.accountId,
-      });
+      let resolved: readonly string[] | null | undefined;
+      if (input.leaseToken || input.signal) {
+        if (!input.leaseToken || !input.signal || !taskAuthority)
+          throw new DomainError(
+            "growth_privacy_task_authority_required",
+            copy.growthErrorGrowthAccountScopeRequired,
+            503,
+          );
+        input.signal.throwIfAborted();
+        resolved = await taskAuthority({
+          ...input,
+          leaseToken: input.leaseToken,
+          signal: input.signal,
+        });
+        input.signal.throwIfAborted();
+      } else
+        resolved = await scope?.({
+          jobId: input.jobId,
+          accountId: input.accountId,
+        });
       if (!resolved)
         throw new DomainError(
           "growth_account_scope_required",
@@ -35,7 +73,11 @@ export function growthPrivacyHook(
       const ownedCreators = z.array(z.uuid()).max(100).parse(resolved);
       if (input.kind === "delete")
         return {
-          receipt: await service.privacyDelete(input.accountId, ownedCreators),
+          receipt: await service.privacyDelete(
+            input.accountId,
+            ownedCreators,
+            input.signal,
+          ),
           retained: [
             {
               category: "pseudonymous_erasure_fence",
@@ -56,6 +98,17 @@ export function growthPrivacyHook(
                 "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
             },
           ],
+        };
+      if (input.signal && input.leaseToken)
+        return {
+          receipt: { domain: "growth", format: "growth-account-export-v1" },
+          stream: growthAccountExport(
+            service,
+            input.accountId,
+            ownedCreators,
+            input.signal,
+          ),
+          retained: [],
         };
       const data = await service.db.transaction(
         service.db.worker,
@@ -168,11 +221,24 @@ export function growthPrivacyHook(
               "insight_snapshot",
               "insight_window",
               "recommendation",
-              "impact",
               "instagram_reply",
               "experiment",
             ])
               creator[table] = await collect(table, "creator_id", creatorId);
+            // Export creator aggregates without other fans' saved quote text or
+            // identity. Their current sharing permission is not proven here.
+            creator.impact = (
+              await client.query(
+                "SELECT creator_id,window_start,unique_fans,ai_conversations,personal_replies,notes,thanks_count FROM growth.impact WHERE creator_id=$1 LIMIT 10001",
+                [creatorId],
+              )
+            ).rows;
+            if ((creator.impact as unknown[]).length > 10000)
+              throw new DomainError(
+                "growth_export_stream_required",
+                copy.growthErrorGrowthExportStreamRequired,
+                503,
+              );
             creator.profile =
               (
                 await client.query(

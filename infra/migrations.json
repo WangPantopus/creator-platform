@@ -258,7 +258,9 @@
       "owner": "W2",
       "version": "0048_w2_usage_lineage",
       "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
-      "state": "reserved_unapplied"
+      "state": "reserved_unapplied",
+      "sourceCommit": "a010a030378a0c62a44d6c14e714cc397722e702",
+      "sourceSha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
     },
     {
       "id": "0049",

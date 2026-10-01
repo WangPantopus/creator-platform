@@ -105,20 +105,20 @@ export function createPrivacyConsumers(input: {
     };
     hooks.push(commercePrivacyHook(input.commerce, authority));
   }
-  if (input.growth)
+  if (input.growth) {
+    const owner = growthPrivacyHook(input.growth, undefined, verify);
     hooks.push({
       domain: "growth",
       async run(job) {
-        const owned = await verify(job);
-        // The producer's two-ID resolver receives only this exact leased job.
-        const result = await growthPrivacyHook(input.growth!, async () => {
-          await verify(job);
-          return owned;
-        }).run(job);
+        await verify(job);
+        // The owner receives the complete current task, including its lease,
+        // cancellation signal and immutable pre-deletion ownership binding.
+        const result = await owner.run(job);
         await verify(job);
         return result;
       },
     });
+  }
   if (input.content) {
     const owner = contentPrivacyHook(
       input.content.purposePool,
