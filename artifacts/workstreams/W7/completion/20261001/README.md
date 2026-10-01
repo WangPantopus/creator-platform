@@ -1,6 +1,6 @@
 # W7 continued implementation — 2026-10-01
 
-The primary personally implements and verifies this continuation in checkout0546 on `codex/w7-completion-20261001`. Preserved `codex/w7-handoff`/PR2 history remains intact. Current source2950ef2 consumes personally reviewed accepted mainc1c615e (canonical creator earnings/onboarding, held financial reads, atomic billing obligations and W2 source/citation lifecycle changes). The accepted owner changes and final W7 diff were personally reviewed; proposed owner SQL remains inactive. [Source hashes](source-sha256.json) and [current resource manifest](resources.json) identify this run. The [entire original acceptance matrix](../../resume/20260930/acceptance.md), all19 notifications and all13 populated Light/Night artboards remain binding and open.
+The primary personally implements and verifies this continuation in checkout0546 on `codex/w7-completion-20261001`. Preserved `codex/w7-handoff`/PR2 history remains intact. Current sourceacc4817 consumes personally reviewed accepted mainc1c615e (canonical creator earnings/onboarding, held financial reads, atomic billing obligations and W2 source/citation lifecycle changes). The accepted owner changes and final W7 diff were personally reviewed; proposed owner SQL remains inactive. [Source hashes](source-sha256.json) and [current resource manifest](resources.json) identify this run. The [entire original acceptance matrix](../../resume/20260930/acceptance.md), all19 notifications and all13 populated Light/Night artboards remain binding and open.
 
 ## Implemented source
 
@@ -20,6 +20,8 @@ The closed W5 Thanks collector now uses a read-only repeatable-read snapshot,250
 
 Idle core/Growth PostgreSQL pool errors now emit only constant sanitized warnings instead of escaping as an uncaught Node event. This responds to the observed API exit during cleanup; the source change has not yet been operated through a database restart.
 
+Account deletion now restricts inbox cleanup to this account’s actual recipients and captured owned creators, preserving unrelated events waiting for notifications. Last-recipient/captured-creator relays are removed before other shared envelopes lose this account. Public share reads reacquire their current row and actual owner status under negative account/creator erasure fences; share creation holds the same negative fences through the current-session/grant reread and insert without setting a runtime creator GUC. Source review is complete; these database/race paths are unoperated. Real W4 held-grant authority and W8 narrow mappings remain unbound. [Precise source receipt](privacy-subject-source-review.json).
+
 ## Personally observed and existing checks
 
 - Shipping web: canonical development sign-in to empty Home; invalid post/relationship cursors show a recoverable unavailable state and Try again recovers Home. Nonexistent share displays unavailable and Try again opens Discover. Download returns410 with no-store, no-index/nofollow/noarchive and nosniff; no source body or artifact is returned. Browser direct text-download navigation was blocked by the client; HTTP evidence is separately preserved. These are empty/negative paths, not populated publication, permission-revocation or export acceptance.
@@ -34,6 +36,8 @@ Idle core/Growth PostgreSQL pool errors now emit only constant sanitized warning
 - Hosted pushed51e8be6: backend/web, Android runtime and Android foundation passed; iOS push job failed106 original image comparisons on Xcode27, while web visual and pull-request iOS remain queued. Both failing Welcome images and complete sanitized log are retained. Current source repairs the iOS runner/toolchain to the reviewed macOS26 Intel/Xcode26.5 renderer, preserving exact dimensions,99.85%/8-channel bounds, all assertions and110 original references. This addresses the actual failed rendering check; it does not bypass the remaining Mac queue or establish a pass. See [CI repair evidence](ci-native-repair.md).
 
 - Previous published9a9fe3b hosted web/backend, Android runtime and Trust compile gates passed; Android foundation, iOS and web visual were still queued at this observation. These results do not cover current native-document source or the new main integration. [Exact source-only checkpoint](native-document-source-checkpoint.json) records their run IDs and limitations.
+
+- Publishedc6bbdce web/backend and Trust compile passed; Android runtime failed at Kotlin compilation because FileProvider.openFile returns a nullable descriptor. The complete sanitized log is retained. Current source refuses null with FileNotFoundException; its fresh build remains required. Queued old Mac runs are never passes.
 
 Full sanitized logs are gzip archived with hashes in [log-manifest.json](log-manifest.json). Original failures and previous evidence are retained. No new test/case/suite/load script or saved UI flow was added, and no paid AI call was made. Xcode's unrelated Package.resolved churn was archived outside the checkout and restored to committed bytes.
 

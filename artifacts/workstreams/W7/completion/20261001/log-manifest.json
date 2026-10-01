@@ -184,5 +184,11 @@
     "gzip": "ci-ios-51e8be6-push.log.gz",
     "sanitized": true,
     "contentSha256": "4d54c08da4b8eeedfd6ab0e0b46c3065e670f6470936190fa854b3ff448f4110"
+  },
+  "ci-android-c6bbdce-pr.log": {
+    "sha256": "9ac7bbc67c73391b0259ecb6293adf8f12ea6697be9a08e48baf8851436cb92b",
+    "gzip": "ci-android-c6bbdce-pr.log.gz",
+    "sanitized": true,
+    "contentSha256": "bf82b90f3712a311ea286a09160f99c0075800d9a105fc1b750a63bf2f16e01a"
   }
 }
