@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { SessionSchema } from "@qelvora/api";
 
 // Cookies are shared across ports on a hostname. Keep explicitly configured
@@ -28,6 +29,9 @@ export async function platformFetch(
   init: RequestInit = {},
   authenticated = true,
 ) {
+  // W1's request-time boundary keeps a build without secrets from freezing
+  // identity availability before the deployment's runtime configuration exists.
+  await connection();
   const base = process.env.QELVORA_API_URL;
   if (!base)
     return Response.json(

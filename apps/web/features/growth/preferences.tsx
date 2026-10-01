@@ -55,6 +55,7 @@ export function PreferenceForm({
   const [value, setValue] = useState(initial),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
+    [requiresSignIn, setRequiresSignIn] = useState(false),
     [invalid, setInvalid] = useState({ quietHours: false, timeZone: false });
   const fromInput = useRef<HTMLInputElement>(null),
     untilInput = useRef<HTMLInputElement>(null),
@@ -97,12 +98,14 @@ export function PreferenceForm({
           return;
         }
         setBusy(true);
+        setRequiresSignIn(false);
         try {
           await mutate("preferences", value, "PUT");
           setMessage(
             growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );
         } catch (e) {
+          setRequiresSignIn(e instanceof GrowthActionError && e.status === 401);
           setMessage(
             e instanceof GrowthActionError && e.status === 400
               ? growthCopy.growthPreferencesWereNotSaved
@@ -269,6 +272,14 @@ export function PreferenceForm({
       <p role="status" className="growth-help">
         {message}
       </p>
+      {requiresSignIn ? (
+        <a
+          className="qv-btn qv-btn--secondary"
+          href="/auth/continue?returnTo=%2Fnotifications%2Fsettings"
+        >
+          {growthCopy.continueWithPantopus}
+        </a>
+      ) : null}
     </form>
   );
 }
