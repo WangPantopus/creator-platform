@@ -983,16 +983,16 @@ function Compose({
           <span />
         </header>
         <Feedback action={action} />
-        {action.error ? (
-          <button
-            className="qv-btn qv-btn--secondary"
-            onClick={() => void action.run(loadDraft)}
-          >
-            Retry loading draft
-          </button>
-        ) : (
+        {!action.error && (
           <p role="status">Loading saved draft…</p>
         )}
+        <button
+          className="qv-btn qv-btn--secondary"
+          aria-busy={action.busy}
+          onClick={() => void action.run(loadDraft)}
+        >
+          Retry loading draft
+        </button>
       </section>
     );
   return (
