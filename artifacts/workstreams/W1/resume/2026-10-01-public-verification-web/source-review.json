@@ -1,0 +1,65 @@
+{
+  "recordedAt": "2026-10-01T14:59:00.962116+00:00",
+  "applicationSourceRevision": "5a987db612bfe652d7adc607982d5316f5e1bae1",
+  "baseRevision": "94fa063f28436aeff8d7a4d17d007361ea2179da",
+  "branch": "codex/w1-native-verification-20261001",
+  "sourceFiles": [
+    {
+      "path": "apps/web/app/verify/[id]/page.tsx",
+      "sha256": "6f9e5461bf771e9b4e2bd4636fb7c211d7bc9484ab5d7359b8a41bb5211ea4b2",
+      "bytes": 7721
+    },
+    {
+      "path": "apps/web/app/globals.css",
+      "sha256": "b23bbbeeeb5cf5fec361e0e23ec58befdeac8c3ee1c5c000b03deab5d3cde641",
+      "bytes": 8152
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "d157563e6b6800ee1129251b37f67a3546b6085520d3fb50884d606312fdae48",
+      "bytes": 62984
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "46b3f9fade954385361193054ac716ad1d32a7cec7ac564f5c51813aff83bf59",
+      "bytes": 63611
+    },
+    {
+      "path": "packages/api/src/identity.ts",
+      "sha256": "834bd744497fc24f65e81b8199433a284dea6184b9e3705253d3657b4dc47206",
+      "bytes": 5858
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "7b16daded7c46ee932ffea6c9204376a76c79831d4afa315d09c5b36bd6b969f",
+      "bytes": 774134
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/PublicVerification.swift",
+      "sha256": "1f21ee5c23224205258ce26311bc949aabc1a8e1044602a5a04ac8f6d480b0d4",
+      "bytes": 11665
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/PublicVerification.kt",
+      "sha256": "63b0e8fb1ebe4f86da97e11b131ae710fea1029ac9d867c75246f54c855ef901",
+      "bytes": 12341
+    }
+  ],
+  "supportingChecks": {
+    "gitDiffCheck": "passed",
+    "personalSourceReview": "performed",
+    "sharedResourcesAndNativeApi": "Inputs/emitted files unchanged from c46c5de checks: 12 outputs / 98 operations. No new consumer build inferred."
+  },
+  "webCompilation": "not run; cleanup restriction",
+  "nativeCompilation": "unrun for native public-verification source",
+  "currentFreshRename": "not run; cleanup restriction",
+  "appOperation": "not performed; no post-cleanup browser/native/provider acceptance",
+  "publicProjection": "Exact returned act ID, availability, withdrawal, matching command act type, supported text shape; metadata-only fallback and exact supplied positive safe-integer version.",
+  "authorPresentation": "Approved AI comes from the named act; private fan/sharer undisclosed.",
+  "webRefresh": "Explicit same-page anchor through existing dynamic no-store public fetch; no automatic foreground refresh or revoke latency claimed.",
+  "resources": "No dependency installation, tools, build, server, database or device recreated.",
+  "hostedCi": "Last W1 Code Review discovery requires GitHub connection; no provider head or pass.",
+  "newTestsOrScripts": false,
+  "originalReferencesChanged": false,
+  "fullW1Acceptance": "open"
+}

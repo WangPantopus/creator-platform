@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — public web projection and recovery source
+
+Application `5a987db6` aligns the actual web `/verify/:id` page with the new native readers: canonical ID/response binding, explicit public availability/withdrawal and matching named-act checks, metadata-only fallback, approved-AI provenance, exact supplied content version and “Valid when checked” status. Retry/Refresh/Home use real links; scoped metadata/title wrapping avoids an unbounded column. Existing shared copy, API/authority policy, generators, migrations and original references are unchanged. [Source review and pending checks](../../../artifacts/workstreams/W1/resume/2026-10-01-public-verification-web/run.md).
+
+This follow-up is uncompiled and unoperated under the same cleanup restriction. Source review/diff checks establish no browser, layout, accessibility or revoke-to-deny acceptance. PR42 now covers public-verification integration across clients and remains draft. Current consumer builds, rename, app/provider/device journeys and exact-head W1 CI remain outstanding; original seven groups/H01–H20 stay assigned.
+
 ## October 1 — current main integration, source checks only
 
 Application `c46c5de` normally integrates main `ef3619b` through all eight owned W1 branches, including W4's payout-onboarding contracts/98th operation and W2's ingestion-recovery and cleanup corrections. W1 reviewed the changed source and owner receipts; owner app/CI receipts retain their original authors and revisions. Current canonical source checks pass for 12 shared resources and 98 Swift/Kotlin operations. [Exact integration and remaining checks](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md). W2's pool-error follow-up PR40 is still separate and unmerged in this checkpoint.
