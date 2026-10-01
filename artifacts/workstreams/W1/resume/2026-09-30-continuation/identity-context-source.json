@@ -1,0 +1,40 @@
+{
+  "sourceParent": "8c215a230e41c97206754a43fb2010182dd350f1",
+  "sourceSha256": {
+    "apps/backend/src/modules/identity/audience-scope.ts": "f9cc6e0246d9afe65c0f5b281a2a532b3a4d05d28b91c65cba0f9584eef896ea",
+    "apps/backend/src/modules/identity/creator-scope.ts": "05a0a1b0aed8b533e53c4805d0a3372db81a2eb282e8c9face3a3c32e79dbad1"
+  },
+  "change": "Creator issuer requires actual same-account HTTP request/current session; creator/audience denial context restored in finally on held client",
+  "checks": {
+    "backendBuild": "passed",
+    "canonicalFolioPreviewBackendBuild": "passed",
+    "affectedLintFormat": "passed",
+    "existingContracts": "9 passed (699ms)"
+  },
+  "logs": {
+    "/private/tmp/creator-w1-continuation-scope-restore-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-scope-restore-rename-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "/private/tmp/creator-w1-continuation-scope-restore-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/creator-w1-continuation-scope-restore-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "/private/tmp/creator-w1-continuation-scope-restore-contracts.log": "d42ce63e986ce7946bd7beb060b3aaac60189f4a705baa8489f93b271f4cd797"
+  },
+  "actualHostHealth": {
+    "status": "ok",
+    "ready": false,
+    "foundationReady": true,
+    "identity": "configured",
+    "identityMode": "development",
+    "generation": "unconfigured",
+    "registeredFeatures": ["conversation", "media", "content", "studio"],
+    "readinessEndpoint": "/health/ready",
+    "database": "configured",
+    "featureEnabled": true
+  },
+  "limits": [
+    "Default host has no current audience/creator media denial configuration and remains gated",
+    "New optional held-client denial callbacks not operated with a configured producer; no new tests or synthetic callback authority",
+    "No SQL/registry/generated/native/web change",
+    "Actor/UUID/request context is not a dedicated worker-purpose proof; no worker issuer inferred",
+    "SQL transaction errors still require caller rollback"
+  ]
+}

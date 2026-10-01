@@ -2,7 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import { IdSchema } from "@qelvora/api";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
-import { assertCurrentSession } from "./request-authority.js";
+import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 import { DomainError, invariant } from "../../core/errors.js";
 
 const creatorScopeBrand: unique symbol = Symbol("CreatorScope");
@@ -47,6 +47,7 @@ export class CreatorIdentityAuthority {
       accountId: IdSchema.parse(actor.accountId),
       development: this.configuration.mode === "development",
     });
+    this.assertRequest(scope.accountId);
     await identityTransaction(this.pool, scope.accountId, async (client) => {
       await this.authorize(client, scope, requirement);
     });
@@ -67,6 +68,7 @@ export class CreatorIdentityAuthority {
       "creator_scope_required",
       "A current issued creator scope is required.",
     );
+    this.assertRequest(scope.accountId);
     return identityTransaction(this.pool, scope.accountId, async (client) => {
       await this.authorize(client, scope, requirement);
       return work(client);
@@ -86,6 +88,7 @@ export class CreatorIdentityAuthority {
       "creator_scope_required",
       "A current issued creator scope is required.",
     );
+    this.assertRequest(scope.accountId);
     await client.query("SELECT set_config('app.account_id',$1,true)", [
       scope.accountId,
     ]);
@@ -93,11 +96,22 @@ export class CreatorIdentityAuthority {
     await this.authorize(client, scope, requirement);
   }
 
+  private assertRequest(accountId: string) {
+    const current = requestAuthority.getStore();
+    if (!current || current.accountId !== accountId)
+      throw new DomainError(
+        "creator_session_required",
+        "Reopen this creator operation with your current account.",
+        401,
+      );
+  }
+
   private async authorize(
     client: PoolClient,
     scope: CreatorScope,
     requirement: CreatorRequirement,
   ) {
+    this.assertRequest(scope.accountId);
     invariant(
       requirement === "owned" || requirement === "verified",
       "creator_requirement_invalid",
@@ -127,14 +141,17 @@ export class CreatorIdentityAuthority {
         "creator_verification_required",
         "Current creator verification and signing recovery are required.",
       );
-    await this.configuration.assertAllowed(
-      { accountId: scope.accountId, adultEligible: true },
-      scope.creatorId,
-      client,
-    );
-    await client.query(
-      "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-      [scope.creatorId, scope.accountId],
-    );
+    try {
+      await this.configuration.assertAllowed(
+        { accountId: scope.accountId, adultEligible: true },
+        scope.creatorId,
+        client,
+      );
+    } finally {
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+        [scope.creatorId, scope.accountId],
+      );
+    }
   }
 }

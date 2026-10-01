@@ -177,19 +177,22 @@ export class AudienceIdentityAuthority {
       "audience_unavailable",
       "This content is unavailable.",
     );
-    await this.configuration.assertAllowed(
-      { accountId: scope.actorAccountId, adultEligible: true },
-      scope.creatorId,
-      {
-        fanId: scope.fanId,
-        fanAccountId: scope.fanAccountId,
-        creatorAccountId: scope.creatorAccountId,
-      },
-      client,
-    );
-    await client.query(
-      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-      [scope.creatorId, scope.fanId, scope.actorAccountId],
-    );
+    try {
+      await this.configuration.assertAllowed(
+        { accountId: scope.actorAccountId, adultEligible: true },
+        scope.creatorId,
+        {
+          fanId: scope.fanId,
+          fanAccountId: scope.fanAccountId,
+          creatorAccountId: scope.creatorAccountId,
+        },
+        client,
+      );
+    } finally {
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+        [scope.creatorId, scope.fanId, scope.actorAccountId],
+      );
+    }
   }
 }
