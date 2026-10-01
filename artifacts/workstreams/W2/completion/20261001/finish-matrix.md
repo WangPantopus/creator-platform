@@ -1,5 +1,7 @@
 # Current W2 scope and R01–R14
 
+**Resource cleanup supersedes live-state statements:** [Container/volume removal and the latest-data recovery gap](resource-loss-checkpoint.md). The cleanup coordinator removed the W2 database before its fresh dump could run. The original validated650,776-byte archive is intact; last125/105/25/939 receipts are committed but do not form a complete latest DB backup. Web/API/PG listeners are gone; local runtimes/builds remain off while the human clarifies resource priority. Source/PR38 and protected originals remain preserved; all nine packages/R01–R14 continue, with current launched-app acceptance unavailable.
+
 This matrix reconciles normally merged PR32/maind31afb6 and current W4 main3de0f14. [Actual source process-loss recovery, current expert27 evaluation and wrapped transcripts](source-process-recovery.md) supersedes older revision/count/PR-open observations. Companion19 remains current; secondary expert legitimately advanced27 through the new source lifecycle and passed a fresh seven-case evaluation. “Implemented” means code exists; it is distinct from composed, operated and release-ready. Historical evidence is preserved in September30 receipts. Nothing below declares the full workstream complete.
 
 ## Nine original packages

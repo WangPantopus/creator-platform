@@ -1,5 +1,7 @@
 # W2 recovery and canonical session continuation
 
+**Resource cleanup supersedes live-state statements:** [Container/volume removal and the latest-data recovery gap](resource-loss-checkpoint.md). The cleanup coordinator removed the W2 database before its fresh dump could run. The original validated650,776-byte archive is intact; last125/105/25/939 receipts are committed but do not form a complete latest DB backup. Web/API/PG listeners are gone; local runtimes/builds remain off while the human clarifies resource priority. Source/PR38 and protected originals remain preserved; all nine packages/R01–R14 continue, with current launched-app acceptance unavailable.
+
 This is an October 1 checkpoint, not complete workstream or pilot acceptance. The founder's complete successor request remains binding: all nine packages, R01–R14, C05/C08/C09/C10, O01/O15 and W2's O08/O10/O19/O21 contributions. September 30 artifacts remain historical evidence. PR #1 is merged; it is not reopened or duplicated.
 
 Worktree: `/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform`. Continuation branch: `codex/w2-completion`, based on verified `origin/main` `2f0319dbb6979878c5a9019e68503506902f9ea0`. The original `codex/w2-creator-ai-handoff` at `9f805888932c63c5a59d1efab29a7a4f47a42a98` is preserved. Current source hashes and sanitized database/provider facts are recorded separately. No implementation or app acceptance was delegated.
