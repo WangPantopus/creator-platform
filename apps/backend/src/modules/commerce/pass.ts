@@ -80,18 +80,23 @@ export class PassCommerce {
       return { creators, replaceableSlotIds };
     });
   }
-  async reconcile(actor: Actor, reference: string) {
+  async reconcile(
+    actor: Actor,
+    reference: string,
+    assertCurrent?: (client: PoolClient) => Promise<void>,
+  ) {
     invariant(
       this.billing,
       "pass_unavailable",
       "The pass is not available yet.",
     );
-    const before = await this.service.account(
-      actor,
-      async (client) =>
+    const before = await this.service.account(actor, async (client) => {
+      await assertCurrent?.(client);
+      return (
         (await client.query("SELECT id,version FROM creator.commerce_pass"))
-          .rows[0] ?? null,
-    );
+          .rows[0] ?? null
+      );
+    });
     const paid = await this.billing.current(actor, reference);
     invariant(
       paid.accountId === actor.accountId &&
@@ -117,6 +122,7 @@ export class PassCommerce {
       "The current paid pass period could not be verified.",
     );
     return this.service.account(actor, async (client) => {
+      await assertCurrent?.(client);
       const fan = (
         await client.query<{ id: string }>(
           "SELECT id FROM creator.fan_profile WHERE account_id=$1",

@@ -14,6 +14,7 @@ import type { PassPeriodVerifier, VerifiedPassPeriod } from "./pass.js";
 export const ApprovedPassPurchasePolicy = z.strictObject({
   version: z.string().min(1).max(100),
   budgetPolicyVersion: z.string().min(1).max(100),
+  quoteValiditySeconds: z.number().int().positive().max(300),
   prorationBehavior: z.literal("create_prorations"),
   discountPolicy: z.literal("no_discounts"),
   allocation: z.literal("separate_pool_transfers"),
@@ -71,8 +72,22 @@ export const PassRenewalActivation = z.strictObject({
   reference: z.string().regex(/^sub_[A-Za-z0-9]+$/u),
   start: PassPurchaseStart,
 });
+export const VerifiedPassQuote = z.strictObject({
+  configurationHash: original.configurationHash,
+  currency: z.string().regex(/^[A-Z]{3}$/u),
+  amount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  monthlyAmount: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  createdAt: z.iso.datetime({ offset: true }),
+  expiresAt: z.iso.datetime({ offset: true }),
+  periodEndsAt: z.iso.datetime({ offset: true }),
+  providerPreviewReference: z.string().min(1).max(200),
+  customerReference: PassPurchaseStart.shape.customerReference,
+  replacesReference: PassPurchaseStart.shape.replacesReference,
+});
 export type PassPurchaseMutation = {
   reference: string;
+  customerReference: string;
+  subscriptionTerminal: boolean;
   processing: boolean;
   state: "paid" | "refunded" | "processing" | "cancelled" | "failed";
   period: VerifiedPassPeriod;
@@ -85,6 +100,7 @@ export type PassPurchaseMutation = {
     paymentReference: string;
     currency: string;
     paidMinor: number;
+    paidAt: string;
     lines: {
       lineReference: string;
       paidMinor: number;
@@ -181,6 +197,152 @@ export class StripePassPurchases implements PassPeriodVerifier {
       "pass_terms_changed",
       "Reconcile the original approved pass terms before changing the purchase.",
     );
+  }
+  /** Read-only actual provider preview. No invoice/payment/subscription is
+   * created; its amount is persisted before fan consent by the host journal. */
+  async quote(
+    actor: Actor,
+    fanId: string,
+    customerReference?: string,
+    replacesReference?: string,
+  ): Promise<z.infer<typeof VerifiedPassQuote>> {
+    this.binding(actor, { configurationHash: this.configurationHash });
+    z.uuid().parse(fanId);
+    return stripeOperation(async () => {
+      if (customerReference) {
+        const customer = await this.customer(actor, fanId, customerReference);
+        invariant(
+          !customer.discount &&
+            customer.balance === 0 &&
+            Object.values(customer.invoice_credit_balance ?? {}).every(
+              (n) => n === 0,
+            ),
+          "pass_tender_policy_unavailable",
+          "Reconcile customer discounts or credits before quoting card cash.",
+        );
+      }
+      invariant(
+        !this.policy.automaticTax.enabled || customerReference,
+        "pass_tax_location_required",
+        "Set up the actual billing customer and tax location before quoting this pass.",
+      );
+      const price = await this.stripe.prices.retrieve(
+        this.approved.priceReference,
+        { expand: ["product"] },
+        this.options,
+      );
+      invariant(
+        !price.livemode &&
+          price.active &&
+          typeof price.product !== "string" &&
+          !price.product.deleted &&
+          price.product.active &&
+          price.product.id === this.approved.productReference &&
+          price.currency.toUpperCase() === this.approved.currency &&
+          price.unit_amount === this.approved.monthlyAmount &&
+          price.recurring?.interval === "month" &&
+          price.recurring.interval_count === 1 &&
+          price.recurring.usage_type === "licensed",
+        "pass_product_mismatch",
+        "The approved monthly pass product is unavailable.",
+      );
+      const created = Math.floor(Date.now() / 1000);
+      const start = new Date(created * 1000);
+      const end =
+        Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1) / 1000;
+      const expires = Math.min(
+        created + this.policy.quoteValiditySeconds,
+        end - 1,
+      );
+      if (replacesReference) {
+        const old = await this.stripe.subscriptions.retrieve(
+          replacesReference,
+          {},
+          this.options,
+        );
+        const items = await collect(
+          this.stripe.subscriptionItems.list(
+            { subscription: old.id, limit: 100 },
+            this.options,
+          ),
+        );
+        invariant(
+          !old.livemode &&
+            old.metadata.commerce_account_id === actor.accountId &&
+            old.metadata.commerce_fan_id === fanId &&
+            old.metadata.commerce_pass_catalog_key === this.approved.key &&
+            customerReference &&
+            reference(old.customer) === customerReference &&
+            ["canceled", "incomplete_expired"].includes(old.status) &&
+            old.ended_at &&
+            old.ended_at <= created &&
+            items.length === 1 &&
+            items[0]!.current_period_end <= created,
+          "pass_period_overlap",
+          "The previous paid calendar period must end before a replacement purchase.",
+        );
+      }
+      invariant(
+        expires > created,
+        "pass_quote_expired",
+        "Refresh the quote in the new calendar period.",
+      );
+      const invoice = await this.stripe.invoices.createPreview(
+        {
+          ...(customerReference ? { customer: customerReference } : {}),
+          currency: price.currency,
+          discounts: "",
+          automatic_tax: this.policy.automaticTax,
+          ...(this.policy.onBehalfOf
+            ? { on_behalf_of: this.policy.onBehalfOf }
+            : {}),
+          subscription_details: {
+            items: [{ price: price.id, quantity: 1 }],
+            billing_mode: { type: "classic" },
+            billing_cycle_anchor: end,
+            start_date: created,
+            cancel_at_period_end: true,
+            proration_behavior: this.policy.prorationBehavior,
+            default_tax_rates: this.policy.defaultTaxRateReferences,
+          },
+        },
+        this.options,
+      );
+      invariant(
+        !invoice.livemode &&
+          invoice.currency === price.currency &&
+          invoice.total > 0 &&
+          Number.isSafeInteger(invoice.total) &&
+          invoice.amount_due === invoice.total &&
+          (!customerReference ||
+            reference(invoice.customer) === customerReference) &&
+          invoice.discounts.length === 0 &&
+          !invoice.lines.has_more &&
+          invoice.lines.data.length > 0 &&
+          invoice.lines.data.every(
+            (line) =>
+              reference(line.pricing?.price_details?.price) === price.id &&
+              line.period.start === created &&
+              line.period.end === end &&
+              (line.discount_amounts?.length ?? 0) === 0 &&
+              (line.pretax_credit_amounts?.length ?? 0) === 0,
+          ),
+        "pass_quote_unavailable",
+        "The complete provider preview must match the approved calendar pass without other charges or credits.",
+      );
+      return VerifiedPassQuote.parse({
+        configurationHash: this.configurationHash,
+        currency: this.approved.currency,
+        amount: invoice.total,
+        monthlyAmount: this.approved.monthlyAmount,
+        createdAt: start.toISOString(),
+        expiresAt: new Date(expires * 1000).toISOString(),
+        periodEndsAt: new Date(end * 1000).toISOString(),
+        providerPreviewReference: invoice.id,
+        ...(customerReference ? { customerReference } : {}),
+        ...(replacesReference ? { replacesReference } : {}),
+      });
+    });
   }
   private async customer(actor: Actor, fanId: string, customerId: string) {
     const customer = await this.stripe.customers.retrieve(
@@ -491,6 +653,28 @@ export class StripePassPurchases implements PassPeriodVerifier {
   /** A separately persisted/fenced journal phase consumes the original paid
    * receipt and current desired renewal state. Never clear a fan cancellation;
    * lease/version loss requires the host's durable cancellation compensation. */
+  async recoverRenewal(
+    actor: Actor,
+    rawInput: unknown,
+  ): Promise<PassPurchaseMutation> {
+    const input = PassRenewalActivation.parse(rawInput);
+    this.binding(actor, input);
+    return stripeOperation(async () => {
+      const sub = await this.subscription(actor, input.fanId, input.reference);
+      invariant(
+        input.start.fanId === input.fanId &&
+          input.start.configurationHash === input.configurationHash &&
+          sub.metadata.commerce_pass_start_key ===
+            contentHash(input.start.key) &&
+          sub.metadata.commerce_pass_start_body === contentHash(input.start) &&
+          (sub.metadata.commerce_pass_renewal_key !== contentHash(input.key) ||
+            sub.metadata.commerce_pass_renewal_body === contentHash(input)),
+        "pass_original_request_changed",
+        "The original renewal request changed.",
+      );
+      return this.startResult(actor, input.start, sub);
+    });
+  }
   async activateRenewal(
     actor: Actor,
     rawInput: unknown,
@@ -685,6 +869,10 @@ export class StripePassPurchases implements PassPeriodVerifier {
         ["void", "uncollectible"].includes(invoice.status ?? "");
       return {
         reference: sub.id,
+        customerReference: reference(sub.customer)!,
+        subscriptionTerminal: ["canceled", "incomplete_expired"].includes(
+          sub.status,
+        ),
         period,
         renewalEnabled: !sub.cancel_at_period_end && sub.status === "active",
         cancellationCompensationRequired,
@@ -696,6 +884,12 @@ export class StripePassPurchases implements PassPeriodVerifier {
       };
     }
     const confirmed = await this.receipts.confirmedInvoice(invoice, lines);
+    invariant(
+      invoice.status_transitions.paid_at &&
+        invoice.status_transitions.paid_at * 1000 <= Date.now(),
+      "pass_cash_invalid",
+      "The original confirmed cash needs its actual payment time.",
+    );
     const receiptLines = lines.map((line) => ({
       lineReference: line.id,
       paidMinor: confirmed.cash.values.get(line.id)!,
@@ -711,6 +905,10 @@ export class StripePassPurchases implements PassPeriodVerifier {
     );
     return {
       reference: sub.id,
+      customerReference: reference(sub.customer)!,
+      subscriptionTerminal: ["canceled", "incomplete_expired"].includes(
+        sub.status,
+      ),
       period,
       processing:
         cancellationCompensationRequired ||
@@ -725,6 +923,9 @@ export class StripePassPurchases implements PassPeriodVerifier {
         paymentReference: confirmed.cash.paymentId,
         currency: invoice.currency.toUpperCase(),
         paidMinor: invoice.total,
+        paidAt: new Date(
+          invoice.status_transitions.paid_at * 1000,
+        ).toISOString(),
         lines: receiptLines,
       },
     };
@@ -738,6 +939,10 @@ export class StripePassPurchases implements PassPeriodVerifier {
     const cancelled = terminal || sub.cancel_at_period_end;
     return {
       reference: sub.id,
+      customerReference: reference(sub.customer)!,
+      subscriptionTerminal: ["canceled", "incomplete_expired"].includes(
+        sub.status,
+      ),
       period,
       renewalEnabled: !sub.cancel_at_period_end && sub.status === "active",
       cancellationCompensationRequired: false,

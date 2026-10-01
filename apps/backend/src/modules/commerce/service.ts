@@ -419,7 +419,27 @@ export class CommerceService {
         [fanId, currency],
       )
     ).rows[0]!;
-    const heldTotal = BigInt(held.amount) + BigInt(billing.amount);
+    const passSchema = (
+      await client.query<{ count: string }>(
+        "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+      )
+    ).rows[0]!;
+    invariant(
+      passSchema.count === "0" || passSchema.count === "4",
+      "pass_schema_incomplete",
+      "Pass billing needs complete schema reconciliation before spending can continue.",
+    );
+    const passPending =
+      passSchema.count === "4"
+        ? (
+            await client.query<{ amount: string }>(
+              "SELECT coalesce(sum(q.amount),0)::text AS amount FROM creator.commerce_pass_billing_effect e JOIN creator.commerce_pass_quote q ON q.id=e.quote_id AND q.fan_id=e.fan_id WHERE e.fan_id=$1 AND q.currency=$2 AND e.operation='start' AND e.state IN('pending','processing','unknown') AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.fan_id=e.fan_id AND l.kind='capture' AND l.refs->>'effectId'=e.id::text)",
+              [fanId, currency],
+            )
+          ).rows[0]!.amount
+        : "0";
+    const heldTotal =
+      BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
       total <= BigInt(Number.MAX_SAFE_INTEGER),

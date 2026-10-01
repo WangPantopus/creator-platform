@@ -279,6 +279,36 @@ export function commercePrivacyHook(
             );
           }
           if (input.scope === "account") {
+            const passSchema = (
+              await client.query<{ count: string }>(
+                "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pass_billing_account','commerce_pass_quote','commerce_pass_billing_effect','commerce_pass_receipt')",
+              )
+            ).rows[0]!;
+            invariant(
+              passSchema.count === "0" || passSchema.count === "4",
+              "pass_schema_incomplete",
+              "The complete pass billing history is required before publishing this export.",
+            );
+            if (passSchema.count === "4")
+              for (const [name, query] of [
+                [
+                  "passBillingAccounts",
+                  "SELECT fan_id,currency,desired_renewal,version,retention_policy_version FROM creator.commerce_pass_billing_account LIMIT 2001",
+                ],
+                [
+                  "passQuotes",
+                  "SELECT id,fan_id,account_version,currency,amount,monthly_amount,quoted_at,expires_at,period_end,retention_policy_version FROM creator.commerce_pass_quote LIMIT 2001",
+                ],
+                [
+                  "passBillingEffects",
+                  "SELECT id,fan_id,operation,intent_version,quote_id,state,attempt,error_code,created_at,updated_at,retention_policy_version FROM creator.commerce_pass_billing_effect LIMIT 2001",
+                ],
+                [
+                  "passReceipts",
+                  "SELECT id,fan_id,subscription_ref,invoice_ref,line_ref,payment_ref,paid_minor,currency,period_start,period_end,paid_at,created_at,retention_policy_version FROM creator.commerce_pass_receipt LIMIT 2001",
+                ],
+              ] as const)
+                await bounded(name, query);
             for (const [name, query] of [
               [
                 "spendingLimits",

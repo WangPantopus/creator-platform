@@ -19,6 +19,8 @@ import {
   type MoneyStatementProvider,
 } from "./reconciliation.js";
 import type { CreatorSettlement } from "./accounting.js";
+import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
+import { invariant } from "../../core/errors.js";
 import {
   createCommerceAudience,
   type GroupAudienceReader,
@@ -38,6 +40,10 @@ export async function createCommerceRuntime(input: {
   stores?: StoreEntitlementVerifier;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
+  passPurchases?: (
+    service: CommerceService,
+    pass: import("./pass.js").PassCommerce,
+  ) => Promise<PassPurchaseJournal>;
   moneyStatement?: MoneyStatementProvider;
   settlement?: (service: CommerceService) => CreatorSettlement;
   assertActorAllowed?: (
@@ -69,14 +75,25 @@ export async function createCommerceRuntime(input: {
     ? new MoneyReconciliation(service, input.moneyStatement)
     : undefined;
   const settlement = input.settlement?.(service);
+  const pass = input.pass?.(service);
+  invariant(
+    !input.passPurchases || pass,
+    "pass_billing_unconfigured",
+    "Pass purchases require the same canonical pass graph.",
+  );
+  const passPurchases =
+    input.passPurchases && pass
+      ? await input.passPurchases(service, pass)
+      : undefined;
   const extended = new ExtendedCommerce(
     service,
     input.stores,
-    input.pass?.(service),
+    pass,
     billing,
     tiers,
     money,
     settlement,
+    passPurchases,
   );
   return {
     service,
@@ -85,6 +102,7 @@ export async function createCommerceRuntime(input: {
     tiers,
     money,
     settlement,
+    passPurchases,
     // W3 readiness consumes this after awaiting composition. It must not
     // configure a second allowance/reservation path or infer it from keys.
     generationAllowanceAvailable: Boolean(generationAllowance),
