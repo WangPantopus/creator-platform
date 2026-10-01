@@ -41,11 +41,6 @@ import {
   type ConversationTimeline,
 } from "./conversation/contracts.ts";
 
-import {
-  ConversationRecordingInputSchema,
-  ConversationRecordingResultSchema,
-} from "./conversation/contracts.ts";
-
 export class CreatorApiClient {
   constructor(
     private readonly baseUrl: string,

@@ -59,30 +59,6 @@ export function configureMediaRequests(current: MediaIdentity) {
   };
 }
 
-export class MediaRequestError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-    readonly code?: string,
-  ) {
-    super(message);
-  }
-}
-
-type MediaIdentity = {
-  accountId: string;
-  signal: AbortSignal;
-  end: () => void;
-};
-let identity: MediaIdentity | undefined;
-/** W1 attaches the current account boundary before mounting private media. */
-export function configureMediaRequests(current: MediaIdentity) {
-  identity = current;
-  return () => {
-    if (identity === current) identity = undefined;
-  };
-}
-
 export async function mediaRequest<T>(
   path: string,
   init: RequestInit = {},

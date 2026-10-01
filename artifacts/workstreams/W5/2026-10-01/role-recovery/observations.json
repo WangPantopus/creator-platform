@@ -1,0 +1,123 @@
+{
+  "recordedAt": "2026-10-01T04:14:10.904414+00:00",
+  "applicationHead": "fae68614dc063a67dac9a63c78f4f1003898ca07",
+  "baseMain": "6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac",
+  "sourceSha256": {
+    "apps/web/features/studio/Studio.tsx": "c8baedc40fce3a9ba365988676e8819db936ca7a6838cd789dae96c2ad5af1ed",
+    "apps/web/features/studio/api.ts": "8f0319da48fc087af139c16127068043b7a94de2a6bebcf703aee8a9cc9dd2c3"
+  },
+  "scope": "Two Studio web files only; current W1 identity scope/session/account guards, pending-command purge/idempotency and all backend/native/API/migration code preserved.",
+  "configuration": {
+    "web": "http://localhost:30055",
+    "api": "http://127.0.0.1:41055",
+    "webWorktree": "/Users/yingpengwang/.codex/worktrees/w5-role-recovery/creator-platform",
+    "backendSource": "Existing owned W5 host cea5e07d302bd36d4eeb99dd627989b0f9ea6d26",
+    "database": "Existing creator_w5 on55435, runtime creator_runtime nonowner/nonBYPASSRLS; no migrations applied",
+    "identity": "Explicitly synthetic actual actor10000000-0000-4000-8000-000000000003, pending creator da06e2ce-d2b3-4fb9-b163-91b8bbe58706"
+  },
+  "journey": {
+    "owner": "Primary W5 agent personally operated",
+    "setup": "Real retained development session, current merged W1 IdentitySessionBoundary, three separate local drafts in actual browser views; no commands submitted.",
+    "outage": "Only listener41055/PID6369 and owned backend cwd verified; SIGSTOP with automatic CONT trap. Final source paused04:10:22Z and resumed04:11:12Z, normal process state S confirmed.",
+    "during": "Private view hidden+inert, exact each local draft retained. Reconnect action focused and enabled. Night keyboard Enter twice while pending keeps aria-busy=true and focus; serialization is additionally source-reviewed, not inferred from domain writes.",
+    "after": [
+      {
+        "view": "390-light",
+        "disabledControls": [
+          "Voice \u00b7 up to 60 s",
+          "Photo",
+          "Save draft",
+          "Review and sign"
+        ],
+        "focusId": "note-text",
+        "focusTag": "TEXTAREA",
+        "height": 844,
+        "hidden": false,
+        "inert": null,
+        "note": "W5 final Light phone recovery. These words stay local.",
+        "scrollWidth": 390,
+        "theme": "light",
+        "width": 390
+      },
+      {
+        "view": "390-night",
+        "disabledControls": [
+          "Voice \u00b7 up to 60 s",
+          "Photo",
+          "Save draft",
+          "Review and sign"
+        ],
+        "focusId": "note-text",
+        "focusTag": "TEXTAREA",
+        "height": 844,
+        "hidden": false,
+        "inert": null,
+        "note": "W5 final Night phone recovery. These words stay local.",
+        "scrollWidth": 390,
+        "theme": "night",
+        "width": 390
+      },
+      {
+        "view": "1280-light",
+        "disabledControls": [
+          "Voice \u00b7 up to 60 s",
+          "Photo",
+          "Save draft",
+          "Review and sign"
+        ],
+        "focusId": "note-text",
+        "focusTag": "TEXTAREA",
+        "height": 720,
+        "hidden": false,
+        "inert": null,
+        "note": "W5 final Light desktop recovery. These words stay local.",
+        "scrollWidth": 1280,
+        "theme": "light",
+        "width": 1280
+      }
+    ],
+    "desktopNight": "Actual1280x720/scrollWidth1280 Night composer inspection on final source. Tab from textarea skips disabled Voice/Photo and focuses AI-use checkbox. No toggle or save. This is layout/keyboard observation, not a fourth final outage run.",
+    "viewportLimitation": "Tab7 remained390x844 after1280 override+reload, excluded from desktop evidence and closed; existing tab5 measured1280x720 and was used.",
+    "reloadLimitation": "Unsubmitted pending text was separately typed after navigation; no disk persistence claimed."
+  },
+  "checks": {
+    "format": 0,
+    "lint": 0,
+    "build": 0
+  },
+  "review": "W1 personally reviewed complete two-file patch and both focus followups, no compatibility blocker; read-only review does not substitute for actual W5 operation.",
+  "administrativeReadOnly": {
+    "pendingCreator": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+    "contentRows": 0
+  },
+  "failedIntermediateEvidence": {
+    "source59cde33": "Reconnect disabled during request, later enabled without focus retry; actualBODY focus captured.",
+    "source28eb0a7": "Initial focus retry passed, but periodic next check disabled focused action; Night pending frame retained.",
+    "files": "before-fix-* and before-periodic-focus-fix-* retained, not counted as final acceptance."
+  },
+  "nativeQualification": "Native/backend/API source unchanged from verified merged PR6. W1 actual final native4Android+2iOS flows and clean Light/Night launches support that parent only. No new authenticated W5 native content/media proof.",
+  "limits": [
+    "Genuine signing remains explicitly held by human",
+    "No real Pantopus, provider/media/payment/publication acceptance",
+    "No fake identity, approvals/reviews/grants/delivery/privacy",
+    "Full original PR9 and all nine packages remain incomplete",
+    "No new test code, unit-test/coverage work, assertion/golden changes"
+  ],
+  "captures": [
+    "before-fix-reconnect-focus-body-390-light.jpg",
+    "before-periodic-focus-fix-outage-1280-light.jpg",
+    "before-periodic-focus-fix-outage-1280-night.jpg",
+    "before-periodic-focus-fix-outage-390-light.jpg",
+    "before-periodic-focus-fix-outage-390-night.jpg",
+    "before-periodic-focus-fix-restored-1280-night.jpg",
+    "before-periodic-focus-fix-restored-390-light.jpg",
+    "final-busy-reconnect-390-night.jpg",
+    "final-composer-1280-night.jpg",
+    "final-outage-1280-light.jpg",
+    "final-outage-390-light.jpg",
+    "final-outage-390-night.jpg",
+    "final-restored-1280-light.jpg",
+    "final-restored-390-light.jpg",
+    "final-restored-390-night.jpg"
+  ]
+}

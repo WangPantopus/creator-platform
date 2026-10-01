@@ -47,7 +47,10 @@ const configured =
           });
           const commerceConfiguration = readCommerceEnvironment(runtime.pool);
           const commerce = commerceConfiguration
-            ? createCommerceRuntime({ ...runtime, ...commerceConfiguration })
+            ? await createCommerceRuntime({
+                ...runtime,
+                ...commerceConfiguration,
+              })
             : undefined;
           const conversation = createConversationRuntime(runtime);
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);

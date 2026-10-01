@@ -960,7 +960,9 @@ export function ConversationScreen({
           Ask {page.creatorName} to step in
         </Button>
         <div className="conversation-actions">
-          <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>Me and privacy</a>
+          <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>
+            Me and privacy
+          </a>
           <a href="/trust/crisis">Get support</a>
         </div>
       </footer>

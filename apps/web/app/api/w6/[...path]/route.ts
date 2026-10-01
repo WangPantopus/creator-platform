@@ -35,7 +35,9 @@ async function proxy(
     if (value) headers[key] = value;
   }
   try {
-    const expected = request.headers.get("x-qelvora-expected-account") ?? request.nextUrl.searchParams.get("expectedAccountId");
+    const expected =
+      request.headers.get("x-qelvora-expected-account") ??
+      request.nextUrl.searchParams.get("expectedAccountId");
     if (expected) {
       if (!IdSchema.safeParse(expected).success)
         return Response.json(
