@@ -20,19 +20,28 @@ import { SourceService } from "../sources/service.js";
 import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { ContentSources } from "./sources.js";
+import { createConversationRuntime } from "../conversation/runtime.js";
 
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3005",
-  url = process.env.DATABASE_URL;
+  url = process.env.DATABASE_URL,
+  apiPort = Number(process.env.W5_API_PORT ?? 4105);
 if (
   process.env.NODE_ENV !== "development" ||
   !url ||
   new URL(url).hostname !== "127.0.0.1" ||
   new URL(url).port !== "55435" ||
   new URL(url).pathname !== "/creator_w5" ||
-  new URL(webOrigin).port !== "3005"
+  !["localhost", "127.0.0.1"].includes(new URL(webOrigin).hostname) ||
+  ![
+    ["3005", 4105],
+    ["30055", 41055],
+  ].some(
+    ([webPort, port]) =>
+      new URL(webOrigin).port === webPort && apiPort === port,
+  )
 )
   throw new Error(
-    "W5 requires its explicit isolated loopback database and web3005.",
+    "W5 requires its isolated loopback database and an explicit3005/4105 or30055/41055 host pair.",
   );
 class W5DevelopmentIdentity extends DevelopmentIdentityAdapter {
   override readonly developmentActors = [
@@ -77,7 +86,7 @@ let contentSources: ContentSources;
 const model = modelFromEnvironment();
 const backend = await createConfiguredBackend({
   config: {
-    port: 4105,
+    port: apiPort,
     featureEnabled: true,
     databaseUrl: url,
     allowedOrigin: webOrigin,
@@ -104,6 +113,8 @@ const backend = await createConfiguredBackend({
     },
   ],
   registerFeatures: async (runtime) => {
+    const conversation = createConversationRuntime(runtime);
+    runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
     const repository = new AgentRepository(runtime.pool),
       agent = new AgentService(
         repository,
@@ -111,6 +122,7 @@ const backend = await createConfiguredBackend({
       ),
       sources = new SourceService(repository);
     content = new ContentService(runtime.pool, {
+      assertAllowed: runtime.assertCreatorAllowed,
       follows: async (client, accountId, creatorId) =>
         Boolean(
           (
@@ -186,6 +198,7 @@ const backend = await createConfiguredBackend({
       profiles: runtime.identity?.profiles,
     });
     return [
+      conversation.registration,
       contentFeature(content),
       studioFeature(studio),
       commerceFeature(commerce),
@@ -232,9 +245,9 @@ const worker =
           });
       }, 5000)
     : undefined;
-backend.server.listen(4105, "127.0.0.1", () =>
+backend.server.listen(apiPort, "127.0.0.1", () =>
   process.stdout.write(
-    "W5 API4105 · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n",
+    `W5 API${apiPort} · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n`,
   ),
 );
 const stop = () => {

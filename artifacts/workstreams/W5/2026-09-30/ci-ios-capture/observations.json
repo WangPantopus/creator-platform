@@ -1,0 +1,50 @@
+{
+  "ci": {
+    "head": "7b167fb",
+    "run": 36763954818,
+    "artifact": 11124533610,
+    "runner": "macOS27/Xcode27 ARM64",
+    "bitmap": "780x1688",
+    "reportedDisplayScale": 1,
+    "observed": "Full content but visibly blurred raster enlarged from1x"
+  },
+  "candidate": {
+    "method": "NSHostingView with explicit2x environment; frame scaled by2/window.backingScaleFactor; bounds stay390x844; existing assertions and goldens unchanged",
+    "local": "macOS26.5/Xcode26.5 x86_64; display2x; host transform1x; complete sharp content personally viewed",
+    "comparison": [
+      {
+        "theme": "light",
+        "reference": [780, 1688],
+        "capture": [780, 1688],
+        "differentPixels": 6563
+      },
+      {
+        "theme": "night",
+        "reference": [780, 1688],
+        "capture": [780, 1688],
+        "differentPixels": 78736
+      }
+    ],
+    "remoteVerified": false,
+    "fullExistingSuite": {
+      "compilation": "pass",
+      "methods": 18,
+      "nonSnapshotMethodsPassed": 15,
+      "snapshotAssertions": 110,
+      "snapshotFailures": 110,
+      "log": "/private/tmp/creator-w5-host-transform-full.log"
+    }
+  },
+  "limitations": [
+    "Local exact assertions still fail;15 existing non-snapshot methods pass.",
+    "Host coordinate repair on a1x runner is unverified until next CI run.",
+    "Reference/candidate profiles differ; native CI may still require reviewed color-space normalization.",
+    "No golden or pixel-tolerance change."
+  ],
+  "colorProfile": {
+    "reference": "LG HDR4K",
+    "candidate": "sRGB IEC61966-2.1",
+    "observed": "A large proportion of remaining Night differences are flat-color encoding (for example235,230,219 vs236,230,218); this cannot be attributed to OS/font rendering alone.",
+    "nextAction": "Inspect next CI sharp captures and resolve a common documented color-space baseline with W1. Preserve strict comparisons; do not regenerate just to hide an unexplained difference."
+  }
+}

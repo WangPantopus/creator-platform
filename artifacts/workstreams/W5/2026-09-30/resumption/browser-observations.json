@@ -1,0 +1,73 @@
+{
+  "host": "localhost3005 -> persisted API4105 creator_w5 nonowner runtime",
+  "actor": "explicit synthetic W5 development creator",
+  "viewportChecks": [
+    {
+      "width": 390,
+      "themes": ["light", "night"],
+      "focusedElement": "note-text",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1280,
+      "themes": ["light", "night"],
+      "sidebarWidth": 248
+    }
+  ],
+  "journeys": [
+    "real development continuation sign-in retained through Studio navigation",
+    "saved draft reopened revision4 with exact text",
+    "own API stopped; private composer hidden/inert during transport outage",
+    "own API restarted; current account/roles revalidated; exact unsaved text and textarea focus restored",
+    "genuine signing review savedrevision5 and returned registered creator passkey required"
+  ],
+  "publication": false,
+  "signedAct": false,
+  "media": false,
+  "isolatedFans": false,
+  "roleRace": {
+    "actors": "explicit development creator1 and drafter3 in two simultaneously open isolated sessions",
+    "hosts": ["3005/4105", "30055/41055"],
+    "removedAccount": "synthetic w5_actor_3",
+    "preservedAccount": "synthetic w5_actor_4",
+    "observedClickToPrivateComposerDetachedMs": 1903,
+    "savedRevision": 5,
+    "savedTextChanged": false,
+    "proof": ["team-draft-before-removal.jpg", "team-view-after-removal.jpg"]
+  },
+  "limitations": [
+    "No real passkey was available; no UV simulated.",
+    "Cookie success is bounded to this namespaced session.",
+    "Screenshots prove current composer layout, not remaining packet/provider/native flows."
+  ],
+  "authorityExpiry": {
+    "configuredMs": 5000,
+    "observed": "own API process SIGSTOP; private subtree hidden/inert while request stalled; SIGCONT and current role/account validation restored exact unsaved text and note-text focus",
+    "measuredTotalLatencyMs": null,
+    "proof": "authority-expired-concealed.jpg"
+  },
+  "finalFocusedComposer": {
+    "viewports": ["390 Light", "390 Night"],
+    "files": ["composer-390-light-final.jpg", "composer-390-night-final.jpg"],
+    "photoBeforeVoice": true,
+    "resizeHandle": false,
+    "horizontalOverflow": false
+  },
+  "signingBlock": "Human directly requested genuine signing stay blocked for now; no registration or UV simulation.",
+  "mediaEntry": {
+    "realObjectId": "a9181632-d598-49f5-9be8-49a66184081c",
+    "latestSavedRevision": 8,
+    "photoDisabledUntilActualProducerConfigured": true,
+    "voiceEntryUsesCreatorObject": true,
+    "savedTextPreserved": true,
+    "sessionExpiryAndReauthenticationObserved": true,
+    "fileUploaded": false,
+    "microphoneRequested": false,
+    "processedMedia": false,
+    "C2PA": false,
+    "proof": [
+      "photo-unconfigured-saved-draft.jpg",
+      "voice-unconfigured-saved-draft.jpg"
+    ]
+  }
+}

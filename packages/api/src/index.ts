@@ -12,3 +12,4 @@ export * as callContracts from "./session.ts";
 export * as conversationContracts from "./conversation/contracts.ts";
 export * as contentContracts from "./content.ts";
 export * as studioContracts from "./studio.ts";
+export * from "./content-client.ts";

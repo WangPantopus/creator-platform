@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-01T01:50:44.369365+00:00",
+  "lease": "W6 explicitly authorized narrow BFF/CreatorVoicePlayer optional current-account precondition, preserve producer and platform guards",
+  "sourceSha256": {
+    "apps/web/app/api/w6/[...path]/route.ts": "d905c96fe6e1d9eab5305e25bfecb97bdb1a62e91183df1c67a306981bddf80d",
+    "apps/web/features/media/VoicePlayer.tsx": "ef1912afd547350ae6fabfd47abcd7599fd099d71f5146eca7e3699ebf6ae84b",
+    "apps/web/features/content/MediaAttachments.tsx": "2cb4cf0bf139c801f6729c004d4ad9e41bc0db9ea78f90c6e295156e89012e63",
+    "apps/web/features/content/Content.tsx": "6171dc4fb93dbbcb7291234bcc38e84d0d06bfd075f7aae7929c80b137e905e5"
+  },
+  "checks": "web types/lint/format/production build pass",
+  "actualHTTP": {
+    "malformedUUID": 400,
+    "duplicateUUID": 400,
+    "validUUIDWithoutSession": 401
+  },
+  "authenticatedMismatchVerified": false,
+  "browserAPIDocumentNavigation": "blocked by client; no cookie extraction or requests via evaluate",
+  "genuineMediaBytesVerified": false,
+  "directNativeAPIGuard": "W6 owner preparing, currently absent",
+  "fakeActorOrAuthority": false
+}

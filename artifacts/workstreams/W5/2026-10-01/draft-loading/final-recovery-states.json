@@ -1,0 +1,39 @@
+{
+  "applicationCommit": "20ea37a02ddde7eb4d2d0cfc15f6f2d4f7578f4f",
+  "states": [
+    {
+      "active": "Check connection and roles",
+      "height": 844,
+      "hidden": true,
+      "inert": true,
+      "phase": "actual-api4105-stopped",
+      "scrollWidth": 390,
+      "text": "W5 original recovery. Keep this unsent text through a real connection interruption.",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "active": "Check connection and roles",
+      "ariaBusy": "true",
+      "disabled": false,
+      "hidden": true,
+      "phase": "actual-busy-read-only-reconnect",
+      "text": "W5 original recovery. Keep this unsent text through a real connection interruption."
+    },
+    {
+      "active": "note-text",
+      "height": 844,
+      "hidden": false,
+      "inert": false,
+      "phase": "original-recovered-after-actual-api-resume",
+      "revision": "SAVED · REVISION 17",
+      "scrollWidth": 390,
+      "text": "W5 original recovery. Keep this unsent text through a real connection interruption.",
+      "theme": "light",
+      "width": 390
+    }
+  ],
+  "api": "Only verified owned API4105 PID6359 stopped04:50:01Z/resumed04:50:26Z; API41055 remained running.",
+  "signingOrSave": false,
+  "qualification": "Earlier original-loaded-draft screenshot actually shows role concealment and is preserved as an intermediate failed-frame qualification; early Refresh role selector was unavailable in focused phone layout and was not accepted as a successful action. After changing an effect dependency list, development hot reload showed the dependency-length warning; hard reload cleared it and final acceptance uses the fresh runtime."
+}

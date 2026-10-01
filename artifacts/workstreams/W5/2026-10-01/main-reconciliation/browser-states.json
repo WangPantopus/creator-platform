@@ -1,0 +1,130 @@
+[
+  {
+    "at": "2026-10-01T07:03:50.980Z",
+    "stage": "loaded-original-draft",
+    "view": {
+      "active": "note-text",
+      "scroll": 390,
+      "textarea": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    }
+  },
+  {
+    "at": "2026-10-01T07:04:36.348Z",
+    "stage": "saved-revision18-hard-reload",
+    "view": {
+      "active": "note-text",
+      "scroll": 390,
+      "text": "Cancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nPhoto\nVoice · up to 60 s\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 18",
+      "textarea": "W5 recovery check. Unsaved words remain available after the connection and current role recover. Current-main save and reload check.",
+      "width": 390
+    }
+  },
+  {
+    "at": "2026-10-01T07:06:10.597Z",
+    "stage": "restored-revision19",
+    "expected": {
+      "width": 390,
+      "height": 844,
+      "theme": "light"
+    },
+    "view": {
+      "active": "note-text",
+      "height": 844,
+      "scroll": 390,
+      "text": "Cancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nPhoto\nVoice · up to 60 s\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 19",
+      "theme": "light",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    }
+  },
+  {
+    "at": "2026-10-01T07:06:11.232Z",
+    "stage": "restored-revision19",
+    "expected": {
+      "width": 390,
+      "height": 844,
+      "theme": "night"
+    },
+    "view": {
+      "active": "note-text",
+      "height": 844,
+      "scroll": 390,
+      "text": "Cancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nPhoto\nVoice · up to 60 s\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 19",
+      "theme": "night",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 390
+    }
+  },
+  {
+    "at": "2026-10-01T07:06:11.983Z",
+    "stage": "restored-revision19",
+    "expected": {
+      "width": 1280,
+      "height": 720,
+      "theme": "light"
+    },
+    "view": {
+      "active": "note-text",
+      "height": 720,
+      "scroll": 1280,
+      "text": "W\nW5 development creator\nQelvora Studio\nNotes\nRequests\nThreads\nMy AI\nOffers\nPublish\nInsights\nEarnings\nTeam\nCreator workspace\nQelvora Studio\nW5 development creator\nRefresh role\nCancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nPhoto\nVoice · up to 60 s\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 19",
+      "theme": "light",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 1280
+    }
+  },
+  {
+    "at": "2026-10-01T07:06:12.558Z",
+    "stage": "restored-revision19",
+    "expected": {
+      "width": 1280,
+      "height": 720,
+      "theme": "night"
+    },
+    "view": {
+      "active": "note-text",
+      "height": 720,
+      "scroll": 1280,
+      "text": "W\nW5 development creator\nQelvora Studio\nNotes\nRequests\nThreads\nMy AI\nOffers\nPublish\nInsights\nEarnings\nTeam\nCreator workspace\nQelvora Studio\nW5 development creator\nRefresh role\nCancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nPhoto\nVoice · up to 60 s\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 19",
+      "theme": "night",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "width": 1280
+    }
+  },
+  {
+    "at": "2026-10-01T07:07:48.066Z",
+    "stage": "owned-api-paused",
+    "dom": "- alert\n- status:\n  - generic: Account status\n  - generic: Reconnect to check your account status. Your unsaved input is kept.\n- main:\n  - alert:\n    - generic: Reconnect to Studio\n    - generic: Your input is kept in this tab. Studio is hidden until your current account and roles can be checked again.\n  - button \"Check connection and roles\" [active]"
+  },
+  {
+    "at": "2026-10-01T07:08:17.330Z",
+    "stage": "owned-api-recovered",
+    "dom": "- alert\n- main:\n  - link \"Cancel\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/notes\n  - strong: New Note\n  - generic: TO\n  - group \"Audience\":\n    - button \"Followers\" [pressed]\n    - button \"All members\"\n    - button \"Tiers\"\n  - paragraph: It's labeled “W5 development creator · to followers” everywhere.\n  - generic: W5 development creator · to followers\n  - generic: Your Note\n  - textbox \"Your Note\":\n    - /placeholder: Write in your own words\n    - text: W5 recovery check. Unsaved words remain available after the connection and current role recover. Unsaved outage check.\n  - button \"Photo\"\n  - button \"Voice · up to 60 s\"\n  - checkbox \"Let my AI use this Adds a source candidate for this same audience. Approve it separately in My AI.\"\n  - strong: Let my AI use this\n  - generic: Adds a source candidate for this same audience. Approve it separately in My AI.\n  - text: Show audience size\n  - checkbox \"Show audience size\" [disabled]\n  - paragraph: Current audience size is unavailable.\n  - text: Use the fan's name token\n  - checkbox \"Use the fan's name token\"\n  - text: Schedule in your time zone\n  - textbox \"Schedule in your time zone\"\n  - button \"Save draft\"\n  - button \"Review and sign\"\n  - paragraph: SAVED · REVISION 20\n  - dialog:\n    - heading \"Photo\" [level=2]\n    - button \"Close\"\n    - region \"Photo attachment\":\n      - paragraph: Choose a photo and describe it for people who cannot see it. Upload and processing happen before the creator reviews the complete publication.\n      - status: Photo uploads are unavailable until the current media service and policy are configured. Your text draft is saved.\n      - text: Photo\n      - button \"Photo\" [disabled]\n      - text: Alternative text\n      - textbox \"Alternative text\" [active]:\n        - /placeholder: Describe the photo\n        - text: Local modal input retained through connection recovery.\n      - button \"Upload photo\" [disabled]"
+  },
+  {
+    "at": "2026-10-01T07:12:00.345Z",
+    "stage": "team-publication",
+    "dom": "- alert\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - generic: Team · triage, drafter, publisher\n  - button \"Refresh role\"\n  - heading \"Publish\" [level=1]\n  - button \"New post\"\n  - paragraph: Audience controls who can see it. AI-source approval is separate.\n  - text: Search your library\n  - searchbox \"Search your library\"\n  - text: State\n  - combobox \"State\":\n    - option \"All states\" [selected]\n    - option \"draft\"\n    - option \"Media processing\"\n    - option \"scheduled\"\n    - option \"published\"\n    - option \"unpublished\"\n    - option \"archived\"\n  - article:\n    - heading \"W5 merged-app acceptance\" [level=2]\n    - paragraph: published · REV 1 · public\n    - paragraph: Local development verification of the merged apps. This post is written by the permitted team and carries no creator signature. AI reuse is off.\n    - paragraph: Separate from AI sources\n    - button \"Edit and review again\"\n    - link \"Open current fan view\":\n      - /url: /content/50000000-0000-4000-8000-000000000001/ecc93017-d7ff-46aa-8628-ef7657bef733\n    - button \"Unpublish\"\n    - button \"Archive\"\n  - article:\n    - heading \"W5 library and Thanks verification\" [level=2]\n    - paragraph: archived · REV 5 · public\n    - paragraph: \"Development verification: this public post is written by the current team member. AI source use remains off.\"\n    - paragraph: AI source removal pending\n    - button \"Edit and review again\"\n    - button \"Unpublish\" [disabled]\n    - button \"Archive\" [disabled]\n  - article:\n    - heading \"Untitled Note\" [level=2]\n    - paragraph: draft · REV 21 · followers\n    - paragraph: W5 recovery check. Unsaved words remain available after the connection and current role recover.\n    - paragraph: Separate from AI sources\n    - button \"Edit and review again\"\n    - button \"Unpublish\" [disabled]\n    - button \"Archive\"\n  - article:\n    - heading \"W5 count availability boundary\" [level=2]\n    - paragraph: draft · REV 2 · public\n    - paragraph: Unavailable audience size cannot be promised.\n    - paragraph: Separate from AI sources\n    - button \"Edit and review again\"\n    - button \"Unpublish\" [disabled]\n    - button \"Archive\"\n  - article:\n    - heading \"W5 development publication\" [level=2]\n    - paragraph: unpublished · REV 1 · public\n    - paragraph: Local development post. This is published by the permitted team.\n    - paragraph: AI use is off\n    - button \"Edit and review again\"\n    - button \"Unpublish\" [disabled]\n    - button \"Archive\"\n- navigation \"Studio\":\n  - link \"Notes\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/notes\n    - text: Notes\n  - link \"Requests\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/requests\n    - text: Requests\n  - link \"Threads\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/threads\n    - text: Threads\n  - link \"My AI\":\n    - /url: /studio/ai\n    - text: My AI\n  - link \"More\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/more\n    - text: More"
+  },
+  {
+    "at": "2026-10-01T07:12:12.061Z",
+    "stage": "library-no-match",
+    "dom": "- alert\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - generic: Team · triage, drafter, publisher\n  - button \"Refresh role\"\n  - heading \"Publish\" [level=1]\n  - button \"New post\"\n  - paragraph: Audience controls who can see it. AI-source approval is separate.\n  - text: Search your library\n  - searchbox \"Search your library\" [active]: NoMatchingW5MergedItem\n  - text: State\n  - combobox \"State\":\n    - option \"All states\" [selected]\n    - option \"draft\"\n    - option \"Media processing\"\n    - option \"scheduled\"\n    - option \"published\"\n    - option \"unpublished\"\n    - option \"archived\"\n  - heading \"No matching items\" [level=3]\n  - paragraph: Try another search or choose All states.\n- navigation \"Studio\":\n  - link \"Notes\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/notes\n    - text: Notes\n  - link \"Requests\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/requests\n    - text: Requests\n  - link \"Threads\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/threads\n    - text: Threads\n  - link \"My AI\":\n    - /url: /studio/ai\n    - text: My AI\n  - link \"More\":\n    - /url: /studio/50000000-0000-4000-8000-000000000001/more\n    - text: More"
+  },
+  {
+    "at": "2026-10-01T07:13:32.277Z",
+    "stage": "cross-tab-account-replaced",
+    "dom": "- main:\n  - generic: Qelvora\n  - heading \"Her AI answers you now. She answers in person when you ask.\" [level=1]\n  - paragraph: \"Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.\"\n  - link \"Continue with Pantopus\":\n    - /url: /api/auth/continue?returnTo=%2Fcontent%2F50000000-0000-4000-8000-000000000001%2Fecc93017-d7ff-46aa-8628-ef7657bef733\n  - paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.\n- alert"
+  },
+  {
+    "at": "2026-10-01T07:14:08.408Z",
+    "stage": "pending-creator-notes-failure",
+    "dom": "- alert\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - generic: W5 pending creator boundary\n  - button \"Refresh role\"\n  - heading \"Notes\" [level=1]\n  - link \"New Note\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/compose\n  - alert:\n    - generic: Action status\n    - generic: Current creator verification and recovery are required.\n  - generic: REPLIES · unavailable\n  - generic: Only you and your triage team see these\n  - text: Show replies\n  - combobox \"Show replies\":\n    - option \"All reviewed replies\" [selected]\n    - option \"Unread\"\n    - option \"Reacted\"\n    - option \"Flagged\"\n- navigation \"Studio\":\n  - link \"Notes\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/notes\n    - text: Notes\n  - link \"Requests\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/requests\n    - text: Requests\n  - link \"Threads\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/threads\n    - text: Threads\n  - link \"My AI\":\n    - /url: /studio/ai\n    - text: My AI\n  - link \"More\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/more\n    - text: More"
+  },
+  {
+    "at": "2026-10-01T07:14:08.863Z",
+    "stage": "pending-creator-library-failure",
+    "dom": "- alert\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - generic: W5 pending creator boundary\n  - button \"Refresh role\"\n  - heading \"Publish\" [level=1]\n  - button \"New post\"\n  - alert:\n    - generic: Action status\n    - generic: Current creator verification and recovery are required.\n  - paragraph: Audience controls who can see it. AI-source approval is separate.\n  - text: Search your library\n  - searchbox \"Search your library\"\n  - text: State\n  - combobox \"State\":\n    - option \"All states\" [selected]\n    - option \"draft\"\n    - option \"Media processing\"\n    - option \"scheduled\"\n    - option \"published\"\n    - option \"unpublished\"\n    - option \"archived\"\n- navigation \"Studio\":\n  - link \"Notes\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/notes\n    - text: Notes\n  - link \"Requests\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/requests\n    - text: Requests\n  - link \"Threads\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/threads\n    - text: Threads\n  - link \"My AI\":\n    - /url: /studio/ai\n    - text: My AI\n  - link \"More\":\n    - /url: /studio/da06e2ce-d2b3-4fb9-b163-91b8bbe58706/more\n    - text: More"
+  }
+]

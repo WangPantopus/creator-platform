@@ -1,0 +1,15 @@
+{
+  "scope": "Canonical W1 state after personally operated synthetic browser invitation/acceptance/removal",
+  "memberships": [
+    {
+      "accountId": "10000000-0000-4000-8000-000000000004",
+      "roles": ["triage", "drafter", "publisher"],
+      "removed": false
+    },
+    {
+      "accountId": "10000000-0000-4000-8000-000000000003",
+      "roles": ["drafter"],
+      "removed": true
+    }
+  ]
+}

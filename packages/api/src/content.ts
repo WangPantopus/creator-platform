@@ -59,10 +59,6 @@ export const ContentDocument = z
       .optional(),
   })
   .refine(
-    (v) => v.text.length > 0 || v.media.length > 0,
-    "Write something or attach processed media.",
-  )
-  .refine(
     (v) => v.kind !== "note" || v.audience.kind !== "public",
     "Notes need an explicit relationship audience.",
   )
@@ -86,6 +82,10 @@ export const ContentDocument = z
   .refine(
     (v) => v.kind !== "note" || !v.media.some((m) => m.kind === "video"),
     "Notes support photos and human voice only.",
+  )
+  .refine(
+    (v) => new Set(v.media.map((m) => m.assetId)).size === v.media.length,
+    "Attach each processed asset only once.",
   );
 export const ContentKey = z.string().min(8).max(128);
 export const SaveContent = z.strictObject({
@@ -141,7 +141,14 @@ export const ContentPage = z.strictObject({
   cursor: z.uuid().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   state: z
-    .enum(["draft", "scheduled", "published", "unpublished", "archived"])
+    .enum([
+      "draft",
+      "media_pending",
+      "scheduled",
+      "published",
+      "unpublished",
+      "archived",
+    ])
     .optional(),
   query: z.string().trim().max(180).optional(),
 });

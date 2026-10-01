@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-10-01T00:45:00Z",
+  "source": "Existing 18-method swift test, scratch /private/tmp/creator-w5-resume-swift; captured images copied without editing",
+  "capture": "c41 recursive 2x layer/mask redraw consumed narrowly; W5 original reference ICC/backing plumbing and strict .image assertion remain",
+  "result": {
+    "methods": 18,
+    "nonSnapshotPassed": 15,
+    "snapshotAssertions": 110,
+    "snapshotFailures": 110,
+    "snapshotDurationSeconds": 104.265
+  },
+  "welcome": [
+    {
+      "theme": "light",
+      "reference": [780, 1688],
+      "capture": [780, 1688],
+      "differentPixels": 2554,
+      "totalPixels": 1316640,
+      "iccBytesEqual": true
+    },
+    {
+      "theme": "night",
+      "reference": [780, 1688],
+      "capture": [780, 1688],
+      "differentPixels": 2663,
+      "totalPixels": 1316640,
+      "iccBytesEqual": true
+    }
+  ],
+  "limitations": [
+    "No comparator, tolerance, golden or recording flag changed.",
+    "Not a hosted CI or operated native creator/device result.",
+    "The first overlapping build aborted because canonical generation rewrote a source; only the completed subsequent run is represented."
+  ]
+}

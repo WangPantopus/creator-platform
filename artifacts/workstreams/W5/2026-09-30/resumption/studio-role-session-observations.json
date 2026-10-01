@@ -1,0 +1,139 @@
+{
+  "recordedAt": "2026-10-01T03:44:01.697636+00:00",
+  "sourceParent": "a7a5c865f986b6435d8fca0f183506e49d5e6d35",
+  "sourceSha256": {
+    "apps/web/features/studio/Studio.tsx": "e1c68ac9d034aa5df14038d212d3ade71f00944a2d37f20cd5eeb70fe5ece11f",
+    "apps/web/features/media/VoiceRecorder.tsx": "45c3d19347d895ab226bac43b6c965bde01fcd3d364c756a01e4dcc0497e2cd0",
+    "apps/web/lib/session.ts": "633be57a999a4f0ea105515e9645525f7200bdf1058c4028f139727cc8d21cf6",
+    "apps/web/lib/request-origin.ts": "77b8e76204a9abd7e796bc0520ad68c5643d076525f4aad4c0413119b36f4c84",
+    "apps/web/app/api/auth/restore/route.ts": "1cfcd7a7828122dd3e116736e1496c7bb07ee81760f77dd0018883cadac95f14"
+  },
+  "ownerLease": {
+    "W1": "Exact c649 restore route/request-origin leaf + compatible currentSession hunk explicitly leased; cookie namespace retained. No whole roots/boundary imported.",
+    "W6": "Exact e1ce8cf recovery copy narrowly reconciled; old leaf canonical text literal."
+  },
+  "roleAuthority": "Single active role request, four-second abort deadline, monotonic request-start five-second expiry, hidden-page abort/conceal and pageshow/focus revalidation. No automatic command replay. Explicit denial clears private input; transport preserves concealed mounted input.",
+  "thanksAuthority": "Serialized expected actual viewer account reads, four-second deadline, monotonic request-start expiry and background clearing.",
+  "actualSessionDiagnosis": {
+    "source": "Existing15minute W1 access session/7day refresh; redacted DB expiry reads only, no tokens/cookies extracted.",
+    "expiredActor3Sessions": [
+      {
+        "accountId": "10000000-0000-4000-8000-000000000003",
+        "expiresAt": "2026-10-01T02:51:47.213575+00:00",
+        "refreshUntil": "2026-10-08T02:36:47.213575+00:00",
+        "createdAt": "2026-10-01T02:36:47.218+00:00",
+        "revoked": false,
+        "currentlyExpired": true
+      },
+      {
+        "accountId": "10000000-0000-4000-8000-000000000003",
+        "expiresAt": "2026-10-01T02:25:32.889348+00:00",
+        "refreshUntil": "2026-10-08T02:10:32.889348+00:00",
+        "createdAt": "2026-10-01T02:10:32.903+00:00",
+        "revoked": false,
+        "currentlyExpired": true
+      },
+      {
+        "accountId": "10000000-0000-4000-8000-000000000003",
+        "expiresAt": "2026-09-30T23:53:12.771242+00:00",
+        "refreshUntil": "2026-10-07T23:38:12.771242+00:00",
+        "createdAt": "2026-09-30T23:38:12.775+00:00",
+        "revoked": false,
+        "currentlyExpired": true
+      }
+    ],
+    "restoredActor1Sessions": [
+      {
+        "accountId": "10000000-0000-4000-8000-000000000001",
+        "expiresAt": "2026-10-01T03:51:11.644564+00:00",
+        "refreshUntil": "2026-10-08T02:06:50.8491+00:00",
+        "createdAt": "2026-10-01T02:06:50.854+00:00",
+        "revoked": false,
+        "currentlyExpired": false
+      },
+      {
+        "accountId": "10000000-0000-4000-8000-000000000001",
+        "expiresAt": "2026-10-01T01:55:51.402884+00:00",
+        "refreshUntil": "2026-10-08T01:40:51.402884+00:00",
+        "createdAt": "2026-10-01T01:40:51.406+00:00",
+        "revoked": false,
+        "currentlyExpired": true
+      }
+    ],
+    "actualBrowserOperation": "Expired3005 Studio link clicked; canonical restore returned same development creator and /studio/50000000-0000-4000-8000-000000000001/threads without fresh actor selection. Retained original session createdAt and refreshUntil; access expiresAt rotated forward.",
+    "limitation": "Does not explain all historical cookie failures or establish independent-client/native authentication."
+  },
+  "outageJourney": {
+    "actor": "Canonical actual development fan two; owned pending creator da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+    "typedText": "W5 serialized role check. Keep these local words through a connection outage.",
+    "operation": "Only owned listener41055/PID6369 confirmed, temporarily SIGSTOP20s with automatic CONT trap. Actual UI concealed hidden+inert and disabled connection check. After actual API resume, same local text/textarea focus restored. No command submitted.",
+    "captures": [
+      "serialized-role-outage-concealed-1280-light.jpg",
+      "serialized-role-restored-1280-light.jpg"
+    ],
+    "actualWidth": 1280,
+    "latencyMeasured": false,
+    "remoteControlsDisabled": [
+      "Photo",
+      "Voice",
+      "Save draft",
+      "Review and sign"
+    ],
+    "processResumed": true
+  },
+  "phoneJourney": {
+    "actualViewport": [
+      390,
+      844
+    ],
+    "scrollWidth": 390,
+    "themes": [
+      "light",
+      "night"
+    ],
+    "captures": [
+      "serialized-role-composer-390-light.jpg",
+      "serialized-role-composer-390-night.jpg"
+    ],
+    "typedText": "W5 phone role check. These words stay local while verification is pending.",
+    "keyboard": "Tab from textarea skips disabled media controls and focuses explicit AI-use checkbox. No toggle/send performed.",
+    "limitation": "Separate manually typed theme runs do not establish reload persistence; no VoiceOver/TalkBack/large-text/native input proof."
+  },
+  "viewportControlLimitation": "New tabs7/8 ignored requested390 override and measured1280x720. Not counted as phone proof; reused actual retained390x844 tab3.",
+  "thanksJourney": {
+    "operation": "Actual restored creator More \u2192 Thanks, current consented feed empty; no withdrawn text/handle shown.",
+    "capture": "serialized-thanks-current-empty.jpg",
+    "actualViewport": [
+      390,
+      844
+    ],
+    "articleCount": 0,
+    "qualifiedImpactVerified": false
+  },
+  "actualDatabaseObservation": {
+    "administrativeReadOnly": true,
+    "rows": [
+      {
+        "creatorId": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+        "contentRows": 0
+      },
+      {
+        "eligibleThanksCount": 0
+      }
+    ],
+    "notRLSAcceptance": true
+  },
+  "builds": {
+    "typesExitCode": 0,
+    "lintExitCode": 0,
+    "productionWebExitCode": 0,
+    "log": "/private/tmp/creator-w5-final-role-restore-web-build.log",
+    "newTests": false,
+    "unitTestsRun": false
+  },
+  "mergeGate": {
+    "completeAppE2E": false,
+    "merged": false,
+    "genuineSigning": "Human explicitly holds blocked"
+  }
+}

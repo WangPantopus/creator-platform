@@ -174,7 +174,7 @@ export function SignedActReview({
         </Notice>
       )}
       {error && (
-        <div role="alert">
+        <div>
           <Notice tone="error" title="Signing status">
             {error}
           </Notice>

@@ -1,0 +1,109 @@
+{
+  "profile": "Two concurrent IAB sessions; loopback web3005/30055 and API4105/41055; preserved creator_w5 nonowner runtime; explicit development accounts only",
+  "thanksWithdrawalClickToCreatorTextDetachedMs": 2017,
+  "unpublishClickToFanTitleDetachedMs": 1097,
+  "samplesPerRace": 1,
+  "thanks": [
+    {
+      "id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 2,
+      "share_digest": false,
+      "show_identity": false,
+      "withdrawn": true,
+      "text": ""
+    }
+  ],
+  "consent": [
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 1,
+      "text_hash": "376bdde4417e836751cb3fc06544be359802e9ae7c778e2efc3e435ed9657cf5",
+      "purpose": "content.thanks_digest",
+      "decision": "grant"
+    },
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 1,
+      "text_hash": "376bdde4417e836751cb3fc06544be359802e9ae7c778e2efc3e435ed9657cf5",
+      "purpose": "content.thanks_identity",
+      "decision": "withdraw"
+    },
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 2,
+      "text_hash": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+      "purpose": "content.thanks_digest",
+      "decision": "withdraw"
+    },
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 2,
+      "text_hash": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+      "purpose": "content.thanks_identity",
+      "decision": "withdraw"
+    }
+  ],
+  "fanEffects": [
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 1,
+      "type": "thanks_changed",
+      "state": "pending",
+      "result_ref": null
+    },
+    {
+      "subject_id": "000d32b0-1b8e-4ec4-85c9-f23bb917d6cc",
+      "version": 2,
+      "type": "thanks_changed",
+      "state": "pending",
+      "result_ref": null
+    }
+  ],
+  "content": [
+    {
+      "id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "version": 2,
+      "state": "archived",
+      "audience": {
+        "kind": "public"
+      },
+      "withdrawn": true
+    }
+  ],
+  "effects": [
+    {
+      "content_id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "version": 2,
+      "type": "published",
+      "state": "pending",
+      "result_ref": null
+    },
+    {
+      "content_id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "version": 1,
+      "type": "source_revoke",
+      "state": "pending",
+      "result_ref": null
+    },
+    {
+      "content_id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "version": 2,
+      "type": "source_revoke",
+      "state": "pending",
+      "result_ref": null
+    },
+    {
+      "content_id": "640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+      "version": 2,
+      "type": "withdrawn",
+      "state": "pending",
+      "result_ref": null
+    }
+  ],
+  "limitations": [
+    "Single local observations, not p95",
+    "No actual W7 delivery receipt or Impact completion",
+    "Team post is accurately labeled and has no personal creator signature",
+    "Genuine signing remains blocked by direct human request"
+  ]
+}
