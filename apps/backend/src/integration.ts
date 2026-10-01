@@ -34,6 +34,7 @@ export type BackendRuntime = {
   conversation: ConversationService;
   identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
   audienceIdentity?: AudienceIdentityAuthority;
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
   assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -94,6 +95,14 @@ export async function createConfiguredBackend(input: {
     throw new Error(
       "Configured identity requires both trust denial callbacks or a composed trust runtime.",
     );
+  if (
+    input.identity.mode !== "development" &&
+    (!input.config.identitySessionKey ||
+      typeof input.assertScopeAllowedInTransaction !== "function")
+  )
+    throw new Error(
+      "Configured identity requires canonical session custody and current caller-held trust denials.",
+    );
   const pool = new pg.Pool({
     connectionString: input.config.databaseUrl,
     max: 20,
@@ -102,12 +111,32 @@ export async function createConfiguredBackend(input: {
   });
   let trust: Awaited<ReturnType<typeof createTrustRuntime>> | undefined;
   const assertScopeAllowed: ScopeRestriction = async (...scope) => {
+    if (
+      !input.assertScopeAllowed &&
+      !trust &&
+      input.identity.mode !== "development"
+    )
+      throw new DomainError(
+        "trust_unconfigured",
+        "Current thread denial authority is unavailable.",
+        503,
+      );
     await input.assertScopeAllowed?.(...scope);
     await trust?.assertScopeAllowed(...scope);
   };
   const assertActorAllowed = async (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => {
+    if (
+      !input.assertActorAllowed &&
+      !trust &&
+      input.identity.mode !== "development"
+    )
+      throw new DomainError(
+        "trust_unconfigured",
+        "Current account denial authority is unavailable.",
+        503,
+      );
     await input.assertActorAllowed?.(actor);
     await trust?.assertActorAllowed(actor);
   };
@@ -130,6 +159,7 @@ export async function createConfiguredBackend(input: {
     input.guardrails,
   );
   const subjects = [...(input.signedSubjectPolicies ?? [])];
+  let featuresConfigured = false;
   const signing = new SignedActService(
     pool,
     input.config.rpId,
@@ -174,6 +204,12 @@ export async function createConfiguredBackend(input: {
       : {}),
     assertActorAllowed,
     assertScopeAllowed,
+    ...(input.assertScopeAllowedInTransaction
+      ? {
+          assertScopeAllowedInTransaction:
+            input.assertScopeAllowedInTransaction,
+        }
+      : {}),
     assertCreatorAllowed: async (actor, creatorId) => {
       await assertActorAllowed(actor);
       if (input.assertCreatorAllowed)
@@ -187,6 +223,10 @@ export async function createConfiguredBackend(input: {
       await trust?.service.assertAllowed(actor, creatorId);
     },
     configureSignedSubjects: (policies) => {
+      if (featuresConfigured)
+        throw new Error(
+          "Signed subjects must be installed during host composition.",
+        );
       for (const policy of policies) {
         if (subjects.some((current) => current.name === policy.name))
           throw new Error("Duplicate signed-subject registration.");
@@ -228,6 +268,7 @@ export async function createConfiguredBackend(input: {
       });
     }
     features = (await input.registerFeatures?.(backendRuntime)) ?? [];
+    featuresConfigured = true;
     Object.freeze(subjects);
   } catch (error) {
     await trust?.stop();

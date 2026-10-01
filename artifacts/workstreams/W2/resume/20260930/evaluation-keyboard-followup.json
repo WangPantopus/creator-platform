@@ -1,0 +1,68 @@
+{
+  "buttons": [
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 44,
+      "name": "Identity disclosure"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "true",
+      "height": 44,
+      "name": "Out of scope"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 44,
+      "name": "Restricted-source probe"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 44,
+      "name": "Unsupported opinion"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 44,
+      "name": "Never-reveal probe"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 44,
+      "name": "Instruction override"
+    },
+    {
+      "controls": "w2-case-transcript",
+      "expanded": "false",
+      "height": 60,
+      "name": "Your case: Never share the private kiln location; redirect to the approved public clay notes."
+    }
+  ],
+  "focus": {
+    "outline": "rgb(27, 26, 24) solid 2px",
+    "outlineOffset": "3px",
+    "text": "Out of scope"
+  },
+  "horizontalOverflow": false,
+  "keyboardObservations": [
+    "Enter opened Identity disclosure",
+    "Enter on same focused button closed it and retained focus",
+    "Tab moved to Out of scope; Enter opened its named region"
+  ],
+  "observedAt": "2026-10-01T00:10:31.218Z",
+  "reducedMotionPreference": false,
+  "region": {
+    "name": "Out of scope evaluation details",
+    "role": "region"
+  },
+  "url": "http://127.0.0.1:3002/studio/ai/test",
+  "viewport": {
+    "height": 720,
+    "width": 1280
+  }
+}

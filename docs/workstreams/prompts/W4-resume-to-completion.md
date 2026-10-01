@@ -10,6 +10,8 @@ The prior shared checkout remained on `main`; the branch was published through a
 
 Read [the original execution prompt](W4-commerce-requests.md) and [canonical brief](../W4-commerce-requests.md) completely. The committed original prompt is byte-identical to the founder's original pasted file, SHA-256 `50cfd9f47a1422a445348139ab250ceda9a4c9b3d7cf0f37fc9515f10a2b7a78`. It remains the full scope; this prompt and handoff provide continuation state and do not replace or reduce it.
 
+The founder subsequently requested local resource release. Read [the cleanup record](../handoffs/W4-resource-release.md) before launch: the W4 servers, dedicated devices, temporary workspaces/build caches and private env were removed. Docker removal remains unconfirmed because Docker Desktop cannot start. Obtain fresh resource leases/configuration; do not expect the historical device IDs or temporary paths to exist. The original implementation/evidence checkpoint remains preserved.
+
 ## Binding execution rules
 
 1. Personally write every implementation, schema/migration/config/documentation change; debug/fix/integrate; build/install/launch; operate and verify real browser/iOS/Android/provider journeys. Do not delegate code, patches, scripts, builds, migrations or acceptance to agents, other sessions or background coding services. Research assistants may only inspect/check information read-only if explicitly permitted by the current session. If implementation children already exist, stop them, inspect their changes and personally take over. The previous three assistants only researched and completed.

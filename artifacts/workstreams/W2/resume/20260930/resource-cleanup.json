@@ -1,0 +1,171 @@
+{
+  "workstream": "W2",
+  "date": "2026-09-30",
+  "timezone": "America/Los_Angeles",
+  "capturedAt": "2026-09-30T21:55:40.493Z",
+  "authorization": "Founder requested removal of unused W2 resources after successor handoff",
+  "sourceHead": "489bbe9bad1289ed33490dc88a596a931868d4c8",
+  "removed": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web/.next-w2-ci",
+      "allocatedKiBBefore": 66460,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web/.next",
+      "allocatedKiBBefore": 178556,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/dist",
+      "allocatedKiBBefore": 948,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/ios/.build",
+      "allocatedKiBBefore": 656152,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/android/.gradle",
+      "allocatedKiBBefore": 2616,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/android/app/build",
+      "allocatedKiBBefore": 34732,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/node_modules/.cache",
+      "allocatedKiBBefore": 0,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/backend/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/api/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/brand/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/copy/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/tokens/.turbo",
+      "allocatedKiBBefore": 8,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/packages/ui-web/.turbo",
+      "allocatedKiBBefore": 4,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-checks-20260930",
+      "allocatedKiBBefore": 484980,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.Trash/creator-w2-native-tools-20260930",
+      "allocatedKiBBefore": 3249696,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/current-state.json",
+      "allocatedKiBBefore": 16,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/history-first.json",
+      "allocatedKiBBefore": 56,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/history-last.json",
+      "allocatedKiBBefore": 4,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/large-export.json",
+      "allocatedKiBBefore": 70400,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/preview.json",
+      "allocatedKiBBefore": 4,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/provider-state.json",
+      "allocatedKiBBefore": 4,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-w2-resume-20260930/state.json",
+      "allocatedKiBBefore": 4,
+      "removed": true
+    }
+  ],
+  "totalAllocatedKiBRemoved": 4744680,
+  "retained": {
+    "workspace": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform",
+    "webPort": 3002,
+    "apiPort": 4102,
+    "postgresPort": 55442,
+    "container": "creator-platform-w2-resume-20260930",
+    "database": "creator_w2_resume",
+    "liveWebOutput": "/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/web/.next-w2-review",
+    "runtimeConfiguration": [
+      "/private/tmp/creator-w2-resume-20260930/runtime.env",
+      "/private/tmp/creator-w2-resume-20260930/provider.env",
+      "/private/tmp/creator-w2-resume-20260930/postgres.env"
+    ],
+    "openAISecretReference": "/Users/yingpengwang/.config/creator-platform/secrets/openai.env",
+    "dependencies": "Existing workspace/node dependencies and shared package/runtime stores",
+    "sourceAndEvidence": "Tracked application, documents and sanitized evidence; source hash manifests",
+    "peerResources": "All peer processes, databases, devices, caches, Docker images/volumes and unrelated Trash"
+  },
+  "nativeTools": "Own released JDK/SDK/Gradle installation/cache permanently removed from its exact Trash directory; reinstallation required for future local native acceptance",
+  "temporaryDiagnostics": "Private raw diagnostics/export/test-env directory removed; sanitized committed receipts and remote CI artifacts remain",
+  "verification": {
+    "targetsAbsent": true,
+    "apiHealth": "ok",
+    "studioHttpStatus": 200,
+    "currentDraft": 16,
+    "evaluationId": "5a8042b0-7308-4ecf-8279-184d511ca501",
+    "evaluationCurrent": true,
+    "evaluationState": "passed",
+    "cases": 7,
+    "publicationAvailable": false
+  },
+  "followUp": {
+    "observedAt": "2026-09-30T22:45:06.756Z",
+    "webPort3002": "no listener",
+    "apiPort4102": "no listener",
+    "postgresPort55442": "no listener",
+    "docker": "Daemon unavailable at configured desktop socket; no engine restart/prune/delete attempted",
+    "privateRuntimeConfiguration": "runtime.env, provider.env and postgres.env previously verified retained are now absent",
+    "openAISecretReference": "Exists; never printed/copied",
+    "liveWebOutput": "Still exists",
+    "removedTargets": "All 23 remain absent",
+    "sourceHashManifest": "All 63 entries unchanged",
+    "volumeOwnershipCleanup": "Not verifiable while daemon offline; no volume deletion attempted",
+    "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
+  }
+}

@@ -231,14 +231,15 @@ describe.skipIf(!adminUrl)(
       } finally {
         instrumentContext = false;
       }
-      // Current memory reads include scoped exclusions and transcript provenance.
-      expect(observedStatements).toBe(50000);
+      // Optimized locked memory reads include scoped exclusion/provenance subqueries.
+      // Three observed statements retain every family predicate and all10,000 pairs.
+      expect(observedStatements).toBe(30000);
       await expect(
         access.openThread(fan, creators[0]!.id, fans[1]!.id),
       ).rejects.toMatchObject({ code: "thread_unavailable" });
       // Ten thousand real scoped transactions include current identity locks.
-      // Keep every pair/assertion; allow slower Docker/CI hosts to finish.
-    }, 600000);
+      // Preserve every pair/assertion and the original five-minute budget.
+    }, 300000);
     it("T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames", async () => {
       const accepted = await conversation.send(fanScope, {
         text: "test takeover",

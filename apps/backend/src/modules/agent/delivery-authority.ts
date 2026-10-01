@@ -10,6 +10,12 @@ import { versionRow, type Workspace } from "./repository.js";
 import type { AgentService } from "./service.js";
 import type { ApprovedSentence, AudiencePort } from "./runtime.js";
 
+export type CapturedAgentAuthority = {
+  versionId: string;
+  versionHash: string;
+  audienceRevision: string;
+};
+
 /** Uses W3's already scoped transaction, never a second connection or domain write.
  * W2 rows and canonical W1/W4 authority stay locked through durable sentence release. */
 export async function assertAgentDelivery(
@@ -18,6 +24,7 @@ export async function assertAgentDelivery(
   scope: ThreadScope,
   client: PoolClient,
   sentence?: ApprovedSentence,
+  captured?: CapturedAgentAuthority,
 ) {
   assertThreadScope(scope);
   const settings = await client.query<{ valid: boolean }>(
@@ -104,6 +111,13 @@ export async function assertAgentDelivery(
     "The current evaluated AI version is unavailable or updating.",
   );
   invariant(
+    !captured ||
+      (captured.versionId === version.id &&
+        captured.versionHash === version.compiledHash),
+    "version_changed",
+    "The creator’s AI changed before provider admission.",
+  );
+  invariant(
     service.pipeline.model?.pricingConfigured &&
       version.configuration.dailyCostCapMicros > 0,
     "pricing_required",
@@ -140,7 +154,8 @@ export async function assertAgentDelivery(
   );
   const audience = await audiences.currentInTransaction(scope, client);
   invariant(
-    Date.parse(audience.validUntil) > Date.now(),
+    Date.parse(audience.validUntil) > Date.now() &&
+      (!captured || captured.audienceRevision === audience.revision),
     "access_changed",
     "Source access changed during generation.",
   );

@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "observedAt": "2026-09-30T23:31:33.183Z",
+  "operation": "Existing product safety classifier; deterministic route plus consent-authorized synthetic semantic classification and actual abort after50ms.",
+  "deterministic": true,
+  "semantic": true,
+  "cancelled": "generation_cancelled",
+  "rows": [
+    {
+      "id": "4227cf4f-1291-4237-8728-1aa78cb4c4bc",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 113,
+      "output_tokens": 26,
+      "cost_micros": "87",
+      "duration_ms": 1187
+    },
+    {
+      "id": "0cbeab91-c6a5-4a67-91a5-47b374c7f195",
+      "provider": "configured",
+      "model": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_micros": null,
+      "duration_ms": 59
+    }
+  ],
+  "productionFanAcceptance": false,
+  "limits": "No paid allowance reserved or fan message stored. Cancellation without provider final usage remains unknown."
+}

@@ -32,7 +32,7 @@ export function configureStudioRequests(
   };
 }
 export async function studioRequest<T>(
-  domain: "studio" | "content",
+  domain: "studio" | "content" | "commerce-approvals",
   path: string,
   body?: unknown,
   expectedAccountId?: string,

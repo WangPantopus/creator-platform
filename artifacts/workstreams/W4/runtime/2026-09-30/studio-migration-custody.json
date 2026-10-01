@@ -1,0 +1,64 @@
+{
+  "canonicalSource": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+  "allocatedSource": [
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "owner": "W5",
+      "sha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "owner": "W5",
+      "sha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "owner": "W5",
+      "sha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "owner": "W5",
+      "sha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "owner": "W5",
+      "sha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "owner": "W5",
+      "sha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9",
+      "canonicalBytesMatch": true,
+      "localRegistered": false,
+      "localApplied": false
+    }
+  ],
+  "proposals": [
+    "apps/backend/src/modules/content/schema-reply-review.sql",
+    "apps/backend/src/modules/commerce/schema-approval.sql"
+  ],
+  "status": "No local registry changes or committed application DB migrations; proposals await allocation."
+}

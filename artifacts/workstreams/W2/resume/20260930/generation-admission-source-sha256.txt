@@ -1,0 +1,5 @@
+c26cf6c0d97d764e0497b08bd9207c2d0bb488a2f1b0058954f220cbc6f9fa70  apps/backend/src/modules/agent/budget.ts
+1615b075b33b34f8a6378f69051ea6dbc24e3063b2b8b700b590d5bb0859fce8  apps/backend/src/modules/agent/memory-proposals.ts
+9af5e6e480040a7bdeb5cb25798264814eaaa5c3d1c0b323168d775c5270973c  apps/backend/src/modules/agent/pipeline.ts
+9658a23a38de1498d448f8efd405b1973d5787663193da1d9ae5c75b4c74ac05  apps/backend/src/modules/agent/provider-usage.ts
+f9a15c52b8d3c629134b66786fb3f4acc4199969093ce6120785a13b73a726f7  apps/backend/src/modules/agent/runtime.ts

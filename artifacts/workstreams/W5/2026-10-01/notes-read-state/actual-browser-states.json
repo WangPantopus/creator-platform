@@ -1,0 +1,99 @@
+[
+  {
+    "stage": "failure-390-light",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nNotes\nNew Note\nAction status\nCurrent creator verification and recovery are required.\nREPLIES · UNAVAILABLE\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged",
+      "theme": "light",
+      "width": 390
+    }
+  },
+  {
+    "stage": "failure-390-night",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nNotes\nNew Note\nAction status\nCurrent creator verification and recovery are required.\nREPLIES · UNAVAILABLE\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged",
+      "theme": "night",
+      "width": 390
+    }
+  },
+  {
+    "stage": "failure-1280-night",
+    "facts": {
+      "scroll": 1280,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nNotes\nNew Note\nAction status\nCurrent creator verification and recovery are required.\nREPLIES · UNAVAILABLE\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged",
+      "theme": "night",
+      "width": 1280
+    }
+  },
+  {
+    "stage": "failure-1280-light",
+    "facts": {
+      "scroll": 1280,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nNotes\nNew Note\nAction status\nCurrent creator verification and recovery are required.\nREPLIES · UNAVAILABLE\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged",
+      "theme": "light",
+      "width": 1280
+    }
+  },
+  {
+    "stage": "success-filter-unread",
+    "facts": {
+      "filter": "unread",
+      "scroll": 1280,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nNotes\nNew Note\n\nDRAFT · NOT SIGNED OR SENT\n\nW5 recovery check. Unsaved words remain available after the connection and current role recover.\n\ndraft · Separate from AI sources\n\nEdit draft\nREPLIES · 0\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged\n\nReviewed private replies appear here when fans reply to a published Note. Replies waiting for safety review stay out of the feed.",
+      "theme": "light",
+      "width": 1280
+    }
+  },
+  {
+    "stage": "saved-draft-keyboard-open",
+    "facts": {
+      "focus": "note-text",
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nCancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nVoice · up to 60 s\nPhoto\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 17",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover."
+    }
+  },
+  {
+    "stage": "saved-draft-reload",
+    "facts": {
+      "focus": "note-text",
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nCancel\nNew Note\nTO\nFollowers\nAll members\nTiers\n\nIt's labeled “W5 development creator · to followers” everywhere.\n\nW5 development creator · to followers\nYour Note\nVoice · up to 60 s\nPhoto\nLet my AI use this\nAdds a source candidate for this same audience. Approve it separately in My AI.\nShow audience size\n\nCurrent audience size is unavailable.\n\nUse the fan's name token\nSchedule in your time zone\nSave draft\nReview and sign\n\nSAVED · REVISION 17",
+      "value": "W5 recovery check. Unsaved words remain available after the connection and current role recover."
+    }
+  },
+  {
+    "stage": "actual-api-pause",
+    "facts": {
+      "hidden": "",
+      "replies": "REPLIES · loadingOnly you and your triage team see these",
+      "text": "Reconnect to Studio\nYour input is kept in this tab. Studio is hidden until your current account and roles can be checked again.\nCheck connection and roles"
+    }
+  },
+  {
+    "stage": "automatically-recovered-api",
+    "facts": {
+      "focus": "Refresh role",
+      "scroll": 1280,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nNotes\nNew Note\n\nDRAFT · NOT SIGNED OR SENT\n\nW5 recovery check. Unsaved words remain available after the connection and current role recover.\n\ndraft · Separate from AI sources\n\nEdit draft\nREPLIES · 0\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged\n\nReviewed private replies appear here when fans reply to a published Note. Replies waiting for safety review stay out of the feed.",
+      "width": 1280
+    }
+  },
+  {
+    "stage": "final-main-1afff5d-success",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 development creator\nRefresh role\nNotes\nNew Note\n\nDRAFT · NOT SIGNED OR SENT\n\nW5 recovery check. Unsaved words remain available after the connection and current role recover.\n\ndraft · Separate from AI sources\n\nEdit draft\nREPLIES · 0\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged\n\nReviewed private replies appear here when fans reply to a published Note. Replies waiting for safety review stay out of the feed.",
+      "theme": "night",
+      "width": 390
+    }
+  },
+  {
+    "stage": "final-main-1afff5d-failure",
+    "facts": {
+      "scroll": 390,
+      "text": "Qelvora Studio\nW5 pending creator boundary\nRefresh role\nNotes\nNew Note\nAction status\nCurrent creator verification and recovery are required.\nREPLIES · UNAVAILABLE\nOnly you and your triage team see these\nShow replies\nAll reviewed replies\nUnread\nReacted\nFlagged",
+      "theme": "light",
+      "width": 390
+    }
+  }
+]

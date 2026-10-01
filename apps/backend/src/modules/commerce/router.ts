@@ -37,7 +37,8 @@ export function createCommerceRouter(input: {
       paymentsAvailable: Boolean(input.service?.provider),
       nativeReplyPurchase: false,
       membershipAvailable: input.extended?.billing?.configured ?? false,
-      passEnabled: input.service?.policy.passEnabled ?? false,
+      passEnabled: input.extended?.pass?.configured ?? false,
+      passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
     }),
   );
@@ -61,6 +62,8 @@ export function createCommerceRouter(input: {
         ...value.capabilities,
         storePurchasesAvailable: input.extended?.storeConfigured ?? false,
         membershipAvailable: input.extended?.billing?.configured ?? false,
+        passPurchaseAvailable:
+          input.extended?.passPurchases?.configured ?? false,
       },
     });
   });
@@ -125,6 +128,37 @@ export function createCommerceRouter(input: {
       ),
     );
   });
+  const passPurchases = () => {
+    if (!input.extended?.passPurchases)
+      throw new DomainError(
+        "pass_billing_unconfigured",
+        "Pass billing is not available yet.",
+        503,
+      );
+    return input.extended.passPurchases;
+  };
+  router.get("/pass/billing", async (req, res) =>
+    res.json(await passPurchases().status(await actorFor(req))),
+  );
+  router.post("/pass/quote", async (req, res) =>
+    res.json(await passPurchases().quote(await actorFor(req))),
+  );
+  router.post("/pass/purchase", async (req, res) =>
+    res.json(await passPurchases().start(await actorFor(req), req.body)),
+  );
+  router.post("/pass/purchase-status", async (req, res) =>
+    res.json(
+      await passPurchases().purchaseStatus(await actorFor(req), req.body),
+    ),
+  );
+  router.post("/pass/cancel", async (req, res) =>
+    res.json(await passPurchases().cancel(await actorFor(req), req.body)),
+  );
+  router.post("/pass/effects/:effectId/reconcile", async (req, res) =>
+    res.json(
+      await passPurchases().run(await actorFor(req), id(req.params.effectId)),
+    ),
+  );
   router.post("/pass/draft", async (req, res) => {
     if (!input.extended)
       throw new DomainError(

@@ -123,6 +123,8 @@ details[open] > summary:before {
   gap: 8px;
   color: var(--ink);
   padding: 8px 0;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 .w2-studio input[type="checkbox"],
 .w2-studio input[type="radio"] {
@@ -183,7 +185,7 @@ details[open] > summary:before {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: 8px 12px;
-  min-height: 36px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,6 +371,7 @@ details[open] > summary:before {
   display: flex;
   gap: 8px;
   align-items: center;
+  min-height: 44px;
 }
 .w2-dialog {
   background: var(--surface);

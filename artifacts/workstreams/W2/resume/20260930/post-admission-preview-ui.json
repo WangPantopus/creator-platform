@@ -1,0 +1,15 @@
+{
+  "details": [
+    {
+      "insideParagraph": false,
+      "open": true,
+      "text": "Open authorized passageThis is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze."
+    }
+  ],
+  "horizontalOverflow": false,
+  "observedAt": "2026-10-01T00:22:57.003Z",
+  "pipeline": [
+    "Pipeline 4610 ms · first approved 4581 ms · cost 2282 USD micros"
+  ],
+  "url": "http://127.0.0.1:3002/studio/ai/test"
+}

@@ -19,6 +19,7 @@ import {
   type AgentTrustAuthority,
 } from "./trust-adapter.js";
 import type { EffectHook } from "../trust/contracts.js";
+import type { PreparedGenerationJournal } from "./generation-journal.js";
 
 /** The configured host supplies canonical authorities and approved providers.
  * Missing producers remain explicit; constructing Studio never enables fan delivery. */
@@ -31,11 +32,14 @@ export function createAgentDomain(input: {
   shadowFeed?: PrivacyParaphrasePort;
   trust?: AgentTrustAuthority;
   exports?: AgentExportArtifactSink;
+  /** Opt-in owner producer for W8's actual configured stream coordinator/store. */
+  coordinatorExportStream?: boolean;
+  usageJournal?: PreparedGenerationJournal;
   settleDeparture?: (
     input: Parameters<EffectHook["run"]>[0],
   ) => Promise<{ complete: boolean; receipt: Record<string, unknown> }>;
 }) {
-  const repository = new AgentRepository(input.pool);
+  const repository = new AgentRepository(input.pool, input.usageJournal);
   const service = new AgentService(
     repository,
     new AgentPipeline(repository, input.model),
@@ -59,7 +63,13 @@ export function createAgentDomain(input: {
       ? new ShadowReplay(service, input.shadowFeed)
       : undefined,
     privacy: input.trust
-      ? agentPrivacyHook(service, lifecycle, input.trust, input.exports)
+      ? agentPrivacyHook(
+          service,
+          lifecycle,
+          input.trust,
+          input.exports,
+          input.coordinatorExportStream,
+        )
       : undefined,
     effects:
       input.trust && input.settleDeparture
@@ -86,6 +96,10 @@ export function createAgentDomain(input: {
       shadow: Boolean(input.shadowFeed),
       trust: Boolean(input.trust && input.settleDeparture),
       exports: Boolean(input.exports),
+      exportStreamProducer: Boolean(
+        input.trust && input.coordinatorExportStream,
+      ),
+      usageJournal: Boolean(input.usageJournal),
     },
   };
 }

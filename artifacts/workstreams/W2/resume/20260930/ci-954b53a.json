@@ -1,0 +1,110 @@
+{
+  "observedAt": "2026-10-01T00:44:43.068113+00:00",
+  "runs": [
+    {
+      "runId": 36796040305,
+      "headSha": "954b53a471eeca0be27f6cf8693bd742c91e477f",
+      "event": "pull_request",
+      "status": "queued",
+      "conclusion": null,
+      "jobs": [
+        {
+          "id": 110159686026,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033480
+        },
+        {
+          "id": 110159686194,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033481
+        },
+        {
+          "id": 110159686239,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        },
+        {
+          "id": 110159686317,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        },
+        {
+          "id": 110159686358,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        }
+      ]
+    },
+    {
+      "runId": 36796036559,
+      "headSha": "954b53a471eeca0be27f6cf8693bd742c91e477f",
+      "event": "push",
+      "status": "queued",
+      "conclusion": null,
+      "jobs": [
+        {
+          "id": 110159583972,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        },
+        {
+          "id": 110159584129,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        },
+        {
+          "id": 110159584167,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033469
+        },
+        {
+          "id": 110159584189,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033471
+        },
+        {
+          "id": 110159584220,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "runner_id": 0
+        }
+      ]
+    },
+    {
+      "runId": 36796040428,
+      "headSha": "954b53a471eeca0be27f6cf8693bd742c91e477f",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 110159591565,
+          "name": "compile",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000033464
+        }
+      ]
+    }
+  ],
+  "merge": "Not eligible; all exact-head required contexts must pass."
+}

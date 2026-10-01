@@ -1,8 +1,10 @@
-import { visualWebURL, visualReferenceURL } from "../../playwright.config";
 import fs from "node:fs";
 import path from "node:path";
 import { test, expect } from "@playwright/test";
 import { compareCatalog } from "./compare";
+const origin = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
+const referenceOrigin =
+  process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
 const design = path.join(process.cwd(), "design");
 const groups = [
   "phase4a-fan-core",
@@ -38,20 +40,19 @@ for (const theme of ["light", "night"] as const) {
       await page.setViewportSize({ width: screen.w, height: screen.h });
       await reference.setViewportSize({ width: screen.w, height: screen.h });
       await reference.goto(
-        `${visualReferenceURL}/${screen.group}/${screen.file}?step=${process.env.VISUAL_STEP ?? 0}`,
+        `${referenceOrigin}/${screen.group}/${screen.file}?step=${process.env.VISUAL_STEP ?? 0}`,
       );
       await reference.locator("x-dc > div").first().waitFor();
       await reference.evaluate((mode) => {
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      // Capture must not mutate input styles while React is still hydrating.
       const expected = await reference.screenshot({
         animations: "disabled",
         caret: "initial",
       });
       await page.goto(
-        `${visualWebURL}/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
+        `${origin}/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
       );
       await page.locator(".preview-board > div").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
@@ -130,7 +131,7 @@ for (const theme of ["light", "night"] as const) {
       (name) =>
         !process.env.VISUAL_COMPONENT || name === process.env.VISUAL_COMPONENT,
     )) {
-      await reference.goto(`${visualReferenceURL}/component/${name}`);
+      await reference.goto(`${referenceOrigin}/component/${name}`);
       await reference.locator("#root > *").first().waitFor();
       await reference.evaluate((mode) => {
         document.documentElement.dataset.theme = mode;
@@ -138,15 +139,17 @@ for (const theme of ["light", "night"] as const) {
       await reference.evaluate(() => document.fonts.ready);
       const expected = await reference.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       await page.goto(
-        `${visualWebURL}/design/components/${name}?raw=1&theme=${theme}`,
+        `${origin}/design/components/${name}?raw=1&theme=${theme}`,
       );
       await page.locator("main > div > *").first().waitFor();
       await page.evaluate(() => document.fonts.ready);
       const actual = await page.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       const comparison = compareCatalog(actual, expected);

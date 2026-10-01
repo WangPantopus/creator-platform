@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   ContentDocument,
   ContentPage,
+  ContentReplyPage,
   SaveContent,
   PublishContent,
   ContentVersionCommand,
@@ -68,6 +69,19 @@ export interface ContentDependencies {
     creatorId: string,
     packetId: string,
   ) => Promise<boolean>;
+  /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
+  reviewReply?: (input: {
+    replyId: string;
+    creatorId: string;
+    fanId: string;
+    version: number;
+    text: string;
+    textHash: string;
+  }) => Promise<{
+    state: "allowed" | "flagged";
+    reference: string;
+    textHash: string;
+  }>;
   assertAllowed?: (actor: Actor, creatorId: string) => Promise<void>;
   effect?: (
     actor: Actor,
@@ -189,30 +203,56 @@ export class ContentService {
       [actor.accountId, creatorId, subjectId, subjectKind, version, type],
     );
   }
-  async transaction<T>(
+  private async replyReviewInstalled(client: PoolClient): Promise<boolean> {
+    const installed = await client.query<{ ready: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2) AND (SELECT count(*)=2 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator' AND c.relname=ANY($3::text[]) AND c.relrowsecurity AND c.relforcerowsecurity) AS ready`,
+      [
+        "0045_w5_reply_review",
+        "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+        ["content_reply_review", "content_reply_read"],
+      ],
+    );
+    return installed.rows[0]?.ready === true;
+  }
+  async assertReplyReviewInstalled(client: PoolClient) {
+    if (!(await this.replyReviewInstalled(client)))
+      throw new DomainError(
+        "reply_review_unconfigured",
+        "Private reply review is unavailable until its complete registered schema is installed.",
+        503,
+      );
+  }
+  async assertCurrentAllowed(
+    client: PoolClient,
     actor: Actor,
     creatorId: string,
-    work: (client: PoolClient) => Promise<T>,
-  ): Promise<T> {
+  ) {
     invariant(
       actor.adultEligible,
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
     await this.dependencies.assertAllowed?.(actor, creatorId);
+    const denied = await client.query(
+      "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
+      [actor.accountId],
+    );
+    invariant(
+      !denied.rowCount,
+      "content_deleted",
+      "This account's content has been removed.",
+    );
+  }
+  async transaction<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ): Promise<T> {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
-      const denied = await client.query(
-        "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
-        [actor.accountId],
-      );
-      invariant(
-        !denied.rowCount,
-        "content_deleted",
-        "This account's content has been removed.",
-      );
       await client.query("SELECT set_config('app.creator_id',$1,true)", [
         creatorId,
       ]);
+      await this.assertCurrentAllowed(client, actor, creatorId);
       return work(client);
     });
   }
@@ -679,13 +719,14 @@ export class ContentService {
     let quotedText: string | null = null,
       quotedHandle: string | null = null;
     if (document.quote) {
+      await this.assertReplyReviewInstalled(client);
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`content.quote:${document.quote.replyId}`],
       );
       const reply = (
         await client.query(
-          "SELECT r.text,p.share_text,p.show_handle,p.version,f.handle FROM creator.content_reply r JOIN creator.content_quote_permission p ON p.reply_id=r.id JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
+          "SELECT r.text,p.share_text,p.show_handle,p.version,f.handle FROM creator.content_reply r JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL JOIN creator.content_quote_permission p ON p.reply_id=r.id JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
           [document.quote.replyId, row.creator_id],
         )
       ).rows[0];
@@ -983,6 +1024,7 @@ export class ContentService {
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {
     const input = ReplyToNote.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       const row = await this.index(client, creatorId, id);
       await this.authorizeRead(client, actor, row);
       invariant(
@@ -1004,53 +1046,227 @@ export class ContentService {
         input.idempotencyKey,
         { creatorId, id, ...input },
         async () => {
+          const replyId = randomUUID();
+          const decision = await this.reviewReplyText(
+            replyId,
+            creatorId,
+            fan.id,
+            1,
+            input.text,
+          );
           const reply = (
             await client.query(
-              "INSERT INTO creator.content_reply(content_id,creator_id,fan_id,text) VALUES($1,$2,$3,$4) RETURNING id,version",
-              [id, creatorId, fan.id, input.text],
+              "INSERT INTO creator.content_reply(id,content_id,creator_id,fan_id,text) VALUES($1,$2,$3,$4,$5) RETURNING id,version",
+              [replyId, id, creatorId, fan.id, input.text],
             )
           ).rows[0];
+          await client.query(
+            "INSERT INTO creator.content_reply_review(reply_id,content_id,creator_id,fan_id,reply_version,state,review_ref,text_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
+            [
+              replyId,
+              id,
+              creatorId,
+              fan.id,
+              1,
+              decision.state,
+              decision.reference,
+              decision.textHash,
+            ],
+          );
           await client.query(
             "INSERT INTO creator.content_quote_permission(reply_id) VALUES($1)",
             [reply.id],
           );
-          return reply;
+          return { ...reply, safetyState: decision.state };
+        },
+      );
+    });
+  }
+  private async reviewReplyText(
+    replyId: string,
+    creatorId: string,
+    fanId: string,
+    version: number,
+    text: string,
+  ) {
+    const textHash = contentHash({ replyId, creatorId, fanId, version, text });
+    try {
+      const result = await this.dependencies.reviewReply?.({
+        replyId,
+        creatorId,
+        fanId,
+        version,
+        text,
+        textHash,
+      });
+      if (
+        result &&
+        ["allowed", "flagged"].includes(result.state) &&
+        result.textHash === textHash &&
+        typeof result.reference === "string" &&
+        result.reference.length > 0 &&
+        result.reference.length <= 200
+      )
+        return { ...result };
+    } catch {
+      /* Unavailable review must never admit an unreviewed reply. */
+    }
+    return { state: "pending" as const, reference: null, textHash };
+  }
+  async retryReplyReview(
+    actor: Actor,
+    creatorId: string,
+    replyId: string,
+    raw: unknown,
+  ) {
+    const input = ContentVersionCommand.parse(raw);
+    return this.transaction(actor, creatorId, (client) =>
+      this.command(
+        client,
+        actor,
+        "reply_review",
+        input.idempotencyKey,
+        { creatorId, replyId, ...input },
+        async () => {
+          await this.assertReplyReviewInstalled(client);
+          const reply = (
+            await client.query(
+              "SELECT r.* FROM creator.content_reply r JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.id=$1 AND r.creator_id=$2 AND f.account_id=$3 AND r.withdrawn_at IS NULL FOR UPDATE OF r",
+              [replyId, creatorId, actor.accountId],
+            )
+          ).rows[0];
+          invariant(
+            reply && reply.version === input.version,
+            "reply_changed",
+            "Only the fan who wrote this current reply can request review.",
+          );
+          const prior = (
+            await client.query(
+              "SELECT state FROM creator.content_reply_review WHERE reply_id=$1",
+              [replyId],
+            )
+          ).rows[0];
+          invariant(
+            prior,
+            "reply_review_unavailable",
+            "This reply requires current review metadata.",
+          );
+          if (prior.state !== "pending")
+            return {
+              id: replyId,
+              version: reply.version,
+              safetyState: prior.state,
+            };
+          const decision = await this.reviewReplyText(
+            replyId,
+            creatorId,
+            reply.fan_id,
+            reply.version,
+            reply.text,
+          );
+          await client.query(
+            "UPDATE creator.content_reply_review SET state=$2,review_ref=$3,text_hash=$4 WHERE reply_id=$1",
+            [replyId, decision.state, decision.reference, decision.textHash],
+          );
+          return {
+            id: replyId,
+            version: reply.version,
+            safetyState: decision.state,
+          };
+        },
+      ),
+    );
+  }
+  async markReplyRead(
+    actor: Actor,
+    creatorId: string,
+    replyId: string,
+    raw: unknown,
+  ) {
+    const input = ContentVersionCommand.parse(raw);
+    return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
+      await this.role(client, actor, creatorId, ["triage"]);
+      return this.command(
+        client,
+        actor,
+        "reply_read",
+        input.idempotencyKey,
+        { creatorId, replyId, ...input },
+        async () => {
+          const row = (
+            await client.query(
+              "SELECT reply_version FROM creator.content_reply_review WHERE reply_id=$1 AND creator_id=$2 AND state<>'pending' AND withdrawn_at IS NULL",
+              [replyId, creatorId],
+            )
+          ).rows[0];
+          invariant(
+            row?.reply_version === input.version,
+            "reply_changed",
+            "Refresh this reply before marking it read.",
+          );
+          await client.query(
+            "INSERT INTO creator.content_reply_read(reply_id,creator_id,account_id,reply_version) VALUES($1,$2,$3,$4) ON CONFLICT(reply_id,account_id) DO UPDATE SET reply_version=greatest(creator.content_reply_read.reply_version,excluded.reply_version),read_at=now()",
+            [replyId, creatorId, actor.accountId, input.version],
+          );
+          return { id: replyId, version: input.version, read: true };
         },
       );
     });
   }
   async replies(actor: Actor, creatorId: string, raw: unknown, studio = false) {
-    const page = ContentPage.parse(raw);
+    const page = ContentReplyPage.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       if (studio) await this.role(client, actor, creatorId, ["triage"]);
+      else
+        invariant(
+          page.filter === "all",
+          "studio_filter_required",
+          "Reply filters require Studio access.",
+        );
       const rows = (
         await client.query(
-          `SELECT r.*,f.handle,p.share_text,p.show_handle,p.version AS consent_version,re.kind AS reaction_kind,re.signed_act_id FROM creator.content_reply r JOIN creator.fan_profile f ON f.id=r.fan_id JOIN creator.content_quote_permission p ON p.reply_id=r.id LEFT JOIN creator.content_reaction re ON re.reply_id=r.id WHERE r.creator_id=$1 AND r.withdrawn_at IS NULL AND ($2::uuid IS NULL OR (r.created_at,r.id)<(SELECT created_at,id FROM creator.content_reply WHERE id=$2)) ORDER BY r.created_at DESC,r.id DESC LIMIT $3`,
-          [creatorId, page.cursor ?? null, page.limit + 1],
+          `SELECT m.reply_id AS id,m.creator_id,m.fan_id,m.reply_version AS version,m.created_at,m.state,m.content_id,r.text,f.handle,p.share_text,p.show_handle,p.version AS consent_version,re.kind AS reaction_kind,re.signed_act_id,(rd.reply_version>=m.reply_version) AS read
+        FROM creator.content_reply_review m JOIN creator.fan_profile f ON f.id=m.fan_id LEFT JOIN creator.content_reply r ON r.id=m.reply_id
+        JOIN creator.content_quote_permission p ON p.reply_id=m.reply_id LEFT JOIN creator.content_reaction re ON re.reply_id=m.reply_id
+        LEFT JOIN creator.content_reply_read rd ON rd.reply_id=m.reply_id AND rd.account_id=$4
+        WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1))
+        AND (NOT $5 OR (($6='flagged' AND m.state='flagged') OR ($6<>'flagged' AND m.state='allowed' AND ($6<>'unread' OR rd.reply_version IS NULL OR rd.reply_version<m.reply_version) AND ($6<>'reacted' OR re.reply_id IS NOT NULL))))
+        ORDER BY m.created_at DESC,m.reply_id DESC LIMIT $3`,
+          [
+            creatorId,
+            page.cursor ?? null,
+            page.limit + 1,
+            actor.accountId,
+            studio,
+            page.filter,
+          ],
         )
       ).rows;
-      const items: PrivateNoteReply[] = [];
-      for (const r of rows.slice(0, page.limit)) {
-        // Fan SELECT RLS returns only their own replies. Ownership and withdrawal
-        // controls survive a parent Note's retraction or lost audience access.
-        items.push({
-          id: r.id,
-          contentId: r.content_id,
-          fanId: r.fan_id,
-          handle: r.handle,
-          text: r.text,
-          version: r.version,
-          createdAt: r.created_at.toISOString(),
-          consent: {
-            shareText: r.share_text,
-            showHandle: r.show_handle,
-            version: r.consent_version,
-          },
-          reaction: r.reaction_kind
-            ? { kind: r.reaction_kind, signedActId: r.signed_act_id }
-            : null,
-        });
-      }
+      const items: PrivateNoteReply[] = rows.slice(0, page.limit).map((r) => ({
+        id: r.id,
+        contentId: r.content_id,
+        fanId: r.fan_id,
+        handle: r.handle,
+        text:
+          studio && r.state !== "allowed"
+            ? "Reply withheld and routed for safety review."
+            : (r.text ?? "Reply withheld and routed for safety review."),
+        version: r.version,
+        createdAt: r.created_at.toISOString(),
+        safetyState: r.state,
+        safetyReviewAvailable: Boolean(this.dependencies.reviewReply),
+        read: Boolean(r.read),
+        consent: {
+          shareText: r.share_text,
+          showHandle: r.show_handle,
+          version: r.consent_version,
+        },
+        reaction: r.reaction_kind
+          ? { kind: r.reaction_kind, signedActId: r.signed_act_id }
+          : null,
+      }));
       return {
         items,
         nextCursor: rows.length > page.limit ? rows[page.limit - 1]!.id : null,
@@ -1197,6 +1413,11 @@ export class ContentService {
             "UPDATE creator.content_reply SET text='[Reply withdrawn]',withdrawn_at=now(),version=version+1 WHERE id=$1",
             [replyId],
           );
+          if (await this.replyReviewInstalled(client))
+            await client.query(
+              "UPDATE creator.content_reply_review SET withdrawn_at=now(),reply_version=$2 WHERE reply_id=$1",
+              [replyId, reply.version + 1],
+            );
           await this.fanEffect(
             client,
             actor,
@@ -1214,6 +1435,7 @@ export class ContentService {
   async react(actor: Actor, creatorId: string, replyId: string, raw: unknown) {
     const input = ReactToReply.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.assertReplyReviewInstalled(client);
       await this.role(client, actor, creatorId);
       return this.command(
         client,
@@ -1224,7 +1446,7 @@ export class ContentService {
         async () => {
           const reply = (
             await client.query(
-              "SELECT * FROM creator.content_reply WHERE id=$1 AND creator_id=$2 AND withdrawn_at IS NULL",
+              "SELECT r.* FROM creator.content_reply r JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL WHERE r.id=$1 AND r.creator_id=$2 AND r.withdrawn_at IS NULL",
               [replyId, creatorId],
             )
           ).rows[0];

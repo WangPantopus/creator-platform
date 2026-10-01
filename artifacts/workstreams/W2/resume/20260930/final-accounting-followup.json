@@ -1,0 +1,70 @@
+{
+  "observedAt": "2026-10-01T04:03:29.712278+00:00",
+  "sourceBase": "497d17f9df09af30f26c39d121a60985fe2de023",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/model.ts": "38d7b9c80f0832ff60054e05cf3d1e0790d06bcf11dc55865afe0b37eec612ad",
+    "apps/backend/src/modules/agent/provider-usage.ts": "70c47a02ef4b29ec29dba2492d2bed23ad5f9ea0a6f7142739eb5be1d7d65022",
+    "apps/backend/src/modules/agent/response-usage.ts": "325d4fa7f77b2c5dcfc093f527061fb34301b791996e7e73a1b8c46103b59b00",
+    "apps/backend/src/modules/agent/streaming.ts": "da0943e7cf97b3c61064d2b9657ce717fb9859f45cace9dab55c31a9b9099523",
+    "apps/backend/src/modules/agent/repository.ts": "e704b5ebffe9436642bcee44b12d70d0eb86b213658a7efc3418eb543164683f"
+  },
+  "change": "Preserve validated real usage when structured/embedding/terminal stream output fails; reject invalid output unchanged. Missing/invalid usage stays unknown. Hold actual HTTP actor session and profile during new repository commands/admissions; private original usage completion retains narrow custody.",
+  "verification": "Backend build and source lint/format pass; real valid synthetic preview personally operated. Failed-provider branch is reviewed/compiled source, not a claimed real production or malformed-provider E2E receipt.",
+  "preview": {
+    "pipelineMs": 4040,
+    "firstApprovedMs": 4010,
+    "costMicros": 2299,
+    "usage": [
+      {
+        "id": "62c21728-45d3-4f8c-8801-d7f5e3b61e0e",
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "input_tokens": 597,
+        "output_tokens": 19,
+        "cost_micros": "270",
+        "duration_ms": 701,
+        "created_at": "2026-10-01T03:56:15.211712+00:00"
+      },
+      {
+        "id": "86c9f796-9c8f-4741-b8ed-cc81a3e30dde",
+        "provider": "OpenAI",
+        "model": "gpt-4.1-2025-04-14",
+        "category": "preview",
+        "input_tokens": 653,
+        "output_tokens": 79,
+        "cost_micros": "1938",
+        "duration_ms": 1687,
+        "created_at": "2026-10-01T03:56:14.255738+00:00"
+      },
+      {
+        "id": "af2df406-8dc1-4ed5-be2d-fc0dee55f863",
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "category": "preview",
+        "input_tokens": 11,
+        "output_tokens": 0,
+        "cost_micros": "1",
+        "duration_ms": 723,
+        "created_at": "2026-10-01T03:56:13.503364+00:00"
+      },
+      {
+        "id": "623fcc4d-6197-4ec3-89c1-a0c9900d5d31",
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "category": "preview",
+        "input_tokens": 128,
+        "output_tokens": 24,
+        "cost_micros": "90",
+        "duration_ms": 1589,
+        "created_at": "2026-10-01T03:56:11.907318+00:00"
+      }
+    ],
+    "costMatchesPersistedRows": true,
+    "screenshot": "final-accounting-preview.png",
+    "performanceAcceptance": false
+  },
+  "state": "Companion18/evaluation seven pass retained; publication off; saved data unchanged",
+  "deferredDecisions": "Founder explicitly deferred licensing/processor/retention choices to release-backlog.md; no gate activated",
+  "mergePriority": "Freeze source to existing accounting/session and genuine app/check closure; reconcile merged W1 main6661226 before final verification and merge"
+}

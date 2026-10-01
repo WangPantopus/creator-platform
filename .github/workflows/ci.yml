@@ -53,15 +53,16 @@ jobs:
             playwright-report
             test-results
   ios-foundation:
-    runs-on: macos-26-intel
+    # Preserve the original Swift references and their reviewed comparison contract.
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - run: xcodebuild -version
       - name: Verify native Swift package
         timeout-minutes: 20
-        run: |
-          nativeTemporaryDirectory="${RUNNER_TEMP}/creator-native-${GITHUB_RUN_ID}-${GITHUB_JOB}"
-          mkdir -p "$nativeTemporaryDirectory"
-          SNAPSHOT_ARTIFACTS="$nativeTemporaryDirectory" swift test --package-path apps/ios
+        run: swift test --package-path apps/ios
+        env:
+          SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/artifacts/ios/snapshots
       - run: brew install xcodegen
       - run: xcodegen generate --spec apps/ios/project.yml
       - name: Select an available iPhone simulator
@@ -71,18 +72,18 @@ jobs:
           import json, os, sys
           devices = json.load(sys.stdin)["devices"]
           runtimes = sorted(
-              (runtime for runtime in devices if ".iOS-26-" in runtime),
+              (runtime for runtime in devices if ".iOS-" in runtime),
               key=lambda runtime: tuple(int(part) for part in runtime.rsplit("iOS-", 1)[1].split("-")),
               reverse=True,
           )
           phones = [d for runtime in runtimes for d in devices[runtime] if d["name"].startswith("iPhone")]
-          if not phones: raise SystemExit("No available iOS 26 iPhone simulator on the pinned runner")
+          if not phones: raise SystemExit("No available iOS iPhone simulator on the reference runner")
           phone = phones[0]
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
       - name: Wait for the selected simulator to finish booting
         run: xcrun simctl bootstatus '${{ steps.simulator.outputs.id }}' -b
-      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -resultBundlePath artifacts/ios/FoundationFlow.xcresult
+      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=NO
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

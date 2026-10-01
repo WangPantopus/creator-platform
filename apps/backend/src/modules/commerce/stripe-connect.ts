@@ -422,6 +422,8 @@ export class StripeConnectPayout implements PayoutProvider {
     );
     return {
       id: row.id,
+      amount: row.amount,
+      currency: row.currency.toUpperCase(),
       state: "succeeded" as const,
       reversed: row.reversed && row.amount_reversed === row.amount,
       reversalReceipts: reversals.map((r) => ({
