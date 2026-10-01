@@ -93,17 +93,26 @@ private struct GrowthSharedReply: Decodable {
   let source: Source?
   let verificationURL: String?
 }
-private struct GrowthReplyExport: Decodable, Identifiable {
+struct GrowthReplyExport: Decodable, Identifiable, Sendable, Equatable {
   let id: String
   let text: String
+  let version: Int
+  let sourceHash: String
+  let authorLabel: String
+  let authorKind: String
+  let verificationURL: String
 }
 #if os(iOS)
 private struct GrowthReplyShareSheet: UIViewControllerRepresentable {
-  let artifact: GrowthReplyExport
+  let artifact: GrowthReplyDocument
+  func makeCoordinator() -> GrowthReplyDocument { artifact }
   func makeUIViewController(context: Context) -> UIActivityViewController {
-    UIActivityViewController(activityItems: [artifact.text], applicationActivities: nil)
+    UIActivityViewController(activityItems: [artifact.source.text, artifact.file], applicationActivities: nil)
   }
   func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+  static func dismantleUIViewController(_ controller: UIActivityViewController, coordinator: GrowthReplyDocument) {
+    coordinator.remove()
+  }
 }
 #endif
 private struct NotificationPage: Decodable { let notifications: [GrowthNotification] }
@@ -192,7 +201,7 @@ public struct GrowthFanFeature: View {
   @State private var homeRequestID = UUID()
   @State private var invitation: GrowthInvitation?
   @State private var shared: GrowthSharedReply?
-  @State private var replyExport: GrowthReplyExport?
+  @State private var replyExport: GrowthReplyDocument?
   @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
@@ -706,7 +715,21 @@ public struct GrowthFanFeature: View {
     do {
       let artifact: GrowthReplyExport = try await client.request("public/shares/" + String(target.dropFirst(7)) + "/export")
       guard !Task.isCancelled, route == target, artifact.id == String(target.dropFirst(7)) else { return }
-      replyExport = artifact
+      let rendering = Task.detached(priority: .userInitiated) { try GrowthReplyDocument.create(artifact) }
+      let document = try await withTaskCancellationHandler {
+        try await rendering.value
+      } onCancel: {
+        rendering.cancel()
+      }
+      defer { if replyExport?.id != document.id { document.remove() } }
+      guard !Task.isCancelled, route == target else { return }
+      // Rendering can be lengthy. Permission/correction must still match before
+      // a file is handed to the system sheet; no locally cached grant is reused.
+      let current: GrowthReplyExport = try await client.request("public/shares/" + artifact.id + "/export")
+      guard !Task.isCancelled, route == target, current == artifact else {
+        throw GrowthRequestFailure(status: 410)
+      }
+      replyExport = document
       error = ""
     } catch {
       guard !Task.isCancelled, route == target else { return }

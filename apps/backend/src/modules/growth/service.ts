@@ -793,6 +793,8 @@ export class GrowthService {
       id: share.id,
       version: source.version,
       sourceHash: source.contentHash,
+      authorLabel: author,
+      authorKind: source.authorKind,
       verificationURL: share.verificationURL,
       text: [
         author,

@@ -17,6 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
+import android.content.ClipData
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -85,6 +89,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     var invitation by remember { mutableStateOf<JSONObject?>(null) }
     var shared by remember { mutableStateOf<JSONObject?>(null) }
     var sharingReply by remember { mutableStateOf(false) }
+    var replyDocument by remember { mutableStateOf<java.io.File?>(null) }
     var following by remember { mutableStateOf(false) }
     var notifications by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var error by remember { mutableStateOf("") }
@@ -92,6 +97,10 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val documentShare = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        replyDocument?.delete();replyDocument = null
+    }
+    DisposableEffect(route) { onDispose {replyDocument?.delete();replyDocument = null} }
     val scrollState = rememberScrollState()
     val client = remember(baseUrl) { baseUrl?.let { GrowthClient(it, token) } }
     val ink = qColor("ink")
@@ -127,18 +136,32 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
         if(client == null || !target.startsWith("/share/") || sharingReply) return
         sharingReply = true
         scope.launch {
+            var prepared: java.io.File? = null
             try {
                 val id = target.removePrefix("/share/")
                 val artifact = client.request("public/shares/$id/export")
-                if(route == target && artifact.getString("id") == id) {
-                    val intent = Intent(Intent.ACTION_SEND).apply {type = "text/plain";putExtra(Intent.EXTRA_TEXT, artifact.getString("text"))}
-                    context.startActivity(Intent.createChooser(intent, QelvoraCopy.text("growthShareCompleteReply")))
-                    error = ""
+                if(route != target || artifact.getString("id") != id) return@launch
+                val file = growthReplyDocument(context.applicationContext, artifact)
+                prepared = file
+                if(route != target) return@launch
+                val current = client.request("public/shares/$id/export")
+                if(route != target || !sameGrowthReplyExport(artifact, current)) throw GrowthRequestFailure(410)
+                val uri = FileProvider.getUriForFile(context, context.packageName + ".growth.reply", file)
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "application/pdf"
+                    putExtra(Intent.EXTRA_TEXT, artifact.getString("text"))
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    clipData = ClipData.newRawUri(QelvoraCopy.text("growthShareCompleteReply"), uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
+                replyDocument?.delete();replyDocument = file
+                documentShare.launch(Intent.createChooser(intent, QelvoraCopy.text("growthShareCompleteReply")))
+                prepared = null
+                error = ""
             } catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled}
             catch(failure: Exception) {
                 if(route == target) {if((failure as? GrowthRequestFailure)?.status == 410) shared = null;record(failure)}
-            } finally {sharingReply = false}
+            } finally {prepared?.delete();sharingReply = false}
         }
     }
     fun pageHome(cursor: String?, threadsCursor: String? = null) {

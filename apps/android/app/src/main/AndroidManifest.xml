@@ -3,6 +3,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <application android:label="Qelvora" android:theme="@style/QelvoraTheme" android:allowBackup="false" android:supportsRtl="true">
+        <provider android:name=".ui.GrowthReplyFileProvider" android:authorities="${applicationId}.growth.reply" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/growth_reply_paths" />
+        </provider>
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
