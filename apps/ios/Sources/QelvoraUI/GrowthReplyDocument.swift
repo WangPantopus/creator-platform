@@ -5,6 +5,8 @@ import CoreText
 /// Local, paged rendering of an already permitted immutable reply. The caller
 /// rechecks the complete export after rendering and before opening the sheet.
 struct GrowthReplyDocument: Identifiable, Sendable {
+  private static let renderLock = NSLock()
+  private static let cacheLimit = 128 * 1024 * 1024
   let source: GrowthReplyExport
   let file: URL
   var id: String { file.lastPathComponent }
@@ -12,6 +14,8 @@ struct GrowthReplyDocument: Identifiable, Sendable {
   func remove() { try? FileManager.default.removeItem(at: file) }
 
   static func create(_ source: GrowthReplyExport) throws -> GrowthReplyDocument {
+    guard renderLock.try() else { throw GrowthRequestFailure(status: 503) }
+    defer { renderLock.unlock() }
     guard UUID(uuidString: source.id) != nil, source.version > 0,
       source.text.utf16.count <= 128000, source.authorLabel.utf16.count <= 512,
       ["human_creator", "approved_draft"].contains(source.authorKind),
@@ -32,9 +36,15 @@ struct GrowthReplyDocument: Identifiable, Sendable {
       if let modified = try old.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
         modified < Date().addingTimeInterval(-86400) { try manager.removeItem(at: old) }
     }
-    guard try manager.contentsOfDirectory(atPath: directory.path).count < 32 else {
+    let retained = try manager.contentsOfDirectory(at: directory,
+      includingPropertiesForKeys: [.fileSizeKey])
+    let used = try retained.reduce(0) { total, file in
+      total + (try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0)
+    }
+    guard retained.count < 32, used < cacheLimit else {
       throw GrowthRequestFailure(status: 503)
     }
+    let remaining = cacheLimit - used
     let file = directory.appendingPathComponent("reply-v\(source.version)-\(UUID().uuidString.lowercased()).pdf")
     var complete = false
     defer { if !complete { try? manager.removeItem(at: file) } }
@@ -107,13 +117,13 @@ struct GrowthReplyDocument: Identifiable, Sendable {
       position += visible.length
       pages += 1
       let bytes = (try manager.attributesOfItem(atPath: file.path)[.size] as? NSNumber)?.intValue ?? 0
-      guard bytes <= 128 * 1024 * 1024 else { throw GrowthRequestFailure(status: 503) }
+      guard bytes <= remaining else { throw GrowthRequestFailure(status: 503) }
     } while position < length
     try Task.checkCancellation()
     context.closePDF()
     closed = true
     let bytes = (try manager.attributesOfItem(atPath: file.path)[.size] as? NSNumber)?.intValue ?? 0
-    guard bytes <= 128 * 1024 * 1024 else { throw GrowthRequestFailure(status: 503) }
+    guard bytes <= remaining else { throw GrowthRequestFailure(status: 503) }
     complete = true
     return GrowthReplyDocument(source: source, file: file)
   }
