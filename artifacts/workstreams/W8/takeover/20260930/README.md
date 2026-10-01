@@ -1,5 +1,9 @@
 # W8 takeover evidence — 2026-09-30
 
+[Read-only repository queue diagnosis](ci-queue-diagnosis.json) distinguishes actual queued checks from source/test failures. Foundation has no serializing concurrency block and its hosted labels are valid; hosted capacity/account cause remains unverified. No run, runner, billing, check or workflow was changed.
+
+[Actual expired-purpose/keyboard acceptance](expired-purpose-acceptance.json) verifies zero current case leases, no private evidence and MAIN#ops-main focus without renewing or changing the case. [PR7 body update/readback](pr7-update-current.json) is successful; [exact4f058a0 check observation](ci-4f058a0.json) has all11 checks queued, so no check or merge readiness is inferred. All five authorized fixture files were compared with439c336 and remain byte-identical, with no later test change.
+
 [Latest signing custody](correction-signing-current.json) pins published0058 bytes while retaining the actual0044 function-composition block.0054 is also exact-hash reserved/unapplied. [Post-account-switch preservation](preservation-post-account-switch.json) confirms all40 SQL/checksums and retained cases/jobs/block/tombstone match the preceding receipt. No schema or provider is activated.
 
 [Actual reload/account-switch acceptance](realtime-account-switch.json) exposes and fixes the cookie-only sign-out gap in the owned Trust BFF using W1 current-token-only logout. Post-fix actual supervisor switch produces logout200, a refused replay batch, four sockets opened/four closed and zero active subscriptions/connections while the conversation clears. No producer UI, SQL, authority or test changed. [Clean d1 image/digest and unsigned installed inventory](trust-image-d1b880d2a22d.json) verify compiled revision binding and actual runtime/inventory mismatch refusals, with explicit signature/deployment/schema-validation limits.
