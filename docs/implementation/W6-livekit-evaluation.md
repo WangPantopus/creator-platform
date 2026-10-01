@@ -27,3 +27,11 @@ The current published Scale plan starts at$500/month. Analytics access therefore
 5. Exercise closure/revocation and all retained output deletion with real storage. Record independently observed provider/store references, worker restart/drain behavior, clocks and latency/cost. W4 alone consumes terminal factual evidence and decides money.
 
 Late grace, both-absent classification and cancellation/rescheduling policy remain separate unanswered decisions. The approved180-second reconnect budget is not initial waiting grace. Existing Foundation CI, library compilation and generated contracts provide no provider qualification or hardware acceptance.
+
+## Pinned SDK candidates inspected
+
+Official latest-release API verification on2026-09-30 returns browser `livekit-client` v2.22.3 (September7), Swift2.17.0 (September14) and Android2.29.0 (September20). These are evaluation candidates, not installed or accepted production dependencies. The search cache listed an older JavaScript release, so exact official release metadata was checked separately. [JavaScript release](https://github.com/livekit/client-sdk-js/releases/tag/v2.22.3), [Swift release](https://github.com/livekit/client-sdk-swift/releases/tag/2.17.0), [Android release](https://github.com/livekit/client-sdk-android/releases/tag/v2.29.0).
+
+The pinned Swift package requires Swift tools6.1/Xcode16.3+ and supports iOS13+; it pins WebRTC150.7871.02 and UniFFI0.1.9. The current W6 iOS17/Simulator toolchain exceeds those declared minimums; actual binary architectures, SDK linking, transport and CallKit/audio-session operation still require verification. [Pinned Package.swift](https://github.com/livekit/client-sdk-swift/blob/2.17.0/Package.swift).
+
+The pinned Android source declares minimum SDK21, compile/target35 and Java8 bytecode. Its own source build uses AGP8.7.2/Kotlin1.9.25; these are upstream build declarations, not instructions to change this repository's pinned tools. W6's SDK35 installation supplies the declared platform, but consumption/linking/runtime/Telecom and physical-device behavior remain unverified. [Pinned Android dependencies](https://github.com/livekit/client-sdk-android/blob/v2.29.0/deps.gradle). No SDK dependency, credential or paid request was introduced; versions do not resolve the admission/history/revocation/deletion gates above.

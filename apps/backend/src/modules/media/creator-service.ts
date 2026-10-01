@@ -14,14 +14,23 @@ import type {
   CreatorIdentityAuthority,
   CreatorScope,
 } from "../identity/creator-scope.js";
+import type {
+  AudienceIdentityAuthority,
+  AudienceScope,
+} from "../identity/audience-scope.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { contentHash } from "../../core/canonical.js";
-import { CreatorMediaTickets, PrivateMediaStorage } from "./storage.js";
+import {
+  CreatorMediaTickets,
+  CreatorMediaPublicationBindingSchema,
+  PrivateMediaStorage,
+  type CreatorMediaPublicationBinding,
+} from "./storage.js";
 
-export type CreatorMediaReadScope = CreatorScope | ThreadScope;
+export type CreatorMediaReadScope = CreatorScope | ThreadScope | AudienceScope;
 export interface CreatorMediaAuthority {
   /** W5/W2 validate the real object, current purpose/audience/consent and approved limits. */
   policy(
@@ -42,6 +51,15 @@ export interface CreatorMediaAuthority {
     asset: CreatorMediaAsset,
     client: PoolClient,
   ): Promise<boolean>;
+  /** W5 returns the exact current published revision/act under the same object
+   * lock after checking this asset and audience. Required for audience tickets;
+   * this read authority does not grant Team an owner scope or mutation access. */
+  currentPublication?(
+    scope: CreatorMediaReadScope,
+    objectId: string,
+    asset: CreatorMediaAsset,
+    client: PoolClient,
+  ): Promise<CreatorMediaPublicationBinding | null>;
 }
 export type CreatorAssetRow = {
   id: string;
@@ -87,6 +105,9 @@ export function creatorAssetView(row: CreatorAssetRow): CreatorMediaAsset {
     provenance: row.provenance,
   });
 }
+function isAudience(scope: CreatorMediaReadScope): scope is AudienceScope {
+  return "kind" in scope && scope.kind === "audience";
+}
 function account(scope: CreatorMediaReadScope) {
   return "accountId" in scope ? scope.accountId : scope.actorAccountId;
 }
@@ -117,12 +138,21 @@ export class CreatorMediaService {
     readonly storage: PrivateMediaStorage,
     readonly tickets: CreatorMediaTickets,
     private readonly authority: CreatorMediaAuthority,
+    readonly audienceIdentity?: AudienceIdentityAuthority,
   ) {}
   transaction<T>(
     scope: CreatorMediaReadScope,
     work: (client: PoolClient) => Promise<T>,
   ) {
     if ("accountId" in scope) return this.identity.withCreator(scope, work);
+    if (isAudience(scope)) {
+      invariant(
+        this.audienceIdentity,
+        "media_audience_unconfigured",
+        "Content playback is awaiting its current audience authority.",
+      );
+      return this.audienceIdentity.withAudience(scope, work);
+    }
     invariant(
       scope.authority !== "triage",
       "media_participant_required",
@@ -202,7 +232,9 @@ export class CreatorMediaService {
       await this.identity.authorizeInTransaction(
         scope,
         client,
-        body.purpose === "human_note" ? "verified" : "owned",
+        ["human_note", "post_audio"].includes(body.purpose)
+          ? "verified"
+          : "owned",
       );
       await this.allowed(scope, client);
       const policy = await this.authority.policy(
@@ -481,7 +513,7 @@ export class CreatorMediaService {
       );
       const asset = await this.row(scope, client, proof.assetId);
       invariant(
-        ["human_note", "post_photo"].includes(asset.purpose),
+        ["human_note", "post_photo", "post_audio"].includes(asset.purpose),
         "media_publication_purpose_invalid",
         "Source and interview audio require their own reviewed purpose authority.",
       );
@@ -558,7 +590,14 @@ export class CreatorMediaService {
   ) {
     if ("accountId" in scope)
       await this.identity.authorizeInTransaction(scope, client, "owned");
-    else {
+    else if (isAudience(scope)) {
+      invariant(
+        this.audienceIdentity,
+        "media_audience_unconfigured",
+        "Content playback is awaiting its current audience authority.",
+      );
+      await this.audienceIdentity.authorizeInTransaction(scope, client);
+    } else {
       assertThreadScope(scope);
       invariant(
         scope.authority !== "triage",
@@ -594,6 +633,7 @@ export class CreatorMediaService {
           "media_provenance_pending",
           "This media is awaiting its signature and content credentials.",
         );
+      const publication = await this.playbackPublication(scope, client, row);
       return {
         asset: creatorAssetView(row),
         ...this.tickets.issue(
@@ -603,14 +643,55 @@ export class CreatorMediaService {
             accountId: account(scope),
             creatorId: scope.creatorId,
             ...("accountId" in scope ? {} : { fanId: scope.fanId }),
+            ...(isAudience(scope) ? { audience: true as const } : {}),
             operation: "play",
             version: row.version,
             accessEpoch: row.access_epoch,
+            ...(publication ? { publication } : {}),
           },
           60,
         ),
       };
     });
+  }
+  private async playbackPublication(
+    scope: CreatorMediaReadScope,
+    client: PoolClient,
+    row: CreatorAssetRow,
+  ): Promise<CreatorMediaPublicationBinding | null> {
+    if (row.owner_account_id === account(scope)) return null;
+    const result = CreatorMediaPublicationBindingSchema.safeParse(
+      await this.authority.currentPublication?.(
+        scope,
+        row.object_id,
+        creatorAssetView(row),
+        client,
+      ),
+    );
+    invariant(
+      result.success,
+      "media_publication_unavailable",
+      "This media requires its current published revision.",
+    );
+    invariant(
+      await this.publicationMatches(
+        scope,
+        client,
+        row.object_id,
+        result.data.signedActId,
+        ProcessedMediaEvidenceSchema.parse({
+          assetId: row.id,
+          version: row.version,
+          sha256: row.output_sha256!,
+          bytes: Number(row.bytes),
+          mimeType: row.mime_type,
+          durationMs: row.duration_ms,
+        }),
+      ),
+      "media_publication_unavailable",
+      "This media requires its exact current publication.",
+    );
+    return result.data;
   }
   async download(scope: CreatorMediaReadScope, id: string, token: string) {
     const ticket = this.tickets.verify(
@@ -619,6 +700,7 @@ export class CreatorMediaService {
         accountId: account(scope),
         creatorId: scope.creatorId,
         ...("accountId" in scope ? {} : { fanId: scope.fanId }),
+        ...(isAudience(scope) ? { audience: true as const } : {}),
       },
       id,
       "play",
@@ -638,9 +720,16 @@ export class CreatorMediaService {
         "media_version_changed",
         "Request a new media link.",
       );
+      const publication = await this.playbackPublication(scope, client, row);
+      invariant(
+        contentHash(publication) === contentHash(ticket.publication ?? null),
+        "media_publication_changed",
+        "Request a new media link for the current publication.",
+      );
       return {
         asset: creatorAssetView(row),
         accessEpoch: row.access_epoch,
+        publication,
         file: this.storage.file(id, "output"),
         size: await this.storage.size(id),
       };
@@ -651,6 +740,7 @@ export class CreatorMediaService {
     id: string,
     version: number,
     accessEpoch: number,
+    publication: CreatorMediaPublicationBinding | null = null,
   ) {
     await this.transaction(scope, async (client) => {
       const row = await this.row(scope, client, id);
@@ -661,6 +751,12 @@ export class CreatorMediaService {
           (row.owner_account_id === account(scope) || verifiedProvenance(row)),
         "media_version_changed",
         "This media is no longer available.",
+      );
+      invariant(
+        contentHash(await this.playbackPublication(scope, client, row)) ===
+          contentHash(publication),
+        "media_publication_changed",
+        "This media is no longer in the same published revision.",
       );
     });
   }

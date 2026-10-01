@@ -87,6 +87,7 @@ export const CreatorMediaPurposeSchema = z.enum([
   "source_audio",
   "interview_audio",
   "post_photo",
+  "post_audio",
   "human_note",
 ]);
 export const CreatorMediaUploadRequestSchema = UploadRequestSchema.extend({

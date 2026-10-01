@@ -15,10 +15,19 @@ const TicketSchema = z.strictObject({
   nonce: z.uuid(),
 });
 type Ticket = z.infer<typeof TicketSchema>;
+export const CreatorMediaPublicationBindingSchema = z.strictObject({
+  signedActId: z.uuid(),
+  version: z.number().int().positive(),
+});
+export type CreatorMediaPublicationBinding = z.infer<
+  typeof CreatorMediaPublicationBindingSchema
+>;
 const CreatorTicketSchema = TicketSchema.omit({ fanId: true }).extend({
   objectId: z.uuid(),
   accessEpoch: z.number().int().positive(),
   fanId: z.uuid().optional(),
+  publication: CreatorMediaPublicationBindingSchema.optional(),
+  audience: z.literal(true).optional(),
 });
 type CreatorTicket = z.infer<typeof CreatorTicketSchema>;
 export class MediaTickets {
@@ -137,9 +146,12 @@ export class CreatorMediaTickets {
     const signature = createHmac("sha256", this.secret)
       .update(payload)
       .digest("base64url");
-    const route = input.fanId
-      ? `threads/${input.creatorId}/${input.fanId}/creator-media`
-      : `creators/${input.creatorId}/media`;
+    const route =
+      input.audience === true
+        ? `creators/${input.creatorId}/audience-media`
+        : input.fanId
+          ? `threads/${input.creatorId}/${input.fanId}/creator-media`
+          : `creators/${input.creatorId}/media`;
     return {
       url: `${this.origin}/v1/w6/${route}/${input.assetId}/${input.operation}?ticket=${payload}.${signature}`,
       expiresAt: new Date(value.expires * 1000).toISOString(),
@@ -147,7 +159,12 @@ export class CreatorMediaTickets {
   }
   verify(
     token: string,
-    scope: { accountId: string; creatorId: string; fanId?: string },
+    scope: {
+      accountId: string;
+      creatorId: string;
+      fanId?: string;
+      audience?: true;
+    },
     assetId: string,
     operation: CreatorTicket["operation"],
   ) {
@@ -188,6 +205,7 @@ export class CreatorMediaTickets {
       value.accountId !== scope.accountId ||
       value.creatorId !== scope.creatorId ||
       value.fanId !== scope.fanId ||
+      value.audience !== scope.audience ||
       value.assetId !== assetId ||
       value.operation !== operation ||
       value.expires <= Math.floor(Date.now() / 1000)

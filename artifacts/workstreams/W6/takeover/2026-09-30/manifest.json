@@ -6,7 +6,8 @@
   "consumedProducers": {
     "creatorScope": "2557d46072db50419cb340cf4fe9d87e4dd4853c",
     "creatorTransaction": "abf6543c8480a2d8cb378e2ba1a162f6293ae65c",
-    "mediaTransport": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564"
+    "mediaTransport": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564",
+    "audienceIdentity": "bd3677c03ccb1b8225bd0d56f033f953ce7aa7aa"
   },
   "sourceSHA256": {
     "apps/backend/src/modules/media/ai-audio.ts": "b1ee612b6254dd27460612026a9832af59490e44f69fb76592a984a54811b335",
@@ -162,5 +163,31 @@
     "iosSimulatorLibrary": "passed28.32s",
     "sqlApplied": false,
     "functionalAcceptance": false
+  },
+  "publicationAudienceFollowup": {
+    "evidence": "publication-audience.json",
+    "sourceSHA256": {
+      "apps/backend/src/modules/identity/audience-scope.ts": "073f9757233d528994da3872cd67fd6b479dbde2ea46f6039dafed3613004ada",
+      "apps/backend/src/modules/media/creator-service.ts": "5e197f2b7289b8a4103676e508ec526838715aa954985c2c2f20f99c90c4eb98",
+      "apps/backend/src/modules/media/creator-scope.sql": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+      "apps/backend/src/modules/media/creator-worker.ts": "e092d0574dc96abd24884256e9e5e333284a6fbdba858c4ab1e53c910c2c4e0c",
+      "apps/backend/src/modules/media/registration.ts": "dd2d430e6420587fae57efcd3b02cab6a2ad8ba940d31dba130046435e228024",
+      "apps/backend/src/modules/media/router.ts": "6d944e435d34dc4ac358786f17cfcaeac09de122e85de5d54e7d9f5e5b24afc4",
+      "apps/backend/src/modules/media/storage.ts": "e6c0bc3c178eb976df53bb72637c35f92a5ee3819cebc0e189b1d1c9952e2e9c",
+      "apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift": "ae8156ebfa0048190e7f04c7a28d7b9b1f830b8517b94126b5a3c2790ea9c18a",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaClient.kt": "fbc9db61869dc06226cb9c56d45663550336b4c569d5932bbaca93ace877af60",
+      "apps/web/features/media/VoiceRecorder.tsx": "6c285f1302ce3591059bcebeba08f6cd793989117c95c8d76ca97c062a1cbfd7",
+      "apps/web/features/media/VoicePlayer.tsx": "5405632c7ec2b61af4e2e56e42f68f8e5306bcb07b8ff07ae2b248bf9c08eee3",
+      "apps/web/features/media/recorder.ts": "12ed47e43663fd227bf1bc13a4935dbf5b34ee0490843039d39175d19abdea03",
+      "packages/api/src/media.ts": "f632033eedd480a9a25ec75cce0eeab059ac678c3953d60a15e4253d1c38ebe9",
+      "packages/api/src/media-openapi.ts": "a6a5d5fb691da5ef9136f55ec152df67c0b6cdfa230bc2d75fb67198bfded03a",
+      "packages/api/generated/openapi.json": "46b960baae1250fcb34632d2dba75c177858f60c8557d1c8c25b18e13809fdbe",
+      "apps/ios/Sources/Generated/QelvoraAPI.swift": "96a7ef015391058a78c9656d0fe8c6546f700dcc37e07641f3c1655e86ceddb9",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "c145eda4fcf517e2582761919c7ffffb5b8b56503248c26fa4dc557507c0f00f"
+    },
+    "sourceBaseRevision": "a4d63f95d56d169726f655b7147a857a6afe661b",
+    "operations": 47,
+    "sqlActiveOrApplied": false,
+    "actualMediaCallHardwareAcceptance": false
   }
 }

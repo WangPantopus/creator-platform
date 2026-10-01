@@ -441,6 +441,7 @@ enum class APIMediaCreatorMediaAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -488,6 +489,7 @@ enum class APIMediaCreatorMediaPlaybackTicketAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -507,6 +509,7 @@ enum class APIMediaCreatorMediaPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -526,6 +529,7 @@ enum class APIMediaCreatorMediaUploadRequestPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -573,6 +577,7 @@ enum class APIMediaCreatorMediaUploadTicketAssetPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
   @SerialName("post_photo") POST_PHOTO,
+  @SerialName("post_audio") POST_AUDIO,
   @SerialName("human_note") HUMAN_NOTE
 }
 
@@ -1692,6 +1697,9 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun audienceCreatorMediaPlayback(creatorId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
   suspend fun readCreatorCallAvailability(creatorId: String): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true))
   suspend fun saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true))
   suspend fun beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media", "POST", body = json.encodeToString(body), authenticated = true))

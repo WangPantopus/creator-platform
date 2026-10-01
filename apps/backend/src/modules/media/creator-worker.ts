@@ -114,10 +114,9 @@ export class CreatorMediaWorker {
           throw new Error("processed_media_integrity_invalid");
         const manifest = {
           schemaVersion: 1,
-          kind:
-            claimed.purpose === "human_note"
-              ? "human_recording"
-              : "human_publication_media",
+          kind: ["human_note", "post_audio"].includes(claimed.purpose)
+            ? "human_recording"
+            : "human_publication_media",
           accountId: claimed.owner_account_id,
           creatorId: claimed.creator_id,
           objectId: claimed.object_id,

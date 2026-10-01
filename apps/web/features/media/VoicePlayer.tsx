@@ -35,20 +35,27 @@ export function CreatorVoicePlayer(
     objectId: string;
     /** Present only for an actual W1-authorized audience thread. */
     fanId?: string;
+    /** Actual authenticated W5 content audience; W1 resolves its real fan profile. */
+    audience?: boolean;
   },
 ) {
-  const family = props.fanId
-    ? `threads/${props.creatorId}/${props.fanId}/creator-media`
-    : `creators/${props.creatorId}/media`;
+  const family =
+    props.audience === true
+      ? `creators/${props.creatorId}/audience-media`
+      : props.fanId
+        ? `threads/${props.creatorId}/${props.fanId}/creator-media`
+        : `creators/${props.creatorId}/media`;
   if (
     props.asset.creatorId !== props.creatorId ||
     props.asset.objectId !== props.objectId ||
-    props.asset.purpose !== "human_note" ||
+    !["human_note", "post_audio"].includes(props.asset.purpose) ||
     props.asset.state !== "ready" ||
     props.asset.mimeType !== "audio/mp4"
   )
     return (
-      <p role="status">This recording is unavailable for the current Note.</p>
+      <p role="status">
+        This recording is unavailable for the current content.
+      </p>
     );
   return (
     <Player

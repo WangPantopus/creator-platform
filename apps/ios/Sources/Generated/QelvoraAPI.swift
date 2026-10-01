@@ -599,6 +599,7 @@ public enum APIMediaCreatorMediaAssetPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -666,6 +667,7 @@ public enum APIMediaCreatorMediaPlaybackTicketAssetPurpose: String, Codable, Sen
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -683,6 +685,7 @@ public enum APIMediaCreatorMediaPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -709,6 +712,7 @@ public enum APIMediaCreatorMediaUploadRequestPurpose: String, Codable, Sendable 
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -777,6 +781,7 @@ public enum APIMediaCreatorMediaUploadTicketAssetPurpose: String, Codable, Senda
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
   case `post_photo` = "post_photo"
+  case `post_audio` = "post_audio"
   case `human_note` = "human_note"
 }
 
@@ -2272,6 +2277,15 @@ public actor CreatorAPIClient {
   }
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readAudienceCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true)
+  }
+  public func audienceCreatorMediaPlayback(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaPlaybackTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/playback", method: "POST", authenticated: true)
+  }
+  public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Range": range].compactMapValues { $0 })
   }
   public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
     try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)

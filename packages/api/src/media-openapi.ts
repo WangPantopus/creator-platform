@@ -56,7 +56,23 @@ const owner = [path("creatorId"), path("assetId")];
 const fan = [path("creatorId"), path("fanId"), path("assetId")];
 const creator = "/v1/w6/creators/{creatorId}/media";
 const thread = "/v1/w6/threads/{creatorId}/{fanId}/creator-media";
+const audience = "/v1/w6/creators/{creatorId}/audience-media";
 export const mediaPaths = {
+  [`${audience}/{assetId}`]: {
+    parameters: owner,
+    get: operation("readAudienceCreatorMedia", "MediaCreatorMediaAsset"),
+  },
+  [`${audience}/{assetId}/playback`]: {
+    parameters: owner,
+    post: operation(
+      "audienceCreatorMediaPlayback",
+      "MediaCreatorMediaPlaybackTicket",
+    ),
+  },
+  [`${audience}/{assetId}/play`]: {
+    parameters: owner,
+    get: playback("playAudienceCreatorMedia"),
+  },
   "/v1/w6/creators/{creatorId}/call-availability": {
     parameters: [path("creatorId")],
     get: operation("readCreatorCallAvailability", "CallAvailabilityView"),

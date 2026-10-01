@@ -56,6 +56,27 @@ export function CreatorVoiceRecording(props: CreatorVoiceRecordingProps) {
     />
   );
 }
+/** The host supplies the current approved Post duration. No product default is
+ * inferred from the transport ceiling or from the separate60-second Note rule. */
+export function CreatorPostVoiceRecording(
+  props: CreatorVoiceRecordingProps & { maxDurationMs: number },
+) {
+  if (
+    !Number.isSafeInteger(props.maxDurationMs) ||
+    props.maxDurationMs <= 0 ||
+    props.maxDurationMs > 3_600_000
+  )
+    return (
+      <p role="status">Recording is awaiting its current duration limit.</p>
+    );
+  return (
+    <RecordingForm
+      key={`${props.creatorId}/${props.objectId}/post_audio/${props.maxDurationMs}`}
+      {...props}
+      purpose="post_audio"
+    />
+  );
+}
 function RecordingForm({
   creatorId,
   fanId,
@@ -65,9 +86,10 @@ function RecordingForm({
   maxDurationMs,
   onReady,
   beforeDiscard,
-}: ThreadRecordingProps &
+}: Omit<ThreadRecordingProps, "purpose"> &
   Omit<CreatorVoiceRecordingProps, "creatorId" | "objectId"> & {
     objectId?: string;
+    purpose?: "human_note" | "human_reply" | "post_audio";
   }) {
   const heading = useId();
   const family =
@@ -194,11 +216,11 @@ function RecordingForm({
     if (
       asset.creatorId !== creatorId ||
       asset.objectId !== objectId ||
-      asset.purpose !== "human_note" ||
+      asset.purpose !== purpose ||
       asset.mimeType !== "audio/mp4"
     ) {
       setError(
-        "The processed recording does not match this Note. Refresh before continuing.",
+        "The processed recording does not match this saved content. Refresh before continuing.",
       );
       return;
     }
@@ -210,7 +232,11 @@ function RecordingForm({
       mimeType: "audio/mp4",
       durationMs: asset.durationMs,
     });
-    if (!evidence.success || !asset.durationMs || asset.durationMs > 60_000) {
+    if (
+      !evidence.success ||
+      !asset.durationMs ||
+      asset.durationMs > maxDurationMs
+    ) {
       setError(
         "The processed recording evidence is unavailable. Refresh before continuing.",
       );
@@ -218,7 +244,7 @@ function RecordingForm({
     }
     notified.current = occurrence;
     onReady(asset, evidence.data);
-  }, [asset, creatorId, objectId, onReady]);
+  }, [asset, creatorId, objectId, onReady, purpose, maxDurationMs]);
   async function send() {
     if (!recording.blob || !creatorId || !family || pendingUpload.current)
       return;
@@ -240,7 +266,7 @@ function RecordingForm({
         ? await uploadCreatorMedia({
             ...common,
             objectId,
-            purpose: "human_note",
+            purpose: purpose === "post_audio" ? "post_audio" : "human_note",
             resumed: ticket.current as CreatorMediaUploadTicket | undefined,
             onTicket: (value) => {
               ticket.current = value;
@@ -249,7 +275,7 @@ function RecordingForm({
         : await uploadRecording({
             ...common,
             fanId: fanId!,
-            purpose,
+            purpose: purpose === "human_reply" ? "human_reply" : "human_note",
             resumed: ticket.current as UploadTicket | undefined,
             onTicket: (value) => {
               ticket.current = value;

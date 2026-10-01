@@ -5,7 +5,7 @@ SET LOCAL ROLE creator_owner;
 CREATE TABLE creator.creator_media_asset (
  id uuid PRIMARY KEY, creator_id uuid NOT NULL REFERENCES creator.creator_profile(id),
  object_id uuid NOT NULL, owner_account_id uuid NOT NULL,
- purpose text NOT NULL CHECK(purpose IN('source_audio','interview_audio','post_photo','human_note')),
+ purpose text NOT NULL CHECK(purpose IN('source_audio','interview_audio','post_photo','post_audio','human_note')),
  state text NOT NULL CHECK(state IN('uploading','quarantined','processing','ready','rejected','revoked','deleted')),
  version integer NOT NULL DEFAULT 1 CHECK(version>0), access_epoch integer NOT NULL DEFAULT 1 CHECK(access_epoch>0), mime_type text NOT NULL,
  bytes bigint NOT NULL CHECK(bytes>0 AND bytes<=268435456), uploaded_bytes bigint NOT NULL DEFAULT 0 CHECK(uploaded_bytes>=0 AND uploaded_bytes<=268435456),
@@ -31,10 +31,10 @@ ALTER TABLE creator.creator_media_asset FORCE ROW LEVEL SECURITY;
 CREATE POLICY scope_read ON creator.creator_media_asset FOR SELECT USING (
  creator_id=nullif(current_setting('app.creator_id',true),'')::uuid AND (
   owner_account_id=nullif(current_setting('app.account_id',true),'')::uuid OR (
-   purpose IN('human_note','post_photo') AND state='ready' AND signed_act_id IS NOT NULL AND provenance->'c2paVerified'='true'::jsonb AND
-   EXISTS(SELECT 1 FROM creator.thread t JOIN creator.fan_profile f ON f.id=t.fan_id
-    WHERE t.creator_id=creator_media_asset.creator_id AND t.fan_id=nullif(current_setting('app.fan_id',true),'')::uuid
-     AND f.account_id=nullif(current_setting('app.account_id',true),'')::uuid AND t.deleted_at IS NULL)
+   purpose IN('human_note','post_photo','post_audio') AND state='ready' AND signed_act_id IS NOT NULL AND provenance->'c2paVerified'='true'::jsonb AND
+   EXISTS(SELECT 1 FROM creator.fan_profile f
+    WHERE f.id=nullif(current_setting('app.fan_id',true),'')::uuid
+     AND f.account_id=nullif(current_setting('app.account_id',true),'')::uuid)
   )
  )
 );
@@ -85,7 +85,7 @@ ALTER TABLE creator.creator_media_publication FORCE ROW LEVEL SECURITY;
 CREATE POLICY scope_read ON creator.creator_media_publication FOR SELECT USING (
  creator_id=nullif(current_setting('app.creator_id',true),'')::uuid AND (
   account_id=nullif(current_setting('app.account_id',true),'')::uuid OR
-  EXISTS(SELECT 1 FROM creator.creator_media_asset a WHERE a.id=creator_media_publication.asset_id AND a.creator_id=creator_media_publication.creator_id AND a.object_id=creator_media_publication.object_id AND a.purpose IN('human_note','post_photo') AND a.state='ready' AND a.provenance->'c2paVerified'='true'::jsonb)
+  EXISTS(SELECT 1 FROM creator.creator_media_asset a WHERE a.id=creator_media_publication.asset_id AND a.creator_id=creator_media_publication.creator_id AND a.object_id=creator_media_publication.object_id AND a.purpose IN('human_note','post_photo','post_audio') AND a.state='ready' AND a.provenance->'c2paVerified'='true'::jsonb)
  )
 );
 CREATE POLICY scope_insert ON creator.creator_media_publication FOR INSERT WITH CHECK (
@@ -105,7 +105,7 @@ BEGIN
    AND sp.command->'content'->>'kind'='content_publication' AND sp.command->'content'->>'creatorId'=NEW.creator_id::text
    AND jsonb_typeof(sp.command->'content'->'mediaEvidence')='array'
    AND sp.command->'content'->'mediaEvidence' @> jsonb_build_array(NEW.evidence)
-   AND a.state='ready' AND a.purpose IN('human_note','post_photo') AND NEW.evidence=jsonb_build_object('assetId',a.id,'version',a.version,'sha256',a.output_sha256,'bytes',a.bytes,'mimeType',a.mime_type,'durationMs',a.duration_ms)
+   AND a.state='ready' AND a.purpose IN('human_note','post_photo','post_audio') AND NEW.evidence=jsonb_build_object('assetId',a.id,'version',a.version,'sha256',a.output_sha256,'bytes',a.bytes,'mimeType',a.mime_type,'durationMs',a.duration_ms)
  ) THEN
   RAISE EXCEPTION 'creator_media_publication_evidence_invalid';
  END IF;
