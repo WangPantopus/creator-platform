@@ -8,6 +8,7 @@ import type { AgentService } from "./service.js";
 import type { AgentLifecycle } from "./lifecycle.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import { generationJournalInstalled } from "./generation-journal.js";
 
 /** W1/W8 supply authoritative job and case projections; HTTP fields cannot mint these scopes. */
 export interface AgentTrustAuthority {
@@ -161,6 +162,16 @@ export function agentPrivacyHook(
         "privacy_scope_large",
         "Split this account operation into bounded creator jobs.",
       );
+      const accountingClient = await service.repository.pool.connect();
+      try {
+        invariant(
+          !(await generationJournalInstalled(accountingClient)),
+          "thread_accounting_privacy_unconfigured",
+          "Register authoritative account fan relationships and thread-accounting export/deletion before acknowledging this request.",
+        );
+      } finally {
+        accountingClient.release();
+      }
       if (input.scope === "thread") {
         invariant(
           !scopes.length,

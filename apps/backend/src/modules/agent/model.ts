@@ -125,8 +125,11 @@ export class OpenAIResponsesModel implements AgentModel {
       ]),
     );
     const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
+    // Input classification, embedding, reply, at most12 sentence guards,
+    // one memory extraction and at most5 sensitivity calls:21 admissions.
+    // Embedding has no output; the20 model calls each cap output at2000.
     return Math.ceil(
-      ((prefixBytes + 80_000) * 20 * input + 40_000 * output) / 1_000_000,
+      ((prefixBytes + 80_000) * 21 * input + 40_000 * output) / 1_000_000,
     );
   }
   async *reply(

@@ -2,12 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { IdentityContinueSchema } from "@qelvora/api/schemas";
 import { IdentityRedirectSchema } from "@qelvora/api";
 import { continuationCookie, cookieOptions } from "../../../../lib/session";
+import { applicationOrigin } from "../../../../lib/request-origin";
 /** Only the backend's Pantopus adapter may create a redirect; this route never creates an identity. */
 export async function GET(request: NextRequest) {
   const requested = request.nextUrl.searchParams.get("returnTo") ?? "/home";
   const context = IdentityContinueSchema.safeParse({ returnTo: requested });
   const returnTo = context.success ? context.data.returnTo : "/home";
-  const target = new URL("/auth/continue", request.url);
+  let target: URL;
+  try {
+    if (
+      process.env.NODE_ENV === "production" &&
+      !(process.env.QELVORA_PUBLIC_ORIGIN ?? process.env.WEB_ORIGIN)
+    )
+      throw new Error("Application origin is not configured");
+    target = new URL("/auth/continue", applicationOrigin(request));
+  } catch {
+    return NextResponse.json(
+      {
+        error: {
+          code: "identity_unconfigured",
+          message: "Pantopus sign-in is temporarily unavailable. Try again.",
+        },
+      },
+      { status: 503 },
+    );
+  }
   target.searchParams.set("returnTo", returnTo);
   if (!context.success) {
     target.searchParams.set("error", "invalid_return");

@@ -19,6 +19,7 @@ import {
   type AgentTrustAuthority,
 } from "./trust-adapter.js";
 import type { EffectHook } from "../trust/contracts.js";
+import type { PreparedGenerationJournal } from "./generation-journal.js";
 
 /** The configured host supplies canonical authorities and approved providers.
  * Missing producers remain explicit; constructing Studio never enables fan delivery. */
@@ -31,11 +32,12 @@ export function createAgentDomain(input: {
   shadowFeed?: PrivacyParaphrasePort;
   trust?: AgentTrustAuthority;
   exports?: AgentExportArtifactSink;
+  usageJournal?: PreparedGenerationJournal;
   settleDeparture?: (
     input: Parameters<EffectHook["run"]>[0],
   ) => Promise<{ complete: boolean; receipt: Record<string, unknown> }>;
 }) {
-  const repository = new AgentRepository(input.pool);
+  const repository = new AgentRepository(input.pool, input.usageJournal);
   const service = new AgentService(
     repository,
     new AgentPipeline(repository, input.model),
@@ -86,6 +88,7 @@ export function createAgentDomain(input: {
       shadow: Boolean(input.shadowFeed),
       trust: Boolean(input.trust && input.settleDeparture),
       exports: Boolean(input.exports),
+      usageJournal: Boolean(input.usageJournal),
     },
   };
 }
