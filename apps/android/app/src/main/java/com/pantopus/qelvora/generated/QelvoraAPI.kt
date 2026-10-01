@@ -1459,7 +1459,9 @@ data class APIMessage(
   val `deliveryState`: APIMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
-  val `signedActId`: String? = null
+  val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null
 )
 
 @Serializable
@@ -1499,7 +1501,9 @@ data class APIAcceptedMessageMessage(
   val `deliveryState`: APIAcceptedMessageMessageDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
-  val `signedActId`: String? = null
+  val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null
 )
 
 @Serializable
@@ -1612,7 +1616,9 @@ data class APIThreadTimelineMessagesItem(
   val `deliveryState`: APIThreadTimelineMessagesItemDeliveryState,
   val `controlEpoch`: Long,
   val `sequence`: Long,
-  val `signedActId`: String? = null
+  val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null
 )
 
 @Serializable
@@ -1722,9 +1728,10 @@ data class APIConversationConversationMessage(
   val `controlEpoch`: Long,
   val `sequence`: Long,
   val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
-  val `member`: String? = null,
   val `offTheRecord`: Boolean,
   val `version`: Long
 )
@@ -1791,9 +1798,10 @@ data class APIConversationConversationPageMessagesItem(
   val `controlEpoch`: Long,
   val `sequence`: Long,
   val `signedActId`: String? = null,
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
-  val `member`: String? = null,
   val `offTheRecord`: Boolean,
   val `version`: Long
 )

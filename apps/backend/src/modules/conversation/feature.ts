@@ -427,7 +427,8 @@ export function conversationFeature(
           await actorFor(req),
           IdSchema.parse(req.params.creatorId),
           IdSchema.parse(req.params.fanId),
-          req.method === "GET" && !req.path.endsWith("/events"),
+          req.path.endsWith("/team-replies") ||
+            (req.method === "GET" && !req.path.endsWith("/events")),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
       router.post(root + "/presence", async (req, res) => {
@@ -647,6 +648,11 @@ export function conversationFeature(
       router.post(root + "/human-replies", async (req, res) =>
         res.json(
           await feature.conversations.humanReply(await scopeFor(req), req.body),
+        ),
+      );
+      router.post(root + "/team-replies", async (req, res) =>
+        res.json(
+          await feature.conversations.teamReply(await scopeFor(req), req.body),
         ),
       );
       router.get(root + "/audit", async (req, res) => {

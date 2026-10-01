@@ -26,6 +26,7 @@ import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
+import { TeamReplySchema } from "../../../../../packages/api/src/conversation/contracts.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -43,6 +44,8 @@ type MessageRow = {
   control_epoch: number;
   sequence: number;
   signed_act_id: string | null;
+  author_account_id: string | null;
+  team_member: string | null;
 };
 type GenerationRow = {
   id: string;
@@ -66,6 +69,8 @@ function message(row: MessageRow): Message {
     controlEpoch: row.control_epoch,
     sequence: row.sequence,
     signedActId: row.signed_act_id,
+    member: row.team_member ?? null,
+    authorAccountId: row.author_account_id ?? null,
   };
 }
 
@@ -208,7 +213,7 @@ export class ConversationService {
         scope.creatorId,
         scope.fanId,
         author,
-        author === "fan" || author === "human_creator"
+        author === "fan" || author === "human_creator" || author === "team"
           ? scope.actorAccountId
           : null,
         text,
@@ -823,6 +828,97 @@ export class ConversationService {
               sequence: 0,
             });
             return output;
+          },
+        ),
+      "write",
+    );
+  }
+  /** D-07: current audited triage authority writes only under the team label.
+   * This grants no creator signature, control change or personal obligation. */
+  async teamReply(scope: ThreadScope, raw: unknown): Promise<Message> {
+    const body = TeamReplySchema.parse(raw);
+    invariant(
+      scope.authority === "triage",
+      "team_required",
+      "Only a current authorized team member can reply as team.",
+    );
+    return this.db.withThread(
+      scope,
+      (client) =>
+        idempotent(
+          client,
+          scope,
+          "team_reply",
+          body.idempotencyKey,
+          body,
+          async () => {
+            const thread = await this.lockThread(client, scope);
+            invariant(
+              thread.control !== "closed",
+              "thread_closed",
+              "This conversation is closed.",
+            );
+            // Team replies do not acquire the creator's takeover authority. Keep
+            // a live AI stream ordered; the creator can interrupt it explicitly.
+            const active = await client.query(
+              "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
+              [scope.threadId, scope.creatorId, scope.fanId],
+            );
+            invariant(
+              !active.rowCount,
+              "reply_in_progress",
+              "Wait for the current reply before sending as team.",
+            );
+            const profile = await client.query<{ handle: string }>(
+              "SELECT handle FROM creator.fan_profile WHERE account_id=$1 FOR SHARE",
+              [scope.actorAccountId],
+            );
+            invariant(
+              profile.rows[0],
+              "team_profile_required",
+              "Choose your public handle before replying as team.",
+            );
+            const output = await this.insertMessage(
+              client,
+              scope,
+              "team",
+              body.text,
+              thread.control_epoch,
+              "delivered",
+            );
+            const labelled = await client.query<{
+              team_member: string;
+              author_account_id: string;
+            }>(
+              "UPDATE creator.message SET team_member=$5 WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='team' AND author_account_id=$6 RETURNING team_member,author_account_id",
+              [
+                scope.threadId,
+                scope.creatorId,
+                scope.fanId,
+                output.id,
+                `@${profile.rows[0].handle} · triage`,
+                scope.actorAccountId,
+              ],
+            );
+            invariant(
+              labelled.rowCount === 1,
+              "team_reply_unavailable",
+              "Current team attribution is required.",
+            );
+            await appendFrame(client, scope, {
+              epoch: thread.control_epoch,
+              kind: "delivered",
+              messageId: output.id,
+              authorKind: "team",
+              text: output.text,
+              generationId: null,
+              sequence: 0,
+            });
+            return {
+              ...output,
+              member: labelled.rows[0]!.team_member,
+              authorAccountId: labelled.rows[0]!.author_account_id,
+            };
           },
         ),
       "write",

@@ -1920,7 +1920,9 @@ public struct APIMessage: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -1929,6 +1931,8 @@ public struct APIMessage: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 
@@ -1970,7 +1974,9 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -1979,6 +1985,8 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 
@@ -2110,7 +2118,9 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
-  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil) {
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2119,6 +2129,8 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
   }
 }
 
@@ -2249,12 +2261,13 @@ public struct APIConversationConversationMessage: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
+  public let `member`: String?
+  public let `authorAccountId`: String?
   public let `citations`: [String]
   public let `createdAt`: String
-  public let `member`: String?
   public let `offTheRecord`: Bool
   public let `version`: Int
-  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, citations: [String], createdAt: String, member: String? = nil, offTheRecord: Bool, version: Int) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2263,9 +2276,10 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
     self.citations = citations
     self.createdAt = createdAt
-    self.member = member
     self.offTheRecord = offTheRecord
     self.version = version
   }
@@ -2347,12 +2361,13 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
   public let `controlEpoch`: Int
   public let `sequence`: Int
   public let `signedActId`: String?
+  public let `member`: String?
+  public let `authorAccountId`: String?
   public let `citations`: [String]
   public let `createdAt`: String
-  public let `member`: String?
   public let `offTheRecord`: Bool
   public let `version`: Int
-  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, citations: [String], createdAt: String, member: String? = nil, offTheRecord: Bool, version: Int) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2361,9 +2376,10 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.controlEpoch = controlEpoch
     self.sequence = sequence
     self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
     self.citations = citations
     self.createdAt = createdAt
-    self.member = member
     self.offTheRecord = offTheRecord
     self.version = version
   }

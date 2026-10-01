@@ -8633,6 +8633,24 @@
                 "type": "null"
               }
             ]
+          },
+          "member": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authorAccountId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8702,6 +8720,24 @@
                 "maximum": 9007199254740991
               },
               "signedActId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "member": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "authorAccountId": {
                 "anyOf": [
                   {
                     "type": "string",
@@ -8984,6 +9020,24 @@
                       "type": "null"
                     }
                   ]
+                },
+                "member": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "authorAccountId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -9256,6 +9310,24 @@
               }
             ]
           },
+          "member": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authorAccountId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "citations": {
             "type": "array",
             "items": {
@@ -9266,12 +9338,6 @@
           },
           "createdAt": {
             "type": "string"
-          },
-          "member": {
-            "type": [
-              "string",
-              "null"
-            ]
           },
           "offTheRecord": {
             "type": "boolean"
@@ -9291,9 +9357,9 @@
           "controlEpoch",
           "sequence",
           "signedActId",
+          "member",
           "citations",
           "createdAt",
-          "member",
           "offTheRecord",
           "version"
         ],
@@ -9427,6 +9493,24 @@
                     }
                   ]
                 },
+                "member": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "authorAccountId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "citations": {
                   "type": "array",
                   "items": {
@@ -9437,12 +9521,6 @@
                 },
                 "createdAt": {
                   "type": "string"
-                },
-                "member": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
                 },
                 "offTheRecord": {
                   "type": "boolean"
@@ -9462,9 +9540,9 @@
                 "controlEpoch",
                 "sequence",
                 "signedActId",
+                "member",
                 "citations",
                 "createdAt",
-                "member",
                 "offTheRecord",
                 "version"
               ],
