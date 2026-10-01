@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-01T13:46:21.441Z",
+  "branch": "codex/w2-source-recovery",
+  "sourceBase": "3de0f14ba82139c9d694ddd3cd676216103a036c",
+  "ingestionRuntimeSource": "d31afb6e1c972f6a1ce547438b2aa8b575637d74",
+  "postRestartPreviewRuntimeSource": "1c11b098c3f86ec07740c760b423c4fccc9ec5f7",
+  "pipelineRevision": "w2-context-guardrails-10",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/pipeline.ts": "02eb87c77ed1474760db1aa53d62d52c19cbe752177baa114d0b3fbb7fa15d5f",
+    "apps/backend/src/modules/ingestion/worker.ts": "b76e7babe21a7a73d627d9fecbc8899b0ddff395146025f462e3f4ca29755879",
+    "apps/backend/src/modules/agent/provider-usage.ts": "70c47a02ef4b29ec29dba2492d2bed23ad5f9ea0a6f7142739eb5be1d7d65022",
+    "apps/web/features/creator-ai/CreatorAI.tsx": "ec7759bfebb5b90fa3ba6f2827fb2e1a59332a11c85c554911724119f863da8b",
+    "apps/web/features/creator-ai/creator-ai.css": "cace328aeb3c9b7df40fd9866dc04f776a4b995bb9a0abd2a9fcd7a48c156118"
+  },
+  "evidenceSha256": {
+    "citation-merged-ci.json": "a2cd4613d3021e41e21771864a273b0321c19aee23295b44f96ccb871c7e0e96",
+    "evaluation-heading-wrap-after-light.png": "b2391987842ca138b7fcfe0207934d0177f644762dbe4e30ce22bfbe5d701a4b",
+    "evaluation-heading-wrap-after-night.png": "b9beeb2e51fd226720c30c952eb71679aa0e1db1ca117dc51d245c9abb71ebd5",
+    "evaluation-heading-wrap-before.png": "41a4f604ef634e33c28a062be455d5b9f758ed2251278c5375d9d90188c5dae5",
+    "evaluation-heading-wrap-phone-light.png": "f1937d4dedcdd063678eef9bf3dfa1dd639e68aafa251b7ab3f3ca1351f598f3",
+    "evaluation-heading-wrap-phone-night.png": "3d7f96acb7661aa38f98b7a9d30a09bd91eec3083ded2a886cff7c5fdc2da8f1",
+    "expert-process-recovery-evaluation.json": "cc0e03191f11e3c38212a2e9870993e47d5cdb69f8e5e67d43a7f2ea9557e4ab",
+    "expert-process-recovery-passed.png": "41a4f604ef634e33c28a062be455d5b9f758ed2251278c5375d9d90188c5dae5",
+    "source-process-before.json": "9320b6af0aeb973cef83f6b479b34954232db86091f13fcf7662e7b7c3fb9ea1",
+    "source-process-cost.json": "8941fad4bcefe962605e8970888c3d0aaaa7b5aaa679731a1c8011a65d62ad76",
+    "source-process-current-data.json": "08395b3d8ae5a76b72e019c7d98fcfc4b41da9f6ec9f6c1d34242657c87b0c16",
+    "source-process-final-data.json": "19783be6256c2e729ded283c9866700bd6ac6331d5bf27a509bf63ce2bb6831f",
+    "source-process-integrated-preview.json": "af2cb0e82c6f922dae0db81aca46047720227b2438dede072d4ed6efb9c54345",
+    "source-process-integrated-preview.png": "7f6d5b4a94cbff208d646a86fbf83f1680f82396871c631a99dd3527e7984b6b",
+    "source-process-lost.json": "2ef5f19f5d5d847eaaab72ad51a990fe8d6e75bae8b37b63a25ef838db63e35d",
+    "source-process-recovered.json": "c7de3c3fcd1c15a8bd5cd375e6b5cceb3219d86a952a1c6a1de96ee52a34ec96",
+    "source-process-recovered.png": "eb3a4ac246c771f02d3beaaaf455697cee436606889b29b44b23fb7572d21df7",
+    "source-process-recovery.md": "6a7a694efa32d0afa01af2382fbb24ea819e039e0efc13647f84de8167ebe1ea",
+    "source-process-revoked.png": "1bd5466745c18900b9a4a7ad0c118b61b79b6482fb1f5b5965cceccf0c19638a"
+  },
+  "resourceState": {
+    "webPort": 3002,
+    "webPid": 57271,
+    "apiPort": 4102,
+    "apiPid": 21082,
+    "apiScope": "primary creator",
+    "databasePort": 55442,
+    "databaseContainer": "creator-platform-w2-recovery-20261001",
+    "nativeDevices": "normally stopped, data retained",
+    "privateAdb": "normally stopped",
+    "disposableCheckDatabase": "normally stopped, data retained"
+  },
+  "checks": {
+    "generation": "12 resources / 97 operations pass",
+    "typecheck": "7/7 pass;10.851s on1c11b09; backend typecheck also passes after3de0f14 billing integration",
+    "lint": "pass",
+    "format": "full root pass",
+    "build": "6/6 pass;34.453s on1c11b09; existing API no-output warning",
+    "priorExactHeadBackend": "35dd3a3 18/18 pass; unchanged T-11 60,447ms",
+    "newPublishedHead": "not yet published at this receipt"
+  },
+  "sessionClaimCorrection": {
+    "receipt": "preview-revision-recovery.json",
+    "originalSha256": "9db01dc1bb44cb16bc7a1e730c1332d8778d7f0086fecc051fa9b258926f9cfb",
+    "actual": "Two real Studio tabs authenticated as secondary actor; distinct session cookies unverified",
+    "unchanged": "Actual response, timestamps, submitted/updated revisions and revision-race evidence"
+  },
+  "limits": [
+    "Synthetic creator-owned material only; no authentic license/signature/verification or processor/retention approval",
+    "Administrative projections reconcile state; they are not RLS experiments",
+    "No captured HTTP response body for post-restart preview; UI and durable accounting evidence are explicit",
+    "Single preview and product evaluation timings are not p95 acceptance",
+    "Native live input, licensed fan delivery, actual200% text and screen readers remain unverified"
+  ]
+}
