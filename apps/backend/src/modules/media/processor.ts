@@ -1,4 +1,8 @@
 import { spawn } from "node:child_process";
+import { constants } from "node:fs";
+import { open } from "node:fs/promises";
+import { createConnection } from "node:net";
+import { once } from "node:events";
 import path from "node:path";
 import { withDeadline } from "./deadline.js";
 import { MEDIA_FILE_CEILING, readMediaFile } from "./files.js";
@@ -101,6 +105,80 @@ export class CommandMalwareScanner implements MalwareScanner {
       if (error instanceof MediaProcessError && error.exitCode === 1)
         return "infected";
       throw new Error("malware_scanner_unavailable");
+    }
+  }
+}
+/** clamd keeps its signature database loaded, so a scan costs milliseconds
+ * instead of a full clamscan database load per file. Size, scan-time and
+ * alert-on-limit settings live in the daemon's own configuration
+ * (StreamMaxLength, MaxFileSize, MaxScanSize, MaxScanTime, AlertExceedsMax). */
+export class ClamdMalwareScanner implements MalwareScanner {
+  constructor(
+    private readonly socket: string,
+    private readonly timeoutMs = 55_000,
+  ) {
+    if (!path.isAbsolute(socket))
+      throw new Error("malware_scanner_path_invalid");
+  }
+  async scan(file: string): Promise<"clean" | "infected"> {
+    // Same descriptor rules as the processor: no links, FIFOs or other non-files.
+    const handle = await open(
+      file,
+      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+    );
+    try {
+      const stat = await handle.stat();
+      if (!stat.isFile() || stat.size <= 0 || stat.size > MEDIA_FILE_CEILING)
+        throw new Error("media_integrity_invalid");
+      const reply = await new Promise<string>((resolve, reject) => {
+        const connection = createConnection(this.socket);
+        const chunks: Buffer[] = [];
+        let length = 0;
+        let settled = false;
+        const fail = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          connection.destroy();
+          reject(new Error("malware_scanner_unavailable"));
+        };
+        const timer = setTimeout(fail, this.timeoutMs);
+        connection.on("data", (chunk: Buffer) => {
+          length += chunk.length;
+          // A verdict is one short line; anything longer is not a clamd reply.
+          if (length > 4096) fail();
+          else chunks.push(chunk);
+        });
+        connection.on("error", fail);
+        connection.on("close", () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(Buffer.concat(chunks).toString("utf8"));
+        });
+        connection.on("connect", () => {
+          void (async () => {
+            connection.write("zINSTREAM\0");
+            for await (const chunk of handle.createReadStream({
+              autoClose: false,
+              highWaterMark: 65_536,
+            }) as AsyncIterable<Buffer>) {
+              const size = Buffer.alloc(4);
+              size.writeUInt32BE(chunk.length);
+              if (!connection.write(Buffer.concat([size, chunk])))
+                await once(connection, "drain");
+            }
+            // A zero-length chunk ends the stream; clamd replies, then closes.
+            connection.end(Buffer.alloc(4));
+          })().catch(fail);
+        });
+      });
+      const verdict = reply.replace(/\0+$/u, "").trim();
+      if (verdict === "stream: OK") return "clean";
+      if (/^stream: \S.* FOUND$/u.test(verdict)) return "infected";
+      throw new Error("malware_scanner_unavailable");
+    } finally {
+      await handle.close();
     }
   }
 }

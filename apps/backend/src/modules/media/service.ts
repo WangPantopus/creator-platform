@@ -24,6 +24,7 @@ import {
 import { contentHash } from "../../core/canonical.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { MediaTickets, PrivateMediaStorage } from "./storage.js";
+import { announceMediaJob } from "./jobs.js";
 
 export interface MediaAuthority {
   /** W4/W5/W2 supply current audience/purpose authorization and content-specific limits. */
@@ -363,10 +364,30 @@ export class MediaService {
       };
     });
   }
-  async read(scope: ThreadScope, id: string) {
-    return this.db.withThread(scope, async (client) =>
-      assetView(await this.row(scope, client, id)),
+  private job(row: AssetRow) {
+    return {
+      kind: "thread" as const,
+      assetId: row.id,
+      creatorId: row.creator_id,
+      fanId: row.fan_id,
+      ownerAccountId: row.owner_account_id,
+    };
+  }
+  /** A wakeup can be lost while the ingestion pool restarts. A participant
+   * waiting on still-claimable work repeats it; the worker lease dedupes. */
+  private async reannounce(client: PoolClient, row: AssetRow) {
+    const pending = await client.query(
+      "SELECT 1 FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND job_available_at<=now() AND (job_lease_until IS NULL OR job_lease_until<now()) AND (state IN('quarantined','processing') OR manifest_pending OR delete_pending)",
+      [row.id, row.creator_id, row.fan_id],
     );
+    if (pending.rowCount) await announceMediaJob(client, this.job(row));
+  }
+  async read(scope: ThreadScope, id: string) {
+    return this.db.withThread(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      await this.reannounce(client, row);
+      return assetView(row);
+    });
   }
   async resume(scope: ThreadScope, id: string) {
     return this.db.withThread(scope, async (client) => {
@@ -458,6 +479,7 @@ export class MediaService {
         "UPDATE creator.media_asset SET state='quarantined',job_available_at=now() WHERE id=$1 AND creator_id=$2 AND fan_id=$3 RETURNING *",
         [id, scope.creatorId, scope.fanId],
       );
+      await announceMediaJob(client, this.job(updated.rows[0]!));
       return assetView(updated.rows[0]!);
     });
   }
@@ -486,6 +508,7 @@ export class MediaService {
             "UPDATE creator.media_asset SET signed_act_id=$1,job_available_at=now(),manifest_pending=true WHERE id=$2 AND creator_id=$3 AND fan_id=$4 RETURNING *",
             [body.signedActId, id, scope.creatorId, scope.fanId],
           );
+          await announceMediaJob(client, this.job(updated.rows[0]!));
           return { asset: assetView(updated.rows[0]!), command };
         },
       ),
@@ -808,6 +831,7 @@ export class MediaService {
         "UPDATE creator.media_asset SET state='revoked',version=version+1,job_available_at=now(),delete_pending=true WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
         [id, scope.creatorId, scope.fanId],
       );
+      await announceMediaJob(client, this.job(row));
     });
     // A worker that was parsing may still have files open. Deletion is acknowledged only by the durable worker.
   }
