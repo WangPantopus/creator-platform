@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Notice, TabBar } from "@qelvora/ui-web";
 import { copy } from "@qelvora/copy";
 import type {
@@ -269,17 +269,48 @@ function ConversationPrivacy({
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [text, setText] = useState("");
+  const revision = useRef(0);
+  const controller = useRef<AbortController | null>(null);
+  const conceal = useCallback(() => {
+    revision.current++;
+    controller.current?.abort();
+    setPage(null);
+    setMemory(null);
+    setAudit(null);
+    setUsage(null);
+    setPolicy(null);
+    setBusy(false);
+  }, []);
   const refresh = useCallback(async () => {
+    conceal();
+    if (document.visibilityState !== "visible") return;
+    if (!navigator.onLine) {
+      setError("Reconnect to view your privacy settings.");
+      return;
+    }
+    const currentRevision = revision.current;
+    const requestController = new AbortController();
+    controller.current = requestController;
+    setError(null);
     try {
       const [fresh, memories, entries, caps, time] = await Promise.all([
-        request<ConversationPage>(root),
-        request<MemoryView>(`${root}/memory`),
-        request<Audit[]>(`${root}/audit`),
-        request<{ providers: ProviderPolicy | null }>("capabilities"),
+        request<ConversationPage>(root, undefined, requestController.signal),
+        request<MemoryView>(
+          `${root}/memory`,
+          undefined,
+          requestController.signal,
+        ),
+        request<Audit[]>(`${root}/audit`, undefined, requestController.signal),
+        request<{ providers: ProviderPolicy | null }>(
+          "capabilities",
+          undefined,
+          requestController.signal,
+        ),
         request<
           import("../../../../packages/api/src/conversation/contracts").ConversationUsage
-        >(`${root}/usage`),
+        >(`${root}/usage`, undefined, requestController.signal),
       ]);
+      if (revision.current !== currentRevision) return;
       setPage(fresh);
       setMemory(memories);
       setAudit(entries);
@@ -287,14 +318,12 @@ function ConversationPrivacy({
       setUsage(time);
       setError(null);
     } catch (error) {
+      if (revision.current !== currentRevision) return;
+      requestController.abort();
       if (
         error instanceof ConversationError &&
         [401, 403, 404].includes(error.status)
       ) {
-        setPage(null);
-        setMemory(null);
-        setAudit(null);
-        setUsage(null);
         setEditing(null);
         setText("");
       }
@@ -304,26 +333,52 @@ function ConversationPrivacy({
           : "Reconnect to view your privacy settings.",
       );
     }
-  }, [root, request]);
+  }, [root, request, conceal]);
   useEffect(() => {
+    const offline = () => {
+      conceal();
+      setError("Reconnect to view your privacy settings.");
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    window.addEventListener("offline", offline);
+    document.addEventListener("visibilitychange", refresh);
     void refresh();
-  }, [refresh]);
+    return () => {
+      conceal();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", offline);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [refresh, conceal]);
   const action = async (run: () => Promise<unknown>) => {
-    if (busy) return;
+    if (busy || !page || !memory) return;
+    const currentRevision = revision.current;
     setBusy(true);
     setError(null);
     try {
       await run();
+      if (revision.current !== currentRevision) return;
       setEditing(null);
       await refresh();
     } catch (error) {
+      if (revision.current !== currentRevision) return;
+      if (
+        error instanceof ConversationError &&
+        [401, 403, 404].includes(error.status)
+      ) {
+        conceal();
+        setEditing(null);
+        setText("");
+      }
       setError(
         error instanceof Error
           ? error.message
           : "This change could not be saved.",
       );
     } finally {
-      setBusy(false);
+      if (revision.current === currentRevision) setBusy(false);
     }
   };
   const decide = (item: MemoryItem, decision: string) =>
@@ -357,6 +412,9 @@ function ConversationPrivacy({
       )}
       <section id="memory">
         <h2>What {page?.creatorName ?? "this creator"}'s AI remembers</h2>
+        {!memory && (
+          <p>{error ? "Memories unavailable." : "Loading your memories…"}</p>
+        )}
         {memory?.items.length === 0 && (
           <p>No memories. The AI asks before remembering.</p>
         )}
