@@ -358,6 +358,15 @@ a.qv-stepin {
   align-items: center;
   gap: 12px;
 }
+.verification-title > svg {
+  flex: none;
+}
+.verification-title h1,
+.verification-rows dt,
+.verification-rows dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .verification-rows {
   margin: 0;
   background: var(--surface);
@@ -365,7 +374,7 @@ a.qv-stepin {
   border-radius: var(--radius-lg);
   padding: 16px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   gap: 10px;
   font-size: 14px;
 }
@@ -377,6 +386,7 @@ a.qv-stepin {
   font: 11px/17px var(--font-mono);
   overflow-wrap: anywhere;
   color: var(--ink-muted);
+  white-space: pre-wrap;
 }
 .proof-code > span {
   white-space: nowrap;

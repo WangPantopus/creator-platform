@@ -1,6 +1,73 @@
 import { IdSchema, PublicSignatureSchema } from "@qelvora/api";
-import { Notice, Message, ShareCard } from "@qelvora/ui-web";
+import { copy, formatCopy } from "@qelvora/copy";
+import { Button, Notice, Message, ShareCard } from "@qelvora/ui-web";
 import { platformFetch } from "../../../lib/session";
+
+function record(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function actLabel(act: string) {
+  switch (act) {
+    case "reply":
+      return copy.identityVerificationActReply;
+    case "approved_draft":
+      return copy.identityVerificationActApproved;
+    case "broadcast":
+      return copy.identityVerificationActNote;
+    case "reaction":
+      return copy.identityVerificationActReaction;
+    case "accept":
+      return copy.identityVerificationActAcceptance;
+    case "correction":
+      return copy.identityVerificationActCorrection;
+    default:
+      return copy.identityVerificationActOther;
+  }
+}
+
+function statusLabel(
+  status: ReturnType<typeof PublicSignatureSchema.parse>["status"],
+) {
+  return {
+    valid: copy.identityVerificationValid,
+    key_revoked: copy.identityVerificationKeyRevoked,
+    creator_revoked: copy.identityVerificationCreatorRevoked,
+    withdrawn: copy.identityVerificationWithdrawn,
+  }[status];
+}
+
+function Unavailable({
+  id,
+  missing = false,
+}: {
+  id: string;
+  missing?: boolean;
+}) {
+  return (
+    <main className="public-verification">
+      <Notice
+        title={
+          missing
+            ? copy.identityVerificationSignedUnavailableTitle
+            : copy.identityVerificationUnavailableTitle
+        }
+      >
+        {missing
+          ? copy.identityVerificationMissing
+          : copy.identityVerificationFailed}
+      </Notice>
+      <Button href={`/verify/${id}`} block>
+        {copy.retry}
+      </Button>
+      <Button href="/home" variant="quiet" block>
+        {copy.navHome}
+      </Button>
+    </main>
+  );
+}
 
 export default async function Verification({
   params,
@@ -9,12 +76,15 @@ export default async function Verification({
 }) {
   const { id } = await params;
   const identifier = IdSchema.safeParse(id);
-  if (!identifier.success)
+  if (!identifier.success || id !== id.toLowerCase())
     return (
       <main className="public-verification">
-        <Notice title="Signed act unavailable">
-          This verification link is invalid.
+        <Notice title={copy.identityVerificationSignedUnavailableTitle}>
+          {copy.identityVerificationInvalidLink}
         </Notice>
+        <Button href="/home" variant="quiet" block>
+          {copy.navHome}
+        </Button>
       </main>
     );
   try {
@@ -24,33 +94,31 @@ export default async function Verification({
       false,
     );
     if (!response.ok)
-      return (
-        <main className="public-verification">
-          <Notice
-            title={
-              response.status === 404
-                ? "Signed act unavailable"
-                : "Verification unavailable"
-            }
-          >
-            {response.status === 404
-              ? "This signed act could not be found."
-              : "Reconnect and try again. Verification could not be checked."}
-          </Notice>
-        </main>
-      );
+      return <Unavailable id={id} missing={response.status === 404} />;
     const signature = PublicSignatureSchema.parse(await response.json());
-    const document = signature.content as {
-      content?: { text?: string; authorKind?: string };
-      actType?: string;
-    } | null;
+    if (signature.signedActId !== id) return <Unavailable id={id} />;
+    const document = record(signature.content);
+    const content = record(document?.content);
+    const publicContent =
+      signature.status !== "withdrawn" &&
+      signature.contentAvailable &&
+      document?.actType === signature.actType;
     const text =
-      typeof document?.content?.text === "string"
-        ? document.content.text
+      publicContent &&
+      ["reply", "approved_draft", "broadcast", "correction"].includes(
+        signature.actType,
+      ) &&
+      typeof content?.text === "string"
+        ? content.text
         : null;
-    const approved =
-      signature.actType === "approved_draft" ||
-      document?.content?.authorKind === "approved_draft";
+    const version =
+      publicContent &&
+      typeof content?.version === "number" &&
+      Number.isSafeInteger(content.version) &&
+      content.version >= 1
+        ? content.version
+        : null;
+    const approved = signature.actType === "approved_draft";
     const time =
       new Intl.DateTimeFormat("en", {
         dateStyle: "medium",
@@ -74,24 +142,20 @@ export default async function Verification({
               strokeLinecap="round"
             />
           </svg>
-          <h1>Signed by {signature.creatorName}</h1>
+          <h1>{formatCopy("signedBy", { name: signature.creatorName })}</h1>
         </div>
         <p>{signature.explanation}</p>
         {signature.status !== "valid" && (
-          <Notice
-            title={
-              signature.status === "withdrawn"
-                ? "This card was withdrawn"
-                : signature.status === "key_revoked"
-                  ? "Signing key revoked"
-                  : "Creator verification revoked"
-            }
-          >
-            The historical approval remains recorded. Current authority is
-            unavailable.
+          <Notice title={statusLabel(signature.status)}>
+            {copy.identityVerificationHistoricalUnavailable}
           </Notice>
         )}
-        {text ? (
+        {(signature.actType === "broadcast" ||
+          signature.actType === "correction") &&
+          text !== null && (
+            <p className="qv-help">{actLabel(signature.actType)}</p>
+          )}
+        {text !== null ? (
           approved ? (
             <Message
               kind="approved_draft"
@@ -115,49 +179,58 @@ export default async function Verification({
           <Notice
             title={
               signature.status === "withdrawn"
-                ? "Content withdrawn"
-                : "Private signed act"
+                ? copy.identityVerificationWithdrawnContentTitle
+                : signature.contentAvailable
+                  ? copy.identityVerificationMetadataTitle
+                  : copy.identityVerificationPrivateTitle
             }
           >
-            This page shows signature metadata. The act’s private content and
-            conversation are not public.
+            {signature.status === "withdrawn"
+              ? copy.identityVerificationWithdrawnContent
+              : signature.contentAvailable
+                ? copy.identityVerificationMetadataNotice
+                : copy.identityVerificationPrivateNotice}
           </Notice>
         )}
         <dl className="verification-rows">
-          <dt>Author</dt>
+          <dt>{copy.identityVerificationAuthor}</dt>
           <dd>{signature.creatorName}</dd>
-          <dt>Written by</dt>
+          <dt>{copy.identityVerificationAct}</dt>
+          <dd>{actLabel(signature.actType)}</dd>
+          {version !== null && (
+            <>
+              <dt>{copy.identityVerificationContentVersion}</dt>
+              <dd>{version}</dd>
+            </>
+          )}
+          <dt>{copy.identityVerificationWrittenBy}</dt>
           <dd>
             {approved
-              ? "AI draft · creator approved"
-              : text
+              ? copy.identityVerificationApprovedAuthor
+              : text !== null
                 ? signature.creatorName
-                : "Shown only with authorized content"}
+                : copy.identityVerificationAuthorizedOnly}
           </dd>
-          <dt>Signed</dt>
+          <dt>{copy.identityVerificationSigned}</dt>
           <dd>{time}</dd>
-          <dt>Shared by</dt>
-          <dd>Not disclosed</dd>
+          <dt>{copy.identityVerificationStatus}</dt>
+          <dd>{statusLabel(signature.status)}</dd>
+          <dt>{copy.identityVerificationSharedBy}</dt>
+          <dd>{copy.identityVerificationNotDisclosed}</dd>
         </dl>
         <div className="verification-hash">
-          Exact act hash · SHA-256
-          <br />
-          {signature.contentHash}
+          {formatCopy("identityVerificationHash", { hash: signature.contentHash })}
         </div>
-        <p className="qv-help">
-          Anyone can open this page. It shows authorized content, signature
-          provenance and current revocation status, with nothing else from the
-          conversation.
-        </p>
+        <p className="qv-help">{copy.identityVerificationPublicNotice}</p>
+        <Button href={`/verify/${id}`} block>
+          {copy.identityVerificationRefresh}
+        </Button>
+        <Button href="/home" variant="quiet" block>
+          {copy.navHome}
+        </Button>
       </main>
     );
   } catch {
-    return (
-      <main className="public-verification">
-        <Notice title="Verification unavailable">
-          Reconnect and try again. Verification could not be checked.
-        </Notice>
-      </main>
-    );
+    return <Unavailable id={id} />;
   }
 }
