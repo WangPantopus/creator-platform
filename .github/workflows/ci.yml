@@ -53,10 +53,8 @@ jobs:
             playwright-report
             test-results
   ios-foundation:
-    # Match the reviewed reference renderer; Xcode27 failed106 original images.
-    runs-on: macos-26-intel
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
+    # Preserve the original Swift references and their reviewed comparison contract.
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: xcodebuild -version
