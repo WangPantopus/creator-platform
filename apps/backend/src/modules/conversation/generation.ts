@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { MemoryProposalSchema } from "../../../../../packages/api/src/conversation/contracts.js";
 import type { Database } from "../../db/database.js";
 import type { ThreadScope } from "../access/scope.js";
 import type { ConversationService } from "./service.js";
@@ -21,6 +22,12 @@ export interface GenerationExecution {
   readonly attemptId: string;
   admit<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
   sealAdmission<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+  /** One classified extraction batch under this actual attempt's held fence.
+   * The callback locks W2's current license/version/audience, with no provider I/O. */
+  commitMemory(
+    raws: readonly unknown[],
+    assertAuthority: (client: PoolClient) => Promise<void>,
+  ): Promise<{ written: number; revision: number | null }>;
 }
 
 export interface ConversationGenerator {
@@ -194,6 +201,12 @@ export class ConversationGenerationProcessor {
     let emitted = 0;
     let expectedRevision = job.contextRevision;
     let admissionsOpen = true;
+    let extractingMemory = false;
+    let memorySignal: AbortSignal | undefined;
+    let memoryBatchCommitted = false;
+    let memoryBatchReceipt:
+      | { written: number; revision: number | null }
+      | undefined;
     const generationSignal = AbortSignal.any([
       controller.signal,
       AbortSignal.timeout(45000),
@@ -250,7 +263,14 @@ export class ConversationGenerationProcessor {
             client,
           );
           const result = await journal(client);
-          if (!seal) generationSignal.throwIfAborted();
+          if (!seal) {
+            generationSignal.throwIfAborted();
+            invariant(
+              admissionsOpen,
+              "generation_admission_closed",
+              "Provider admission is closed.",
+            );
+          }
           return result;
         },
         "write",
@@ -261,6 +281,86 @@ export class ConversationGenerationProcessor {
       attemptId: token,
       admit: (journal) => fence(journal, false),
       sealAdmission: (journal) => fence(journal, true),
+      commitMemory: async (raws, assertAuthority) => {
+        invariant(
+          extractingMemory && !memoryBatchCommitted && emitted > 0,
+          "memory_admission_closed",
+          "This attempt's memory batch is not available.",
+        );
+        memorySignal!.throwIfAborted();
+        invariant(
+          raws.length <= 5,
+          "memory_batch_large",
+          "Shorten this memory proposal batch.",
+        );
+        const proposals = raws.map((raw) => MemoryProposalSchema.parse(raw));
+        const before = expectedRevision + emitted;
+        invariant(
+          proposals.every(
+            (proposal) =>
+              proposal.expectedRevision === before &&
+              proposal.provenanceMessageId === job.fan_message_id,
+          ),
+          "memory_batch_changed",
+          "Memory proposals must use this attempt's exact current source and snapshot.",
+        );
+        memoryBatchCommitted = true;
+        const receipt = await fence(async (client) => {
+          invariant(
+            extractingMemory,
+            "memory_admission_closed",
+            "This attempt's memory batch is not available.",
+          );
+          memorySignal!.throwIfAborted();
+          await assertAuthority(client);
+          const result = await this.memory.writeProposalsInTransaction(
+            scope,
+            client,
+            proposals,
+          );
+          invariant(
+            result.revision === null ||
+              result.revision === before ||
+              result.revision === before + 1,
+            "memory_changed",
+            "The memory extraction revision changed.",
+          );
+          const current = await client.query(
+            `SELECT g.id FROM creator.generation g JOIN creator.thread t
+             ON t.id=g.thread_id AND t.creator_id=g.creator_id AND t.fan_id=g.fan_id
+             WHERE g.id=$4 AND g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3
+             AND g.worker_token=$5 AND g.lease_until>clock_timestamp() AND g.state='generating'
+             AND g.epoch=$6 AND t.control_epoch=$6 AND t.control='ai_active' AND NOT t.off_the_record
+             AND t.revision=$7 AND g.last_sequence=$8`,
+            [
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+              job.id,
+              token,
+              job.epoch,
+              result.revision ?? before,
+              emitted,
+            ],
+          );
+          invariant(
+            current.rowCount === 1,
+            "generation_interrupted",
+            "The generation attempt changed before the memory batch committed.",
+          );
+          invariant(
+            extractingMemory,
+            "memory_admission_closed",
+            "This attempt's memory batch is not available.",
+          );
+          memorySignal!.throwIfAborted();
+          return result;
+        }, false);
+        memoryBatchReceipt = receipt;
+        if (receipt.revision !== null)
+          expectedRevision = receipt.revision - emitted;
+        return receipt;
+      },
     };
     const context: ConversationContextPort = {
       current: (scope) => this.memory.context(scope),
@@ -328,17 +428,28 @@ export class ConversationGenerationProcessor {
           (m) => m.id === job.ai_message_id && m.authorKind === "ai",
         );
         if (answer && memoryCurrent) {
-          const receipt = await this.generator.extract(
-            scope,
-            snapshot,
-            [job.text, answer.text],
-            AbortSignal.any([generationSignal, AbortSignal.timeout(10000)]),
-            execution,
-          );
+          extractingMemory = true;
+          memorySignal = AbortSignal.any([
+            generationSignal,
+            AbortSignal.timeout(10000),
+          ]);
+          let receipt: { revision: number | null } | void;
+          try {
+            receipt = await this.generator.extract(
+              scope,
+              snapshot,
+              [job.text, answer.text],
+              memorySignal,
+              execution,
+            );
+          } finally {
+            extractingMemory = false;
+          }
           if (receipt?.revision !== null && receipt?.revision !== undefined) {
             invariant(
-              receipt.revision === job.contextRevision + emitted ||
-                receipt.revision === job.contextRevision + emitted + 1,
+              memoryBatchReceipt
+                ? receipt.revision === memoryBatchReceipt.revision
+                : receipt.revision === job.contextRevision + emitted,
               "memory_changed",
               "The memory extraction revision changed.",
             );

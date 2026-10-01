@@ -644,6 +644,28 @@ public enum APIMediaMediaState: String, Codable, Sendable {
   case `deleted` = "deleted"
 }
 
+public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
+  public let `assetId`: String
+  public let `version`: Int
+  public let `sha256`: String
+  public let `bytes`: Int
+  public let `mimeType`: APIMediaProcessedMediaEvidenceMimeType
+  public let `durationMs`: Int?
+  public init(assetId: String, version: Int, sha256: String, bytes: Int, mimeType: APIMediaProcessedMediaEvidenceMimeType, durationMs: Int? = nil) {
+    self.assetId = assetId
+    self.version = version
+    self.sha256 = sha256
+    self.bytes = bytes
+    self.mimeType = mimeType
+    self.durationMs = durationMs
+  }
+}
+
+public enum APIMediaProcessedMediaEvidenceMimeType: String, Codable, Sendable {
+  case `audio_mp4` = "audio/mp4"
+  case `image_png` = "image/png"
+}
+
 public struct APIMediaUploadRequest: Codable, Sendable {
   public let `purpose`: APIMediaUploadRequestPurpose
   public let `mimeType`: APIMediaUploadRequestMimeType

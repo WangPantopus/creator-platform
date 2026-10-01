@@ -488,6 +488,22 @@ enum class APIMediaMediaState {
 }
 
 @Serializable
+data class APIMediaProcessedMediaEvidence(
+  val `assetId`: String,
+  val `version`: Long,
+  val `sha256`: String,
+  val `bytes`: Long,
+  val `mimeType`: APIMediaProcessedMediaEvidenceMimeType,
+  val `durationMs`: Long? = null
+)
+
+@Serializable
+enum class APIMediaProcessedMediaEvidenceMimeType {
+  @SerialName("audio/mp4") AUDIO_MP4,
+  @SerialName("image/png") IMAGE_PNG
+}
+
+@Serializable
 data class APIMediaUploadRequest(
   val `purpose`: APIMediaUploadRequestPurpose,
   val `mimeType`: APIMediaUploadRequestMimeType,

@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import type { Database } from "../../db/database.js";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import {
@@ -203,69 +204,90 @@ export class MemoryService {
     );
     return this.db.withThread(
       scope,
-      async (client) => {
-        const current = await client.query(
-          "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR UPDATE",
-          [...pair(scope), revision],
-        );
-        if (!current.rowCount) return { written: 0, revision: null };
-        const exclusions = (
-          await client.query<{ key: string; text: string | null }>(
-            "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
-            pair(scope),
-          )
-        ).rows;
-        if (exclusions.length > 1000) return { written: 0, revision };
-        let written = 0;
-        for (const proposal of proposals) {
-          const key = normalized(proposal.semanticKey);
-          if (
-            !key ||
-            exclusions.some(
-              (e) => e.key === key || e.key === contentHash(key),
-            ) ||
-            (exclusions.length &&
-              (!this.semantics ||
-                (await this.semantics.matches(proposal.text, exclusions))))
-          )
-            continue;
-          const provenance = await client.query(
-            "SELECT id FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 AND author_kind='fan' AND NOT off_the_record",
-            [proposal.provenanceMessageId, ...pair(scope)],
-          );
-          invariant(
-            provenance.rowCount === 1,
-            "provenance_unavailable",
-            "The memory source is unavailable.",
-          );
-          const prior = await client.query(
-            "SELECT id FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND semantic_key=$4",
-            [...pair(scope), key],
-          );
-          if (prior.rowCount) continue;
-          await client.query(
-            "INSERT INTO creator.memory(thread_id,creator_id,fan_id,kind,text,semantic_key,provenance_message_id,thread_revision_at_write,sensitive_category,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'proposed')",
-            [
-              ...pair(scope),
-              proposal.kind,
-              proposal.text,
-              key,
-              proposal.provenanceMessageId,
-              revision,
-              proposal.sensitiveCategory ?? null,
-            ],
-          );
-          written++;
-        }
-        if (written)
-          await client.query(
-            "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
-            pair(scope),
-          );
-        return { written, revision: revision + (written ? 1 : 0) };
-      },
+      (client) => this.writeProposalsInTransaction(scope, client, proposals),
       "write",
     );
+  }
+  /** The actual GenerationExecution.commitMemory supplies its fenced client.
+   * This helper issues no scope and opens no transaction. W2's current licensed
+   * authority must be locked on that client before the atomic proposal batch. */
+  async writeProposalsInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    raws: readonly unknown[],
+  ): Promise<{ written: number; revision: number | null }> {
+    assertThreadScope(scope);
+    await assertCurrentSession(client, scope.actorAccountId);
+    invariant(
+      raws.length <= 5,
+      "memory_batch_large",
+      "Shorten this memory proposal batch.",
+    );
+    const proposals = raws.map((raw) => MemoryProposalSchema.parse(raw));
+    if (!proposals.length) return { written: 0, revision: null };
+    const revision = proposals[0]!.expectedRevision;
+    invariant(
+      proposals.every((p) => p.expectedRevision === revision),
+      "memory_batch_changed",
+      "Memory proposals must use one current snapshot.",
+    );
+    const current = await client.query(
+      "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND revision=$4 AND NOT off_the_record AND deleted_at IS NULL FOR UPDATE",
+      [...pair(scope), revision],
+    );
+    if (!current.rowCount) return { written: 0, revision: null };
+    const exclusions = (
+      await client.query<{ key: string; text: string | null }>(
+        "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
+        pair(scope),
+      )
+    ).rows;
+    if (exclusions.length > 1000) return { written: 0, revision };
+    let written = 0;
+    for (const proposal of proposals) {
+      const key = normalized(proposal.semanticKey);
+      if (
+        !key ||
+        exclusions.some((e) => e.key === key || e.key === contentHash(key)) ||
+        (exclusions.length &&
+          (!this.semantics ||
+            (await this.semantics.matches(proposal.text, exclusions))))
+      )
+        continue;
+      const provenance = await client.query(
+        "SELECT id FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 AND author_kind='fan' AND NOT off_the_record",
+        [proposal.provenanceMessageId, ...pair(scope)],
+      );
+      invariant(
+        provenance.rowCount === 1,
+        "provenance_unavailable",
+        "The memory source is unavailable.",
+      );
+      const prior = await client.query(
+        "SELECT id FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND semantic_key=$4",
+        [...pair(scope), key],
+      );
+      if (prior.rowCount) continue;
+      await client.query(
+        "INSERT INTO creator.memory(thread_id,creator_id,fan_id,kind,text,semantic_key,provenance_message_id,thread_revision_at_write,sensitive_category,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'proposed')",
+        [
+          ...pair(scope),
+          proposal.kind,
+          proposal.text,
+          key,
+          proposal.provenanceMessageId,
+          revision,
+          proposal.sensitiveCategory ?? null,
+        ],
+      );
+      written++;
+    }
+    if (written)
+      await client.query(
+        "UPDATE creator.thread SET revision=revision+1,memory_revision=memory_revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+        pair(scope),
+      );
+    return { written, revision: revision + (written ? 1 : 0) };
   }
   async requestConsentOnce(
     scope: ThreadScope,
