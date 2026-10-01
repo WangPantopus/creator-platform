@@ -5,6 +5,7 @@ import type { PoolClient } from "pg";
 import { allocateSlotDayPool } from "./extended.js";
 import { createHash } from "node:crypto";
 import { PayoutCustody, type PayoutTransferRequest } from "./payout-custody.js";
+import type { PassPoolJournal } from "./pass-pool-journal.js";
 
 export interface CreditRules {
   currency: string;
@@ -196,6 +197,15 @@ export interface VerifiedPoolCycle {
   poolMinor: bigint;
   weights: readonly { creatorId: string; slotSeconds: bigint }[];
   sourceReference: string;
+  policyVersion: string;
+  reconciledAt: Date;
+  /** Complete genuine charge budgets after the reviewed take/refunds/reserves.
+   * No unknown or unallocated tender may contribute to the net pool. */
+  funding: readonly {
+    sourcePayment: string;
+    sourceTransaction: string;
+    poolMinor: bigint;
+  }[];
 }
 export interface PoolCycleVerifier {
   current(cycle: string): Promise<VerifiedPoolCycle>;
@@ -205,14 +215,37 @@ export class PoolSettlement {
   constructor(
     private readonly service: CommerceService,
     private readonly verifier?: PoolCycleVerifier,
+    private readonly journal?: PassPoolJournal,
   ) {}
   async post(actor: Actor, creatorId: string, cycle: string) {
+    if (this.journal) {
+      const prior = await this.journal.existing(actor, creatorId, cycle);
+      if (prior.length) {
+        const effects = [];
+        for (const id of prior) effects.push(await this.journal.run(actor, id));
+        return { effects };
+      }
+    }
     invariant(
-      this.service.policy.passEnabled && this.verifier,
+      this.service.policy.passEnabled && this.verifier && this.journal,
       "pool_unavailable",
       "Verified pass pool accounting is unavailable.",
     );
+    // Validate the genuine owner before reading the complete provider pool;
+    // repeat under the allocation transaction after those external reads.
+    await this.service.account(actor, async (client) => {
+      const creator = await client.query(
+        "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required",
+        [creatorId, actor.accountId],
+      );
+      invariant(
+        creator.rowCount === 1,
+        "creator_required",
+        "Only the verified creator may settle this pool allocation.",
+      );
+    });
     const truth = await this.verifier.current(cycle);
+    this.journal.plan(truth);
     invariant(
       truth.cycle === cycle &&
         /^\d{4}-\d{2}$/u.test(cycle) &&
@@ -228,7 +261,7 @@ export class PoolSettlement {
       "pool_allocation_invalid",
       "The creator pool allocation is invalid.",
     );
-    return this.service.account(actor, async (client) => {
+    const posted = await this.service.account(actor, async (client) => {
       const creator = await client.query(
         "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required",
         [creatorId, actor.accountId],
@@ -256,6 +289,23 @@ export class PoolSettlement {
         "pool_reconciliation_required",
         "The posted immutable pool differs from current evidence. A cause-linked adjustment is required.",
       );
+      const destination = (
+        await client.query<{ provider_ref: string }>(
+          "SELECT provider_ref FROM creator.commerce_payout_account WHERE creator_id=$1 FOR SHARE",
+          [creatorId],
+        )
+      ).rows[0];
+      invariant(
+        destination?.provider_ref,
+        "payout_account_required",
+        "The pool needs an actual current payout destination.",
+      );
+      const effects = await this.journal!.stage(
+        client,
+        truth,
+        creatorId,
+        destination.provider_ref,
+      );
       await client.query(
         "INSERT INTO creator.commerce_ledger(creator_id,kind,amount,currency,cause,provider_ref,refs) VALUES($1,'pool_alloc',$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
         [
@@ -275,8 +325,16 @@ export class PoolSettlement {
           }),
         ],
       );
-      return { amount: allocation.amount.toString(), currency: truth.currency };
+      return {
+        amount: allocation.amount.toString(),
+        currency: truth.currency,
+        effects,
+      };
     });
+    const effects = [];
+    for (const id of posted.effects)
+      effects.push(await this.journal.run(actor, id));
+    return { ...posted, effects };
   }
 }
 

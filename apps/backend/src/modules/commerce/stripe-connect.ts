@@ -7,6 +7,7 @@ import type {
   VerifiedMoneyStatement,
 } from "./reconciliation.js";
 import type { PayoutProvider } from "./accounting.js";
+import type { PoolTransferProvider } from "./pass-pool-journal.js";
 
 const reference = (value: string | { id: string } | null | undefined) =>
   typeof value === "string" ? value : value?.id;
@@ -45,10 +46,15 @@ export interface StripeConnectPolicy {
   }): Promise<{ entries: readonly Entry[]; reservesAllocated: boolean }>;
 }
 
-export class StripeMoneyStatement implements MoneyStatementProvider {
-  constructor(
-    private readonly stripe: Stripe,
-    private readonly policy: StripeConnectPolicy,
+export abstract class StripeCardMoneyStatement
+  implements MoneyStatementProvider
+{
+  protected constructor(
+    protected readonly stripe: Stripe,
+    policy: Pick<
+      StripeConnectPolicy,
+      "topology" | "collectionAccount" | "processingFees"
+    >,
   ) {
     invariant(
       policy.topology === "separate_charges_and_transfers" &&
@@ -58,6 +64,18 @@ export class StripeMoneyStatement implements MoneyStatementProvider {
       "Configure the reviewed platform charge and transfer policy.",
     );
   }
+  protected abstract assertBinding(
+    payment: Stripe.PaymentIntent,
+  ): Promise<void>;
+  usesConnection(stripe: Stripe) {
+    return this.stripe === stripe;
+  }
+  protected abstract allocations(input: {
+    payment: Stripe.PaymentIntent;
+    capturedMinor: number;
+    refundedMinor: number;
+    balance: Stripe.Balance;
+  }): Promise<{ entries: readonly Entry[]; reservesAllocated: boolean }>;
   async charge(paymentId: string) {
     invariant(
       /^pi_[A-Za-z0-9]+$/u.test(paymentId),
@@ -69,13 +87,13 @@ export class StripeMoneyStatement implements MoneyStatementProvider {
       !payment.livemode &&
         payment.status === "succeeded" &&
         payment.latest_charge &&
-        payment.metadata.packet_id &&
         !payment.transfer_data &&
         !payment.on_behalf_of &&
         !payment.application_fee_amount,
       "payout_topology_conflict",
       "The captured sandbox payment must match the configured platform topology.",
     );
+    await this.assertBinding(payment);
     const charge = await this.stripe.charges.retrieve(
       reference(payment.latest_charge)!,
     );
@@ -219,10 +237,8 @@ export class StripeMoneyStatement implements MoneyStatementProvider {
         "provider_environment_mismatch",
         "Sandbox funds are required.",
       );
-      const allocation = await this.policy.allocations({
-        paymentId: payment.id,
-        packetId: payment.metadata.packet_id!,
-        currency: payment.currency.toUpperCase(),
+      const allocation = await this.allocations({
+        payment,
         capturedMinor: charge.amount_captured,
         refundedMinor: refunded,
         balance,
@@ -316,31 +332,57 @@ export class StripeMoneyStatement implements MoneyStatementProvider {
   }
 }
 
+/** Personal request cash retains its exact packet binding. Pool invoice cash
+ * uses a separate subclass; it cannot masquerade as a personal packet. */
+export class StripeMoneyStatement extends StripeCardMoneyStatement {
+  constructor(
+    stripe: Stripe,
+    private readonly policy: StripeConnectPolicy,
+  ) {
+    super(stripe, policy);
+  }
+  protected async assertBinding(payment: Stripe.PaymentIntent) {
+    invariant(
+      payment.metadata.packet_id,
+      "payout_topology_conflict",
+      "The captured payment must belong to its original personal packet.",
+    );
+  }
+  protected async allocations(input: {
+    payment: Stripe.PaymentIntent;
+    capturedMinor: number;
+    refundedMinor: number;
+    balance: Stripe.Balance;
+  }) {
+    return this.policy.allocations({
+      paymentId: input.payment.id,
+      packetId: input.payment.metadata.packet_id!,
+      currency: input.payment.currency.toUpperCase(),
+      capturedMinor: input.capturedMinor,
+      refundedMinor: input.refundedMinor,
+      balance: input.balance,
+    });
+  }
+}
+
 /** Current Connect accounts are pre-provisioned under W8's durable onboarding
  * custody. Account creation is deliberately not repeated after an unknown write. */
-export class StripeConnectPayout implements PayoutProvider {
-  constructor(
-    private readonly stripe: Stripe,
-    private readonly money: StripeMoneyStatement,
-    private readonly authority: {
+export class StripeConnectTransfers {
+  protected constructor(
+    protected readonly stripe: Stripe,
+    protected readonly money: StripeCardMoneyStatement,
+    protected readonly authority: {
       assertAccount(reference: string): Promise<void>;
-      paymentForCommitment(commitmentId: string): Promise<string>;
       assertTransfer(
         input: Parameters<PayoutProvider["transfer"]>[0],
       ): Promise<void>;
-      onboardingReturnUrl: string;
-      onboardingRefreshUrl: string;
     },
   ) {
-    for (const url of [
-      authority.onboardingReturnUrl,
-      authority.onboardingRefreshUrl,
-    ])
-      invariant(
-        new URL(url).protocol === "https:",
-        "onboarding_origin_invalid",
-        "Configure the approved HTTPS onboarding return routes.",
-      );
+    invariant(
+      money.usesConnection(stripe),
+      "payout_connection_mismatch",
+      "Current cash and transfers must use the same approved Stripe connection.",
+    );
   }
   async account(id: string) {
     return stripeOperation(async () => {
@@ -367,33 +409,7 @@ export class StripeConnectPayout implements PayoutProvider {
       };
     });
   }
-  async onboarding(id: string) {
-    return stripeOperation(async () => {
-      await this.authority.assertAccount(id);
-      const link = await this.stripe.accountLinks.create({
-        account: id,
-        type: "account_onboarding",
-        return_url: this.authority.onboardingReturnUrl,
-        refresh_url: this.authority.onboardingRefreshUrl,
-      });
-      return { url: link.url, expiresAt: new Date(link.expires_at * 1000) };
-    });
-  }
-  async reconciledBalance(commitmentId: string) {
-    const sourcePayment =
-      await this.authority.paymentForCommitment(commitmentId);
-    const current = await this.money.current(sourcePayment);
-    const { charge } = await this.money.charge(sourcePayment);
-    return {
-      netMinor: current.netMinor,
-      currency: current.currency,
-      sourcePayment,
-      sourceTransaction: charge.id,
-      reconciledAt: current.fetchedAt,
-      disputeOpen: current.disputeOpen,
-    };
-  }
-  private async truth(row: Stripe.Transfer) {
+  protected async truth(row: Stripe.Transfer) {
     invariant(
       !row.livemode &&
         row.metadata.commerce === "payout" &&
@@ -442,6 +458,15 @@ export class StripeConnectPayout implements PayoutProvider {
     };
   }
   async transfer(input: Parameters<PayoutProvider["transfer"]>[0]) {
+    return this.transferOriginal(input, true);
+  }
+  /** Pool allocations may be exact slices of a charge's reviewed net budget.
+   * Both paths still require original-effect authority, current cash/account
+   * truth and exact original source charge; the default remains whole-net. */
+  protected async transferOriginal(
+    input: Parameters<PayoutProvider["transfer"]>[0],
+    wholeNet: boolean,
+  ) {
     return stripeOperation(async () => {
       await this.authority.assertTransfer(input);
       const prior = await this.recoverTransfer(input);
@@ -461,7 +486,9 @@ export class StripeConnectPayout implements PayoutProvider {
       invariant(
         !current.disputeOpen &&
           current.currency === input.currency &&
-          current.netMinor === input.amount,
+          (wholeNet
+            ? current.netMinor === input.amount
+            : current.netMinor >= input.amount),
         "payout_amount_changed",
         "Current funds changed before transfer.",
       );
@@ -541,7 +568,7 @@ export class StripeConnectPayout implements PayoutProvider {
       this.truth(await this.stripe.transfers.retrieve(id)),
     );
   }
-  async reverse(id: string, key: string) {
+  protected async reverseRemaining(id: string, key: string) {
     return stripeOperation(async () => {
       const current = await this.stripe.transfers.retrieve(id);
       await this.truth(current);
@@ -553,6 +580,167 @@ export class StripeConnectPayout implements PayoutProvider {
       );
       const confirmed = await this.current(id);
       return { id, reversed: confirmed.reversed };
+    });
+  }
+}
+
+export class StripeConnectPayout
+  extends StripeConnectTransfers
+  implements PayoutProvider
+{
+  constructor(
+    stripe: Stripe,
+    money: StripeMoneyStatement,
+    private readonly personal: {
+      assertAccount(reference: string): Promise<void>;
+      assertTransfer(
+        input: Parameters<PayoutProvider["transfer"]>[0],
+      ): Promise<void>;
+      paymentForCommitment(commitmentId: string): Promise<string>;
+      onboardingReturnUrl: string;
+      onboardingRefreshUrl: string;
+    },
+  ) {
+    super(stripe, money, personal);
+    for (const url of [
+      personal.onboardingReturnUrl,
+      personal.onboardingRefreshUrl,
+    ])
+      invariant(
+        new URL(url).protocol === "https:",
+        "onboarding_origin_invalid",
+        "Configure the approved HTTPS onboarding return routes.",
+      );
+  }
+  async onboarding(id: string) {
+    return stripeOperation(async () => {
+      await this.personal.assertAccount(id);
+      const link = await this.stripe.accountLinks.create({
+        account: id,
+        type: "account_onboarding",
+        return_url: this.personal.onboardingReturnUrl,
+        refresh_url: this.personal.onboardingRefreshUrl,
+      });
+      return { url: link.url, expiresAt: new Date(link.expires_at * 1000) };
+    });
+  }
+  async reconciledBalance(commitmentId: string) {
+    const sourcePayment =
+      await this.personal.paymentForCommitment(commitmentId);
+    const current = await this.money.current(sourcePayment);
+    const { charge } = await this.money.charge(sourcePayment);
+    return {
+      netMinor: current.netMinor,
+      currency: current.currency,
+      sourcePayment,
+      sourceTransaction: charge.id,
+      reconciledAt: current.fetchedAt,
+      disputeOpen: current.disputeOpen,
+    };
+  }
+  async reverse(id: string, key: string) {
+    return this.reverseRemaining(id, key);
+  }
+}
+
+/** Configured only with the prepared pool graph's immutable-effect authority.
+ * A pool allocation consumes a deterministic original charge slice; it never
+ * invents a personal commitment or reconstructs changed funding/destination.
+ * The inherited authority must verify this exact journal key/body and approved
+ * cycle funding, including receipt ownership/period and net-budget exclusion. */
+export class StripePassPoolTransfers
+  extends StripeConnectTransfers
+  implements PoolTransferProvider
+{
+  constructor(
+    stripe: Stripe,
+    money: import("./stripe-pass-pool.js").StripePassPoolMoney,
+    authority: {
+      assertAccount(reference: string): Promise<void>;
+      assertTransfer(
+        input: Parameters<PayoutProvider["transfer"]>[0],
+      ): Promise<void>;
+    },
+  ) {
+    super(stripe, money, authority);
+  }
+  override async transfer(input: Parameters<PayoutProvider["transfer"]>[0]) {
+    return this.transferOriginal(input, false);
+  }
+  async reverseOriginal(
+    input: import("./pass-pool-journal.js").OriginalPoolReversal,
+  ) {
+    return stripeOperation(async () => {
+      invariant(
+        input.key.endsWith(":reverse") &&
+          Number.isSafeInteger(input.amount) &&
+          input.amount > 0,
+        "pool_reversal_invalid",
+        "An exact original pool reversal is required.",
+      );
+      const current = await this.stripe.transfers.retrieve(input.reference);
+      const cash = await this.truth(current);
+      const originalKey = input.key.slice(0, -":reverse".length);
+      invariant(
+        cash.keyHash === createHash("sha256").update(originalKey).digest("hex"),
+        "pool_reversal_conflict",
+        "The reversal belongs to a different original transfer.",
+      );
+      const original = {
+        destination: cash.destination,
+        amount: cash.amount,
+        currency: cash.currency,
+        sourcePayment: cash.sourcePayment,
+        sourceTransaction: cash.sourceTransaction,
+        key: originalKey,
+      };
+      await this.authority.assertTransfer(original);
+      const hash = createHash("sha256").update(input.key).digest("hex");
+      const prior = (
+        await collect(
+          this.stripe.transfers.listReversals(input.reference, { limit: 100 }),
+        )
+      ).filter(
+        (r) =>
+          r.metadata?.commerce === "pool_reversal" &&
+          r.metadata.commerce_key === hash,
+      );
+      invariant(
+        prior.length <= 1 &&
+          prior.every(
+            (r) =>
+              reference(r.transfer) === input.reference &&
+              r.amount === input.amount &&
+              r.metadata?.commerce_transfer === input.reference,
+          ),
+        "pool_reversal_conflict",
+        "Original reversal receipts require reconciliation.",
+      );
+      if (prior.length || current.reversed) return;
+      const age = Date.now() - Date.parse(input.createdAt);
+      invariant(
+        Number.isFinite(age) && age >= -60000 && age < 23 * 3600000,
+        "pool_reversal_aged_unknown",
+        "An aged unknown reversal requires original provider evidence before another write.",
+      );
+      invariant(
+        current.amount - current.amount_reversed === input.amount,
+        "pool_reversal_amount_changed",
+        "The original reversal amount cannot be reconstructed from changed cash.",
+      );
+      await this.authority.assertTransfer(original);
+      await this.stripe.transfers.createReversal(
+        input.reference,
+        {
+          amount: input.amount,
+          metadata: {
+            commerce: "pool_reversal",
+            commerce_key: hash,
+            commerce_transfer: input.reference,
+          },
+        },
+        { idempotencyKey: input.key },
+      );
     });
   }
 }
