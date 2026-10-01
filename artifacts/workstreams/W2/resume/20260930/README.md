@@ -1,5 +1,7 @@
 # W2 continuation — 2026-09-30
 
+**Founder merge priority:** [Frozen increment and deferred release backlog](release-backlog.md) records the human decision to decide licensing and processor/retention later, while prioritizing the verified existing PR merge. Their production gates remain disabled; all nine packages/R01–R14 remain assigned. Close only the existing accounting/session edits and genuine launched-app/CI failures before merging.
+
 **Exclusion/completion continuation:** [Current source and actual app receipt](memory-completion-followup.md) integrates W3’s actual opaque exclusion snapshot and private custody of already admitted provider completion. The launched Studio preview persisted matching 2,273-micro cost; first approved 5.184 seconds misses the cold target. A separate API35 shipping launch still shows System UI ANR and was stopped with data retained. Published119d26a has five passing checks and six queued macOS contexts; fresh source-head checks remain required. All nine packages/R01–R14 and disabled production gates remain preserved.
 
 **Actual launched-app continuation:** [Current source, operated journeys and remaining gates](launched-app-followup.md) records W1 host registration, repaired44-pixel controls, actual phone preview/cost and Night dialog recovery. PR1 is ready for review; full exact-head CI and actual native journeys still govern merge. All nine packages/R01–R14 and disabled production gates remain preserved.
