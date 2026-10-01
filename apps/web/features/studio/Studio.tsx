@@ -266,12 +266,13 @@ export function Studio({
     return () => clearTimeout(timer);
   }, [conceal, creator, freshUntil]);
   useEffect(() => {
-    if (suspended) reconnectButton.current?.focus();
-    else if (previousFocus.current?.isConnected) {
+    if (suspended) {
+      if (!loading && !document.hidden) reconnectButton.current?.focus();
+    } else if (previousFocus.current?.isConnected) {
       previousFocus.current.focus();
       previousFocus.current = null;
     }
-  }, [suspended]);
+  }, [loading, suspended]);
   useEffect(() => {
     void refresh();
     return () => {
