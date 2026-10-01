@@ -35,6 +35,14 @@
 .commerce-main {
   min-width: 0;
 }
+.commerce-phone .commerce-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+.commerce-phone .commerce-content {
+  flex: 1;
+}
 .commerce-header {
   display: flex;
   align-items: center;
@@ -306,6 +314,14 @@
 .commerce-money {
   font: var(--data-lg-weight) var(--data-lg-size) / var(--data-lg-line)
     var(--data-lg-font);
+}
+.commerce-pool-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.commerce-pool-stats .commerce-money {
+  overflow-wrap: anywhere;
 }
 .commerce-offer-table {
   border-block: 1px solid var(--line);
