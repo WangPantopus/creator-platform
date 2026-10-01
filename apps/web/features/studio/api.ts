@@ -36,6 +36,7 @@ export async function studioRequest<T>(
   path: string,
   body?: unknown,
   expectedAccountId?: string,
+  options: { signal?: AbortSignal } = {},
 ): Promise<T> {
   const scope = identityScope;
   if (!scope || scope.signal.aborted)
@@ -71,7 +72,11 @@ export async function studioRequest<T>(
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       cache: "no-store",
-      signal: AbortSignal.any([scope.signal, AbortSignal.timeout(15000)]),
+      signal: AbortSignal.any([
+        scope.signal,
+        AbortSignal.timeout(15000),
+        ...(options.signal ? [options.signal] : []),
+      ]),
     });
   } catch {
     throw new StudioFailure(
