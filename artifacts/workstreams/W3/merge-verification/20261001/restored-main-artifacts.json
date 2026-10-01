@@ -1,0 +1,24 @@
+{
+  "sourceMain": "107c8eb756e8391fb32840647e52d22d3234583a",
+  "retainedPeerEvidence": [
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/README.md",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-fix-reconnect-focus-body-390-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-1280-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-1280-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-390-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-outage-390-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-restored-1280-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/before-periodic-focus-fix-restored-390-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-busy-reconnect-390-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-composer-1280-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-1280-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-390-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-outage-390-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-recovery-states.json",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-1280-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-390-light.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/final-restored-390-night.jpg",
+    "artifacts/workstreams/W5/2026-10-01/role-recovery/observations.json"
+  ],
+  "qualification": "Peer evidence bytes verified against this published main after restoration; this corrects the earlier stale source label."
+}

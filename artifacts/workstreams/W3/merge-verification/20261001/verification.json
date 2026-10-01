@@ -1,0 +1,217 @@
+{
+  "sourceCommit": "9f7d5eae957dd0372ff8054ac117fe391e74d70a",
+  "incomingMain": "f6802e1f691aeef14052055a41b4d2bfff54c831",
+  "priorNativeRouteFix": "8e273550d9c9143e84ccb8d991f18e800e33422d",
+  "canonicalOperations": 49,
+  "locallyRunUnitTests": false,
+  "newOrWeakenedTests": false,
+  "appliedSQLModified": false,
+  "originalAndroidDataPreserved": true,
+  "productionReady": false,
+  "acceptanceScope": "Enabled development account and configuration-gate routes; full licensed fan acceptance remains open",
+  "nativeVerificationInProgress": false,
+  "sourceHashes": {
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "38768da301a7af71c3fa82299d088862a8e03a8c6cefc81bb45ea69c71f6173d",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "214444e500a70c1848a1aec63d4e411e2d9fe3bb475ce31ae2f50bcc98d2afef",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "bcc470c867933bb343d76a44a9c0ce4fc5a7f0d03335c875c55e8d91b98ce341",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "fb8907c4af36e9ebe181581aa5cf341863f00e1e1e6082ea49e24ed72aaab066"
+  },
+  "checks": [
+    {
+      "log": "merge-final-generate.log",
+      "sha256": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-web-build.log",
+      "sha256": "c599328620b29af72732d2f27ba6ff39647774cf7c2841a12c8f7f7714d7ecd0",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-bff-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-ios-build.log",
+      "sha256": "a2312896fadd064853610bacbdcd1baf186a01e667f4a44ca35e23f477144ad8",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-android-build.log",
+      "sha256": "cbf916517cb73f14b9558ab71c4e4813f9961489cd69934c832b0e7751a8fcbf",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-android-signature.log",
+      "sha256": "e095c0d045eab7b585845fcea123d02075f02c186cf90d97c89460f2406ca78c",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-final-studio-web-build.log",
+      "sha256": "ee6c3604843871a5cb82a446197b8559d926795af41d2180d02ee85ca7eb6fff",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-android-ink-build-final.log",
+      "sha256": "464248e9f258ace918fabea958e0972017c8a22e6ae472a9330dba6be027b70b",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-trust-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-trust-web-build.log",
+      "sha256": "d1b9435154a4dc4041c82e2085a2c1da9599fa092c407be1765fc4e70d9aa515",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-trust-generate.log",
+      "sha256": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-trust-reconciliation-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-memory-contract-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-memory-contract-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "log": "merge-memory-contract-hosted-web-backend.log",
+      "sha256": "fc0ac427c80a138700380b6ecc6b102c5811b48c90f9f2e54d29455caa3e2a1d",
+      "exitCode": 0,
+      "head": "632f68d0c3db5bdda08c552e2819ed266a239d28"
+    },
+    {
+      "log": "merge-memory-contract-hosted-android-runtime.log",
+      "sha256": "e713ae34c4272f4103ad1932726b7deb675b9974cf7289bed8a0099939daf172",
+      "exitCode": 0,
+      "head": "632f68d0c3db5bdda08c552e2819ed266a239d28"
+    }
+  ],
+  "iOSManualAcceptance": {
+    "sourceCommit": "9f7d5eae957dd0372ff8054ac117fe391e74d70a",
+    "canonicalSignIn": true,
+    "savedRestoration": true,
+    "LightAndNight": true,
+    "actorProfileIsolation": true,
+    "identityDestinationRetained": true,
+    "currentSignOut": "verified8e27355",
+    "sessionRefresh": "verified8e27355",
+    "allDeviceSignOut": true,
+    "signedOutRelaunch": true,
+    "liveReader": "Official authorized Maestro2.11 manual gestures; fresh inspect_screen and original pixels",
+    "fullLicensedFanFlow": false
+  },
+  "webOnlyMainUpdate": "de1d42d71c00810d864fe599de2bb0f3c39b1a8f",
+  "currentApplicationCommit": "632f68d0c3db5bdda08c552e2819ed266a239d28",
+  "nativeAndBackendSourcesUnchangedByWebOnlyMainUpdate": true,
+  "hostedSource9f7d5ea": {
+    "TrustCompilation": "success",
+    "FoundationWebAndBackend": "success",
+    "FoundationAndroidRuntime": "success",
+    "macOSWebVisualIosFoundationAndroidFoundation": "queued, not passed",
+    "actualCompletedJobLogsDownloadedAndRead": true
+  },
+  "incomingTrustMain": "705215955415332e601adf5c42a2169cd0d173a5",
+  "androidInkFix": {
+    "sourceCommit": "f8c92868f33c80c72988e66995e62240c9c89512",
+    "apkSHA256": "4b860c24eb4db45070ab5f04182a763a789db80b9fb0ec57580d9391b1702c58",
+    "originalNightFailurePreserved": true,
+    "shippingBuildAndSignature": true,
+    "finalManualAcceptance": "passed actual canonical Light/Night account and session journeys on corrected APK"
+  },
+  "trustReconciliation": {
+    "fanOnlyStrictAcceptedRetryAndSafetyPathPreserved": true,
+    "boundedLockedMemorySnapshotAndTransactionSafeMatcherPreserved": "initial4e0d128; single-query optimization superseded632f68d to preserve existing real scoped read contract",
+    "registryByteIdenticalToMain": true,
+    "newProposalRegisteredOrApplied": false,
+    "shippingIOSAndroidAndAPIContractsUnchanged": true,
+    "browserProfileRestoredAfterActualAPIReboot": true,
+    "privacyFreshVerificationGateObserved": true,
+    "currentMemorySource": "Five genuine bounded scoped queries and transactionSafe semantic gate; explicit read lock retained; existing audit assertion unchanged"
+  },
+  "hosted4e0d128": {
+    "TrustCompilation": "success",
+    "FoundationWebBackend": "failed observedStatements30000 vs preserved50000",
+    "AndroidRuntime": "canceled after source correction; not passed",
+    "macOSJobs": "queued, not passed"
+  },
+  "hostedSource632f68d": {
+    "TrustCompilation": "success",
+    "FoundationWebBackend": "success",
+    "FoundationAndroidRuntime": "success",
+    "macOSChecks": "queued, not passed",
+    "completedJobLogsDownloadedAndRead": true
+  },
+  "enabledRouteManualAcceptanceComplete": true,
+  "AndroidManualAcceptance": {
+    "applicationCommit": "632f68d0c3db5bdda08c552e2819ed266a239d28",
+    "nativeSourceCommit": "f8c92868f33c80c72988e66995e62240c9c89512",
+    "apkSHA256": "4b860c24eb4db45070ab5f04182a763a789db80b9fb0ec57580d9391b1702c58",
+    "canonicalSignIn": true,
+    "savedColdRestoration": true,
+    "actualLightAndNightInk": true,
+    "actorProfileIsolation": true,
+    "identityDestinationRetained": true,
+    "sessionRefresh": "personally tapped on final APK; same actor restored, no visible error",
+    "currentSignOut": "personally verified9f7d5ea before style-only correction",
+    "allDeviceSignOut": true,
+    "signedOutColdRelaunch": true,
+    "originalNightFailurePreserved": true,
+    "newOriginalPixelsPersonallyViewed": true,
+    "stockOSANRObservedDuringFinalWalkthrough": false,
+    "normalStopDataPreserved": true,
+    "fullLicensedFanFlow": false,
+    "controls": "Human-authorized official Maestro2.11; one observed manual gesture then fresh hierarchy; no saved test flow/suite"
+  },
+  "currentSourceHashes": {
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "38768da301a7af71c3fa82299d088862a8e03a8c6cefc81bb45ea69c71f6173d",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "214444e500a70c1848a1aec63d4e411e2d9fe3bb475ce31ae2f50bcc98d2afef",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "bcc470c867933bb343d76a44a9c0ce4fc5a7f0d03335c875c55e8d91b98ce341",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "a8caf3343be585b23a4d35580b39879f09d0002a5a406668634fa6ccf42d28a7",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRecording.kt": "1b04e77b8a236b7aceffc953635ff7fa90e53e2db372abf18b1dd0e8f63c1493"
+  },
+  "originalScreenHashes": {
+    "ios-final-account-night.png": "9da308159973049d1fef3f844aab8b6bce89fe40f74258a8452725f3af118f02",
+    "browser-account-night.png": "e172138f20e8e2658df995112e89fcc2fdf93088febed142190e07af8c2d4fbf",
+    "browser-all-device-signout.png": "3d8fb5e8a832909141026721bbb64919b51c1caac372fead33a0490df1a88a74",
+    "browser-privacy-destination.png": "f24552b5b572a2e3f04e574002b47659c686f9f85f986c898e4c526c7a02fda7",
+    "browser-privacy-after-trust-main.png": "f7e1c17d1fa7ce3bc014e66756a62e203e460de72677ebbd3775b112310ff767",
+    "browser-keyboard-refresh.png": "cadf3ebaad96c165cf97dbbbbee5f7cd99c269435dfe3a893537d1b3721ddfd5",
+    "ios-final-all-device-signout.png": "b6b7e790338db63b7ba3ec8006127d93ea172913a89f5bbeedf906f34023c95a",
+    "ios-before-route-fix.png": "0faead2530806a889ca6a68f2bc26fdd2b0404880f9e983f3bd064489ab369c1",
+    "ios-final-account-light.png": "d3008f03b826256483eae75b566f0e3361ea1ef947de5081abaa12f3a7823cde",
+    "browser-account-light.png": "3241249f10ab0b305fe1018b67bda4beca26340f8f9f23cbe3454e1cfddd5033",
+    "browser-conversation-unconfigured.png": "9f7b0f64540f16ec01eeb4a9297c45d3b885f80ce94e2d01fa31011dfbc5d03c",
+    "ios-second-account.png": "e22631f1e1b70777b9ac368ba2a3ffb499abf6c26af57251c2bc6bef6b5e9393",
+    "android-all-device-signout-before-color-fix.png": "4aca3554673672d28a4134043db79c47334131d09084f560e98ba363664d2c3c",
+    "android-second-account-before-color-fix.png": "13639284e5eb1e94a923e06e983be87d92ee8630dee688d705a6897bdb820079",
+    "android-final-all-device-signout.png": "51ddd3d677cf7809cc107aac7ec89069158e69603875c9f7829501efce1e0b9a",
+    "browser-after-trust-main.png": "7388f3bbfe1480fc9a4df3df1d2c50564836e0b54004e36b2e1e422ee725f47d",
+    "android-before-color-fix-night.png": "0f7af6db4a86ed7a1ca38423bafe582816c84c0626024cab22370a76d52dbe7b",
+    "android-final-account-light.png": "a0cd8e0f4f03afd691d6f00757349e310f130097862e46d6f19d14aad5efacb8",
+    "browser-final-account.png": "7388f3bbfe1480fc9a4df3df1d2c50564836e0b54004e36b2e1e422ee725f47d",
+    "browser-after-memory-reconciliation.png": "7388f3bbfe1480fc9a4df3df1d2c50564836e0b54004e36b2e1e422ee725f47d",
+    "browser-second-account.png": "ca3f7f50c80b777a0511f64a43d935893dd7172caa27fe32e85dc515d0288452",
+    "android-before-color-fix-light.png": "7f0eaa96b4c08b7d6bf1d0ad38f95392834144cefb3fc0de8b7630c7f203c58f",
+    "android-final-account-night.png": "611de12db0e884a149676344d67534e2f4bf40b9e6d4d76101fe62a86b91ca15",
+    "ios-account-light.png": "3c44d9068da4cc1b778cedc327abc73d544fa9e9ccbfbb7aa8e28e6b7ff55e41"
+  }
+}
