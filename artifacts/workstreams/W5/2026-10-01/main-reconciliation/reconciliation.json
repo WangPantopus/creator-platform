@@ -13,8 +13,9 @@
     "originalColumnValuesAndRowMultiplicitiesPreserved": true,
     "aliasedSqlReplayed": false,
     "canonicalAlreadyApplied": 40,
-    "trafficReopened": false,
-    "closedBackupRestoredIndependently": true
+    "trafficReopened": true,
+    "closedBackupRestoredIndependently": true,
+    "trafficPurpose": "W5-owned loopback app acceptance after canonical runner and backend/web builds"
   },
   "validation": {
     "generatedOperations": 96,
@@ -25,9 +26,9 @@
     "webProductionBuild": "pass",
     "scopedEslint": "pass",
     "mergeMarkersRemaining": 0,
-    "iosShippingBuild": "running",
-    "androidShippingBuild": "running",
-    "combinedAppAcceptance": "pending"
+    "iosShippingBuild": "pass after top-level array/record native generator alias repair",
+    "androidShippingBuild": "pass after same alias repair",
+    "combinedAppAcceptance": "running: preserved Note revision17 loaded, save revision18 and hard reload passed, original wording restored as revision19"
   },
   "gates": {
     "genuineCreatorSigning": "blocked by user choice; never simulated",

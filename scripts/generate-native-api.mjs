@@ -67,6 +67,10 @@ function register(name, schema) {
     schema.enum.every((value) => typeof value === "string")
   )
     models.set(name, { kind: "enum", schema });
+  else {
+    models.set(name, { kind: "alias", schema });
+    fieldType(schema, `${name}Value`);
+  }
 }
 function fieldType(schema, name, language = "swift") {
   schema = concrete(schema);
@@ -151,6 +155,9 @@ for (const [name, { kind, schema }] of models) {
   if (kind === "nullable") {
     swift += `public typealias ${name} = ${fieldType(concrete(schema), `${name}Value`)}?\n\n`;
     kotlin += `typealias ${name} = ${fieldType(concrete(schema), `${name}Value`, "kotlin")}?\n\n`;
+  } else if (kind === "alias") {
+    swift += `public typealias ${name} = ${fieldType(schema, `${name}Value`)}\n\n`;
+    kotlin += `typealias ${name} = ${fieldType(schema, `${name}Value`, "kotlin")}\n\n`;
   } else if (kind === "enum") {
     swift += `public enum ${name}: String, Codable, Sendable {\n${schema.enum.map((value) => `  case \`${value.replace(/[^A-Za-z0-9_]/g, "_")}\` = ${JSON.stringify(value)}`).join("\n")}\n}\n\n`;
     kotlin += `@Serializable\nenum class ${name} {\n${schema.enum.map((value) => `  @SerialName(${JSON.stringify(value)}) ${value.replace(/[^A-Za-z0-9_]/g, "_").toUpperCase()}`).join(",\n")}\n}\n\n`;

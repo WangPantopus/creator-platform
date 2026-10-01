@@ -25,6 +25,8 @@ public enum APIJSONValue: Codable, Sendable {
   }
 }
 
+public typealias APIAgentAgentAudience = APIJSONValue
+
 public struct APIAgentCorrectionRequest: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `paraphrasedPrompt`: String
@@ -233,6 +235,8 @@ public struct APIAgentPublishRequest: Codable, Sendable {
   }
 }
 
+public typealias APIAgentRevision = Int
+
 public struct APIAgentSourceAction: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `action`: APIAgentSourceActionAction
@@ -340,6 +344,8 @@ public enum APICommerceCommitmentState: String, Codable, Sendable {
   case `resolved` = "resolved"
 }
 
+public typealias APICommerceCurrency = String
+
 public struct APICommerceDecidePacket: Codable, Sendable {
   public let `action`: APICommerceDecidePacketAction
   public let `version`: Int
@@ -413,6 +419,10 @@ public struct APICommerceFulfillmentCommand: Codable, Sendable {
     self.messageId = messageId
   }
 }
+
+public typealias APICommerceIdempotencyKey = String
+
+public typealias APICommerceMinorUnits = Int
 
 public enum APICommerceModeKind: String, Codable, Sendable {
   case `written_reply` = "written_reply"
@@ -548,6 +558,8 @@ public struct APICommercePassPurchaseQuote: Codable, Sendable {
     self.periodEndsAt = periodEndsAt
   }
 }
+
+public typealias APICommercePassPurchaseStatus = APIJSONValue
 
 public enum APICommercePaymentState: String, Codable, Sendable {
   case `authorization_pending` = "authorization_pending"
@@ -1587,6 +1599,8 @@ public enum APICallSessionState: String, Codable, Sendable {
   case `cancelled` = "cancelled"
 }
 
+public typealias APIContentAudience = APIJSONValue
+
 public struct APIContentConsentResult: Codable, Sendable {
   public let `version`: Int
   public let `share_text`: Bool
@@ -1749,6 +1763,8 @@ public struct APIContentEffectsResult: Codable, Sendable {
     self.processed = processed
   }
 }
+
+public typealias APIContentKey = String
 
 public struct APIContentList: Codable, Sendable {
   public let `items`: [APIContentListItemsItem]
@@ -2362,6 +2378,61 @@ public struct APIContentScheduledResult: Codable, Sendable {
   public init(published: Int) {
     self.published = published
   }
+}
+
+public typealias APIContentThanksFeed = [APIContentThanksFeedValueItem]
+
+public struct APIContentThanksFeedValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `target_kind`: APIContentThanksFeedValueItemTargetKind
+  public let `target_id`: String
+  public let `text`: String
+  public let `handle`: String?
+  public let `created_at`: String
+  public init(id: String, version: Int, target_kind: APIContentThanksFeedValueItemTargetKind, target_id: String, text: String, handle: String? = nil, created_at: String) {
+    self.id = id
+    self.version = version
+    self.target_kind = target_kind
+    self.target_id = target_id
+    self.text = text
+    self.handle = handle
+    self.created_at = created_at
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `version`
+    case `target_kind`
+    case `target_id`
+    case `text`
+    case `handle`
+    case `created_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.target_kind = try container.decode(APIContentThanksFeedValueItemTargetKind.self, forKey: .target_kind)
+    self.target_id = try container.decode(String.self, forKey: .target_id)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.created_at = try container.decode(String.self, forKey: .created_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(version, forKey: .version)
+    try container.encode(target_kind, forKey: .target_kind)
+    try container.encode(target_id, forKey: .target_id)
+    try container.encode(text, forKey: .text)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(created_at, forKey: .created_at)
+  }
+}
+
+public enum APIContentThanksFeedValueItemTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
 }
 
 public struct APIContentThanksQuery: Codable, Sendable {
@@ -3280,6 +3351,8 @@ public enum APIStudioInvitationRolesItem: String, Codable, Sendable {
   case `publisher` = "publisher"
   case `scheduler` = "scheduler"
 }
+
+public typealias APIStudioCommerceProjection = APIJSONValue
 
 public struct APIStudioTeam: Codable, Sendable {
   public let `members`: [APIStudioTeamMembersItem]
@@ -5760,6 +5833,8 @@ public struct APIConversationConversationRecordingResult: Codable, Sendable {
   }
 }
 
+public typealias APIConversationConversationRecordingView = APIJSONValue
+
 public struct APIConversationConversationTimeline: Codable, Sendable {
   public let `threadId`: String
   public let `creatorId`: String
@@ -6210,6 +6285,8 @@ public enum APIConversationTranslationLabel: String, Codable, Sendable {
   case `Translated___original_available` = "Translated · original available"
 }
 
+public typealias APIContentContentAudience = APIJSONValue
+
 public struct APIContentContentConsentResult: Codable, Sendable {
   public let `version`: Int
   public let `share_text`: Bool
@@ -6372,6 +6449,8 @@ public struct APIContentContentEffectsResult: Codable, Sendable {
     self.processed = processed
   }
 }
+
+public typealias APIContentContentKey = String
 
 public struct APIContentContentList: Codable, Sendable {
   public let `items`: [APIContentContentListItemsItem]
@@ -6985,6 +7064,61 @@ public struct APIContentContentScheduledResult: Codable, Sendable {
   public init(published: Int) {
     self.published = published
   }
+}
+
+public typealias APIContentContentThanksFeed = [APIContentContentThanksFeedValueItem]
+
+public struct APIContentContentThanksFeedValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public let `target_kind`: APIContentContentThanksFeedValueItemTargetKind
+  public let `target_id`: String
+  public let `text`: String
+  public let `handle`: String?
+  public let `created_at`: String
+  public init(id: String, version: Int, target_kind: APIContentContentThanksFeedValueItemTargetKind, target_id: String, text: String, handle: String? = nil, created_at: String) {
+    self.id = id
+    self.version = version
+    self.target_kind = target_kind
+    self.target_id = target_id
+    self.text = text
+    self.handle = handle
+    self.created_at = created_at
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `version`
+    case `target_kind`
+    case `target_id`
+    case `text`
+    case `handle`
+    case `created_at`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.target_kind = try container.decode(APIContentContentThanksFeedValueItemTargetKind.self, forKey: .target_kind)
+    self.target_id = try container.decode(String.self, forKey: .target_id)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.handle = try container.decode(String?.self, forKey: .handle)
+    self.created_at = try container.decode(String.self, forKey: .created_at)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(version, forKey: .version)
+    try container.encode(target_kind, forKey: .target_kind)
+    try container.encode(target_id, forKey: .target_id)
+    try container.encode(text, forKey: .text)
+    try container.encode(handle, forKey: .handle)
+    try container.encode(created_at, forKey: .created_at)
+  }
+}
+
+public enum APIContentContentThanksFeedValueItemTargetKind: String, Codable, Sendable {
+  case `content` = "content"
+  case `message` = "message"
 }
 
 public struct APIContentContentThanksQuery: Codable, Sendable {
@@ -7682,6 +7816,8 @@ public struct APIStudioStudioAudiencesGroupsItem: Codable, Sendable {
     self.name = name
   }
 }
+
+public typealias APIStudioStudioCommerceProjection = APIJSONValue
 
 public struct APIStudioStudioControlCommand: Codable, Sendable {
   public let `idempotencyKey`: String

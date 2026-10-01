@@ -20,6 +20,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
+typealias APIAgentAgentAudience = JsonElement
+
 @Serializable
 data class APIAgentCorrectionRequest(
   val `expectedRevision`: Long,
@@ -166,6 +168,8 @@ data class APIAgentPublishRequest(
   val `changes`: String
 )
 
+typealias APIAgentRevision = Long
+
 @Serializable
 data class APIAgentSourceAction(
   val `expectedRevision`: Long,
@@ -228,6 +232,8 @@ enum class APICommerceCommitmentState {
   @SerialName("resolved") RESOLVED
 }
 
+typealias APICommerceCurrency = String
+
 @Serializable
 data class APICommerceDecidePacket(
   val `action`: APICommerceDecidePacketAction,
@@ -285,6 +291,10 @@ data class APICommerceFulfillmentCommand(
   val `idempotencyKey`: String,
   val `messageId`: String
 )
+
+typealias APICommerceIdempotencyKey = String
+
+typealias APICommerceMinorUnits = Long
 
 @Serializable
 enum class APICommerceModeKind {
@@ -385,6 +395,8 @@ data class APICommercePassPurchaseQuote(
   val `expiresAt`: String,
   val `periodEndsAt`: String
 )
+
+typealias APICommercePassPurchaseStatus = JsonElement
 
 @Serializable
 enum class APICommercePaymentState {
@@ -982,6 +994,8 @@ enum class APICallSessionState {
   @SerialName("cancelled") CANCELLED
 }
 
+typealias APIContentAudience = JsonElement
+
 @Serializable
 data class APIContentConsentResult(
   val `version`: Long,
@@ -1053,6 +1067,8 @@ data class APIContentDocumentLive(
 data class APIContentEffectsResult(
   val `processed`: Long
 )
+
+typealias APIContentKey = String
 
 @Serializable
 data class APIContentList(
@@ -1343,6 +1359,26 @@ data class APIContentRevisionResult(
 data class APIContentScheduledResult(
   val `published`: Long
 )
+
+typealias APIContentThanksFeed = List<APIContentThanksFeedValueItem>
+
+@Serializable
+data class APIContentThanksFeedValueItem(
+  val `id`: String,
+  val `version`: Long,
+  val `target_kind`: APIContentThanksFeedValueItemTargetKind,
+  val `target_id`: String,
+  val `text`: String,
+  @Required
+  val `handle`: String? = null,
+  val `created_at`: String
+)
+
+@Serializable
+enum class APIContentThanksFeedValueItemTargetKind {
+  @SerialName("content") CONTENT,
+  @SerialName("message") MESSAGE
+}
 
 @Serializable
 data class APIContentThanksQuery(
@@ -1805,6 +1841,8 @@ enum class APIStudioInvitationRolesItem {
   @SerialName("publisher") PUBLISHER,
   @SerialName("scheduler") SCHEDULER
 }
+
+typealias APIStudioCommerceProjection = JsonElement
 
 @Serializable
 data class APIStudioTeam(
@@ -3175,6 +3213,8 @@ data class APIConversationConversationRecordingResult(
   val `signedActId`: String
 )
 
+typealias APIConversationConversationRecordingView = JsonElement
+
 @Serializable
 data class APIConversationConversationTimeline(
   val `threadId`: String,
@@ -3427,6 +3467,8 @@ enum class APIConversationTranslationLabel {
   @SerialName("Translated · original available") TRANSLATED___ORIGINAL_AVAILABLE
 }
 
+typealias APIContentContentAudience = JsonElement
+
 @Serializable
 data class APIContentContentConsentResult(
   val `version`: Long,
@@ -3498,6 +3540,8 @@ data class APIContentContentDocumentLive(
 data class APIContentContentEffectsResult(
   val `processed`: Long
 )
+
+typealias APIContentContentKey = String
 
 @Serializable
 data class APIContentContentList(
@@ -3788,6 +3832,26 @@ data class APIContentContentRevisionResult(
 data class APIContentContentScheduledResult(
   val `published`: Long
 )
+
+typealias APIContentContentThanksFeed = List<APIContentContentThanksFeedValueItem>
+
+@Serializable
+data class APIContentContentThanksFeedValueItem(
+  val `id`: String,
+  val `version`: Long,
+  val `target_kind`: APIContentContentThanksFeedValueItemTargetKind,
+  val `target_id`: String,
+  val `text`: String,
+  @Required
+  val `handle`: String? = null,
+  val `created_at`: String
+)
+
+@Serializable
+enum class APIContentContentThanksFeedValueItemTargetKind {
+  @SerialName("content") CONTENT,
+  @SerialName("message") MESSAGE
+}
 
 @Serializable
 data class APIContentContentThanksQuery(
@@ -4123,6 +4187,8 @@ data class APIStudioStudioAudiencesGroupsItem(
   val `id`: String,
   val `name`: String
 )
+
+typealias APIStudioStudioCommerceProjection = JsonElement
 
 @Serializable
 data class APIStudioStudioControlCommand(
