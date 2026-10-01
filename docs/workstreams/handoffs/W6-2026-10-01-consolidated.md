@@ -1,5 +1,7 @@
 # W6 consolidated handoff — October 1, 2026
 
+> Worktree cleanup follow-up: the user authorized removal of W6 checkouts after complete remote preservation. Treat970d/6438/89d9 paths below as historical after cleanup; create/reuse a fresh worktree from `origin/codex/w6-completion-20261001` and inspect `origin/codex/w6-isolated-recovery-20261001`. The previously uncommitted iOS lockfile is now preserved verbatim as recovery evidence, not adopted code, under `artifacts/workstreams/W6/cleanup/2026-10-01-worktrees/`. Both implementations retain their existing PRs.
+
 This is the current handoff for **Calls, voice, and media**, combining the two open W6 follow-ups and the latest direct user instruction. It supersedes older execution-policy and readiness summaries where they conflict. It does not claim W6 is complete.
 
 The [copy-paste successor prompt](../prompts/W6-resume-20261001.md) contains the assignment and complete remaining work. Historical documents remain useful evidence at their recorded source revisions.
