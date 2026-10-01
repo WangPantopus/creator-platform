@@ -1,0 +1,2 @@
+Performing Streamed Install
+adb: failed to install apps/android/app/build/outputs/apk/debug/app-debug.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.pantopus.qelvora signatures do not match newer version; ignoring!]

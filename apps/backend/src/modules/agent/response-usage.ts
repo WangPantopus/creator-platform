@@ -10,6 +10,16 @@ export const ModelRateSchema = z.strictObject({
 });
 export type ModelRate = z.infer<typeof ModelRateSchema>;
 
+/** A real provider result can carry valid usage even when its content is
+ * refused, incomplete or invalid. Preserve that usage without accepting output. */
+export class ProviderResponseError extends DomainError {
+  readonly usage: Usage;
+  constructor(code: string, message: string, usage: Usage) {
+    super(code, message, 503);
+    this.usage = Object.freeze({ ...usage });
+  }
+}
+
 /** Reported cache reads/writes are subsets of input tokens, never extra tokens.
  * Missing counters/rates remain unknown unless their price cannot change the total. */
 export function responseUsage(

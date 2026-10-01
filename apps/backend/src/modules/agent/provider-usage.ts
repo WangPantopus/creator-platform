@@ -4,6 +4,7 @@ import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { StreamProposal } from "./streaming.js";
 import type { PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
+import { ProviderResponseError } from "./response-usage.js";
 
 /** Structural consumer of W3's canonical GenerationExecution (7f5f63d).
  * Only the actual scoped processor supplies these callbacks, never HTTP JSON. */
@@ -174,6 +175,9 @@ export async function withProviderUsage<T extends { usage: Usage }>(
     const result = await call();
     usage = result.usage;
     return result;
+  } catch (error) {
+    if (error instanceof ProviderResponseError) usage = error.usage;
+    throw error;
   } finally {
     await finish(usage);
   }
@@ -206,6 +210,9 @@ export async function* withProviderStreamUsage(
       if ("usage" in proposal) usage = proposal.usage;
       yield proposal;
     }
+  } catch (error) {
+    if (error instanceof ProviderResponseError) usage = error.usage;
+    throw error;
   } finally {
     await finish(usage);
   }

@@ -1,5 +1,7 @@
 # Resume prompt — planning, coordination and integrated delivery
 
+> Checkpoint update: the founder subsequently authorized a combined implementation commit. Read [implementation-checkpoint.md](implementation-checkpoint.md) and resume from `codex/foundation-integrations-checkpoint` or a later reviewed integration revision. Earlier documentation-only/uncommitted descriptions below are historical.
+
 You are taking over the original creator-platform foundation/planning/coordination session. You are not automatically the owner of any one W1–W8 domain. Continue from existing work; do not restart the app or replace the eight workstream plans.
 
 Repository: /Users/yingpengwang/creator-platform. First read docs/workstreams/handoffs/planning-coordination.md completely. The original workstream document is docs/workstreams/README.md. Read its linked W1–W8 briefs, docs/workstreams/prompts/README.md, STANDARDS.md, CONTRACTS.md, VERIFICATION.md, COVERAGE.md, OPPORTUNITIES.md and DECISIONS.md. Those original briefs and prompts contain the full remaining domain scope; this continuation does not reduce it.

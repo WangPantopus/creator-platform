@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-10-01T00:50:25.424499+00:00",
+  "files": {
+    "apps/backend/src/modules/agent/generation-journal.ts": "b90b27a2b41cae85f0ba280c49812550e087b27dbe7ebe3794995cb6323bc5c6",
+    "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+    "apps/backend/src/modules/agent/repository.ts": "103d4d2b3a9a75791c654777990a54a73eb11fd38ae35c642a9e3077eb873929",
+    "apps/backend/src/modules/agent/provider-usage.ts": "ee17161e1eb73942575d49953579a2667993cd7b346bbaefe68a8e41ac830004",
+    "apps/backend/src/modules/agent/runtime.ts": "b1eb1042fd1ffbcf7559773d3b2fba1b3faab7010a867612e9a89e027f6b42d2",
+    "apps/backend/src/modules/agent/integration.ts": "4adb0bbb3cd4bb4cc2511a04d6818fbe347d82dc33b49f49adf9f6aaea137d4b",
+    "apps/backend/src/modules/agent/service.ts": "3e850786c7e9d2efb48032ae9c2647db21a0e7f033206d3f478e8864316495cc",
+    "apps/backend/src/modules/agent/lifecycle.ts": "6e694bb9df70def996c234c33637118b5bc34a413550e037c3a82b90fb5bc5af",
+    "apps/backend/src/modules/agent/trust-adapter.ts": "70dfe49e968ad49984a05294d77efc4872b8aeb60fbb74561b4f97eac4270313",
+    "apps/web/app/api/auth/continue/route.ts": "8e761ee6326b919cc336e4576d1ad32c82da61e914518f2134ccbc42e8bd99a5",
+    "apps/backend/src/modules/agent/model.ts": "4c2d2557629f768a9369ec949bbddcafa1b811dc3ac0601e50ff14d04aa7f507",
+    "apps/backend/src/modules/agent/budget.ts": "e009fd5038a1d58cfde3a537a57c27e14b4fb70a458ea129aae2dcb7ef562640"
+  }
+}

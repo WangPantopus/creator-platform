@@ -64,8 +64,19 @@ export class MemoryService {
       scope,
       async (client) => {
         const thread = (
-          await client.query(
-            "SELECT revision,control_epoch,off_the_record,intro_shared FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR SHARE",
+          await client.query<{
+            revision: number;
+            control_epoch: number;
+            off_the_record: boolean;
+            intro_shared: boolean;
+            exclusions: { key: string; text: string | null }[];
+            provenance_message_id: string | null;
+          }>(
+            `SELECT t.revision,t.control_epoch,t.off_the_record,t.intro_shared,
+            (SELECT coalesce(jsonb_agg(e),'[]'::jsonb) FROM
+              (SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001) e) AS exclusions,
+            (SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='fan' ORDER BY sequence DESC LIMIT 1) AS provenance_message_id
+          FROM creator.thread t WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t`,
             pair(scope),
           )
         ).rows[0];
@@ -74,12 +85,9 @@ export class MemoryService {
           "thread_unavailable",
           "This conversation is unavailable.",
         );
-        const exclusions = (
-          await client.query<{ key: string; text: string | null }>(
-            "SELECT semantic_key AS key,normalized_text AS text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 LIMIT 1001",
-            pair(scope),
-          )
-        ).rows;
+        // One locked snapshot also carries bounded exclusions and provenance.
+        // Every subquery retains the same explicit family predicate under RLS.
+        const exclusions = thread.exclusions;
         invariant(
           exclusions.length <= 1000,
           "memory_exclusions_capacity",
@@ -135,14 +143,8 @@ export class MemoryService {
           (!matcher || (await matcher.matches(intro, exclusions)))
         )
           intro = null;
-        const provenance = (
-          await client.query<{ id: string }>(
-            "SELECT id FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='fan' ORDER BY sequence DESC LIMIT 1",
-            pair(scope),
-          )
-        ).rows[0];
         invariant(
-          provenance,
+          thread.provenance_message_id,
           "context_source_unavailable",
           "Send a message before assembling conversation context.",
         );
@@ -154,7 +156,7 @@ export class MemoryService {
           messages,
           memory,
           excludedKeys: exclusions.map((e) => e.key),
-          provenanceMessageId: provenance.id,
+          provenanceMessageId: thread.provenance_message_id,
         };
       },
       "read",

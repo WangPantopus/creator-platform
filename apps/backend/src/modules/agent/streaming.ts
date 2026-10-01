@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError } from "../../core/errors.js";
 import { ReplySchema, type ModelConfiguration } from "./model.js";
-import { responseUsage } from "./response-usage.js";
+import { ProviderResponseError, responseUsage } from "./response-usage.js";
 import { contentHash } from "../../core/canonical.js";
 export type ReplySentence = z.infer<typeof ReplySchema>["sentences"][number];
 export type StreamProposal = { sentence: ReplySentence } | { usage: Usage };
@@ -147,30 +147,56 @@ export async function* streamResponses(
           while (delivered < sentences.length)
             yield { sentence: sentences[delivered++]! };
         } else if (item.type === "response.completed") {
-          if (item.response?.status !== "completed")
-            throw new DomainError(
-              "provider_incomplete",
-              "The reply did not complete.",
-              503,
+          const usage = responseUsage(
+            item.response?.usage,
+            model,
+            configuration.rates?.[model],
+          );
+          let reply: z.infer<typeof ReplySchema>;
+          try {
+            if (item.response?.status !== "completed")
+              throw new DomainError(
+                "provider_incomplete",
+                "The reply did not complete.",
+                503,
+              );
+            reply = ReplySchema.parse(JSON.parse(raw));
+          } catch (error) {
+            throw new ProviderResponseError(
+              error instanceof DomainError
+                ? error.code
+                : "provider_output_invalid",
+              "The final reply could not be safely validated.",
+              usage,
             );
-          const reply = ReplySchema.parse(JSON.parse(raw));
+          }
+          // The terminal provider receipt already arrived. Preserve its actual
+          // usage even if a later sentence is rejected or delivery is cancelled.
+          yield { usage };
           while (delivered < reply.sentences.length)
             yield { sentence: reply.sentences[delivered++]! };
-          const rate = configuration.rates?.[model];
-          yield {
-            usage: responseUsage(item.response.usage, model, rate),
-          };
           completed = true;
         } else if (
           item.type === "response.failed" ||
           item.type === "response.incomplete" ||
           item.type === "error"
-        )
+        ) {
+          if (item.response?.usage != null)
+            throw new ProviderResponseError(
+              "provider_incomplete",
+              "The model stream was interrupted.",
+              responseUsage(
+                item.response.usage,
+                model,
+                configuration.rates?.[model],
+              ),
+            );
           throw new DomainError(
             "provider_incomplete",
             "The model stream was interrupted.",
             503,
           );
+        }
       }
     }
     if (!completed)

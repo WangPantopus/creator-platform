@@ -4,6 +4,7 @@ import { streamResponses, type StreamProposal } from "./streaming.js";
 import { contentHash } from "../../core/canonical.js";
 import {
   ModelRateSchema,
+  ProviderResponseError,
   responseUsage,
   type ModelRate,
 } from "./response-usage.js";
@@ -126,10 +127,11 @@ export class OpenAIResponsesModel implements AgentModel {
     );
     const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
     // Input classification, embedding, reply, at most12 sentence guards,
-    // one memory extraction and at most5 sensitivity calls:21 admissions.
-    // Embedding has no output; the20 model calls each cap output at2000.
+    // One memory extraction, at most5 sensitivity calls and one complete
+    // exclusion comparison:22 admissions. Embedding has no output; the21
+    // model calls each cap output at2000. Exclusion input is bounded to64KB.
     return Math.ceil(
-      ((prefixBytes + 80_000) * 21 * input + 40_000 * output) / 1_000_000,
+      ((prefixBytes + 80_000) * 22 * input + 42_000 * output) / 1_000_000,
     );
   }
   async *reply(
@@ -239,52 +241,61 @@ export class OpenAIResponsesModel implements AgentModel {
       { model: this.embeddingModel, input: texts },
       signal,
     );
-    const rows = z
-      .array(
-        z.object({
-          index: z.number().int().nonnegative(),
-          embedding: z.array(z.number().finite()).min(16).max(4096),
-        }),
-      )
-      .parse(result.data);
-    if (rows.length !== texts.length)
-      throw new DomainError(
-        "embedding_invalid",
-        "The embedding response is incomplete.",
-        503,
-      );
-    const sorted = rows.sort((a, b) => a.index - b.index);
-    if (
-      sorted.some(
-        (row, index) =>
-          row.index !== index ||
-          row.embedding.length !== sorted[0]?.embedding.length,
-      )
-    )
-      throw new DomainError(
-        "embedding_invalid",
-        "The embedding response is inconsistent.",
-        503,
-      );
     const tokenUsage = z
       .object({ total_tokens: z.number().int().nonnegative() })
       .parse(result.usage);
     const rate = this.configuration.rates?.[this.embeddingModel];
-    return {
-      vectors: sorted.map((row) => row.embedding),
-      usage: {
-        provider: "OpenAI",
-        model: this.embeddingModel,
-        inputTokens: tokenUsage.total_tokens,
-        outputTokens: 0,
-        costMicros: rate
-          ? Math.ceil(
-              (tokenUsage.total_tokens * rate.inputMicrosPerMillion) /
-                1_000_000,
-            )
-          : null,
-      },
+    const cost = rate
+      ? Math.ceil(
+          (tokenUsage.total_tokens * rate.inputMicrosPerMillion) / 1_000_000,
+        )
+      : null;
+    const usage: Usage = {
+      provider: "OpenAI",
+      model: this.embeddingModel,
+      inputTokens: tokenUsage.total_tokens,
+      outputTokens: 0,
+      costMicros: cost !== null && Number.isSafeInteger(cost) ? cost : null,
     };
+    try {
+      const rows = z
+        .array(
+          z.object({
+            index: z.number().int().nonnegative(),
+            embedding: z.array(z.number().finite()).min(16).max(4096),
+          }),
+        )
+        .parse(result.data);
+      if (rows.length !== texts.length)
+        throw new DomainError(
+          "embedding_invalid",
+          "The embedding response is incomplete.",
+          503,
+        );
+      const sorted = rows.sort((a, b) => a.index - b.index);
+      if (
+        sorted.some(
+          (row, index) =>
+            row.index !== index ||
+            row.embedding.length !== sorted[0]?.embedding.length,
+        )
+      )
+        throw new DomainError(
+          "embedding_invalid",
+          "The embedding response is inconsistent.",
+          503,
+        );
+      return {
+        vectors: sorted.map((row) => row.embedding),
+        usage,
+      };
+    } catch {
+      throw new ProviderResponseError(
+        "embedding_invalid",
+        "The embedding response is incomplete or inconsistent.",
+        usage,
+      );
+    }
   }
   async structured<T>(
     instructions: string,
@@ -322,32 +333,48 @@ export class OpenAIResponsesModel implements AgentModel {
       },
       signal,
     );
-    if (result.status !== "completed")
-      throw new DomainError(
-        "provider_incomplete",
-        "The model response did not complete.",
-        503,
+    const usage = responseUsage(
+      result.usage,
+      model,
+      this.configuration.rates?.[model],
+    );
+    try {
+      if (result.status !== "completed")
+        throw new DomainError(
+          "provider_incomplete",
+          "The model response did not complete.",
+          503,
+        );
+      const outputs = z
+        .array(
+          z.object({
+            type: z.string(),
+            content: z
+              .array(
+                z.object({ type: z.string(), text: z.string().optional() }),
+              )
+              .optional(),
+          }),
+        )
+        .parse(result.output);
+      const text = outputs
+        .flatMap((item) => item.content ?? [])
+        .filter((item) => item.type === "output_text")
+        .map((item) => item.text ?? "")
+        .join("");
+      return {
+        value: schema.parse(JSON.parse(text)),
+        usage,
+      };
+    } catch (error) {
+      throw new ProviderResponseError(
+        error instanceof DomainError ? error.code : "provider_output_invalid",
+        error instanceof DomainError
+          ? error.message
+          : "The model response could not be safely validated.",
+        usage,
       );
-    const outputs = z
-      .array(
-        z.object({
-          type: z.string(),
-          content: z
-            .array(z.object({ type: z.string(), text: z.string().optional() }))
-            .optional(),
-        }),
-      )
-      .parse(result.output);
-    const text = outputs
-      .flatMap((item) => item.content ?? [])
-      .filter((item) => item.type === "output_text")
-      .map((item) => item.text ?? "")
-      .join("");
-    const rate = this.configuration.rates?.[model];
-    return {
-      value: schema.parse(JSON.parse(text)),
-      usage: responseUsage(result.usage, model, rate),
-    };
+    }
   }
 }
 export function modelFromEnvironment(

@@ -1,0 +1,88 @@
+{
+  "removed": [
+    {
+      "path": "/private/tmp/creator-w2-workspace",
+      "status": "removed",
+      "allocatedKiB": 77148
+    },
+    {
+      "path": "/private/tmp/creator-w2-build",
+      "status": "removed",
+      "allocatedKiB": 410088
+    },
+    {
+      "path": "/private/tmp/creator-w2-next-interrupted-20260929",
+      "status": "removed",
+      "allocatedKiB": 73508
+    },
+    {
+      "path": "/Users/yingpengwang/creator-platform/artifacts/workstreams/W2/build",
+      "status": "removed",
+      "allocatedKiB": 108
+    },
+    {
+      "path": "/private/tmp/w2-provision.sql",
+      "status": "removed",
+      "allocatedKiB": 4
+    },
+    {
+      "path": "/private/tmp/w2-state.json",
+      "status": "removed",
+      "allocatedKiB": 4
+    },
+    {
+      "path": "/private/tmp/w2-state-final.json",
+      "status": "removed",
+      "allocatedKiB": 4
+    },
+    {
+      "path": "/private/tmp/w2-night-page.html",
+      "status": "removed",
+      "allocatedKiB": 20
+    },
+    {
+      "path": "/private/tmp/w2-web-final.html",
+      "status": "removed",
+      "allocatedKiB": 20
+    },
+    {
+      "path": "/private/tmp/w2-web-state.json",
+      "status": "removed",
+      "allocatedKiB": 4
+    },
+    {
+      "path": "/private/tmp/w2-source-page.html",
+      "status": "removed",
+      "allocatedKiB": 20
+    }
+  ],
+  "removedAllocatedKiB": 560928,
+  "sharedDependencies": "Preserved: private copies only linked repository node_modules/packages/backend/design/config. No separately installed W2 package/library or native build/device resources were identified.",
+  "docker": {
+    "status": "blocked; container/storage/image removal unverified",
+    "reason": "Docker socket _ping returns Docker Desktop is unable to start; bounded inspect and removal time out.",
+    "attempt": {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "--volumes",
+        "creator-platform-w2-20260929"
+      ],
+      "result": "timed out; client terminated; removal unverified"
+    },
+    "remainingContainer": "creator-platform-w2-20260929",
+    "database": "creator_w2; live storage cannot be inspected or backed up while Docker is unavailable. Committed synthetic export and exact applied SQL remain.",
+    "safety": "No shared engine restart, global prune, Docker disk deletion, or image deletion without checking peer references."
+  },
+  "listeners": {
+    "checkedPorts": [3002, 4102, 55442],
+    "remainingListeners": [],
+    "stoppedWebPids": [32112, 32819],
+    "api": "Already absent during cleanup inventory."
+  },
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/1",
+  "native": "W2 never leased/built/installed iOS or Android; no W2 native cache, build, package, device or simulator to remove.",
+  "browser": "Browser inventory still shows W2 localhost tabs after close attempt timed out. Closing and previous viewport reset remain unverified. A separate data: error tab is blocked by browser URL policy; no bypass attempted.",
+  "recordedAtUtc": "2026-09-30T04:43:05.120190+00:00"
+}

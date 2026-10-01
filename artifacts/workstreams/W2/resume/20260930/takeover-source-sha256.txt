@@ -1,0 +1,9 @@
+2f15002d1d27b21b41328f7492647528bd1f8430ad9ac5817a40a52ce5706686  apps/backend/src/modules/agent/delivery-authority.ts
+10869dc0992a26dc6b39bdbefd22482c7a3dec8499dae27288e4ef20982621e5  apps/backend/src/modules/agent/integration.ts
+7b6eeb57dfa37549948953dfc984964fc6a7763203ccf8d64ac1e2a9ffe1af5b  apps/backend/src/modules/agent/model.ts
+751d778d96b1addc627f6bfc7347af565757b4e8c516b75d025ab9c9555df137  apps/backend/src/modules/agent/pipeline.ts
+fdde1984abfb2f879b033f952f78cdebe574e5651200bea923c3ea22841f4230  apps/backend/src/modules/agent/runtime.ts
+e2c19054837fbc73f2d8e81d5c5d8d7e77e4381bdf6292f9357f11ba3fd0b298  apps/backend/src/modules/agent/service.ts
+0557804f9ac82c5ccbb933543de9a301a0d3115cc74f5dc604c27ef4b2456b8c  apps/backend/src/modules/agent/streaming.ts
+b254795d1d05bd37fb8b09a2e04ca8e1a478b41001ffe6ae3877607c8b01798d  apps/web/app/api/studio/ai/[...path]/route.ts
+a3cd0fb1f10a9c7937118876436f592e0fc3c23e788a343bd7797da2fd9e6668  apps/web/features/creator-ai/CreatorAI.tsx

@@ -204,7 +204,7 @@ struct NativeHandleForm: View {
     }
     @ViewBuilder private var handleField: some View {
         #if os(iOS)
-        TextField("@handle", text: $handle).textInputAutocapitalization(.never).autocorrectionDisabled().submitLabel(.next)
+        TextField("@handle", text: $handle).qDisableAutoCapitalization().autocorrectionDisabled().submitLabel(.next)
         #else
         TextField("@handle", text: $handle)
         #endif

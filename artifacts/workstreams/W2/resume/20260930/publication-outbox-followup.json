@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-10-01T01:26:52.668299+00:00",
+  "source": {
+    "apps/backend/src/modules/agent/growth-adapter.ts": "99ba2be62e9a40fe7a7c398fcf78b417912aef52c410b1b4d0590af0b16694b7",
+    "apps/backend/src/modules/agent/privacy-stream.ts": "ba7f0511edfc0a99cc815bd736a9679c4ee22f94e19d55ab821e040a34ad49cb",
+    "apps/backend/src/modules/agent/trust-adapter.ts": "980c253e89a2d55db39606a786546d2dc3f44ce692818f2a4b05a01631202bda",
+    "apps/backend/src/modules/trust/contracts.ts": "9f304627ab8a6756aba2a5b7a9fa1d0573475f02a4a7a1e3adfd8c544bb22c5e",
+    "apps/backend/src/modules/trust/privacy-export.ts": "8785cbcd498057e6a7924ab4c8b2dfff654ecf2b5ded96d85b775a2b1622b433"
+  },
+  "passed": [
+    "backend build including typecheck",
+    "changed five-source-file ESLint",
+    "changed five-source-file Prettier",
+    "git diff --check"
+  ],
+  "contract": "ai.version_published filter before limit; private W4 receipt/lifecycle/refund outbox remains unacknowledged",
+  "W8Custody": {
+    "sourceCommit": "e33a56847fb85b726c55d9226018b17725bdbd77",
+    "registry": "infra/migrations.json",
+    "state": "0048 reserved_unapplied with a010a030 source path/hash16dddc80; active registration/order/application pending"
+  },
+  "newEngineeringTests": false,
+  "canonicalStreamContract": {
+    "producer": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74",
+    "files": {
+      "apps/backend/src/modules/trust/contracts.ts": "9f304627ab8a6756aba2a5b7a9fa1d0573475f02a4a7a1e3adfd8c544bb22c5e",
+      "apps/backend/src/modules/trust/privacy-export.ts": "8785cbcd498057e6a7924ab4c8b2dfff654ecf2b5ded96d85b775a2b1622b433"
+    },
+    "unchangedProducerBytes": true,
+    "activation": "old Trust worker/host has no registered coordinator/store; default W2 opt-in remains disabled"
+  }
+}

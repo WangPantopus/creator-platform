@@ -1,0 +1,59 @@
+{
+  "observedAt": "2026-10-01T04:39:30.506807+00:00",
+  "main": "107c8eb756e8391fb32840647e52d22d3234583a",
+  "sourceCheckpoint": "73b298a1a64c16dd2cb434e5324cc5259c052501",
+  "laterMainDelta": "Only3 web account/Studio recovery files; no backend/contracts/native changes",
+  "ios": {
+    "device": "09FA41B1-C300-4970-9F09-26F7CB884425",
+    "runtime": "iOS26.5",
+    "xcode": "26.5",
+    "signature": "verified ad hoc",
+    "cases": 2,
+    "failures": 0,
+    "seconds": 41.046,
+    "state": "owned simulator shutdown after verified journeys; saved data retained",
+    "scope": "Actual unconfigured shipping sign-in Light/Night, explicit native identity catalog fixture"
+  },
+  "android": {
+    "device": "CreatorPlatform_W2_Resume_AOSP35_20260930",
+    "api": 35,
+    "image": "official AOSP default x86_64",
+    "cpuCores": 4,
+    "memoryMb": 2560,
+    "gpu": "host; Vulkan disabled",
+    "adbPort": 5042,
+    "emulatorPort": 5562,
+    "hciPort": 15602,
+    "coldLaunchMs": 7620,
+    "cases": 4,
+    "failures": 0,
+    "seconds": 19.235,
+    "nightShippingSignIn": {
+      "cases": 1,
+      "failures": 0,
+      "seconds": 4.378
+    },
+    "postUiNightColdLaunchMs": 3967,
+    "visibleSystemUiFailure": false,
+    "scope": "Actual unconfigured shipping sign-in; context removal/mode selector/pause are explicit component fixtures",
+    "retainedFailure": "Google API35 image SystemUI ANR at launcher before W2 app; own device normally stopped, data retained; not represented as clean"
+  },
+  "checks": {
+    "generate": "passed",
+    "workspaceTypecheck": "7/7 passed",
+    "lint": "passed",
+    "format": "passed",
+    "backendBuild": "passed",
+    "productionWebBuild": "passed",
+    "laterMainWebTypecheck": "passed",
+    "laterMainWebLint": "passed",
+    "newHeadHostedCi": "required after push; pending"
+  },
+  "binariesSha256": {
+    "apps/android/app/build/outputs/apk/debug/app-debug.apk": "b262bc6ae3fe3671c36e7b7bc7f9e40242b592ac56d46ba2ea7ac78de710d186",
+    "apps/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "4faf0f6e4ee04fff18663084e4166a653e8cbb541dc3cddbe14fd542d30a8fb7",
+    "tmp/w2-native-20260930/ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp": "f365eaa842bd402508e87422779c1287ecb4042b6694bc4472b120119dc61252"
+  },
+  "releaseReady": false,
+  "allNinePackagesAndR01ThroughR14": "preserved; deferred release backlog and actual finish matrix remain assigned"
+}

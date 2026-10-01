@@ -55,8 +55,8 @@ export class AgentRepository {
       );
       const authority = requestAuthority.getStore();
       if (authority) {
-        // Fan generation can use the creator's repository scope. Hold the
-        // actual HTTP actor's session, then restore the repository account.
+        // Runtime reads/admissions can use a creator scope under an actual fan
+        // request. Hold that HTTP actor's session, then restore owner RLS scope.
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           authority.accountId,
         ]);

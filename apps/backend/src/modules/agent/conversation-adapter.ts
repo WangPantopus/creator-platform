@@ -3,18 +3,26 @@ import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import type { createAgentDomain } from "./integration.js";
 import { proposeMemory, type MemoryProposalPort } from "./memory-proposals.js";
+import {
+  selectMemorySurvivors,
+  type MemoryExclusionSnapshot,
+} from "./memory-exclusions.js";
 import type { ThreadSnapshot } from "./pipeline.js";
 import type { ProviderExecution } from "./provider-usage.js";
 import type { ApprovedSentence, ConversationContextPort } from "./runtime.js";
 
 type Proposal = Parameters<MemoryProposalPort["propose"]>[1];
-/** Structural consumer of W3's published 600bfb0 GenerationExecution.
+/** Structural consumer of W3's published 63c61a9 GenerationExecution.
  * W3's processor must supply its actual held-client batch producer. A host
  * cannot substitute an interactive scope or a check followed by another TX. */
 export interface MemoryGenerationExecution extends ProviderExecution {
+  memoryExclusions(
+    assertAuthority: (client: PoolClient) => Promise<void>,
+  ): Promise<MemoryExclusionSnapshot>;
   commitMemory(
     proposals: readonly unknown[],
     assertAuthority: (client: PoolClient) => Promise<void>,
+    exclusions?: MemoryExclusionSnapshot,
   ): Promise<{ written: number; revision: number | null }>;
 }
 
@@ -63,7 +71,9 @@ export function createAgentConversationGenerator(
       invariant(
         execution &&
           typeof (execution as Partial<MemoryGenerationExecution>)
-            .commitMemory === "function",
+            .commitMemory === "function" &&
+          typeof (execution as Partial<MemoryGenerationExecution>)
+            .memoryExclusions === "function",
         "generation_execution_required",
         "The actual generation processor must own provider admission, memory commit and sealing.",
       );
@@ -79,7 +89,9 @@ export function createAgentConversationGenerator(
       invariant(
         execution &&
           typeof (execution as Partial<MemoryGenerationExecution>)
-            .commitMemory === "function",
+            .commitMemory === "function" &&
+          typeof (execution as Partial<MemoryGenerationExecution>)
+            .memoryExclusions === "function",
         "memory_execution_required",
         "Memory must commit on the actual generation processor's held client.",
       );
@@ -90,6 +102,18 @@ export function createAgentConversationGenerator(
         execution,
         signal,
       );
+      const memoryExecution = execution as MemoryGenerationExecution;
+      const exclusions = await memoryExecution.memoryExclusions(
+        admission.assertAdmission,
+      );
+      invariant(
+        exclusions.revision === snapshot.revision,
+        "memory_exclusions_changed",
+        "Use this extraction's actual current exclusion snapshot.",
+      );
+      // Retained hashes are not recoverable text or semantic approval.
+      if (exclusions.exclusions.some((item) => item.text === null))
+        return { revision: null };
       const proposals: Proposal[] = [];
       await proposeMemory({
         scope,
@@ -121,12 +145,22 @@ export function createAgentConversationGenerator(
         "Memory must use one bounded extraction batch.",
       );
       if (!proposals.length) return { revision: null };
+      const survivors = await selectMemorySurvivors({
+        scope,
+        proposals,
+        exclusions,
+        model,
+        journal: admission,
+        signal,
+      });
+      if (!survivors.length) return { revision: null };
       await admission.assertCurrent();
       // Classifiers completed outside locks. W3 now checks its exact lease,
       // thread snapshot and this SQL-only W2 authority through the batch commit.
-      return (execution as MemoryGenerationExecution).commitMemory(
-        proposals,
+      return memoryExecution.commitMemory(
+        survivors,
         admission.assertAdmission,
+        exclusions,
       );
     },
   });

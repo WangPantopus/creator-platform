@@ -1,0 +1,126 @@
+{
+  "synthetic": true,
+  "sourceHead": "eb0f6a043c96459e34d85cbef4637402b068449b",
+  "observedAt": "2026-09-30T23:18:04.525Z",
+  "request": "Bounded real structured adapter operations, identical 600-note synthetic input, store:false. No saved Studio data or runtime configuration changed.",
+  "adapter": "responses-v2-cache-accounting",
+  "modelFingerprint": "4efd6d3807cf606138605762d47abbb56e6ee043bd91c969943bc68ea78c2dca",
+  "rates": {
+    "gpt-4.1-mini-2025-04-14": {
+      "inputMicrosPerMillion": 400000,
+      "outputMicrosPerMillion": 1600000,
+      "cachedInputMicrosPerMillion": 100000,
+      "cacheWriteMicrosPerMillion": 400000
+    },
+    "gpt-4.1-2025-04-14": {
+      "inputMicrosPerMillion": 2000000,
+      "outputMicrosPerMillion": 8000000,
+      "cachedInputMicrosPerMillion": 500000,
+      "cacheWriteMicrosPerMillion": 2000000
+    },
+    "text-embedding-3-small": {
+      "inputMicrosPerMillion": 20000,
+      "outputMicrosPerMillion": 0
+    }
+  },
+  "receipts": [
+    {
+      "attempt": 1,
+      "elapsedMs": 1902,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    },
+    {
+      "attempt": 2,
+      "elapsedMs": 1878,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    },
+    {
+      "attempt": 3,
+      "elapsedMs": 1189,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    },
+    {
+      "attempt": 4,
+      "elapsedMs": 1312,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    },
+    {
+      "attempt": 5,
+      "elapsedMs": 1227,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    },
+    {
+      "attempt": 6,
+      "elapsedMs": 1579,
+      "value": {
+        "label": "synthetic"
+      },
+      "usage": {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 22260,
+        "outputTokens": 7,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 8916
+      }
+    }
+  ],
+  "nonzeroCacheObserved": false,
+  "publicationAvailable": false
+}

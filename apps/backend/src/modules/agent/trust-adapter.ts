@@ -186,6 +186,7 @@ export function agentPrivacyHook(
             jobId: input.jobId,
             threadData: "not_stored_by_agent",
           },
+          ...(input.kind === "export" ? { data: [] } : {}),
         };
       }
       for (const scope of scopes)

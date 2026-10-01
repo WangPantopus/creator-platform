@@ -1,0 +1,846 @@
+{
+  "observedAt": "2026-10-01T05:20:57.824805+00:00",
+  "main": "705215955415332e601adf5c42a2169cd0d173a5",
+  "correctedPublishedSource": "31cf9f40d76ccee53086bf24142f4a025bc29b24",
+  "reason": "Final source comparison caught earlier reconciliation regressions; preserve current non-W2 authorities and source/evidence, not merely compilation",
+  "restoredExactMainFiles": [
+    {
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "sha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
+    },
+    {
+      "path": "apps/backend/src/db/database.ts",
+      "sha256": "608d4c0e742d0323e473789aec4c7be3daf389e93274ab8075cb467b8c068780"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "fae70d7a41f2c1f44a9de4af835b3e64750268c65ee2322ceed8bbcc55ce00e2"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "sha256": "f546b98b1b99dd3aae2a33a2731a4a7b35dc0ebb189033b195b5641f77a4f263"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/generation.ts",
+      "sha256": "b6daf2e8c5589e41a790f4226b839c00ea30046f7b0934a267bb092e9d694e5f"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/memory.ts",
+      "sha256": "367a41892524c0e73aeb9940e22371d97999b63d4e32586c2fca21735a0259cc"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "sha256": "56e0bf67e0c75cefe0ab948cb9591e52e4b6d57cfafa9668645c9597a32bade8"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/wellbeing.ts",
+      "sha256": "310d1cecb94f991a45ee9ce21c866984bb15f05c8f3a599f6661c79815a3be72"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "20a30a6172fb497bab69e432e62671002eb6526486e8972840070cddbe3159bb"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/database.ts",
+      "sha256": "cca204ac57422b0226d65101cf309c492acd4a1da5894dbe9753f3b369d2d1ae"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/erasure.ts",
+      "sha256": "773c828a0aa9278dded4f1c0c2b95e57bec115c385eeab8ae0ebd7cc681cca56"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/lifecycle.ts",
+      "sha256": "2791f97de4b53ff8370f6785a8e233821e91f1ee85615c6de974107121d316fa"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/privacy-export.ts",
+      "sha256": "2c6ea92dadd9d1aec11db9c90d9cce67fd2af330f9bcb659655bdb37c5416b7e"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/runtime.ts",
+      "sha256": "1a2645c22db0aa864c2ed7fdbcaf14a0a02907073cec0fe8e44987791735a0d8"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/service.ts",
+      "sha256": "a267d2ad73f5603ae1fe8bebff7ec47202f45a55bd684c10138579d4d076a0b4"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/identity-authority.ts",
+      "sha256": "bb71a405b037175e57d50ec06570fdd5d48fe1417e5e508426e38303457d0171"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "sha256": "7351427c0e25008ea229b5a244b8bc1fc9e52acf8539f310b4fecc2b98e77108"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/private-file-artifacts.ts",
+      "sha256": "e36fa69eb1aa55c5e334d0be54bbc50ce3187e45d7fb7ef192e96f2b04885fad"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/router.ts",
+      "sha256": "65165bedcb73a4ff5fef1b1fab4354cc5f020e1c51648e4c0bc1526a62b48cd2"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/service.ts",
+      "sha256": "a3393c6a5f06b301acd89bf277d8684d0f7118677236180a0f3e4faac0124692"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/worker.ts",
+      "sha256": "66d16f70f19bdac9891b4d3f88c8a61f68d422161cd2b6b704cc40ddc8c0e38d"
+    },
+    {
+      "path": "apps/backend/src/operations/deploy.ts",
+      "sha256": "7c7a12247446667d44d65344e6138ad55a5e8f5b185e646fa28dd651ea299183"
+    },
+    {
+      "path": "apps/backend/src/operations/local-server.ts",
+      "sha256": "52a27612e144a4c036d452b5a54a99ba4abe86b9bb1cdd607a61405b85c3c0f0"
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "sha256": "5a76dd3ded58498df06f872b3ea91d2d68baf134f6e94626286a06cceb9e5899"
+    },
+    {
+      "path": "apps/backend/src/operations/telemetry.ts",
+      "sha256": "875446755793102a9834e5c361204016e80315b897e6978a763c01438099ecfa"
+    },
+    {
+      "path": "apps/backend/src/operations/wal.ts",
+      "sha256": "45f120f918ef2b2ff4fa0d1e75f3437fe319fac3a81e624b67ccf1dd5ba287a1"
+    },
+    {
+      "path": "apps/backend/src/realtime/gateway.ts",
+      "sha256": "b737c4a499d4cd8790cdd1024e57df39802cd0a55f3f03442c16f31ebbe832c5"
+    },
+    {
+      "path": "apps/web/app/api/auth/complete/route.ts",
+      "sha256": "2a95cc89aa9e8b7b65dcceba19267442c45b8acbddab0a7eb289ee7433c6b900"
+    },
+    {
+      "path": "apps/web/app/api/trust/[...path]/route.ts",
+      "sha256": "e200394aabc83d3245867bfe28d85e6f2241bbeea0af78fd3faf5835714a9cee"
+    },
+    {
+      "path": "apps/web/app/globals.css",
+      "sha256": "3c73d93d0ffa1b662bb266a27dd023f5f1d8b2ddbaa01b7d883e385765d3f2f7"
+    },
+    {
+      "path": "apps/web/app/ops/metrics/page.tsx",
+      "sha256": "8a58f0a154054d2cdbbf7e302716841cfddb7bddbecb046d1dafecc56939e3f4"
+    },
+    {
+      "path": "apps/web/app/ops/trust-client.tsx",
+      "sha256": "e1670e41fb5efb10e7b41228f20e613d64ed4e199110a3727c29b6d6f4a407ed"
+    },
+    {
+      "path": "apps/web/app/ops/trust.css",
+      "sha256": "5789791804bda3f69b32014a8342fdbfa7011d7992534c1183b58c3b57a9d378"
+    },
+    {
+      "path": "apps/web/app/support/privacy/page.tsx",
+      "sha256": "820c8edc0f607c75c9e59127cb4a6434d2faf72d265df04d1466375edc3f0e57"
+    },
+    {
+      "path": "apps/web/lib/trust-session.ts",
+      "sha256": "9b62774585fcc5039037a7b82ec8792f234f12f5a0c0dca4b3259f3df4afd3df"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/README.md",
+      "sha256": "db8fface1149618adc0337033c32d6e6afe9fa5620ac9b216cc3541cac764a10"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/access-history-account-switch-phone-light.jpeg",
+      "sha256": "ae2abce9e340ac5e270340cb222a6570b8b587c05804031544284e9a308f8dc9"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/access-history-phone-light.jpeg",
+      "sha256": "384e1b5eec4a627c3731b5dda2fb42aee84274c8a7fa7d9afd6b98690a732a01"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/android-runtime-current.json",
+      "sha256": "0fe3412d3a38eb9903408ee011df8ebe7d8a03c5d2cd63e32b122e24107c4708"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/browser-acceptance.json",
+      "sha256": "d9740b39ade9687d3cb86ed33d1c51fe25cdf064548392a22c1aa82cd3ff26b5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/browser-independent-acceptance.json",
+      "sha256": "1626a170e14f6870f65dedfb42785d907c483fc8281d5dcfafaa36ea73918b8a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-phone-light.jpg",
+      "sha256": "966eecffd7e768677c8e0bd3b8257bca5c2b98a3bf926b92e387fd83a19736aa"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-reauthenticated-port-isolated.jpg",
+      "sha256": "1686b40a3b44a215ad727d402a3f3e75f21e58d7054a75312ac1978ce001df6f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-reauthenticated.jpg",
+      "sha256": "0747eab82acb58b332993b10b9071c3cecbab09e01d4809a7f6ae284fb88b2b5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-resolved-notice-phone-light.jpg",
+      "sha256": "1686b40a3b44a215ad727d402a3f3e75f21e58d7054a75312ac1978ce001df6f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-return-visit.jpg",
+      "sha256": "0747eab82acb58b332993b10b9071c3cecbab09e01d4809a7f6ae284fb88b2b5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-report-saved.jpg",
+      "sha256": "ff6b60b77011ef329964ca4f78de0f223b4e12777300f962882dc02a0f2a8934"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/canonical-thread-phone-night.jpg",
+      "sha256": "25834acd7ba34bee6970a2bb453e543e6202fb5a2afd5d0fb4b61a5ce38b6f3d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/case-expired-purpose-keyboard-light.jpg",
+      "sha256": "ba8a92d552f716cf1777b3291f15de090ba8ad175bf804e134c7b4c2ce446699"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-0f83.json",
+      "sha256": "cf8c0bc19388ef0a01c52ef22cd3de07363ad2a0e1ca870c6b70d8cb089ae477"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-439-run-custody.json",
+      "sha256": "c442c433a68c3ed4ff030985aa05b474c6a03d44bbcd35cf0d50b8f03c3d7fcd"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-4f058a0.json",
+      "sha256": "f33459d306f0eefd9652a9f1ee054a699798b0bb904caf75e73dd0b43986f137"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-current.json",
+      "sha256": "a5acb2e31010f8fcf0452cded479987ae4fb1529fcc395426cac613217d1b8f1"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-f64f165-launched.json",
+      "sha256": "838878727f2fc1d640354355f1b6a5fece7010a07c378f7161b53f8642c79170"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-queue-diagnosis.json",
+      "sha256": "bbc848e274a074af063ec09b2ac2209a707f244adf8e96c4f3407b2e69c69ea3"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ci-runner-continuation.json",
+      "sha256": "a8387eb5bf4583ccf6bd72aae505ea4f030b670eb9655aafaf009cd000c5a2d0"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/composed-signing-closed-clone.json",
+      "sha256": "fd199376b87fca648c49a1d3c09620a483f282903ce9109eeae782043e95e152"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/composed-signing-source.json",
+      "sha256": "1a8c92e4098a0352ab71f7e3f59681d694c69f94ed638e27172cd704e7547bb2"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/correction-signing-current.json",
+      "sha256": "b3281eb289f0e74a20927b4359733fcee2206995f58704e754bb76f6d3fa375b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/correction-signing-custody.json",
+      "sha256": "91bb66b7fefc5cd79f6a398c39795a2db751a5b2c6286d1414ce6acb940779b6"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/creator-media-custody.json",
+      "sha256": "a9b39ad619e10df93141ef82ea3847c4b227abe7b8324d4fda2b0e1f0582a41a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/expired-purpose-acceptance.json",
+      "sha256": "83b5159f455204f2310fe627e608599fbdb63b4b6c03e14fe520138bada8495c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/feedback-draft-account-reset-phone-light.jpeg",
+      "sha256": "343b2c18a7e15995e01dcd35ff376c55ea1551459863a499ff7b954d306c8095"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-actor-refresh-web-build.txt",
+      "sha256": "a52554c636f36b9f3894dec852f3d9c1616aeec0389522992fb486b0bb12750a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-backend-build.txt",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-canonical-report-full.jpg",
+      "sha256": "102285756b0c3342ee17d4daac6cffc9d82469fda906112d783df6edff97ecc4"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-canonical-report-viewport.jpg",
+      "sha256": "ebc1ae744c3ef361309105ec63c497a3e060758c014ab43990faba0037f7c46c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-merge-acceptance.json",
+      "sha256": "741c1d8d1fbe7c5768187ef787f025ae0459c0bf808f8bca60cfeb513b8d23c3"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-ops-fan-denied.jpg",
+      "sha256": "123c2acaa7ec10aa66b8a958c9af91c71640e75164061831e13a7406140f994d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-ops-supervisor-metrics.jpg",
+      "sha256": "38c6330f04e0e345edc61f7ae206dfffb0fd53e532a1e3eb94ba1252537c3e9a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-ops-supervisor-queue.jpg",
+      "sha256": "c55c2607f4f4dd46f8f60e804755fbc1e2a79eb58ea22721d6191523e8b902a4"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-preservation.json",
+      "sha256": "768251573c9b260ea5ab11f5480c471534917a36e328c2b4fa25ffc6de79fd6e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-privacy-actor-switch-before-fix.jpg",
+      "sha256": "67462e04e20c31d02f3418ce68bd03bdad53347676d1ea49a0f65cf580b9ff71"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-privacy-actor-two.jpg",
+      "sha256": "67462e04e20c31d02f3418ce68bd03bdad53347676d1ea49a0f65cf580b9ff71"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-privacy-original.jpg",
+      "sha256": "904c6da30985092318ef09104a671f3194f8256625f098d5b5ce46d3706ac8f3"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/final-runtime-readiness.json",
+      "sha256": "80d200845a5a92ddc33db457b810ef573cb28ee9a9d08f950a2d19f68164574d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/foundation-bf92-welcome-light-implementation.png",
+      "sha256": "c22c2371b348cec146b1294edc160c05f658b01a298838809374b4b9872a1b3d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/foundation-bf92-welcome-light-reference.png",
+      "sha256": "c208f54205720769f20ce171a6a88d8f00f5eb42c476779099035765812a0a92"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/foundation-recovered-diagnostics.json",
+      "sha256": "49ca3c7e59dd187a520000e78122e57108862f0511652500aed97ba3871283d4"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/growth-stream-capacity.json",
+      "sha256": "b52b73bfcef34c5c2a23f323e4f21841d60edaaa50a40a4c7642d25a0621fd64"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/growth-stream-integration.json",
+      "sha256": "1f4a368752bbd11a0f9caa51e479fc923e71bbc0c64da920ca83885a0ab5fa96"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/image-revision-binding-source.json",
+      "sha256": "093416626f806e84b0933184d95578acbce4cb9845679b53be137846d9f6b41c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/integration-provenance.json",
+      "sha256": "fbade2e5635cdb3bbe1ebb85f399f90e6005fbe0c4ef12b4445b0e08550828b8"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/journal-retention-custody.json",
+      "sha256": "14f4c3379b962a8539722b4ddd601a615c21c86f532f6ab1997b6b23fad70768"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/main-pr6-reconciliation.json",
+      "sha256": "a5a38f9364746607063b2be8c009d6e70859f249441545d7adb7b73e49563ad9"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/main-reconciled-runtime.json",
+      "sha256": "59269178103f3d8245cf03dd3bc7817ae1bdffa305b6eacbc939d90eaf57e9b9"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/metrics-phone-overflow.json",
+      "sha256": "eed00e8672b6d14010bfe4d3f95885719e8cd7d80ea6001bcdd7327588e1c728"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/migration-reservations.json",
+      "sha256": "6c43267fec2efc9da95985f8c841ed6188ee4c7b5daab0f01e552c349d2d3197"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-foundation/receipt.json",
+      "sha256": "517f8a904165e51411a55e2e3e732ea31d4cb3a870301b410690f3b87580eeac"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-foundation/testComponentCatalogThemes.Button-light.png",
+      "sha256": "34dfd4f4be75084e108a104a8458e8ad12ba12c1a256b67c3514582b0f0d54fd"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-foundation/testComponentCatalogThemes.EmptyState-light.png",
+      "sha256": "6a071bad40a12e80418167c7134e486c95c44776c2151af2fcea0151c7b57162"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-foundation/testWelcomeThemes.light.png",
+      "sha256": "3886f87c1ca7b4f2d20eac34de2b15a98f23df3b1f7ff9d723827072df97eeac"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-foundation/testWelcomeThemes.night.png",
+      "sha256": "6e72ffc72e0f92e7d4ffc980be08a62e440a49210f5ecb377cf7ece098454de7"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-crisis-host-night.png",
+      "sha256": "55a1b364cd45a669cd19137411455494f0c6622dc62bd4f43b5bac6d1e295b0d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-final-crisis-night.png",
+      "sha256": "98490f47b841c4f7b75e4595aa6297edd429b18ee15c3dcad17c1ee33b480d29"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-final-existing-ui.txt",
+      "sha256": "69e833f636bc65f26d1dd61bbc62b516d9d048108522da3a38bcca4a37836b0a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-final-help-light.png",
+      "sha256": "400a1e0397b91f5fa296f533e12f4192d054f767f5a000a526cb5242a57c0af9"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-help-first-light.png",
+      "sha256": "a0abedf40cb755a1bf0d639d44bf62a3c9d69ff2fdfaeadc99d7cc7437cdcb85"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-help-host-light.png",
+      "sha256": "e3ec59a3fd231aae4959cfc48c4a464002b6235c63435885d62ea2ac3e95a43c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-help-host-loaded-light.png",
+      "sha256": "b617461cfe01115764bd58461eb5110435a6bc9be75a8278beec5d144cd0e43e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/android-report-arrival-host-light.png",
+      "sha256": "ed9ff38d55111b19ee0a40802280426d3c7727c1a00b5523d68cea0ce6afc4fa"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-crisis-night.png",
+      "sha256": "0614e3e533fab855c30d4be2b1119a0d16f750fd3bac59211ab805413e7e3394"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-existing-ui-selector-authorized.txt",
+      "sha256": "4b09289c9932143e6f14aaec3a0fbfe050bc6e19e00570b87dafdcc462d2470e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-existing-ui.txt",
+      "sha256": "f5b52bf436463a0b549aaac08c66bc6391021eb7d86f3ca247815200cc4010bd"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-native-message-identities.png",
+      "sha256": "4a1a0534ba7485e1ddb25b99ba74d204801b731db146bd2fd6098621401f354b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-signin-unconfigured-dark.png",
+      "sha256": "cad377ad5c9ea9293ab57a71bab682ded560d4bf1c8250d5a002809c3ba45b32"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-signin-unconfigured-light.png",
+      "sha256": "2f3583b67fc74e986aa32aad2959b89ab612ff9af876215c99ced061ad2e5bbd"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-welcome-dark.png",
+      "sha256": "d706688a00b649c46de757b60a8519a4850409e762c103b2ee73be073605e6b7"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-final-welcome-light.png",
+      "sha256": "2a68dff4e24bec9d63aa74154eff81ed34058cb16cf1abfc46a0ddfdfe468147"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-help-light.png",
+      "sha256": "8ac16785f2bf5a629d8f149b57b6a9a471ded69885a26d6a59bc9f1c5a1c5a3b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-message-identities.png",
+      "sha256": "747e3934e0f1d1591abd69110c81999c4f1b4edf8f8f5da2233ac0b7eb8e6d35"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-report-arrival-light.png",
+      "sha256": "971048496b21cd12881f01de489873a1542070df6b6e2b6eeabf5f8be55b1eff"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-selector-authorized-message-identities.png",
+      "sha256": "30319371667b6dff1885d269be2a8ba0b1a6477147f00e4bc8c487e19b009f5a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-selector-authorized-signin-light.png",
+      "sha256": "5d806600d77bb98bcb85acd4acec096ae22d531ef63c9f0cf25dd5f69ae70a85"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-selector-authorized-signin-night.png",
+      "sha256": "fd5c0bbaff8c09692064dbc391d57b2452683827825dd422deb8646119527e86"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-selector-authorized-welcome-light.png",
+      "sha256": "b26b2cefdbfd082e05020a3ff1f9f9777a032d41566d175a4fb3f5880b302507"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-selector-authorized-welcome-night.png",
+      "sha256": "3d0abe77c8cfa4f0dc601b45268e4f57253a1064ef1dad5fdd4a933369f23dcb"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-signin-unconfigured-light-ax.txt",
+      "sha256": "9b025ef72b2dc75a7c432637ef1f9dd42557ec75c91443f624bb379c45fa94ca"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-signin-unconfigured-light.png",
+      "sha256": "d696588f458117e8397fafaa2155f393223a8473296c5a235dee77725397fd17"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-signin-unconfigured-night-ax.txt",
+      "sha256": "7c235f791b65c6e67248ab56d36ebf4b7431d750971e37fd0bec3bdaa3339e42"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-signin-unconfigured-night.png",
+      "sha256": "159fc789362e5dc454759c806352d623865381a134f5524f2e13d700fc1c915c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-welcome-light.png",
+      "sha256": "83e07580d1b01893e194a071cd531913d842d93550ade82b402b256bfd76aecf"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/ios-welcome-night.png",
+      "sha256": "79b82a3408c6dfeff316a52d643d4266846ccf288e69969e7b744e2d90be518c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/native-launched/receipt.json",
+      "sha256": "db2321f2f89f2b04df3165fb220797a379ad5de3c40169c24dfcc5d82b44f95d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/open-pr-readiness.json",
+      "sha256": "72c745524289f271c00a4374b56e13d7ff52cc206024f50a9661fe654d7073ac"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-audits-desktop-night.jpg",
+      "sha256": "0bdd4bbaaee7c6b13c62c4c2d7d1f9e9c50d57a012f9f6dff381ca457fb92b79"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-case-desktop-light.jpg",
+      "sha256": "1a748a990c25cd16f1eae6012aaa9ac04aab837722b6ffa500f61897825d7d85"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-case-desktop-night.jpg",
+      "sha256": "34f3969af2a91c644e9f13be7cb1acbe162a9b1a39cad43b1bc1f9a41618819f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-case-phone-night.jpg",
+      "sha256": "fb935fb9f87c4226ee84f372ef1d86856d17974e187d8b8c2d746ad31278874e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-case-resolved-phone-night.jpg",
+      "sha256": "7d78e36b640503afa24ac31a0e448f0acb1439cf8ff643749eca720e4691f2f6"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-metrics-desktop-light.jpg",
+      "sha256": "d97c74aeb8bfe9093028d54005fbfaa076fe83ff3a630da731863e08a93306d1"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/ops-queue-desktop-light.jpg",
+      "sha256": "bada13b987d89e3d1819be698336ff77f675954b931e1710da31eb714ffd3c4d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/pr-merge-priority-current.json",
+      "sha256": "7e8ecb0d4e82d86f3e8a33021f0ed4e52bed28239f54f9a8dd4b044049bd0aa1"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/pr7-description.md",
+      "sha256": "887f5216c204bc0fb82c8e7b5af584d9193b11a68e1cb63b72ef4c403be6b17f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/pr7-launched-update.json",
+      "sha256": "2cc9a20847599a14495c2d67b9e2c76bc2c589b3b713f240299f9d0af44d4bb7"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/pr7-update-current.json",
+      "sha256": "f3d6aad9ea4b257938d8b41b61b74be3531eb2b6b8724c27cdaf20232c2bbfb0"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/preservation-post-account-switch.json",
+      "sha256": "2bbe04f12922fa7d473d370cf36e4bef6523f607cd8c3eedf521b7b58d41c54a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/preservation-post-wal.json",
+      "sha256": "bf71e157290651e8575709fccd9215596f302637c49c4138645b0dd969643318"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/privacy-progress-phone-light.jpeg",
+      "sha256": "6ceb57c2aa5b4344dae0ff3713837670dc9bb3fd05339965be56fe174cdd4fb5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/privacy-reauthenticated-stream-source-light.jpg",
+      "sha256": "904c6da30985092318ef09104a671f3194f8256625f098d5b5ce46d3706ac8f3"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/private-artifact-storage.json",
+      "sha256": "20c32ec8f1b581ad11ea4235cb31077b694dfd1a813e4492a3091052169078c0"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/proposal-publication-custody.json",
+      "sha256": "7abc5e58fef8e2b044edaa50210d577a058569bcc7c3ed956518d893b73015a7"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-account-switch.json",
+      "sha256": "6a090ad69668845dac29c0dd92ffd2f02d1e103c12d89527405c90adde73483e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-canonical-history-light.jpg",
+      "sha256": "4816b10afa67691fe5242c51f1fcd0909041b4b62d401fa26776ba294f51d836"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-corrected-drain-metrics-light.jpg",
+      "sha256": "d430ad622d1d1d9bd697f4dac197a12b5845ae3957564857bab97df47d87fc55"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-corrected-drain-metrics-light.txt",
+      "sha256": "cd0e073527ed7553272c4cd2ca08f617482c7bf2149451055ccb4380006cdc3a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-corrected-drain-recovered-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-corrected-drain.json",
+      "sha256": "d2995f71b38329f2c72edf28855aae6828a169e6d45a5893ec7bee6fa74de949"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-drain-before-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-drain-offline-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-drain-reconnected-light.jpg",
+      "sha256": "f45dc3e737837b6a92c0ded1d885b06cf063da9b6652dd2f61f5f808d81c4b52"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-drain-recovered-light.jpg",
+      "sha256": "b9b01309f62aa747a23990068befbf949873eaf11c9e754c1440d0fbd6122893"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-first-drain.json",
+      "sha256": "ddddb300dbd8caeb466bc50d6814750f6a2584a03ba8f03b25c639ec7d45a4a4"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-implementation.json",
+      "sha256": "d5b6ca8b423a2004b51dcd564ba31f63e5e6482d7cab29ab0defda4636acc5f2"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-metrics-first-light.jpg",
+      "sha256": "456dc3996b76d49762accf766963559d487f4d6ef2306ec6568fe8fab2899809"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-metrics-first.txt",
+      "sha256": "32f34f59c38b87929bfa88c16f2df8406b38cf922f5194a208de2be06ddf8c5b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-reconnect-metrics-light.jpg",
+      "sha256": "71b2077d60ddb09555830916ce04120952dc8648cf4945c62c5d729f7944f5e8"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-reconnect-metrics.txt",
+      "sha256": "39e7f308074fec9b96f9d5663bca20831483d5a5aa62412faee171ee5162bb8d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-reloaded-history-light.jpg",
+      "sha256": "4816b10afa67691fe5242c51f1fcd0909041b4b62d401fa26776ba294f51d836"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-report-retained-desktop.jpg",
+      "sha256": "102285756b0c3342ee17d4daac6cffc9d82469fda906112d783df6edff97ecc4"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-shutdown-source.json",
+      "sha256": "e984dc8a386aa209d2bfba6b46047120babf131420d67ee8519c2bb58bf3e94e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-switch-cleared-conversation-light.jpg",
+      "sha256": "d6549e3bcd80d96d4a60ea326c189479b07b05d127f813ff53e30b221f78e71d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-switch-closed-metrics-light.jpg",
+      "sha256": "3701a143a5a2f4e4dc63328524a0263e270d056128a77503e6d41b73abab4822"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/realtime-switch-closed-metrics.txt",
+      "sha256": "be7012f83291e8ed6c0038444cf5c7fc64117679bd3fa9399e5f7ae12be80377"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/recording-association-custody.json",
+      "sha256": "62d597b3080a9cc8a2f7a0ccd564fc724604edb2fce2a134aa193fd92d9c233f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/recovery-continuity.json",
+      "sha256": "e638cd173ed289d1d4a6a4422e58e758596e838321c0fd4dfe9d6f2b0dd8c856"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/runtime-realtime-continuity.json",
+      "sha256": "2156460e214333ded41100d3fd34b9795e866b867346665ff178d279affc0037"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/runtime-stream-continuity.json",
+      "sha256": "efabd3ce445e0490c64c8cca79a6b4579234c2ab63843d51e21437219f092244"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/status-phone-light.jpeg",
+      "sha256": "12205bf781717c22dbb13bd6dab2959287ed43568efca11df48e8193cc5a755f"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/support-other-account-private-reset.jpg",
+      "sha256": "e5caf90d94777143deee79b698bafb6bae5429cc3394790c8ea9395e9e4e4be5"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/trust-help-phone-light.jpeg",
+      "sha256": "8ded41da793c87b15e04599d44ae9e05fd2d7bc63e4639e342a4bd49f1cdca43"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/trust-image-current.json",
+      "sha256": "83ad52f054d39834302c380d5ba8496bd00568077b50780f07a498eaa1746e2d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/trust-image-d1b880d2a22d.json",
+      "sha256": "a248d9f629dd22f3b18aee3b3b192d2c22755a2f8303cb286941f84451f45589"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/trust-installed-d1b880d2a22d.cdx.json",
+      "sha256": "1de98e40360060b3c72708d2e1acc6bf67ed726d33b418fc8922f45fa1327205"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/trust-installed.cdx.json",
+      "sha256": "3181d824f33926d05cd69ef67fb1ebb8b12389fb9aa137dfd7ec71a1f9170fae"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/verification.json",
+      "sha256": "bd716c4a306903a2cdbe9d03706706c831ee60f699fdf373867e3f36fa26e2d6"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/w5-alias-custody.json",
+      "sha256": "7cd45ec3c25b1653d2d57d6781933db8272b188a335977d01a36ee5a40edf40b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-desktop-light-fixed-current.jpg",
+      "sha256": "b3b4877b0ba79bb0403af4e2e20673aa276a40f32456f9bb27dace7cfe48f4ce"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-desktop-light-fixed.png",
+      "sha256": "26af817b18dfa7138d48b313922d1725d58ee1cccb6dbbfe20e1d3747c33ffd3"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-light-fixed.png",
+      "sha256": "c0f4804724a3b53186dabdbb6b8b3f714878167f48bc0b677c18f939aceeefd1"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-light-fixed.txt",
+      "sha256": "ebe6dde248f973c03b4a947bb2d7e0fb6efc02f0c4170c6a228a75191d1ae720"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-night-fixed.png",
+      "sha256": "9f8d6d4e26547f19a6005d927c039d145121b2c7ba40357741ccc4a9660b750c"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-night-fixed.txt",
+      "sha256": "bb7b633588157fd84c2c87bc97d96428058edc5d1e1d9383e9d52ee3e0963a9e"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-night.png",
+      "sha256": "07ac1be71b5f9ce9da8164a750a440ac7ae7daa668290994969cac6e1378a06b"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-metrics-phone-night.txt",
+      "sha256": "4bdbc86ad9805ebd95e691c1bc85cfb84dc30783e07a88417d363a714472ed79"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-observer-live.json",
+      "sha256": "b7337cf32a36d378149504c1f092200e0c6fa670722e475cbff0fde5defe6048"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-observer-live.png",
+      "sha256": "6b00a7133ae6151bccf6373f730e30a5b4c6f18257e527f0d6d5b172abc08c38"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-observer-live.txt",
+      "sha256": "a0f02e091b0816f9b7f45d403ea4ecf00b0a4af0fa550ec863b8a50dfe3c9e57"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/wal-observer-source.json",
+      "sha256": "1392469b81a82352ca9a4e849958ac15c6777c9b8a396d55fd37af67a67be004"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/welcome-after-box-sizing-phone-light.jpg",
+      "sha256": "f6c71b70c8fb4bdae143c4156b1573f9ad461fa78b8f91bea72ac859410203a2"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/welcome-after-box-sizing-phone-night.jpg",
+      "sha256": "43c98fe01e1b9e9969f70b748b54d029ded0456570bb22cbbf44f67f0e064b4d"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/welcome-before-box-sizing-phone-light.jpg",
+      "sha256": "c4062af140a666f72084e39b8a73dc85bbbb1b9b46bd1d1be7d9ef1f9793b64a"
+    },
+    {
+      "path": "artifacts/workstreams/W8/takeover/20260930/welcome-overflow.json",
+      "sha256": "9c17bbbc8b652f0fdf3c10cd72f9cab542d7b07a02450fdbcf213a555b2e48ab"
+    },
+    {
+      "path": "docs/operations/W8-ci-fixture-proposal.md",
+      "sha256": "c52656a76ec9a8dafe2f820321e1ea109461af36bbb6f67406a89ae3e95683aa"
+    },
+    {
+      "path": "docs/operations/W8-ios-ui-selector-proposal.md",
+      "sha256": "b95d2d851765d9666d5e59d319444c87b280916b4b1f0231c93ea608a59cb3bf"
+    },
+    {
+      "path": "docs/operations/W8-privacy-streaming.md",
+      "sha256": "5233fb44fcb3c1bd7f0e74ccbe202c5a59dd358a9a6baa35d689201bdb25a0c2"
+    },
+    {
+      "path": "docs/operations/W8-release.md",
+      "sha256": "9160a8d34053a047d77d7c30c6eb65e256a5879be1c676893ba48b11401f1d2c"
+    },
+    {
+      "path": "docs/operations/W8-required-inputs.md",
+      "sha256": "50c9e4b4f98fd9a112811d3ddb537b514250107dc849928d2b088fece0c48b38"
+    },
+    {
+      "path": "docs/operations/W8-runbook.md",
+      "sha256": "47cee87ad2d4da17f433e65de59af3ec225e53eb30a1cb62a024b82a9eaf871e"
+    },
+    {
+      "path": "docs/workstreams/coordination/W8-contracts.md",
+      "sha256": "23ae6254e80b044203d48360779399f9526f6e296b3e1a9670c1f864fe53f087"
+    },
+    {
+      "path": "docs/workstreams/coordination/W8-next-allocations.md",
+      "sha256": "a54f84fa50272d1bbf8014a4111f07642ad7112ebb8dbd524449d1926d7f8988"
+    },
+    {
+      "path": "docs/workstreams/status/W8.md",
+      "sha256": "c1106ad93a075daa2f12d2ce9ce05aa6f0c8d6483b09665f73a1b3ab2a4890c8"
+    },
+    {
+      "path": "infra/containers/trust-sbom.mjs",
+      "sha256": "a0a9bbbbbd084a08adb5b3ab59df6b418c08a7e7904e88f9d1c643da1fa8a7d5"
+    },
+    {
+      "path": "infra/containers/trust.Dockerfile",
+      "sha256": "9763a3e986ee394cd02105eeb1224a1f35566699b04fe13f022c8704bb8bc82a"
+    },
+    {
+      "path": "infra/migrations.json",
+      "sha256": "781926308b5c4f4472ded45eefc867a3e77ac7f01453ca745198ff005e3d22c4"
+    }
+  ],
+  "checks": {
+    "backendBuild": "passed",
+    "productionWebBuild": "passed",
+    "restoredSourceLint": "passed",
+    "format": "passed",
+    "nativeSource": "unchanged by guard restoration; rebuilt native source remains as31cf9f4",
+    "freshHeadCI": "required after correction push"
+  },
+  "existingIsolationCheck": {
+    "pairs": 10000,
+    "threads": 1000,
+    "deadlineMs": 300000,
+    "observedStatements": 30000,
+    "reason": "Adopt actual main optimized locked thread/exclusion/provenance query, with explicit scoped predicates retained in each subquery; align existing statement observation without changing pair isolation assertions",
+    "fixture": "main existing fresh disposable database/registered migration bootstrap retained, no saved-cluster runtime password rotation"
+  },
+  "migrationCustody": "Original current main migration bytes and reserved_unapplied44-60 metadata restored; reserved0048 SHA matches current W2 SQL exactly; no DDL applied to saved runtime",
+  "releaseReady": false
+}
