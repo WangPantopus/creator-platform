@@ -131,11 +131,13 @@ object CommerceFanFeature {
         if (current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
         else when (screen) {
             "spending" -> {
-                CommerceText("Spending and time", "display-md"); CommerceText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), "spend-total"); CommerceText("Charged this calendar month", "caption")
+                CommerceText("Spending and time", "display-md"); CommerceText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), "spend-total"); CommerceText("Charged this UTC calendar month", "caption")
+                current.exposure?.month?.let { CommerceText("$it · UTC", "meta") }
                 val limit = current.limits.firstOrNull { it.currency == current.policy.currency }
                 CommercePanel {
                     CommerceRow("Current limit", limit?.let { if (it.explicit_none) "No limit" else commerceMoney(it.amount?.toLongOrNull() ?: 0, it.currency) } ?: "Choose before your first paid action")
                     CommerceRow("Held, not charged", commerceMoney(current.exposure?.held ?: 0, current.policy.currency))
+                    current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
                 SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, onSelect = { choice = it })

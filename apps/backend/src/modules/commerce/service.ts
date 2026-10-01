@@ -438,8 +438,14 @@ export class CommerceService {
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
     const totals = (
-      await client.query<{ captured: string; held: string }>(
-        `SELECT coalesce(sum(CASE WHEN kind='capture' THEN amount ELSE 0 END),0)::text AS captured FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'`,
+      await client.query<{ captured: string; refunded: string; month: string }>(
+        `SELECT coalesce(sum(amount) FILTER(WHERE kind='capture'),0)::text AS captured,
+         coalesce(sum(amount) FILTER(WHERE kind='refund'),0)::text AS refunded,
+         to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month
+         FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2
+         AND kind IN('capture','refund')
+         AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+         AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
         [fanId, currency],
       )
     ).rows[0]!;
@@ -478,11 +484,14 @@ export class CommerceService {
       BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
-      total <= BigInt(Number.MAX_SAFE_INTEGER),
+      total <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        BigInt(totals.refunded) <= BigInt(Number.MAX_SAFE_INTEGER),
       "balance_reconciliation_required",
       "This balance needs reconciliation before new spending.",
     );
     return {
+      month: totals.month,
+      refunded: Number(totals.refunded),
       captured: Number(totals.captured),
       held: Number(heldTotal),
       total: Number(total),

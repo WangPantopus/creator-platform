@@ -19,7 +19,7 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceStoreProduct(val productId:String,val basePlanId:String?=null)
 @Serializable data class CommerceTierCatalog(val apple:CommerceStoreProduct?=null,val google:CommerceStoreProduct?=null)
 @Serializable data class CommerceTier(val id:String,val creator_id:String,val name:String,val state:String="active",val catalog:CommerceTierCatalog)
-@Serializable data class CommerceExposure(val captured: Long, val held: Long, val total: Long, val currency: String)
+@Serializable data class CommerceExposure(val captured: Long, val held: Long, val total: Long, val currency: String, val refunded: Long? = null, val month: String? = null)
 @Serializable data class CommerceMode(val id: String, val creator_id: String, val title: String, val kind: String, val amount: String?, val public_amount: String?, val currency: String, val weekly_limit: Int, val used: Int, val reserved: Int, val delivery_hours: Int, val decision_hours: Int, val state: String, val shareable: Boolean, val version: Int)
 @Serializable data class CommerceLimit(val currency: String, val amount: String?, val explicit_none: Boolean, val pending_amount: String?, val effective_at: String?, val reminders_on: Boolean, val version: Int, val pending_none: Boolean? = null)
 @Serializable data class CommerceAllowance(val available: Int, val unit: String)

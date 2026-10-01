@@ -172,6 +172,7 @@ export async function createCommerceRuntime(input: {
     money,
     settlement,
     passPurchases,
+    poolJournal,
   );
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),

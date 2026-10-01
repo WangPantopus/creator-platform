@@ -575,6 +575,85 @@ public enum APICommercePaymentState: String, Codable, Sendable {
   case `failed` = "failed"
 }
 
+public struct APICommercePoolEarnings: Codable, Sendable {
+  public let `creatorId`: String
+  public let `cycle`: String
+  public let `observedAt`: String
+  public let `closesAt`: String
+  public let `fanCount`: Int
+  public let `slotCount`: Int
+  public let `historyLimited`: Bool
+  public let `postedCycles`: [APICommercePoolEarningsPostedCyclesItem]
+  public init(creatorId: String, cycle: String, observedAt: String, closesAt: String, fanCount: Int, slotCount: Int, historyLimited: Bool, postedCycles: [APICommercePoolEarningsPostedCyclesItem]) {
+    self.creatorId = creatorId
+    self.cycle = cycle
+    self.observedAt = observedAt
+    self.closesAt = closesAt
+    self.fanCount = fanCount
+    self.slotCount = slotCount
+    self.historyLimited = historyLimited
+    self.postedCycles = postedCycles
+  }
+}
+
+public struct APICommercePoolEarningsPostedCyclesItem: Codable, Sendable {
+  public let `cycle`: String
+  public let `currency`: String
+  public let `allocationMinor`: String
+  public let `transferredMinor`: String?
+  public let `reversedMinor`: String?
+  public let `slotSeconds`: String
+  public let `totalSlotSeconds`: String
+  public let `pendingEffects`: Int
+  public let `postedAt`: String
+  public init(cycle: String, currency: String, allocationMinor: String, transferredMinor: String? = nil, reversedMinor: String? = nil, slotSeconds: String, totalSlotSeconds: String, pendingEffects: Int, postedAt: String) {
+    self.cycle = cycle
+    self.currency = currency
+    self.allocationMinor = allocationMinor
+    self.transferredMinor = transferredMinor
+    self.reversedMinor = reversedMinor
+    self.slotSeconds = slotSeconds
+    self.totalSlotSeconds = totalSlotSeconds
+    self.pendingEffects = pendingEffects
+    self.postedAt = postedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `cycle`
+    case `currency`
+    case `allocationMinor`
+    case `transferredMinor`
+    case `reversedMinor`
+    case `slotSeconds`
+    case `totalSlotSeconds`
+    case `pendingEffects`
+    case `postedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.cycle = try container.decode(String.self, forKey: .cycle)
+    self.currency = try container.decode(String.self, forKey: .currency)
+    self.allocationMinor = try container.decode(String.self, forKey: .allocationMinor)
+    self.transferredMinor = try container.decode(String?.self, forKey: .transferredMinor)
+    self.reversedMinor = try container.decode(String?.self, forKey: .reversedMinor)
+    self.slotSeconds = try container.decode(String.self, forKey: .slotSeconds)
+    self.totalSlotSeconds = try container.decode(String.self, forKey: .totalSlotSeconds)
+    self.pendingEffects = try container.decode(Int.self, forKey: .pendingEffects)
+    self.postedAt = try container.decode(String.self, forKey: .postedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(cycle, forKey: .cycle)
+    try container.encode(currency, forKey: .currency)
+    try container.encode(allocationMinor, forKey: .allocationMinor)
+    try container.encode(transferredMinor, forKey: .transferredMinor)
+    try container.encode(reversedMinor, forKey: .reversedMinor)
+    try container.encode(slotSeconds, forKey: .slotSeconds)
+    try container.encode(totalSlotSeconds, forKey: .totalSlotSeconds)
+    try container.encode(pendingEffects, forKey: .pendingEffects)
+    try container.encode(postedAt, forKey: .postedAt)
+  }
+}
+
 public struct APICommerceReauthorizePacket: Codable, Sendable {
   public let `version`: Int
   public let `idempotencyKey`: String
