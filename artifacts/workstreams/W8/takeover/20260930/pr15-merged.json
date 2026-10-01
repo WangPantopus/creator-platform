@@ -1,0 +1,123 @@
+{
+  "observedAt": "2026-10-01T06:43:18.683717+00:00",
+  "pullRequest": {
+    "baseRefOid": "c70c3ae14cbae72cec2c7981eb6519d733850c26",
+    "headRefOid": "5d1adc831eac7501d322a93e9ce8f2901d3d6973",
+    "mergeCommit": {
+      "oid": "ad369bd5a0935c09da2687bf69a6a2d0f0a6da18"
+    },
+    "mergedAt": "2026-10-01T06:42:08Z",
+    "number": 15,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/15"
+  },
+  "mode": "normal merge, exact head match; no admin override",
+  "firstParent": "c70c3ae14cbae72cec2c7981eb6519d733850c26",
+  "mergedTree": "baa807af090f1993886c4feac1049b13021c7ec5",
+  "matchesPersonallyReviewedMergeTree": true,
+  "unchangedMainTrees": {
+    "apps/backend/src": true,
+    "apps/web": true,
+    "apps/ios": true,
+    "apps/android": true,
+    "packages": true,
+    "config": true,
+    "tests": true,
+    ".github": true,
+    "infra/migrations.json": true
+  },
+  "requiredChecks": "Authenticated main branch protected=false, rulesets=[] at merge observation; no configured required checks",
+  "observedChecksAfterMerge": [
+    {
+      "name": "web-and-backend",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108359/job/110252048389"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "IN_PROGRESS",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626380"
+    },
+    {
+      "name": "compile",
+      "status": "IN_PROGRESS",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108389/job/110252050501"
+    },
+    {
+      "name": "web-visual",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108359/job/110252048385"
+    },
+    {
+      "name": "web-visual",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626524"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108359/job/110252048369"
+    },
+    {
+      "name": "ios-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626559"
+    },
+    {
+      "name": "android-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108359/job/110252048194"
+    },
+    {
+      "name": "android-foundation",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626538"
+    },
+    {
+      "name": "android-runtime",
+      "status": "QUEUED",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36826108359/job/110252048387"
+    },
+    {
+      "name": "android-runtime",
+      "status": "IN_PROGRESS",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36825968523/job/110251626767"
+    }
+  ],
+  "acceptance": "w5-adoption-operator.json: actual preserved-backup/closed-restore/upgrade/fresh-reference/non-owner/unchanged-data and browser continuity. No unit or new native acceptance is inferred. Existing queued/running checks are not called green.",
+  "runtimeHealth": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "correlationId": "ef52ba0a-a510-4cd4-9c96-fb4d6b3c0c1f",
+      "release": null,
+      "alive": true,
+      "ready": null
+    },
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "correlationId": "f12fe02c-da40-4901-aae5-77ccab7fc3a6",
+      "release": "a3e15acc97145991cd8b84e3ddcecc0bfdb780a4",
+      "alive": null,
+      "ready": false
+    }
+  ],
+  "ownedCheckout": "codex/w8-trust-handoff retains reviewed5d1adc8 product source plus evidence continuation; live API remains a3e15ac. Peer native/test/reference trees were not imported into the preserved checkout.",
+  "limits": [
+    "Original W5 database not upgraded; source read-only backup and W8 closed clones only.",
+    "No global reserved migration activation, runtime restart, required-check removal, test/golden edit or paid call.",
+    "PR9 final reconciliation and combined app acceptance, and all original W8 release gates remain open."
+  ]
+}

@@ -46,7 +46,12 @@ export function createCommerceRouter(input: {
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
       payoutOnboardingAvailable:
         input.extended?.settlement?.onboardingConfigured ?? false,
-      poolEarningsAvailable: Boolean(input.extended?.poolJournal),
+      creatorEarningsAvailable:
+        input.service?.creatorFinancialReadAvailable ?? false,
+      poolEarningsAvailable: Boolean(
+        input.extended?.poolJournal &&
+          input.service?.creatorFinancialReadAvailable,
+      ),
     }),
   );
   router.get("/overview", async (req, res) => {
@@ -54,6 +59,10 @@ export function createCommerceRouter(input: {
     const value = await service().overview(
       actor,
       req.query.creatorId ? id(req.query.creatorId) : undefined,
+      {
+        creatorFinance:
+          req.query.creatorEarnings === "1" || req.query.poolEarnings === "1",
+      },
     );
     const poolCreator = req.query.creatorId
       ? id(req.query.creatorId)
@@ -86,7 +95,12 @@ export function createCommerceRouter(input: {
         membershipAvailable: input.extended?.billing?.configured ?? false,
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
-        poolEarningsAvailable: Boolean(input.extended?.poolJournal),
+        creatorEarningsAvailable:
+          input.service?.creatorFinancialReadAvailable ?? false,
+        poolEarningsAvailable: Boolean(
+          input.extended?.poolJournal &&
+            input.service?.creatorFinancialReadAvailable,
+        ),
         payoutOnboardingAvailable:
           input.extended?.settlement?.onboardingConfigured ?? false,
       },
