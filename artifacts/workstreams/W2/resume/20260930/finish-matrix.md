@@ -1,5 +1,7 @@
 # R01–R14 current finish matrix
 
+**Canonical admission/creator hold:** [Exact W3 contract and W2 consumer source](generation-admission-followup.md) journals on the actual held W3 client before provider I/O and keeps creator holds through memory until same-runtime `sealExecution`. It is not a terminal weighted generation receipt; W8 allocation, all-attempt/cache persistence and executionAttributed readiness remain pending. W5 approved Notes/public-answer context projection remains absent. All nine packages/R01–R14 are retained.
+
 **Evaluation disclosure accessibility:** [Actual keyboard source/receipt](evaluation-accessibility-followup.md) adds expanded/collapsed state, named transcript regions and keyboard toggling. Enter/Tab/focus were operated on the saved companion18 evaluation; full R12 accessibility/native/populated acceptance remains open.
 
 **Memory journal continuation:** [Current implementation and remaining receipt boundary](memory-journal-followup.md) adds pre-call durable memory extraction/sensitivity usage and current W3 authority checks; memory costs count toward the creator cap. W3 must adopt the required journal input and treat onUsage as diagnostic only. Generation receipts/cache columns still require W8 allocation and the same execution lease through memory/final seal. No weighted settlement readiness is claimed. On predecessor d2285ba, both root/backend and Android runtime jobs plus Trust pass; six native/visual contexts remain queued. Fresh final-head CI is required. All nine packages/R01–R14 and production gates are preserved.

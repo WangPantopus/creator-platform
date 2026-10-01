@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import { invariant } from "../../core/errors.js";
+import type { PoolClient } from "pg";
 export async function reserveCreatorCost(
   repository: AgentRepository,
   scope: CreatorScope,
@@ -61,15 +62,41 @@ export async function settleCreatorCost(
   model: string,
   versionHash: string,
 ) {
-  return repository.transaction(scope, async (client) => {
-    const settled = await client.query(
-      "UPDATE creator.ai_cost_hold SET state=$3 WHERE id=$1 AND creator_id=$2 AND state='held' RETURNING id",
-      [id, scope.creatorId, completed ? "settled" : "released"],
+  return repository.transaction(scope, (client) =>
+    settleCreatorCostInTransaction(
+      client,
+      scope,
+      id,
+      completed,
+      provider,
+      model,
+      versionHash,
+    ),
+  );
+}
+/** W3 supplies its existing final admission transaction after memory work. */
+export async function settleCreatorCostInTransaction(
+  client: PoolClient,
+  scope: CreatorScope,
+  id: string,
+  completed: boolean,
+  provider: string,
+  model: string,
+  versionHash: string,
+) {
+  // Serialize with reserveCreatorCost's workspace lock: a reservation must
+  // observe either the still-held ceiling or all usage before its release.
+  await client.query(
+    "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+    [scope.creatorId],
+  );
+  const settled = await client.query(
+    "UPDATE creator.ai_cost_hold SET state=$3 WHERE id=$1 AND creator_id=$2 AND state='held' RETURNING id",
+    [id, scope.creatorId, completed ? "settled" : "released"],
+  );
+  if (settled.rowCount && !completed)
+    await client.query(
+      "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,0,0,NULL,'provider_unknown',0)",
+      [scope.creatorId, versionHash, provider, model],
     );
-    if (settled.rowCount && !completed)
-      await client.query(
-        "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,$3,$4,0,0,NULL,'provider_unknown',0)",
-        [scope.creatorId, versionHash, provider, model],
-      );
-  });
 }

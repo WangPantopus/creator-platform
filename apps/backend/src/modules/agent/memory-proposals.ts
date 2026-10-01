@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { contentHash } from "../../core/canonical.js";
+import { invariant } from "../../core/errors.js";
+import type { PoolClient } from "pg";
 import type { AgentModel } from "./model.js";
 import type { ThreadSnapshot } from "./pipeline.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import type { AgentRepository } from "./repository.js";
-import { withProviderUsage } from "./provider-usage.js";
+import { withProviderUsage, type ProviderExecution } from "./provider-usage.js";
 
 const categories = [
   "health",
@@ -69,14 +71,33 @@ export async function proposeMemory(input: {
   journal: {
     repository: AgentRepository;
     versionHash: string;
+    execution?: ProviderExecution;
     /** W3 checks the current attempt, context revision and processor consent. */
     assertCurrent(): Promise<void>;
+    /** Current W2 delivered version/source/license/audience on W3's client. */
+    assertAdmission?(client: PoolClient): Promise<void>;
   };
   /** Diagnostic notification only; the W2 journal already persists each call. */
   onUsage?: (usage: Usage) => Promise<void>;
 }) {
   assertThreadScope(input.scope);
   if (input.snapshot.offTheRecord) return;
+  invariant(
+    !input.journal.execution || input.journal.assertAdmission,
+    "memory_admission_unconfigured",
+    "Memory provider admission requires current delivered-source authority.",
+  );
+  const admittedExecution: ProviderExecution | undefined = input.journal
+    .execution && {
+    generationId: input.journal.execution.generationId,
+    attemptId: input.journal.execution.attemptId,
+    admit: (journal) =>
+      input.journal.execution!.admit(async (client) => {
+        await input.journal.assertAdmission!(client);
+        return journal(client);
+      }),
+    sealAdmission: (journal) => input.journal.execution!.sealAdmission(journal),
+  };
   const current = async () => {
     input.signal.throwIfAborted();
     await input.journal.assertCurrent();
@@ -98,6 +119,7 @@ export async function proposeMemory(input: {
       "memory",
       input.signal,
       call,
+      admittedExecution,
     );
     await input.onUsage?.(result.usage);
     return result;
