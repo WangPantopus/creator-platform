@@ -1,0 +1,12 @@
+{
+  "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "382e193012a32d574d6d8850dfefb12ad40d8260ab01d4fb313c7d29d829dfd3",
+  "apps/backend/src/modules/commerce/router.ts": "936fde0ee9c4446c8a98f3a80c85ae750c1a40cb865c925018a5a0efcc2c5117",
+  "apps/ios/Sources/Generated/QelvoraAPI.swift": "b5809783f1199fd1ff72814ea62af9f27f5b869e2a414ef10fb5ff2689977d61",
+  "apps/web/app/api/commerce/[...path]/route.ts": "c6cfbbf188fba3944be77b28c8daae078b6c9d9fcbccc37e80f47b9734bb6ec9",
+  "apps/web/features/commerce/CommerceScreen.tsx": "b81fab032c7de9469798ad21dd2f3ba2540ce3a8592365f8bfbd9e5a66fceffb",
+  "packages/api/generated/openapi.json": "ee696b155b4a4a0137b4c2b0cdafce721bdc0479d758819991d941dca8fd521d",
+  "packages/api/src/commerce/contracts.ts": "1c3ed865b3bef761e6b15002b2df527ec2025d800f62193ab71cee8930841e37",
+  "packages/api/src/openapi.ts": "96f90cdaee58348bc9918a6482072d8a758da6be147db6ed693293e87cf60927",
+  "apps/backend/src/modules/commerce/creator-earnings.ts": "91da22083ceb6f74f10a058bb20a99fc20c3d8901673068cb5692bb9a31c8497",
+  "apps/web/features/commerce/CreatorEarnings.tsx": "7cd7995283ad76775bf80f7b4e11b684836103cd3cee60a1953e5068885d5bb7"
+}

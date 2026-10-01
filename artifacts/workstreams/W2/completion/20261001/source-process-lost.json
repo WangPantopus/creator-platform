@@ -1,0 +1,39 @@
+{
+  "jobs": [
+    {
+      "id": "b120f860-4c33-42d4-9a10-e43ec0767aa8",
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:42:44.384075+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 1
+    },
+    {
+      "id": "eb9157b6-ef7d-4965-a056-f406b1c4a1c9",
+      "state": "completed",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:45:06.554166+00:00",
+      "leaseUntil": null,
+      "sourceRevision": 2
+    },
+    {
+      "id": "a627e482-5936-4cce-ad3a-41ecebcd7f01",
+      "state": "running",
+      "attempts": 1,
+      "createdAt": "2026-10-01T12:50:17.289084+00:00",
+      "leaseUntil": "2026-10-01T12:54:08.73388+00:00",
+      "sourceRevision": 3
+    }
+  ],
+  "chunks": 0,
+  "source": {
+    "id": "8c97be4b-d47d-4c78-9159-8fc4976da5a3",
+    "hash": "5f750a6f07b255a0a18a266056be0b7609875d044233bc9117bcf0acbd502c59",
+    "state": "processing",
+    "progress": 33,
+    "revision": 3,
+    "indexState": "pending",
+    "textLength": 237599
+  },
+  "capturedAt": "2026-10-01T12:57:16.589965+00:00"
+}

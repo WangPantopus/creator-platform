@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-01T11:28:56.396255+00:00",
+  "baseline": "817940d32fdec5c16167ff52b1b6a7e11a9d10f6",
+  "branch": "codex/w4-payout-compensation-20261001",
+  "scope": "Guarded original payout/pool compensation source; no genuine provider acceptance.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "api": 4104,
+    "web": 3004,
+    "database": "creator_w4",
+    "reviewDatabase": "creator_w4_sql_review",
+    "identity": "canonical development fan w4_local_fan",
+    "providerMode": "unconfigured; no provider writes",
+    "viewport": "1280x900",
+    "themes": [
+      "Light",
+      "Night"
+    ]
+  },
+  "checks": {
+    "backendBuild": "passed",
+    "workspaceTypechecks": "7 passed",
+    "scopedEslint": "passed",
+    "scopedPrettier": "passed",
+    "completeDDL": "compiled in disposable review transaction then rolled back;40 canonical entries and both proposed relations absent",
+    "apiRestart": "compiled shipping server restarted successfully; health200 ready:false",
+    "actualBrowser": "Existing fan refreshed Earnings after API restart and saw creator-access-required in both themes. Screenshots personally inspected."
+  },
+  "preservedFailures": [
+    "Initial unused legacy reversal parameters failed lint; removed and final lint passed.",
+    "Initial review command used wrong configuration variable and attempted default5432; corrected variable connected only to approved review DB."
+  ],
+  "migration": {
+    "state": "unallocated/unregistered/unapplied/inactive",
+    "sourceSha256": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd",
+    "registryOrAppliedBytesChanged": false
+  },
+  "limitations": [
+    "No Stripe credentials, reviewed cash policy or genuine verified creator/passkey is available.",
+    "No positive payout/partial reversal/crash/aged provider acceptance claimed.",
+    "Native input unavailable; native financial/store/a11y acceptance remains unverified.",
+    "Current-purpose W8 restricted-creator recovery issuer remains external.",
+    "DDL rehearsal is not migration installation or money verification.",
+    "No new tests/cases/automated journey scripts/assertion/reference edits."
+  ],
+  "sourceHashes": "source-sha256.json",
+  "buildHashes": "build-sha256.json",
+  "databaseDiagnostics": "database-diagnostics.json",
+  "ddlEvidence": "ddl-review-rollback.json",
+  "ready": "readiness.json"
+}
