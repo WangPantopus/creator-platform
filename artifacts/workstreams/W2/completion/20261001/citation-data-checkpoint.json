@@ -1,0 +1,53 @@
+{
+  "sources": 124,
+  "versions": 105,
+  "usageRows": 865,
+  "capturedAt": "2026-10-01T12:17:31.782443+00:00",
+  "migrations": 40,
+  "workspaces": [
+    {
+      "mode": "expert",
+      "paused": true,
+      "revision": 17,
+      "creatorId": "20000000-0000-4000-8000-000000000003",
+      "deletedAt": null,
+      "liveVersionId": null
+    },
+    {
+      "mode": "companion",
+      "paused": true,
+      "revision": 19,
+      "creatorId": "20000000-0000-4000-8000-000000000002",
+      "deletedAt": null,
+      "liveVersionId": null
+    }
+  ],
+  "evaluations": 24,
+  "expertPreview": [
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "createdAt": "2026-10-01T12:15:11.643279+00:00",
+      "costMicros": 296
+    },
+    {
+      "model": "gpt-4.1-2025-04-14",
+      "createdAt": "2026-10-01T12:15:10.598068+00:00",
+      "costMicros": 2234
+    },
+    {
+      "model": "text-embedding-3-small",
+      "createdAt": "2026-10-01T12:15:10.172771+00:00",
+      "costMicros": 1
+    },
+    {
+      "model": "gpt-4.1-mini-2025-04-14",
+      "createdAt": "2026-10-01T12:15:09.031527+00:00",
+      "costMicros": 94
+    }
+  ],
+  "usageSinceLastCheckpoint": {
+    "knownRows": 109,
+    "unknownRows": 1,
+    "knownCostMicros": 60943
+  }
+}
