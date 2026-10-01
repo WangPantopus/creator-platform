@@ -1,0 +1,77 @@
+{
+  "applicationCommit": "58998384567cf53aa6c4758dd54a736a6d7fcacf",
+  "base": "107c8eb756e8391fb32840647e52d22d3234583a",
+  "states": [
+    {
+      "height": 844,
+      "label": "Draft · not signed or sent",
+      "phase": "initial-corrected-390-light",
+      "scrollWidth": 390,
+      "signedMarker": false,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.",
+      "theme": "light",
+      "whiteSpace": "pre-wrap",
+      "width": 390,
+      "wrap": "anywhere"
+    },
+    {
+      "height": 844,
+      "label": "Draft · not signed or sent",
+      "phase": "saved-multiline-390-light",
+      "scrollWidth": 390,
+      "signedMarker": false,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nDraft attribution check: line breaks stay visible.\nLongDraftWordForWrappingWithoutClaimingSignatureOrPublicationLongDraftWordForWrappingWithoutClaimingSignatureOrPublication",
+      "theme": "light",
+      "whiteSpace": "pre-wrap",
+      "width": 390,
+      "wrap": "anywhere"
+    },
+    {
+      "height": 844,
+      "label": "Draft · not signed or sent",
+      "phase": "reloaded-saved-multiline-390-night",
+      "scrollWidth": 390,
+      "signedMarker": false,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nDraft attribution check: line breaks stay visible.\nLongDraftWordForWrappingWithoutClaimingSignatureOrPublicationLongDraftWordForWrappingWithoutClaimingSignatureOrPublication",
+      "theme": "night",
+      "whiteSpace": "pre-wrap",
+      "width": 390,
+      "wrap": "anywhere"
+    },
+    {
+      "height": 720,
+      "label": "Draft · not signed or sent",
+      "phase": "reloaded-saved-multiline-1280-light",
+      "scrollWidth": 1280,
+      "signedMarker": false,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nDraft attribution check: line breaks stay visible.\nLongDraftWordForWrappingWithoutClaimingSignatureOrPublicationLongDraftWordForWrappingWithoutClaimingSignatureOrPublication",
+      "theme": "light",
+      "whiteSpace": "pre-wrap",
+      "width": 1280,
+      "wrap": "anywhere"
+    },
+    {
+      "height": 720,
+      "label": "Draft · not signed or sent",
+      "phase": "reloaded-saved-multiline-1280-night",
+      "scrollWidth": 1280,
+      "signedMarker": false,
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover.\n\nDraft attribution check: line breaks stay visible.\nLongDraftWordForWrappingWithoutClaimingSignatureOrPublicationLongDraftWordForWrappingWithoutClaimingSignatureOrPublication",
+      "theme": "night",
+      "whiteSpace": "pre-wrap",
+      "width": 1280,
+      "wrap": "anywhere"
+    },
+    {
+      "phase": "keyboard-edit-revision-13",
+      "text": ""
+    },
+    {
+      "phase": "restored-original-revision-15-after-reload",
+      "revision": "SAVED · REVISION 15",
+      "text": "W5 recovery check. Unsaved words remain available after the connection and current role recover."
+    }
+  ],
+  "originalRestored": true,
+  "loadingRace": "Revision 13 loaded after the editor became visible and overwrote an attempted restoration. Revision 14 retained multiline content. Waited for loaded revision 14, restored and saved revision 15, then reloaded and verified original text. This existing Compose loading race is separately open; no signing or publication was performed."
+}
