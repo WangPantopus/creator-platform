@@ -751,16 +751,18 @@ data class APICallAvailabilityWindowsItem(
   val `endsAt`: String
 )
 
+typealias APICallAvailabilityView = APICallAvailabilityViewValue?
+
 @Serializable
-data class APICallAvailabilityView(
+data class APICallAvailabilityViewValue(
   val `creatorId`: String,
   val `version`: Long,
   val `timeZone`: String,
-  val `windows`: List<APICallAvailabilityViewWindowsItem>
+  val `windows`: List<APICallAvailabilityViewValueWindowsItem>
 )
 
 @Serializable
-data class APICallAvailabilityViewWindowsItem(
+data class APICallAvailabilityViewValueWindowsItem(
   val `startsAt`: String,
   val `endsAt`: String
 )
@@ -1636,21 +1638,26 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
 }
 
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
+data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
 class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
-  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean): String = withContext(Dispatchers.IO) {
-    val connection = URL(baseURL.trimEnd('/') + path).openConnection() as HttpURLConnection
+  private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
+    requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
+  private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
+    val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
+    val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
     try {
       connection.requestMethod = method
       connection.connectTimeout = 15000; connection.readTimeout = 30000
-      connection.setRequestProperty("Accept", "application/json")
+      connection.setRequestProperty("Accept", accept)
+      headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.bufferedWriter().use { it.write(body) } }
+      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() } ?: ""
-      if (status !in 200..299) throw CreatorAPIError(status, payload)
-      payload
+      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { it.readBytes() } ?: byteArrayOf()
+      if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
+      CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
     } finally { connection.disconnect() }
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
@@ -1685,6 +1692,19 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorCallAvailability(creatorId: String): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true))
+  suspend fun saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true))
+  suspend fun beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun revokeCreatorMedia(creatorId: String, assetId: String): APIMediaMediaRevocation = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "DELETE", authenticated = true))
+  suspend fun resumeCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/resume", "POST", authenticated = true))
+  suspend fun uploadCreatorMediaChunk(creatorId: String, assetId: String, ticket: String, uploadOffset: Long, body: ByteArray): APIMediaCreatorMediaAsset = json.decodeFromString(requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/upload", "PUT", body = body, authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Upload-Offset" to uploadOffset.toString()).mapNotNull { (name, value) -> value?.let { name to it } }.toMap(), accept = "application/json").body.toString(Charsets.UTF_8))
+  suspend fun finishCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/finish", "POST", authenticated = true))
+  suspend fun creatorMediaPlayback(creatorId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
+  suspend fun readFanCreatorMedia(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}", "GET", authenticated = true))
+  suspend fun fanCreatorMediaPlayback(creatorId: String, fanId: String, assetId: String): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/playback", "POST", authenticated = true))
+  suspend fun playFanCreatorMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/creator-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket), headers = listOf("Range" to range).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
 }
 
 object ApplicationDestination {

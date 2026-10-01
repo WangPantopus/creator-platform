@@ -5,7 +5,8 @@
   "initialRevision": "d52e449",
   "consumedProducers": {
     "creatorScope": "2557d46072db50419cb340cf4fe9d87e4dd4853c",
-    "creatorTransaction": "abf6543c8480a2d8cb378e2ba1a162f6293ae65c"
+    "creatorTransaction": "abf6543c8480a2d8cb378e2ba1a162f6293ae65c",
+    "mediaTransport": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564"
   },
   "sourceSHA256": {
     "apps/backend/src/modules/media/ai-audio.ts": "b1ee612b6254dd27460612026a9832af59490e44f69fb76592a984a54811b335",
@@ -58,8 +59,8 @@
     "iosFoundation": "queued",
     "iosReviewAvailable": false
   },
-  "creatorMigration": "unallocated/unapplied",
-  "availabilityMigration": "unallocated/unapplied",
+  "creatorMigration": "0047 reserved_unapplied; inactive, review pending",
+  "availabilityMigration": "0046 reserved_unapplied; inactive",
   "capabilities": {
     "media": false,
     "calls": false,
@@ -110,6 +111,31 @@
       "failures": 0,
       "runnerDurationMs": 657
     },
+    "functionalAcceptance": false,
+    "sourceRevision": "49e90549f2161cc7a90047b00f9370016ffb6ec4"
+  },
+  "canonicalOwnerIntegration": {
+    "recordedAt": "2026-10-01T00:08:39.319038+00:00",
+    "producer": "dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564",
+    "operations": 44,
+    "generationConsistency": "passed",
+    "backendProductionBuildLintFormat": "passed",
+    "webTypecheck": "passed",
+    "swiftLibraryDurationSeconds": 14.13,
+    "existingResourceTests": {
+      "tests": 2,
+      "failures": 0
+    },
     "functionalAcceptance": false
+  },
+  "migrationReservations": {
+    "producer": "3e1a42fbce377614156fdb37571c0e48a81efc99",
+    "availabilityVersion": "0046_w6_call_availability",
+    "creatorMediaVersion": "0047_w6_creator_media",
+    "state": "reserved_unapplied",
+    "activeOrApplied": false,
+    "availabilitySourceSHA256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
+    "creatorMediaReviewSourceRevision": "fcae41c691ce2d1d02cc4625a4d55a8cc1e0e52a",
+    "creatorMediaReviewSourceSHA256": "f3e3dfad8835c7448683408f92b6e090a880a9f0873ca38c5b0e05a72e3130f5"
   }
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { publicSchemas } from "./schemas.ts";
+import { mediaPaths } from "./media-openapi.ts";
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const json = (name: string) => ({ "application/json": { schema: ref(name) } });
@@ -209,6 +210,7 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      ...mediaPaths,
     },
     components: {
       securitySchemes: {

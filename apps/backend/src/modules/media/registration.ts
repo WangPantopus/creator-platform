@@ -5,6 +5,14 @@ import { createW6Router, type W6RouterDependencies } from "./router.js";
 export function mediaFeature(
   services: Omit<W6RouterDependencies, "scopeFor" | "creatorScopeFor">,
 ): FeatureRegistration {
+  if (
+    services.creatorMedia &&
+    services.availability?.identity &&
+    services.creatorMedia.identity !== services.availability.identity
+  )
+    throw new Error(
+      "Creator media and availability require the same identity issuer.",
+    );
   return {
     name: "media",
     path: "/v1/w6",

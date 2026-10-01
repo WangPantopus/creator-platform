@@ -998,12 +998,14 @@ public struct APICallAvailabilityWindowsItem: Codable, Sendable {
   }
 }
 
-public struct APICallAvailabilityView: Codable, Sendable {
+public typealias APICallAvailabilityView = APICallAvailabilityViewValue?
+
+public struct APICallAvailabilityViewValue: Codable, Sendable {
   public let `creatorId`: String
   public let `version`: Int
   public let `timeZone`: String
-  public let `windows`: [APICallAvailabilityViewWindowsItem]
-  public init(creatorId: String, version: Int, timeZone: String, windows: [APICallAvailabilityViewWindowsItem]) {
+  public let `windows`: [APICallAvailabilityViewValueWindowsItem]
+  public init(creatorId: String, version: Int, timeZone: String, windows: [APICallAvailabilityViewValueWindowsItem]) {
     self.creatorId = creatorId
     self.version = version
     self.timeZone = timeZone
@@ -1011,7 +1013,7 @@ public struct APICallAvailabilityView: Codable, Sendable {
   }
 }
 
-public struct APICallAvailabilityViewWindowsItem: Codable, Sendable {
+public struct APICallAvailabilityViewValueWindowsItem: Codable, Sendable {
   public let `startsAt`: String
   public let `endsAt`: String
   public init(startsAt: String, endsAt: String) {
@@ -2141,24 +2143,41 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
 }
 
 public struct CreatorAPIError: Error, Sendable { public let status: Int; public let body: Data }
+public struct CreatorAPIBinaryResponse: Sendable {
+  public let body: Data
+  public let status: Int
+  public let contentType: String?
+  public let contentRange: String?
+  public let acceptRanges: String?
+}
 
 public actor CreatorAPIClient {
   private let baseURL: URL
   private let session: URLSession
   private let token: @Sendable () async throws -> String?
   public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }
-  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool) async throws -> Response {
+  private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
+    let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
+    return try JSONDecoder().decode(Response.self, from: response.body)
+  }
+  private func requestBytes(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], accept: String = "application/octet-stream", contentType: String = "application/octet-stream") async throws -> CreatorAPIBinaryResponse {
     guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }
     url.percentEncodedPath = path
-    var request = URLRequest(url: url.url!)
+    if !query.isEmpty {
+      let encodedQuery = query.compactMap { item in item.value.map { segment(item.name) + "=" + segment($0) } }.joined(separator: "&")
+      url.percentEncodedQuery = encodedQuery.isEmpty ? nil : encodedQuery
+    }
+    guard let target = url.url else { throw URLError(.badURL) }
+    var request = URLRequest(url: target)
     request.httpMethod = method; request.httpBody = body
-    request.setValue("application/json", forHTTPHeaderField: "Accept")
-    if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+    request.setValue(accept, forHTTPHeaderField: "Accept")
+    if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
+    for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
     let (data, response) = try await session.data(for: request)
     guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
     guard (200..<300).contains(response.statusCode) else { throw CreatorAPIError(status: response.statusCode, body: data) }
-    return try JSONDecoder().decode(Response.self, from: data)
+    return CreatorAPIBinaryResponse(body: data, status: response.statusCode, contentType: response.value(forHTTPHeaderField: "Content-Type"), contentRange: response.value(forHTTPHeaderField: "Content-Range"), acceptRanges: response.value(forHTTPHeaderField: "Accept-Ranges"))
   }
   private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }
   public func health() async throws -> APIHealth {
@@ -2253,6 +2272,45 @@ public actor CreatorAPIClient {
   }
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)
+  }
+  public func saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand) async throws -> APICallAvailability {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "PUT", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest) async throws -> APIMediaCreatorMediaUploadTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))", method: "GET", authenticated: true)
+  }
+  public func revokeCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaMediaRevocation {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))", method: "DELETE", authenticated: true)
+  }
+  public func resumeCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaUploadTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))/resume", method: "POST", authenticated: true)
+  }
+  public func uploadCreatorMediaChunk(creatorId: String, assetId: String, ticket: String, uploadOffset: Int, body: Data) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))/upload", method: "PUT", body: body, authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Upload-Offset": String(uploadOffset)].compactMapValues { $0 }, contentType: "application/octet-stream")
+  }
+  public func finishCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))/finish", method: "POST", authenticated: true)
+  }
+  public func creatorMediaPlayback(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaPlaybackTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))/playback", method: "POST", authenticated: true)
+  }
+  public func playCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Range": range].compactMapValues { $0 })
+  }
+  public func readFanCreatorMedia(creatorId: String, fanId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/creator-media/\(segment(assetId))", method: "GET", authenticated: true)
+  }
+  public func fanCreatorMediaPlayback(creatorId: String, fanId: String, assetId: String) async throws -> APIMediaCreatorMediaPlaybackTicket {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/creator-media/\(segment(assetId))/playback", method: "POST", authenticated: true)
+  }
+  public func playFanCreatorMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/creator-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Range": range].compactMapValues { $0 })
   }
 }
 

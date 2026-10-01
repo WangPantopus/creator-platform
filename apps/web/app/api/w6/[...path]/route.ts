@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { platformFetch } from "../../../../lib/session";
+import { sameRequestOrigin } from "../../../../lib/request-origin";
 export const dynamic = "force-dynamic";
 /** Same-origin cookie bridge: target paths are fixed to W6 and ticket URLs never redirect. */
 async function proxy(
@@ -16,10 +17,7 @@ async function proxy(
       { error: { message: "This media route is unavailable." } },
       { status: 400 },
     );
-  if (
-    !["GET", "HEAD"].includes(request.method) &&
-    request.headers.get("origin") !== request.nextUrl.origin
-  )
+  if (!["GET", "HEAD"].includes(request.method) && !sameRequestOrigin(request))
     return Response.json(
       { error: { message: "Open this action from the app." } },
       { status: 403 },
