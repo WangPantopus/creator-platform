@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — generation efficiency
+
+Canonical generators now retain unchanged output bytes and modification times, avoiding unnecessary native recompilation after small shared changes. Actual generation/check compared all 15 output files: zero byte or timestamp changes. API types, affected lint/format and both original shared/rename checks pass; no new tests or generated-source edits. [Evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-generation/run.md). No build-speed or broader acceptance claim.
+
 ## October 1 — authorship practice keyboard recovery
 
 Personally operated four keyboard answers and observed focus fall to the page on completion. The web repair moves focus to Restart only when the completed answer owned focus and focus has not moved to another control. Light 4/4 and Night/reduced-motion 1/4 both recover focus; Restart resets card/score and Tab returns to answers. [Evidence and exact source/build hashes](../../../artifacts/workstreams/W1/resume/2026-10-01-comprehension/run.md). Production web build, typecheck and affected lint/formatting pass. Cards, author labels, score semantics and original references are preserved. This closes the observed browser focus defect only; H15's full visual/accessibility matrix and H16's consented-participant study remain open.

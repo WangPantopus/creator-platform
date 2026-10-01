@@ -357,7 +357,10 @@ for (const [name, content] of outputs) {
       console.error(`Generated file is stale: ${name}`);
       mismatches++;
     }
-  } else {
+  } else if (
+    !fs.existsSync(target) ||
+    fs.readFileSync(target, "utf8") !== content
+  ) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, content);
   }
