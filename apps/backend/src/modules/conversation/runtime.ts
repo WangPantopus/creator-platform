@@ -70,10 +70,9 @@ export function createConversationRuntime(input: {
     input.policy,
     Boolean(
       generator &&
-        (input.allowance ||
-          (input.generationAllowanceAvailable &&
-            generator.executionAttributed &&
-            generator.seal)) &&
+        generator.executionAttributed &&
+        generator.seal &&
+        (input.allowance || input.generationAllowanceAvailable) &&
         input.citation &&
         input.assertReady &&
         input.assertApproved &&

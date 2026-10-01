@@ -1,0 +1,91 @@
+{
+  "predecessor": "7f5f63d8a78a3114933dc420a4a4ea2c9312b87c",
+  "scope": "increment12 intentional source checkpoint; unapplied SQL is a producer proposal, not acceptance",
+  "producers": {
+    "W2MemoryJournal": "e3ea1480a477d18b76a018d955ebf3fa310adcf0",
+    "W2ExecutionAndCapHold": "741d8ddf1c04f28299b9684e4ea15113c4c6ab81",
+    "W2CapturedAdmission": "954b53a471eeca0be27f6cf8693bd742c91e477f"
+  },
+  "files": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "gitBlob": "e61db8eef46e008ac511f633ad4748baa1d4a784",
+      "sha256": "0cc39c4048db5b48dccaa00ae395d4217cc4a5f62c8e8af827e1086f75e4c24e"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/budget.ts",
+      "gitBlob": "7775c47f573498275cd331a4d8f34621b35111fb",
+      "sha256": "c26cf6c0d97d764e0497b08bd9207c2d0bb488a2f1b0058954f220cbc6f9fa70"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/delivery-authority.ts",
+      "gitBlob": "6664b3e6a82481ff8b42c55566c2017dbb36b8b2",
+      "sha256": "268c240fca05445faaae710aa9ee90ba014c87a6135e6eecdfcf23060db666fe"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/memory-proposals.ts",
+      "gitBlob": "03eb92cd344826f90012c91ed65db9b06811a025",
+      "sha256": "1615b075b33b34f8a6378f69051ea6dbc24e3063b2b8b700b590d5bb0859fce8"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/pipeline.ts",
+      "gitBlob": "0fa10be928144915b527fae67f1a55f1fa5d3c6c",
+      "sha256": "9af5e6e480040a7bdeb5cb25798264814eaaa5c3d1c0b323168d775c5270973c"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/provider-usage.ts",
+      "gitBlob": "caee09a01a42df1c21208f5e10301d052daad674",
+      "sha256": "9658a23a38de1498d448f8efd405b1973d5787663193da1d9ae5c75b4c74ac05"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "gitBlob": "cdaf3a8cd5cb7cc591356a8e5d19c91e93a96e85",
+      "sha256": "72aa0e0cd0e9f4bc9c09d9a51a13bf24d427387e3caf44fbe9994a9fdbb3997d"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/approved-generator.ts",
+      "gitBlob": "e6e397d4a83824ada218bf281d43fe376ee88084",
+      "sha256": "31a09102596b7516e9fa3242018b883fedad780605114083a32f1ab15dfb20e3"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "gitBlob": "70265e46843adf657b398d1a874f4e59e5f215b6",
+      "sha256": "fc42185a8225fd1b0a0ab6c0e9239555d32085e163e7321b63f32bbaae36ed14"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "gitBlob": "5680865568cfabf7610c3db8d3e3b3b8a6a81c52",
+      "sha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/privacy.ts",
+      "gitBlob": "5a4f5bc4ee14940220d827afaafc4b9c6b2af35e",
+      "sha256": "86dda869e2171b28e34f61c7c3eceb7679681af505a475ccc6ca3dd8355d80e6"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "gitBlob": "dc17c38a01067e307cad113c9f8e1b4ffd9644fe",
+      "sha256": "44a5e9d5d24f97969d08e81927dcf56997c4a68d9427f0572ac7a28ad7d6ba48"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "gitBlob": "e47fbdaf8fb7fa90c6f48eb8eb3970a110f04d13",
+      "sha256": "424fb6efbd019972a82d98f9d27bb7bec984da12f3d71302a86c0fc1937c4975"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "gitBlob": "1f9e4dd21176291d526f0390f5ddc1e87ec9d264",
+      "sha256": "680dc2add352069b18251dfe3cadf62ef621ffe6c0d38b561e3fc9ad89c8811d"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "gitBlob": "681c5ddd146efd3767e5bf4256ec46d89758c8f2",
+      "sha256": "dce2fe2972f2f38e4149b227d3f268b558b7a6c954a2d83e94484ab359bbf086"
+    },
+    {
+      "path": "packages/api/src/schemas.ts",
+      "gitBlob": "12ccc1f94d9a5f2b4a7c9f6b21c91941682eb421",
+      "sha256": "d082bed889bfafe2474ed40b01a4028296b3ad9880de717b1221b272aac9f976"
+    }
+  ]
+}

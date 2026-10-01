@@ -9,6 +9,7 @@ import { nearestStyleExamples } from "./style-index.js";
 import {
   withProviderUsage,
   withProviderStreamUsage,
+  type ProviderExecution,
 } from "./provider-usage.js";
 import { AgentRepository, event, type CreatorScope } from "./repository.js";
 import {
@@ -251,6 +252,8 @@ export class AgentPipeline {
       active: boolean;
     }[];
     signal: AbortSignal;
+    /** W3's current durable attempt commits each provider admission. */
+    execution?: ProviderExecution;
     usageCategory?: "reply" | "preview" | "evaluation" | "shadow";
     /** Only creator-owned synthetic previews/evaluations request withheld text. */
     includeDiagnostics?: boolean;
@@ -287,6 +290,7 @@ export class AgentPipeline {
         input.usageCategory ?? "preview",
         input.signal,
         call,
+        input.execution,
       );
       usage.push(result.usage);
       providerCallPending = false;
@@ -469,6 +473,7 @@ export class AgentPipeline {
             route,
             input.signal,
           ),
+        input.execution,
       );
       const sentences: { text: string; citations: string[] }[] = [];
       let blocked = false;

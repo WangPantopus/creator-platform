@@ -132,7 +132,7 @@ export function conversationPrivacyHook(input: {
           if (job.kind === "export") {
             const messages = (
               await client.query(
-                `SELECT id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt" FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence LIMIT 2001`,
+                `SELECT id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",author_account_id AS "authorAccountId",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt" FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence LIMIT 2001`,
                 pair,
               )
             ).rows;
@@ -322,7 +322,7 @@ export function conversationPrivacyHook(input: {
               pair,
             );
           await client.query(
-            "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','takeover','handback','pause') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
+            "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','humanReply','team_reply','takeover','handback','pause','control:human_active','control:ai_active','control:ai_paused') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
             [family.threadId],
           );
           for (const record of keep)

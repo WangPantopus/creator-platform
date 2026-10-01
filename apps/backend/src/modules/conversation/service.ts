@@ -47,6 +47,8 @@ type MessageRow = {
   control_epoch: number;
   sequence: number;
   signed_act_id: string | null;
+  author_account_id: string | null;
+  team_member: string | null;
 };
 type GenerationRow = {
   id: string;
@@ -70,6 +72,8 @@ function message(row: MessageRow): Message {
     controlEpoch: row.control_epoch,
     sequence: row.sequence,
     signedActId: row.signed_act_id,
+    member: row.team_member ?? null,
+    authorAccountId: row.author_account_id ?? null,
   };
 }
 
@@ -1055,8 +1059,11 @@ export class ConversationService {
               thread.control_epoch,
               "delivered",
             );
-            await client.query(
-              "UPDATE creator.message SET team_member=$5 WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='team' AND author_account_id=$6",
+            const labelled = await client.query<{
+              team_member: string;
+              author_account_id: string;
+            }>(
+              "UPDATE creator.message SET team_member=$5 WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='team' AND author_account_id=$6 RETURNING team_member,author_account_id",
               [
                 scope.threadId,
                 scope.creatorId,
@@ -1065,6 +1072,11 @@ export class ConversationService {
                 `@${profile.rows[0].handle} · triage`,
                 scope.actorAccountId,
               ],
+            );
+            invariant(
+              labelled.rowCount === 1,
+              "team_reply_unavailable",
+              "Current team attribution is required.",
             );
             await appendFrame(client, scope, {
               epoch: thread.control_epoch,
@@ -1075,7 +1087,11 @@ export class ConversationService {
               generationId: null,
               sequence: 0,
             });
-            return output;
+            return {
+              ...output,
+              member: labelled.rows[0]!.team_member,
+              authorAccountId: labelled.rows[0]!.author_account_id,
+            };
           },
         ),
       "write",

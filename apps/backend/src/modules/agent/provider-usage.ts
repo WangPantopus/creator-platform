@@ -2,6 +2,16 @@ import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import type { AgentModel } from "./model.js";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { StreamProposal } from "./streaming.js";
+import type { PoolClient } from "pg";
+
+/** Structural consumer of W3's canonical GenerationExecution (7f5f63d).
+ * Only the actual scoped processor supplies these callbacks, never HTTP JSON. */
+export interface ProviderExecution {
+  readonly generationId: string;
+  readonly attemptId: string;
+  admit<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+  sealAdmission<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+}
 
 async function openProviderUsage(
   repository: AgentRepository,
@@ -10,16 +20,22 @@ async function openProviderUsage(
   versionHash: string,
   category: string,
   signal: AbortSignal,
+  execution?: ProviderExecution,
 ) {
   signal.throwIfAborted();
   const started = performance.now();
-  const id = await repository.transaction(scope, async (client) => {
+  const insert = async (client: PoolClient) => {
     const row = await client.query<{ id: string }>(
       "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,'configured',$3,0,0,NULL,$4,0) RETURNING id",
       [scope.creatorId, versionHash, model.fingerprint, category],
     );
     return row.rows[0]!.id;
-  });
+  };
+  // W3 holds current thread/session/lease/processor authority through this
+  // admission commit. No nested transaction and no provider I/O in its callback.
+  const id = execution
+    ? await execution.admit(insert)
+    : await repository.transaction(scope, insert);
   return async (usage: Usage) => {
     await repository.transaction(scope, async (client) => {
       await client.query(
@@ -59,6 +75,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
   category: string,
   signal: AbortSignal,
   call: () => Promise<T>,
+  execution?: ProviderExecution,
 ): Promise<T> {
   const finish = await openProviderUsage(
     repository,
@@ -67,6 +84,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
     versionHash,
     category,
     signal,
+    execution,
   );
   let usage = unknownUsage(model);
   try {
@@ -88,6 +106,7 @@ export async function* withProviderStreamUsage(
   category: string,
   signal: AbortSignal,
   call: () => AsyncIterable<StreamProposal>,
+  execution?: ProviderExecution,
 ): AsyncIterable<StreamProposal> {
   const finish = await openProviderUsage(
     repository,
@@ -96,6 +115,7 @@ export async function* withProviderStreamUsage(
     versionHash,
     category,
     signal,
+    execution,
   );
   let usage = unknownUsage(model);
   try {

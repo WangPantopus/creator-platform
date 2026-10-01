@@ -643,7 +643,9 @@ export function conversationFeature(
           "fan_required",
           "Only the sender can check their message.",
         );
-        const key = IdSchema.parse(req.params.key);
+        const key = SendMessageSchema.shape.idempotencyKey.parse(
+          req.params.key,
+        );
         res.json(
           await feature.db.withThread(scope, async (client) => {
             const row = (

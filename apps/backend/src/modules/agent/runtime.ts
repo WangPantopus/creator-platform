@@ -5,9 +5,17 @@ import type {
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { DomainError, invariant } from "../../core/errors.js";
-import { reserveCreatorCost, settleCreatorCost } from "./budget.js";
+import {
+  reserveCreatorCost,
+  settleCreatorCost,
+  settleCreatorCostInTransaction,
+} from "./budget.js";
 import { AgentService } from "./service.js";
-import { assertAgentDelivery } from "./delivery-authority.js";
+import {
+  assertAgentDelivery,
+  type CapturedAgentAuthority,
+} from "./delivery-authority.js";
+import type { ProviderExecution } from "./provider-usage.js";
 import {
   licenseRow,
   sourceRows,
@@ -49,6 +57,22 @@ export type ApprovedSentence = {
 };
 export class LiveAgentRuntime {
   private readonly active = new Map<string, Set<AbortController>>();
+  private readonly executionHolds = new WeakMap<
+    ProviderExecution,
+    {
+      creatorId: string;
+      threadId: string;
+      fanId: string;
+      actorAccountId: string;
+      generationId: string;
+      attemptId: string;
+      hold: string;
+      versionHash: string;
+      model: string;
+      completed: boolean;
+      sealed: boolean;
+    }
+  >();
   constructor(
     private readonly service: AgentService,
     private readonly conversations: ConversationContextPort,
@@ -58,9 +82,50 @@ export class LiveAgentRuntime {
     for (const controller of this.active.get(creatorId) ?? [])
       controller.abort();
   }
+  /** Creator-cap closure only, not a final generation-cost receipt. W3 invokes
+   * this on the same runtime/execution after extraction and before settlement. */
+  async sealExecution(scope: ThreadScope, execution: ProviderExecution) {
+    assertThreadScope(scope);
+    const held = this.executionHolds.get(execution);
+    invariant(
+      held &&
+        held.creatorId === scope.creatorId &&
+        held.threadId === scope.threadId &&
+        held.fanId === scope.fanId &&
+        held.actorAccountId === scope.actorAccountId &&
+        held.generationId === execution.generationId &&
+        held.attemptId === execution.attemptId,
+      "creator_cost_hold_required",
+      "This runtime has no matching generation cost hold.",
+    );
+    if (held.sealed) return;
+    await execution.sealAdmission((client) =>
+      settleCreatorCostInTransaction(
+        client,
+        this.creatorScope(scope),
+        held.hold,
+        held.completed,
+        "configured",
+        held.model,
+        held.versionHash,
+      ),
+    );
+    held.sealed = true;
+  }
   /** W3 invokes these inside its existing acceptance/release transaction. */
-  async assertReady(scope: ThreadScope, client: PoolClient) {
-    await assertAgentDelivery(this.service, this.audiences, scope, client);
+  async assertReady(
+    scope: ThreadScope,
+    client: PoolClient,
+    captured?: CapturedAgentAuthority,
+  ) {
+    await assertAgentDelivery(
+      this.service,
+      this.audiences,
+      scope,
+      client,
+      undefined,
+      captured,
+    );
   }
   async assertApproved(
     scope: ThreadScope,
@@ -200,6 +265,7 @@ export class LiveAgentRuntime {
     message: string,
     signal: AbortSignal,
     deliver: (sentence: ApprovedSentence) => Promise<void>,
+    execution?: ProviderExecution,
   ) {
     assertThreadScope(scope);
     invariant(
@@ -208,6 +274,11 @@ export class LiveAgentRuntime {
       "Shorten this message before sending.",
     );
     const creatorScope = this.creatorScope(scope);
+    invariant(
+      !execution || !this.executionHolds.has(execution),
+      "generation_already_started",
+      "This runtime already owns the generation attempt.",
+    );
     const current = await this.current(creatorScope);
     invariant(
       this.conversations.assertProcessorConsent,
@@ -228,6 +299,37 @@ export class LiveAgentRuntime {
         ),
       ) ?? null,
     );
+    const executionHold = execution
+      ? {
+          creatorId: scope.creatorId,
+          threadId: scope.threadId,
+          fanId: scope.fanId,
+          actorAccountId: scope.actorAccountId,
+          generationId: execution.generationId,
+          attemptId: execution.attemptId,
+          hold,
+          versionHash: current.version.compiledHash,
+          model: this.service.pipeline.model?.fingerprint ?? "unconfigured",
+          completed: false,
+          sealed: false,
+        }
+      : undefined;
+    if (execution && executionHold)
+      this.executionHolds.set(execution, executionHold);
+    const admittedExecution: ProviderExecution | undefined = execution && {
+      generationId: execution.generationId,
+      attemptId: execution.attemptId,
+      admit: (journal) =>
+        execution.admit(async (client) => {
+          await this.assertReady(scope, client, {
+            versionId: current.version.id,
+            versionHash: current.version.compiledHash,
+            audienceRevision: grants.revision,
+          });
+          return journal(client);
+        }),
+      sealAdmission: (journal) => execution.sealAdmission(journal),
+    };
     let completed = false;
     const controller = new AbortController();
     const controllers =
@@ -292,6 +394,7 @@ export class LiveAgentRuntime {
         grants,
         snapshot,
         signal: AbortSignal.any([signal, controller.signal]),
+        execution: admittedExecution,
         beforeSentence: assertCurrent,
         onSentence: async (sentence) => {
           emitted++;
@@ -320,15 +423,20 @@ export class LiveAgentRuntime {
       if (timer) clearTimeout(timer);
       controller.abort();
       try {
-        await settleCreatorCost(
-          this.service.repository,
-          creatorScope,
-          hold,
-          completed,
-          "configured",
-          this.service.pipeline.model?.fingerprint ?? "unconfigured",
-          current.version.compiledHash,
-        );
+        if (executionHold) {
+          // Memory extraction is still billed under this attempt. The exact
+          // W3 execution seals it later; crash/authority loss retains the hold.
+          executionHold.completed = completed;
+        } else
+          await settleCreatorCost(
+            this.service.repository,
+            creatorScope,
+            hold,
+            completed,
+            "configured",
+            this.service.pipeline.model?.fingerprint ?? "unconfigured",
+            current.version.compiledHash,
+          );
       } finally {
         controllers.delete(controller);
         if (!controllers.size) this.active.delete(scope.creatorId);
