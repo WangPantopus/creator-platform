@@ -557,14 +557,19 @@ export class MediaService {
       "Only the verified creator can sign this recording.",
     );
     await assertCurrentSession(client, scope.actorAccountId);
-    const owner = await client.query(
-      "SELECT 1 FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL AND cp.account_id=$4 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF t,cp",
+    const owner = await client.query<{ control: string }>(
+      "SELECT t.control FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL AND cp.account_id=$4 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF t,cp",
       [scope.threadId, scope.creatorId, scope.fanId, scope.actorAccountId],
     );
     invariant(
       owner.rowCount === 1,
       "media_signing_authority_unavailable",
       "Current creator and conversation authority could not be confirmed.",
+    );
+    invariant(
+      owner.rows[0]?.control === "human_active",
+      "takeover_required",
+      "Take over this conversation before signing a personal recording.",
     );
     const proof = ProcessedMediaEvidenceSchema.parse(expected);
     const row = await this.row(scope, client, proof.assetId, true);
