@@ -1,16 +1,48 @@
 import type { Actor } from "../identity/adapter.js";
 import { invariant } from "../../core/errors.js";
 import type { CommerceService } from "./service.js";
+import type { PoolClient } from "pg";
+import { z } from "zod";
+import { contentHash } from "../../core/canonical.js";
 
 /** W7 supplies audience-qualified durable read evidence; this is never a client route. */
 export interface QualifiedRead {
   evidenceId: string;
   commitmentId: string;
+  creatorId: string;
+  fanId: string;
+  packetId: string;
+  threadId: string;
   readerAccountId: string;
+  /** Exact original delivered evidence, bound by the signed publication/review producer. */
+  fulfillmentHash: string;
   audienceEligible: boolean;
   authenticated: boolean;
   distinctHuman: boolean;
 }
+/** Canonical W7 receipt reader, not a client proof or an actor issuer. It must
+ * authorize the actual current purpose/reader, then hold identity/pair, thread,
+ * mode/consent and exact signed publication/review locks in canonical order on
+ * this client through issuance. Public permission alone is insufficient. No
+ * provider I/O, anonymous owner impersonation or successful default is allowed. */
+export type QualifiedReadAuthority = (
+  client: PoolClient,
+  actor: Actor,
+  evidenceId: string,
+) => Promise<QualifiedRead | null>;
+const QualifiedReadReceipt = z.strictObject({
+  evidenceId: z.string().min(8).max(160),
+  commitmentId: z.uuid(),
+  creatorId: z.uuid(),
+  fanId: z.uuid(),
+  packetId: z.uuid(),
+  threadId: z.uuid(),
+  readerAccountId: z.uuid(),
+  fulfillmentHash: z.string().regex(/^[a-f0-9]{64}$/u),
+  audienceEligible: z.boolean(),
+  authenticated: z.boolean(),
+  distinctHuman: z.boolean(),
+});
 export interface VerifiedStoreEntitlement {
   provider: "apple" | "google";
   reference: string;
@@ -50,6 +82,7 @@ export class ExtendedCommerce {
     readonly settlement?: import("./accounting.js").CreatorSettlement,
     readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
     readonly poolJournal?: import("./pass-pool-journal.js").PassPoolJournal,
+    private readonly qualifiedReads?: QualifiedReadAuthority,
   ) {
     invariant(
       !poolJournal || poolJournal.isForService(service),
@@ -310,33 +343,91 @@ export class ExtendedCommerce {
     );
     return this.pass.reconcile(actor, reference);
   }
-  async creditRead(actor: Actor, evidence: QualifiedRead) {
+  async creditRead(actor: Actor, evidenceId: string) {
+    const readId = z.string().min(8).max(160).parse(evidenceId);
     const rule = this.service.policy.credits;
     invariant(
       rule,
       "credits_unconfigured",
       "Public answer credits are not configured.",
     );
+    invariant(
+      this.qualifiedReads,
+      "qualified_read_authority_unavailable",
+      "Credits require the canonical durable read and current signed-source authority.",
+    );
+    invariant(
+      /^[A-Z]{3}$/u.test(rule.currency) &&
+        Number.isSafeInteger(rule.perRead) &&
+        rule.perRead > 0 &&
+        Number.isSafeInteger(rule.monthlyCap) &&
+        rule.monthlyCap >= 0,
+      "credit_policy_invalid",
+      "Credit amounts must be explicitly configured in minor units.",
+    );
     return this.service.account(actor, async (client) => {
+      let receipt: QualifiedRead | null;
+      try {
+        receipt = await this.qualifiedReads!(client, actor, readId);
+      } finally {
+        await client.query(
+          "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
+          [actor.accountId],
+        );
+      }
+      invariant(
+        receipt,
+        "qualified_read_unavailable",
+        "The durable qualified read is unavailable.",
+      );
+      const evidence = QualifiedReadReceipt.parse(receipt);
+      invariant(
+        evidence.evidenceId === readId,
+        "qualified_read_binding_mismatch",
+        "The durable read must match its original evidence identity.",
+      );
+      const thread = await client.query(
+        "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+        [evidence.threadId, evidence.creatorId, evidence.fanId],
+      );
+      invariant(
+        thread.rowCount === 1,
+        "answer_unavailable",
+        "The answer is unavailable.",
+      );
       const record = (
         await client.query<{
           creator_id: string;
           fan_id: string;
-          reader: string;
           asker: string;
           creator_account: string;
           state: string;
           visibility: string;
           currency: string;
           credit_eligible: boolean;
+          packet_id: string;
+          thread_id: string;
+          evidence: unknown;
+          current_creator: boolean;
         }>(
-          `SELECT c.creator_id,c.fan_id,c.state,p.visibility,p.snapshot->>'currency' AS currency,fp.account_id AS asker,cp.account_id AS creator_account,NOT EXISTS(SELECT 1 FROM creator.commerce_share_grant sg WHERE sg.commitment_id=c.id AND sg.revoked_at IS NOT NULL) AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.packet_id=p.id AND l.kind='refund') AS credit_eligible FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.fan_profile fp ON fp.id=c.fan_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 FOR UPDATE OF p,c`,
+          `SELECT c.creator_id,c.fan_id,c.state,c.evidence,c.packet_id,p.thread_id,p.visibility,p.snapshot->>'currency' AS currency,fp.account_id AS asker,cp.account_id AS creator_account,cp.verification='verified' AND NOT cp.recovery_required AS current_creator,p.payment_state='captured' AND c.delivered_at IS NOT NULL AND c.mode IN('written_reply','voice_note','group_answer','guaranteed_review') AND NOT EXISTS(SELECT 1 FROM creator.commerce_share_grant sg WHERE sg.commitment_id=c.id AND (sg.revoked_at IS NOT NULL OR NOT sg.fan_choice OR NOT sg.creator_permission)) AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.packet_id=p.id AND l.kind='refund') AS credit_eligible FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id JOIN creator.fan_profile fp ON fp.id=c.fan_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 FOR UPDATE OF p,c FOR SHARE OF cp`,
           [evidence.commitmentId],
         )
       ).rows[0];
       invariant(record, "answer_unavailable", "The answer is unavailable.");
+      invariant(
+        record.creator_id === evidence.creatorId &&
+          record.fan_id === evidence.fanId &&
+          record.packet_id === evidence.packetId &&
+          record.thread_id === evidence.threadId &&
+          record.evidence !== null &&
+          contentHash(record.evidence) === evidence.fulfillmentHash,
+        "qualified_read_binding_mismatch",
+        "The read must bind the exact delivered commitment evidence.",
+      );
       const eligible =
         record.state === "delivered" &&
+        record.current_creator &&
         record.credit_eligible &&
         record.currency === rule.currency &&
         record.visibility === "public" &&
@@ -368,14 +459,6 @@ export class ExtendedCommerce {
           [record.fan_id, record.currency],
         )
       ).rows[0]!;
-      invariant(
-        Number.isSafeInteger(rule.perRead) &&
-          rule.perRead > 0 &&
-          Number.isSafeInteger(rule.monthlyCap) &&
-          rule.monthlyCap >= 0,
-        "credit_policy_invalid",
-        "Credit amounts must be explicitly configured in minor units.",
-      );
       const remaining = BigInt(rule.monthlyCap) - BigInt(used.amount);
       const amount = Number(
         remaining <= 0n

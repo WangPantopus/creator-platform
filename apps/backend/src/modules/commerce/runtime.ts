@@ -7,7 +7,11 @@ import {
   MembershipBilling,
   type MembershipBillingProvider,
 } from "./billing.js";
-import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
+import {
+  ExtendedCommerce,
+  type StoreEntitlementVerifier,
+  type QualifiedReadAuthority,
+} from "./extended.js";
 import { commerceFeature } from "./registration.js";
 import {
   CommerceGenerationAllowance,
@@ -57,6 +61,7 @@ export async function createCommerceRuntime(input: {
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
   stores?: StoreEntitlementVerifier;
+  qualifiedReads?: QualifiedReadAuthority;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
@@ -173,6 +178,7 @@ export async function createCommerceRuntime(input: {
     settlement,
     passPurchases,
     poolJournal,
+    input.qualifiedReads,
   );
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
