@@ -198,5 +198,15 @@
     "actualMediaCallHardwareAcceptance": false,
     "sourceRevision": "4ce525ce3725f576fc458a7023b320d32989a04a",
     "finalAndroidAPK": "passed345s;47 operations"
+  },
+  "savedObjectPolicyFollowup": {
+    "evidence": "policy-projection.json",
+    "policyRevision": "d15a4519b1c335ff86c6bfe4ed620b192944558e",
+    "generatorRevision": "1ada9369fa85fa72fccc7a98182559929bea2ab9",
+    "recordingRevision": "c425ae783c00b502c81ca3c10bd290a2ff7874a8",
+    "operations": 48,
+    "iosSimulatorLibrary": "passed50.33s",
+    "androidKotlin": "passed177s; compile only, last actualAPK47",
+    "functionalAcceptance": false
   }
 }
