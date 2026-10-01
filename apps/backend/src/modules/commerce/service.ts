@@ -22,10 +22,7 @@ import type {
   GenerationAllowance,
   ThreadScope,
 } from "../access/scope.js";
-import {
-  capabilitySnapshot,
-  sourceAudienceSnapshot,
-} from "../access/commerce.js";
+import { capabilitySnapshot } from "../access/commerce.js";
 import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
