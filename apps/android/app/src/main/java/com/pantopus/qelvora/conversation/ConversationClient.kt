@@ -13,8 +13,11 @@ import java.net.URL
     val id: String, val threadId: String, val authorKind: APIMessageAuthorKind, val text: String,
     val deliveryState: APIMessageDeliveryState, val controlEpoch: Long, val sequence: Long,
     val signedActId: String? = null, val citations: List<String>, val createdAt: String,
-    val member: String? = null, val offTheRecord: Boolean, val version: Long
+    val member: String? = null, val offTheRecord: Boolean, val version: Long,
+    val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null
 )
+@Serializable data class ConversationAgentVersion(val id: String, val hash: String)
+@Serializable data class ConversationFeedbackPolicy(val version: String, val notice: String)
 fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
     APIMessageAuthorKind.FAN -> "You"
     APIMessageAuthorKind.AI -> QelvoraCopy.text("aiAuthor",mapOf("name" to name))
@@ -31,7 +34,7 @@ fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
     val control: APIThreadControl, val epoch: Long, val cursor: Long, val revision: Long,
     val generationSequences: Map<String, Long>, val messages: List<ConversationMessage>, val before: Long? = null,
     val offTheRecord: Boolean, val introShared: Boolean, val consentCurrent: Boolean, val canSend: Boolean,
-    val unavailableReason: String? = null
+    val unavailableReason: String? = null, val feedbackPolicy: ConversationFeedbackPolicy? = null
 )
 @Serializable data class ConversationProvider(val name: String, val termsUrl: String, val noTraining: Boolean, val noRetention: Boolean)
 @Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean)

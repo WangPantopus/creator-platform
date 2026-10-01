@@ -115,7 +115,8 @@ export function ConversationScreen({
       const item = latestPending.current;
       if (item) {
         const result = await request<{ accepted: boolean }>(
-          `${root}/messages/status/${item.key}`,
+          `${root}/messages/status`,
+          { idempotencyKey: item.key },
         );
         if (
           result.accepted &&
@@ -464,6 +465,51 @@ export function ConversationScreen({
       if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
   };
+  const feedback = async (
+    message: ConversationMessage,
+    rating: "helpful" | "not_helpful" | null,
+  ) => {
+    if (
+      busy ||
+      !online ||
+      !message.agentVersion ||
+      (rating !== null && !page?.feedbackPolicy)
+    )
+      return;
+    const revision = lifecycle.current;
+    setBusy(true);
+    try {
+      const result = await request<{
+        rating: "helpful" | "not_helpful" | null;
+      }>(`${root}/messages/${message.id}/feedback`, {
+        messageVersion: message.version,
+        agentVersion: message.agentVersion,
+        rating,
+        ...(rating !== null
+          ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
+          : {}),
+      });
+      if (mounted.current && lifecycle.current === revision) {
+        setOlder((items) =>
+          items.map((item) =>
+            item.id === message.id && item.version === message.version
+              ? { ...item, feedback: result.rating }
+              : item,
+          ),
+        );
+        await refresh();
+      }
+    } catch (error) {
+      if (mounted.current && lifecycle.current === revision)
+        setFailure(
+          error instanceof Error
+            ? error.message
+            : "Your response could not be saved. Try again.",
+        );
+    } finally {
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
+    }
+  };
   if (!page)
     return (
       <main className="conversation-screen">
@@ -664,6 +710,56 @@ export function ConversationScreen({
                   Don’t remember this
                 </button>
               ))}
+            {message.authorKind === "ai" &&
+              message.agentVersion &&
+              ["delivered", "interrupted"].includes(message.deliveryState) &&
+              page.feedbackPolicy && (
+                <details className="conversation-feedback">
+                  <summary>{formatCopy("thisHelped", {})}</summary>
+                  <p className="qv-help">{page.feedbackPolicy.notice}</p>
+                  <div className="conversation-actions">
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "helpful"}
+                      onClick={() => void feedback(message, "helpful")}
+                    >
+                      {formatCopy("thisHelped", {})}
+                    </button>
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "not_helpful"}
+                      onClick={() => void feedback(message, "not_helpful")}
+                    >
+                      Not helpful
+                    </button>
+                    {message.feedback && (
+                      <button
+                        className="qv-link-btn"
+                        disabled={busy || !online}
+                        onClick={() => void feedback(message, null)}
+                      >
+                        Remove my response
+                      </button>
+                    )}
+                  </div>
+                  {message.feedback && (
+                    <p className="qv-help" role="status">
+                      Your response is saved.
+                    </p>
+                  )}
+                </details>
+              )}
+            {message.feedback && !page.feedbackPolicy && (
+              <button
+                className="qv-link-btn"
+                disabled={busy || !online}
+                onClick={() => void feedback(message, null)}
+              >
+                Remove my response
+              </button>
+            )}
             {message.authorKind !== "fan" &&
               message.authorKind !== "system" && (
                 <div className="conversation-actions">

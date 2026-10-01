@@ -114,6 +114,20 @@ private struct W3ThreadScreen: View {
                 .accessibilityLabel(message.authorLabel(name: page.creatorName))
             if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
             if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open("/support") } }
+            if message.authorKind == .ai, message.agentVersion != nil, message.deliveryState == .delivered || message.deliveryState == .interrupted, let policy = page.feedbackPolicy {
+                DisclosureGroup(QelvoraCopy.text("thisHelped")) {
+                    Text(policy.notice).qText("caption")
+                    Button(QelvoraCopy.text("thisHelped"), variant: .quiet, disabled: model.busy || model.offline) { Task { await model.feedback(message, rating: "helpful") } }.accessibilityValue(message.feedback == "helpful" ? "Selected" : "Not selected")
+                    Button("Not helpful", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.feedback(message, rating: "not_helpful") } }.accessibilityValue(message.feedback == "not_helpful" ? "Selected" : "Not selected")
+                    if message.feedback != nil {
+                        Text("Your response is saved.").qText("caption")
+                        Button("Remove my response", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.feedback(message, rating: nil) } }
+                    }
+                }.qText("caption")
+            }
+            if message.feedback != nil, page.feedbackPolicy == nil {
+                Button("Remove my response", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.feedback(message, rating: nil) } }
+            }
             if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {

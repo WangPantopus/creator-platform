@@ -15,6 +15,7 @@ import type { ProviderPolicy } from "../../../../../packages/api/src/conversatio
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import { invariant } from "../../core/errors.js";
+import type { ConversationLineage } from "./lineage.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -30,6 +31,8 @@ export function createConversationRuntime(input: {
   firstConversation?: Pick<CommerceService, "openTrial">;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
+  /** Prepared only after W8's real migration/checksum and lifecycle policy. */
+  lineage?: ConversationLineage;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -61,6 +64,7 @@ export function createConversationRuntime(input: {
     ...(input.assertReady ? { assertReady: input.assertReady } : {}),
     ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
     ...(input.citation ? { citation: input.citation } : {}),
+    ...(input.lineage ? { lineage: input.lineage } : {}),
   });
   const feature = new ConversationFeature(
     input.database,
@@ -100,6 +104,7 @@ export function createConversationRuntime(input: {
           )
       : undefined,
     (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
+    input.lineage,
   );
   return {
     feature,

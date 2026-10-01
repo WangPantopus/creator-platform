@@ -30,6 +30,7 @@ import type { ConversationWellbeing } from "./wellbeing.js";
 import { TeamReplySchema } from "../../../../../packages/api/src/conversation/contracts.js";
 import { crisisText } from "../agent/pipeline.js";
 import { contentHash } from "../../core/canonical.js";
+import type { ConversationLineage } from "./lineage.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -89,6 +90,7 @@ export class ConversationService {
     policyVersion?: string;
     citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
     wellbeing?: ConversationWellbeing;
+    lineage?: ConversationLineage;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
     this.delivery = delivery;
@@ -760,6 +762,12 @@ export class ConversationService {
             "Exact-version delivery validation is unavailable.",
           );
           await this.delivery.assertApproved(scope, client, approved);
+          await this.delivery.lineage?.pinApproved(
+            scope,
+            client,
+            generation.ai_message_id,
+            approved,
+          );
         }
         await client.query(
           "UPDATE creator.generation SET last_sequence=$1,state=$2 WHERE id=$3 AND thread_id=$4 AND creator_id=$5 AND fan_id=$6",
