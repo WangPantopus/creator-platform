@@ -261,6 +261,7 @@ private struct W3PrivacyScreen: View {
             Text("The AI keeps no memory from it. It is still labeled, visible to the creator and their team, and you can delete it.").qText("caption")
             Toggle("Share my intro with this creator's AI", isOn: Binding(get: { memory?.introShared ?? false }, set: { value in Task { await preferences(offTheRecord: memory?.offTheRecord ?? false, introShared: value) } })).disabled(busy || memory == nil)
             Text("Time with this creator's AI").qText("display-md")
+            if usage == nil { Text(failure.isEmpty ? "Loading time history…" : "Time history unavailable.").qText("body") }
             if let usage {
                 Text(usage.measurement + " Days are shown in UTC.").qText("caption")
                 Text("This week · \(Int(usage.days.reduce(0) { $0 + $1.seconds } / 60)) minutes").qText("body")

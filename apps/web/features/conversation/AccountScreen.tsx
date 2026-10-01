@@ -515,6 +515,9 @@ function ConversationPrivacy({
       </section>
       <section>
         <h2>Time with this creator’s AI</h2>
+        {usage === null && (
+          <p>{error ? "Time history unavailable." : "Loading time history…"}</p>
+        )}
         {usage && (
           <article>
             <p>{usage.measurement} Days are shown in UTC.</p>
