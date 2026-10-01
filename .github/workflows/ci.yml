@@ -75,7 +75,9 @@ jobs:
           phone = next(d for runtime, entries in devices.items() if ".iOS-" in runtime for d in entries if d["name"].startswith("iPhone"))
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
-      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+      - name: Wait for the selected simulator to finish booting
+        run: xcrun simctl bootstatus '${{ steps.simulator.outputs.id }}' -b
+      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -resultBundlePath artifacts/ios/FoundationFlow.xcresult CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
       - name: Check native package and exact snapshots
         if: ${{ !cancelled() }}
         # Keep stalled captures from holding the job and its failure artifacts for hours.

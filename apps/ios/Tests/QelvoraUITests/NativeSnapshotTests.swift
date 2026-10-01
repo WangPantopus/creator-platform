@@ -96,6 +96,18 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // A transform alone magnifies the1x layer cache. Redraw each hosted
+      // layer at the reference scale before AppKit composites the bitmap.
+      func prepareLayer(_ layer: CALayer) {
+        layer.contentsScale = 2
+        layer.rasterizationScale = 2
+        layer.setNeedsDisplay()
+        for child in layer.sublayers ?? [] { prepareLayer(child) }
+        if let mask = layer.mask { prepareLayer(mask) }
+        layer.displayIfNeeded()
+      }
+      if let layer = host.layer { prepareLayer(layer) }
+      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas)")
       // Match the existing2x references without inheriting a runner display's scale/profile.
       guard
         let context = CGContext(

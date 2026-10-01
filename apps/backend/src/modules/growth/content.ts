@@ -1,4 +1,5 @@
 import { copy } from "@qelvora/copy";
+import type { SignedActCommand } from "@qelvora/api";
 import type { Actor } from "../identity/adapter.js";
 import type { SignedActService } from "../identity/signed-acts.js";
 import { contentHash } from "../../core/canonical.js";
@@ -8,6 +9,15 @@ import type { GrowthService } from "./service.js";
 /** Structural C08 port matches W5 ContentService.get. The host supplies the
  * actual service; W7 never manufactures creator or audience authority. */
 export interface ContentPublicationReader {
+  publicationProof?(
+    actor: Actor,
+    creatorId: string,
+    id: string,
+  ): Promise<{
+    command: SignedActCommand;
+    signedActId: string | null;
+    mediaReady: boolean;
+  } | null>;
   get(
     actor: Actor,
     creatorId: string,
@@ -118,26 +128,80 @@ export function contentPublicProjection(
       }
     }
     // Quote/packet retractions originate in separate fan/commerce outboxes.
-    // Media signing also binds owner processing evidence outside the document.
     // Keep these effects pending until their current owner adapters are bound.
-    if (
-      publicState &&
-      (current.document.quote ||
-        current.document.packetId ||
-        Boolean(current.document.media?.length))
-    ) {
+    if (publicState && (current.document.quote || current.document.packetId)) {
       await growth.withdrawContent(
         current.creatorId,
         current.id,
         current.version,
       );
       throw new DomainError(
-        current.document.media?.length
-          ? "content_media_proof_adapter_required"
-          : "content_retraction_adapter_required",
+        "content_retraction_adapter_required",
         copy.growthErrorContentEffectUnconfigured,
         503,
       );
+    }
+    let publicationHash = contentHash({
+      actType: current.document.kind === "note" ? "broadcast" : "reply",
+      subjectId: current.id,
+      content: {
+        kind: "content_publication",
+        creatorId: current.creatorId,
+        version: current.version,
+        document: current.document,
+      },
+    });
+    if (publicState) {
+      // W5 reads the stored complete command and rechecks current processed
+      // media/W6 readiness. Never reconstruct media evidence from a document.
+      const proof = content.publicationProof
+        ? await content.publicationProof(actor, current.creatorId, current.id)
+        : null;
+      if (content.publicationProof) {
+        const body = proof?.command.content;
+        if (
+          !proof ||
+          !body ||
+          typeof body !== "object" ||
+          Array.isArray(body) ||
+          proof.command.subjectId !== current.id ||
+          proof.command.actType !==
+            (current.document.kind === "note" ? "broadcast" : "reply") ||
+          body.kind !== "content_publication" ||
+          body.creatorId !== current.creatorId ||
+          body.version !== current.version ||
+          body.document === undefined ||
+          contentHash(body.document) !== contentHash(current.document) ||
+          proof.signedActId !== current.signedActId
+        ) {
+          await growth.withdrawContent(
+            current.creatorId,
+            current.id,
+            current.version,
+          );
+          throw new DomainError(
+            "content_version_unavailable",
+            copy.growthErrorContentVersionUnavailable,
+            503,
+          );
+        }
+        publicationHash = contentHash(proof.command);
+      }
+      if (
+        (current.document.media?.length && !proof) ||
+        (proof && proof.mediaReady !== true)
+      ) {
+        await growth.withdrawContent(
+          current.creatorId,
+          current.id,
+          current.version,
+        );
+        throw new DomainError(
+          "content_media_proof_adapter_required",
+          copy.growthErrorContentEffectUnconfigured,
+          503,
+        );
+      }
     }
     if (publicState && current.authorKind !== "team") {
       const signature = current.signedActId
@@ -145,17 +209,7 @@ export function contentPublicProjection(
         : null;
       publicState =
         signature?.status === "valid" &&
-        signature.contentHash ===
-          contentHash({
-            actType: current.document.kind === "note" ? "broadcast" : "reply",
-            subjectId: current.id,
-            content: {
-              kind: "content_publication",
-              creatorId: current.creatorId,
-              version: current.version,
-              document: current.document,
-            },
-          });
+        signature.contentHash === publicationHash;
     }
     if (publicState)
       await growth.projectContent({

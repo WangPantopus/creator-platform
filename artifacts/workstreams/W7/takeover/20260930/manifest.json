@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-01T00:12:41.393929+00:00",
+  "recordedAt": "2026-10-01T00:22:10.406051+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
-    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "774495a67c77952b0a7abb8dd9fdacea047bd59bb0c339875d4219f1c8d2bb0a",
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "72641d0081aa24baee27fa2cbd82de9db1cb2eff11c27016b8d84beee4a7b00b",
     "apps/web/lib/session.ts": "d16dd614fc8f9de9705835bda438c1640f00245c3aa78fedd2990ceacca253f5",
     "apps/web/app/api/trust/[...path]/route.ts": "006cee4cd531d7f523b1d578df985db2347f1bc65f3e04d6a4e278197eddabae",
     "apps/web/app/creators/[handle]/chat/page.tsx": "7b9bdb15745b08f6bfe522cd8a754f07f50f0686c3ee3b0a304dc9a7e886d736",
@@ -15,8 +15,8 @@
     "apps/web/features/growth/preferences.tsx": "a86d9748dadef0fb8617f147dff8c07da79ab506289ab044e99a409e8989c334",
     "apps/web/lib/trust-session.ts": "c3eff172600f810c8b8aca449e25331fe5d76838f66fb23b2f551d34894f388d",
     "apps/web/app/api/auth/complete/route.ts": "1f26cf1f142460c6b3e076c7e9e73f8ce91d8d2dd49a2c7498ba2c71390abcd2",
-    ".github/workflows/ci.yml": "0082580c9c284095c13fe86bef7d970460c7c7a59fd5603e9ea6edc4fa873258",
-    "apps/backend/src/modules/growth/content.ts": "98f8d86ef35c624a403a7a08f48a268b35cb7628aa8a9cf0f9f19a42cb87614a"
+    ".github/workflows/ci.yml": "3f35117e365c0d757e7d174088ecf8c358472c1a681a96ecc83201995ca8adf0",
+    "apps/backend/src/modules/growth/content.ts": "93e958eb48c37863b528ecd3af21416398afe5e9a3bf333ccf00fc094ad77213"
   },
   "nativeReferenceCount": 110,
   "nativeReferenceSetSha256": "a729e6b68ee8bea71fd90a1ba4e60474ede2b4cec69fe79887829b9625594510",
@@ -141,7 +141,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "21858728063c20a4bd01779d810f629e0eb4895b9e5655bf040d4bb2eeed4b7d",
+    "README.md": "015c4e306810ae7f428ad97c2433a6eb999e51909b500cb9df566a64cab43c07",
     "approved-input-search.json": "edee150a6bab7cc43cf2b97795402098b9f2869c9a53dbb01448074b5c2e0e08",
     "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend-contracts.log": "00c68520c2ce4f9bdbdc93c60e9a39d2e8539abb81dbefb6c2793ae199647e4c",
@@ -181,7 +181,19 @@
     "ios-ui-SignIn-unconfigured-Light.png": "e549e9c434efa7d3348f2b4be5400409e193c4b4bd22f4a7af0dfabb1c4db0d2",
     "ios-ui-summary.json": "ca7e8510b261fc57721eda36823efa38dd09dc5695dfcbe1d532a1088b66c3ed",
     "ios-ui.log": "c148440871bb494eedbba5494bb94b071d6ebf0c867cfa00ddb2f1a292865fa8",
-    "ios-ui-Welcome-Light.png": "d1455ffa45a4add0189a8df19def9b307df0a3d7699ca3473d065f11001fb7e6"
+    "ios-ui-Welcome-Light.png": "d1455ffa45a4add0189a8df19def9b307df0a3d7699ca3473d065f11001fb7e6",
+    "proof-contracts.log": "8b37f375ba86fde183d6f5e2b8949a47f970dc62430b27f30f4ab491256a7800",
+    "hosted-643-ios.log": "8596e77bc812b02822f50539f850999e25802e9d5fe715d321484b562a72d10a",
+    "ios-boot.log": "ed19e23cc0754215695ea209d19eac6080272d357b791e887a768711b082ec1c",
+    "proof-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "proof-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "ios-ready-ui.log": "0ab24eeb67ca5809e27ef7dcf2f42b969c6780a947174ae0ced8194da46f8a1d",
+    "proof-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "hosted-643-button-light.png": "c98517def09fe57441249c2233c62d69ef68f5d24daf18a2b95112af36bc439a",
+    "proof-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ios-ready-ui-summary.json": "c94e6df4b38895a31eb3dae4c5ce673374f1f571feebcb658563a38adfcce1aa",
+    "hosted-643-summary.json": "e58cfe4efd6284f720a43645bad7d8406c6e38f7ee52d64f7d5ab5dcc3f0685a",
+    "layer-swift.log": "f2c18f8ff0ea6ba6c895d8b954592237268d4d212c20658fbcfb572a79bb43fb"
   },
   "managedSecretScan": "no complete managed key or connection URL appears in text evidence",
   "verification": {
@@ -227,8 +239,15 @@
   },
   "nativeStepTimeoutMinutes": 20,
   "mediaPublicationBoundary": {
-    "actualOwnerReview": "10405eb",
-    "status": "current-publication media proof unavailable; public media retracted and effect remains pending",
+    "actualOwnerProof": "0742900",
+    "port": "ContentService.publicationProof(actor,creatorId,id)",
+    "fullStoredCommandComparedToCurrentDocument": true,
+    "mediaReadyMustBeExactlyTrue": true,
+    "humanFullCommandHashComparedToW1Verification": true,
+    "missingStaleUnreadyProof": "retract projection;503;effect pending",
+    "hostInstalled": false,
+    "mediaSQLApplied": false,
+    "genuineSignedMediaAcceptance": false,
     "newTestCases": 0,
     "backendBuild": "pass",
     "backendTypecheck": "pass",
@@ -240,6 +259,38 @@
     "passed": 2,
     "failed": 0,
     "seconds": 25.193,
+    "device": "90934313-E0DD-445C-B8AF-AA8188BD2AC0",
+    "deviceStateAfter": "Shutdown",
+    "erasedOrReset": false,
+    "actualCreatorOrAccessibilityAcceptance": false
+  },
+  "hosted643": {
+    "head": "64330399332c74ef6c87117a0daac78d4a587beb",
+    "run": 36790849898,
+    "job": 110143134887,
+    "conclusion": "cancelled",
+    "UIFailure": "AX-loaded initialization timeout before tests",
+    "snapshotFailuresBeforeCancellation": 92,
+    "snapshotsCompleted": false,
+    "retainedArtifactRoot": "/private/tmp/creator-w7-takeover-hosted-643"
+  },
+  "currentNativeCapture": {
+    "existingSwiftTests": 18,
+    "existingImageComparisons": 110,
+    "localSeconds": 32.859,
+    "localResult": "pass",
+    "localBackingScale": 2,
+    "hostedBackingVerification": "required",
+    "comparatorChanged": false,
+    "originalReferencesChanged": false
+  },
+  "existingIOSUIReadinessReproduction": {
+    "tests": 2,
+    "passed": 2,
+    "failed": 0,
+    "seconds": 26.953,
+    "bootstatusSeconds": 16,
+    "parallelTesting": false,
     "device": "90934313-E0DD-445C-B8AF-AA8188BD2AC0",
     "deviceStateAfter": "Shutdown",
     "erasedOrReset": false,
