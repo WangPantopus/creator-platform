@@ -466,7 +466,6 @@ object QelvoraCopy {
     "w6Requestfc03f5" to "Request {value1}",
     "w6JoiningEarlyStartsNothingTheConnectedTimerPausesDuringA" to "Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.",
     "w6ConnectedOf" to "Connected {value1} of {value2}",
-    "w6Bearer" to "Bearer {value1}",
     "w6SecondsRecorded" to "{value1} seconds recorded",
     "w6UpToSeconds" to "Up to {value1} seconds",
     "w6Starts" to "Starts",

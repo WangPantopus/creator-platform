@@ -508,5 +508,16 @@
     "No actual microphone/sign/publication/audience/provider/hardware acceptance",
     "Capability gates remain false",
     "All local sources held from push until exact a124ad0 ios-review artifact inspection"
-  ]
+  ],
+  "protocolCorrection": {
+    "recordedAt": "2026-10-01T01:50:46.637051+00:00",
+    "originalCheckpoint": "64574eabd73390f2b55f4c4a986b351db6a4a8ee",
+    "removedIntroducedKey": "w6Bearer",
+    "reason": "Authorization Bearer wire syntax is protocol, not translatable UI copy; restored original literal interpolation in both native transports.",
+    "correctedAdditiveKeyCount": 277,
+    "all204OriginalValuesUnchanged": true,
+    "original278KeySourceHashesAndChecksPreservedAbove": true,
+    "correctiveChecks": "Backend/web/generation/shared2 and native compilation recorded separately in account-pin.json; actual auth journey not claimed",
+    "configSha256": "25d84124c40f734dc2d80ea26e9aff8f4e448ac63dd42c5dda33d9e4918c0295"
+  }
 }

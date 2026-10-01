@@ -466,7 +466,6 @@ public enum QelvoraCopy {
     "w6Requestfc03f5": "Request {value1}",
     "w6JoiningEarlyStartsNothingTheConnectedTimerPausesDuringA": "Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.",
     "w6ConnectedOf": "Connected {value1} of {value2}",
-    "w6Bearer": "Bearer {value1}",
     "w6SecondsRecorded": "{value1} seconds recorded",
     "w6UpToSeconds": "Up to {value1} seconds",
     "w6Starts": "Starts",

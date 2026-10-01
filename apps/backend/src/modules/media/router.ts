@@ -80,7 +80,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
   const scope = async (req: Request) => {
     z.uuid().parse(req.params.creatorId);
     z.uuid().parse(req.params.fanId);
-    return dependencies.scopeFor(req);
+    const current = await dependencies.scopeFor(req);
+    assertExpectedAccount(req, current.actorAccountId);
+    return current;
   };
   const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
   const creatorMedia = () => {
@@ -100,7 +102,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         "Creator operations are not connected yet.",
         503,
       );
-    return dependencies.creatorScopeFor!(req);
+    const current = await dependencies.creatorScopeFor!(req);
+    assertExpectedAccount(req, current.accountId);
+    return current;
   };
   const audienceScope = async (req: Request) => {
     z.uuid().parse(req.params.creatorId);
@@ -110,7 +114,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
         "Content playback is awaiting its current audience authority.",
         503,
       );
-    return dependencies.audienceScopeFor(req);
+    const current = await dependencies.audienceScopeFor(req);
+    assertExpectedAccount(req, current.actorAccountId);
+    return current;
   };
   const creatorAvailability = () => {
     if (!dependencies.availability)
@@ -422,6 +428,29 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     },
   );
   return router;
+}
+
+/** A caller may pin a request to its original account, never select authority. */
+function assertExpectedAccount(req: Request, accountId: string) {
+  const header = req.get("x-qelvora-expected-account");
+  const query = req.query.expectedAccountId;
+  const headerId =
+    header === undefined ? undefined : z.uuid().parse(header).toLowerCase();
+  const queryId =
+    query === undefined ? undefined : z.uuid().parse(query).toLowerCase();
+  if (headerId && queryId && headerId !== queryId)
+    throw new DomainError(
+      "media_account_selector_conflict",
+      "Reopen this media with your current account.",
+      400,
+    );
+  const expected = headerId ?? queryId;
+  if (expected !== undefined && expected !== accountId.toLowerCase())
+    throw new DomainError(
+      "media_account_changed",
+      "Your account changed. Reopen this media before continuing.",
+      403,
+    );
 }
 
 async function streamMedia(

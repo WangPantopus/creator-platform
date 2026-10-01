@@ -5061,17 +5061,6 @@
         }
       }
     },
-    "Bearer {value1}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bearer {value1}"
-          }
-        }
-      }
-    },
     "{value1} seconds recorded": {
       "extractionState": "manual",
       "localizations": {

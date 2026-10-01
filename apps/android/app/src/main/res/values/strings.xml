@@ -466,7 +466,6 @@
   <string name="w6_requestfc03f5" formatted="false">Request {value1}</string>
   <string name="w6_joining_early_starts_nothing_the_connected_timer_pauses_during_a" formatted="false">Joining early starts nothing. The connected timer pauses during a drop, up to {value1} minutes total.</string>
   <string name="w6_connected_of" formatted="false">Connected {value1} of {value2}</string>
-  <string name="w6_bearer" formatted="false">Bearer {value1}</string>
   <string name="w6_seconds_recorded" formatted="false">{value1} seconds recorded</string>
   <string name="w6_up_to_seconds" formatted="false">Up to {value1} seconds</string>
   <string name="w6_starts" formatted="false">Starts</string>

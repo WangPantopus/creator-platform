@@ -2312,14 +2312,14 @@ public actor CreatorAPIClient {
   public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
     try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])
   }
-  public func readAudienceCreatorMedia(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaAsset {
-    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true)
+  public func readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaCreatorMediaAsset {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func audienceCreatorMediaPlayback(creatorId: String, assetId: String) async throws -> APIMediaCreatorMediaPlaybackTicket {
-    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/playback", method: "POST", authenticated: true)
+  public func audienceCreatorMediaPlayback(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaCreatorMediaPlaybackTicket {
+    try await request("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/playback", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil) async throws -> CreatorAPIBinaryResponse {
-    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket)], headers: ["Range": range].compactMapValues { $0 })
+  public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil, xQelvoraExpectedAccount: String? = nil, expectedAccountId: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket), URLQueryItem(name: "expectedAccountId", value: expectedAccountId)], headers: ["Range": range, "x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
     try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)

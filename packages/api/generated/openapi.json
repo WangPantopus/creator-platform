@@ -3022,6 +3022,16 @@
             "type": "string",
             "format": "uuid"
           }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original account. Must match the actual current session; never grants authority.",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
         }
       ],
       "get": {
@@ -3120,6 +3130,16 @@
           "in": "path",
           "name": "assetId",
           "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original account. Must match the actual current session; never grants authority.",
           "schema": {
             "type": "string",
             "format": "uuid"
@@ -3251,6 +3271,26 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-qelvora-expected-account",
+            "required": false,
+            "description": "Pin to the original account. Must match the actual current session; never grants authority.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expectedAccountId",
+            "required": false,
+            "description": "Account pin for media elements. Must match the actual session and any account header.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],

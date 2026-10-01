@@ -29,14 +29,16 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
     init { require(base.protocol == "https" || (base.protocol == "http" && base.host in listOf("localhost", "127.0.0.1", "10.0.2.2"))); require(base.userInfo == null) }
     private fun asset(value: JSONObject) = NativeMediaAsset(value.getString("id"), value.getString("state"), value.getInt("version"), value.getLong("bytes"), value.getLong("uploadedBytes"), value.getString("sha256"), value.getString("mimeType"), if (value.isNull("failureCode")) null else value.getString("failureCode"))
     private fun ticket(bytes: ByteArray): NativeUploadTicket { val value = JSONObject(bytes.toString(Charsets.UTF_8)); return NativeUploadTicket(asset(value.getJSONObject("asset")), URL(value.getString("url")), value.getInt("chunkBytes").also { require(it in 1..1_048_576) }) }
-    suspend fun request(path: String, method: String = "GET", bytes: ByteArray? = null, contentType: String = "application/json", offset: Long? = null): ByteArray = withContext(Dispatchers.IO) {
+    suspend fun request(path: String, method: String = "GET", bytes: ByteArray? = null, contentType: String = "application/json", offset: Long? = null, expectedAccountId: String? = null): ByteArray = withContext(Dispatchers.IO) {
         require(path.startsWith("/v1/w6/") && !path.contains(".."))
         val url = URI(base.toString()).resolve(path).toURL()
         require(url.host == base.host && url.protocol == base.protocol && url.port == base.port)
+        val expected = expectedAccountId?.let { java.util.UUID.fromString(it).toString().also { canonical -> require(canonical.equals(it, ignoreCase = true)) } }
         val connection = url.openConnection() as HttpURLConnection
         connection.instanceFollowRedirects = false; connection.requestMethod = method; connection.connectTimeout = 15_000; connection.readTimeout = 15_000
-        connection.setRequestProperty("Authorization", QelvoraCopy.text("w6Bearer", mapOf("value1" to (token()).toString()))); connection.setRequestProperty("Content-Type", contentType)
+        connection.setRequestProperty("Authorization", "Bearer ${token()}"); connection.setRequestProperty("Content-Type", contentType)
         offset?.let { connection.setRequestProperty("Upload-Offset", it.toString()) }
+        expected?.let { connection.setRequestProperty("x-qelvora-expected-account", it) }
         try {
             bytes?.let { connection.doOutput = true; connection.setFixedLengthStreamingMode(it.size); connection.outputStream.use { stream -> stream.write(it) } }
             if (connection.responseCode !in 200..299) throw NativeMediaRequestError(connection.responseCode)
