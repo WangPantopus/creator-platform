@@ -136,6 +136,10 @@ export class Database {
         { accountId: scope.actorAccountId, adultEligible: true },
         scope.creatorId,
         scope.threadId,
+        {
+          fanAccountId: scope.fanAccountId,
+          creatorAccountId: scope.creatorAccountId,
+        },
       );
       // Instrument the actual SQL method, so a future assembler query cannot omit its family predicate silently.
       const scopedClient = this.observeQuery

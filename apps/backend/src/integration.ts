@@ -6,6 +6,7 @@ import { Database } from "./db/database.js";
 import {
   AccessService,
   type ScopeRestriction,
+  type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
 import { ConversationService } from "./modules/conversation/service.js";
 import type { GuardrailProvider } from "./modules/agent/providers.js";
@@ -36,6 +37,8 @@ export async function createConfiguredBackend(input: {
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  /** Genuine current denial on the caller-held non-owner transaction. */
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
 }) {
   if (!input.config.featureEnabled || !input.config.databaseUrl)
     throw new Error(
@@ -54,7 +57,12 @@ export async function createConfiguredBackend(input: {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, input.assertScopeAllowed);
+  const access = new AccessService(
+    pool,
+    undefined,
+    input.assertScopeAllowed,
+    input.assertScopeAllowedInTransaction,
+  );
   const conversation = new ConversationService(
     database,
     access,
