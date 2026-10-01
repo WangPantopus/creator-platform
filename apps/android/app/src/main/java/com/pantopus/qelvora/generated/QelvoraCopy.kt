@@ -883,7 +883,9 @@ object QelvoraCopy {
     "growthRetainedFanAggregates" to "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair" to "Both quiet-hour boundaries are required",
     "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
-    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59."
+    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59.",
+    "growthDownloadCompleteReply" to "Download complete reply",
+    "growthShareCompleteReply" to "Share complete reply"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

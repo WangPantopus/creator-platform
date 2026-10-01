@@ -24,6 +24,7 @@ export async function configureGrowthForBackend(
     assertAllowed?: Parameters<typeof canonicalCreatorOwner>[1];
     provider?: DeliveryProvider;
     sources?: GrowthEventSources;
+    sourceScan?: Parameters<typeof createGrowthRuntime>[0]["sourceScan"];
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
     experimentsEnabled?: boolean;
@@ -78,7 +79,9 @@ export async function configureGrowthForBackend(
       privacyScope: input.privacyScope,
       privacyTaskAuthority: input.privacyTaskAuthority,
       provider: input.provider,
+      verificationOrigin: env.GROWTH_PUBLIC_ORIGIN,
       sources: input.sources,
+      sourceScan: input.sourceScan,
       activationSource: input.activationSource,
       thanksPermission: input.thanksPermission,
       experimentsEnabled: input.experimentsEnabled,

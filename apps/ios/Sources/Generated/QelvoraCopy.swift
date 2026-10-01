@@ -883,7 +883,9 @@ public enum QelvoraCopy {
     "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
     "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
-    "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
+    "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
+    "growthDownloadCompleteReply": "Download complete reply",
+    "growthShareCompleteReply": "Share complete reply"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

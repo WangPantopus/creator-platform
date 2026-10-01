@@ -1,4 +1,4 @@
-import { copy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import {
   createHash,
   createHmac,
@@ -22,11 +22,27 @@ import {
   type PublicCreator,
   type GrowthOwners,
   type PublicContent,
-  type ShareSource,
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
+
+const ShareSourceRecord = z.strictObject({
+  id: z.uuid(),
+  creatorId: z.uuid(),
+  creatorName: z.string().min(1).max(80),
+  version: z.int().positive(),
+  text: z.string().min(1).max(100000),
+  authorKind: z.enum(["human_creator", "approved_draft"]),
+  signedActId: z.uuid(),
+  signedAt: z.iso.datetime(),
+  contentHash: z.string().regex(/^[a-f0-9]{64}$/u),
+  handle: z
+    .string()
+    .regex(/^[a-z0-9_]{3,30}$/u)
+    .nullable(),
+  correction: z.string().max(20000).nullable(),
+});
 
 export class GrowthService {
   readonly notifications: Notifications;
@@ -36,7 +52,23 @@ export class GrowthService {
     readonly owners: GrowthOwners,
     private readonly secret: Buffer,
     provider?: DeliveryProvider,
+    private readonly verificationOrigin?: string,
   ) {
+    if (verificationOrigin) {
+      const origin = new URL(verificationOrigin);
+      if (
+        origin.protocol !== "https:" ||
+        origin.username ||
+        origin.password ||
+        origin.pathname !== "/" ||
+        origin.search ||
+        origin.hash
+      )
+        throw new Error(
+          "Growth requires an HTTPS verification origin without credentials or a path.",
+        );
+      this.verificationOrigin = origin.origin;
+    }
     if (secret.length !== 32)
       throw new Error("Growth requires a 32-byte encryption/aggregation key");
     this.erasure = new GrowthErasure(secret);
@@ -96,15 +128,18 @@ export class GrowthService {
   }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
-    if (item.state === "withdrawn")
-      return this.withdrawContent(item.creatorId, item.id, item.version);
+    if (item.state === "withdrawn") {
+      await this.withdrawContent(item.creatorId, item.id, item.version);
+      return { published: false };
+    }
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
         copy.growthErrorSignedContentRequired,
       );
-    await this.db.transaction(this.db.worker, async (client) => {
-      if (!(await this.erasure.creator(client, item.creatorId))) return;
+    return this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.creatorId)))
+        return { published: false };
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`growth.content:${item.id}`],
@@ -125,7 +160,7 @@ export class GrowthService {
         prior?.version > item.version ||
         (prior?.version === item.version && prior.state === "withdrawn")
       )
-        return;
+        return { published: false };
       if (prior?.version === item.version) {
         if (contentHash(prior.document) !== contentHash(item))
           throw new DomainError(
@@ -133,7 +168,7 @@ export class GrowthService {
             copy.growthErrorEntryIdConflict,
             409,
           );
-        return;
+        return { published: true };
       }
       await client.query(
         `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
@@ -147,6 +182,7 @@ export class GrowthService {
           item.publishedAt,
         ],
       );
+      return { published: true };
     });
   }
   /** W5 withdraws without changing the immutable content version. Negative
@@ -322,10 +358,58 @@ export class GrowthService {
         ).rows,
     );
   }
-  async home(actor: Actor) {
+  async home(actor: Actor, raw: unknown = {}) {
+    const input = z
+      .strictObject({
+        postsCursor: z.string().min(1).max(1024).optional(),
+        threadsCursor: z.string().min(1).max(1024).optional(),
+      })
+      .parse(raw);
+    let threadCursor: string | undefined;
+    if (input.threadsCursor) {
+      try {
+        const value = z
+          .strictObject({
+            accountId: z.uuid(),
+            threadId: z.uuid(),
+            kind: z.literal("threads"),
+          })
+          .parse(JSON.parse(this.open(input.threadsCursor)));
+        if (value.accountId !== actor.accountId)
+          throw new Error("cursor_account_changed");
+        threadCursor = value.threadId;
+      } catch {
+        throw new DomainError(
+          "home_cursor_invalid",
+          copy.growthThisDestinationIsNoLongerAvailable,
+          400,
+        );
+      }
+    }
+    let before: { accountId: string; publishedAt: string; id: string } | null =
+      null;
+    if (input.postsCursor) {
+      try {
+        before = z
+          .strictObject({
+            accountId: z.uuid(),
+            publishedAt: z.iso.datetime(),
+            id: z.uuid(),
+          })
+          .parse(JSON.parse(this.open(input.postsCursor)));
+        if (before.accountId !== actor.accountId)
+          throw new Error("cursor_account_changed");
+      } catch {
+        throw new DomainError(
+          "home_cursor_invalid",
+          copy.growthThisDestinationIsNoLongerAvailable,
+          400,
+        );
+      }
+    }
     const own = await this.db.actor(actor, null, async (client) => {
       const follows = await client.query(
-        "SELECT creator_id FROM growth.follow WHERE account_id=$1",
+        "SELECT count(*)::int AS count FROM growth.follow WHERE account_id=$1",
         [actor.accountId],
       );
       const unread = await client.query(
@@ -333,28 +417,87 @@ export class GrowthService {
         [actor.accountId],
       );
       return {
-        ids: follows.rows.map((r) => r.creator_id as string),
+        followingCount: follows.rows[0].count as number,
         unread: unread.rows[0].count,
+        posts: (
+          await client.query(
+            `SELECT p.id,p.document,c.document AS creator,to_char(p.published_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_time
+           FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id
+           WHERE EXISTS(SELECT 1 FROM growth.follow f WHERE f.account_id=$1 AND f.creator_id=p.creator_id)
+           AND p.state='published' AND c.state='published' AND c.document->>'verified'='true'
+           AND ($2::timestamptz IS NULL OR (p.published_at,p.id)<($2::timestamptz,$3::uuid))
+           ORDER BY p.published_at DESC,p.id DESC LIMIT 31`,
+            [actor.accountId, before?.publishedAt ?? null, before?.id ?? null],
+          )
+        ).rows,
       };
     });
-    const entries = (await this.owners.home(actor))
+    if (threadCursor && !this.owners.homePage)
+      throw new DomainError(
+        "home_cursor_unavailable",
+        copy.growthThisDestinationIsNoLongerAvailable,
+        503,
+      );
+    const page = this.owners.homePage
+      ? await this.owners.homePage(actor, threadCursor)
+      : { entries: await this.owners.home(actor), nextCursor: null };
+    if (
+      page.entries.length > 100 ||
+      (page.nextCursor && !z.uuid().safeParse(page.nextCursor).success)
+    )
+      throw new DomainError(
+        "home_scope_invalid",
+        copy.growthErrorPrivateReplyUnavailable,
+        503,
+      );
+    const entries = page.entries
       .filter((e) => Destination.safeParse(e.destination).success)
       .sort(
         (a, b) =>
           Number(b.kind !== "thread") - Number(a.kind !== "thread") ||
           b.updatedAt.localeCompare(a.updatedAt),
       );
-    const result = await this.db.runtime.query(
-      "SELECT p.document,c.document AS creator FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=ANY($1::uuid[]) AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC LIMIT 30",
-      [own.ids],
-    );
+    const posts = own.posts.slice(0, 30);
+    const last = posts.at(-1);
     return {
       entries,
-      posts: result.rows.map((r) => ({
-        post: r.document as PublicContent,
-        creator: r.creator as PublicCreator,
-      })),
-      following: own.ids,
+      posts: posts.map((r) => {
+        const post = r.document as PublicContent;
+        const characters = Array.from(post.body);
+        return {
+          post: {
+            id: post.id,
+            creatorId: post.creatorId,
+            version: post.version,
+            title: post.title,
+            authorLabel: post.authorLabel,
+            preview:
+              characters.slice(0, 480).join("") +
+              (characters.length > 480 ? "…" : ""),
+          },
+          creator: r.creator as PublicCreator,
+        };
+      }),
+      followingCount: own.followingCount,
+      nextThreadsCursor: page.nextCursor
+        ? this.seal(
+            JSON.stringify({
+              accountId: actor.accountId,
+              threadId: page.nextCursor,
+              kind: "threads",
+            }),
+          )
+        : null,
+      nextPostsCursor:
+        own.posts.length > 30 && last
+          ? this.seal(
+              JSON.stringify({
+                accountId: actor.accountId,
+                publishedAt: last.cursor_time,
+                id: last.id,
+              }),
+            )
+          : null,
       unread: own.unread,
     };
   }
@@ -476,12 +619,13 @@ export class GrowthService {
     );
   }
   async createShare(actor: Actor, grantId: string) {
-    const source = await this.owners.shareSource(actor, grantId);
-    if (!source)
+    const supplied = await this.owners.shareSource(actor, grantId);
+    if (!supplied)
       throw new DomainError(
         "sharing_unavailable",
         copy.growthErrorSharingUnavailable,
       );
+    const source = ShareSourceRecord.parse(supplied);
     const current = await this.owners.shareStatus(grantId, source);
     if (!current.valid)
       throw new DomainError(
@@ -517,7 +661,7 @@ export class GrowthService {
       [id],
     );
     if (!result.rowCount) return null;
-    const source = result.rows[0].source as ShareSource;
+    const source = ShareSourceRecord.parse(result.rows[0].source);
     const status = await this.owners.shareStatus(
       result.rows[0].grant_id,
       source,
@@ -525,10 +669,90 @@ export class GrowthService {
     return status.valid
       ? {
           id,
-          source: { ...source, correction: status.correction },
+          source: {
+            ...source,
+            correction: z
+              .string()
+              .max(20000)
+              .nullable()
+              .parse(status.correction),
+          },
+          verificationURL: this.verificationOrigin
+            ? `${this.verificationOrigin}/share/${id}`
+            : null,
           state: "valid" as const,
         }
       : { id, state: "withdrawn" as const };
+  }
+  async shareExport(id: string) {
+    // Recheck the canonical grant/source on the export action, rather than
+    // exporting the potentially stale content a client already displayed.
+    const share = await this.share(z.uuid().parse(id));
+    if (!share || share.state !== "valid")
+      throw new DomainError(
+        "share_unavailable",
+        copy.growthCardUnavailable,
+        410,
+      );
+    if (!share.verificationURL)
+      throw new DomainError(
+        "share_origin_unconfigured",
+        copy.growthImageNeedsOrigin,
+        503,
+      );
+    const source = share.source;
+    if (
+      source.text.length > 100000 ||
+      source.creatorName.length > 80 ||
+      !["human_creator", "approved_draft"].includes(source.authorKind)
+    )
+      throw new DomainError(
+        "share_source_unavailable",
+        copy.growthCardUnavailable,
+        503,
+      );
+    const author =
+      source.authorKind === "approved_draft"
+        ? formatCopy("growthPreparedByAiApprovedBy", {
+            value1: source.creatorName,
+          })
+        : source.handle
+          ? formatCopy("growthSharedReplyTo", {
+              name: source.creatorName,
+              handle: source.handle,
+            })
+          : formatCopy("growthSharedPersonalReply", {
+              name: source.creatorName,
+            });
+    return {
+      id: share.id,
+      version: source.version,
+      sourceHash: source.contentHash,
+      verificationURL: share.verificationURL,
+      text: [
+        author,
+        "",
+        source.text,
+        "",
+        formatCopy("growthSignedByVersion", {
+          name: source.creatorName,
+          version: source.version,
+        }),
+        formatCopy("growthVerifyThisImmutableVersion", {
+          value1: source.version,
+          value2: share.verificationURL,
+        }),
+        ...(source.correction
+          ? [
+              "",
+              formatCopy("growthSNoteOnThisReply", {
+                value1: source.creatorName,
+                value2: source.correction,
+              }),
+            ]
+          : []),
+      ].join("\n"),
+    };
   }
   async createInvite(actor: Actor, input: unknown) {
     const value = z

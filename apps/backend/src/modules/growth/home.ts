@@ -22,61 +22,41 @@ const Directory = z.object({
   fan: z.object({ id: z.uuid() }),
   threads: z
     .array(z.object({ id: z.uuid(), creatorId: z.uuid(), fanId: z.uuid() }))
-    .max(100),
+    .max(50),
   nextCursor: z.uuid().nullable().optional(),
 });
 
 /** Minimal private Home read through fresh issued fan scopes. The host can
  * compose this with W4 request/W6 call entries; no analytics receives text. */
-export function canonicalConversationHome(
+export function canonicalConversationHomePage(
   conversation: ConversationHomeDirectory,
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "publicVerification">,
   handleFor: (creatorId: string) => Promise<string | null>,
-): GrowthOwners["home"] {
-  return async (actor) => {
-    const entries: z.infer<typeof Directory>["threads"] = [];
+): NonNullable<GrowthOwners["homePage"]> {
+  return async (actor, cursor) => {
+    const directory = Directory.parse(
+      await conversation.account(actor, cursor),
+    );
+    const entries = directory.threads;
     const seen = new Set<string>();
-    let fanId: string | undefined, cursor: string | undefined;
-    // W3 now returns at most50 relationships per page. Read two authorized
-    // pages rather than silently treating the first page as the whole account.
-    for (let page = 0; page < 2; page++) {
-      const directory = Directory.parse(
-        await conversation.account(actor, cursor),
-      );
-      if (fanId && fanId !== directory.fan.id)
+    for (const entry of entries) {
+      if (seen.has(entry.id) || entry.fanId !== directory.fan.id)
         throw new DomainError(
           "home_scope_invalid",
           copy.growthErrorPrivateReplyUnavailable,
           503,
         );
-      fanId = directory.fan.id;
-      for (const entry of directory.threads) {
-        if (seen.has(entry.id) || entry.fanId !== fanId)
-          throw new DomainError(
-            "home_scope_invalid",
-            copy.growthErrorPrivateReplyUnavailable,
-            503,
-          );
-        seen.add(entry.id);
-        entries.push(entry);
-      }
-      cursor = directory.nextCursor ?? undefined;
-      if (entries.length > 100 || (cursor && page === 1))
-        throw new DomainError(
-          "home_directory_limit",
-          copy.growthErrorPrivateReplyUnavailable,
-          503,
-        );
-      if (!cursor) break;
-      if (!directory.threads.length || !seen.has(cursor))
-        throw new DomainError(
-          "home_scope_invalid",
-          copy.growthErrorPrivateReplyUnavailable,
-          503,
-        );
+      seen.add(entry.id);
     }
+    const nextCursor = directory.nextCursor ?? null;
+    if (nextCursor && (!seen.has(nextCursor) || nextCursor === cursor))
+      throw new DomainError(
+        "home_scope_invalid",
+        copy.growthErrorPrivateReplyUnavailable,
+        503,
+      );
     const result: HomeEntry[] = [];
     for (const entry of entries) {
       try {
@@ -112,7 +92,11 @@ export function canonicalConversationHome(
         if (!row.thread) continue;
         const message = row.message;
         let label: string = copy.growthSystem;
-        let preview = message?.text.slice(0, 240) ?? "";
+        let preview = message
+          ? Array.from(message.text as string)
+              .slice(0, 240)
+              .join("")
+          : "";
         if (message?.author_kind === "fan") label = copy.navYou;
         else if (message?.author_kind === "ai")
           label = formatCopy("aiAuthor", { name: scope.creatorName });
@@ -153,6 +137,33 @@ export function canonicalConversationHome(
         throw error;
       }
     }
-    return result.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    // W3's directory is UUID ordered. Sorting this bounded page by activity
+    // does not claim global recency across pages; all families remain reachable.
+    return {
+      entries: result.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+      nextCursor,
+    };
+  };
+}
+
+/** Compatibility for hosts on the original non-paged contract. New hosts must
+ * bind homePage so an account beyond this legacy bound stays navigable. */
+export function canonicalConversationHome(
+  ...dependencies: Parameters<typeof canonicalConversationHomePage>
+): GrowthOwners["home"] {
+  const read = canonicalConversationHomePage(...dependencies);
+  return async (actor) => {
+    const first = await read(actor);
+    if (!first.nextCursor) return first.entries;
+    const second = await read(actor, first.nextCursor);
+    if (second.nextCursor)
+      throw new DomainError(
+        "home_directory_limit",
+        copy.growthErrorPrivateReplyUnavailable,
+        503,
+      );
+    return [...first.entries, ...second.entries].sort((a, b) =>
+      b.updatedAt.localeCompare(a.updatedAt),
+    );
   };
 }

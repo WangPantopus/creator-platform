@@ -17,6 +17,12 @@ import {
   type GrowthPrivacyTaskAuthority,
 } from "./lifecycle.js";
 import { registerGrowth } from "./integration.js";
+import {
+  rotatingGrowthSources,
+  databaseGrowthSourceCheckpoint,
+  type GrowthSourceDirectory,
+  type GrowthSourceCheckpoint,
+} from "./sources.js";
 
 /** Same runtime mounts in W1's canonical app and supplies W8's account-job hook. */
 export async function createGrowthRuntime(input: {
@@ -25,7 +31,14 @@ export async function createGrowthRuntime(input: {
   secret: Buffer;
   owners: GrowthOwners;
   provider?: DeliveryProvider;
+  verificationOrigin?: string;
   sources?: GrowthEventSources;
+  sourceScan?: {
+    directory: GrowthSourceDirectory;
+    checkpoint?: GrowthSourceCheckpoint;
+    namespace?: string;
+    pageSize?: number;
+  };
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
   privacyScope?: GrowthPrivacyScope;
@@ -40,6 +53,8 @@ export async function createGrowthRuntime(input: {
     value: number,
   ) => void;
 }) {
+  if (input.sources && input.sourceScan)
+    throw new Error("growth_source_configuration_conflict");
   const db = new GrowthDatabase(input.runtimePool, input.workerPool);
   await db.ready();
   const schema = await input.workerPool.query(
@@ -52,7 +67,16 @@ export async function createGrowthRuntime(input: {
     input.owners,
     input.secret,
     input.provider,
+    input.verificationOrigin,
   );
+  const sourceFactory = input.sourceScan
+    ? rotatingGrowthSources(
+        input.sourceScan.directory,
+        input.sourceScan.checkpoint ??
+          databaseGrowthSourceCheckpoint(service, input.sourceScan.namespace),
+        input.sourceScan.pageSize,
+      )
+    : input.sources;
   const retention = new Retention(service, input.thanksPermission);
   const relay = new GrowthRelay(service);
   const engagement = new Engagement(service, input.installURLs);
@@ -61,23 +85,23 @@ export async function createGrowthRuntime(input: {
     timer: ReturnType<typeof setTimeout> | null = null,
     stopped = true;
   let sourceCount: number | null =
-    typeof input.sources === "function" ? null : (input.sources?.length ?? 0);
+    typeof sourceFactory === "function" ? null : (sourceFactory?.length ?? 0);
   let sourceReadiness:
     | "unconfigured"
     | "pending"
     | "available"
-    | "unavailable" = input.sources ? "pending" : "unconfigured";
+    | "unavailable" = sourceFactory ? "pending" : "unconfigured";
   async function tick() {
     let sources: readonly import("./relay.js").GrowthEventSource[] = [];
     try {
       sources =
-        typeof input.sources === "function"
-          ? await input.sources()
-          : (input.sources ?? []);
+        typeof sourceFactory === "function"
+          ? await sourceFactory()
+          : (sourceFactory ?? []);
       if (sources.length > 100)
         throw new Error("producer_scope_batch_exceeded");
       sourceCount = sources.length;
-      sourceReadiness = input.sources ? "available" : "unconfigured";
+      sourceReadiness = sourceFactory ? "available" : "unconfigured";
     } catch {
       // Enumeration failure must not prevent existing leased inbox/delivery
       // recovery. Those paths recheck current owner state independently.

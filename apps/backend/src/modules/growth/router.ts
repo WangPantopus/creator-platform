@@ -92,6 +92,10 @@ export function createGrowthRouter(
       );
     res.json(value);
   });
+  router.get("/public/shares/:id/export", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await service.shareExport(uuid(req.params.id)));
+  });
   router.post("/unsubscribe", async (req, res) =>
     res.json(
       await service.unsubscribe(
@@ -165,7 +169,7 @@ export function createGrowthRouter(
     res.json(await experiments.stop(await actorFor(req), uuid(req.params.id))),
   );
   router.get("/home", async (req, res) =>
-    res.json(await service.home(await actorFor(req))),
+    res.json(await service.home(await actorFor(req), req.query)),
   );
   router.put("/follow/:creatorId", async (req, res) =>
     res.json(

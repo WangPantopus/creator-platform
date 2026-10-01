@@ -1,5 +1,5 @@
 import { copy } from "@qelvora/copy";
-import type { SignedActCommand } from "@qelvora/api";
+import { SignedActCommandSchema, type SignedActCommand } from "@qelvora/api";
 import type { Actor } from "../identity/adapter.js";
 import type { SignedActService } from "../identity/signed-acts.js";
 import { contentHash } from "../../core/canonical.js";
@@ -118,6 +118,11 @@ export function contentPublicProjection(
           current.document.audience.kind === "public" &&
           Boolean(current.publishedAt);
       } catch (error) {
+        await growth.withdrawContent(
+          current.creatorId,
+          current.id,
+          current.version,
+        );
         if (
           !(
             error instanceof DomainError && error.code === "content_unavailable"
@@ -141,26 +146,28 @@ export function contentPublicProjection(
         503,
       );
     }
-    let publicationHash = contentHash({
-      actType: current.document.kind === "note" ? "broadcast" : "reply",
-      subjectId: current.id,
-      content: {
-        kind: "content_publication",
-        creatorId: current.creatorId,
-        version: current.version,
-        document: current.document,
-      },
-    });
     if (publicState) {
       // W5 reads the stored complete command and rechecks current processed
       // media/W6 readiness. Never reconstruct media evidence from a document.
-      const proof = content.publicationProof
-        ? await content.publicationProof(actor, current.creatorId, current.id)
-        : null;
-      if (content.publicationProof) {
-        const body = proof?.command.content;
+      let proof;
+      try {
+        proof = content.publicationProof
+          ? await content.publicationProof(actor, current.creatorId, current.id)
+          : null;
+      } catch (error) {
+        await growth.withdrawContent(
+          current.creatorId,
+          current.id,
+          current.version,
+        );
+        throw error;
+      }
+      const command = SignedActCommandSchema.safeParse(proof?.command);
+      {
+        const body = command.success ? command.data.content : null;
         if (
           !proof ||
+          !command.success ||
           !body ||
           typeof body !== "object" ||
           Array.isArray(body) ||
@@ -185,12 +192,8 @@ export function contentPublicProjection(
             503,
           );
         }
-        publicationHash = contentHash(proof.command);
       }
-      if (
-        (current.document.media?.length && !proof) ||
-        (proof && proof.mediaReady !== true)
-      ) {
+      if (proof.mediaReady !== true) {
         await growth.withdrawContent(
           current.creatorId,
           current.id,
@@ -202,17 +205,39 @@ export function contentPublicProjection(
           503,
         );
       }
+      if (current.authorKind !== "team") {
+        let signature;
+        try {
+          signature = current.signedActId
+            ? await signing.publicVerification(current.signedActId)
+            : null;
+        } catch (error) {
+          await growth.withdrawContent(
+            current.creatorId,
+            current.id,
+            current.version,
+          );
+          throw error;
+        }
+        if (
+          signature?.status !== "valid" ||
+          signature.contentHash !== contentHash(proof.command)
+        ) {
+          await growth.withdrawContent(
+            current.creatorId,
+            current.id,
+            current.version,
+          );
+          throw new DomainError(
+            "content_version_unavailable",
+            copy.growthErrorContentVersionUnavailable,
+            503,
+          );
+        }
+      }
     }
-    if (publicState && current.authorKind !== "team") {
-      const signature = current.signedActId
-        ? await signing.publicVerification(current.signedActId)
-        : null;
-      publicState =
-        signature?.status === "valid" &&
-        signature.contentHash === publicationHash;
-    }
-    if (publicState)
-      await growth.projectContent({
+    if (publicState) {
+      const projection = await growth.projectContent({
         id: current.id,
         creatorId: current.creatorId,
         version: current.version,
@@ -227,7 +252,15 @@ export function contentPublicProjection(
         // Public publication/source intent alone does not approve AI reuse.
         aiContextEligible: false,
       });
-    else
+      // An erasure fence or a same/newer withdrawal wins under W7's lock.
+      // A no-op must not complete W5's public-distribution effect as published.
+      if (!projection.published)
+        throw new DomainError(
+          "content_version_unavailable",
+          copy.growthErrorContentVersionUnavailable,
+          503,
+        );
+    } else
       await growth.withdrawContent(
         current.creatorId,
         current.id,

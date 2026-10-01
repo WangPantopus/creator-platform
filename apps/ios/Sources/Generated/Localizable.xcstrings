@@ -9581,6 +9581,28 @@
           }
         }
       }
+    },
+    "Download complete reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download complete reply"
+          }
+        }
+      }
+    },
+    "Share complete reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share complete reply"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

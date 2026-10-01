@@ -1,6 +1,9 @@
 import Foundation
 import SwiftUI
 import UserNotifications
+#if os(iOS)
+import UIKit
+#endif
 
 public struct GrowthCreator: Codable, Identifiable, Sendable {
   public let id: String
@@ -55,12 +58,21 @@ private struct GrowthHome: Decodable {
     let kind: String
   }
   struct Update: Decodable {
+    struct Post: Decodable {
+      let id: String
+      let title: String
+      let authorLabel: String
+      let preview: String
+    }
     let creator: GrowthCreator
-    let post: GrowthPost
+    let post: Post
   }
   let entries: [Entry]
   let posts: [Update]
   let unread: Int
+  let followingCount: Int?
+  let nextPostsCursor: String?
+  let nextThreadsCursor: String?
 }
 private struct GrowthInvitation: Decodable {
   let creator: GrowthCreator
@@ -76,7 +88,21 @@ private struct GrowthSharedReply: Decodable {
   }
   let state: String
   let source: Source?
+  let verificationURL: String?
 }
+private struct GrowthReplyExport: Decodable, Identifiable {
+  let id: String
+  let text: String
+}
+#if os(iOS)
+private struct GrowthReplyShareSheet: UIViewControllerRepresentable {
+  let artifact: GrowthReplyExport
+  func makeUIViewController(context: Context) -> UIActivityViewController {
+    UIActivityViewController(activityItems: [artifact.text], applicationActivities: nil)
+  }
+  func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+#endif
 private struct NotificationPage: Decodable { let notifications: [GrowthNotification] }
 private struct GrowthNotification: Decodable, Identifiable {
   let id: String
@@ -108,7 +134,7 @@ public struct GrowthClient: Sendable {
     self.baseURL = baseURL
     self.token = token
   }
-  func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil) async throws
+  func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, expectedSession: String? = nil) async throws
     -> T
   {
     guard let url = URL(string: "/v1/growth/" + path, relativeTo: baseURL) else {
@@ -120,7 +146,9 @@ public struct GrowthClient: Sendable {
     request.timeoutInterval = 10
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    if !path.hasPrefix("public/"), let value = try await token() {
+    let value = path.hasPrefix("public/") ? nil : try await token()
+    if let expectedSession, value != expectedSession { throw GrowthRequestFailure(status: 401) }
+    if let value {
       request.setValue("Bearer " + value, forHTTPHeaderField: "Authorization")
     }
     let (data, response) = try await URLSession.shared.data(for: request)
@@ -128,6 +156,7 @@ public struct GrowthClient: Sendable {
     guard (200..<300).contains(http.statusCode) else {
       throw GrowthRequestFailure(status: http.statusCode)
     }
+    if expectedSession != nil, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
   public func registerDevice(installationID: UUID, token value: Data, granted: Bool) async throws {
@@ -151,8 +180,16 @@ public struct GrowthFanFeature: View {
   @State private var category = "For you"
   @State private var section = "Chat"
   @State private var home: GrowthHome?
+  @State private var homePostsCursor: String?
+  @State private var homeThreadsCursor: String?
+  @State private var homePageRevision = 0
+  @AccessibilityFocusState private var homeHeadingFocused: Bool
+  @State private var pagingHome = false
+  @State private var homeRequestID = UUID()
   @State private var invitation: GrowthInvitation?
   @State private var shared: GrowthSharedReply?
+  @State private var replyExport: GrowthReplyExport?
+  @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
   @State private var pass: GrowthPassAccess?
@@ -198,6 +235,7 @@ public struct GrowthFanFeature: View {
   }
   public var body: some View {
     VStack(spacing: 0) {
+      ScrollViewReader { reader in
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
           if route == "/notifications/settings" {
@@ -242,7 +280,7 @@ public struct GrowthFanFeature: View {
             }
           } else if route == "/home", let home {
             HStack {
-              Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg")
+              Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($homeHeadingFocused)
               Spacer()
               Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { route = "/notifications" }
             }
@@ -258,6 +296,11 @@ public struct GrowthFanFeature: View {
                 }.padding(16)
               }.buttonStyle(.plain)
             }
+            if let cursor = home.nextThreadsCursor {
+              Button(QelvoraCopy.text("navMore") + ": " + QelvoraCopy.text("growthYourPeople"), variant: .secondary, block: true) {
+                Task { await pageHome(homePostsCursor, threadsCursor: cursor) }
+              }.disabled(pagingHome)
+            }
             ForEach(home.posts, id: \.post.id) { update in
               SwiftUI.Button {
                 route = "/creators/" + update.creator.handle + "/posts/" + update.post.id
@@ -265,13 +308,24 @@ public struct GrowthFanFeature: View {
                 VStack(alignment: .leading, spacing: 8) {
                   Text(update.post.authorLabel).qText("label")
                   Text(update.post.title).qText("title")
-                  Text(update.post.body).qText("voice-md")
+                  Text(update.post.preview).qText("voice-md")
                 }.padding(16)
               }.buttonStyle(.plain)
             }
+            if let cursor = home.nextPostsCursor {
+              Button(QelvoraCopy.text("navMore"), variant: .secondary, block: true) {
+                Task { await pageHome(cursor, threadsCursor: homeThreadsCursor) }
+              }.disabled(pagingHome)
+            }
+            if pagingHome { ProgressView().accessibilityLabel(QelvoraCopy.text("growthLoading")) }
+            if homePostsCursor != nil || homeThreadsCursor != nil {
+              Button(QelvoraCopy.text("growthLatestFirst"), variant: .quiet, block: true) {
+                Task { await pageHome(nil) }
+              }.disabled(pagingHome)
+            }
             if home.entries.isEmpty && home.posts.isEmpty {
               EmptyState(
-                title: QelvoraCopy.text("growthPickACreatorToStart"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
+                title: QelvoraCopy.text(home.followingCount == 0 && homePostsCursor == nil && homeThreadsCursor == nil && home.nextThreadsCursor == nil ? "growthPickACreatorToStart" : "growthNoUpdatesYet"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
               ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { route = "/discover" } }
             }
           } else if route.hasPrefix("/invite/"), let invitation {
@@ -283,16 +337,24 @@ public struct GrowthFanFeature: View {
             }
           } else if route.hasPrefix("/share/"), let shared {
             if shared.state == "valid", let source = shared.source {
-              Text(
-                source.authorKind == "approved_draft"
-                  ? QelvoraCopy.text("approvedAuthor", values: ["name": source.creatorName])
-                  : QelvoraCopy.text("growthPersonalReply2", values: ["name": source.creatorName])
-              ).qText("label")
-              Text(source.text).qText("voice-md")
-              Text(QelvoraCopy.text("growthSignedByVersion", values: ["name": source.creatorName, "version": String(source.version)]))
-                .qText("caption")
+              VStack(alignment: .leading, spacing: 16) {
+                AuthorLabel(kind: source.authorKind == "approved_draft" ? .approvedDraft : .humanCreator, name: source.creatorName, onMaya: source.authorKind != "approved_draft")
+                Text(source.text).qText(source.authorKind == "approved_draft" ? "body" : "voice-md")
+                Text(QelvoraCopy.text("growthSignedByVersion", values: ["name": source.creatorName, "version": String(source.version)]))
+                  .qText("caption")
+              }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundStyle(qColor(source.authorKind == "approved_draft" ? "ai-ink" : "on-maya", scheme))
+                .background(qColor(source.authorKind == "approved_draft" ? "ai-surface" : "maya-surface", scheme))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
               if let correction = source.correction {
                 Notice(title: QelvoraCopy.text("growthCorrection"), children: correction)
+              }
+              if shared.verificationURL != nil {
+                Button(QelvoraCopy.text("growthShareCompleteReply"), variant: .secondary, block: true, disabled: sharingReply) {
+                  Task { await exportSharedReply() }
+                }
+              } else {
+                Notice(title: QelvoraCopy.text("growthUnavailable"), children: QelvoraCopy.text("growthImageNeedsOrigin"))
               }
             } else {
               EmptyState(
@@ -411,7 +473,11 @@ public struct GrowthFanFeature: View {
             if requiresSignIn { Button(QelvoraCopy.text("continueWithPantopus"), block: true) { signIn(route) } }
             Button(QelvoraCopy.text("growthTryAgain"), variant: .secondary) { Task { await load() } }
           }
-        }.padding(16)
+        }.padding(16).id("growth-home-top")
+      }.onChange(of: homePageRevision) { _, _ in
+        reader.scrollTo("growth-home-top", anchor: .top)
+        homeHeadingFocused = true
+      }
       }
       if !hasSession {
         TabBar(active: route == "/discover" ? .discover : .home) { tab in
@@ -427,6 +493,9 @@ public struct GrowthFanFeature: View {
     ) { _, target in route = target }.task(id: route) {
       await load()
     }
+    #if os(iOS)
+    .sheet(item: $replyExport) { artifact in GrowthReplyShareSheet(artifact: artifact) }
+    #endif
   }
   private func creatorCard(_ value: GrowthCreator) -> some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -455,6 +524,8 @@ public struct GrowthFanFeature: View {
     }.background(qColor("surface", scheme)).clipShape(RoundedRectangle(cornerRadius: 16))
   }
   private func load() async {
+    replyExport = nil
+    homeRequestID = UUID()
     guard let client else {
       error = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured")
       return
@@ -484,6 +555,8 @@ public struct GrowthFanFeature: View {
           pass = try? await client.request("discovery-access")
         }
       } else if route == "/home" {
+        homePostsCursor = nil
+        homeThreadsCursor = nil
         home = try await client.request("home")
       } else if route.hasPrefix("/invite/") {
         invitation = try await client.request("public/invites/" + String(route.dropFirst(8)))
@@ -531,11 +604,52 @@ public struct GrowthFanFeature: View {
       record(error)
     }
   }
+  private func pageHome(_ cursor: String?, threadsCursor: String? = nil) async {
+    guard let client, route == "/home", !pagingHome else { return }
+    pagingHome = true
+    let requestID = UUID()
+    homeRequestID = requestID
+    defer { pagingHome = false }
+    do {
+      guard let currentSession = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+      var components = URLComponents()
+      components.queryItems = [cursor.map { URLQueryItem(name: "postsCursor", value: $0) }, threadsCursor.map { URLQueryItem(name: "threadsCursor", value: $0) }].compactMap { $0 }
+      let path = "home" + (components.percentEncodedQuery.flatMap { $0.isEmpty ? nil : "?" + $0 } ?? "")
+      let page: GrowthHome = try await client.request(path, expectedSession: currentSession)
+      guard !Task.isCancelled, route == "/home", homeRequestID == requestID else { return }
+      home = page
+      homePostsCursor = cursor
+      homeThreadsCursor = threadsCursor
+      homePageRevision += 1
+      error = ""
+    } catch {
+      guard !Task.isCancelled, route == "/home", homeRequestID == requestID else { return }
+      requiresSignIn = (error as? GrowthRequestFailure)?.status == 401
+      if let status = (error as? GrowthRequestFailure)?.status, [401, 403, 410].contains(status) { home = nil }
+      self.error = (error as? GrowthRequestFailure)?.message ?? QelvoraCopy.text("growthTheServiceIsUnavailableReconnectAndTryAgain")
+    }
+  }
   private func record(_ failure: Error) {
     requiresSignIn = (failure as? GrowthRequestFailure)?.status == 401
     error =
       (failure as? GrowthRequestFailure)?.message
       ?? QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+  }
+  private func exportSharedReply() async {
+    guard let client, route.hasPrefix("/share/"), !sharingReply else { return }
+    let target = route
+    sharingReply = true
+    defer { sharingReply = false }
+    do {
+      let artifact: GrowthReplyExport = try await client.request("public/shares/" + String(target.dropFirst(7)) + "/export")
+      guard !Task.isCancelled, route == target, artifact.id == String(target.dropFirst(7)) else { return }
+      replyExport = artifact
+      error = ""
+    } catch {
+      guard !Task.isCancelled, route == target else { return }
+      if (error as? GrowthRequestFailure)?.status == 410 { shared = nil }
+      record(error)
+    }
   }
   private func follow(_ creator: GrowthCreator) async {
     guard let client else { return }

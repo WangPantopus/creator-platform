@@ -198,6 +198,10 @@ export interface GrowthOwners {
     recipient: GrowthEvent["recipients"][number],
   ): Promise<NotificationState>;
   home(actor: Actor): Promise<HomeEntry[]>;
+  homePage?(
+    actor: Actor,
+    cursor?: string,
+  ): Promise<{ entries: HomeEntry[]; nextCursor: string | null }>;
   discoveryAccess(actor: Actor): Promise<PassDiscoveryView>;
   creatorFor(actor: Actor): Promise<string | null>;
   shareSource(actor: Actor, grantId: string): Promise<ShareSource | null>;

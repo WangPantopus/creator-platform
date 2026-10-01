@@ -13,6 +13,10 @@ import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { createAgentDomain } from "./modules/agent/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
+import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { DomainError } from "./core/errors.js";
+import { copy } from "@qelvora/copy";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -39,13 +43,6 @@ const configured =
         },
         signedSubjectPolicies: [commerceSignedSubjects],
         registerFeatures: async (runtime) => {
-          features.growth = await configureGrowthForBackend({
-            ...runtime,
-            assertAllowed: async (actor, creatorId) =>
-              creatorId
-                ? runtime.assertCreatorAllowed(actor, creatorId)
-                : runtime.assertActorAllowed(actor),
-          });
           const commerceConfiguration = readCommerceEnvironment(runtime.pool);
           const commerce = commerceConfiguration
             ? await createCommerceRuntime({
@@ -56,6 +53,24 @@ const configured =
           const conversation = createConversationRuntime(runtime);
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
           const agent = createAgentDomain({ pool: runtime.pool, model: null });
+          const contentDependencies = {
+            assertAllowed: runtime.assertCreatorAllowed,
+            effect: async (
+              ...args: Parameters<ReturnType<typeof contentPublicProjection>>
+            ): Promise<{ reference: string }> => {
+              if (!features.growth || !runtime.identity)
+                throw new DomainError(
+                  "content_delivery_unconfigured",
+                  copy.growthErrorContentEffectUnconfigured,
+                  503,
+                );
+              return contentPublicProjection(
+                features.growth.service,
+                content.content,
+                runtime.identity.signing,
+              )(...args);
+            },
+          };
           const content = runtime.assertScopeAllowedInTransaction
             ? await createCommerceStudio({
                 assertScopeAllowedInTransaction:
@@ -67,7 +82,7 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: contentDependencies,
               })
             : createContentStudio({
                 pool: runtime.pool,
@@ -77,13 +92,39 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: contentDependencies,
               });
           runtime.configureSignedSubjects(
             Array.isArray(content.signedSubjects)
               ? content.signedSubjects
               : [content.signedSubjects],
           );
+          features.growth = await configureGrowthForBackend({
+            ...runtime,
+            assertAllowed: async (actor, creatorId) =>
+              creatorId
+                ? runtime.assertCreatorAllowed(actor, creatorId)
+                : runtime.assertActorAllowed(actor),
+            owners: runtime.identity
+              ? {
+                  homePage: canonicalConversationHomePage(
+                    conversation.feature,
+                    runtime.access,
+                    runtime.database,
+                    runtime.identity.signing,
+                    async (creatorId) => {
+                      const row = (
+                        await runtime.pool.query(
+                          "SELECT document->>'handle' AS handle FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
+                          [creatorId],
+                        )
+                      ).rows[0];
+                      return row?.handle ?? null;
+                    },
+                  ),
+                }
+              : undefined,
+          });
           return [
             conversation.registration,
             agentFeature({

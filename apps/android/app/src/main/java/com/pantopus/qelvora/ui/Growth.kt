@@ -15,6 +15,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -34,16 +36,19 @@ class GrowthRequestFailure(val status: Int): Exception(when(status) {401 -> Qelv
 
 /** Session credential comes from W1; no growth-owned credential persistence. */
 class GrowthClient(private val origin: String, private val token: () -> String? = { null }) {
-    suspend fun request(path: String, method: String = "GET", body: JSONObject? = null): JSONObject = withContext(Dispatchers.IO) {
+    suspend fun request(path: String, method: String = "GET", body: JSONObject? = null, expectedSession: String? = null): JSONObject = withContext(Dispatchers.IO) {
         val connection = URL(URL(origin), "/v1/growth/$path").openConnection() as HttpURLConnection
         try {
             connection.requestMethod = method; connection.connectTimeout = 5000; connection.readTimeout = 10000
             connection.useCaches = false; connection.setRequestProperty("Content-Type", "application/json")
-            if(!path.startsWith("public/")) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
+            val credential = if(path.startsWith("public/")) null else token()
+            if(expectedSession != null && credential != expectedSession) throw GrowthRequestFailure(401)
+            credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (body != null) { connection.doOutput = true; connection.outputStream.use { it.write(body.toString().toByteArray()) } }
             if (connection.responseCode !in 200..299) throw GrowthRequestFailure(connection.responseCode)
             val response = connection.inputStream.use { it.readNBytes(1_000_001) }
             if (response.size > 1_000_000) throw IllegalStateException(QelvoraCopy.text("growthThisResponseIsUnavailable"))
+            if(expectedSession != null && token() != credential) throw GrowthRequestFailure(401)
             JSONObject(response.toString(Charsets.UTF_8))
         } finally { connection.disconnect() }
     }
@@ -66,17 +71,61 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     var creator by remember { mutableStateOf<JSONObject?>(null) }
     var posts by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var home by remember { mutableStateOf<JSONObject?>(null) }
+    var homePostsCursor by remember { mutableStateOf<String?>(null) }
+    var homeThreadsCursor by remember { mutableStateOf<String?>(null) }
+    var pagingHome by remember { mutableStateOf(false) }
     var invitation by remember { mutableStateOf<JSONObject?>(null) }
     var shared by remember { mutableStateOf<JSONObject?>(null) }
+    var sharingReply by remember { mutableStateOf(false) }
     var following by remember { mutableStateOf(false) }
     var notifications by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var error by remember { mutableStateOf("") }
     var requiresSignIn by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
     val client = remember(baseUrl) { baseUrl?.let { GrowthClient(it, token) } }
     val ink = qColor("ink")
     fun record(failure: Exception) {requiresSignIn = (failure as? GrowthRequestFailure)?.status == 401;error = if(failure is GrowthRequestFailure) failure.message!! else QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")}
+    fun exportSharedReply() {
+        val target = route
+        if(client == null || !target.startsWith("/share/") || sharingReply) return
+        sharingReply = true
+        scope.launch {
+            try {
+                val id = target.removePrefix("/share/")
+                val artifact = client.request("public/shares/$id/export")
+                if(route == target && artifact.getString("id") == id) {
+                    val intent = Intent(Intent.ACTION_SEND).apply {type = "text/plain";putExtra(Intent.EXTRA_TEXT, artifact.getString("text"))}
+                    context.startActivity(Intent.createChooser(intent, QelvoraCopy.text("growthShareCompleteReply")))
+                    error = ""
+                }
+            } catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled}
+            catch(failure: Exception) {
+                if(route == target) {if((failure as? GrowthRequestFailure)?.status == 410) shared = null;record(failure)}
+            } finally {sharingReply = false}
+        }
+    }
+    fun pageHome(cursor: String?, threadsCursor: String? = null) {
+        val previous = home ?: return
+        if (route != "/home" || pagingHome || client == null) return
+        pagingHome = true
+        scope.launch {
+            try {
+                val currentSession = token() ?: throw GrowthRequestFailure(401)
+                val query = listOfNotNull(cursor?.let { "postsCursor=" + URLEncoder.encode(it, "UTF-8") }, threadsCursor?.let { "threadsCursor=" + URLEncoder.encode(it, "UTF-8") }).joinToString("&")
+                val page = client.request("home" + if(query.isEmpty()) "" else "?$query", expectedSession = currentSession)
+                if (route == "/home" && home === previous) {home = page;homePostsCursor = cursor;homeThreadsCursor = threadsCursor;error = "";scrollState.scrollTo(0)}
+            } catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled}
+            catch(failure: Exception) {
+                if(route == "/home" && home === previous) {
+                    if((failure as? GrowthRequestFailure)?.status in listOf(401,403,410)) home = null
+                    record(failure)
+                }
+            } finally {pagingHome = false}
+        }
+    }
     LaunchedEffect(route, refresh, category) {
         error = ""; requiresSignIn = false; loading = true
         try {
@@ -84,7 +133,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
             if (client == null) throw IllegalStateException(QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured"))
             when {
                 route == "/discover" -> { val result = client.request("public/creators?q=${URLEncoder.encode(query, "UTF-8")}&category=${if (category == "For you") "" else category}"); creators = result.objects("creators");pass = null;pass = try {client.request("discovery-access")}catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled} catch(_: Exception) {null} }
-                route == "/home" -> home = client.request("home")
+                route == "/home" -> {homePostsCursor = null;homeThreadsCursor = null;home = client.request("home")}
                 route.startsWith("/invite/") -> invitation = client.request("public/invites/${route.removePrefix("/invite/")}")
                 route.startsWith("/share/") -> shared = client.request("public/shares/${route.removePrefix("/share/")}")
                 route == "/notifications/settings" -> Unit
@@ -103,7 +152,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
         finally {loading = false}
     }
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             when {
                 route == "/notifications/settings" -> GrowthNotificationSettings(client)
                 route == "/discover" -> {
@@ -160,11 +209,15 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {BasicText(QelvoraCopy.text("growthYourPeople"), style = qText("display-lg").copy(color = ink));Button(QelvoraCopy.text("growthNotifications"), ButtonVariant.QUIET) {route = "/notifications"}}
                     GrowthPostValuePrompt(client) { route = it }
                     home!!.objects("entries").forEach {entry -> Button(entry.getString("creatorName") + " · " + entry.getString("label"), ButtonVariant.SECONDARY, block = true) {route = entry.getString("destination")} }
-                    home!!.objects("posts").forEach {update -> val post = update.getJSONObject("post");BasicText(post.getString("authorLabel"), style = qText("label").copy(color = ink));Button(post.getString("title"), ButtonVariant.SECONDARY, block = true) {route = "/creators/${update.getJSONObject("creator").getString("handle")}/posts/${post.getString("id")}"} }
-                    if (home!!.objects("entries").isEmpty() && home!!.objects("posts").isEmpty()) EmptyState(QelvoraCopy.text("growthPickACreatorToStart"), QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")) {Button(QelvoraCopy.text("navDiscover"), ButtonVariant.SECONDARY) {route = "/discover"}}
+                    if(home!!.has("nextThreadsCursor") && !home!!.isNull("nextThreadsCursor")) Button(QelvoraCopy.text("navMore") + ": " + QelvoraCopy.text("growthYourPeople"), ButtonVariant.SECONDARY, disabled = pagingHome) {pageHome(homePostsCursor, home!!.getString("nextThreadsCursor"))}
+                    home!!.objects("posts").forEach {update -> val post = update.getJSONObject("post");BasicText(post.getString("authorLabel"), style = qText("label").copy(color = ink));Button(post.getString("title"), ButtonVariant.SECONDARY, block = true) {route = "/creators/${update.getJSONObject("creator").getString("handle")}/posts/${post.getString("id")}"};BasicText(post.getString("preview"), style = qText("voice-md").copy(color = ink)) }
+                    if(home!!.has("nextPostsCursor") && !home!!.isNull("nextPostsCursor")) Button(QelvoraCopy.text("navMore"), ButtonVariant.SECONDARY, disabled = pagingHome) {pageHome(home!!.getString("nextPostsCursor"), homeThreadsCursor)}
+                    if(homePostsCursor != null || homeThreadsCursor != null) Button(QelvoraCopy.text("growthLatestFirst"), ButtonVariant.QUIET, disabled = pagingHome) {pageHome(null)}
+                    if(pagingHome) BasicText(QelvoraCopy.text("growthLoading"), style = qText("caption").copy(color = ink))
+                    if (home!!.objects("entries").isEmpty() && home!!.objects("posts").isEmpty()) EmptyState(QelvoraCopy.text(if(home!!.optInt("followingCount") == 0 && homePostsCursor == null && homeThreadsCursor == null && home!!.isNull("nextThreadsCursor")) "growthPickACreatorToStart" else "growthNoUpdatesYet"), QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")) {Button(QelvoraCopy.text("navDiscover"), ButtonVariant.SECONDARY) {route = "/discover"}}
                 }
                 invitation != null -> {val invite = invitation!!;val name = invite.getJSONObject("creator").getString("name");BasicText(QelvoraCopy.text("growthInvitedYouIn", mapOf("name" to name)), style = qText("display-lg").copy(color = ink));BasicText(QelvoraCopy.text("growthAFirstConversationOfAbout24HoursNoCardNeeded"), style = qText("body").copy(color = ink));Button(QelvoraCopy.text("growthAcceptInvitation"), block = true) {route = invite.getString("destination")} }
-                shared != null -> {val card = shared!!;val source = card.optJSONObject("source");if (card.getString("state") != "valid" || source == null) EmptyState(QelvoraCopy.text("growthThisCardWasWithdrawn2"), QelvoraCopy.text("growthPermissionToShareThisReplyIsNoLongerCurrent")) else {val name = source.getString("creatorName");BasicText(if (source.getString("authorKind") == "approved_draft") QelvoraCopy.text("approvedAuthor", mapOf("name" to name)) else QelvoraCopy.text("growthPersonalReply2", mapOf("name" to name)), style = qText("label").copy(color = ink));BasicText(source.getString("text"), style = qText("voice-md").copy(color = ink));BasicText(QelvoraCopy.text("growthSignedByVersion", mapOf("name" to name, "version" to source.getInt("version").toString())), style = qText("caption").copy(color = ink));if (!source.isNull("correction")) Notice(title = QelvoraCopy.text("growthCorrection"), children = source.getString("correction"))} }
+                shared != null -> {val card = shared!!;val source = card.optJSONObject("source");if (card.getString("state") != "valid" || source == null) EmptyState(QelvoraCopy.text("growthThisCardWasWithdrawn2"), QelvoraCopy.text("growthPermissionToShareThisReplyIsNoLongerCurrent")) else {val name = source.getString("creatorName");val approved = source.getString("authorKind") == "approved_draft";val cardInk = qColor(if(approved) "ai-ink" else "on-maya");Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(qColor(if(approved) "ai-surface" else "maya-surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {AuthorLabel(kind = if(approved) AuthorKind.APPROVED_DRAFT else AuthorKind.HUMAN_CREATOR, name = name, onMaya = !approved);BasicText(source.getString("text"), style = qText(if(approved) "body" else "voice-md").copy(color = cardInk));BasicText(QelvoraCopy.text("growthSignedByVersion", mapOf("name" to name, "version" to source.getInt("version").toString())), style = qText("caption").copy(color = cardInk))};if (!source.isNull("correction")) Notice(title = QelvoraCopy.text("growthCorrection"), children = source.getString("correction"));if(!card.isNull("verificationURL")) Button(QelvoraCopy.text("growthShareCompleteReply"), ButtonVariant.SECONDARY, block = true, disabled = sharingReply) {exportSharedReply()} else Notice(title = QelvoraCopy.text("growthUnavailable"), children = QelvoraCopy.text("growthImageNeedsOrigin"))} }
             }
             if (loading) BasicText(QelvoraCopy.text("growthLoading2"), style = qText("caption").copy(color = ink))
             if (error.isNotEmpty()) {Notice("error", QelvoraCopy.text("growthUnavailable"), error);if(requiresSignIn) Button(QelvoraCopy.text("continueWithPantopus"), block = true) {onSignIn(route)};Button(QelvoraCopy.text("growthTryAgain"), ButtonVariant.SECONDARY) {refresh++}}
