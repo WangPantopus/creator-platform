@@ -7,6 +7,7 @@ import type { SignedActService } from "../identity/signed-acts.js";
 import { DomainError } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
 import { readConversationHomeCursor } from "../conversation/home-cursor.js";
+import { deliveredTextCommand } from "../conversation/signed-preview.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
 export interface ConversationHomeDirectory {
@@ -55,7 +56,7 @@ export function canonicalConversationHomePage(
   conversation: ConversationHomeDirectory,
   access: AccessService,
   database: Database,
-  signing: Pick<SignedActService, "publicVerification">,
+  signing: Pick<SignedActService, "matchesThreadAct">,
   handleFor: (creatorId: string) => Promise<string | null>,
 ): NonNullable<GrowthOwners["homePage"]> {
   return async (actor, cursor) => {
@@ -120,21 +121,38 @@ export function canonicalConversationHomePage(
           );
         const handle = await handleFor(scope.creatorId);
         if (!handle || !/^[a-z0-9_]{3,30}$/u.test(handle)) continue;
-        const row = await database.withThread(scope, async (client) => {
-          const thread = (
-            await client.query(
-              "SELECT privacy_notice_at FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
-              [scope.threadId, scope.creatorId, scope.fanId],
-            )
-          ).rows[0];
-          const message = (
-            await client.query(
-              "SELECT author_kind,text,created_at,signed_act_id,signed_content_hash FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND delivery_state='delivered' ORDER BY sequence DESC LIMIT 1",
-              [scope.threadId, scope.creatorId, scope.fanId],
-            )
-          ).rows[0];
-          return { thread, message };
-        });
+        const row = await database.withThread(
+          scope,
+          async (client) => {
+            const thread = (
+              await client.query(
+                "SELECT privacy_notice_at FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+                [scope.threadId, scope.creatorId, scope.fanId],
+              )
+            ).rows[0];
+            const message = (
+              await client.query(
+                "SELECT author_kind,author_account_id,text,created_at,signed_act_id,signed_content_hash,to_jsonb(m)->'signed_command' AS signed_command,to_jsonb(m)->'approval_id' AS approval_id,to_jsonb(m)->'recording_asset_id' AS recording_asset_id,to_jsonb(m)->'corrects_message_id' AS corrects_message_id,to_jsonb(m)->'corrects_message_version' AS corrects_message_version FROM creator.message m WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND delivery_state='delivered' ORDER BY sequence DESC LIMIT 1",
+                [scope.threadId, scope.creatorId, scope.fanId],
+              )
+            ).rows[0];
+            const command = message
+              ? deliveredTextCommand(scope, message)
+              : null;
+            const signed = Boolean(
+              command &&
+                typeof message?.signed_act_id === "string" &&
+                (await signing.matchesThreadAct(
+                  client,
+                  scope,
+                  message.signed_act_id,
+                  command,
+                )),
+            );
+            return { thread, message, signed };
+          },
+          "read",
+        );
         if (!row.thread) continue;
         const message = row.message;
         let label: string = copy.growthSystem;
@@ -149,14 +167,7 @@ export function canonicalConversationHomePage(
         else if (message?.author_kind === "team")
           label = formatCopy("growthCreatorTeam", { name: scope.creatorName });
         else if (message && message.author_kind !== "system") {
-          const signature = message.signed_act_id
-            ? await signing.publicVerification(message.signed_act_id)
-            : null;
-          if (
-            signature?.status !== "valid" ||
-            signature.contentHash !== message.signed_content_hash
-          )
-            preview = copy.growthUpdateUnavailable;
+          if (!row.signed) preview = copy.growthUpdateUnavailable;
           else
             label =
               message.author_kind === "approved_draft"
