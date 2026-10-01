@@ -1,18 +1,20 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-30T23:55:43.533303+00:00",
+  "recordedAt": "2026-10-01T00:02:20.927521+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
     "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "774495a67c77952b0a7abb8dd9fdacea047bd59bb0c339875d4219f1c8d2bb0a",
     "apps/web/lib/session.ts": "d16dd614fc8f9de9705835bda438c1640f00245c3aa78fedd2990ceacca253f5",
-    "apps/web/app/api/trust/[...path]/route.ts": "4c35857a1a0d75214a8ce96df8d09faf9e8ec0bde89b0e2bf926b32646269b83",
+    "apps/web/app/api/trust/[...path]/route.ts": "006cee4cd531d7f523b1d578df985db2347f1bc65f3e04d6a4e278197eddabae",
     "apps/web/app/creators/[handle]/chat/page.tsx": "7b9bdb15745b08f6bfe522cd8a754f07f50f0686c3ee3b0a304dc9a7e886d736",
     "apps/web/app/onboarding/handle/page.tsx": "0a26072ec169366c26f59648e62c5f06a8fe02bc4ff4001805ec8b15154bea7b",
     "apps/web/features/identity/handle.tsx": "847e26d52e6a6af6eaa3edbe1f717a8de8d2c0b409228936d24ea60cde35beb4",
     "tests/visual/foundation.spec.ts": "4e4dc91fc76dc5ecc6fe1a4eea5c9b8ebd6aac7623d0ef541519e00d59611225",
     "apps/backend/src/modules/growth/service.ts": "ade1bb862301618742e7a7cd4000b531ee5ca4c0253953b410cd420569236e46",
     "apps/backend/src/modules/growth/retention.ts": "4d3470b2f35910932412a02c70765bb8cb11bcecd30d5c71e15383ae502cacb3",
-    "apps/web/features/growth/preferences.tsx": "a86d9748dadef0fb8617f147dff8c07da79ab506289ab044e99a409e8989c334"
+    "apps/web/features/growth/preferences.tsx": "a86d9748dadef0fb8617f147dff8c07da79ab506289ab044e99a409e8989c334",
+    "apps/web/lib/trust-session.ts": "c3eff172600f810c8b8aca449e25331fe5d76838f66fb23b2f551d34894f388d",
+    "apps/web/app/api/auth/complete/route.ts": "1f26cf1f142460c6b3e076c7e9e73f8ce91d8d2dd49a2c7498ba2c71390abcd2"
   },
   "nativeReferenceCount": 110,
   "nativeReferenceSetSha256": "a729e6b68ee8bea71fd90a1ba4e60474ede2b4cec69fe79887829b9625594510",
@@ -137,7 +139,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "d33564f0142b3b658e9f5ddcbdab1e5ecabc2d1260a2f9ec00657ebab062404b",
+    "README.md": "1d6b759aaaa703e06de901fa9cd36f08823f197206a39067f8f1e77120dea2d3",
     "approved-input-search.json": "edee150a6bab7cc43cf2b97795402098b9f2869c9a53dbb01448074b5c2e0e08",
     "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend-contracts.log": "00c68520c2ce4f9bdbdc93c60e9a39d2e8539abb81dbefb6c2793ae199647e4c",
@@ -157,6 +159,10 @@
     "scaled-cache-swift.log": "3901bba9574c31244fa85db473b0f37d1d6c5140db27c412e9f1c51193d14bed",
     "settings-accessibility.json": "04e099044b09fd34ab4268f1d8303d25e5091f8f4602a044fd8fa30142b45de3",
     "settings-phone.png": "52ede563add261f3ca7544ba61445bc0670eb37088085fc57f47ed8aabf9e9f4",
+    "w8-cookie-build.log": "571eb9ed6b25e520e9eceb619ca748bda1ee2a47f1a87b7c078e127e2f29795a",
+    "w8-cookie-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "w8-cookie-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "w8-unconfigured.log": "c6271023acb1d27b3a1d980830fdb14cb2113b9378dac97fea15b058a8928648",
     "web-build.log": "3fbfe0cab59e11ec8e1727853ed44c13c2cfe28330ff9b4147d9791e1baff384",
     "web-catalog-and-mac-baselines.log": "708e23ee94a79a3e7324a22e520b14ac59225a5ee9a46ec4bf7be2152378ce39",
     "web-foundation-caret.log": "f13a9591c11407820284f0534acf2bdef22f28c408cdf1caf2e3680c9caa14ee",
@@ -196,5 +202,13 @@
     "disabledDuringSaveObserved": true,
     "enabledAfterSaveObserved": true,
     "nativeScreenReaderAcceptance": "unverified"
+  },
+  "w8CookieValidation": {
+    "source": "553b443dfd6c43295af39b9548b64781d1ebd9c3",
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed",
+    "currentEndpoint": "503 trust_unconfigured",
+    "configuredHostAcceptance": "unverified"
   }
 }

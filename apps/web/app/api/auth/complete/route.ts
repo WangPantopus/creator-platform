@@ -10,6 +10,7 @@ import {
   cookieOptions,
   platformFetch,
 } from "../../../../lib/session";
+import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 export async function POST(request: NextRequest) {
   if (!sameRequestOrigin(request))
@@ -88,6 +89,11 @@ async function complete(
       ...cookieOptions,
       maxAge: 7 * 86400,
     });
+    if (
+      process.env.W8_LOCAL_DEVELOPMENT === "true" &&
+      process.env.NODE_ENV !== "production"
+    )
+      redirect.cookies.delete(trustLocalSessionCookie);
     redirect.cookies.delete(continuationCookie);
     return redirect;
   } catch {
