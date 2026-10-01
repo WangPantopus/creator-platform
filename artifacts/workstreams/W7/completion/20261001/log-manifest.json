@@ -190,5 +190,89 @@
     "gzip": "ci-android-c6bbdce-pr.log.gz",
     "sanitized": true,
     "contentSha256": "bf82b90f3712a311ea286a09160f99c0075800d9a105fc1b750a63bf2f16e01a"
+  },
+  "dependencies-document-restore.log": {
+    "sha256": "976d827792ad9ba51952a75edcb34b3329179ab67f809555a1492c58d5778db6",
+    "gzip": "dependencies-document-restore.log.gz",
+    "sanitized": true,
+    "contentSha256": "f9e495d35b14c8e497bf865d95a95e55d0acc726c14faad42139cc36385894c0"
+  },
+  "ios-document-build.log": {
+    "sha256": "a935fa53f33d8e7f31d732d7ebff5cc7aa4f66e328c0893e4970eb1cfcbad7d9",
+    "gzip": "ios-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "e7ab5da3f0967d63a43cef128cfeadd99b41853c3b086b625170bc539a9ed5fd"
+  },
+  "swift-document-checks.log": {
+    "sha256": "0541ab7bed0002c5f9e14b0e59fa1e1ce90eb360036628c5f9a70be7177f22c5",
+    "gzip": "swift-document-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "226bae073134b3ee6c0616dd57f0f7bf74483875c8b76ee119710b73345b8270"
+  },
+  "ios-document-boot.log": {
+    "sha256": "c7f3c876ece0fad2a1e84bd1ba5ecf7dbdb0b6d324f406c5df0e311cd1b68cb6",
+    "gzip": "ios-document-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "b1b43bc2f9f0e8192b35d9e59f158a96c0be9df445e6438765c63debdd5ed145"
+  },
+  "backend-document-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-leased-privacy-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-leased-privacy-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-readiness-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-readiness-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-readiness-contracts.log": {
+    "sha256": "7c2f16f1a2aeb9f4cdfe50ab1aa676c9870dca431332f11f918e21e544570ec5",
+    "gzip": "backend-readiness-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "c3b5a4a9067c69d576156358f482a47cdbc7da65fd34f6ef500ea25ed3a04139"
+  },
+  "backend-document-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-document-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "backend-leased-privacy-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-leased-privacy-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "backend-readiness-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-readiness-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "web-document-build.log": {
+    "sha256": "6313999a54607858c6263207932ccc7def506b2bf00f4a486bf8fb01d494c43f",
+    "gzip": "web-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "e20cd51a70a1522baeb7b56aa2420592e9380a41f013c2513a868c0b5a8edff0"
+  },
+  "web-document-runtime.log": {
+    "sha256": "3028b4b06cd8544947e9b5dfe17baf5a327d5e3e1f2e45c7880b9e60e1e7ba4c",
+    "gzip": "web-document-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "18cff962ff711d83a70f2d7313728e1a470dc87bade9902c50cff465db442c7e"
+  },
+  "web-document-loopback-runtime.log": {
+    "sha256": "870b5d793cf88cdc2fcb1fb854dde0e541d99e62ce49b667a856e15ce803fd21",
+    "gzip": "web-document-loopback-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "2dfa23063b248671ad8f34406e675640e9e979495356b42449f51d847e1fcc5f"
   }
 }
