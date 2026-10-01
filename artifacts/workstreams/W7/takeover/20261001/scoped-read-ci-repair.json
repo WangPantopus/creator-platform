@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-01T05:49:52.501716+00:00",
+  "failedHead": "3639136ea5b312a555d7f3d94a9a4191c52b811f",
+  "canonicalFoundationRun": 36820366447,
+  "failedJob": 110234434588,
+  "failure": "T11 expected50000 observedStatements; incoming main705 composite memory query emitted30000 instrumentation statements.17other existing checks passed.",
+  "repair": "Restore original separate scoped thread/exclusion/transcript/memory/provenance queries, maintaining bounded predicates, exclusion/provenance assertions and current shared read-lock transaction. No query/check/authority case removed or weakened.",
+  "testsSourceDelta": false,
+  "newTestCasesSuitesScripts": false,
+  "personalImplementationReview": true,
+  "sourceSha256": "21777c9ccb858bec2058aa2565ddb83d87701afc4a4cfa3b7b96a97046a26595",
+  "verification": {
+    "backendBuild": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "originalPostgresAndContracts": "18/18 pass,127.75s",
+    "T11": "10000 pairs/1000 real threads/50000 scoped statements pass124.690s",
+    "launchedAppAcceptance": "pending; existing checks do not replace actual web/iOS/Android gate"
+  },
+  "resources": {
+    "API": "95214/session55221,loopback4107,current source,keys retained",
+    "newIsolatedCheckContainer": "creator-platform-w7-ci-repair-20261001",
+    "newCheckVolume": "creator-platform-w7-ci-repair-20261001",
+    "newCheckPort": 55457,
+    "bootstrapDatabase": "creator_w7_test_ci_20261001",
+    "checkContainerState": "normally stopped; named volume/data retained",
+    "originalAppDB": "creator_w7_takeover_20260930/55447 preserved",
+    "suiteFixture": "original suite created/cleaned its own random creator_foundation database only"
+  },
+  "exact363CI": {
+    "Trust": "36820465936 success",
+    "AndroidRuntime": "success",
+    "WebBackend": "failure preserved",
+    "MacChecks": "queued, not passing"
+  },
+  "remainingAssignment": "All original W7 gates unchanged; final exact-new-head CI, review and launched journeys required before incremental merge",
+  "artifactSha256": {
+    "scoped-read-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "scoped-read-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "scoped-read-lint.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "scoped-read-existing-postgres-checks.log": "09981ccf4f807098cd42f599cefac7c72fd61d0f1322d1bce6add2064be4d8b1",
+    "actual-current-head-scoped-read-ci-failure.log": "46149220b7b1d857f342a9f9bdb94308275a573249670e9a05cc77c500d6d944"
+  }
+}

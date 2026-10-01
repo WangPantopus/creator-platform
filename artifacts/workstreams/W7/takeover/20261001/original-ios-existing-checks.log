@@ -1,0 +1,532 @@
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+[0/1] Planning build
+Building for debugging...
+[0/10] Write sources
+[2/10] Copying Localizable.xcstrings
+[3/11] Write sources
+[4/11] Copying Glyphs.json
+[5/11] Write swift-version--58304C5D6DBC2206.txt
+[7/23] Emitting module QelvoraUI
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[8/23] Compiling QelvoraUI QelvoraAPI.swift
+[9/23] Compiling QelvoraUI QelvoraCopy.swift
+[10/23] Compiling QelvoraUI QelvoraTokens.swift
+[11/23] Compiling QelvoraUI CommerceClient.swift
+[12/23] Compiling QelvoraUI CommerceFeature.swift
+[13/23] Compiling QelvoraUI StoreMembership.swift
+[14/23] Compiling QelvoraUI StoreMembershipPane.swift
+[15/23] Compiling QelvoraUI ContentFeature.swift
+[16/23] Compiling QelvoraUI Conversation.swift
+[17/23] Compiling QelvoraUI W3ConversationClient.swift
+[18/23] Compiling QelvoraUI W3FanFeatures.swift
+[19/39] Compiling QelvoraUI AccessComponents.swift
+[20/39] Compiling QelvoraUI ComponentPreview.swift
+[21/39] Compiling QelvoraUI Controls.swift
+[22/39] Compiling QelvoraUI DeliveryProtocol.swift
+[23/39] Compiling QelvoraUI Growth.swift
+[24/44] Compiling QelvoraUI W3Realtime.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[25/44] Compiling QelvoraUI W3ResumeStorage.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[26/44] Compiling QelvoraUI FanShell.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[27/44] Compiling QelvoraUI GrowthPreferences.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[28/44] Compiling QelvoraUI NativeCallOffers.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[29/44] Compiling QelvoraUI NativeCallView.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[30/44] Compiling QelvoraUI NativeMediaClient.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[31/44] Compiling QelvoraUI NativeVoiceRecorder.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[32/44] Compiling QelvoraUI Overlays.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[33/44] Compiling QelvoraUI Theme.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[34/44] Compiling QelvoraUI Trust.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+[35/45] Compiling QelvoraUI Catalog.swift
+[36/46] Compiling QelvoraUI W6FanFeatures.swift
+[37/46] Compiling QelvoraUI Identity.swift
+[38/46] Compiling QelvoraUI Navigation.swift
+[39/46] Compiling QelvoraUI StudioComponents.swift
+[40/46] Compiling QelvoraUI ThreadComponents.swift
+[41/46] Compiling QelvoraUI Welcome.swift
+[42/51] Compiling NativeSnapshots main.swift
+[43/51] Emitting module NativeSnapshots
+[43/51] Write Objects.LinkFileList
+[45/51] Emitting module QelvoraUITests
+[46/51] Compiling QelvoraUITests DeliveryProtocolTests.swift
+[47/51] Compiling QelvoraUITests GeneratedContractTests.swift
+[48/53] Compiling QelvoraUITests IdentityTests.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:177:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+175 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+176 |       }
+177 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+178 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+179 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[49/53] Compiling QelvoraUITests NativeSnapshotTests.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:177:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+175 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+176 |       }
+177 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+178 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+179 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[49/53] Write Objects.LinkFileList
+[50/53] Linking qelvora-native-snapshots
+[51/53] Applying qelvora-native-snapshots
+[52/53] Linking QelvoraNativePackageTests
+Build complete! (61.26s)
+Test Suite 'All tests' started at 2026-09-30 22:50:54.714.
+Test Suite 'QelvoraNativePackageTests.xctest' started at 2026-09-30 22:50:54.715.
+Test Suite 'DeliveryProtocolTests' started at 2026-09-30 22:50:54.715.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' passed (0.003 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' passed (0.000 seconds).
+Test Suite 'DeliveryProtocolTests' passed at 2026-09-30 22:50:54.722.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'GeneratedContractTests' started at 2026-09-30 22:50:54.722.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' passed (0.000 seconds).
+Test Suite 'GeneratedContractTests' passed at 2026-09-30 22:50:54.723.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'IdentityTests' started at 2026-09-30 22:50:54.723.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' started.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' passed (0.002 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' started.
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' started.
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' passed (0.000 seconds).
+Test Suite 'IdentityTests' passed at 2026-09-30 22:50:54.728.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'NativeSnapshotTests' started at 2026-09-30 22:50:54.728.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' passed (0.928 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' passed (27.562 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' passed (0.455 seconds).
+Test Suite 'NativeSnapshotTests' passed at 2026-09-30 22:51:23.673.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 28.945 (28.946) seconds
+Test Suite 'QelvoraNativePackageTests.xctest' passed at 2026-09-30 22:51:23.673.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 28.955 (28.958) seconds
+Test Suite 'All tests' passed at 2026-09-30 22:51:23.673.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 28.955 (28.959) seconds
+Native capture testAuthorIdentitySurfaces()/light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testAuthorIdentitySurfaces()/night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Mark.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Seal.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Avatar.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AuthorLabel.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/IdentityStrip.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ThreadHeader.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SignedMarker.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SystemLine.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Message.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Note.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ReactionChip.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CitationChip.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/MemoryChip.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Correction.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ContextCard.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/VoiceNote.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Composer.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/StepIn.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AccessLines.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ModeList.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/IncludeList.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TermsBlock.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EtaLine.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/RequestStatus.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Receipt.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SpendLimit.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/QueueCard.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CapacityHeader.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/LabelPreview.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SigningSheet.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AuditBanner.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SourceRow.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Button.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TabBar.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Segmented.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Notice.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/NotificationRow.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EmptyState.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ShareCard.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CallChip.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ReservedLabel.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Countdown.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/InsteadMenu.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TestConsole.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/VersionList.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/DigestItem.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/StudioTabBar.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Sidebar.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Sheet.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Dialog.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Toast.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Skeleton.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EmailFrame.light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Mark.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Seal.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Avatar.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AuthorLabel.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/IdentityStrip.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ThreadHeader.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SignedMarker.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SystemLine.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Message.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Note.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ReactionChip.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CitationChip.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/MemoryChip.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Correction.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ContextCard.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/VoiceNote.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Composer.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/StepIn.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AccessLines.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ModeList.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/IncludeList.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TermsBlock.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EtaLine.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/RequestStatus.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Receipt.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SpendLimit.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/QueueCard.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CapacityHeader.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/LabelPreview.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SigningSheet.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/AuditBanner.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/SourceRow.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Button.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TabBar.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Segmented.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Notice.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/NotificationRow.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EmptyState.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ShareCard.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/CallChip.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/ReservedLabel.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Countdown.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/InsteadMenu.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/TestConsole.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/VersionList.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/DigestItem.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/StudioTabBar.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Sidebar.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Sheet.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Dialog.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Toast.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/Skeleton.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testComponentCatalogThemes()/EmailFrame.night: backing=2.0, canvas=(390.0, 844.0)
+Native capture testWelcomeThemes()/light: backing=2.0, canvas=(390.0, 844.0)
+Native capture testWelcomeThemes()/night: backing=2.0, canvas=(390.0, 844.0)
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: x86_64-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

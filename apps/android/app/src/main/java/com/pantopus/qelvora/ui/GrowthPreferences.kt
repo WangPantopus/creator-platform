@@ -3,6 +3,9 @@ package com.pantopus.qelvora.ui
 import com.pantopus.qelvora.generated.QelvoraCopy
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +30,7 @@ import java.util.TimeZone
 private val growthKinds = listOf("ai_reply", "approved_draft", "personal_reply", "request_status", "call_reminder", "answered_publicly", "content_match", "announcement", "creator_offer", "slot_change", "new_packet", "commitment_due", "guardrail", "pool_share", "note", "reaction", "public_answer", "spending_reminder", "weekly_impact")
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 internal fun GrowthNotificationSettings(client: GrowthClient?) {
     var value by remember { mutableStateOf<JSONObject?>(null) }
     var creators by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
@@ -40,6 +44,9 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
     val fromFocus = remember { FocusRequester() }
     val untilFocus = remember { FocusRequester() }
     val zoneFocus = remember { FocusRequester() }
+    val fromView = remember { BringIntoViewRequester() }
+    val untilView = remember { BringIntoViewRequester() }
+    val zoneView = remember { BringIntoViewRequester() }
     val timeZones = remember { TimeZone.getAvailableIDs().toSet() }
     val scope = rememberCoroutineScope()
     val ink = qColor("ink")
@@ -76,9 +83,9 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
         BasicText(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd"), style = qText("body").copy(color = ink))
         value?.let {current ->
             listOf("push" to QelvoraCopy.text("growthPushNotifications"), "email" to QelvoraCopy.text("growthEmailDigest"), "hideSensitive" to QelvoraCopy.text("growthHideSensitivePreviews")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (current.getBoolean(key)) QelvoraCopy.text("growthOn") else QelvoraCopy.text("growthOff"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {update(key, !current.getBoolean(key))} }
-            GrowthPreferenceField(from, {from = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursFromHhMm"), errors["from"], fromFocus, !busy)
-            GrowthPreferenceField(until, {until = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursUntilHhMm"), errors["until"], untilFocus, !busy)
-            GrowthPreferenceField(zone, {zone = it; clearError("zone")}, QelvoraCopy.text("growthTimeZone"), errors["zone"], zoneFocus, !busy)
+            GrowthPreferenceField(from, {from = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursFromHhMm"), errors["from"], fromFocus, fromView, !busy)
+            GrowthPreferenceField(until, {until = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursUntilHhMm"), errors["until"], untilFocus, untilView, !busy)
+            GrowthPreferenceField(zone, {zone = it; clearError("zone")}, QelvoraCopy.text("growthTimeZone"), errors["zone"], zoneFocus, zoneView, !busy)
             BasicText(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours"), style = qText("caption").copy(color = ink))
             creators.forEach {(id, name) -> Button(QelvoraCopy.text("growthCreatorWithState", mapOf("name" to name, "state" to if (contains("mutedCreators", id)) QelvoraCopy.text("growthMuted") else QelvoraCopy.text("growthPushAndEmailAllowed"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {toggle("mutedCreators", id)} }
             growthKinds.forEach {kind -> BasicText(QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }), style = qText("label").copy(color = ink));listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)} } }
@@ -93,10 +100,17 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
                     if (zone.isEmpty() || zone.length > 80 || zone !in timeZones) next["zone"] = QelvoraCopy.text("growthErrorTimeZone")
                     errors = next
                     if (next.isNotEmpty()) {
-                        when {
-                            "from" in next -> fromFocus.requestFocus()
-                            "until" in next -> untilFocus.requestFocus()
-                            else -> zoneFocus.requestFocus()
+                        val target = when {
+                            "from" in next -> fromFocus to fromView
+                            "until" in next -> untilFocus to untilView
+                            else -> zoneFocus to zoneView
+                        }
+                        target.first.requestFocus()
+                        scope.launch {
+                            // An already-focused field also needs scrolling after Save.
+                            // Include the newly rendered inline error in the target.
+                            withFrameNanos { }
+                            target.second.bringIntoView()
                         }
                     } else {
                         busy = true
@@ -120,8 +134,9 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
 }
 
 @Composable
-private fun GrowthPreferenceField(value: String, change: (String) -> Unit, label: String, failure: String?, focus: FocusRequester, enabled: Boolean) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+@OptIn(ExperimentalFoundationApi::class)
+private fun GrowthPreferenceField(value: String, change: (String) -> Unit, label: String, failure: String?, focus: FocusRequester, view: BringIntoViewRequester, enabled: Boolean) {
+    Column(modifier = Modifier.bringIntoViewRequester(view), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         BasicText(label, style = qText("caption").copy(color = qColor("ink-muted")))
         BasicTextField(value, change, enabled = enabled, singleLine = true,
             textStyle = qText("body").copy(color = qColor("ink")),

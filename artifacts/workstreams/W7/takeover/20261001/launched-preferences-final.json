@@ -1,0 +1,116 @@
+{
+  "recordedAt": "2026-10-01T07:24:56.160705+00:00",
+  "branch": "codex/w7-handoff",
+  "pr": 2,
+  "acceptedMain": "ebb24c7e640d972933ca907a673bb879b8190a56",
+  "reconciliationCommits": [
+    "329a022545ff9b763c6db133aafbb6e13286309f",
+    "45cbc999bb65127adc1b9d1989399a04a3535b34"
+  ],
+  "sourceSha256": {
+    ".github/workflows/ci.yml": "ce1f354182ce3155170904942f1ce90ac43899e542af01ab37f47764aad81dff",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "30ce934eaebe0a366944e80a000afc612901487778a18b3ce1a2c4898b419ed2",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt": "b4bcb67dcf78a9bdd866d6a9efd35427461292e13a2053cca75158f3cb71bd27",
+    "apps/android/app/src/main/res/values/strings.xml": "670289579a8e303d0d29e1133e3ed72086547aec2edb36f351618880ccae9fec",
+    "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsLight_composer.png": "c5fe163d6b0643be229ab0ee4eef4ef8568b52c7f3587abc4b012d94a585e663",
+    "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsNight_composer.png": "e4cd07c92c2f8e1165e5f97659e84f94efaa2d7d6e8797537effda52923098de",
+    "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesLight_composer_ended.png": "391cecc1f7031661e6065281de4c80b2b817d5e40f7d31f8c75b30c1df91ddf0",
+    "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesNight_composer_ended.png": "2cf415d95270b284f7fe33e17470b1cf5e87a6fb7996da5ece3442e9c56abe73",
+    "apps/backend/src/modules/growth/canonical.ts": "d27df9dfe84d1a100b2606e236bdf923f8c857146a6887e314b003e4ca0e5de1",
+    "apps/backend/src/modules/growth/configured.ts": "114add980eae82bd47aae968eb2cc957ec3cac875fc10cc9787292b7c3111392",
+    "apps/backend/src/modules/growth/content.ts": "93e958eb48c37863b528ecd3af21416398afe5e9a3bf333ccf00fc094ad77213",
+    "apps/backend/src/modules/growth/contracts.ts": "ff2b0c9953ed5fd1bbbe8e5c81e93df745626c3888dd7709fd7fe8a46a48409c",
+    "apps/backend/src/modules/growth/experiments.ts": "fc4744e39ff6e46f416dda6cfe310aae62155aa8820e8a01e7faa69d1fc2aaec",
+    "apps/backend/src/modules/growth/home.ts": "501aa2cd54bb70f9e8be33190823399c9bdc617675b707e6024c4650d0189b28",
+    "apps/backend/src/modules/growth/lifecycle.ts": "ecfb02745f295fa6bb70b4f7320af7ce6af018bf8b62ff4f7503f3b049b7c77e",
+    "apps/backend/src/modules/growth/notifications.ts": "fd68e2594780cf2aabd4ae990294e3090630837fa3dadce305d64aeff68762d6",
+    "apps/backend/src/modules/growth/providers.ts": "d050f66a8aa01429be4085a55a4d7b84faabfbce8ff633f406d321dfe5784b36",
+    "apps/backend/src/modules/growth/relay.ts": "4801373075c884aeba82e66803e6a7268f148b86fa832228ad5b3afb58d19c19",
+    "apps/backend/src/modules/growth/retention.ts": "4d3470b2f35910932412a02c70765bb8cb11bcecd30d5c71e15383ae502cacb3",
+    "apps/backend/src/modules/growth/runtime.ts": "cf19e99c49b1135f467e15c4d1b3b23f56985f7236ec84e34137e28dad343bee",
+    "apps/backend/src/modules/growth/service.ts": "129328cdd74b6fd50e4c53506704055f25b9b9499465edfe41b4405ecd38a94a",
+    "apps/ios/Sources/Generated/Localizable.xcstrings": "d21d57ae55ef458d299d73148f23dd5b7b22e00b5c15e9bb64710ce85cc87c15",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "d7688612d89297eb984b51bf6029dcf6c20630f9f6426174f60299c6414d6e8b",
+    "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift": "ca0961bb369bccb87fc73474f30827c0813a16c5a2a9690b1b8a42ed31909c25",
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "d96627435632d7fae92f8b1d4e10946543766b60dd65a1cb223732b8f09054c3",
+    "apps/web/features/growth/growth.css": "7969bb7486f6f949d5d2f24e8116b8327471ee6c4dbb5eced0e392116cf02ac0",
+    "apps/web/features/growth/preferences.tsx": "5f446d2611673e8b25b1d338af6aa5a694bb43cf902817859c0572debe4b1e82",
+    "config/copy.json": "009b9eaa41c0c35bbe4683af45b7e9221d987a27b347bcaf7560329e2937fea9",
+    "packages/copy/src/index.ts": "19339fed61a03171354d35df10469dcfbdfeba21641678777411c6191605cd67"
+  },
+  "personallyOperated": {
+    "web": "PASS: canonical sign-in, validation, changed Save/reload/restoration; final cross-client1 then0 reads",
+    "ios": "PASS: shipping app final combined source actual Save1 ACK/cold Night1/restore Save0 ACK/cold Light0; earlier same-form invalid focus and own-API failed Reload retained draft",
+    "android": "PASS: corrected shipping app Save1 ACK/cold Night1/restore Save0 ACK/cold Light0, visible focused invalid-time/zone errors, own-API failed Reload retained draft, no ANR since boot"
+  },
+  "supportingChecks": {
+    "builds": "backend, shipping web, signed iOS, Android PASS",
+    "existingSwift": "18 PASS, original110 refs,28.548s",
+    "existingAndroid": "19 PASS including original Paparazzi checks",
+    "generateLintFormat": "PASS"
+  },
+  "personalReview": "Complete for current W7 source and reconciliation; shared host, Memory, generated API and peer source exact accepted main",
+  "currentHeadCI": "Pending publication and fresh canonical Foundation/Trust. Historical failed/queued/canceled runs are not passes.",
+  "signingCertificateSha256": "4acf25296401e873973d915be6ee3358668761259b56ca8bc22ed3decda79dbf",
+  "resources": {
+    "api": {
+      "pid": 21303,
+      "session": 26576,
+      "port": 4107
+    },
+    "web": {
+      "pid": 61152,
+      "session": 11196,
+      "port": 3007
+    },
+    "adb": {
+      "pid": 9981,
+      "port": 5047
+    },
+    "ios": {
+      "udid": "90934313-E0DD-445C-B8AF-AA8188BD2AC0",
+      "state": "normally shut down, data retained"
+    },
+    "android": {
+      "avd": "CreatorPlatform_W7_Api34_20261001",
+      "serial": "emulator-5570",
+      "state": "normally stopped, data retained"
+    },
+    "nativeControls": "own49167 exit130; full discovery/7001 window released to W5; no peer process stopped",
+    "database": "creator-platform-w7-resume-20260930/creator_w7_takeover_20260930 retained, original managed keys, no incoming source migrations automatically applied"
+  },
+  "exclusions": [
+    "No real creator/provider/release acceptance",
+    "No new tests/suites/scripts/flowfiles",
+    "No OpenAI/provider secret opened",
+    "Raw emulator/control logs and key data not published"
+  ],
+  "evidenceSha256": {
+    "w7-final-android-before-validation-scroll-repair.png": "43e8d9edcaf5aface1f1559996877c609ac50524c22c24e42d1e4d83c81aacc8",
+    "w7-final-android-changed-cold-night.png": "4807b3664562f11f79868ff4eef2374c521a4092c59b7e8c490747d2418b8c3c",
+    "w7-final-android-changed-save-night.png": "911c30c04eae141ef861db66e275263f121af2ea0bb31f4c89704040e84e28e8",
+    "w7-final-android-existing-comparisons.log": "f3b5f57d3ad8052654cf57bcef6c77b8fe3af880fc364ca4b3b4589d0945b2b6",
+    "w7-final-android-failed-reload-draft-retained-night.png": "cf9eb83b4dcfc305ed8ba97546c8ae796882c3f34ac49fa418d9bace00c214ea",
+    "w7-final-android-failed-reload-night.png": "052275926feb91ba282944a3f06143e8d164e751fdfd5fa41ae315f42f7f919a",
+    "w7-final-android-install.log": "0e8bce768440117cbe224cdac46c219cacb46c92d269c84024bdacf4cfd767a3",
+    "w7-final-android-invalid-time-focus.png": "c2f3080ffe999afa7ec6f20bb57bbf8f501b6696eb25b4fc2268a8bf868858cc",
+    "w7-final-android-lastanr.log": "42cf4931006fd0ff42d3522af31f9346431b409aa22a793ecc16b5aedeed28a1",
+    "w7-final-android-original-cold-restored-light.png": "7f6138ffdf9d4d5d3a49011d03a7a9f413f4dc7f88b3ffc8f8086b1b621e8c82",
+    "w7-final-android-original-restored-save-night.png": "9e14dfcba697ffb6ac9cf2a76bf3287275513ce5fbdfc45a5ea1753e4f637569",
+    "w7-final-android-preserved-key-install.log": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+    "w7-final-android-repaired-time-focus-night.png": "34ae542632e0c3faa553d04975fd7324e6918a2647f3ec00ed19c34eb82099a9",
+    "w7-final-android-repaired-zone-focus-night.png": "5c634ce8be5ba4d0f2964413418fd7e751ffbd73837787696550bb63eba89d0a",
+    "w7-final-format.log": "8488f5b2421bda28ce47eddc32b8fee98def934f4f8d9133c2fcf83cdb53727d",
+    "w7-final-generate-check.log": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e",
+    "w7-final-ios-changed-cold-night.png": "5a12e29b7c41868a3ee8a7b45817213f9f7a9c00d7684f856af8a8e9b89b1950",
+    "w7-final-ios-changed-save-night.png": "d56939aee26823b529e64455c1a4c76d104c5402b5063ab0e0613b58edcd8a77",
+    "w7-final-ios-original-cold-restored-light.png": "11705d251f6cfd2c0f4e611f6f424f0b7371ac2479b2f6528096af30b80f528b",
+    "w7-final-ios-original-restored-save-night.png": "850a637eac9faa8d95a79c13f181e554410cef171e6c7d605ca8d1c0596108df",
+    "w7-final-lint.log": "c6c4b725b7860cec20bca1c59d73a2bc21483bcdd227bf52f856967ca122f448",
+    "w7-final-main-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "w7-final-main-ios-build.log": "8f260798734911ffc75c6cd3c62bf74a40f0d8ebbc2920d963f05144621f4c63",
+    "w7-final-main-web-build.log": "4b9e63c27469229df34a02951ae5dd795241087ec07e62e1653cd39376ad4e61",
+    "w7-final-original-ios-existing-checks.log": "2934fac46521383f4dd9cff53b611d6b3987af3310da2108500572d9c2c7aa1d",
+    "w7-final-web-current-original-restored.png": "5589c1044c827f8e4c040f567dc0af6483bcc2dbbd0ba1d5534a6e6d71f63d10"
+  }
+}
