@@ -15,7 +15,8 @@ import java.net.URL
     val signedActId: String? = null, val citations: List<String>, val createdAt: String,
     val member: String? = null, val offTheRecord: Boolean, val version: Long,
     val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null,
-    val correction: ConversationCorrection? = null
+    val correction: ConversationCorrection? = null,
+    val recording: ConversationRecording? = null
 )
 @Serializable data class ConversationCorrection(val originalMessageId: String, val originalVersion: Long)
 @Serializable data class ConversationAgentVersion(val id: String, val hash: String)

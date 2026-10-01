@@ -195,7 +195,25 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
-                    ConversationMessageRow(message, current.creatorName, current.control, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    message.recording?.let { recording ->
+                        val asset = recording.asset
+                        if (recording.state == "available" && asset != null &&
+                            message.threadId == current.threadId && asset.threadId == current.threadId &&
+                            asset.state == APIMediaMediaAssetState.READY && asset.mimeType == "audio/mp4" &&
+                            asset.purpose == APIMediaMediaAssetPurpose.HUMAN_REPLY &&
+                            message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && message.signedActId != null &&
+                            asset.signedActId == message.signedActId) {
+                            ConversationRecordingPlayer(baseURL, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
+                                active = foreground && !privacy && source == null, token = session::currentToken,
+                                onVerify = { session.open("/verify/${message.signedActId}") })
+                        } else {
+                            BasicText(message.authorLabel(current.creatorName), style = qText("label"))
+                            BasicText("This recording is unavailable for this conversation.", style = qText("caption"))
+                            if (message.signedActId != null) SignedMarker(current.creatorName) { session.open("/verify/${message.signedActId}") }
+                        }
+                        Button("Report", variant = ButtonVariant.QUIET) { session.open("/support") }
+                    }
                     val version = message.agentVersion
                     val policy = current.feedbackPolicy
                     if (message.feedback != null && policy == null && version != null) {

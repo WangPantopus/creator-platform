@@ -8,6 +8,7 @@ struct W3Message: Decodable, Identifiable, Sendable {
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
     let agentVersion: W3AgentVersion?; let feedback: String?
     let correction: W3Correction?
+    let recording: W3Recording?
     func authorLabel(name: String) -> String {
         if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
         if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }

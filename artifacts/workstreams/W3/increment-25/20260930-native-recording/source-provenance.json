@@ -1,0 +1,156 @@
+{
+  "workstream": "W3",
+  "increment": 25,
+  "predecessor": "e34f9365d652c8eddb7bfe8e2329f8d56ea6f6fc",
+  "sourceFiles": [
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3Recording.swift",
+      "sha256": "f2148354ad97837f7acd8da2128ae8217fb2910314a62d8158fbb57f2fe4ccea",
+      "gitBlob": "9d48beefc92955d81b9fc08845998f5a80c5da59"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+      "sha256": "172f3261d1faa91063052856041a72697ebf808caa0d49ec3f30dfc450f40a44",
+      "gitBlob": "08bff058ab07c5d54d89bd43991e484dfbe4bcf2"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "sha256": "e711196ed110ba11865f47b8d2b7570fb1097a0ab0bd122b0d4dbeccc08a14fd",
+      "gitBlob": "1e6aefb4a7a4b7511d0591b6b79607a858cb86a5"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/ThreadComponents.swift",
+      "sha256": "254b01a46686bcefef9602114ff6b57c9022f9cc7a7393649b6064e185b261f2",
+      "gitBlob": "711dffcdc8692ee3a688afb0f82c5b2376390411"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRecording.kt",
+      "sha256": "b99ed4d8c2812a8c79dd8b67470a218cc5197a2eadad4552a82cbbaf048e678b",
+      "gitBlob": "31f1994122990496786eb1d94a9a635b3c0d350b"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+      "sha256": "e1d3416a80feeaeebe5a79cf7fcb8a882872e9dfe5a73532af07ba65ab9faa9e",
+      "gitBlob": "3d83faea455caba1ce69478eeeb0bdaa7d038eb9"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "sha256": "4e5fb41eca33bbd1281c8d48c1f3c0ca567f1a0e902739782e57c14427a55e25",
+      "gitBlob": "3b1db8962f674b5dde9b806b0c5952d132ecb216"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/ThreadComponents.kt",
+      "sha256": "0769c7325f085f206d662660c77a3797031b835441b13cf8c986b401fa8b0f97",
+      "gitBlob": "f9c88d244b13d38af23d0c6a15dbda2fa9afb3f0"
+    },
+    {
+      "path": "apps/web/features/conversation/ConversationScreen.tsx",
+      "sha256": "3ce1927e99dbe06a06531e390afb769722537ae767f27baa461ce2ad73b4b0b0",
+      "gitBlob": "bad0a1295d6e7c7ea42855afcd2d95f844d8aae5"
+    }
+  ],
+  "componentLease": "W1 explicitly granted narrow optional Swift/Compose waveform/position/playback additions; original defaults/references/assertions preserved. Publication releases lease.",
+  "logs": [
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-shipping-build.log",
+      "sha256": "30c5b4af3a9adfbc590bd1fd6e02429508963698a5a7282be46622eacca12013"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-shipping-build-repair.log",
+      "sha256": "f2874a739021bd57a141f9c99a3ae6b8a89ef6fe8b5eee3c35599c37a0da3daf"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-final-build.log",
+      "sha256": "2239fbe1c75798a17bb8bd779bc3b096d48a004f8137916708650cc3fa829b4b"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-final-signature.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-boot.log",
+      "sha256": "c42420bbab00ba06b97e1ad5ef5466fb463df871503b3b85ab22e94bbd1a6625"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-install.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-launch.log",
+      "sha256": "2728cbecc508ca1b684ef6609e6593a7f3f344de2bb094ae419364c6594acf19"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-night-launch.log",
+      "sha256": "922aeb5bb316ef6638a0c1d714746b86a08cc732e0b2842fc1df595eb5037db2"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-ios-shutdown.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-android-shipping-build.log",
+      "sha256": "516dd3e710ba4be3ecfb13101bb5bb900e73140c3adf987ebea9c9e1750a75d1"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-android-signature.log",
+      "sha256": "b0a1af67205efcd284e5bbae691ebf4a0d296b4fcae02cd28e7e0509d0e0efbc"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-web-build.log",
+      "sha256": "1e1ecb97857efa22860375fa467f0942689a04ed4fb553fd68a6920eb5420dfc"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-web-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-web-format.log",
+      "sha256": "e639187e96ca73d40861ed4b4c5a6c3df4a49eb1ac99dbeaf117805ea87e12e2"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-live-health.json",
+      "sha256": "1f60bae97182db42fa1d40db324d1133934a21e887dc697dda0d891a03d0f18c"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment25-android-runtime-ownership.json",
+      "sha256": "7590842d2f236bfacaeb1e0b75e1653f72e25c711076ec0b68757524521aa6f5"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/workstreams/W3/increment-25/20260930-native-recording/android-boot-frame.png",
+      "sha256": "c3108b17f6bcf3d4e8448f6bc1f82d4fb3ee26d2388c8312b51915f29b0e64a9"
+    },
+    {
+      "path": "artifacts/workstreams/W3/increment-25/20260930-native-recording/ios-initial-frame.png",
+      "sha256": "bc598016c3fe754549aa293c8f330955a4b3d768876c36daaa3e375890d7d018"
+    },
+    {
+      "path": "artifacts/workstreams/W3/increment-25/20260930-native-recording/ios-light-welcome.png",
+      "sha256": "d80c45f11d8316d5854087fdd57db2b1542310fa966ab77c353ee1c84a521125"
+    },
+    {
+      "path": "artifacts/workstreams/W3/increment-25/20260930-native-recording/ios-night-welcome.png",
+      "sha256": "0a64c41cb1ccf5848040e6c831d13dbe31d59b653bc461bdf0de743721af2d47"
+    }
+  ],
+  "androidAPK": {
+    "path": "/private/tmp/creator-w3-continuation-android-20260930/app-build/outputs/apk/debug/app-debug.apk",
+    "sha256": "31b132474ebc1bf8d90574db9666f7bcb7922f9cdb5c3f99fda3be0a6a78ff4d",
+    "signature": "v2 verified"
+  },
+  "iosFinalBuild": "Signed final shipping Simulator build/codesign pass; actual Light/Night Welcome captures precede final metadata-only bounding fix and are not final-source interaction proof.",
+  "androidRuntime": "Owned5572/5043 preserved-data instance13 boot reached adb device; boot-completion property still empty and final APK not installed/launched at this observation. Earlier System UI ANR remains recorded.",
+  "prebootGuard": "Guard matched its own shell text and failed before receipt; launcher proceeded. Current exact executable/AVD/port ownership independently rechecked. No successful preboot claim.",
+  "webBuild": "Final production build/scoped ESLint pass; signed recording not played.",
+  "testsAdded": false,
+  "unitTestsRunForIncrement": false,
+  "nativeInteractiveAcceptance": false,
+  "signedRecordingAcceptance": false,
+  "fullW3Acceptance": false,
+  "mergeReady": false,
+  "preservedUnstagedFiles": [
+    "apps/ios/Package.resolved",
+    "apps/web/next-env.d.ts"
+  ]
+}
