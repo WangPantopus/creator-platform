@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { TrustSession, trustApi } from "../../ops/trust-client";
+import {
+  TrustSession,
+  trustApi,
+  useTrustSession,
+} from "../../ops/trust-client";
 export default function FeedbackPage() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const form = useRef<HTMLFormElement>(null);
+  const epoch = useTrustSession(() => {
+    form.current?.reset();
+    setMessage("");
+    setBusy(false);
+  });
   return (
     <main className="trust-page">
       <Link href="/support">Support</Link>
@@ -16,9 +26,11 @@ export default function FeedbackPage() {
       </p>
       <TrustSession />
       <form
+        ref={form}
         className="trust-panel"
         onSubmit={async (event) => {
           event.preventDefault();
+          const current = epoch.current;
           setBusy(true);
           const input = new FormData(event.currentTarget);
           try {
@@ -29,13 +41,15 @@ export default function FeedbackPage() {
               authorshipClear: input.get("clear") === "yes",
               comment: input.get("comment"),
             });
+            if (epoch.current !== current) return;
             setMessage("Your feedback is saved.");
           } catch (error) {
+            if (epoch.current !== current) return;
             setMessage(
               error instanceof Error ? error.message : "Feedback unavailable.",
             );
           } finally {
-            setBusy(false);
+            if (epoch.current === current) setBusy(false);
           }
         }}
       >

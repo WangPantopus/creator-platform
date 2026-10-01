@@ -1,0 +1,106 @@
+{
+  "environment": "Isolated W5 development actors; HTTP product operations, not browser or signed Note acceptance",
+  "contentId": "1c651e35-11de-4231-8150-b70a2751ce07",
+  "actions": [
+    {
+      "action": "Current team workspace",
+      "status": 200
+    },
+    {
+      "action": "Save team-owned draft",
+      "status": 200,
+      "id": "1c651e35-11de-4231-8150-b70a2751ce07",
+      "version": 1,
+      "state": "draft"
+    },
+    {
+      "action": "Repeat exact draft command",
+      "status": 200,
+      "id": "1c651e35-11de-4231-8150-b70a2751ce07",
+      "version": 1,
+      "state": "draft"
+    },
+    {
+      "action": "Publish under current team identity",
+      "status": 200,
+      "id": "1c651e35-11de-4231-8150-b70a2751ce07",
+      "version": 1,
+      "state": "published"
+    },
+    {
+      "action": "Fan 1 reads authorized public post",
+      "status": 200,
+      "version": 1,
+      "authorKind": "team",
+      "signedActId": null,
+      "teamMember": "w5_actor_4",
+      "state": "published"
+    },
+    {
+      "action": "Fan 1 submits own Thanks",
+      "status": 200,
+      "id": "fe9717f8-7ced-4ee4-bff1-66aef729dfb6",
+      "version": 1
+    },
+    {
+      "action": "Fan 2 reads authorized public post",
+      "status": 200,
+      "version": 1,
+      "authorKind": "team",
+      "signedActId": null,
+      "teamMember": "w5_actor_4",
+      "state": "published"
+    },
+    {
+      "action": "Fan 2 submits own Thanks",
+      "status": 200,
+      "id": "95f06f4e-4cb1-448b-bf59-095818322cef",
+      "version": 1
+    },
+    {
+      "action": "Fan denied creator digest",
+      "status": 403,
+      "errorCode": "creator_role_required"
+    },
+    {
+      "action": "Creator reads consented digest",
+      "status": 200
+    },
+    {
+      "action": "Current team unpublishes exact revision",
+      "status": 200,
+      "version": 1,
+      "state": "unpublished"
+    },
+    {
+      "action": "Deep link denies removed post",
+      "status": 403,
+      "errorCode": "content_unavailable"
+    },
+    {
+      "action": "Own Thanks remains returnable after removal",
+      "status": 200,
+      "version": 1,
+      "withdrawn": false,
+      "shareWithCreatorDigest": true,
+      "showIdentity": false
+    },
+    {
+      "action": "Fan 1 withdraws own Thanks after removal",
+      "status": 200,
+      "id": "fe9717f8-7ced-4ee4-bff1-66aef729dfb6",
+      "version": 2
+    },
+    {
+      "action": "Fan 2 withdraws own Thanks after removal",
+      "status": 200,
+      "id": "95f06f4e-4cb1-448b-bf59-095818322cef",
+      "version": 2
+    },
+    {
+      "action": "Stale draft edit rejected",
+      "status": 403,
+      "errorCode": "content_changed"
+    }
+  ]
+}

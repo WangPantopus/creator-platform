@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import { applicationOrigin } from "../../../../lib/request-origin";
 import { IdentityContinueSchema } from "@qelvora/api/schemas";
 import { IdentityRedirectSchema } from "@qelvora/api";
-import { continuationCookie, cookieOptions } from "../../../../lib/session";
-import { applicationOrigin } from "../../../../lib/request-origin";
+import {
+  continuationCookie,
+  continuationReturnCookie,
+  cookieOptions,
+} from "../../../../lib/session";
 /** Only the backend's Pantopus adapter may create a redirect; this route never creates an identity. */
 export async function GET(request: NextRequest) {
-  const requested = request.nextUrl.searchParams.get("returnTo") ?? "/home";
+  const query = request.nextUrl.searchParams;
+  const requested = query.get("returnTo") ?? "/home";
   const context = IdentityContinueSchema.safeParse({ returnTo: requested });
-  const returnTo = context.success ? context.data.returnTo : "/home";
+  const valid =
+    context.success &&
+    query.getAll("returnTo").length <= 1 &&
+    ![...query.keys()].some((key) => key !== "returnTo");
+  const returnTo = valid && context.success ? context.data.returnTo : "/home";
   let target: URL;
   try {
     if (
@@ -28,7 +37,7 @@ export async function GET(request: NextRequest) {
     );
   }
   target.searchParams.set("returnTo", returnTo);
-  if (!context.success) {
+  if (!valid) {
     target.searchParams.set("error", "invalid_return");
     return NextResponse.redirect(target);
   }
@@ -61,6 +70,12 @@ export async function GET(request: NextRequest) {
               ...cookieOptions,
               maxAge: 300,
             });
+          // Keep navigation context longer than the one-use five-minute
+          // authorization challenge, so an expired callback can start again.
+          redirect.cookies.set(continuationReturnCookie, returnTo, {
+            ...cookieOptions,
+            maxAge: 1800,
+          });
           return redirect;
         }
       }

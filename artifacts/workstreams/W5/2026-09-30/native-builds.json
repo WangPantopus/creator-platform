@@ -1,0 +1,24 @@
+{
+  "scope": "Full shipping app compile/install/launch. Captures show genuine W1 welcome. No operated W5 content or hardware journey claimed.",
+  "ios": {
+    "build": "BUILD SUCCEEDED",
+    "sdk": "iOS26.5 Simulator",
+    "device": "iPhone17",
+    "uuid": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
+    "api": "http://127.0.0.1:4105",
+    "isolatedOutputs": "/private/tmp/creator-w5-ios-derived"
+  },
+  "android": {
+    "build": "BUILD SUCCESSFUL",
+    "apiLevel": 35,
+    "device": "Pixel7 x86_64",
+    "avd": "CreatorPlatform_W5",
+    "emulatorPort": 5590,
+    "adbServerPort": 5045,
+    "explicitTransport": "127.0.0.1:5591",
+    "api": "http://10.0.2.2:4105",
+    "apkSha256": "11cf844a8b2a4cae2b6731e79973076e75353e48854bb38238e209e132af11eb",
+    "isolatedOutputs": "/private/tmp/creator-w5-android/app-build",
+    "sdkLicense": "Existing installed SDK/license files copied read-only; no new license accepted."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "parentRevision": "bd3677c03ccb1b8225bd0d56f033f953ce7aa7aa",
+  "scope": "Optional canonical thread identity issuance on an already-held core transaction; no worker authority or configured denial supplied",
+  "sources": {
+    "apps/backend/src/modules/access/scope.ts": "428fe1eeef40f9b0ae2d847077cce49a786fdb355e12367cea4309e66d4d8407",
+    "apps/backend/src/integration.ts": "c5b1205ee3aeb1d09c7f1d108a299f5937627b116efee7063109616c0d760bdc"
+  },
+  "logs": {
+    "held-thread-final-build": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "held-thread-final-lint": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-lint.log",
+      "sha256": "0e03f343e9777fb5e4c472ffb9e35ff311cc0e877cd34f58625e1449b8566270"
+    },
+    "held-thread-final-postgres": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-postgres.log",
+      "sha256": "7596dde1e5ae54bbe1fdb23dd7191c2f586e1b20c50620f94a828a7b316ae3a8"
+    },
+    "held-thread-final-contracts": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-contracts.log",
+      "sha256": "1769c916f24120a705ca0a5d88903a81189cc89b3d0386ef9e04e77ffdb0659b"
+    },
+    "held-thread-final-rename": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-rename.log",
+      "sha256": "c484a7ba6ec4fec21c0e6b39ba5307bc24f421cc69a3228946dc7d79f8343f5b"
+    },
+    "held-thread-final-rename-backend": {
+      "path": "/private/tmp/creator-w1-continuation-held-thread-final-rename-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "android-team": {
+      "path": "/private/tmp/creator-w1-continuation-android-team.log",
+      "sha256": "cc28e5fbec5ee6f63d602861bc950290a5a48395f90801376bd893edd3d01850"
+    },
+    "final-rename-backend": {
+      "path": "/private/tmp/creator-w1-continuation-final-rename-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "final-rename-web": {
+      "path": "/private/tmp/creator-w1-continuation-final-rename-web.log",
+      "sha256": "c4c765fb9e45b92b34e448d2d5f8a322eb92a7eaa091178d3c0a2305df0f6cbe"
+    },
+    "final-rename-ios": {
+      "path": "/private/tmp/creator-w1-continuation-final-rename-ios.log",
+      "sha256": "5396717d671a05441a166632d7f841891d19ea2e82adbf3af7e139fb2749263d"
+    },
+    "final-rename-android": {
+      "path": "/private/tmp/creator-w1-continuation-final-rename-android.log",
+      "sha256": "e48ba9a34f686b3f87435b9303a053f22e422edd9df92677d09205c065ca9da6"
+    }
+  },
+  "checks": {
+    "backendBuild": "passed",
+    "affectedLint": "passed",
+    "contractCases": 9,
+    "contractRunnerSeconds": 1.93,
+    "postgresCasesPassed": 2,
+    "postgresCasesFiltered": 7,
+    "postgresCases": [
+      "T-11 denies unscoped read/write and leaves no tenant context on pooled connections",
+      "T-34 refuses team and stolen-session named acts"
+    ],
+    "postgresRunnerSeconds": 3.78,
+    "renamedBackendCurrentSource": "passed",
+    "androidAtParentRevision": {
+      "cases": 19,
+      "buildSeconds": 920,
+      "suites": [
+        {
+          "name": "com.pantopus.qelvora.DeliveryProtocolTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.522"
+        },
+        {
+          "name": "com.pantopus.qelvora.GeneratedContractTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.397"
+        },
+        {
+          "name": "com.pantopus.qelvora.NativeSnapshotsTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "64.809"
+        }
+      ]
+    },
+    "renamedWebIosAndroidAtParentRevision": "passed; no native/web source changed by this helper"
+  },
+  "availability": "Default host has no assertScopeAllowedInTransaction; openThreadInTransaction fails 503 before issuance; legacy openThread remains compatible",
+  "limits": [
+    "Existing checks exercise retained foundation paths; new held-client path has source/type verification, no operated domain acceptance",
+    "No new suites, SQL, grants, RLS, credentials, provider or role fabricated",
+    "Actual current HTTP session required; worker restart requires separately issued purpose authority",
+    "Caller owns BEGIN/COMMIT/ROLLBACK and must select write lock before mutations or domain locks",
+    "Hosted native and visual jobs pending; release-ready no"
+  ]
+}

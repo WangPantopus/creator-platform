@@ -1,0 +1,13 @@
+{
+  "sourceRevision": "bf44ada37268bb489c97d32432e4c4d81f25c8f9",
+  "imageId": "sha256:588a8f5211fbc6628af48e3cd341c0169a81e5fd7480efb9424b82c2581cdfe7",
+  "bytes": 395462186,
+  "user": "node",
+  "uid": 1000,
+  "nodeVersion": "v24.21.0",
+  "compilerAbsent": true,
+  "backendSourceAbsent": true,
+  "bundlePresent": true,
+  "startupWithoutAdapter": "Refused: Choose a deployed environment.",
+  "scope": "Local build/runtime inspection. No configured deployment, signing, provider readiness or release acceptance."
+}

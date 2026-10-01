@@ -6,12 +6,17 @@ import type { ShadowReplay } from "./modules/agent/shadow.js";
 import { commerceFeature } from "./modules/commerce/registration.js";
 import type { CommerceService } from "./modules/commerce/service.js";
 import type { ExtendedCommerce } from "./modules/commerce/extended.js";
+import {
+  conversationFeature,
+  type ConversationFeature,
+} from "./modules/conversation/feature.js";
+import { contentFeature } from "./modules/content/registration.js";
+import type { ContentService } from "./modules/content/service.js";
+import { studioFeature } from "./modules/studio/registration.js";
+import type { StudioService } from "./modules/studio/service.js";
 import { createGrowthRouter } from "./modules/growth/router.js";
 import type { GrowthService } from "./modules/growth/service.js";
-import {
-  createW6Router,
-  type W6RouterDependencies,
-} from "./modules/media/router.js";
+import { mediaFeature } from "./modules/media/registration.js";
 import {
   createTrustRouter,
   type TrustRouterOptions,
@@ -20,6 +25,9 @@ import {
 /** The host constructs owner services with approved configuration. W1 supplies the
  * same current actor and issued ThreadScope to every router. */
 export function registerDomainFeatures(input: {
+  conversation?: ConversationFeature;
+  content?: ContentService;
+  studio?: StudioService;
   agent?: {
     service: AgentService;
     sources: SourceService;
@@ -29,10 +37,14 @@ export function registerDomainFeatures(input: {
   commerce?: CommerceService;
   extendedCommerce?: ExtendedCommerce;
   growth?: GrowthService;
-  media?: Omit<W6RouterDependencies, "scopeFor">;
+  media?: Parameters<typeof mediaFeature>[0];
   trust?: Omit<TrustRouterOptions, "actor">;
 }): FeatureRegistration[] {
   const registrations: FeatureRegistration[] = [];
+  if (input.conversation)
+    registrations.push(conversationFeature(input.conversation));
+  if (input.content) registrations.push(contentFeature(input.content));
+  if (input.studio) registrations.push(studioFeature(input.studio));
   if (input.agent)
     registrations.push({
       name: "agent",
@@ -48,12 +60,7 @@ export function registerDomainFeatures(input: {
       path: "/v1/growth",
       router: ({ actorFor }) => createGrowthRouter(input.growth!, actorFor),
     });
-  if (input.media)
-    registrations.push({
-      name: "media",
-      path: "/v1/w6",
-      router: ({ scopeFor }) => createW6Router({ ...input.media, scopeFor }),
-    });
+  if (input.media) registrations.push(mediaFeature(input.media));
   if (input.trust)
     registrations.push({
       name: "trust",

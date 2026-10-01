@@ -4,6 +4,7 @@ import type { Actor } from "./adapter.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { assertCurrentSession } from "./request-authority.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 
 export interface SignedSubjectPolicy {
   /** A namespaced domain registration, e.g. content or commerce. */
@@ -13,6 +14,8 @@ export interface SignedSubjectPolicy {
     actor: Actor,
     creatorId: string,
     requested: SignedActCommand,
+    /** Process-issued on this held client; never accepted from request JSON. */
+    threadScope?: ThreadScope,
   ): Promise<SignedActCommand | null>;
 }
 export async function prepareSignedSubject(
@@ -21,10 +24,27 @@ export async function prepareSignedSubject(
   creatorId: string,
   requested: SignedActCommand,
   policies: readonly SignedSubjectPolicy[],
+  threadScope?: ThreadScope,
 ) {
+  if (threadScope) {
+    assertThreadScope(threadScope);
+    invariant(
+      threadScope.actorAccountId === actor.accountId &&
+        threadScope.creatorId === creatorId &&
+        threadScope.authority === "creator",
+      "creator_required",
+      "Only the current creator can prepare this conversation act.",
+    );
+  }
   let canonical: SignedActCommand | null = null;
   for (const policy of policies) {
-    const candidate = await policy.prepare(client, actor, creatorId, requested);
+    const candidate = await policy.prepare(
+      client,
+      actor,
+      creatorId,
+      requested,
+      threadScope,
+    );
     if (candidate) {
       invariant(
         canonical === null,

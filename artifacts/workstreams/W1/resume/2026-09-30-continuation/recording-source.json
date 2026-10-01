@@ -1,0 +1,448 @@
+{
+  "recordedAt": "2026-10-01T03:11:16.242160+00:00",
+  "sourceParent": "adc7cd1487d1cba663b84c8da7aad2459ddf7cd8",
+  "producers": {
+    "W3Recording": "bb2e1645d242882d3e2a0138ac6b67800edf2172",
+    "W6FileProofLocalImmutable": "682766cdec3318a70aa949eda93a9834845f5f05",
+    "W6ArchiveRead": "9b4540ecd20b580768e49836a15df5804d9e154e",
+    "W6TakeoverGuard": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e"
+  },
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "bc43caeb1981aab02d0f7cc2f86506a14686430087ccc82a37cf6cda6d7826f3",
+    "apps/backend/src/modules/conversation/feature.ts": "0718a3dd1e56f921fe71c146f55f096ee37623cc418526c7374acb618d8c61aa",
+    "apps/backend/src/modules/conversation/lineage.ts": "24e4c265589fba088ff6881d743a62c94480695ae1a03af8619b35afe511e907",
+    "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+    "apps/backend/src/modules/conversation/privacy.ts": "95cf4032321827c6a33c8d3f4f989cae1816a59f4460847b2ef3f7bfc68d9800",
+    "apps/backend/src/modules/conversation/recordings.ts": "58e87081c1f406aee49c9c65b02e6b1e0e05d8a71f6d348a0a1572319ba966b6",
+    "apps/backend/src/modules/conversation/runtime.ts": "1675ca405103e59f37a7dda00be93dd79f13a66fadbb59a041fec0b549d98375",
+    "apps/backend/src/modules/media/ai-audio.ts": "54f34259cc12a83ba0800894712df60bd43e8e00743ee739f9300ef10b5dc979",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "de9ff425f04de730238da375b8f29db3fca017d078fbfc0833d07261774fb808",
+    "apps/backend/src/modules/media/creator-service.ts": "1c6c4de000fea6d668180b003a2aee77be11f5e5a1dc1168ac3a46ec95b53765",
+    "apps/backend/src/modules/media/creator-worker.ts": "a5a4977c07c3615ff7ef49ab5f7a1b9823d92165b212e35ae8030876ea799b09",
+    "apps/backend/src/modules/media/lifecycle.ts": "9f6367ce3f9fd37e03cca358571cfb7e954d15bf834a9a81a16a3cd2f5901e6c",
+    "apps/backend/src/modules/media/router.ts": "aa52555f3f86aabb819371d27f6b0e7c04f5735cde7b3220d59ca35bc0fc29c1",
+    "apps/backend/src/modules/media/service.ts": "9b2a49fc51e7e0700c86579ee290a809749406679f68c2587816d5a92368c988",
+    "apps/backend/src/modules/media/storage.ts": "e2cad00e93ecd0b773e36781761e2950b77273b6004931216eee1ce90ba1c9a0",
+    "apps/backend/src/modules/media/worker.ts": "4a7f8ce2941c1c16b287d57493af2edef1339833f5ddec959dca8bebba944596",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "fc2c519d4d292f65fc3ba97e8a0b3f15dbbe4b803c0fc955a8e2b18fa5be4a70",
+    "apps/web/app/media/voice/page.tsx": "3df272a46f17d67d60a99981239c41e9edf25f127df20445845590da5797bc10",
+    "apps/web/app/threads/[creatorId]/[fanId]/page.tsx": "d429b3d34c6e62056e98f758495f953654d385c28f7c1c5dc181e82791111b85",
+    "apps/web/features/media/VoicePlayer.tsx": "0663d11239dfcc5fd8ef9a21605347bedb68a6eb617ffe99d4ad38cc5d07b7ec",
+    "packages/api/generated/openapi.json": "17dad5178bffcc1d2c2403765093555d04c92a2e2746a90482259570ef13841f",
+    "packages/api/src/client.ts": "c2908bec68de8d487382fc3736994239a4f28dd63b04306e3d6a8bcd66c937e1",
+    "packages/api/src/conversation/contracts.ts": "a2bc5881be3c12458dcfda781747370bb93f678178d4b112be6ee9df03b4395e",
+    "packages/api/src/media-openapi.ts": "7dd9c9d85e611c55de9b3cec8cc999d8a675bceabde24efd6c42c757982d1368",
+    "packages/api/src/media.ts": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
+    "packages/api/src/openapi.ts": "d8d930fe0d111ef4929ebb01f62598ffa8b89fc436a7ad523f5150f0481fa35e"
+  },
+  "canonicalOperationDiff": {
+    "previousCount": 48,
+    "currentCount": 49,
+    "added": [
+      "deliverConversationRecording"
+    ],
+    "removed": [],
+    "changedOldOperationObjects": [
+      {
+        "id": "readAudienceCreatorMedia",
+        "changedFields": [],
+        "pathParametersChanged": true
+      },
+      {
+        "id": "audienceCreatorMediaPlayback",
+        "changedFields": [],
+        "pathParametersChanged": true
+      },
+      {
+        "id": "playAudienceCreatorMedia",
+        "changedFields": [
+          "description",
+          "parameters"
+        ],
+        "pathParametersChanged": false
+      },
+      {
+        "id": "playCreatorMedia",
+        "changedFields": [
+          "description"
+        ],
+        "pathParametersChanged": false
+      },
+      {
+        "id": "playFanCreatorMedia",
+        "changedFields": [
+          "description"
+        ],
+        "pathParametersChanged": false
+      }
+    ],
+    "preservedOldIdsPathsMethods": true
+  },
+  "renameInputs": [
+    {
+      "canonical": "apps/backend/src/modules/conversation/feature.ts",
+      "sourceSha256": "0718a3dd1e56f921fe71c146f55f096ee37623cc418526c7374acb618d8c61aa",
+      "renamed": "apps/backend/src/modules/conversation/feature.ts",
+      "renamedSha256": "26223ed7d693685ec5070bdaa28d52cc3e58086503287488c7082cf5589eca04"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/lineage.ts",
+      "sourceSha256": "24e4c265589fba088ff6881d743a62c94480695ae1a03af8619b35afe511e907",
+      "renamed": "apps/backend/src/modules/conversation/lineage.ts",
+      "renamedSha256": "24e4c265589fba088ff6881d743a62c94480695ae1a03af8619b35afe511e907"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/privacy.ts",
+      "sourceSha256": "95cf4032321827c6a33c8d3f4f989cae1816a59f4460847b2ef3f7bfc68d9800",
+      "renamed": "apps/backend/src/modules/conversation/privacy.ts",
+      "renamedSha256": "50ec3053d588634b36fa79fc622c85407e1d6f7c8872f0592cb906d8eb592b34"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/runtime.ts",
+      "sourceSha256": "1675ca405103e59f37a7dda00be93dd79f13a66fadbb59a041fec0b549d98375",
+      "renamed": "apps/backend/src/modules/conversation/runtime.ts",
+      "renamedSha256": "1675ca405103e59f37a7dda00be93dd79f13a66fadbb59a041fec0b549d98375"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/ai-audio.ts",
+      "sourceSha256": "54f34259cc12a83ba0800894712df60bd43e8e00743ee739f9300ef10b5dc979",
+      "renamed": "apps/backend/src/modules/media/ai-audio.ts",
+      "renamedSha256": "54f34259cc12a83ba0800894712df60bd43e8e00743ee739f9300ef10b5dc979"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/creator-lifecycle.ts",
+      "sourceSha256": "de9ff425f04de730238da375b8f29db3fca017d078fbfc0833d07261774fb808",
+      "renamed": "apps/backend/src/modules/media/creator-lifecycle.ts",
+      "renamedSha256": "de9ff425f04de730238da375b8f29db3fca017d078fbfc0833d07261774fb808"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/creator-service.ts",
+      "sourceSha256": "1c6c4de000fea6d668180b003a2aee77be11f5e5a1dc1168ac3a46ec95b53765",
+      "renamed": "apps/backend/src/modules/media/creator-service.ts",
+      "renamedSha256": "91182596f28a4738e3507cd2a4752999f4197412ab16ddce41c9b2a5e99ae16d"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/creator-worker.ts",
+      "sourceSha256": "a5a4977c07c3615ff7ef49ab5f7a1b9823d92165b212e35ae8030876ea799b09",
+      "renamed": "apps/backend/src/modules/media/creator-worker.ts",
+      "renamedSha256": "a5a4977c07c3615ff7ef49ab5f7a1b9823d92165b212e35ae8030876ea799b09"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/lifecycle.ts",
+      "sourceSha256": "9f6367ce3f9fd37e03cca358571cfb7e954d15bf834a9a81a16a3cd2f5901e6c",
+      "renamed": "apps/backend/src/modules/media/lifecycle.ts",
+      "renamedSha256": "9f6367ce3f9fd37e03cca358571cfb7e954d15bf834a9a81a16a3cd2f5901e6c"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/router.ts",
+      "sourceSha256": "aa52555f3f86aabb819371d27f6b0e7c04f5735cde7b3220d59ca35bc0fc29c1",
+      "renamed": "apps/backend/src/modules/media/router.ts",
+      "renamedSha256": "bc3f8c3a5c8d5854135aa27bd3351548da0e4faf633e338447919b31493a66d7"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/service.ts",
+      "sourceSha256": "9b2a49fc51e7e0700c86579ee290a809749406679f68c2587816d5a92368c988",
+      "renamed": "apps/backend/src/modules/media/service.ts",
+      "renamedSha256": "5cac42b3196e2b40b447b1b230bb1ffdcbe0b8244b73dcfc60e22f2e71e70a0f"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/storage.ts",
+      "sourceSha256": "e2cad00e93ecd0b773e36781761e2950b77273b6004931216eee1ce90ba1c9a0",
+      "renamed": "apps/backend/src/modules/media/storage.ts",
+      "renamedSha256": "e2cad00e93ecd0b773e36781761e2950b77273b6004931216eee1ce90ba1c9a0"
+    },
+    {
+      "canonical": "apps/backend/src/modules/media/worker.ts",
+      "sourceSha256": "4a7f8ce2941c1c16b287d57493af2edef1339833f5ddec959dca8bebba944596",
+      "renamed": "apps/backend/src/modules/media/worker.ts",
+      "renamedSha256": "4a7f8ce2941c1c16b287d57493af2edef1339833f5ddec959dca8bebba944596"
+    },
+    {
+      "canonical": "apps/web/app/media/voice/page.tsx",
+      "sourceSha256": "3104d925814fd94a65feb71c56fcecba82a8433eb30b5226cb88b0cc3522d99b",
+      "renamed": "apps/web/app/media/voice/page.tsx",
+      "renamedSha256": "ce7f141edc6d6b46e0dec823c1e66213ac615e25c2bc70b6cbb7ca3e90ad5928"
+    },
+    {
+      "canonical": "apps/web/app/threads/[creatorId]/[fanId]/page.tsx",
+      "sourceSha256": "d429b3d34c6e62056e98f758495f953654d385c28f7c1c5dc181e82791111b85",
+      "renamed": "apps/web/app/threads/[creatorId]/[fanId]/page.tsx",
+      "renamedSha256": "ec24e31107104483ec33dbddb02eee23001e0453ea700a25fc06c7b726bc6c37"
+    },
+    {
+      "canonical": "apps/web/features/media/VoicePlayer.tsx",
+      "sourceSha256": "0663d11239dfcc5fd8ef9a21605347bedb68a6eb617ffe99d4ad38cc5d07b7ec",
+      "renamed": "apps/web/features/media/VoicePlayer.tsx",
+      "renamedSha256": "6bd7a6f798f6ea7e5e20bda942002aa19bdba6f70da41e370020b233a048a6db"
+    },
+    {
+      "canonical": "packages/api/src/client.ts",
+      "sourceSha256": "c2908bec68de8d487382fc3736994239a4f28dd63b04306e3d6a8bcd66c937e1",
+      "renamed": "packages/api/src/client.ts",
+      "renamedSha256": "c2908bec68de8d487382fc3736994239a4f28dd63b04306e3d6a8bcd66c937e1"
+    },
+    {
+      "canonical": "packages/api/src/conversation/contracts.ts",
+      "sourceSha256": "a2bc5881be3c12458dcfda781747370bb93f678178d4b112be6ee9df03b4395e",
+      "renamed": "packages/api/src/conversation/contracts.ts",
+      "renamedSha256": "a2bc5881be3c12458dcfda781747370bb93f678178d4b112be6ee9df03b4395e"
+    },
+    {
+      "canonical": "packages/api/src/media-openapi.ts",
+      "sourceSha256": "7dd9c9d85e611c55de9b3cec8cc999d8a675bceabde24efd6c42c757982d1368",
+      "renamed": "packages/api/src/media-openapi.ts",
+      "renamedSha256": "1dfcaa852383851b88b9b8e69b169fa62ab0e86a1f557c7c048e5b8104cd038c"
+    },
+    {
+      "canonical": "packages/api/src/media.ts",
+      "sourceSha256": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
+      "renamed": "packages/api/src/media.ts",
+      "renamedSha256": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f"
+    },
+    {
+      "canonical": "packages/api/src/openapi.ts",
+      "sourceSha256": "d8d930fe0d111ef4929ebb01f62598ffa8b89fc436a7ad523f5150f0481fa35e",
+      "renamed": "packages/api/src/openapi.ts",
+      "renamedSha256": "d8d930fe0d111ef4929ebb01f62598ffa8b89fc436a7ad523f5150f0481fa35e"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+      "renamed": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "renamedSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+    },
+    {
+      "canonical": "apps/backend/src/modules/conversation/recordings.ts",
+      "sourceSha256": "58e87081c1f406aee49c9c65b02e6b1e0e05d8a71f6d348a0a1572319ba966b6",
+      "renamed": "apps/backend/src/modules/conversation/recordings.ts",
+      "renamedSha256": "2e2602246b4633b74d226c4b15f2936a4614e41235204cfaa4ed935678c878d3"
+    }
+  ],
+  "schema": {
+    "allocation": null,
+    "applied": false,
+    "proposalSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+    "canonicalRegistryChanged": false,
+    "appliedMigrationChanged": false
+  },
+  "defaultHost": {
+    "health": {
+      "status": "ok",
+      "ready": false,
+      "foundationReady": true,
+      "identity": "configured",
+      "identityMode": "development",
+      "generation": "unconfigured",
+      "registeredFeatures": [
+        "conversation",
+        "media",
+        "content",
+        "studio"
+      ],
+      "readinessEndpoint": "/health/ready",
+      "database": "configured",
+      "featureEnabled": true
+    },
+    "conversation": {
+      "providers": null,
+      "consentAvailable": false,
+      "generationAvailable": false,
+      "firstConversationAvailable": false,
+      "correctionsAvailable": false,
+      "recordingDeliveryAvailable": false,
+      "accessDisclosure": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
+    }
+  },
+  "checks": {
+    "APIBackendWebBuilds": "passed",
+    "canonical49OperationConsistency": "passed",
+    "affectedLintFormat": "passed",
+    "normallySignedShippingIOS": "passed; strict signature verified",
+    "shippingAndroidAssemble": "passed; APK signature verified",
+    "FolioPreviewFourConsumerBuilds": "passed; normal iOS and APK signatures verified; generated from refreshed canonical sources",
+    "newTestsOrChangedAssertionsReferences": false,
+    "unitRunsOrCoverageWork": false
+  },
+  "actualIOS": {
+    "deviceId": "365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5",
+    "device": "W1 iPhone17/iOS26.5",
+    "existingSuite": "FoundationFlowTests",
+    "passed": 2,
+    "failures": 0,
+    "seconds": 36.035,
+    "journey": "Shipping Welcome/Continue shows genuinely unconfigured sign-in in Light/Dark; catalog keeps illustrative creator/AI labels",
+    "genuineIdentityPasskeyRecordingProviderAcceptance": false,
+    "stoppedNormallyAfterRun": true
+  },
+  "actualWeb": {
+    "viewport": "390x844/DPR1",
+    "journey": "Creator-only media URL retains actual query; explicit Choose a Note reaches persisted pending workspace; current Studio Threads route renders audited-entry explanation",
+    "realSignedRecordingOperated": false
+  },
+  "actualAndroid": {
+    "adbPort": 5051,
+    "emulatorPort": 5574,
+    "status": "stopped normally; same-data software, restart and host GPU shipping launches each retained visible System UI ANR",
+    "sourceQualification": "Parent entry source; current49-operation APK builds/signature pass but clean current shipping launch unobserved",
+    "failureSuppressed": false,
+    "cause": "unproven; host load/swap observations retained as observations only"
+  },
+  "hostedChecks": {
+    "head": "adc7cd1487d1cba663b84c8da7aad2459ddf7cd8",
+    "compile": "success",
+    "webAndBackend": "success",
+    "androidRuntime": "success;4 existing launched UI cases",
+    "macOSNativeVisual": "queued",
+    "verifiesThisIncrement": false
+  },
+  "logs": {
+    "creator-w1-continuation-recording-android-signature.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-android-signature.log",
+      "sha256": "b0a1af67205efcd284e5bbae691ebf4a0d296b4fcae02cd28e7e0509d0e0efbc"
+    },
+    "creator-w1-continuation-recording-android.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-android.log",
+      "sha256": "a86d593d2a3da3be8e7c6b7420a05951255c0d92111e715c054afc8453b8bdee"
+    },
+    "creator-w1-continuation-recording-api-types.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-api-types.log",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+    },
+    "creator-w1-continuation-recording-backend.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "creator-w1-continuation-recording-final-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-final-format.log",
+      "sha256": "5de0a58269d550addfe8250caf8c4319d19a5c135539f1dcd0331478dde5b7db"
+    },
+    "creator-w1-continuation-recording-format-check.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-format-check.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "creator-w1-continuation-recording-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-format.log",
+      "sha256": "c775359f5b24765f70e08abd065b3b0b79446cae25eb376e632307a2ed403ec8"
+    },
+    "creator-w1-continuation-recording-generate-check.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-generate-check.log",
+      "sha256": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e"
+    },
+    "creator-w1-continuation-recording-generate.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-generate.log",
+      "sha256": "b2c14c9fff898daa0501b9fce611f11c0cbdc4d3cd8abc0ba298493856ef88cf"
+    },
+    "creator-w1-continuation-recording-ios-attachments.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-attachments.log",
+      "sha256": "add41c8daa0494e2adc0d5894ea599cac43919dee7e6e298001844ab6a019c2a"
+    },
+    "creator-w1-continuation-recording-ios-boot.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-boot.log",
+      "sha256": "e5972376cbb15dcc42cce3e1ef5f8d66a40ca4eaf0edb5cbd22f8eb3a118a7f9"
+    },
+    "creator-w1-continuation-recording-ios-project.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-project.log",
+      "sha256": "b7d3af03d9e4857c27224f9ec38e7372b085cff584ae4e888fa6ecde7e8c4115"
+    },
+    "creator-w1-continuation-recording-ios-shutdown.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-shutdown.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-recording-ios-signature.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-signature.log",
+      "sha256": "1b83899f5b5ef0d3aa721d3ffaecee6556946850d5fd5bc15b4472b649878d4f"
+    },
+    "creator-w1-continuation-recording-ios-ui.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios-ui.log",
+      "sha256": "079003caad9b71006ce6f4a8bcf6f023fa0a8e2d2a58d77ffcdfd3db032f5b8a"
+    },
+    "creator-w1-continuation-recording-ios.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-ios.log",
+      "sha256": "01494b8bb3198817fa681158d79de9bdb91f711c4349bd00e548e8969ef401d3"
+    },
+    "creator-w1-continuation-recording-lint.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-recording-rename-android-signature.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-android-signature.log",
+      "sha256": "b0a1af67205efcd284e5bbae691ebf4a0d296b4fcae02cd28e7e0509d0e0efbc"
+    },
+    "creator-w1-continuation-recording-rename-android.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-android.log",
+      "sha256": "a1a59f8e6127f9620c4aca754e6b408b0055bef272341a490f36a8c75cf97dba"
+    },
+    "creator-w1-continuation-recording-rename-backend.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-backend.log",
+      "sha256": "486f43d87bef9ddda8155d2eca9d2d4cb6772f047e248e4827201cbbf7a748c0"
+    },
+    "creator-w1-continuation-recording-rename-generate-check.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-generate-check.log",
+      "sha256": "e1819da4b550d2601f3791214b4e8779f8f30bfff098822767494b8004603f4a"
+    },
+    "creator-w1-continuation-recording-rename-generate.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-generate.log",
+      "sha256": "34363ae9149b50440404f911bfc8e3d524cede7bfbccd9aae050ee97145a99b7"
+    },
+    "creator-w1-continuation-recording-rename-ios-project.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-ios-project.log",
+      "sha256": "d9ff9499bae2ae221e9465ba1942516accfd5d1ba11056914da6e15fe1a041b5"
+    },
+    "creator-w1-continuation-recording-rename-ios-signature.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-ios-signature.log",
+      "sha256": "f6ede93d98830a5802075e7e7999d2709a56716ac57f65cadadb2a6b19367ad7"
+    },
+    "creator-w1-continuation-recording-rename-ios.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-ios.log",
+      "sha256": "1de0c938f3ee8cbe6ffcb83f6869132bbc168063767c3c5c46df48d647d6d46d"
+    },
+    "creator-w1-continuation-recording-rename-web-proof-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-web-proof-final.log",
+      "sha256": "f270b31fa71afe8f81998d009f1a211b944bcc509db2b52d0318ff689fc4e530"
+    },
+    "creator-w1-continuation-recording-rename-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-rename-web.log",
+      "sha256": "6d070088778039bcb7ddf2769df20df8df52ca3f898bd24c9466457dc18d8559"
+    },
+    "creator-w1-continuation-recording-root-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-root-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "creator-w1-continuation-recording-root-lint.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-root-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "creator-w1-continuation-recording-source-format.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-source-format.log",
+      "sha256": "9eba4eeab40a12f86bfd85a88f592fad5ce8176c0e6f60f6a68f6da146ec6d21"
+    },
+    "creator-w1-continuation-recording-web-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-web-final.log",
+      "sha256": "719add5f899154cb8ec0874ef6f147433e3496b4ede698df22bd9ea5c235a6c9"
+    },
+    "creator-w1-continuation-recording-web-proof-final.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-web-proof-final.log",
+      "sha256": "eb8cc384c044200fe497eeec10bd0c489e095408e418897a373f9875b484654f"
+    },
+    "creator-w1-continuation-recording-web.log": {
+      "path": "/private/tmp/creator-w1-continuation-recording-web.log",
+      "sha256": "27d81bc2861b286fdd0cc725c387b57ea43ae0f1f7647a34568fa63a29e47a4e"
+    }
+  },
+  "evidenceSha256": {
+    "recording-incomplete-link.png": "1483d93b1f210c7e245c249d3c8188bf71ffd67b5088aa0e6d4b355068ee9804",
+    "recording-integration.md": "f3b9ccbb50d6ce331ec14ae8dd8b70ebd55136dd5d4ac1b7c2e9f709a1ee402e",
+    "recording-ios-attachments.json": "f6f6508a765adca8baa3328515e1ed60d7967d5bca7ddc314bed7274ce7513c1",
+    "recording-ios-unconfigured-light.png": "d45a5768837231af4866d55939ed74bb6c3de37004698b63ddbf082c6f3337bd",
+    "recording-ios-unconfigured-night.png": "29fc661dd042bcab3a5c390477f14813d502be704c79cf13aa68bd42c7701c26",
+    "recording-parent-android-system-ui-host-gpu.png": "827c4e7ee3294e1107e794411ce0908df013ec8a9312511ad91209d74e65b491"
+  },
+  "gates": [
+    "Exact pushed-head checks and affected launched-app E2E before merge",
+    "Genuine identity/HTTPS/RP/native associations",
+    "Verified creator/passkeys and actual held private-publication denial",
+    "Registered exact recording/correction schema",
+    "Approved provider/license/archive authority and actual configured recording journey"
+  ],
+  "releaseReady": false
+}

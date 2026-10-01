@@ -1,0 +1,88 @@
+{
+  "parentRevision": "c41ea4798a0dd8b45d08b2e6e0035a98615742f2",
+  "teamProducer": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
+  "scope": "C03 optional private member/account attribution and current triage team reply only; W1 content audience identity producer",
+  "sources": {
+    "apps/backend/src/modules/identity/audience-scope.ts": "073f9757233d528994da3872cd67fd6b479dbde2ea46f6039dafed3613004ada",
+    "apps/backend/src/integration.ts": "aab3d774ba7b32a8eeea20eba1fb505423fe9c6d5da37e1b1cd842211ce947b7",
+    "apps/backend/src/modules/conversation/service.ts": "6947adbac1a226bec327775f31ec768e15fcf82984c9273041b9b67ee268a172",
+    "apps/backend/src/modules/conversation/feature.ts": "6982a7ee690baf67a7f1baedcf6c2ead1a648baa1337e51b2f5989b4c22fa905",
+    "apps/web/app/api/conversations/[...path]/route.ts": "d4688f1e55ba38d35bfdb352af9da1115d9800f656120d0e917635a821b8fba1",
+    "packages/api/src/schemas.ts": "d082bed889bfafe2474ed40b01a4028296b3ad9880de717b1221b272aac9f976",
+    "packages/api/generated/openapi.json": "92f6846535c473d3a4749194e78c59bd45d2ead76ee5d7145078f9f7e290c048",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "a7b7bc3876ca0e4e55b73fcfb4f50dd7ab0dcf0ff89a3b38bd1e916644f3574e",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "762959dca874d02494500e46c4ffde3817628358522bfbbcb4a09f0e239e323b"
+  },
+  "logs": {
+    "team-types": {
+      "path": "/private/tmp/creator-w1-continuation-team-types.log",
+      "sha256": "7b2bb4761fac28c4504a9a064109fec103c37dc8530b7d1556c8019a17048d13"
+    },
+    "team-contracts": {
+      "path": "/private/tmp/creator-w1-continuation-team-contracts.log",
+      "sha256": "5873c5ece58ade9986a22ecb82ec445a249488af0f8a7b7ba3fc472123c1b189"
+    },
+    "team-postgres": {
+      "path": "/private/tmp/creator-w1-continuation-team-postgres.log",
+      "sha256": "0ca315148d2e676c9264e9948f528ff37e32b7638ce3384a64f1bfe5bcea88ff"
+    },
+    "team-backend": {
+      "path": "/private/tmp/creator-w1-continuation-team-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "team-lint": {
+      "path": "/private/tmp/creator-w1-continuation-team-lint.log",
+      "sha256": "8f950fed9dfad8346044c444b115c033626fa055172a2e41151f86fc95827d34"
+    },
+    "team-web": {
+      "path": "/private/tmp/creator-w1-continuation-team-web.log",
+      "sha256": "5bc0f3d143ae45b5dc912a12c30c6ac0bb05b35eaec539a83dc7dadf6076d598"
+    },
+    "team-swift": {
+      "path": "/private/tmp/creator-w1-continuation-team-swift.log",
+      "sha256": "13f34da54d458eeefe4cd32f6f02550883c6acae6c34e513f78554c2dd465c98"
+    },
+    "team-ios": {
+      "path": "/private/tmp/creator-w1-continuation-team-ios.log",
+      "sha256": "d02ef86f98ed31bc6960a83e55df09f8d8c4ebd2b0b78932f5a464503cdd98cf"
+    },
+    "team-generation": {
+      "path": "/private/tmp/creator-w1-continuation-team-generation.log",
+      "sha256": "04099dc6dc959ad7fad66e11689752cfdca19f3c57a0e9abcbaa69f1266283b7"
+    },
+    "team-shared": {
+      "path": "/private/tmp/creator-w1-continuation-team-shared.log",
+      "sha256": "f0b96499012a204d71b6b1377688a93ff1207fb1a21522fa81b6cb8b76673ee8"
+    },
+    "audience-backend-final": {
+      "path": "/private/tmp/creator-w1-continuation-audience-backend-final.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "audience-lint": {
+      "path": "/private/tmp/creator-w1-continuation-audience-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "checks": {
+    "contractCases": 9,
+    "contractRunnerSeconds": 3.2,
+    "postgresCasesPassed": 1,
+    "postgresCasesIntentionallyFiltered": 8,
+    "postgresCase": "T-34",
+    "postgresRunnerSeconds": 6.57,
+    "sharedCases": 2,
+    "nativeOperations": 44,
+    "swiftPackageBuildSeconds": 122.92,
+    "iosNormallySignedBuild": "passed",
+    "backendWebBuilds": "passed",
+    "android": "running in isolated W1 outputs; no result claimed"
+  },
+  "audienceAvailability": "Default host has no assertAudienceAllowed callback and does not construct audienceIdentity; no media/provider availability enabled",
+  "limits": [
+    "No real creator/team publication or role grant fabricated",
+    "No new tests/suites or SQL changes",
+    "W8 held-client audience denial, W5 object audience and W6 exact publication/tickets required",
+    "Broader W3 safety/provider/admission/lineage source not consumed",
+    "Native system/device/passkey and release acceptance remain unverified"
+  ]
+}

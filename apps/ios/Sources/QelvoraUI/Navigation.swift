@@ -115,7 +115,7 @@ public struct Sidebar: View {
                 Avatar(initial: String(name.prefix(1)))
                 VStack(alignment: .leading, spacing: QelvoraTokens.token("space-1") / 2) {
                     Text(name).qText("body-strong")
-                    Text(QelvoraCopy.studioName).italic().qText("sidebar-brand").foregroundStyle(qColor("ink-muted", scheme))
+                    Text(QelvoraCopy.studioName).qText("sidebar-brand", italic: true).foregroundStyle(qColor("ink-muted", scheme))
                 }
             }.padding(.horizontal, QelvoraTokens.token("space-2")).padding(.bottom, QelvoraTokens.token("space-4"))
             group(main)

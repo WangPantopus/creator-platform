@@ -251,7 +251,7 @@ outputs.set(
     )
     .join(
       ",\n",
-    )}\n  ]\n  public static func text(_ key: String, values: [String: String] = [:]) -> String {\n    guard var result = strings[key] else { preconditionFailure("Unknown copy key: \\(key)") }\n    for (key, value) in values { result = result.replacingOccurrences(of: "{\\(key)}", with: value) }; return result\n  }\n  public static let brandName = ${JSON.stringify(brand.name)}\n  public static let studioName = ${JSON.stringify(brand.studioName)}\n}\n`,
+    )}\n  ]\n  private static let variables = try! NSRegularExpression(pattern: #"\\{([^}]+)\\}"#)\n  public static func text(_ key: String, values: [String: String] = [:]) -> String {\n    guard let template = strings[key] else { preconditionFailure("Unknown copy key: \\(key)") }\n    let source = template as NSString\n    let result = NSMutableString(string: template)\n    for match in variables.matches(in: template, range: NSRange(location: 0, length: source.length)).reversed() {\n      if let value = values[source.substring(with: match.range(at: 1))] { result.replaceCharacters(in: match.range, with: value) }\n    }\n    return result as String\n  }\n  public static let brandName = ${JSON.stringify(brand.name)}\n  public static let studioName = ${JSON.stringify(brand.studioName)}\n}\n`,
 );
 outputs.set(
   `${nativeDir}/QelvoraCopy.kt`,
@@ -261,7 +261,7 @@ outputs.set(
     .map(([key, value]) => `    ${kotlinString(key)} to ${kotlinString(value)}`)
     .join(
       ",\n",
-    )}\n  )\n  fun text(key: String, values: Map<String, String> = emptyMap()): String = values.entries.fold(strings.getValue(key)) { text, (key, value) -> text.replace("{$key}", value) }\n  const val brandName = ${kotlinString(brand.name)}\n  const val studioName = ${kotlinString(brand.studioName)}\n}\n`,
+    )}\n  )\n  private val variables = Regex("""\\{([^}]+)\\}""")\n  fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }\n  const val brandName = ${kotlinString(brand.name)}\n  const val studioName = ${kotlinString(brand.studioName)}\n}\n`,
 );
 outputs.set(
   "apps/ios/Sources/Generated/Localizable.xcstrings",

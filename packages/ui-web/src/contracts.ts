@@ -391,6 +391,8 @@ export interface ButtonProps {
 /** The fan app's four tabs. */
 export interface TabBarProps {
   active?: "Home" | "Discover" | "Requests" | "You";
+  /** Shipping route destinations; design previews may omit them. */
+  hrefs?: Partial<Record<"Home" | "Discover" | "Requests" | "You", string>>;
 }
 
 /** A segmented section switcher. */

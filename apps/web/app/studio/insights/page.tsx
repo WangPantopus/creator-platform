@@ -1,3 +1,4 @@
+import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { growthRequest } from "../../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
 import { Producer } from "../../../features/growth/actions";
@@ -12,12 +13,14 @@ export default async function Insights() {
       <GrowthShell studio>
         <div className="growth-studio-content">
           <section className="growth-stack">
-            <span className="growth-meta">INSIGHTS · LAST CLOSED WEEK</span>
-            <h1>What fans asked, and your sources couldn't answer</h1>
+            <span className="growth-meta">
+              {growthCopy.growthInsightsLastClosedWeek}
+            </span>
+            <h1>{growthCopy.growthWhatFansAskedAndYourSourcesCouldnTAnswer}</h1>
             <p className="growth-help">
-              Only groups with at least five distinct fans appear. Closed weekly
-              windows prevent repeated small filters from revealing individual
-              questions.
+              {
+                growthCopy.growthOnlyGroupsWithAtLeastFiveDistinctFansAppearClosed
+              }
             </p>
             {clusters.length ? (
               clusters.map((c) => (
@@ -28,22 +31,25 @@ export default async function Insights() {
                   <div>
                     <strong>{c.topicKey.replaceAll("-", " ")}</strong>
                     <p className="growth-help">
-                      {c.questionCount} unresolved signals from {c.fanCount}{" "}
-                      fans · 7 days
+                      {growthFormat("growthUnresolvedSignalsFromFans7Days", {
+                        value1: c.questionCount,
+                        value2: c.fanCount,
+                      })}
                     </p>
                   </div>
                   <a
                     href={`#producer-${c.topicKey}`}
                     className="qv-btn qv-btn--secondary"
                   >
-                    Answer once for everyone
+                    {growthCopy.growthAnswerOnceForEveryone}
                   </a>
                 </article>
               ))
             ) : (
-              <NoData title="No eligible question groups yet">
-                Groups appear after a complete weekly evidence window, with at
-                least five distinct fans. Individual questions stay private.
+              <NoData title={growthCopy.growthNoEligibleQuestionGroupsYet}>
+                {
+                  growthCopy.growthGroupsAppearAfterACompleteWeeklyEvidenceWindowWithAt
+                }
               </NoData>
             )}
           </section>

@@ -263,7 +263,7 @@ function renderNode(
   return React.createElement(node.tagName, props, ...renderKids());
 }
 
-/** Runs the shipped design's tiny renderVals function in a fresh VM, with no I/O or process access. */
+/** Runs the trusted repository design's renderVals function in a fresh VM. */
 function initialValues(source: string, options: RenderOptions): Values {
   const script = source
     .match(/class Component extends DCLogic \{([\s\S]*?)<\/script>/)?.[0]
@@ -277,7 +277,8 @@ function initialValues(source: string, options: RenderOptions): Values {
     },
   });
   return vm.runInContext(`${script}; new Component().renderVals()`, context, {
-    timeout: 100,
+    // A bounded wall-clock budget must tolerate concurrent native builds.
+    timeout: 1000,
   }) as Values;
 }
 export function renderScreen(
@@ -336,7 +337,7 @@ export function renderComponent(name: string): React.ReactNode {
       }),
     },
   });
-  vm.runInContext(script, context, { timeout: 100 });
+  vm.runInContext(script, context, { timeout: 1000 });
   const className = source.match(/<div id="root"(?: class="([^"]*)")?>/)?.[1];
   return React.createElement("div", { className }, rendered);
 }

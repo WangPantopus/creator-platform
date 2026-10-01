@@ -1,0 +1,84 @@
+{
+  "observedAt": "2026-09-30 21:15:15 UTC",
+  "headRevision": "e129fede3e96a3e809a077bfe8136934184b6d32",
+  "checks": [
+    {
+      "id": 110081290920,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201384/job/110081290920"
+    },
+    {
+      "id": 110081289663,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201384/job/110081289663"
+    },
+    {
+      "id": 110081289381,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201384/job/110081289381"
+    },
+    {
+      "id": 110081289345,
+      "name": "web-visual",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201384/job/110081289345"
+    },
+    {
+      "id": 110081288944,
+      "name": "android-foundation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201384/job/110081288944"
+    },
+    {
+      "id": 110081261693,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772195222/job/110081261693"
+    },
+    {
+      "id": 110081261630,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772195222/job/110081261630"
+    },
+    {
+      "id": 110081261494,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772195222/job/110081261494"
+    },
+    {
+      "id": 110081261456,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772195222/job/110081261456"
+    },
+    {
+      "id": 110081261172,
+      "name": "ios-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772195222/job/110081261172"
+    },
+    {
+      "id": 110081121010,
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36772201177/job/110081121010"
+    }
+  ],
+  "qualification": "This is pre-final-push e129 evidence only. Current final-head CI/merge state must be read from PR6; queued/running is not pass."
+}

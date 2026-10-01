@@ -1,5 +1,7 @@
 # Consented pilot operation
 
+Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
+
 Recruit through W7's authorized channel only after staffed support/privacy and current legal/provider gates. No invitations or messages have been sent by W8. Recruiter draft: “Try an authorized creator AI with clear AI/human labels. Participation is voluntary; you can skip questions or leave. We would like feedback on usefulness, authorship clarity and control over your data.” Human names, approved consent and contact must be configured before use.
 
 Use synthetic rehearsal first, then an approved, consented cohort. Tasks: find creator → understand authorization → converse → identify AI versus signed human/team → report a reply → find support → export/delete → manage billing separately. Ask what the participant believes happened before explaining. Record denominator and consent version; collect no raw conversation by default. W8 feedback intake stores optional comment, cohort, usefulness and authorship clarity for 90 days. Reports remain separate safety cases; pilot feedback never influences commercial ranking or unlocks access.

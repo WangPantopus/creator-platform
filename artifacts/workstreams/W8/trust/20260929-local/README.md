@@ -1,5 +1,7 @@
 # W8 actual local run and handoff
 
+Historical actual-run record. Latest continuation and issue dispositions: [W8 handoff](../../../../../docs/workstreams/handoffs/W8.md), [resume prompt](../../../../../docs/workstreams/handoffs/W8-resume-prompt.md), [handoff state](../../handoff/20260929/current-state.json). Late W1 source fixes and current database availability require new W8 acceptance; older captures remain intact below.
+
 Primary W8 owner personally implemented, debugged, migrated, built, launched and checked these paths on 2026-09-29 PDT / 2026-09-30 UTC. Research assistance was read-only. No new test code or suites were written. Existing peer changes and tests were preserved.
 
 This is implemented local scope with partial owner integration. It is **not a release-ready product or a staging deployment**. Synthetic accounts/content and unavailable providers are explicitly identified below.

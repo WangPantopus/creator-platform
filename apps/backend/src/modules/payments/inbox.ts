@@ -6,7 +6,11 @@ import type { Actor } from "../identity/adapter.js";
 import type { CommerceService } from "../commerce/service.js";
 
 /** This pool has only INSERT on the minimal provider inbox, never domain owner privileges. */
-export function createStripeInboxRouter(pool: Pool, signingSecret: string) {
+export function createStripeInboxRouter(
+  pool: Pool,
+  signingSecret: string,
+  collectionAccount = "platform",
+) {
   invariant(
     signingSecret.startsWith("whsec_"),
     "webhook_unconfigured",
@@ -26,6 +30,11 @@ export function createStripeInboxRouter(pool: Pool, signingSecret: string) {
         req.body,
         req.get("Stripe-Signature") ?? "",
         signingSecret,
+      );
+      invariant(
+        event.account === collectionAccount,
+        "webhook_account_mismatch",
+        "The notification belongs to another collection account.",
       );
       await pool.query(
         "INSERT INTO creator.commerce_provider_inbox(provider,event_id,event_type,object_ref) VALUES('stripe',$1,$2,$3) ON CONFLICT DO NOTHING",

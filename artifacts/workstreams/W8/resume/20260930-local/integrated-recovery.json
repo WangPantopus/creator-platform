@@ -1,0 +1,76 @@
+{
+  "scope": "Isolated local logical backup restore,40-registry upgrade and newer journal replay; no reopened traffic, WAL/production RPO/RTO or finished purges claimed.",
+  "database": "creator_w8_integrated_restore",
+  "sourceMigrationRevision": "bf44ada37268bb489c97d32432e4c4d81f25c8f9",
+  "backupSha256": "fa89bf7d3c89cb2f0d5ab615030aec6d711bd5376f88113eb0ba593a7751f04b",
+  "journalSha256": "d192da00441534abae93265db2833082ba37be77bba1a669dddccd6292c0a8e7",
+  "steps": [
+    {
+      "operation": "createdb",
+      "exitCode": 0,
+      "elapsedMs": 326
+    },
+    {
+      "operation": "restore",
+      "exitCode": 0,
+      "elapsedMs": 3288
+    },
+    {
+      "operation": "migration",
+      "exitCode": 0,
+      "elapsedMs": 5051
+    },
+    {
+      "operation": "journal",
+      "exitCode": 0,
+      "elapsedMs": 5727
+    }
+  ],
+  "elapsedMs": 14713,
+  "journalReceipt": {
+    "operation": "restore",
+    "rows": 1,
+    "sha256": "d192da00441534abae93265db2833082ba37be77bba1a669dddccd6292c0a8e7",
+    "replayMs": 71,
+    "trafficReady": false,
+    "requiredNext": "Run every domain's denial/purge and verify acknowledgments before reopening traffic."
+  },
+  "metadata": {
+    "migrations": 40,
+    "tombstones": 1,
+    "privacyTasks": [
+      {
+        "domain": "agent",
+        "state": "pending"
+      },
+      {
+        "domain": "commerce",
+        "state": "pending"
+      },
+      {
+        "domain": "content",
+        "state": "pending"
+      },
+      {
+        "domain": "conversation",
+        "state": "pending"
+      },
+      {
+        "domain": "growth",
+        "state": "pending"
+      },
+      {
+        "domain": "identity",
+        "state": "pending"
+      },
+      {
+        "domain": "media",
+        "state": "pending"
+      },
+      {
+        "domain": "trust",
+        "state": "pending"
+      }
+    ]
+  }
+}

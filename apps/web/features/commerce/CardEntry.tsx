@@ -65,10 +65,11 @@ export function CardEntry({
     [sending, setSending] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    dialog.current?.showModal();
     const previous = document.activeElement;
+    dialog.current?.showModal();
     return () => {
-      if (previous instanceof HTMLElement) previous.focus();
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus();
     };
   }, []);
   useEffect(() => {
