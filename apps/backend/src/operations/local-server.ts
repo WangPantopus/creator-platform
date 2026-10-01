@@ -688,7 +688,8 @@ const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
     ? telemetry.increment(signal, value)
     : telemetry.observe(signal, value),
 );
-if (!restoredTrafficDisabled) await worker.start();
+if (restoredTrafficDisabled) await new TrustStore(workerPool).assertRole(true);
+else await worker.start();
 const wal = new PostgresWalObserver(workerPool, telemetry);
 await wal.start();
 const server = createServer(app);
