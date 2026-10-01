@@ -2,6 +2,9 @@
 -- Allocation custody is independent of personal-commitment payouts.
 BEGIN;
 SET LOCAL ROLE creator_owner;
+-- Complete creator-only live slot counts without scanning every fan's history.
+CREATE INDEX commerce_pass_creator_cycle ON creator.commerce_pass_slot(creator_id,cycle_start)
+ WHERE state='active' AND grant_id IS NOT NULL;
 CREATE TABLE creator.commerce_pool_cycle (
  cycle text PRIMARY KEY CHECK(cycle ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'),
  currency text NOT NULL CHECK(currency ~ '^[A-Z]{3}$'),

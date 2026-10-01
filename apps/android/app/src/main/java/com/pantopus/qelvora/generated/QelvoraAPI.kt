@@ -414,6 +414,33 @@ enum class APICommercePaymentState {
 }
 
 @Serializable
+data class APICommercePoolEarnings(
+  val `creatorId`: String,
+  val `cycle`: String,
+  val `observedAt`: String,
+  val `closesAt`: String,
+  val `fanCount`: Long,
+  val `slotCount`: Long,
+  val `historyLimited`: Boolean,
+  val `postedCycles`: List<APICommercePoolEarningsPostedCyclesItem>
+)
+
+@Serializable
+data class APICommercePoolEarningsPostedCyclesItem(
+  val `cycle`: String,
+  val `currency`: String,
+  val `allocationMinor`: String,
+  @Required
+  val `transferredMinor`: String? = null,
+  @Required
+  val `reversedMinor`: String? = null,
+  val `slotSeconds`: String,
+  val `totalSlotSeconds`: String,
+  val `pendingEffects`: Long,
+  val `postedAt`: String
+)
+
+@Serializable
 data class APICommerceReauthorizePacket(
   val `version`: Long,
   val `idempotencyKey`: String,
