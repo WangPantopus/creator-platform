@@ -1,0 +1,3 @@
+{"accountId" : "10000000-0000-4000-8000-000000000003", "roles" : ["drafter"], "revoked" : true}
+{"accountId" : "10000000-0000-4000-8000-000000000004", "roles" : ["triage","drafter","publisher"], "revoked" : false}
+{"id" : "a9181632-d598-49f5-9be8-49a66184081c", "version" : 12, "state" : "draft", "publications" : 0}

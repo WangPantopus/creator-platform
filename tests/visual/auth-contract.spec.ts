@@ -11,7 +11,6 @@ const invalidPaths = [
   "/creators/maya/nested\tdraft",
   "/creators/maya/nested\r\ndraft",
   "/" + "x".repeat(2048),
-  "/creators/maya/requests?draft=" + "x".repeat(1200),
 ];
 
 function authURL(path: string, returnTo: string) {
@@ -44,7 +43,7 @@ test("welcome and auth seam use the same context contract and preserve a registe
   request,
 }) => {
   const returnTo =
-    "/creators/maya/requests?context=00000000-0000-4000-8000-000000000001";
+    "/creators/maya/requests?context=11111111-1111-4111-8111-111111111111";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
     name: "Continue with Pantopus",

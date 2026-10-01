@@ -1,0 +1,42 @@
+{
+  "recordedAt": "2026-10-01T02:07:17.486175+00:00",
+  "exactOriginalRun": 36780139572,
+  "originalRevision": "a124ad00c4c8646ed9556318be0ce8bc5506398a",
+  "artifact": {
+    "id": 11136716185,
+    "name": "visual-review"
+  },
+  "personallyInspected": [
+    "ThreadLight actual/reference",
+    "StyleLight actual/reference"
+  ],
+  "originalFailures": [
+    {
+      "screen": "Thread",
+      "pixels": 6200,
+      "maxChannelDelta": 232
+    },
+    {
+      "screen": "Style",
+      "pixels": 7863,
+      "maxChannelDelta": 232
+    }
+  ],
+  "observedCause": "Red Next Issue badge caused by recoverable hydration mismatch: temporary screenshot caret-color transparent inline styles on actual inputs before React hydration. Installed Playwright1.63 coreBundle21585 and21730 inspected.",
+  "repair": "Existing two screen capture calls caret initial; no capture mutation of unfocused input style",
+  "assertionsThresholdsGoldens": "Unchanged",
+  "newCasesFilesHarnesses": 0,
+  "existingRerun": {
+    "command": "CI=true VISUAL_SCREENS=Thread,Style pnpm exec playwright test tests/visual/catalog.spec.ts --grep \"Thread,Style preserve the reference\" --output /tmp/qelvora-w6-runtime-20261001/visual-results",
+    "result": "Both existing Light/Night cases pass;14.1s and5.4s;72s total reported1.2m",
+    "scope": "Affected screens only; not full media or source iOS proof"
+  },
+  "sourceSHA256": "b619a559a2d239f7996cd13322c58ff2fdc2bde522161064ff5c500d24288a2c",
+  "sourceCommit": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
+  "inspectedSourceImagesSHA256": {
+    "source-ci-thread-light-actual.png": "87e04926ebee6d5179639badba20145e41d0b8aca9f50a8169bc6f3015afcc18",
+    "source-ci-thread-light-reference.png": "3817880d2fc8f36a1605c695c6aa62bcf0977a70010239ea56a6e9bbb5b64bc8",
+    "source-ci-style-light-actual.png": "69d4ec2e1c40398ce3b9a7db6915fb8c6a45b665b6d4af8b243a0ac2358356b6",
+    "source-ci-style-light-reference.png": "0e3b267bfef97571f38fc058cca74857b3fce37f6edb6d4c6de3fe3d76945b17"
+  }
+}

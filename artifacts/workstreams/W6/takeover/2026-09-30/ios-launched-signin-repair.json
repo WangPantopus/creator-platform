@@ -1,0 +1,65 @@
+{
+  "recordedAt": "2026-10-01T02:37:05.372246+00:00",
+  "sourceParent": "a6e8785ba55ab3a68ed08cce5de24b0cd3597e8b",
+  "lease": "W1 optional Notice identifier + actual FanShell unconfigured error only; actual failed screens/tree inspected before repair",
+  "device": {
+    "id": "A737F284-71A6-4F21-AAE9-B0FB98D933CD",
+    "name": "Creator Platform W6 Media 20261001",
+    "model": "iPhone17",
+    "os": "iOS26.5",
+    "logicalDimensions": [
+      402,
+      874
+    ],
+    "pngDimensions": [
+      1206,
+      2622
+    ]
+  },
+  "shippingBuild": "Normal Debug iOS Simulator; Sign to Run Locally; codesign verified. No signing-disabling flags.",
+  "before": {
+    "cases": 2,
+    "assertionFailures": 2,
+    "failedCases": 1,
+    "passedCases": 1,
+    "seconds": 151.932,
+    "cause": "Correct Account status error displayed as one combined StaticText without pantopus-unavailable identifier; same missing identifier in Light/Night.",
+    "bundle": "/tmp/qelvora-w6-runtime-20261001/ios-foundation-ui.xcresult",
+    "exitCode": 65
+  },
+  "repair": "Add optional Notice accessibility identifier to its existing combined element; root supplies it only for actual canonical unconfigured sign-in error. Same copy/layout/announcement, assertions and cases.",
+  "after": {
+    "cases": 2,
+    "failures": 0,
+    "seconds": 54.693,
+    "bundle": "/tmp/qelvora-w6-runtime-20261001/ios-foundation-ui-repair.xcresult",
+    "exitCode": 0,
+    "journeys": [
+      "Actual shipping Welcome/Continue/unconfigured notice/Button remains enabled/no fabricated Handle in Light/Night",
+      "Shipping illustrative Message catalog Creator/AI labels and signed marker"
+    ]
+  },
+  "sourceSHA256": {
+    "apps/ios/Sources/QelvoraUI/Overlays.swift": "ae953e88487d0c6605f09389e7d1a04af7f71a09bab9bcfc6a60b656e4c44027",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "d19a7d65ca919f7da8e636c2ba20bbd1cfe9f2c7f30046c8dcf665b699f8efcf",
+    "apps/ios/UITests/FoundationFlowTests.swift": "479bef1aaa425c89645bb07051dcf9921891df2898ff95980c6c2f2a52280328"
+  },
+  "evidenceSHA256": {
+    "launched-apps/ios-signin-before-light.png": "477117481e8e1b088aafc5c049708bb7ae4311738dc52db96c00db43b4f47781",
+    "launched-apps/ios-signin-before-night.png": "953a284e7287673852b9122d97d4525bd5f47fa82085acd01bb53fc03d56f911",
+    "launched-apps/ios-signin-repaired-light.png": "06c88e673a8195a053720b1072509b5f3df0af54f976b3ce48342fb8de88c2c1",
+    "launched-apps/ios-signin-repaired-night.png": "cacaee25051626f449d5023dde18aabf77eb0b8d9553de0abf2cf2572c515b3c",
+    "launched-apps/ios-message-identities.png": "84b259624f6db3760b81c8cc2b474f2e6db3ce349fbd0d2b4a0afcf8705a100c",
+    "ios-foundation-ui.log": "16da7be300dd4a251c5e7b6bf0f84e44008f2d560b7a34cc22937db810ee183d",
+    "ios-foundation-ui-repair.log": "f7cc15aeeb69515bebbcdf824e20b383632c1282430fe7a409c9552ba71b3be4",
+    "ios-signin-failed-accessibility.txt": "efe1311cdef2d51fa1c6e4fb9a2c2ea12e29c2e5c3016bafbc98bfcd1009d191"
+  },
+  "limits": [
+    "No actual native microphone capture/upload/passkey/media/publication/playback/provider/incoming/background/cellular/camera acceptance",
+    "Catalog journey uses illustrative composition",
+    "Source CI36780139572 exact ios-review still absent; local app result does not replace exact capture inspection"
+  ],
+  "newTestsOrChangedAssertionsReferences": false,
+  "capabilitiesRemainFalse": true,
+  "mergeReady": false
+}

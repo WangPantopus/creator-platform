@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-10-01T03:08:42.861166+00:00",
+  "source": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+  "device": "A737F284-71A6-4F21-AAE9-B0FB98D933CD/iPhone17/iOS26.5",
+  "shippingApp": "Current normally signed generic simulator build with mandatory playbackFile models",
+  "launch": "Existing debug return-to /media/voice; real unconfigured API4106; no catalog or fabricated account",
+  "textSize": {
+    "original": "large",
+    "observed": "accessibility-large",
+    "restored": "large",
+    "exact200Percent": "not claimed"
+  },
+  "observed": [
+    "Personally inspected actual Light and actual Night recorder",
+    "Heading/body/time/Record/status fit idle screen without clipping",
+    "No native mic/preview/tap/sign/play acceptance"
+  ],
+  "captureAttempts": {
+    "initial": "Captured actual launch before content appeared; retained as startup, not layout pass",
+    "appearance": "First --appearance dark is not the supported Night argument, produced Light; corrected to actual --appearance night before Night inspection"
+  },
+  "captures": {
+    "ios-recorder-accessibility-light.png": "3174a64ba548737f7041976262b34f97c86a5ec4564a24a79ae21face7574d2a",
+    "ios-recorder-accessibility-night.png": "0baf3b5d5710dad3f46d4ae6c05ec22d5590aa4668995c0ab3d783104f330cf3",
+    "ios-recorder-accessibility-startup.png": "403e90b6d41e3c12cd049000842eece7fb3012506eb57bd6f3a08c2e67a9a344"
+  },
+  "logs": {
+    "ios-content-size-original.log": "9bfce334a37bd1bc1d36b0370195b31fe9a9389dd43d0873891a3544ef1140a1",
+    "ios-content-size-current.log": "5f861cede1f1d1291590f39922ff83eae9a1828d6592fef67f392cb6123cffd8",
+    "ios-content-size-restored.log": "9bfce334a37bd1bc1d36b0370195b31fe9a9389dd43d0873891a3544ef1140a1",
+    "ios-accessibility-boot.log": "09e03860e8c9bc26ac77925dc490baf3fef0c9636847cd8e3220f98180bda76b",
+    "ios-accessibility-light-final-launch.log": "dc626e7dbe8fb704456808be2a1e1847da5f3209c8da55edf80c967925fe436e",
+    "ios-accessibility-night-corrected-launch.log": "746c6516ada407166e502b8ea61b50cafb931d157b1032c8518f2039744384d0"
+  },
+  "ownedSimulatorShutDown": true,
+  "newTests": false,
+  "mergeReady": false
+}

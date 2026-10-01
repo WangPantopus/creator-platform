@@ -1,0 +1,90 @@
+[WebServer] (node:56085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56111) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56146) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:56194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/visual/auth-contract.spec.ts:22:5 › auth seam rejects external, nested backslash and control-character contexts (2.9s)
+  ✓  2 tests/visual/auth-contract.spec.ts:41:5 › welcome and auth seam use the same context contract and preserve a registered context (2.0s)
+  ✘  3 tests/visual/foundation.spec.ts:31:9 › welcome reference composition matches approved design in light (1.4s)
+(node:56289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 tests/visual/foundation.spec.ts:31:9 › creator-home reference composition matches approved design in light (3.9s)
+  ✘  5 tests/visual/foundation.spec.ts:31:9 › handle-preview reference composition matches approved design in light (658ms)
+(node:56349) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 tests/visual/foundation.spec.ts:31:9 › welcome reference composition matches approved design in night (1.4s)
+[WebServer] (node:56364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:56368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 tests/visual/foundation.spec.ts:31:9 › creator-home reference composition matches approved design in night (1.5s)
+  ✓  8 tests/visual/foundation.spec.ts:31:9 › handle-preview reference composition matches approved design in night (1.2s)
+  ✓  9 tests/visual/foundation.spec.ts:91:5 › unconfigured Pantopus sign-in does not create a local identity and preserves arrival (7.3s)
+
+
+  1) tests/visual/foundation.spec.ts:31:9 › welcome reference composition matches approved design in light 
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: welcome.light.png
+
+
+      59 |         caret: "initial",
+      60 |       });
+    > 61 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      62 |         maxDiffPixels: 0,
+      63 |       });
+      64 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/970d/creator-platform/tests/visual/foundation.spec.ts:61:24
+
+    attachment #1: welcome-light (image/png) ───────────────────────────────────────────────────────
+    Expected: tests/visual/baselines/welcome-light.png
+    Received: ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-welcome-referen-08cc6-es-approved-design-in-light/welcome-light-actual.png
+    Diff:     ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-welcome-referen-08cc6-es-approved-design-in-light/welcome-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-welcome-referen-08cc6-es-approved-design-in-light/error-context.md
+
+  2) tests/visual/foundation.spec.ts:31:9 › handle-preview reference composition matches approved design in light 
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: handle-preview.light.png
+
+
+      59 |         caret: "initial",
+      60 |       });
+    > 61 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      62 |         maxDiffPixels: 0,
+      63 |       });
+      64 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/970d/creator-platform/tests/visual/foundation.spec.ts:61:24
+
+    attachment #1: handle-preview-light (image/png) ────────────────────────────────────────────────
+    Expected: tests/visual/baselines/handle-preview-light.png
+    Received: ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-handle-preview--67a2b-es-approved-design-in-light/handle-preview-light-actual.png
+    Diff:     ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-handle-preview--67a2b-es-approved-design-in-light/handle-preview-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../../tmp/qelvora-w6-runtime-20261001/merge-web-results/foundation-handle-preview--67a2b-es-approved-design-in-light/error-context.md
+
+  2 failed
+    tests/visual/foundation.spec.ts:31:9 › welcome reference composition matches approved design in light 
+    tests/visual/foundation.spec.ts:31:9 › handle-preview reference composition matches approved design in light 
+  7 passed (47.8s)

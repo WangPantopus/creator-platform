@@ -1,0 +1,2 @@
+$ tsx scripts/generate-openapi.ts --check
+Verified Swift/Kotlin API models and 48 operations from OpenAPI.
