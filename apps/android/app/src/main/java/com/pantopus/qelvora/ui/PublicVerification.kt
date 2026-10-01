@@ -88,7 +88,7 @@ private fun PublicVerificationScreen(baseURL: String?, signedActId: String, onHo
         val current = if (foreground) signature?.takeIf { it.signedActId == signedActId } else null
         if (current != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Glyph("sealCheck", 40.dp, qColor("maya-ink"))
+                Glyph("sealCheck", 40.dp, qColor("maya-ink"), qColor("ground"))
                 VerificationText(QelvoraCopy.text("signedBy", mapOf("name" to current.creatorName)), "display-lg", modifier = Modifier.weight(1f).semantics { heading() })
             }
             VerificationText(current.explanation)
@@ -99,9 +99,9 @@ private fun PublicVerificationScreen(baseURL: String?, signedActId: String, onHo
                     Message(kind = if (current.actType == "approved_draft") MessageKind.APPROVED_DRAFT else MessageKind.HUMAN_CREATOR, children = text, name = current.creatorName, actions = false, onVerify = retry)
                 } else {
                     Column(Modifier.fillMaxWidth().background(qColor("maya-surface"), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        AuthorLabel(AuthorKind.HUMAN_CREATOR, current.creatorName, onMaya = true)
+                        AuthorLabel(if (current.actType == "correction") AuthorKind.CORRECTION else AuthorKind.HUMAN_CREATOR, current.creatorName, onMaya = true)
                         VerificationText(if (current.actType == "broadcast") QelvoraCopy.text("identityVerificationActNote") else QelvoraCopy.text("identityVerificationActCorrection"), "caption", "on-maya")
-                        VerificationText(text, "voice-lg", "on-maya")
+                        VerificationText(text, if (current.actType == "correction") "voice-md" else "voice-lg", "on-maya")
                         SignedMarker(current.creatorName, onMaya = true, onClick = retry)
                     }
                 }
@@ -148,7 +148,7 @@ private fun VerificationText(value: String, style: String = "body", color: Strin
 
 @Composable
 private fun VerificationRow(label: String, value: String) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         VerificationText(label, color = "ink-muted", modifier = Modifier.weight(0.4f))
         VerificationText(value, modifier = Modifier.weight(0.6f), alignment = TextAlign.End)
     }

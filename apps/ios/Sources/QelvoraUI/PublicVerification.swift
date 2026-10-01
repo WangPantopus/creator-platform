@@ -50,7 +50,7 @@ private struct PublicVerificationScreen: View {
                 Text("/VERIFY/" + signedActId.uppercased()).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
                 if scenePhase == .active, let signature, signature.signedActId == signedActId {
                     HStack(spacing: 12) {
-                        QelvoraGlyph(name: "sealCheck", size: 40, color: qColor("maya-ink", scheme))
+                        QelvoraGlyph(name: "sealCheck", size: 40, color: qColor("maya-ink", scheme), cutColor: qColor("ground", scheme))
                         Text(QelvoraCopy.text("signedBy", values: ["name": signature.creatorName])).qText("display-lg").accessibilityAddTraits(.isHeader)
                     }
                     Text(signature.explanation).qText("body")
@@ -62,9 +62,9 @@ private struct PublicVerificationScreen: View {
                             Message(kind: signature.actType == "approved_draft" ? .approvedDraft : .humanCreator, children: text, name: signature.creatorName, actions: false, onVerify: retry)
                         } else {
                             VStack(alignment: .leading, spacing: 12) {
-                                AuthorLabel(kind: .humanCreator, name: signature.creatorName, onMaya: true)
+                                AuthorLabel(kind: signature.actType == "correction" ? .correction : .humanCreator, name: signature.creatorName, onMaya: true)
                                 Text(signature.actType == "broadcast" ? QelvoraCopy.text("identityVerificationActNote") : QelvoraCopy.text("identityVerificationActCorrection")).qText("caption")
-                                Text(text).qText("voice-lg")
+                                Text(text).qText(signature.actType == "correction" ? "voice-md" : "voice-lg")
                                 SignedMarker(name: signature.creatorName, onMaya: true, action: retry)
                             }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundStyle(qColor("on-maya", scheme))

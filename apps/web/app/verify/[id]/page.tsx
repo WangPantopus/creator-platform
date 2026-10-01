@@ -1,6 +1,14 @@
 import { IdSchema, PublicSignatureSchema } from "@qelvora/api";
 import { copy, formatCopy } from "@qelvora/copy";
-import { Button, Notice, Message, ShareCard } from "@qelvora/ui-web";
+import {
+  AuthorLabel,
+  Button,
+  Notice,
+  Message,
+  ShareCard,
+  SignedMarker,
+} from "@qelvora/ui-web";
+import type { CSSProperties } from "react";
 import { platformFetch } from "../../../lib/session";
 
 function record(value: unknown): Record<string, unknown> | null {
@@ -164,6 +172,25 @@ export default async function Verification({
             >
               {text}
             </Message>
+          ) : signature.actType === "correction" ? (
+            <article className="qv qv-correction-wrap">
+              <div
+                className="qv-correction qv-on-maya"
+                style={{ "--qv-cut": "var(--maya-surface)" } as CSSProperties}
+              >
+                <AuthorLabel
+                  kind="correction"
+                  name={signature.creatorName}
+                  onMaya
+                />
+                <p className="qv-voice-md">{text}</p>
+                <SignedMarker
+                  name={signature.creatorName}
+                  time={time}
+                  signedActId={id}
+                />
+              </div>
+            </article>
           ) : (
             <ShareCard
               name={signature.creatorName}
