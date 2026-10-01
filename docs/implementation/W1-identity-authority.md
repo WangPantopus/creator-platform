@@ -72,6 +72,8 @@ Android root: FanAppShell with Keystore, same registrations, validated return in
 
 ## Device support and release gates
 
+Current native entry-point source requires complete release HTTPS/debug loopback API origins, rejecting user information, query, fragment, path prefix and invalid port. Custom app links reject ports; the already configured Swift HTTPS link path accepts only default443. Canonical iOS project source binds empty-default `CREATOR_API_URL`/`CREATOR_LINK_HOST` to the consumed plist keys, but generated plist/configured build and genuine associations remain unverified under cleanup. [Exact URI/configuration source](../../artifacts/workstreams/W1/resume/2026-10-01-native-uri/run.md). This does not establish persisted-credential issuer/origin isolation, which remains a separate review across clients/stores.
+
 Current native storage follow-up checks credential and W3 cursor deletion, updates existing Keychain credentials without deleting first, and shares a process credential-read fence across feature clients. Both shells attempt cleanup independently, retain failed-clear messages with Retry, and gate another account until cleanup succeeds. Swift rotation also requires the same prior stored credential; Android cleanup survives cancellation. This is uncompiled source with actual OS failure/restart/revocation/device acceptance outstanding; process fencing is not persistent deletion proof. [Exact source qualification](../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md).
 
 | Surface                                 | Implemented adapter                                                     | Current evidence limit                                                                   |
