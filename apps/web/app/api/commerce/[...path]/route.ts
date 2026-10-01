@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { platformFetch } from "../../../../lib/session";
 const route =
-  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|billing|quote|purchase|purchase-status|cancel|effects\/[a-f0-9-]{36}\/reconcile|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|commitments\/[a-f0-9-]{36}\/release|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|reconcile-money|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
+  /^(?:capabilities|overview|spend-limit|memberships\/(?:start|reconcile|[a-f0-9-]{36}\/cancel)|pass\/(?:draft|initial|billing|quote|purchase|purchase-status|cancel|effects\/[a-f0-9-]{36}\/reconcile|slots\/[a-f0-9-]{36}\/replace)|stores\/verify|commitments\/[a-f0-9-]{36}\/release|packets(?:\/[a-f0-9-]{36}(?:\/(?:withdraw|decide|info|deliver|share|reconcile|reconcile-money|authentication|offer-choice|reauthorize))?)?|creators\/[a-f0-9-]{36}\/(?:(?:modes|tiers)(?:\/[a-f0-9-]{36})?|earnings|fans\/[a-f0-9-]{36}\/(?:access|trial|disclosure)))$/u;
 async function proxy(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -26,12 +26,16 @@ async function proxy(
     query.size &&
     !(
       request.method === "GET" &&
-      target === "overview" &&
       [...query].every(
         ([key, value]) =>
           query.getAll(key).length === 1 &&
-          ((key === "creatorId" && /^[a-f0-9-]{36}$/u.test(value)) ||
-            (key === "poolEarnings" && value === "1")),
+          ((target === "overview" &&
+            ((key === "creatorId" && /^[a-f0-9-]{36}$/u.test(value)) ||
+              (["poolEarnings", "creatorEarnings"].includes(key) &&
+                value === "1"))) ||
+            (/^creators\/[a-f0-9-]{36}\/earnings$/u.test(target) &&
+              ((key === "currency" && /^[A-Z]{3}$/u.test(value)) ||
+                (key === "cursor" && /^[A-Za-z0-9_-]{1,512}$/u.test(value))))),
       )
     )
   )

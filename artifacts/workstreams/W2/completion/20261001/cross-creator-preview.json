@@ -1,0 +1,73 @@
+{
+  "capturedAt": "2026-10-01T12:29:33.015Z",
+  "sourceHead": "2386eb25613a749280c32b134f5f06bfda238a2a",
+  "actorRole": "primary companion19; canonical W1 actor one",
+  "requestedForeignSourceId": "675448b0-de08-4206-a98e-ed8e12359661",
+  "status": 200,
+  "response": {
+    "compiledHash": "8f64dc6119db94ace631cfe37560e0e21441d10c96ce52c0d18a04ef7aa4fde9",
+    "sentences": [
+      {
+        "text": "I'm sorry, but I can't access or quote from the other creator’s source as requested.",
+        "citations": []
+      }
+    ],
+    "blocked": false,
+    "category": "input_refusal:private/other-fan details",
+    "passages": [
+      {
+        "id": "5ae0946c-5f06-45df-836d-754cc2f90179",
+        "sourceId": "11e53ba0-0ede-40ee-93ad-58f1a972474c",
+        "sourceRevision": 2,
+        "title": "W2 resume source",
+        "text": "This is synthetic creator-owned writing for the isolated W2 source workflow. Clay dries slowly. A bisque firing prepares it for glaze.",
+        "start": 0,
+        "end": 134,
+        "audience": {
+          "kind": "public"
+        }
+      }
+    ],
+    "contextHash": "b02bfe5b277f387b0a746246cfc65c15e46465f14d5b0ca354a8e53db90100c8",
+    "usage": [
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 165,
+        "outputTokens": 29,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 113
+      },
+      {
+        "provider": "OpenAI",
+        "model": "text-embedding-3-small",
+        "inputTokens": 48,
+        "outputTokens": 0,
+        "costMicros": 1
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "inputTokens": 584,
+        "outputTokens": 20,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 266
+      },
+      {
+        "provider": "OpenAI",
+        "model": "gpt-4.1-2025-04-14",
+        "inputTokens": 773,
+        "outputTokens": 46,
+        "cachedInputTokens": 0,
+        "cacheWriteInputTokens": 0,
+        "costMicros": 1914
+      }
+    ],
+    "durationMs": 4468,
+    "firstApprovedMs": 4439,
+    "route": "large"
+  },
+  "limitation": "Actual Studio draft public-audience preview; retrieved provenance inspection does not prove licensed W3 fan/tier/group context acceptance."
+}

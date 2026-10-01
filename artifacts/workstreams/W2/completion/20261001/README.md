@@ -4,6 +4,10 @@ This is an October 1 checkpoint, not complete workstream or pilot acceptance. Th
 
 Worktree: `/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform`. Continuation branch: `codex/w2-completion`, based on verified `origin/main` `2f0319dbb6979878c5a9019e68503506902f9ea0`. The original `codex/w2-creator-ai-handoff` at `9f805888932c63c5a59d1efab29a7a4f47a42a98` is preserved. Current source hashes and sanitized database/provider facts are recorded separately. No implementation or app acceptance was delegated.
 
+## Current citation, revision and keyboard continuation
+
+[PR23 normal merge and the current companion19/expert17 pipeline10 evidence](citation-keyboard-continuation.md) supersede the older revision/count/PR-open observations below. Counts124/105/24/865 are dated12:17UTC. Current branch is `codex/w2-acceptance`. Unsupported companion citations are withheld, previews bind to their submitted revision and keyboard focus clears fixed navigation. All release/acceptance boundaries remain in the matrix.
+
 ## Subsequent main and import recovery
 
 [Current 250,001-character refusal, corrected same-file reselection and W4 PR25 integration](source-import-final-checkpoint.md) records the remaining personally operated import boundary. Main 817940d is incorporated as 907813b; current generation/type/build checks pass and W2 implementation hashes remain unchanged.
