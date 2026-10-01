@@ -383,10 +383,12 @@ export class StripeConnectPayout implements PayoutProvider {
     const sourcePayment =
       await this.authority.paymentForCommitment(commitmentId);
     const current = await this.money.current(sourcePayment);
+    const { charge } = await this.money.charge(sourcePayment);
     return {
       netMinor: current.netMinor,
       currency: current.currency,
       sourcePayment,
+      sourceTransaction: charge.id,
       reconciledAt: current.fetchedAt,
       disputeOpen: current.disputeOpen,
     };
@@ -395,7 +397,10 @@ export class StripeConnectPayout implements PayoutProvider {
     invariant(
       !row.livemode &&
         row.metadata.commerce === "payout" &&
-        row.metadata.commerce_key &&
+        /^[a-f0-9]{64}$/u.test(row.metadata.commerce_key ?? "") &&
+        row.transfer_group === `commerce:${row.metadata.commerce_key}` &&
+        /^pi_[A-Za-z0-9]+$/u.test(row.metadata.commerce_payment ?? "") &&
+        reference(row.destination) &&
         row.source_transaction &&
         row.balance_transaction &&
         row.amount > 0,
@@ -424,6 +429,10 @@ export class StripeConnectPayout implements PayoutProvider {
       id: row.id,
       amount: row.amount,
       currency: row.currency.toUpperCase(),
+      destination: reference(row.destination)!,
+      sourcePayment: row.metadata.commerce_payment!,
+      sourceTransaction: reference(row.source_transaction)!,
+      keyHash: row.metadata.commerce_key!,
       state: "succeeded" as const,
       reversed: row.reversed && row.amount_reversed === row.amount,
       reversalReceipts: reversals.map((r) => ({
@@ -466,6 +475,11 @@ export class StripeConnectPayout implements PayoutProvider {
         "Current available card funds do not cover this transfer.",
       );
       const { charge } = await this.money.charge(input.sourcePayment);
+      invariant(
+        charge.id === input.sourceTransaction,
+        "payout_source_changed",
+        "The original source charge changed; funds require reconciliation.",
+      );
       const key = createHash("sha256").update(input.key).digest("hex");
       await this.authority.assertTransfer(input);
       return this.truth(
@@ -474,7 +488,7 @@ export class StripeConnectPayout implements PayoutProvider {
             amount: input.amount,
             currency: input.currency.toLowerCase(),
             destination: input.destination,
-            source_transaction: charge.id,
+            source_transaction: input.sourceTransaction,
             transfer_group: `commerce:${key}`,
             metadata: {
               commerce: "payout",
@@ -513,6 +527,8 @@ export class StripeConnectPayout implements PayoutProvider {
         row.amount === input.amount &&
           row.currency === input.currency.toLowerCase() &&
           reference(row.destination) === input.destination &&
+          reference(row.source_transaction) === input.sourceTransaction &&
+          row.transfer_group === `commerce:${key}` &&
           row.metadata.commerce_payment === input.sourcePayment,
         "payout_reference_conflict",
         "The original transfer has different immutable terms.",

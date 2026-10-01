@@ -1,0 +1,1 @@
+{"status":"ok","ready":false,"foundationReady":true,"identity":"configured","identityMode":"development","generation":"unconfigured","registeredFeatures":["conversation","creator-ai","media","commerce","content","studio"],"readinessEndpoint":"/health/ready","database":"configured","featureEnabled":true}

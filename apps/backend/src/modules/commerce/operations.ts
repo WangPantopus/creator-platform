@@ -277,6 +277,17 @@ export function commercePrivacyHook(
               "SELECT id,creator_id,commitment_id,amount,currency,state,error_code,created_at FROM creator.commerce_payout_effect WHERE ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001",
               [creator],
             );
+            const payoutCustody = (
+              await client.query<{ relation: string | null }>(
+                "SELECT to_regclass('creator.commerce_payout_custody')::text AS relation",
+              )
+            ).rows[0];
+            if (payoutCustody?.relation)
+              await bounded(
+                "payoutCustody",
+                "SELECT effect_id,creator_id,commitment_id,destination,source_payment,source_transaction,amount,currency,request_hash,created_at FROM creator.commerce_payout_custody WHERE ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001",
+                [creator],
+              );
           }
           if (input.scope === "account") {
             const passSchema = (
