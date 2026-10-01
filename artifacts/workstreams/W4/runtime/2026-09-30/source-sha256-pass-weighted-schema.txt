@@ -1,0 +1,3 @@
+d4128be50587a25225c4f34fd45576d3bf330327788eaa21493bf174b121c3ec  apps/backend/src/modules/commerce/stripe-pass-purchases.ts
+60ab295d660d4dc6192d811bd8a97c657433dea25d6a0f0759e03cf751505155  apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql
+ec7210f0ecbace8a2279124809e1e07d9baca0770aa8e3c3bfe32a24f983324c  apps/backend/src/modules/commerce/generation-allowance.ts

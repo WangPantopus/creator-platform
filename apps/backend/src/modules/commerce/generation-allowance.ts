@@ -7,6 +7,9 @@ import {
 } from "../access/commerce.js";
 import type { GenerationAllowance, ThreadScope } from "../access/scope.js";
 
+export const GENERATION_COST_MIGRATION_VERSION =
+  "0049_w4_generation_cost_settlement";
+
 export type GenerationCostReceipt = {
   generationId: string;
   policyVersion: string;
@@ -42,7 +45,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
         policy.version.length <= 200 &&
         typeof policy.reserveUnits === "function" &&
         typeof policy.current === "function" &&
-        policy.migration.version.length > 0 &&
+        policy.migration.version === GENERATION_COST_MIGRATION_VERSION &&
         /^[a-f0-9]{64}$/u.test(policy.migration.checksum),
       "cost_policy_unconfigured",
       "Configure reviewed cost policy and exact canonical migration custody.",

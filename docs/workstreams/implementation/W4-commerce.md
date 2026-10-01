@@ -1,5 +1,7 @@
 # Resumed implementation additions — 2026-09-30
 
+[Current primary continuation](../handoffs/W4-primary-continuation-2026-09-30.md) supersedes dated missing-adapter/allocation descriptions below. It includes current pass SDK purchase/recovery/cancellation/renewal effects and the0049 weighted-schema proposal under W8 custody; provider activation and genuine acceptance remain pending.
+
 ## Current Studio/Approval handoff checkpoint — 2026-09-30
 
 Checked source `a16558c70d725ce72a99e390c990018335203405` is committed and pushed. The founder requested a seamless handoff after this coherent increment. [Current checkpoint](../handoffs/W4-resume-checkpoint-2026-09-30.md), [machine-readable source/runtime/CI state](../handoffs/W4-resume-checkpoint-2026-09-30.json) and [comprehensive next-agent prompt](../prompts/W4-next-agent-2026-09-30.md) govern continuation; original R01–R15 and all nine packages remain in scope; full acceptance remains unfinished.
