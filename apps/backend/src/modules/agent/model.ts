@@ -169,7 +169,7 @@ export class OpenAIResponsesModel implements AgentModel {
     const { apiKey: _apiKey, ...publicConfiguration } = configuration;
     void _apiKey;
     this.fingerprint = contentHash({
-      adapter: "responses-v2-cache-accounting",
+      adapter: "responses-v3-cache-routing",
       ...publicConfiguration,
     });
   }
@@ -302,6 +302,11 @@ export class OpenAIResponsesModel implements AgentModel {
         store: false,
         max_output_tokens: 2000,
         instructions,
+        prompt_cache_key: contentHash({
+          model,
+          instructions,
+          schema: jsonSchema,
+        }),
         input: [{ role: "user", content: context.join("\n\n") }],
         text: {
           format: {

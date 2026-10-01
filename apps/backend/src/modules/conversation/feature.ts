@@ -19,7 +19,12 @@ import {
   type ProviderPolicy,
   type ConversationPage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
-import { IdSchema } from "@qelvora/api";
+import {
+  IdSchema,
+  SendMessageSchema,
+  type AcceptedMessage,
+} from "@qelvora/api";
+import { needsImmediateSafety, crisisText } from "../agent/pipeline.js";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
@@ -41,6 +46,13 @@ export class ConversationFeature {
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
     readonly wellbeing?: ConversationWellbeing,
     readonly firstConversation?: Pick<CommerceService, "openTrial">,
+    readonly routeSafety?: (
+      scope: ThreadScope,
+      text: string,
+      signal: AbortSignal,
+      deliver: (sentence: { text: string; safety: true }) => Promise<void>,
+    ) => Promise<boolean>,
+    readonly afterBoundary?: (scope: ThreadScope, epoch: number) => void,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -427,7 +439,8 @@ export function conversationFeature(
           await actorFor(req),
           IdSchema.parse(req.params.creatorId),
           IdSchema.parse(req.params.fanId),
-          req.method === "GET" && !req.path.endsWith("/events"),
+          req.path.endsWith("/team-replies") ||
+            (req.method === "GET" && !req.path.endsWith("/events")),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
       router.post(root + "/presence", async (req, res) => {
@@ -554,20 +567,57 @@ export function conversationFeature(
       );
       router.post(root + "/messages", async (req, res) => {
         const scope = await scopeFor(req);
-        // Existing accepted keys reconcile even during provider outage.
-        const prior = await feature.db.withThread(
-          scope,
-          async (client) =>
-            (
-              await client.query<{ response: unknown }>(
-                "SELECT response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation='send' AND key=$2",
-                [
-                  scope.actorAccountId,
-                  z.string().min(8).max(128).parse(req.body.idempotencyKey),
-                ],
-              )
-            ).rows[0],
+        invariant(
+          scope.authority === "fan",
+          "fan_required",
+          "Only the fan can send this message.",
         );
+        const body = SendMessageSchema.parse(req.body);
+        // Existing accepted keys reconcile even during provider outage.
+        const prior = await feature.conversations.accepted(scope, body);
+        if (prior) {
+          res.json(prior);
+          if (prior.generationId) feature.afterAcceptance?.(scope);
+          return;
+        }
+        if (!prior) {
+          const expected = await feature.conversations.safetyCheckpoint(scope);
+          let accepted: AcceptedMessage | null = null;
+          if (needsImmediateSafety(body.text)) {
+            accepted = await feature.conversations.sendSafety(
+              scope,
+              body,
+              expected,
+            );
+          } else if (feature.routeSafety && feature.policy?.verified) {
+            const abort = new AbortController();
+            res.on("close", () => {
+              if (!res.writableEnded) abort.abort();
+            });
+            await feature.routeSafety(
+              scope,
+              body.text,
+              AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]),
+              async (sentence) => {
+                invariant(
+                  sentence.safety === true && sentence.text === crisisText,
+                  "safety_invalid",
+                  "The platform safety response is unavailable.",
+                );
+                accepted = await feature.conversations.sendSafety(
+                  scope,
+                  body,
+                  expected,
+                );
+              },
+            );
+          }
+          if (accepted) {
+            feature.afterBoundary?.(scope, accepted.message.controlEpoch);
+            res.json(accepted);
+            return;
+          }
+        }
         if (
           !prior &&
           (!feature.generationAvailable || !feature.policy?.verified)
@@ -577,8 +627,9 @@ export function conversationFeature(
             "AI messaging is not connected yet.",
             503,
           );
-        res.json(await feature.conversations.send(scope, req.body));
-        feature.afterAcceptance?.(scope);
+        const accepted = await feature.conversations.send(scope, body);
+        res.json(accepted);
+        if (accepted.generationId) feature.afterAcceptance?.(scope);
       });
       router.post(root + "/fan-replies", async (req, res) =>
         res.json(
@@ -617,36 +668,30 @@ export function conversationFeature(
           }),
         );
       });
-      router.post(root + "/takeover", async (req, res) =>
-        res.json(
-          await feature.conversations.changeControl(
-            await scopeFor(req),
-            "human_active",
+      for (const [path, control] of [
+        ["takeover", "human_active"],
+        ["handback", "ai_active"],
+        ["pause", "ai_paused"],
+      ] as const) {
+        router.post(root + "/" + path, async (req, res) => {
+          const scope = await scopeFor(req);
+          const boundary = await feature.conversations.changeControl(
+            scope,
+            control,
             req.body,
-          ),
-        ),
-      );
-      router.post(root + "/handback", async (req, res) =>
-        res.json(
-          await feature.conversations.changeControl(
-            await scopeFor(req),
-            "ai_active",
-            req.body,
-          ),
-        ),
-      );
-      router.post(root + "/pause", async (req, res) =>
-        res.json(
-          await feature.conversations.changeControl(
-            await scopeFor(req),
-            "ai_paused",
-            req.body,
-          ),
-        ),
-      );
+          );
+          feature.afterBoundary?.(scope, boundary.epoch);
+          res.json(boundary);
+        });
+      }
       router.post(root + "/human-replies", async (req, res) =>
         res.json(
           await feature.conversations.humanReply(await scopeFor(req), req.body),
+        ),
+      );
+      router.post(root + "/team-replies", async (req, res) =>
+        res.json(
+          await feature.conversations.teamReply(await scopeFor(req), req.body),
         ),
       );
       router.get(root + "/audit", async (req, res) => {

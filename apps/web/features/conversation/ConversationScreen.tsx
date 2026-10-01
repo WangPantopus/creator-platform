@@ -83,13 +83,20 @@ export function ConversationScreen({
   const cursorKey = `qelvora:conversation:${accountId}:${creatorId}:${fanId}`;
   const lifecycle = useRef(0);
   const mounted = useRef(true);
+  const transportReady = useRef(false);
   const refresh = useCallback(async () => {
     const revision = lifecycle.current;
     try {
       const fresh = await request<ConversationPage>(root);
       if (!mounted.current || lifecycle.current !== revision) return;
       // A delayed HTTP response cannot put an earlier author boundary back on screen.
-      if (current.current && fresh.cursor < current.current.cursor) return;
+      if (
+        current.current &&
+        (fresh.cursor < current.current.cursor ||
+          fresh.epoch < current.current.epoch ||
+          fresh.revision < current.current.revision)
+      )
+        return;
       current.current = fresh;
       gate.current = new ThreadDeliveryGate(
         fresh.threadId,
@@ -98,7 +105,7 @@ export function ConversationScreen({
         fresh.generationSequences,
       );
       setPage(fresh);
-      setOnline(navigator.onLine);
+      setOnline(navigator.onLine && transportReady.current);
       setFailure(null);
       setBefore((value) => value ?? fresh.before);
       sessionStorage.setItem(
@@ -131,6 +138,7 @@ export function ConversationScreen({
         gate.current = null;
         setPage(null);
         setOlder([]);
+        setBefore(null);
         setDraft("");
         setPending(null);
         sessionStorage.removeItem(cursorKey);
@@ -151,16 +159,7 @@ export function ConversationScreen({
     setDraft("");
     setPending(null);
     setBefore(null);
-    let resumeCursor: number | undefined;
     try {
-      const stored = JSON.parse(sessionStorage.getItem(cursorKey) ?? "null");
-      if (
-        Number.isSafeInteger(stored?.cursor) &&
-        stored.cursor >= 0 &&
-        Number.isSafeInteger(stored?.epoch) &&
-        stored.epoch >= 0
-      )
-        resumeCursor = stored.cursor;
       for (const key of Object.keys(sessionStorage))
         if (
           key.startsWith("qelvora:conversation:") &&
@@ -200,8 +199,16 @@ export function ConversationScreen({
       }
     };
     const connect = async () => {
-      if (disposed || connecting || !navigator.onLine) return;
+      if (
+        disposed ||
+        connecting ||
+        !navigator.onLine ||
+        document.visibilityState !== "visible"
+      )
+        return;
       connecting = true;
+      transportReady.current = false;
+      setOnline(false);
       clearTimeout(reconnect);
       reconnect = undefined;
       const previous = socket;
@@ -228,22 +235,36 @@ export function ConversationScreen({
         ]);
         socket = liveSocket;
         socket.onopen = () => {
+          if (
+            disposed ||
+            socket !== liveSocket ||
+            document.visibilityState !== "visible"
+          ) {
+            liveSocket.close();
+            return;
+          }
           delay = 1000;
-          socket?.send(
+          transportReady.current = true;
+          liveSocket.send(
             JSON.stringify({
               kind: "subscribe",
               creatorId,
               fanId,
-              cursor: Math.min(
-                resumeCursor ?? gate.current?.cursor ?? 0,
-                gate.current?.cursor ?? 0,
-              ),
+              cursor: gate.current?.cursor ?? 0,
             }),
           );
-          resumeCursor = undefined;
+          void orderedRefresh();
         };
         socket.onmessage = (event) => {
+          if (disposed || socket !== liveSocket) return;
           try {
+            if (
+              typeof event.data !== "string" ||
+              new TextEncoder().encode(event.data).byteLength > 1_000_000
+            ) {
+              liveSocket.close();
+              return;
+            }
             const payload: unknown = JSON.parse(String(event.data));
             if (
               typeof payload === "object" &&
@@ -259,7 +280,9 @@ export function ConversationScreen({
         };
         socket.onclose = () => {
           if (disposed || socket !== liveSocket) return;
+          transportReady.current = false;
           setOnline(false);
+          if (document.visibilityState !== "visible") return;
           reconnect = setTimeout(() => void connect(), delay);
           delay = Math.min(delay * 2, 15000);
         };
@@ -274,10 +297,12 @@ export function ConversationScreen({
       }
     };
     const offline = () => {
+      transportReady.current = false;
       setOnline(false);
       socket?.close();
     };
     const resume = () => {
+      transportReady.current = false;
       setOnline(false);
       clearTimeout(reconnect);
       socket?.close();
@@ -289,6 +314,11 @@ export function ConversationScreen({
       if (document.visibilityState === "visible" && navigator.onLine) {
         if (!socket || socket.readyState === WebSocket.CLOSED) void connect();
         else void orderedRefresh();
+      } else {
+        transportReady.current = false;
+        setOnline(false);
+        clearTimeout(reconnect);
+        socket?.close();
       }
     };
     document.addEventListener("visibilitychange", visible);
@@ -297,13 +327,14 @@ export function ConversationScreen({
     const poll = setInterval(() => {
       if (navigator.onLine && document.visibilityState === "visible")
         void orderedRefresh();
-    }, 5000);
+    }, 15000);
     setOnline(false);
     void connect();
     return () => {
       disposed = true;
       mounted.current = false;
       lifecycle.current++;
+      transportReady.current = false;
       socket?.close();
       clearTimeout(reconnect);
       clearInterval(poll);

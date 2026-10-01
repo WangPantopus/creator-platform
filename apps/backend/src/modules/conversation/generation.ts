@@ -11,21 +11,48 @@ import type { ThreadSnapshot } from "../agent/pipeline.js";
 import { BoundedWorkerPool, workerBudgets } from "../../workers/pool.js";
 import { invariant } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import type { PoolClient } from "pg";
+
+/** W2 journals only its own attempt/usage/fence rows in these callbacks.
+ * Provider network calls begin after the admission transaction commits. */
+export interface GenerationExecution {
+  readonly generationId: string;
+  readonly attemptId: string;
+  admit<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+  sealAdmission<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+}
 
 export interface ConversationGenerator {
+  /** Canonical W2 readiness after every call has attributed pre-call custody. */
+  readonly executionAttributed?: boolean;
+  seal?(scope: ThreadScope, execution: GenerationExecution): Promise<void>;
+  routeSafety?(
+    scope: ThreadScope,
+    text: string,
+    context: ConversationContextPort,
+    signal: AbortSignal,
+    deliver: (sentence: {
+      text: string;
+      citations: [];
+      authorKind: "ai";
+      safety: true;
+    }) => Promise<void>,
+  ): Promise<boolean>;
   generate(
     scope: ThreadScope,
     text: string,
     context: ConversationContextPort,
     signal: AbortSignal,
     deliver: (sentence: ApprovedSentence) => Promise<void>,
+    execution?: GenerationExecution,
   ): Promise<unknown>;
   extract?(
     scope: ThreadScope,
     snapshot: ThreadSnapshot,
     exchange: readonly string[],
     signal: AbortSignal,
-  ): Promise<void>;
+    execution?: GenerationExecution,
+  ): Promise<{ revision: number | null } | void>;
 }
 /** Durable jobs are creator.generation rows written by acceptance. A host's
  * generation pool may call recover with freshly authorized scopes after restart.
@@ -33,7 +60,10 @@ export interface ConversationGenerator {
 export class ConversationGenerationProcessor {
   private readonly pool = new BoundedWorkerPool(workerBudgets.generation);
   private readonly pending = new Set<string>();
-  private readonly active = new Map<string, AbortController>();
+  private readonly active = new Map<
+    string,
+    { controller: AbortController; epoch: number }
+  >();
   private readonly retries = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly again = new Map<
     string,
@@ -49,12 +79,15 @@ export class ConversationGenerationProcessor {
     private readonly memory: MemoryService,
     private readonly generator: ConversationGenerator,
   ) {}
-  interrupt(threadId: string) {
-    this.active.get(threadId)?.abort();
+  interrupt(threadId: string, beforeEpoch?: number) {
+    const current = this.active.get(threadId);
+    // A replayed old control receipt cannot abort a newer accepted attempt.
+    if (current && (beforeEpoch === undefined || current.epoch < beforeEpoch))
+      current.controller.abort();
   }
   close() {
     this.closed = true;
-    for (const controller of this.active.values()) controller.abort();
+    for (const { controller } of this.active.values()) controller.abort();
     for (const timer of this.retries.values()) clearTimeout(timer);
     this.retries.clear();
     this.again.clear();
@@ -154,8 +187,78 @@ export class ConversationGenerationProcessor {
       return;
     }
     const controller = new AbortController();
-    this.active.set(scope.threadId, controller);
+    this.active.set(scope.threadId, { controller, epoch: job.epoch });
     let emitted = 0;
+    let expectedRevision = job.contextRevision;
+    let admissionsOpen = true;
+    const generationSignal = AbortSignal.any([
+      controller.signal,
+      AbortSignal.timeout(45000),
+    ]);
+    const fence = async <T>(
+      journal: (client: PoolClient) => Promise<T>,
+      seal: boolean,
+    ): Promise<T> => {
+      if (seal) admissionsOpen = false;
+      else {
+        generationSignal.throwIfAborted();
+        invariant(
+          admissionsOpen,
+          "generation_admission_closed",
+          "Provider admission is closed.",
+        );
+      }
+      return this.db.withThread(
+        scope,
+        async (client) => {
+          if (!seal) {
+            generationSignal.throwIfAborted();
+            invariant(
+              admissionsOpen,
+              "generation_admission_closed",
+              "Provider admission is closed.",
+            );
+          }
+          const current = await client.query(
+            `SELECT g.id FROM creator.generation g JOIN creator.thread t
+           ON t.id=g.thread_id AND t.creator_id=g.creator_id AND t.fan_id=g.fan_id
+           WHERE g.id=$4 AND g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3
+           AND g.worker_token=$5 AND g.lease_until>clock_timestamp() AND g.state='generating'
+           AND g.epoch=$6 AND t.control_epoch=$6 AND t.control='ai_active'
+           AND t.revision=$7 AND g.last_sequence=$8 FOR UPDATE OF g`,
+            [
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+              job.id,
+              token,
+              job.epoch,
+              expectedRevision + emitted,
+              emitted,
+            ],
+          );
+          invariant(
+            current.rowCount === 1,
+            "generation_interrupted",
+            "The generation attempt changed before provider admission.",
+          );
+          await this.conversations.assertProcessorConsentInTransaction(
+            scope,
+            client,
+          );
+          const result = await journal(client);
+          if (!seal) generationSignal.throwIfAborted();
+          return result;
+        },
+        "write",
+      );
+    };
+    const execution: GenerationExecution = {
+      generationId: job.id,
+      attemptId: token,
+      admit: (journal) => fence(journal, false),
+      sealAdmission: (journal) => fence(journal, true),
+    };
     const context: ConversationContextPort = {
       current: (scope) => this.memory.context(scope),
       assertProcessorConsent: (scope) =>
@@ -187,7 +290,7 @@ export class ConversationGenerationProcessor {
         scope,
         job.text,
         context,
-        AbortSignal.any([controller.signal, AbortSignal.timeout(45000)]),
+        generationSignal,
         async (sentence) => {
           const frame = await this.conversations.releaseApprovedSentence(
             scope,
@@ -203,41 +306,57 @@ export class ConversationGenerationProcessor {
           );
           emitted++;
         },
+        execution,
       );
       invariant(
         emitted > 0,
         "empty_reply",
         "The model returned no approved response.",
       );
-      await this.conversations.complete(scope, job.id, false, token);
       if (this.generator.extract) {
         const snapshot = await this.memory.context(scope);
-        if (
-          snapshot.epoch !== job.epoch ||
-          snapshot.revision !== job.contextRevision + emitted
-        )
-          return;
+        const memoryCurrent =
+          snapshot.epoch === job.epoch &&
+          snapshot.revision === job.contextRevision + emitted &&
+          !snapshot.offTheRecord;
         snapshot.provenanceMessageId = job.fan_message_id;
         const page = await this.conversations.read(scope);
         const answer = page.messages.find(
           (m) => m.id === job.ai_message_id && m.authorKind === "ai",
         );
-        if (answer)
-          await this.generator.extract(
+        if (answer && memoryCurrent) {
+          const receipt = await this.generator.extract(
             scope,
             snapshot,
             [job.text, answer.text],
-            AbortSignal.timeout(10000),
+            AbortSignal.any([generationSignal, AbortSignal.timeout(10000)]),
+            execution,
           );
+          if (receipt?.revision !== null && receipt?.revision !== undefined) {
+            invariant(
+              receipt.revision === job.contextRevision + emitted ||
+                receipt.revision === job.contextRevision + emitted + 1,
+              "memory_changed",
+              "The memory extraction revision changed.",
+            );
+            expectedRevision = receipt.revision - emitted;
+          }
+        }
       }
+      await this.generator.seal?.(scope, execution);
+      admissionsOpen = false;
+      await this.conversations.complete(scope, job.id, false, token);
     } catch {
+      admissionsOpen = false;
+      await this.generator.seal?.(scope, execution).catch(() => undefined);
       // Completion is fenced by the same row/epoch/token. A newer human boundary
       // already settled its reservation and must not be undone here.
       await this.conversations
         .complete(scope, job.id, true, token)
         .catch(() => undefined);
     } finally {
-      if (this.active.get(scope.threadId) === controller)
+      admissionsOpen = false;
+      if (this.active.get(scope.threadId)?.controller === controller)
         this.active.delete(scope.threadId);
     }
   }

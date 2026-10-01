@@ -18,6 +18,13 @@ export function approvedConversationGenerator(input: {
   onExtractionUsage?: (scope: ThreadScope, usage: Usage) => Promise<void>;
 }): ConversationGenerator {
   return {
+    async routeSafety(scope, text, context, signal, deliver) {
+      return new LiveAgentRuntime(
+        input.agent,
+        context,
+        input.audiences,
+      ).routeSafety(scope, text, signal, deliver);
+    },
     async generate(scope, text, context, signal, deliver) {
       return new LiveAgentRuntime(
         input.agent,
@@ -57,7 +64,7 @@ export function approvedConversationGenerator(input: {
               onUsage: (usage) => input.onExtractionUsage!(scope, usage),
             });
             signal.throwIfAborted();
-            await input.memory.writeProposals(scope, proposals);
+            return input.memory.writeProposalsWithReceipt(scope, proposals);
           },
         }
       : {}),

@@ -44,6 +44,13 @@ export interface GenerationAllowance {
     grantId: string,
     consumed: boolean,
   ): Promise<void>;
+  /** W3 calls only after persisting a real visible AI sentence, in that write. */
+  recordOutput?(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+    grantId: string,
+  ): Promise<void>;
 }
 
 export class AccessService {
@@ -209,6 +216,20 @@ export class AccessService {
     await client.query(
       "UPDATE creator.access_grant SET reserved=reserved-1, used=used+$4 WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND reserved > 0",
       [grantId, scope.creatorId, scope.fanId, consumed ? 1 : 0],
+    );
+  }
+  async recordAllowanceOutput(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+    grantId: string,
+  ) {
+    assertThreadScope(scope);
+    await this.generationAllowance?.recordOutput?.(
+      scope,
+      client,
+      generationId,
+      grantId,
     );
   }
 }

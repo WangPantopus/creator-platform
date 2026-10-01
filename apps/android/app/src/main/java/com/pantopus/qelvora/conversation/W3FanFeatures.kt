@@ -106,7 +106,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 resumeActivated = true
             }
             val fresh = client.page(root)
-            if (fresh.cursor >= (page?.cursor ?: 0)) {
+            if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
                 page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }

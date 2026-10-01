@@ -14,6 +14,7 @@ import type { ConversationAllowance } from "./allowance.js";
 import type { ProviderPolicy } from "../../../../../packages/api/src/conversation/contracts.js";
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
+import { invariant } from "../../core/errors.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -23,6 +24,9 @@ export function createConversationRuntime(input: {
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
+  /** From W4's awaited prepared runtime, using this exact AccessService.
+   * Keep allowance absent to select its single canonical generation path. */
+  generationAllowanceAvailable?: boolean;
   firstConversation?: Pick<CommerceService, "openTrial">;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
@@ -34,6 +38,11 @@ export function createConversationRuntime(input: {
   ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
+  invariant(
+    !(input.allowance && input.generationAllowanceAvailable),
+    "allowance_conflict",
+    "Configure one generation allowance path.",
+  );
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
@@ -61,7 +70,10 @@ export function createConversationRuntime(input: {
     input.policy,
     Boolean(
       generator &&
-        input.allowance &&
+        (input.allowance ||
+          (input.generationAllowanceAvailable &&
+            generator.executionAttributed &&
+            generator.seal)) &&
         input.citation &&
         input.assertReady &&
         input.assertApproved &&
@@ -72,6 +84,23 @@ export function createConversationRuntime(input: {
     input.citation,
     wellbeing,
     input.firstConversation,
+    generator?.routeSafety
+      ? (scope, text, signal, deliver) =>
+          generator.routeSafety!(
+            scope,
+            text,
+            {
+              current: (current) => memory.context(current),
+              assertProcessorConsent: (current) =>
+                input.conversation.assertProcessorConsent(current),
+              assertDeliveryCurrent: (current, expected) =>
+                input.conversation.assertSafetyCurrent(current, expected),
+            },
+            signal,
+            deliver,
+          )
+      : undefined,
+    (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
   );
   return {
     feature,

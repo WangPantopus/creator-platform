@@ -8,6 +8,7 @@ import {
   HumanReplySchema,
   ModelProposalSchema,
   SendMessageSchema,
+  AcceptedMessageSchema,
   type AcceptedMessage,
   type Frame,
   type Message,
@@ -26,6 +27,9 @@ import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
+import { TeamReplySchema } from "../../../../../packages/api/src/conversation/contracts.js";
+import { crisisText } from "../agent/pipeline.js";
+import { contentHash } from "../../core/canonical.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -88,32 +92,39 @@ export class ConversationService {
   /** Revalidate the current configured policy before every remote fan-text call.
    * A thread's historical notice alone is not current processor consent. */
   async assertProcessorConsent(scope: ThreadScope) {
+    await this.db.withThread(scope, (client) =>
+      this.assertProcessorConsentInTransaction(scope, client),
+    );
+  }
+  async assertProcessorConsentInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+  ) {
+    assertThreadScope(scope);
     invariant(
       this.delivery.policyVersion,
       "processor_consent_unavailable",
       "Current AI processor policy is unavailable.",
     );
-    await this.db.withThread(scope, async (client) => {
-      const current = await client.query(
-        `SELECT t.id FROM creator.thread t
-         WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3
-         AND t.processor_consent_version=$4
-         AND EXISTS(SELECT 1 FROM creator.processor_consent c
-           WHERE c.thread_id=t.id AND c.creator_id=$2 AND c.fan_id=$3
-           AND c.version=$4 AND c.withdrawn_at IS NULL)`,
-        [
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-          this.delivery.policyVersion,
-        ],
-      );
-      invariant(
-        current.rowCount === 1,
-        "processor_consent_required",
-        "Review the current AI providers before messaging.",
-      );
-    });
+    const current = await client.query(
+      `SELECT t.id FROM creator.thread t
+     WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3
+     AND t.processor_consent_version=$4
+     AND EXISTS(SELECT 1 FROM creator.processor_consent c
+       WHERE c.thread_id=t.id AND c.creator_id=$2 AND c.fan_id=$3
+       AND c.version=$4 AND c.withdrawn_at IS NULL)`,
+      [
+        scope.threadId,
+        scope.creatorId,
+        scope.fanId,
+        this.delivery.policyVersion,
+      ],
+    );
+    invariant(
+      current.rowCount === 1,
+      "processor_consent_required",
+      "Review the current AI providers before messaging.",
+    );
   }
   private async settle(
     client: PoolClient,
@@ -187,6 +198,166 @@ export class ConversationService {
     );
     return found.rows[0];
   }
+  async safetyCheckpoint(scope: ThreadScope) {
+    return this.db.withThread(scope, async (client) => {
+      const thread = await this.lockThread(client, scope, true);
+      invariant(
+        thread.control !== "closed",
+        "thread_closed",
+        "Open Help and safety for free support.",
+      );
+      return { epoch: thread.control_epoch, revision: thread.revision };
+    });
+  }
+  async assertSafetyCurrent(
+    scope: ThreadScope,
+    expected: { epoch: number; revision: number },
+  ) {
+    const current = await this.safetyCheckpoint(scope);
+    invariant(
+      current.epoch === expected.epoch &&
+        current.revision === expected.revision,
+      "conversation_changed",
+      "This conversation changed. Retry your message.",
+    );
+  }
+  private async interruptGenerations(client: PoolClient, scope: ThreadScope) {
+    const active = await client.query<GenerationRow>(
+      "SELECT * FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') FOR UPDATE",
+      [scope.threadId, scope.creatorId, scope.fanId],
+    );
+    for (const generation of active.rows) {
+      await client.query(
+        "UPDATE creator.generation SET state='interrupted' WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
+        [generation.id, scope.threadId, scope.creatorId, scope.fanId],
+      );
+      await client.query(
+        "UPDATE creator.message SET delivery_state='interrupted' WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
+        [
+          generation.ai_message_id,
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+        ],
+      );
+      await this.settle(
+        client,
+        scope,
+        generation,
+        generation.last_sequence > 0,
+      );
+      await appendFrame(client, scope, {
+        epoch: generation.epoch,
+        kind: "interrupted",
+        messageId: generation.ai_message_id,
+        authorKind: "ai",
+        text: "",
+        generationId: generation.id,
+        sequence: generation.last_sequence,
+      });
+    }
+    return active.rows.length;
+  }
+  /** Fixed W2 platform safety copy: no license, paid generation or allowance.
+   * The classification snapshot is fenced again in the actual message write. */
+  async sendSafety(
+    scope: ThreadScope,
+    raw: unknown,
+    expected: { epoch: number; revision: number },
+  ): Promise<AcceptedMessage> {
+    const body = SendMessageSchema.parse(raw);
+    invariant(
+      scope.authority === "fan",
+      "fan_required",
+      "Only the fan can send this message.",
+    );
+    return this.db.withThread(
+      scope,
+      (client) =>
+        idempotent(
+          client,
+          scope,
+          "send",
+          body.idempotencyKey,
+          {
+            creatorId: scope.creatorId,
+            fanId: scope.fanId,
+            recipient: "ai",
+            ...body,
+          },
+          async () => {
+            const thread = await this.lockThread(client, scope);
+            invariant(
+              thread.control !== "closed",
+              "thread_closed",
+              "Open Help and safety for free support.",
+            );
+            invariant(
+              thread.control_epoch === expected.epoch &&
+                thread.revision === expected.revision,
+              "conversation_changed",
+              "This conversation changed. Retry your message.",
+            );
+            const interrupted = await this.interruptGenerations(client, scope);
+            const epoch = thread.control_epoch + (interrupted ? 1 : 0);
+            if (interrupted) {
+              await client.query(
+                "UPDATE creator.thread SET control_epoch=$4 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+                [scope.threadId, scope.creatorId, scope.fanId, epoch],
+              );
+              await this.delivery.wellbeing?.boundary(scope, client);
+            }
+            const fan = await this.insertMessage(
+              client,
+              scope,
+              "fan",
+              body.text,
+              epoch,
+              "accepted",
+            );
+            const reply = await this.insertMessage(
+              client,
+              scope,
+              "ai",
+              crisisText,
+              epoch,
+              "delivered",
+            );
+            if (interrupted)
+              await appendFrame(client, scope, {
+                epoch,
+                kind: "control",
+                control: thread.control,
+                messageId: reply.id,
+                authorKind: "ai",
+                text: crisisText,
+                generationId: null,
+                sequence: 0,
+              });
+            await appendFrame(client, scope, {
+              epoch,
+              kind: "accepted",
+              messageId: fan.id,
+              authorKind: "fan",
+              text: fan.text,
+              generationId: null,
+              sequence: 0,
+            });
+            await appendFrame(client, scope, {
+              epoch,
+              kind: "delivered",
+              messageId: reply.id,
+              authorKind: "ai",
+              text: crisisText,
+              generationId: null,
+              sequence: 0,
+            });
+            return { message: fan, generationId: null };
+          },
+        ),
+      "write",
+    );
+  }
   private async insertMessage(
     client: PoolClient,
     scope: ThreadScope,
@@ -208,7 +379,7 @@ export class ConversationService {
         scope.creatorId,
         scope.fanId,
         author,
-        author === "fan" || author === "human_creator"
+        author === "fan" || author === "human_creator" || author === "team"
           ? scope.actorAccountId
           : null,
         text,
@@ -249,14 +420,53 @@ export class ConversationService {
       };
     });
   }
-  async send(scope: ThreadScope, raw: unknown): Promise<AcceptedMessage> {
+  async accepted(
+    scope: ThreadScope,
+    raw: unknown,
+  ): Promise<AcceptedMessage | null> {
+    const body = SendMessageSchema.parse(raw);
+    invariant(
+      scope.authority === "fan",
+      "fan_required",
+      "Only the sender can check their message.",
+    );
+    return this.db.withThread(scope, async (client) => {
+      const row = (
+        await client.query<{ request_hash: string; response: unknown }>(
+          "SELECT request_hash,response FROM creator.idempotency_key WHERE actor_account_id=$1 AND operation='send' AND key=$2",
+          [scope.actorAccountId, body.idempotencyKey],
+        )
+      ).rows[0];
+      if (!row) return null;
+      invariant(
+        row.request_hash ===
+          contentHash({
+            operation: "send",
+            threadId: scope.threadId,
+            request: {
+              creatorId: scope.creatorId,
+              fanId: scope.fanId,
+              recipient: "ai",
+              ...body,
+            },
+          }),
+        "idempotency_conflict",
+        "This retry key was already used for a different request.",
+      );
+      return AcceptedMessageSchema.parse(row.response);
+    });
+  }
+  async send(
+    scope: ThreadScope,
+    raw: unknown,
+  ): Promise<AcceptedMessage & { generationId: string }> {
     const body = SendMessageSchema.parse(raw);
     invariant(
       scope.authority === "fan",
       "fan_required",
       "Only this fan can send their message.",
     );
-    return this.db.withThread(
+    const accepted = await this.db.withThread(
       scope,
       (client) =>
         idempotent(
@@ -388,6 +598,12 @@ export class ConversationService {
         ),
       "write",
     );
+    invariant(
+      accepted.generationId,
+      "generation_not_required",
+      "This message already received free safety support. Reopen its accepted state.",
+    );
+    return accepted;
   }
   async fanReply(scope: ThreadScope, raw: unknown): Promise<Message> {
     const body = SendMessageSchema.parse(raw);
@@ -571,6 +787,13 @@ export class ConversationService {
           "UPDATE creator.thread SET revision=revision+1 WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
           [scope.threadId, scope.creatorId, scope.fanId],
         );
+        if (!generation.reservation_id)
+          await this.access.recordAllowanceOutput(
+            scope,
+            client,
+            generation.id,
+            generation.grant_id,
+          );
         return appendFrame(client, scope, {
           epoch: generation.epoch,
           kind: "sentence",
@@ -634,7 +857,7 @@ export class ConversationService {
             scope.fanId,
           ],
         );
-        await this.settle(client, scope, generation, !failed || visible);
+        await this.settle(client, scope, generation, visible);
         await client.query(
           "UPDATE creator.generation SET completed_at=now(),worker_token=NULL,lease_until=NULL WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
           [generationId, scope.threadId, scope.creatorId, scope.fanId],
@@ -684,53 +907,7 @@ export class ConversationService {
               "control_unchanged",
               "The conversation already has this speaker.",
             );
-            const active = await client.query<GenerationRow>(
-              "SELECT * FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN ($4,$5) FOR UPDATE",
-              [
-                scope.threadId,
-                scope.creatorId,
-                scope.fanId,
-                "queued",
-                "generating",
-              ],
-            );
-            for (const generation of active.rows) {
-              await client.query(
-                "UPDATE creator.generation SET state=$1 WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
-                [
-                  "interrupted",
-                  generation.id,
-                  scope.threadId,
-                  scope.creatorId,
-                  scope.fanId,
-                ],
-              );
-              await client.query(
-                "UPDATE creator.message SET delivery_state=$1 WHERE id=$2 AND thread_id=$3 AND creator_id=$4 AND fan_id=$5",
-                [
-                  "interrupted",
-                  generation.ai_message_id,
-                  scope.threadId,
-                  scope.creatorId,
-                  scope.fanId,
-                ],
-              );
-              await this.settle(
-                client,
-                scope,
-                generation,
-                generation.last_sequence > 0,
-              );
-              await appendFrame(client, scope, {
-                epoch: generation.epoch,
-                kind: "interrupted",
-                messageId: generation.ai_message_id,
-                authorKind: "ai",
-                text: "",
-                generationId: generation.id,
-                sequence: generation.last_sequence,
-              });
-            }
+            await this.interruptGenerations(client, scope);
             const epoch = thread.control_epoch + 1;
             await client.query(
               "UPDATE creator.thread SET control=$1,control_epoch=$2 WHERE id=$3 AND creator_id=$4 AND fan_id=$5",
@@ -815,6 +992,85 @@ export class ConversationService {
               kind: "delivered",
               messageId: output.id,
               authorKind: "human_creator",
+              text: output.text,
+              generationId: null,
+              sequence: 0,
+            });
+            return output;
+          },
+        ),
+      "write",
+    );
+  }
+  /** D-07: current audited triage authority writes only under the team label.
+   * This grants no creator signature, control change or personal obligation. */
+  async teamReply(scope: ThreadScope, raw: unknown): Promise<Message> {
+    const body = TeamReplySchema.parse(raw);
+    invariant(
+      scope.authority === "triage",
+      "team_required",
+      "Only a current authorized team member can reply as team.",
+    );
+    return this.db.withThread(
+      scope,
+      (client) =>
+        idempotent(
+          client,
+          scope,
+          "team_reply",
+          body.idempotencyKey,
+          body,
+          async () => {
+            const thread = await this.lockThread(client, scope);
+            invariant(
+              thread.control !== "closed",
+              "thread_closed",
+              "This conversation is closed.",
+            );
+            // Team replies do not acquire the creator's takeover authority. Keep
+            // a live AI stream ordered; the creator can interrupt it explicitly.
+            const active = await client.query(
+              "SELECT id FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 1",
+              [scope.threadId, scope.creatorId, scope.fanId],
+            );
+            invariant(
+              !active.rowCount,
+              "reply_in_progress",
+              "Wait for the current reply before sending as team.",
+            );
+            const profile = await client.query<{ handle: string }>(
+              "SELECT handle FROM creator.fan_profile WHERE account_id=$1 FOR SHARE",
+              [scope.actorAccountId],
+            );
+            invariant(
+              profile.rows[0],
+              "team_profile_required",
+              "Choose your public handle before replying as team.",
+            );
+            const output = await this.insertMessage(
+              client,
+              scope,
+              "team",
+              body.text,
+              thread.control_epoch,
+              "delivered",
+            );
+            await client.query(
+              "UPDATE creator.message SET team_member=$5 WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='team' AND author_account_id=$6",
+              [
+                scope.threadId,
+                scope.creatorId,
+                scope.fanId,
+                output.id,
+                `@${profile.rows[0].handle} · triage`,
+                scope.actorAccountId,
+              ],
+            );
+            await appendFrame(client, scope, {
+              epoch: thread.control_epoch,
+              kind: "delivered",
+              messageId: output.id,
+              authorKind: "team",
               text: output.text,
               generationId: null,
               sequence: 0,
