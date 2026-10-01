@@ -369,15 +369,23 @@ export class GrowthService {
     if (input.threadsCursor) {
       try {
         const value = z
-          .strictObject({
-            accountId: z.uuid(),
-            threadId: z.uuid(),
-            kind: z.literal("threads"),
-          })
+          .union([
+            z.strictObject({
+              accountId: z.uuid(),
+              threadId: z.uuid(),
+              kind: z.literal("threads"),
+            }),
+            z.strictObject({
+              accountId: z.uuid(),
+              ownerCursor: z.string().min(1).max(256),
+              kind: z.literal("threads-page"),
+            }),
+          ])
           .parse(JSON.parse(this.open(input.threadsCursor)));
         if (value.accountId !== actor.accountId)
           throw new Error("cursor_account_changed");
-        threadCursor = value.threadId;
+        threadCursor =
+          value.kind === "threads" ? value.threadId : value.ownerCursor;
       } catch {
         throw new DomainError(
           "home_cursor_invalid",
@@ -440,10 +448,16 @@ export class GrowthService {
       );
     const page = this.owners.homePage
       ? await this.owners.homePage(actor, threadCursor)
-      : { entries: await this.owners.home(actor), nextCursor: null };
+      : {
+          entries: await this.owners.home(actor),
+          nextCursor: null,
+          order: "directory" as const,
+        };
     if (
       page.entries.length > 100 ||
-      (page.nextCursor && !z.uuid().safeParse(page.nextCursor).success)
+      (page.nextCursor &&
+        (!z.string().min(1).max(256).safeParse(page.nextCursor).success ||
+          page.nextCursor === threadCursor))
     )
       throw new DomainError(
         "home_scope_invalid",
@@ -479,12 +493,13 @@ export class GrowthService {
         };
       }),
       followingCount: own.followingCount,
+      threadOrder: page.order ?? "directory",
       nextThreadsCursor: page.nextCursor
         ? this.seal(
             JSON.stringify({
               accountId: actor.accountId,
-              threadId: page.nextCursor,
-              kind: "threads",
+              ownerCursor: page.nextCursor,
+              kind: "threads-page",
             }),
           )
         : null,

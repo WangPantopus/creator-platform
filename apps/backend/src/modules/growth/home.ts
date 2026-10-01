@@ -6,9 +6,24 @@ import type { Database } from "../../db/database.js";
 import type { SignedActService } from "../identity/signed-acts.js";
 import { DomainError } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
+import { readConversationHomeCursor } from "../conversation/home-cursor.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
 export interface ConversationHomeDirectory {
+  accountForHome?(
+    actor: Actor,
+    cursor?: string,
+  ): Promise<{
+    fan: { id: string };
+    threads: readonly {
+      id: string;
+      creatorId: string;
+      fanId: string;
+      activityAt?: string;
+    }[];
+    nextCursor?: string | null;
+    order: "activity" | "directory";
+  }>;
   account(
     actor: Actor,
     cursor?: string,
@@ -21,9 +36,17 @@ export interface ConversationHomeDirectory {
 const Directory = z.object({
   fan: z.object({ id: z.uuid() }),
   threads: z
-    .array(z.object({ id: z.uuid(), creatorId: z.uuid(), fanId: z.uuid() }))
+    .array(
+      z.object({
+        id: z.uuid(),
+        creatorId: z.uuid(),
+        fanId: z.uuid(),
+        activityAt: z.iso.datetime().optional(),
+      }),
+    )
     .max(50),
-  nextCursor: z.uuid().nullable().optional(),
+  nextCursor: z.string().min(1).max(256).nullable().optional(),
+  order: z.enum(["activity", "directory"]).optional(),
 });
 
 /** Minimal private Home read through fresh issued fan scopes. The host can
@@ -37,12 +60,17 @@ export function canonicalConversationHomePage(
 ): NonNullable<GrowthOwners["homePage"]> {
   return async (actor, cursor) => {
     const directory = Directory.parse(
-      await conversation.account(actor, cursor),
+      await (conversation.accountForHome?.(actor, cursor) ??
+        conversation.account(actor, cursor)),
     );
     const entries = directory.threads;
     const seen = new Set<string>();
     for (const entry of entries) {
-      if (seen.has(entry.id) || entry.fanId !== directory.fan.id)
+      if (
+        seen.has(entry.id) ||
+        entry.fanId !== directory.fan.id ||
+        (directory.order === "activity" && !entry.activityAt)
+      )
         throw new DomainError(
           "home_scope_invalid",
           copy.growthErrorPrivateReplyUnavailable,
@@ -51,7 +79,25 @@ export function canonicalConversationHomePage(
       seen.add(entry.id);
     }
     const nextCursor = directory.nextCursor ?? null;
-    if (nextCursor && (!seen.has(nextCursor) || nextCursor === cursor))
+    const position =
+      nextCursor && directory.order === "activity"
+        ? readConversationHomeCursor(nextCursor)
+        : null;
+    const nextThreadId = position?.threadId ?? nextCursor;
+    if (
+      position &&
+      (position.threadId !== entries.at(-1)?.id ||
+        position.activityAt !== entries.at(-1)?.activityAt)
+    )
+      throw new DomainError(
+        "home_scope_invalid",
+        copy.growthErrorPrivateReplyUnavailable,
+        503,
+      );
+    if (
+      nextCursor &&
+      (!nextThreadId || !seen.has(nextThreadId) || nextCursor === cursor)
+    )
       throw new DomainError(
         "home_scope_invalid",
         copy.growthErrorPrivateReplyUnavailable,
@@ -124,9 +170,11 @@ export function canonicalConversationHomePage(
           label,
           preview,
           destination: `/creators/${handle}/chat`,
-          updatedAt: new Date(
-            message?.created_at ?? row.thread.privacy_notice_at,
-          ).toISOString(),
+          updatedAt:
+            entry.activityAt ??
+            new Date(
+              message?.created_at ?? row.thread.privacy_notice_at,
+            ).toISOString(),
           kind: "thread",
         });
       } catch (error) {
@@ -137,11 +185,15 @@ export function canonicalConversationHomePage(
         throw error;
       }
     }
-    // W3's directory is UUID ordered. Sorting this bounded page by activity
-    // does not claim global recency across pages; all families remain reachable.
+    // Only W3's installed activity projection establishes global recency. Older
+    // hosts remain UUID paged; sorting that page does not establish global order.
     return {
-      entries: result.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+      entries: result.sort(
+        (a, b) =>
+          b.updatedAt.localeCompare(a.updatedAt) || b.id.localeCompare(a.id),
+      ),
       nextCursor,
+      order: directory.order ?? "directory",
     };
   };
 }

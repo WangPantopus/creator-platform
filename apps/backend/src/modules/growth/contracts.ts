@@ -201,7 +201,11 @@ export interface GrowthOwners {
   homePage?(
     actor: Actor,
     cursor?: string,
-  ): Promise<{ entries: HomeEntry[]; nextCursor: string | null }>;
+  ): Promise<{
+    entries: HomeEntry[];
+    nextCursor: string | null;
+    order?: "activity" | "directory";
+  }>;
   discoveryAccess(actor: Actor): Promise<PassDiscoveryView>;
   creatorFor(actor: Actor): Promise<string | null>;
   shareSource(actor: Actor, grantId: string): Promise<ShareSource | null>;
