@@ -25,7 +25,10 @@
         "name": "creator-platform-w5-local",
         "running": false,
         "port": 55435,
-        "databases": ["creator_w5", "creator_w5_upgrade"],
+        "databases": [
+          "creator_w5",
+          "creator_w5_upgrade"
+        ],
         "lastVerifiedStatus": "exited after own docker stop",
         "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       },
@@ -33,7 +36,9 @@
         "name": "creator-platform-w5-ci",
         "running": false,
         "port": 51360,
-        "databases": ["creator_foundation"],
+        "databases": [
+          "creator_foundation"
+        ],
         "lastVerifiedStatus": "exited after own docker stop",
         "currentVerification": "Docker daemon unavailable on final recheck; inspect container and volume before reuse"
       }
@@ -93,7 +98,16 @@
   "resourceCleanup": {
     "record": "resource-cleanup.json",
     "allocatedBytesRemovedByThisCleanup": 2407641088,
-    "noListenersVerified": [3005, 3006, 3105, 4105, 5045, 55435, 51360, 5590],
+    "noListenersVerified": [
+      3005,
+      3006,
+      3105,
+      4105,
+      5045,
+      55435,
+      51360,
+      5590
+    ],
     "laterEnvironmentChange": "All W5 /private/tmp resources absent on final recheck; cause unverified. Docker daemon unavailable; do not assume containers or data are accessible."
   },
   "absentAtFinalRecheck": [
@@ -109,9 +123,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T01:50:44.369365+00:00",
+    "recordedAt": "2026-10-01T02:33:40.140874+00:00",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "b2f7788c6afdde167a324a032a7b3d2703518d99; attached correction consumer follows, inspect HEAD",
+    "lastPushedCheckpoint": "cea5e07d302bd36d4eeb99dd627989b0f9ea6d26 application checkpoint; documentation checkpoint follows, inspect HEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -119,15 +133,15 @@
         "webPort": 3005,
         "webSession": 67790,
         "apiPort": 4105,
-        "apiSession": 19017,
-        "apiPid": 78418
+        "apiSession": 68408,
+        "apiPid": 6359
       },
       "secondary": {
         "webPort": 30055,
         "webSession": 89623,
         "apiPort": 41055,
-        "apiSession": 44223,
-        "apiPid": 78429
+        "apiSession": 7899,
+        "apiPid": 6369
       },
       "developmentDatabase": {
         "container": "creator-platform-w5-local",
@@ -147,7 +161,12 @@
       }
     },
     "browser": {
-      "tabs": ["1", "3"],
+      "tabs": [
+        "1",
+        "3",
+        "5",
+        "6"
+      ],
       "nativeInputAvailable": false,
       "cookieNamespaceConsumed": "cf851a5",
       "focused390LightNightVerified": true,
@@ -159,7 +178,11 @@
       "postVoiceUnavailablePolicyVerified": true,
       "countBoundaryDraftRevision": 2,
       "realSessionExpiryAndBoundReadRenewalVerified": true,
-      "correctionCurrentDirectoryEmptyVerified": true
+      "correctionCurrentDirectoryEmptyVerified": true,
+      "pendingCreatorControlsBothWidthsThemesVerified": true,
+      "pendingCreatorId": "da06e2ce-d2b3-4fb9-b163-91b8bbe58706",
+      "accountAliasCurrentAndScopedUnavailableVerified": true,
+      "currentPrivateSessionExpired": true
     },
     "mediaMigration": "schema-media-publication.sql proposed, unallocated, unapplied; no applied SQL or checksums rewritten",
     "signing": "Human instructed keep genuine signing blocked; no UV/passkey simulation",
@@ -167,7 +190,7 @@
       "keyLoaded": false,
       "paidCalls": 0
     },
-    "verification": "Generation78 and full client/navigation suffix preserved; API/web/backend types, scoped lint/format+web/backend production builds pass; latest generated schema Swift build43.15s; existing18backend pass338.03s and15nonsnapshot pass/110strict comparisons fail104.294s; b2f native current-bound-read Swift23.24s/Android307s compile pass; attached-correction generate78/API+web types/lint/format/production web build pass",
+    "verification": "Final API/web types, scoped lint/format and backend/web production builds pass; actual launched pending-profile web 390/1280 Light/Night and /you account/query journeys verified. No unit tests run this continuation. Historical18 backend pass/15 nonsnapshot pass/110 strict comparisons fail remain unchanged; no current all-CI or E2E merge-ready claim.",
     "unverified": [
       "Genuine signed Note/two-fan reply/reaction",
       "Real media/C2PA and live/replay",
@@ -178,18 +201,25 @@
     "signatureWithdrawal": "Published held-client ContentSignatureWithdrawal + authorizePublicationSignatureWithdrawal exact domain/revision/full-command policy. W1 consumed registry/current held W8 denial/durable real publisher audit + W8 RLS remain required and absent.",
     "mediaCurrentPublication": "Original recording signature/provenance stays separate; mandatory publicationBinding verifies current published act/full evidence under shared object lock; tuple is current published signedAct/version",
     "postVoice": "Actual saved Post post_audio; exact d15a451 configured policy projection, no fallback; producer unmounted/no microphone or signing proof",
-    "audienceMedia": "Personal current tuple/C2PA/ticket consumer on actual no-Thread W1 audience route; real media producer unmounted/unverified; optional actual-account metadata/ticket/byte precondition personally composed under explicit W6 BFF/Player lease; direct native guard unavailable.",
+    "audienceMedia": "Web actual-account-bound consumer committed; provisional native attachments uncommitted pending W6 mandatory final served-file SHA/size/variant contract. Processed publication signature tuple is preserved; mismatch fails closed. No real bytes/provider playback proof.",
     "mediaLifecycle": "Exact c425ae7 recorder generation and de17183 canonical form; keyed old-node preview/player cleanup plus personal player hidden-authority pause",
     "nativeAuthority": "Serialized monotonic5s/scene expiry, private state keyed to route, signature closure, actual-account GET binding; compile only, native operation unverified",
     "nativeBuildResources": {
       "owned": "/private/tmp/creator-w5-native-authority",
       "jdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/jdk-x64/jdk-21.0.12.1+1/Contents/Home",
       "sdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/sdk",
-      "androidBuild": "compileDebugKotlin pass5m7s; no APK/device/SDK modification",
-      "iosBuild": "final bound-read Swift compilation pass23.24s",
-      "ownCachesPreserved": true
+      "androidBuild": "Final provisional attachment assembleDebug passes351s; APK SHA25610c37134e29483d1ff3bc0e988df47ba24d6d4a5eb39be2d36a75a54a8110d8f. No Android emulator launched yet.",
+      "iosBuild": "Full shipping simulator host and final AudioSession incremental build pass. Normal FanAppShell installed and visibly launched to genuine Pantopus sign-in on owned W5 iPhone17/iOS26.5; launch-only, not authenticated/native E2E.",
+      "ownCachesPreserved": true,
+      "iosOwned": "/private/tmp/creator-w5-native-audience-host",
+      "iosSimulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27 booted; peer devices preserved",
+      "xcodegenReadonlyLease": "/private/tmp/creator-w1-continuation-tools-20260930/xcodegen/bin/xcodegen",
+      "runtimeEmulatorLease": "W6 official SDK/image installation completed; await owner verified read-only lease. Reserve W5-only ADB5045/emulator5590/AVD/userdata."
     },
     "corrections": "Personal strict3cda401 command/input/UI/BFF; exact source version/current account, bounded expiry, original retry, real five-field receipt plus full delivered metadata readback. Original directory empty; genuine UV held; producer/migration/unallocated lineage and audited timeline metadata integration still required. Pending reload recovery unverified.; exact16162 contracts consumed, newest100 query only; genuine lineage port/current missing message columns await W3/W8; actual correction label/exact original-version opener prepared.",
-    "hostedCI": "b2f7788 Foundation36801572897 web-and-backend passes; duplicate Foundation36801576495 and Trust36801576465/other foundation jobs queued at inspection; strict local110 snapshot failures unchanged."
+    "hostedCI": "Last inspected d17e148 PR9 draft with required contexts incomplete; no current head all-green/E2E acceptance and no merge. PR1\u20139 inspected; none has complete app-level acceptance plus required head gates.",
+    "preparedStudioRead": "Exact W3 37f727eb type-only port and personal bounded same-pool held-client consumer committed cea5e07. Unmounted pending actual canonical base columns, W8 alias/fresh-upgrade custody and genuine prepared owner instance.",
+    "creatorVerification": "Actual pending creator profile disables Save/review/Photo/Voice while local text remains editable; explicit later session expiry clears private input.",
+    "accountAlias": "Explicit W1 lease: unscoped protected identity/account redirect; any query preserved with unavailable notice and deliberate general-account navigation."
   }
 }
