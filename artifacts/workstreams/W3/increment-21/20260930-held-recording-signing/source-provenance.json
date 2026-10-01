@@ -1,0 +1,148 @@
+{
+  "workstream": "W3",
+  "increment": 21,
+  "predecessor": "600bfb01413b06be095f88ae994f022b7d7cf8ca",
+  "implementation": "personal; no delegation/new tests/applied SQL edits",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/app.ts",
+      "sha256": "1c1447794b034afae6e77b76feeaec9988f37936d44e21021caa73b8e6b2d183",
+      "gitBlob": "1e21f8d7d5709af6898991b35b0f001788994ce2"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/signed-acts.ts",
+      "sha256": "05ba82aa2cb354a7627b7dc82d4d6d4cb4cdee93576769fb43fd28be61804688",
+      "gitBlob": "d4be4ce35ba1514dd871580588ad022979de45a0"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/subjects.ts",
+      "sha256": "45d3a06cff81719d25f29312f96a88c44ab6990fc17bc608de77c8007c770cdc",
+      "gitBlob": "f074f05f8bfb26beaa11ea1971ad3d50aa9e204b"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/recordings.ts",
+      "sha256": "58e87081c1f406aee49c9c65b02e6b1e0e05d8a71f6d348a0a1572319ba966b6",
+      "gitBlob": "9655a553c15b0fa9727603d3d574ce112c9db9af"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "sha256": "09ce1a25ace9c9745f7d2bd38aff25e5dfceb1f5d912d3a57e5535fecd1f55ae",
+      "gitBlob": "88dcdf5aa52e143cbcd9a3db2caa19652a29218a"
+    }
+  ],
+  "W1Producer": {
+    "commit": "adc7cd1487d1cba663b84c8da7aad2459ddf7cd8",
+    "scope": "Byte-identical signed-acts.ts and subjects.ts; exact beginThreadSubject call region from app.ts; all other actual held signing dependencies personally compared",
+    "reviewedClosure": {
+      "apps/backend/src/app.ts": {
+        "W1sha256": "d0cb95b1c6b678a3f9f59ec3e6c25261e1c7410a861028d46c715f2fbd2b2ef9",
+        "W3sha256": "1c1447794b034afae6e77b76feeaec9988f37936d44e21021caa73b8e6b2d183",
+        "identical": false
+      },
+      "apps/backend/src/modules/identity/signed-acts.ts": {
+        "W1sha256": "05ba82aa2cb354a7627b7dc82d4d6d4cb4cdee93576769fb43fd28be61804688",
+        "W3sha256": "05ba82aa2cb354a7627b7dc82d4d6d4cb4cdee93576769fb43fd28be61804688",
+        "identical": true
+      },
+      "apps/backend/src/modules/identity/subjects.ts": {
+        "W1sha256": "45d3a06cff81719d25f29312f96a88c44ab6990fc17bc608de77c8007c770cdc",
+        "W3sha256": "45d3a06cff81719d25f29312f96a88c44ab6990fc17bc608de77c8007c770cdc",
+        "identical": true
+      },
+      "apps/backend/src/modules/access/scope.ts": {
+        "W1sha256": "428fe1eeef40f9b0ae2d847077cce49a786fdb355e12367cea4309e66d4d8407",
+        "W3sha256": "0a8454637082c742d9edf7c0afc819f22d880bf0838207877b500b69a66a9fe0",
+        "identical": false,
+        "exactHeldIssuerRegion": true
+      },
+      "apps/backend/src/modules/identity/adapter.ts": {
+        "W1sha256": "309945984babbbb74ea0389f3bf99c0aa62fd508d8faeafa336ef2a6b60067b0",
+        "W3sha256": "309945984babbbb74ea0389f3bf99c0aa62fd508d8faeafa336ef2a6b60067b0",
+        "identical": true
+      },
+      "apps/backend/src/modules/identity/read.ts": {
+        "W1sha256": "00467be153c5b1114cac58180b165eda375bd0bf52063d36934bb7fbd6a578a2",
+        "W3sha256": "00467be153c5b1114cac58180b165eda375bd0bf52063d36934bb7fbd6a578a2",
+        "identical": true
+      },
+      "apps/backend/src/modules/identity/request-authority.ts": {
+        "W1sha256": "42c02fdda43855be37b0013cebce0fc97a4b4386626de2c2dbef8c10f60efd4e",
+        "W3sha256": "42c02fdda43855be37b0013cebce0fc97a4b4386626de2c2dbef8c10f60efd4e",
+        "identical": true
+      },
+      "apps/backend/src/modules/identity/transaction.ts": {
+        "W1sha256": "8840ab237262f50458f11d23608f3ded555c78b03d703a9887a1e458e5fc078e",
+        "W3sha256": "8840ab237262f50458f11d23608f3ded555c78b03d703a9887a1e458e5fc078e",
+        "identical": true
+      },
+      "apps/backend/src/modules/identity/sessions.ts": {
+        "W1sha256": "bfa7c1c013073836f6d2359b94a85a4676679618bc2ee0a3f602830ba41ad6ba",
+        "W3sha256": "dea64d41f568f1362eece8e8cf13799f25832370bcb1560ebd7c653a5cddff1d",
+        "identical": false
+      },
+      "apps/backend/src/integration.ts": {
+        "W1sha256": "c5b1205ee3aeb1d09c7f1d108a299f5937627b116efee7063109616c0d760bdc",
+        "W3sha256": "413390c4c2919b3acf093a29fc0cbcdc2fb7e3d4cea4f1f706e70ccd960c2880",
+        "identical": false
+      },
+      "apps/backend/src/core/canonical.ts": {
+        "W1sha256": "f640c52590bd39233bbda1ab8a94577cbae867f83554c9bb9527703377f948ac",
+        "W3sha256": "f640c52590bd39233bbda1ab8a94577cbae867f83554c9bb9527703377f948ac",
+        "identical": true
+      },
+      "apps/backend/src/core/errors.ts": {
+        "W1sha256": "8d1e0ef1768abc0a5ca99db6f0d192b08b453145dd4e2d9645c12b8511976773",
+        "W3sha256": "8d1e0ef1768abc0a5ca99db6f0d192b08b453145dd4e2d9645c12b8511976773",
+        "identical": true
+      },
+      "packages/api/src/schemas.ts": {
+        "W1sha256": "d082bed889bfafe2474ed40b01a4028296b3ad9880de717b1221b272aac9f976",
+        "W3sha256": "d082bed889bfafe2474ed40b01a4028296b3ad9880de717b1221b272aac9f976",
+        "identical": true
+      },
+      "packages/api/src/index.ts": {
+        "W1sha256": "1902c5c35fe7688e4033ee1774fe3cf5a37c0c53b2c3edf5cc2053d455e8f408",
+        "W3sha256": "6fb8871d390f6bd077a28dc2b83704bc37c80d73f321f47f7ba003f7238a60da",
+        "identical": false
+      },
+      "apps/web/features/identity/signing.tsx": {
+        "W1sha256": "6f3b7f701be263cac59d0a0dced1418c6443f13909a2968ba52e6d96dc16e988",
+        "W3sha256": "6f3b7f701be263cac59d0a0dced1418c6443f13909a2968ba52e6d96dc16e988",
+        "identical": true
+      }
+    },
+    "excludedUnrelatedComposition": [
+      "newer Trust/provider/audience host in integration.ts/app.ts",
+      "session refresh clock_timestamp change",
+      "additional package index namespaces",
+      "W5 Studio host; absent in W3 current tree"
+    ],
+    "exactHeldIssuerPreservedWithW3W4AllowanceExtensions": true
+  },
+  "recordingProposal": {
+    "sha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+    "unchanged": true,
+    "allocated": false,
+    "applied": false
+  },
+  "firstSigningPolicy": "actual prepared ConversationRecordings; requires fifth genuine creator ThreadScope/current session/human_active/exact processed evidence on held client; no fake scope or act consumption",
+  "sharedC11Operation": "W1 independently publishing under own generator/bootstrap ownership; not yet consumed",
+  "actualPrivateFanPublicationAuthority": false,
+  "actualSignedRecordingAcceptance": false,
+  "allClientAcceptance": false,
+  "mergeReady": false,
+  "logs": [
+    {
+      "path": "tmp/w3-runtime-20260930/increment21-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment21-source-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment21-source-format-check.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    }
+  ]
+}

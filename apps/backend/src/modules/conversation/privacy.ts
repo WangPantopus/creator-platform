@@ -3,10 +3,30 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import { invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
-import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
+import type { ConversationLineage } from "./lineage.js";
+import { generationJournalInstalled } from "../agent/generation-journal.js";
+import type { GenerationAccountingLifecycle } from "../agent/journal-privacy.js";
+import type {
+  GenerationCostPrivacyReconciliation,
+  GenerationPrivacyJob,
+} from "../commerce/generation-privacy.js";
+import { z } from "zod";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
+function financialJob(job: Job): GenerationPrivacyJob {
+  const leased = (value: Job): value is GenerationPrivacyJob =>
+    typeof value.leaseToken === "string" &&
+    z.uuid().safeParse(value.leaseToken).success;
+  invariant(
+    leased(job),
+    "privacy_lease_required",
+    "Financial deletion requires the actual current leased privacy job.",
+  );
+  // Preserve the actual job object. W4/W8 recheck its lease and family on the
+  // same client; a parsed token does not grant or replace lifecycle authority.
+  return job;
+}
 function authorLabel(kind: AuthorKind, name: string, member: string | null) {
   const fill = (value: string) =>
     value
@@ -64,7 +84,7 @@ export interface ConversationPrivacyRetention {
       reason: string;
     }[]
   >;
-  settleGeneration(
+  settleGeneration?(
     client: PoolClient,
     job: Job,
     family: ConversationPrivacyFamily,
@@ -77,12 +97,23 @@ export interface ConversationPrivacyRetention {
   ): Promise<void>;
 }
 
+/** W2's prepared lifecycle producer consumes W8's real family/job authority.
+ * This port never creates an interactive or provider-admission ThreadScope. */
+export type ConversationAccountingLifecycle = Pick<
+  GenerationAccountingLifecycle,
+  "exportMetadata" | "sealGeneration" | "purgeFamily"
+>;
+
 export function conversationPrivacyHook(input: {
   pool: Pool;
   authority: ConversationPrivacyAuthority;
   retention?: ConversationPrivacyRetention;
   lineage?: ConversationLineage;
   recordings?: ConversationRecordings;
+  accounting?: ConversationAccountingLifecycle;
+  /** Exact prepared W4 port; original-policy evidence precedes journal purge.
+   * Finite reviewed retention and expiry remain W8's separate responsibility. */
+  generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
 }): PrivacyHook {
   return {
     domain: "conversation",
@@ -115,12 +146,20 @@ export function conversationPrivacyHook(input: {
         "This data request needs a bounded conversation subjob.",
       );
       invariant(
-        job.kind !== "delete" || input.retention,
+        job.kind !== "delete" ||
+          (input.retention &&
+            (input.retention.settleGeneration ||
+              input.generationCostPrivacyReconciliation)),
         "conversation_retention_unavailable",
         "Conversation deletion needs the verified dispute-retention and allowance adapters.",
       );
       const client = await input.pool.connect();
       const data: unknown[] = [];
+      const accountingReceipts: Record<string, unknown>[] = [];
+      const financialDispositions: {
+        threadId: string;
+        financialDispositionReference: string;
+      }[] = [];
       const retained: {
         category: string;
         until: string | null;
@@ -128,6 +167,26 @@ export function conversationPrivacyHook(input: {
       }[] = [];
       try {
         await client.query("BEGIN");
+        const accountingInstalled = await generationJournalInstalled(client);
+        const weightedInstalled = (
+          await client.query<{ installed: boolean }>(
+            "SELECT EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('creator.commerce_allowance_reservation') AND attname='cost_policy_version' AND NOT attisdropped) AS installed",
+          )
+        ).rows[0]?.installed;
+        invariant(
+          !accountingInstalled || input.accounting,
+          "conversation_accounting_unavailable",
+          "This data request needs the prepared generation-accounting lifecycle adapter.",
+        );
+        invariant(
+          job.kind !== "delete" ||
+            !(weightedInstalled || input.generationCostPrivacyReconciliation) ||
+            (accountingInstalled &&
+              input.accounting &&
+              input.generationCostPrivacyReconciliation),
+          "conversation_financial_custody_unavailable",
+          "Weighted deletion requires the actual prepared generation journal and original-policy financial lifecycle.",
+        );
         for (const family of families) {
           invariant(
             (job.creatorId === null || job.creatorId === family.creatorId) &&
@@ -155,7 +214,7 @@ export function conversationPrivacyHook(input: {
           if (job.kind === "export") {
             const messages = (
               await client.query(
-                `SELECT id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt" FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence LIMIT 2001`,
+                `SELECT id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",author_account_id AS "authorAccountId",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt" FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence LIMIT 2001`,
                 pair,
               )
             ).rows;
@@ -224,6 +283,15 @@ export function conversationPrivacyHook(input: {
             );
             data.push({
               thread,
+              ...(input.accounting
+                ? {
+                    accounting: await input.accounting.exportMetadata(
+                      client,
+                      job,
+                      family,
+                    ),
+                  }
+                : {}),
               ...(input.lineage
                 ? {
                     lineage: await input.lineage.exportMetadata(client, family),
@@ -259,6 +327,7 @@ export function conversationPrivacyHook(input: {
               "bounded_subjob_required",
               "This export needs a smaller conversation subjob.",
             );
+            await input.authority.assertFamily(client, job, family);
             continue;
           }
           const keep = await input.retention!.retainedMessages(
@@ -324,17 +393,64 @@ export function conversationPrivacyHook(input: {
               grantId: string;
               visible: boolean;
             }>(
-              `SELECT id,reservation_id AS "reservationId",grant_id AS "grantId",last_sequence>0 AS visible FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') FOR UPDATE`,
-              pair,
+              `SELECT id,reservation_id AS "reservationId",grant_id AS "grantId",last_sequence>0 AS visible FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::boolean OR state IN('queued','generating')) FOR UPDATE`,
+              [
+                ...pair,
+                accountingInstalled ||
+                  Boolean(input.generationCostPrivacyReconciliation),
+              ],
             )
           ).rows;
-          for (const generation of generations)
-            await input.retention!.settleGeneration(
+          for (const generation of generations) {
+            await input.accounting?.sealGeneration(
               client,
               job,
               family,
-              generation,
+              generation.id,
             );
+            if (input.generationCostPrivacyReconciliation)
+              await input.generationCostPrivacyReconciliation.settleGeneration(
+                client,
+                financialJob(job),
+                family,
+                generation,
+              );
+            else
+              await input.retention!.settleGeneration!(
+                client,
+                job,
+                family,
+                generation,
+              );
+          }
+          if (input.generationCostPrivacyReconciliation) {
+            const disposition =
+              await input.generationCostPrivacyReconciliation.disposition(
+                client,
+                financialJob(job),
+                family,
+              );
+            invariant(
+              /^[a-f0-9]{64}$/u.test(disposition.financialDispositionReference),
+              "financial_disposition_unavailable",
+              "Keep accounting custody until its actual original-policy disposition is complete.",
+            );
+            financialDispositions.push({
+              threadId: family.threadId,
+              financialDispositionReference:
+                disposition.financialDispositionReference,
+            });
+            await input.authority.assertFamily(client, job, family);
+          }
+          if (input.accounting) {
+            const accounting = await input.accounting.purgeFamily(
+              client,
+              job,
+              family,
+            );
+            accountingReceipts.push(accounting.receipt);
+            retained.push(...accounting.retained);
+          }
           // Tombstoned thread remains as the minimal family identifier. Denial is
           // already immediate through W8; content and replay payloads are purged.
           await client.query(
@@ -387,7 +503,7 @@ export function conversationPrivacyHook(input: {
               pair,
             );
           await client.query(
-            "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','takeover','handback','pause') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
+            "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','humanReply','team_reply','conversation_correction','takeover','handback','pause','control:human_active','control:ai_active','control:ai_paused') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
             [family.threadId],
           );
           for (const record of keep)
@@ -396,7 +512,20 @@ export function conversationPrivacyHook(input: {
               until: record.until,
               reason: record.reason,
             });
+          await input.authority.assertFamily(client, job, family);
         }
+        invariant(
+          Buffer.byteLength(
+            JSON.stringify({
+              accountingReceipts,
+              financialDispositions,
+              retained,
+            }),
+            "utf8",
+          ) <= 8_000_000,
+          "bounded_subjob_required",
+          "This receipt needs a smaller conversation subjob.",
+        );
         await client.query("COMMIT");
         return {
           receipt: {
@@ -405,6 +534,8 @@ export function conversationPrivacyHook(input: {
             jobId: job.jobId,
             idempotencyKey: job.idempotencyKey,
             processedThreads: families.length,
+            ...(accountingReceipts.length ? { accountingReceipts } : {}),
+            ...(financialDispositions.length ? { financialDispositions } : {}),
             completedAt: new Date().toISOString(),
           },
           ...(job.kind === "export" ? { data } : {}),

@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "d2ca5d1081441b8572b31f99bd033054499280e1",
+  "incomingMain": "0a9a9a74b063ca7ddbd43bbcee6585935ad62ecf",
+  "at": "2026-10-01T06:09:56.538119+00:00",
+  "logs": {
+    "backend-build": {
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "exitCode": 0
+    },
+    "web-build": {
+      "sha256": "357d224bddaa8fad1ddc5d6d090542498272f23d1029fb449f66c5a5a9e8b945",
+      "exitCode": 0
+    },
+    "lint": {
+      "sha256": "c6c4b725b7860cec20bca1c59d73a2bc21483bcdd227bf52f856967ca122f448",
+      "exitCode": 0
+    },
+    "format-check": {
+      "sha256": "8488f5b2421bda28ce47eddc32b8fee98def934f4f8d9133c2fcf83cdb53727d",
+      "exitCode": 0
+    },
+    "generate": {
+      "sha256": "ab4348cf7bdb30fe90b35b7029264abc9018ceb37e35de445d87c915b4d2de8e",
+      "exitCode": 0
+    },
+    "ios-build": {
+      "sha256": "bea84312754b87e2e1871755f66db9f10b23be7b8cae060136a55c82242df6ae",
+      "exitCode": 0
+    },
+    "ios-signature": {
+      "sha256": "797ad89bdd91393daf875d5313a6e7e7173d6f6453b7b0195e6a6f8ad0a4e14f",
+      "exitCode": 0
+    }
+  },
+  "nativeLaunched": false,
+  "iosBinarySHA256": "f9273b99619917c44081828cab28bb93fa71024a8a6375c51d8fba1fcc8585ad",
+  "androidAPKSHA256": "9eee87deb4c6d048c18964bd16ae2c42851ed1dfd1ba86fec651a7719d16274b",
+  "androidBuildSource": "e38e275d7b7493d7872b5fe343b871182c71a82f",
+  "androidShippingSourceUnchangedByPR1": true
+}

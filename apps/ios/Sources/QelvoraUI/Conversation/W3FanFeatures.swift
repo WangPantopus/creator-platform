@@ -26,6 +26,7 @@ private struct W3ConversationDestination: View {
 }
 
 private struct W3ThreadScreen: View {
+    let baseURL: URL
     @StateObject private var model: W3ThreadModel
     @ObservedObject var session: FanSession
     @State private var privacy = false
@@ -36,7 +37,7 @@ private struct W3ThreadScreen: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
-        _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out")); self.session = session
+        self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out")); self.session = session
     }
     var body: some View {
         VStack(spacing: 0) {
@@ -112,6 +113,7 @@ private struct W3ThreadScreen: View {
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system { SystemLine(children: message.text) }
+        else if message.recording != nil { recordingRow(message, page: page) }
         else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
         }
@@ -146,7 +148,26 @@ private struct W3ThreadScreen: View {
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
             }
         }
+
     }
+    @ViewBuilder private func recordingRow(_ message: W3Message, page: W3Page) -> some View {
+        if let recording = message.recording {
+            if recording.state == "available", let asset = recording.asset,
+               message.threadId == page.threadId, asset.threadId == page.threadId,
+               asset.state == .ready, asset.mimeType == "audio/mp4", asset.purpose == .human_reply,
+               message.authorKind == .human_creator, let act = message.signedActId, asset.signedActId == act,
+               let accountId = session.session?.accountId {
+                W3RecordingView(baseURL: baseURL, accountId: accountId, creatorId: model.creatorId, fanId: model.fanId, asset: asset, name: page.creatorName, time: message.createdAt, active: scenePhase == .active && !privacy && source == nil && originalReply == nil, onVerify: { session.open("/verify/" + act) })
+                    .id(accountId + "/" + asset.id + "/" + String(asset.version) + "/" + asset.sha256)
+            } else {
+                Text(message.authorLabel(name: page.creatorName)).qText("label")
+                Text("This recording is unavailable for this conversation.").qText("caption")
+                if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
+            }
+        }
+        Button("Report", variant: .quiet) { session.open(reportDestination(message)) }
+    }
+
     private func reportDestination(_ message: W3Message) -> String {
         "/support?creatorId=" + model.creatorId + (message.authorKind == .ai ? "&messageId=" + message.id : "")
     }
@@ -263,7 +284,7 @@ private struct W3AccountScreen: View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
             Text("You").qText("title")
             if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
-            Text(account?.fan.handle ?? "Your account").qText("display-md")
+            Text(account.map { "@" + $0.fan.handle } ?? "Your account").qText("display-md")
             Text(account?.fan.intro ?? "Your intro is private until you choose to share it.").qText("body")
             Button("Handle and intro", variant: .quiet) { session.open("/identity/account") }
             Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce/requests") }
@@ -271,6 +292,7 @@ private struct W3AccountScreen: View {
             Button("Notifications", variant: .quiet, block: true) { session.open("/notifications/settings") }
             Text("Me and privacy").qText("display-md")
             Text("Memory and conversation access by creator").qText("body")
+            if let account, account.threads.isEmpty { Text("No conversations yet.").qText("body") }
             ForEach(account?.threads ?? []) { thread in Button(thread.name, variant: .quiet, block: true) { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) } }
             if loading { Text("Loading your conversations…").qText("caption") }
             if let next = account?.nextCursor { Button("More conversations", variant: .quiet, disabled: loading || !failure.isEmpty) { Task { await refresh(before: next) } } }

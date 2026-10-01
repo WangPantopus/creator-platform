@@ -1,0 +1,84 @@
+{
+  "workstream": "W3",
+  "increment": 18,
+  "predecessor": "37f727eb6ba3a72e4c0762d96fc5ea77c0a15f2c",
+  "producer": "3746829cee8911f62284576193ad6f157d7178c5",
+  "implementation": "personal source review and immutable producer consumption; no delegation or new test code",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "sha256": "669a9d73446a6ec932dcf70a3bf257a6f07b7033cee56ea88fcfe5ac7d27eb61",
+      "gitBlob": "69c0bab2d58b7b6072feafa05818cec373b4f1da",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "sha256": "d693befce3bbfe6fb5fa9077acf238f16d22b41e5604a82be0deb96378bfbca9",
+      "gitBlob": "5bd4c59cf7e49cfc24a7fa39b36e87e80540289e",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "sha256": "24e5eb660d23d181f13847734d4007851c36bd4ff74c8d1a064b748cb16c050b",
+      "gitBlob": "64dd0bf848d93a8476006418bf59092e6ac707a6",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "sha256": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d",
+      "gitBlob": "78cd4818880435280bc7a423c2d70e6871bd2b27",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "sha256": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5",
+      "gitBlob": "ff59877baf8efa3e8860306f33191fb37f438cbd",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "sha256": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd",
+      "gitBlob": "d2d25baeca0e28ef75761ae83d436e473f1be565",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "sha256": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a",
+      "gitBlob": "b738cc1e774f4e707edf6a8ddf0dc15a19d6c624",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "sha256": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6",
+      "gitBlob": "7a6aaab1c94409936f81029be9bc38c857c9e8f0",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "sha256": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9",
+      "gitBlob": "6219d6dc31003baea5642f94906452ed3982a664",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "sha256": "503a6e637f790491b060066cd9d5b0dd84d5e5b737d476c1f325204c4e87f8f6",
+      "gitBlob": "20941e4ee70f0987cf3573277d6a85800781af01",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "infra/migrations.json",
+      "sha256": "097d36d82ef4d2144072128d8b87e7bffe09d4951eae54f37c292c462884378c",
+      "gitBlob": "391c0afe45444045bd2c29d44fa670a575b0cf9a",
+      "producerByteIdentical": true
+    },
+    {
+      "path": "apps/backend/scripts/migrate-trust.ts",
+      "sha256": "7b8a3f9d8867ca5bf24ac69a8df479628ed17da9ed37d0349ee9689221cee7d3",
+      "gitBlob": "96b3a774520df8da3ada37d0a209f69b5b7fa68f",
+      "producerByteIdentical": true
+    }
+  ],
+  "retainedLiveMutated": false,
+  "reservedApplied": false,
+  "productE2EComplete": false
+}

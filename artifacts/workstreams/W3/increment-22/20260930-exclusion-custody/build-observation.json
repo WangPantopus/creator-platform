@@ -1,0 +1,10 @@
+{
+  "command": "pnpm --filter @qelvora/backend build",
+  "exitCode": 0,
+  "sourceSha256": {
+    "apps/backend/src/modules/conversation/memory.ts": "01af8e8c634e491bf3b2131e1a481bba553d3e802dba9463e05cc35aa28d2767",
+    "apps/backend/src/modules/conversation/generation.ts": "d526469e5159b1550fa35e4e08a6df815db30c6cfaa1e4c4a2c449887d28a4a0"
+  },
+  "sourceUnchangedDuringBuild": true,
+  "unitChecksRun": false
+}

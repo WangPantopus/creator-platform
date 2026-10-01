@@ -1,0 +1,92 @@
+{
+  "workstream": "W3",
+  "increment": 20,
+  "predecessor": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+  "implementation": "personal; no delegation/new tests/applied SQL edits",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/conversation/generation.ts",
+      "sha256": "6463c04186b186ae93c2fbcaf23e24ab6d008883b776a960f34b157b2ee4aad0",
+      "gitBlob": "d978267ab92c41c7845e6de449bf491e15ee318f"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/memory.ts",
+      "sha256": "c859b88ab56b65d19a89f4612ff263436b4422db9a11cf901179da117df0b530",
+      "gitBlob": "dd793d1f9b32387d2966be624baf954622da71b5"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "8c57f2f69057b44e27288e25c1a437f04fc41cde3aeb3a26b458efa84762a5a0",
+      "gitBlob": "c867c43caaeb6d1f359004c75f0883465b0f52b7"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256": "9d5fa50c20decef86a20c46cf12d5f99136602b83df1a5c166da8b1ba8f55d8f",
+      "gitBlob": "bc4baf90bdcf17ba236b1f4cb98100ac68a994d1"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256": "85130292b98ec2f05b883af8c04090f0d8af1b92ce7bd582e422d85e5469229b",
+      "gitBlob": "3fba83fb0a09abea75b619069ac341a5cf7088f2"
+    }
+  ],
+  "logs": [
+    {
+      "path": "tmp/w3-runtime-20260930/increment20-final-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment20-final-source-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment20-final-source-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment20-canonical-generation.log",
+      "sha256": "258152ae6d2a60ab6b765b2d726e5b04fcc6bcc6367c1320681a6f64d3b418b9"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment20-generated-check.log",
+      "sha256": "90de7138975851ef4c9b6bf1a563a3e03a7c28f6c3ceb0195935a2d4dfb3f399"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment19-ci-trust-failure.log",
+      "sha256": "94b0a9d278878de007957a40be8ba0746d6622a7bc8dd3a038a93ad9fe7b5c03"
+    },
+    {
+      "path": "tmp/w3-runtime-20260930/increment19-ci-foundation-job.log",
+      "sha256": "417ef65b1544ae2fbb78fa3947ee8bfeb6944fd3b12d027c71b84656e2ceb7f1"
+    }
+  ],
+  "CIRepair": {
+    "head": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+    "failedFoundationJob": 110192481726,
+    "failedTrustJob": 110192495942,
+    "cause": "Canonical generator automatically namespaces the W6 ProcessedMediaEvidenceSchema as MediaProcessedMediaEvidence; outputs were not regenerated in increment19",
+    "repair": "pnpm generate followed by unchanged pnpm generate:check; three output files only; no handwritten generated edits or assertion/workflow changes"
+  },
+  "memoryProducer": {
+    "actualExecution": true,
+    "heldClient": true,
+    "singleAtomicBatchMax": 5,
+    "exactFanMessageProvenance": true,
+    "leaseEpochControlConsentRevisionSequenceAndPhaseFence": true,
+    "extractionDeadlineBeforeAndAfterSQL": true,
+    "W2CurrentLicenseVersionAudienceCallback": "assertAuthority(actual held PoolClient); SQL-only locks, no provider I/O or new transaction"
+  },
+  "nativeDriverApproval": "pending; no interactive input or driver installation",
+  "allClientAcceptance": false,
+  "mergeReady": false,
+  "preservedUnstaged": [
+    {
+      "path": "apps/ios/Package.resolved",
+      "sha256": "9d2d4764e569259be9107b6d28d257f9cf0ffa0e2da0c9028d6277337cfb1318"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b"
+    }
+  ]
+}

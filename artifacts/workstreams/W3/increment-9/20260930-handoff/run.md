@@ -1,0 +1,21 @@
+# W3 increment 9 — history and browser recovery checkpoint
+
+2026-09-30, America/Los_Angeles. Personally implemented from b334ca6d23fc29c86bb83896128dc7a5896c42f5; no delegated implementation or new test code.
+
+Consumed W8's exact published da03bb764cd05d0f6ac7e19fcd012611226465c5 capability-hash correction: an absent pass is canonical null rather than undefined. This preserves strict canonical hashing and zero/no-grant authority, so a grant-free history projection no longer fails merely because no pass exists. No grant/units are manufactured; no shared schema or applied migration changes.
+
+The web connection retries after its first snapshot request fails, using the existing1–15s backoff and a single timer. Focus/visibility refresh current authority and reconnect a closed socket. Sending stays unavailable after a failed refresh or reconnect until a successful current snapshot restores it; browser-online and socket-open alone do not enable sending. Existing visible5s metadata polling and account/scope/cursor fencing remain. No actual unavailable-first-load/reconnect/takeover acceptance is claimed from static verification.
+
+Backend and web TypeScript, scoped ESLint, Prettier and git diff whitespace pass. Final production web build passes after the last changes. Logs: /private/tmp/creator-w3-increment9-backend-typecheck.log, web-typecheck-final.log, lint-final.log and web-build-final.log. Native source is unchanged since increment8's successful shipping builds and18 Swift checks. Previously recorded backend/Android cases are not rerun or claimed to cover new behavior.
+
+Hosted b334ca6 PR run36774945367 passes web-and-backend, android-foundation and android-runtime. web-visual and ios-foundation are queued at this observation; this is not an all-green final-head result. The superseded f350fd3 push/PR runs were canceled after the current replacement was pushed. Draft PR8 still targets codex/foundation-integrations-checkpoint; main2e337a1afdf6d8bba3974427588e0b34b6d42d36 lacks the combined foundation and remains unmerged.
+
+Browser evidence: normal canonical flow on localhost personally reached synthetic development selection and handle setup, but its submission returned to sign-in. Separate canonical HTTP-cookie-jar diagnostics persisted actor one's fan profile and passed account/cursor boundaries. On the alternate127.0.0.1 origin, the browser stops at Start sign-in from this app, while separate HTTP requests reach the development selector. Inspected headers have the expected host, HttpOnly/SameSite=lax cookie and5-minute expiry. Cross-port localhost cookie interference is a hypothesis, not a proven cause. Do not inject credentials or bypass current identity to disguise this discrepancy.
+
+The founder has no real creator/source material. I explained that a creator need not be a YouTuber and proposed a clearly fictional development demo. That demo is not implemented yet. The next owner should build it as explicitly synthetic local verification using canonical published producers; production authorization remains a later publication gate. A real creator profile is not needed merely to start development.
+
+Inspection also found Android presently consumes bounded HTTP replay on a300ms loop, with periodic snapshots, rather than a true websocket connection. Its root build/catalog/runtime checks passing do not establish C04 multiplexed Android acceptance or acceptable load. This is an explicit implementation backlog item for the next primary owner.
+
+Owned API was restarted from da0f19f for warm handoff with WEB_ORIGIN=http://127.0.0.1:3003. Public capabilities return200/providersnull/AI and first conversation unavailable; unsigned account401. Node listener snapshot83587(API)/9715(web), recheck before takeover. The saved [browser handoff state](browser-handoff-state.png) is1280x720 Light and shows the continuation blocker; no credentials or authenticated product success.
+
+Before the handoff documentation commit, implementation da0f19f PR run36777237703 passed web-and-backend and android-runtime; Android foundation/iOS/web visual remain queued. The final handoff-only tip will have separate CI results. [Readable blocker capture](browser-handoff-blocker.png) is a browser-native440x180 clip of the same current continuation state.

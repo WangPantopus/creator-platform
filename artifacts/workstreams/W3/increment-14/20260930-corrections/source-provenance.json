@@ -1,0 +1,218 @@
+{
+  "predecessor": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
+  "scope": "Increment14 personally implemented consumers and inspected immutable producers; pending SQL/unconfigured authority are not product acceptance",
+  "producers": [
+    {
+      "commit": "4a1262357eb12281cdf030ead7974d580c964ff2",
+      "owner": "W1",
+      "consumption": "Held-client scope issuer and narrow configured-host registration fragments; prior W4 output hooks retained"
+    },
+    {
+      "commit": "a010a030378a0c62a44d6c14e714cc397722e702",
+      "owner": "W2",
+      "consumption": "Usage core budget/model/provider-usage/runtime/service and immutable0048 SQL"
+    },
+    {
+      "commit": "de038f460f967f877c42ae4f5274f359afe8f572",
+      "owner": "W2",
+      "consumption": "Exact generation-journal.ts, repository.ts, journal-privacy.ts"
+    },
+    {
+      "commit": "d0d843b3c16b2d9bbc5b5aac3a19baab95c9bb59",
+      "owner": "W4",
+      "consumption": "Exact access/commerce.ts, attributed-cost-policy.ts, immutable0049 SQL"
+    },
+    {
+      "commit": "feba6e6169e388094e4553e48c155cce5b4c450b",
+      "owner": "W4",
+      "consumption": "Exact generation-allowance.ts and additive read-only AccessService identity getter"
+    },
+    {
+      "commit": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74",
+      "owner": "W8",
+      "consumption": "Exact trust/contracts.ts and privacy-export.ts type/stream dependency only"
+    }
+  ],
+  "files": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+      "gitBlob": "68b8e3ac6107c1f4886e9619407cd7ef67ada995",
+      "sha256": "c5fd8c52114d955ec2baa3dc83174a7fe1051511c8f0b3d6627c71950f645f78"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "gitBlob": "5aab89562f1ac8b4cf71c9d66e3f4f731bc32503",
+      "sha256": "5960ba7f3eda3419751ffaf34ff09a49d6ea7e21b0317e3cc59b0866a48e646e"
+    },
+    {
+      "path": "apps/backend/src/db/database.ts",
+      "gitBlob": "dbeaf232d271ef540ab8a98ff1ac4aa971fd63c7",
+      "sha256": "76b566f2d02ed15105e213714ca24f262c7027476749657343e10d120af35889"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "gitBlob": "a9cc024ce1b7a0d07cfcfdc06dbaaec69c7f4e13",
+      "sha256": "413390c4c2919b3acf093a29fc0cbcdc2fb7e3d4cea4f1f706e70ccd960c2880"
+    },
+    {
+      "path": "apps/backend/src/modules/access/commerce.ts",
+      "gitBlob": "3c480f693ee1932da589222594406a77d3d476d9",
+      "sha256": "f0497762e946ec62473b4319b42bf1a1ca01c51f52b155fe0c505072f96766d8"
+    },
+    {
+      "path": "apps/backend/src/modules/access/scope.ts",
+      "gitBlob": "8d359a4d20e66b4a309b82e0603984171c8a2e7f",
+      "sha256": "0a8454637082c742d9edf7c0afc819f22d880bf0838207877b500b69a66a9fe0"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/budget.ts",
+      "gitBlob": "a9c94ed75172c3f9c9858f72e4f07d6a21b13d37",
+      "sha256": "e009fd5038a1d58cfde3a537a57c27e14b4fb70a458ea129aae2dcb7ef562640"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-journal.ts",
+      "gitBlob": "f39fb7bc9c8fa5c199e472d4cf03d0313cce9adb",
+      "sha256": "f8ce4d2998a1f28d8eedb14a75545e0a611a75bca105cc7867ed7530085e3592"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/journal-privacy.ts",
+      "gitBlob": "b46945ca10d4afe17e6a81b378994a3e8cd76672",
+      "sha256": "d91a258af410131a20b54c1c878e02b571e94a678d224fc9c15bb97776789e34"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "gitBlob": "84c3afa8995d48b1047f6ec0d848cf919835e5cc",
+      "sha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/model.ts",
+      "gitBlob": "8ff9f65bd7b3367f53fec946ca3de8a3e1b60b99",
+      "sha256": "4c2d2557629f768a9369ec949bbddcafa1b811dc3ac0601e50ff14d04aa7f507"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/provider-usage.ts",
+      "gitBlob": "4f7e6650509b63015eae5ff0eab59c3cf103db39",
+      "sha256": "ee17161e1eb73942575d49953579a2667993cd7b346bbaefe68a8e41ac830004"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/repository.ts",
+      "gitBlob": "04cf2ab70fa4db64be54b010ea8d4c36fa550bd8",
+      "sha256": "cb7666b8c70b2ba93c4178de5143a1de2a485abbe017dc6d58dad9d4e64b27d5"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "gitBlob": "40e3a7e5699b6cb883b9f4a7049425966dde34d2",
+      "sha256": "b1eb1042fd1ffbcf7559773d3b2fba1b3faab7010a867612e9a89e027f6b42d2"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/service.ts",
+      "gitBlob": "abdd43ccd4c2f4e5c9d7c81ae9621ce697bee62e",
+      "sha256": "3e850786c7e9d2efb48032ae9c2647db21a0e7f033206d3f478e8864316495cc"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/attributed-cost-policy.ts",
+      "gitBlob": "b96ddd4af1fb5711e4dd8ce8d5b5667391543e58",
+      "sha256": "b6cd9d2b0fd1a3d3dfd974300b247ea5c52c139ce7e2e5a1bb172c6fcabcf5d1"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-allowance.ts",
+      "gitBlob": "c22112fa8cc31531da822705aecf7f733ebf5f6d",
+      "sha256": "246f22548812f55c5e56a754cabc14e4b5f5a268c1d17b83d25c0f9947b691f5"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
+      "gitBlob": "78e0cca5c25fbcfde7e5a5c30c57f85e41b88bcf",
+      "sha256": "60ab295d660d4dc6192d811bd8a97c657433dea25d6a0f0759e03cf751505155"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/approved-generator.ts",
+      "gitBlob": "ae1d7d9e4ec321b4b438db2256db8f0806fed4eb",
+      "sha256": "6b4f1c83fc7496d2ed63273b31570d2df9d699d292f4243a3f6204c3d8b425d7"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/corrections.ts",
+      "gitBlob": "7afa6dbe7b20d3d787942632c65daeb1921b7472",
+      "sha256": "8010b7877a697bad53f0f9a1216f2140f3885f3a546185cb076f7bca966b27a8"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "gitBlob": "27cd197a83ca5c1c12b010d5d392617420b2e8cf",
+      "sha256": "cebad9d728bcb0ddd2466f87ab80d5af88029f1fb4e38a48bbe12e93d493d40d"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/generation.ts",
+      "gitBlob": "402b814e700093642b338e51ef7ca12e37042d59",
+      "sha256": "b725a3cbc94ba322e1f635a16a7851de0a5e29119601ae255607f2868e2909fb"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/lineage.ts",
+      "gitBlob": "ee0d2d026ef728126a081fc3d21a901c0b61cd98",
+      "sha256": "debe2ecac831777592b9ef61902ab529a86f518cd0e1b36bf3d5b1d78562cbd8"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "gitBlob": "b09d746e3b16d2e2b48fa526467af77eac90c38e",
+      "sha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/privacy.ts",
+      "gitBlob": "55d05e63b7e798b77d264fde3f67db3baa8d2b9b",
+      "sha256": "6c1054e5a307953a4a7ad9f8d204974c0aa49c14cb9922f974261821bafdd0f6"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "gitBlob": "d3a7dc3182d3d116685092eae5ea57c8069b0d29",
+      "sha256": "255f90c85e7fba5b67019428e4698c2e94d2924d0d416aef3874ef87c6d59da4"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "gitBlob": "3c1c6ba9384d18cb9d72ee663a99603c83518235",
+      "sha256": "c6f97ee294c40a281dc08a13d60b55c6e905ba4a63007efd21dad602d1ef5ecc"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/contracts.ts",
+      "gitBlob": "2d0b3ab7bb39c35b476f8aa8a01d9c7db97ea33b",
+      "sha256": "9f304627ab8a6756aba2a5b7a9fa1d0573475f02a4a7a1e3adfd8c544bb22c5e"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-export.ts",
+      "gitBlob": "65e83dab4ead9d2114b59b5eb1129ae82acf4994",
+      "sha256": "8785cbcd498057e6a7924ab4c8b2dfff654ecf2b5ded96d85b775a2b1622b433"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+      "gitBlob": "889c943959e448b9ce8746f594a713648760cf91",
+      "sha256": "9bdcc72b42e36576b3efa81eb6b42516452128f7cbdd28da188fbdb912fad99d"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "gitBlob": "29ff50b7cbf954f318d6eb7bdd3d564837f34879",
+      "sha256": "380c0bc4285c3b2f06b85e9270fe722774fb09f418c9f1077c0ef982f57a7d94"
+    },
+    {
+      "path": "apps/web/app/api/conversations/[...path]/route.ts",
+      "gitBlob": "e8644fb5cbede12e38f4b184713414fcff4244f5",
+      "sha256": "445e8900216fd1f5870b8284eb62ad8c4a00063b3d2591079b3e028268028e6c"
+    },
+    {
+      "path": "apps/web/app/threads/[creatorId]/[fanId]/messages/[messageId]/page.tsx",
+      "gitBlob": "583033ad9ef445d1d05065d269fe404f2f8c8792",
+      "sha256": "7721ef3653b0a73e91225e834933bd93847af7373c2920f5cab332c634efaa8a"
+    },
+    {
+      "path": "apps/web/features/conversation/AccountScreen.tsx",
+      "gitBlob": "f7c6b57bc03bd85495580d7425fcdb47507271a0",
+      "sha256": "2afd0fa7dc94648c2fddb76e5a938f1c4ae378fbc6b634d68f95a78cc37887d4"
+    },
+    {
+      "path": "apps/web/features/conversation/ConversationScreen.tsx",
+      "gitBlob": "ece44eb5d1f2aa6536279ca0e3826dc5ee977a7c",
+      "sha256": "c145c12ae0d38a2c3f6b889987dde1ceeb4945a8f2e5c2847172d447b002fcbc"
+    },
+    {
+      "path": "packages/api/src/conversation/contracts.ts",
+      "gitBlob": "d49a2ce6d11c6457d2c68fb1840a4f7bb5ad156c",
+      "sha256": "99029c7f9b33d92b96a3fbc2e75d515a6ce47bdf27ceb85928669a379f0c2756"
+    }
+  ]
+}
