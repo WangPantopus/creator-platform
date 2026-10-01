@@ -311,7 +311,7 @@
     "ios-time-history-denied-night.png": "3a167e7ee0a360abc4b3fbc86f24a0e89dbc0ed7f0169f415b22dc6933d4531b",
     "ios-time-history-signature.log": "5618bd9bd1012edb0b7ff77e1555240c9d914841a6da6bd82ee2d30db309842b",
     "operated-observations.json": "c3d3cc9daa1f248e211a009b28767c8a8d404f52efa6fc035c14cf9d14249712",
-    "run.md": "4173768124608ec718b222f2ab3bc6c580a117c802ebcc193468e6e74392390b",
+    "run.md": "d563df9d2d4583279e8586739b9b9a43ee6767e9c6116096dce3c8e0ca117eed",
     "web-current-denied-light.png": "528a26246f86b2cad17b50a75371f8969373e05583df6018a1926408f54e1ed5",
     "web-current-main-denied-light.png": "528a26246f86b2cad17b50a75371f8969373e05583df6018a1926408f54e1ed5",
     "web-current-main-denied-night.png": "f73c7137c79fce2c872ac38bd33713c03b29eaf0afc64e35a95b42e2580ba855",
@@ -335,7 +335,12 @@
     "web-time-history-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "web-time-history-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "web-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "web-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "web-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ci-438ab04-push-android-runtime.log": "321b86925a9ef060a715e2fc00a11c0ca330d571f8710abf580093c15dc3419e",
+    "ci-438ab04-pr-web-backend.log": "e18072a8fc3f43a0ac35aee4abf956046803b73534c06c7eb93b86bae8a411c8",
+    "ci-438ab04-push-web-backend.log": "29ff63d9e4547ba02371f6a4ee6c0a74e736460b0d765a92b40712843b1577b4",
+    "ci-438ab04-pr-android-runtime.log": "1d4155d8e7d4ec131fb0417722caf99560ac1fcb58f1fcc4c5d886fff3606350",
+    "ci-checkpoint-438ab04.json": "8cad3007010a4e3184c969f65abff2cf4e07d82f7da81a90810bb39dbff726f8"
   },
   "subsequentBillingIntegration": {
     "currentMain": "3de0f14ba82139c9d694ddd3cd676216103a036c",
@@ -366,5 +371,24 @@
     "sha256": "b92b011fe6cbcd2da770737c68054e500632be7e75b876b388d1ba87c5309a15",
     "transientSyntheticSessionRowsRetained": false,
     "heavyRuntimeRestarted": false
+  },
+  "latestW2SourceIntegration": {
+    "main": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+    "normalMerge": "b6fed34d18b8db547073083e8c131cf1bc572e19",
+    "reviewed": "PR38 actual six-line W2 transcript CSS diff and recovery/cleanup receipts",
+    "incomingW3RuntimeAPIAndNativeDiff": "zero",
+    "allSevenW3SourceHashesUnchanged": true,
+    "postIntegrationLocalBuildOrOperation": false,
+    "hostedCI": "New published head must be assessed independently; reviewed 438ab04 checkpoint is retained in ci-checkpoint-438ab04.json."
+  },
+  "confirmedCleanupPriority": {
+    "origin": "Direct human cleanup instruction quoted by W5 and confirmed in its completed report",
+    "heavyLocalRuntimeOrBuildMayResume": false,
+    "W3OriginalPrivateExport": {
+      "bytes": 55281,
+      "sha256": "b92b011fe6cbcd2da770737c68054e500632be7e75b876b388d1ba87c5309a15"
+    },
+    "restoredW3Volume": "removed by cleanup coordinator; later synthetic sessions not retained",
+    "currentW3AuthoredSourceLossClaimed": false
   }
 }
