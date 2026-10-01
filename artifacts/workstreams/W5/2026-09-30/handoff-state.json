@@ -123,9 +123,9 @@
   ],
   "snapshotKind": "Historical transfer snapshot; currentContinuation supersedes runtime, PR and browser fields",
   "currentContinuation": {
-    "recordedAt": "2026-10-01T03:06:41.861363+00:00",
+    "recordedAt": "2026-10-01T03:10:11.539826+00:00",
     "branch": "codex/w5-studio-content",
-    "lastPushedCheckpoint": "e0995381cf3621d1bf862732d95e4029ef6b0f92 application checkpoint; documentation follows, inspect HEAD",
+    "lastPushedCheckpoint": "e099538 final served-file consumer + e10a55b docs; required-nullable Swift followup accompanies this file, inspect actualHEAD",
     "PR": "https://github.com/WangPantopus/creator-platform/pull/9",
     "PRState": "draft; incomplete; not merged",
     "runtime": {
@@ -210,12 +210,12 @@
       "jdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/jdk-x64/jdk-21.0.12.1+1/Contents/Home",
       "sdkReadonlyLease": "/tmp/qelvora-w6-native-recovery-20260930/sdk",
       "androidBuild": "Final file-proof corrected assembleDebug PASS280s; APK7cb4a2aaa07b2a99769376c94a1199ea3cad646bfda45b6b4e3cdda15b8f92c7 installed ownAPI35. LightcoldStatusok19897ms, Nighttimeout26354ms +actualSystemUIANR. Not runtime acceptance.",
-      "iosBuild": "Final corrected final-file proof shipping build PASS; actual normal FanAppShell correct/content destination bothLight/Night genuineSignInonly; no authenticatedcontent/bytes.",
+      "iosBuild": "Required-nullable asset/provenance duration decoding shipping rebuild PASS. Earlier e099538 normalRoot/content boththemes genuineSignInonly; no authenticatedmediaoperation of newdecoder.",
       "ownCachesPreserved": true,
       "iosOwned": "/private/tmp/creator-w5-native-audience-host",
       "iosSimulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27 gracefully shutdown aftercaptures/data preserved; peerdevices untouched",
       "xcodegenReadonlyLease": "/private/tmp/creator-w1-continuation-tools-20260930/xcodegen/bin/xcodegen",
-      "runtimeEmulatorLease": "Verified readonly W6 emulator37.1.11/API35image/platformtools; ownoverlay runtime-sdk/AVDhomes/TMP/ADB5045/emulator5590/netsim5. OwnAPI35 emulator gracefully stopped/data preserved afterANR. W6 officialAPI34 provision pending; do notwritepeerSDK."
+      "runtimeEmulatorLease": "Verified readonly W6 emulator37.1.11/API35+officialAPI34r14 images/platformtools. OwnAPI35stopped/data preserved afterANR. New ownCreatorPlatform_W5_API34 created0; bootpending session8041/ADB5045/emulator5590/netsim5/TMP runtime-api34-tmp. NopeerSDKwrite."
     },
     "corrections": "Personal strict3cda401 command/input/UI/BFF; exact source version/current account, bounded expiry, original retry, real five-field receipt plus full delivered metadata readback. Original directory empty; genuine UV held; producer/migration/unallocated lineage and audited timeline metadata integration still required. Pending reload recovery unverified.; exact16162 contracts consumed, newest100 query only; genuine lineage port/current missing message columns await W3/W8; actual correction label/exact original-version opener prepared.",
     "hostedCI": "Inspected parent3fa1 PR9 fiveSUCCESS/sixQUEUED; newly pushed e099 currentrequiredjobs must be inspected. xcode-27 validhostedpreview, queuecause/ETAunverified; no workflowchange/no PRmerge/noallgreenE2Eclaim.",

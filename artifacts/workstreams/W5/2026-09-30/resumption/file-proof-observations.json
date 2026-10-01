@@ -1,6 +1,6 @@
 {
-  "recordedAt": "2026-10-01T03:03:43.926250+00:00",
-  "sourceParent": "3fa1d4789666305118383cb28941b43502dcda11",
+  "recordedAt": "2026-10-01T03:10:11.537220+00:00",
+  "sourceParent": "e10a55ba5ff5369b89f834c93d36fee8ef8e0f73",
   "sourceSha256": {
     "packages/api/src/media.ts": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
     "packages/api/generated/openapi.json": "476295b7c9d2fa162b8778b4d6b5fbf43032e2c51a5d373164fdfe593eaa1639",
@@ -10,7 +10,7 @@
     "apps/web/features/content/MediaAttachments.tsx": "9bd92b0e886a8493e7e9a1dfec35eb3a5cc7a8d05a5c00e8f00d86ff54342b44",
     "apps/web/features/studio/Studio.tsx": "567d31614128b4b9a2107d0f885dc347039377667fa8474ad182f901feccebac",
     "apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift": "2b416fa7cffae899b4baaa1ffbc2b82bab04e7633fb8aeedcc4dc7fddcea7a22",
-    "apps/ios/Sources/QelvoraUI/Content/ContentAttachments.swift": "d459d237e89ac651e30f64e821cab6fdd16ce5289cf501c5053f1f33bbf5535d",
+    "apps/ios/Sources/QelvoraUI/Content/ContentAttachments.swift": "165cb565b42a12bac2b9b10b3b3c677498a7da365c13544b86a3cdf7bec64cdc",
     "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentFeature.kt": "e9e23940ccdea0f2492fc9240568ce6d92accfba19d4f856111f8b351e9e360f",
     "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentAttachments.kt": "f588d9aae30809f7b276538ea2ee6fc2995d7a0da11d6b2d65427b410d6d8bb4"
   },
@@ -19,7 +19,8 @@
     "apiMediaFileIdentical": true,
     "consumption": "Only exact PlaybackFile/mandatory ticket contract; no whole producer graph, storage, worker, root assembly or migrations imported",
     "proof": "Actual served-file variant/SHA256/byte-count is distinct from immutable processed signing tuple; audience consumers require credentialed proof and genuine coherent provenance",
-    "mountedLocally": false
+    "mountedLocally": false,
+    "compatibilityReview": "W6 personally reviewed e099538 Swift/Kotlin range/hash/currentviewer/lifecycle against682 contract and found compatible. Required-nullable Swift key omission finding repaired separately; owner re-review pending."
   },
   "generated": {
     "operations": 78,
@@ -35,7 +36,7 @@
   },
   "ios": {
     "buildExitCode": 0,
-    "buildLog": "/private/tmp/creator-w5-native-audience-host/build-file-proof-corrected.log",
+    "buildLog": "/private/tmp/creator-w5-native-audience-host/build-required-nullable.log",
     "host": "actual shipping FanAppShell normal root; no replacement test harness",
     "simulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
     "device": "iPhone17 / iOS26.5",
@@ -54,7 +55,9 @@
       "native-fan-final-file-night.png"
     ],
     "authenticatedContentOrBytesVerified": false,
-    "resourceDisposition": "Own simulator gracefully shutdown after captures; data preserved. Actual own launchctl identified mediaanalysisdPID7373 consuming343.6% CPU; no W5 lingering native compiler found."
+    "resourceDisposition": "Own simulator gracefully shutdown after captures; data preserved. Actual own launchctl identified mediaanalysisdPID7373 consuming343.6% CPU; no W5 lingering native compiler found.",
+    "requiredNullableRepair": "Explicit keyed Decodable requires presence of durationMs, processedMediaDurationMs, signedActId and provenance while accepting canonical JSON null. Synthesized optional decoding previously allowed missing photo duration keys; repaired after W6 review. Final shipping rebuild passed0; generated dependencies restored after build.",
+    "launchSource": "e099538 before required-nullable decoder repair; the repair is rebuilt, not operated authenticated media"
   },
   "android": {
     "buildExitCode": 0,
@@ -85,7 +88,19 @@
     "runtimeAcceptance": false,
     "authenticatedContentOrBytesVerified": false,
     "environment": "Own SDK overlay of verified readonly W6 emulator/image/platformtools; own AVD/userdata/tmp/ADB5045/5590/netsim5. NETSIM_INSTANCE5 retry still reports CPU hangs and netsim gRPC/Wifi fallback; SystemUI ANR retained, no dismissal/input workaround.",
-    "resourceDisposition": "Own API35 emulator gracefully stopped after failed capture; AVD/userdata preserved. W6 is provisioning officialAPI34 CI-profile image; no W5 SDK download/writes."
+    "resourceDisposition": "Own API35 emulator gracefully stopped after failed capture; AVD/userdata preserved. W6 is provisioning officialAPI34 CI-profile image; no W5 SDK download/writes.",
+    "api34Recovery": {
+      "image": "Official Google APIsAPI34x86_64r14; W6 vendor installcompleted0; readonly lease verified",
+      "packageXmlSha256": "214f88f2639afd1c1d4fca11acd22a6bea9881dc0325e1699c6c458e662740f8",
+      "sourcePropertiesSha256": "bd7597e0dfa855335194fbafaf63bde93aa86bc3b56cea73cd54635715e77abc",
+      "kernelRanchuSha256": "b1e5cd842220175a4c07be9a2bcf5beb7b336794b00cf9b7b53abf35557b24df",
+      "ownedAVD": "CreatorPlatform_W5_API34",
+      "avdCreateExitCode": 0,
+      "ownEmulatorSession": 8041,
+      "state": "Boot pending; no runtime acceptance claimed",
+      "ownTemporaryDirectory": "/private/tmp/creator-w5-native-authority/runtime-api34-tmp",
+      "peerSDKChanges": false
+    }
   },
   "failedObservationsPreserved": {
     "invalidDestination": "Earlier web-like /creators/{id}/posts/{id} launch is not registered native route. Old captures renamed invalid-destination; no acceptance inferred",

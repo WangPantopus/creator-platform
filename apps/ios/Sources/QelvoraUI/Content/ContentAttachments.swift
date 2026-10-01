@@ -25,12 +25,55 @@ private struct ContentAudienceAsset: Decodable, Sendable {
         let processedMediaBytes: Int; let processedMediaMimeType: String
         let processedMediaDurationMs: Int?
         let fileVariant: String; let fileSha256: String; let fileBytes: Int
+        private enum CodingKeys: String, CodingKey {
+            case c2paVerified, assetId, assetVersion, creatorId, objectId, accountId, signedActId
+            case processedMediaSha256, processedMediaBytes, processedMediaMimeType, processedMediaDurationMs
+            case fileVariant, fileSha256, fileBytes
+        }
+        init(from decoder: Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            c2paVerified = try values.decode(Bool.self, forKey: .c2paVerified)
+            assetId = try values.decode(String.self, forKey: .assetId)
+            assetVersion = try values.decode(Int.self, forKey: .assetVersion)
+            creatorId = try values.decode(String.self, forKey: .creatorId)
+            objectId = try values.decode(String.self, forKey: .objectId)
+            accountId = try values.decode(String.self, forKey: .accountId)
+            signedActId = try values.decode(String.self, forKey: .signedActId)
+            processedMediaSha256 = try values.decode(String.self, forKey: .processedMediaSha256)
+            processedMediaBytes = try values.decode(Int.self, forKey: .processedMediaBytes)
+            processedMediaMimeType = try values.decode(String.self, forKey: .processedMediaMimeType)
+            // This key is required even when its actual value is JSON null.
+            processedMediaDurationMs = try values.decode(Int?.self, forKey: .processedMediaDurationMs)
+            fileVariant = try values.decode(String.self, forKey: .fileVariant)
+            fileSha256 = try values.decode(String.self, forKey: .fileSha256)
+            fileBytes = try values.decode(Int.self, forKey: .fileBytes)
+        }
     }
     let id: String; let creatorId: String; let objectId: String
     let purpose: String; let state: String; let version: Int
     let sha256: String; let mimeType: String; let bytes: Int
     let ownerAccountId: String; let signedActId: String?
     let durationMs: Int?; let provenance: Provenance?
+    private enum CodingKeys: String, CodingKey {
+        case id, creatorId, objectId, purpose, state, version, sha256, mimeType, bytes
+        case ownerAccountId, signedActId, durationMs, provenance
+    }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        creatorId = try values.decode(String.self, forKey: .creatorId)
+        objectId = try values.decode(String.self, forKey: .objectId)
+        purpose = try values.decode(String.self, forKey: .purpose)
+        state = try values.decode(String.self, forKey: .state)
+        version = try values.decode(Int.self, forKey: .version)
+        sha256 = try values.decode(String.self, forKey: .sha256)
+        mimeType = try values.decode(String.self, forKey: .mimeType)
+        bytes = try values.decode(Int.self, forKey: .bytes)
+        ownerAccountId = try values.decode(String.self, forKey: .ownerAccountId)
+        signedActId = try values.decode(String?.self, forKey: .signedActId)
+        durationMs = try values.decode(Int?.self, forKey: .durationMs)
+        provenance = try values.decode(Provenance?.self, forKey: .provenance)
+    }
 }
 private struct ContentPlaybackTicket: Decodable, Sendable {
     let asset: ContentAudienceAsset; let url: String; let expiresAt: String
