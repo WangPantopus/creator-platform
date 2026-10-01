@@ -1,0 +1,62 @@
+- link "Skip to case content":
+  - /url: "#ops-main"
+- main:
+  - link "Back to cases":
+    - /url: /ops
+  - heading "Trust service metrics" [level=1]
+  - paragraph: Supervisor snapshot of the current process and worker. Message, generation, payment, call, voice and notification collectors must be connected before their reliability or cost can be assessed.
+  - heading "Runtime" [level=2]
+  - paragraph: local-development · 3685c0acacb45b8acabf8d0ef097deca592b1026
+  - paragraph: Started 9/30/2026, 7:08:24 PM · uptime 203 seconds
+  - paragraph: Resident memory 150.8 MiB · heap used 39.6 MiB
+  - paragraph: "Event loop lag: p95 21.8 ms · p99 23.7 ms"
+  - heading "Runtime and transport signals" [level=2]
+  - paragraph: "realtime connections active: 0.00"
+  - paragraph: "realtime subscriptions pending: 0.00"
+  - paragraph: "realtime subscriptions active: 0.00"
+  - paragraph: "privacy queue count: 0.00"
+  - paragraph: "privacy queue age seconds: 0.00"
+  - paragraph: "privacy blocked count: 11.00"
+  - paragraph: "dead letter count: 0.00"
+  - paragraph: "effect blocked count: 0.00"
+  - paragraph: "effect queue age seconds: 0.00"
+  - paragraph: "safety urgent case age seconds: 0.00"
+  - paragraph: "worker pool waiting: 0.00"
+  - paragraph: "worker pool total: 2.00"
+  - paragraph: "realtime connections opened: 1.00"
+  - paragraph: "realtime subscriptions accepted: 1.00"
+  - paragraph: "realtime batches completed: 1397.00"
+  - paragraph: "realtime batches refused: 1.00"
+  - paragraph: "realtime connections closed: 1.00"
+  - heading "Transport timing" [level=2]
+  - paragraph: Replay time measures server work. Send time ends at the transport callback; client display and settlement require separate receipts.
+  - paragraph: realtime_batch_ms · 1398 samples · mean 85.2 ms
+  - heading "HTTP requests" [level=2]
+  - paragraph: Cumulative counts since this process started. Durations include request handling; these are not provider or visible-sentence latency measurements.
+  - paragraph: GET:/v1/trust/session:2xx · 69 requests · mean 6.0 ms
+  - paragraph: GET:/v1/conversations/:creatorId/:fanId:2xx · 33 requests · mean 127.2 ms
+  - paragraph: POST:/v1/conversations/realtime-ticket:2xx · 1 requests · mean 128.2 ms
+  - paragraph: POST:/v1/conversations/:creatorId/:fanId/presence:2xx · 8 requests · mean 170.6 ms
+  - paragraph: GET:/health/live:2xx · 1 requests · mean 0.9 ms
+  - paragraph: GET:/health/ready:5xx · 1 requests · mean 12.3 ms
+  - paragraph: POST:/v1/trust/dev/session:2xx · 1 requests · mean 1.5 ms
+  - paragraph: POST:/v1/identity/logout:2xx · 1 requests · mean 19.3 ms
+  - paragraph: GET:/v1/trust/capabilities:2xx · 6 requests · mean 0.6 ms
+  - paragraph: GET:/v1/trust/cases/:id:4xx · 2 requests · mean 24.5 ms
+  - paragraph: GET:/v1/trust/privacy/jobs:2xx · 1 requests · mean 24.7 ms
+  - paragraph: GET:/v1/conversations/:creatorId/:fanId:4xx · 7 requests · mean 1.1 ms
+  - paragraph: POST:/v1/conversations/:creatorId/:fanId/presence:4xx · 1 requests · mean 2.3 ms
+  - paragraph: GET:/v1/trust/operations/metrics:2xx · 1 requests · mean 26.7 ms
+  - button "Refresh snapshot"
+  - paragraph: Synthetic local accounts · no provider or production identity
+  - generic: Switch to local actor
+  - combobox "Switch to local actor":
+    - option "Fan · @kilnfire"
+    - option "A different fan"
+    - option "Creator · Maya"
+    - option "Ops · supervisor" [selected]
+    - option "Ops · independent reviewer"
+    - option "Ops · verification only"
+  - button "Use local actor"
+  - button "Sign out"
+- alert

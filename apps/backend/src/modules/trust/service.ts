@@ -12,7 +12,12 @@ import {
   type DecisionCommand,
   type PrivacyCommand,
   type QueueName,
+  type PrivacyDomain,
 } from "./contracts.js";
+import {
+  PrivacyArtifact,
+  type PrivacyArtifactStore,
+} from "./privacy-export.js";
 
 type CaseRow = CaseSummary & {
   reporter_account_id: string;
@@ -56,6 +61,9 @@ const effectTypes: Partial<Record<DecisionCommand["resolution"], string>> = {
 };
 export type TrustDependencies = {
   privacyVerificationMethod?: "current_session" | "external_receipt";
+  verifyExport?: (
+    actor: Actor,
+  ) => Promise<{ verifiedAt: Date; reference: string }>;
   evidence?: (
     actor: Actor,
     input: ReportCommand,
@@ -83,6 +91,7 @@ export class TrustService {
   constructor(
     readonly store: TrustStore,
     readonly dependencies: TrustDependencies = {},
+    readonly artifacts?: PrivacyArtifactStore,
   ) {}
   private async capturePrivacyOwnership(actor: Actor) {
     if (!this.dependencies.privacyOwnership) return null;
@@ -930,6 +939,7 @@ export class TrustService {
         job.creator_id ?? undefined,
         job.thread_id ?? undefined,
       );
+      await this.verifyFreshExport(actor);
       return {
         schemaVersion: 1,
         jobId: id,
@@ -941,6 +951,101 @@ export class TrustService {
         ).rows,
       };
     });
+  }
+  /** This check is repeated during streaming; progress remains readable after
+   * deletion, while payload download still needs current permitted authority. */
+  async authorizeExport(actor: Actor, id: string) {
+    await this.verifyFreshExport(actor);
+    await this.store.actor(actor, async (client) => {
+      const job = (
+        await client.query(
+          "SELECT creator_id,thread_id FROM creator_trust.privacy_job WHERE id=$1 AND account_id=$2 AND kind='export' AND state='complete' AND completed_at>now()-interval '7 days'",
+          [id, actor.accountId],
+        )
+      ).rows[0];
+      if (!job)
+        throw new DomainError(
+          "export_artifact_unavailable",
+          "This export artifact is unavailable.",
+          404,
+        );
+      await this.assertAllowedInTransaction(
+        client,
+        actor,
+        job.creator_id ?? undefined,
+        job.thread_id ?? undefined,
+      );
+    });
+  }
+  private async verifyFreshExport(actor: Actor) {
+    if (!this.dependencies.verifyExport)
+      throw new DomainError(
+        "export_verification_unavailable",
+        "Reconnect your account before downloading personal data.",
+        503,
+      );
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const value = await (async () => {
+      try {
+        return await Promise.race([
+          this.dependencies.verifyExport!(actor),
+          new Promise<never>((_resolve, reject) => {
+            timer = setTimeout(
+              () =>
+                reject(
+                  new DomainError(
+                    "export_verification_unavailable",
+                    "Account verification is unavailable. Reconnect and retry.",
+                    503,
+                  ),
+                ),
+              2000,
+            );
+            timer.unref();
+          }),
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    })();
+    const proof = z
+      .strictObject({
+        verifiedAt: z.date(),
+        reference: z.string().trim().min(8).max(200),
+      })
+      .safeParse(value);
+    const age = proof.success
+      ? Date.now() - proof.data.verifiedAt.getTime()
+      : Infinity;
+    if (!proof.success || age < -30_000 || age >= 300_000)
+      throw new DomainError(
+        "fresh_verification_required",
+        "Continue with Pantopus again before downloading personal data.",
+        401,
+      );
+  }
+  async exportArtifact(
+    actor: Actor,
+    id: string,
+    domain: PrivacyDomain,
+    signal: AbortSignal,
+  ) {
+    const data = await this.exportData(actor, id);
+    const part = data.domains.find((entry) => entry.domain === domain);
+    const parsed = PrivacyArtifact.safeParse(part?.data);
+    if (!parsed.success || !this.artifacts)
+      throw new DomainError(
+        "export_artifact_unavailable",
+        "This protected export artifact is unavailable.",
+        503,
+      );
+    const binding = { jobId: id, accountId: actor.accountId, domain };
+    await this.artifacts.verify(parsed.data, binding, signal);
+    await this.authorizeExport(actor, id);
+    return {
+      artifact: parsed.data,
+      chunks: this.artifacts.read(parsed.data, binding, signal),
+    };
   }
   async inbox(actor: Actor) {
     return this.store.actor(actor, async (client) => ({

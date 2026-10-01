@@ -1,6 +1,8 @@
 # Existing Foundation fixture compatibility proposal
 
-Current source: `da03bb764cd05d0f6ac7e19fcd012611226465c5`. Existing tests and references are untouched. This proposal does not authorize an edit or waive a failure.
+The human explicitly authorized this exact five-file exception on2026-09-30. W8 applied the existing fixture/setup corrections below; all product assertions, invalid-input denials, required checks, goldens, tolerances, immutable SQL and RLS/grants remain intact. The exception does not waive failures or authorize further test changes.
+
+The first corrected local run reached all18 backend checks:15 passed and3 failed. T-11's10,000 scoped pairs exceeded its unchanged120-second limit; T-18/T-24 observed `reply_in_progress` instead of the expected unavailable allowance; T-27's direct sensitive proposal resolved instead of rejecting. These now require source investigation. The run used the separately leased disposable cluster on55448 and cleaned up its generated database. Canonical Report clicking is separately verified in the browser; Android interaction remains unverified.
 
 The [W8 resume prompt](../workstreams/handoffs/W8-resume-prompt.md) says: “Write no new tests or test code” and “Preserve existing tests without weakening them.” Current C11 only permits registered UUID references and literal query values; accepting old free-text drafts/contexts would weaken the product contract.
 
@@ -16,4 +18,4 @@ The exact setup change must account for repeated runs and the canonical checksum
 
 Visual/snapshot failures are separate. Investigate actual implementation captures and approved reference/environment conditions; this proposal does not authorize updating goldens or tolerances. Trust compilation and local shipping builds passing do not make Foundation or the release ready.
 
-Current Android CI reports a touch-injection failure, not a definitive missing-element diagnosis. The missing arrival is a source/setup finding; investigate the actual report before changing that fixture. Download wrappers returned artifact metadata, but their reusable ZIP URLs returned403 from this host. No underlying runtime cause is waived.
+Checkpoint61e07b1 Android job110104255786 has an inspected diagnostic: `arrivalContextCanBeRemoved` reports “Failed to inject touch input”, followed by “Expected exactly '1' node but could not find any node” with content description `Remove this post from your first message`. Its former fixture supplied no scoped arrival, while MainActivity starts at `/home`. This establishes the missing control in that run; it does not establish native interactive acceptance. The other three runtime cases passed. Download wrappers returned artifact metadata, but their reusable ZIP URLs returned403 from this host; the captures remain uninspected. No failure is waived.

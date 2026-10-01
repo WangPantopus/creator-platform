@@ -16,6 +16,17 @@ if (
   throw new Error("Development adapters cannot be deployed.");
 const modulePath = process.env.TRUST_ADAPTER_MODULE;
 const release = process.env.RELEASE_REVISION;
+// The image build substitutes this literal. Runtime env cannot relabel the
+// bundled source or authorize a differently versioned integration artifact.
+const builtRevision = process.env.TRUST_BUILD_REVISION;
+if (
+  !builtRevision ||
+  !/^[a-f0-9]{40}$/.test(builtRevision) ||
+  release !== builtRevision
+)
+  throw new Error(
+    "Release revision does not match the compiled source commit.",
+  );
 if (!modulePath || !release || !/^[a-f0-9]{40,64}$/.test(release))
   throw new Error(
     "A reviewed adapter module and immutable release digest are required.",

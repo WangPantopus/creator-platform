@@ -263,6 +263,7 @@ export async function createConfiguredBackend(input: {
     input.config.allowedOrigin,
     {
       assertActorAllowed,
+      ...(trust ? { telemetry: trust.telemetry } : {}),
       ...(sessions
         ? { resolveSession: (token: string) => sessions.resolve(token) }
         : {}),

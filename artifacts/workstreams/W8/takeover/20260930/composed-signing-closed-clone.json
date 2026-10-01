@@ -1,0 +1,106 @@
+{
+  "observedAt": "2026-10-01T03:48:46.133975+00:00",
+  "clone": {
+    "database": "creator_w8_signing_custody_22731060fed24f2885174ee97a5dfce6",
+    "postgres": "17.11 (Debian 17.11-1.pgdg12+2)",
+    "ledgerCount": 40,
+    "functionOwner": "creator_owner",
+    "securityDefiner": false,
+    "triggerCount": 1,
+    "cases": 4,
+    "approvalTablePresent": true
+  },
+  "backupSha256": "63145aaea8223b16896fee99da04cdaeb8e09f29df2415b2065164bb1ac26a05",
+  "sourceInputs": [
+    {
+      "id": "0044",
+      "sha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb",
+      "bytes": 14080
+    },
+    {
+      "id": "0056",
+      "sha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35",
+      "bytes": 4692
+    },
+    {
+      "id": "0057",
+      "sha256": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11",
+      "bytes": 969
+    },
+    {
+      "id": "0058",
+      "sha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911",
+      "bytes": 6720
+    },
+    {
+      "id": "0059",
+      "sha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+      "bytes": 13980
+    },
+    {
+      "id": "0060",
+      "sha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc",
+      "bytes": 16471
+    }
+  ],
+  "operations": [
+    {
+      "operation": "create-own-closed-clone",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "restore-original-reviewed-backup",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0044_w4_personal_approval",
+      "exitCode": 0,
+      "outputSha256": "6d7ef53452a4cf255ff1ca5fb13a650ed8a387a008ca3ee58495bf957bc33424",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0056_w3_correction_feedback_lineage",
+      "exitCode": 0,
+      "outputSha256": "97ba2f1129b41a41249e5807f09cad3540c36da1c5122df3e27af3ccd3c1d7ac",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0057_w3_feedback_consent",
+      "exitCode": 0,
+      "outputSha256": "8d97ed19a1ac15f9fd698cd5a6e43ae62198f182f1304d8321fb619cd31b352d",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0058_w3_correction_signature",
+      "exitCode": 0,
+      "outputSha256": "9ca86cf8b99d039a0f0a558e5e5e64fda290b2a038a4426e62f8a25452175fcb",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0059_w3_recording_association",
+      "exitCode": 0,
+      "outputSha256": "b6ad7d86208bb3064b6176da4190a3fc7bf694d51650824536529fe6c3d0f7ea",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    },
+    {
+      "operation": "ddl-0060_w8_composed_signed_message",
+      "exitCode": 0,
+      "outputSha256": "6c2c70df7d1ac69b8a822419be598b0ab6b19825e9250702ffc32f603b1c9a4c",
+      "commandCompletionObservedInOriginalOperatorRun": true
+    }
+  ],
+  "metadataQueryCorrections": {
+    "failedQueries": 2,
+    "cause": "Operator metadata query used wrong ledger and case relation names",
+    "resolution": "Used actual creator.schema_migration and creator_trust.safety_case; no restore or DDL repeated"
+  },
+  "trafficClosed": true,
+  "runtimeOrWorkerAttached": false,
+  "appliedToCurrentDatabase": false,
+  "canonicalLedgerEntriesAdded": false,
+  "meaning": "Restored canonical40 backup plus exact reserved proposal DDL only; CREATE FUNCTION validates syntax/declaration types, not every lazy-planned SQL branch or actual signing/RLS authorization. No signer, purpose scope, provider, synthetic signing row or application acceptance."
+}

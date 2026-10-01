@@ -11,6 +11,7 @@ import {
   cookieOptions,
   platformFetch,
 } from "../../../../lib/session";
+import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 function retry(request: NextRequest, error: string) {
   const saved = ReturnTargetSchema.safeParse(
@@ -102,7 +103,7 @@ async function complete(
       process.env.W8_LOCAL_DEVELOPMENT === "true" &&
       process.env.NODE_ENV !== "production"
     )
-      redirect.cookies.delete("w8_local_session");
+      redirect.cookies.delete(trustLocalSessionCookie);
     redirect.cookies.delete(continuationCookie);
     redirect.cookies.delete(continuationReturnCookie);
     return redirect;

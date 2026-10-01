@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-10-01T02:58:08.086801+00:00",
+  "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+  "sourcePath": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+  "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+  "sourceBytes": 13980,
+  "sourceLines": 183,
+  "fullSqlPersonallyRead": true,
+  "reservation": {
+    "id": "0059",
+    "owner": "W3",
+    "version": "0059_w3_recording_association",
+    "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+    "state": "reserved_unapplied",
+    "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+    "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+  },
+  "activeRegistration": false,
+  "sqlAppliedOrCopied": false,
+  "existingActive40EntriesAndSqlChanged": false,
+  "existingTestsRlsGrantsChanged": false,
+  "requires": [
+    "Compose require_signed_message with exact0044 current personal Approval predicate; 0058 and0059 current published functions both use foundation-only approved_draft fallback",
+    "Review non-owner same-client current creator/fan/account denial and W6 signing/playback purpose authority before media locks; host callbacks cannot invent signature/owner authority",
+    "Prove fresh/upgrade under earlier reservations and actual immutable consumed command/current unrevoked signing key/current creator proof",
+    "Preserve exact recording association/evidence in owner exports and remove associated messages before physically deleting referenced media; proposed FK has no ON DELETE action",
+    "Verify processed digest and credentialed file-byte SHA/size against current signed media descriptor; fileSha256 regex alone is not binary-verification acceptance",
+    "Keep current approved retention/license expiry, no invented media readiness or legacy recording backfill"
+  ],
+  "sourceFindings": {
+    "tuple": "Same media id/thread/creator/fan FK, paired recording asset/evidence and unique signed-act/media occurrence",
+    "signedRecording": "New delivered human_creator with empty text/no AI/correction/citations, exact ready same-family human_reply audio/mp4, current owner/key, consumed unwithdrawn reply command, exact processed/provenance fields",
+    "immutability": "Freezes recording identity/body/provenance plus delivered AI originals and signed corrections; independent privacy/memory flags can change",
+    "privacyDependency": "creator.message recording FK points to creator.media_asset; existing media delete cannot be assumed safe before conversation unlink/removal",
+    "composition": "Final ELSIF approved_draft branch repeats existing0058 foundation predicate and drops0044 personal Approval checks"
+  },
+  "limitations": [
+    "Source custody and allocation only; no current-db upgrade, provider callback, native recording, erasure, download or signature acceptance",
+    "No peer checkout/database/device/message touched"
+  ]
+}
