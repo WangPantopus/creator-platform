@@ -12,7 +12,7 @@ public enum PublicVerificationFeature {
             guard let id = identifier(session.destination) else {
                 return AnyView(Notice(title: QelvoraCopy.text("identityVerificationSignedUnavailableTitle"), children: QelvoraCopy.text("identityVerificationInvalidLink")))
             }
-            return AnyView(PublicVerificationScreen(baseURL: baseURL, signedActId: id, onHome: { session.open("/home") }))
+            return AnyView(PublicVerificationScreen(baseURL: baseURL, signedActId: id, onHome: { session.open("/home") }).id((baseURL?.absoluteString ?? "") + "/" + id))
         }
     }
 
@@ -48,7 +48,7 @@ private struct PublicVerificationScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text("/VERIFY/" + signedActId.uppercased()).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
-                if scenePhase == .active, let signature {
+                if scenePhase == .active, let signature, signature.signedActId == signedActId {
                     HStack(spacing: 12) {
                         QelvoraGlyph(name: "sealCheck", size: 40, color: qColor("maya-ink", scheme))
                         Text(QelvoraCopy.text("signedBy", values: ["name": signature.creatorName])).qText("display-lg").accessibilityAddTraits(.isHeader)

@@ -85,7 +85,7 @@ private fun PublicVerificationScreen(baseURL: String?, signedActId: String, onHo
     val retry = { signature = null; failure = null; loading = true; attempt += 1 }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 28.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         VerificationText("/VERIFY/" + signedActId.uppercase(Locale.ROOT), "data-sm", "ink-muted")
-        val current = if (foreground) signature else null
+        val current = if (foreground) signature?.takeIf { it.signedActId == signedActId } else null
         if (current != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Glyph("sealCheck", 40.dp, qColor("maya-ink"))
