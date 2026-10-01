@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-01T01:05:05.027075+00:00",
+  "recordedAt": "2026-10-01T01:27:07.837109+00:00",
   "publishedCaptureCommit": "64330399332c74ef6c87117a0daac78d4a587beb",
   "sourceSha256": {
     "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "72641d0081aa24baee27fa2cbd82de9db1cb2eff11c27016b8d84beee4a7b00b",
@@ -21,8 +21,10 @@
     "apps/backend/src/modules/growth/database.ts": "cca204ac57422b0226d65101cf309c492acd4a1da5894dbe9753f3b369d2d1ae",
     "apps/backend/src/modules/growth/erasure.ts": "773c828a0aa9278dded4f1c0c2b95e57bec115c385eeab8ae0ebd7cc681cca56",
     "apps/backend/src/modules/growth/lifecycle.ts": "ecfb02745f295fa6bb70b4f7320af7ce6af018bf8b62ff4f7503f3b049b7c77e",
-    "apps/backend/src/modules/growth/privacy-export.ts": "a55846e92b1513d801e3565c0d5bcc1070492005c60d5cf4e61c7e4c9091a8ce",
-    "apps/backend/src/modules/growth/runtime.ts": "cf19e99c49b1135f467e15c4d1b3b23f56985f7236ec84e34137e28dad343bee"
+    "apps/backend/src/modules/growth/privacy-export.ts": "2c6ea92dadd9d1aec11db9c90d9cce67fd2af330f9bcb659655bdb37c5416b7e",
+    "apps/backend/src/modules/growth/runtime.ts": "cf19e99c49b1135f467e15c4d1b3b23f56985f7236ec84e34137e28dad343bee",
+    "apps/backend/src/integration.ts": "3d8aed10c9a16fee51cda31de25a1edc3e079814fbfdad29d37ba18758eaaf59",
+    "apps/backend/src/server.ts": "17afafa33b7e5d05d5d0e6839a017e6d6b89cc6a32066c27846c3c40fab048b1"
   },
   "nativeReferenceCount": 110,
   "nativeReferenceSetSha256": "a729e6b68ee8bea71fd90a1ba4e60474ede2b4cec69fe79887829b9625594510",
@@ -147,7 +149,7 @@
     "tests/visual/baselines/welcome-night.png": "a955ff3382d727fcd0782ea7f4f8f6099c15505822abc42a73753c44f007be54"
   },
   "artifactSha256": {
-    "README.md": "378d3680d4aa7657b8d75407d93990e2b6cc7edfa6171ed458c34665de5d677e",
+    "README.md": "dada0dd55c215bf6dfa0d2b6a5420621bc3d9a82125ea381006644be4f9944d4",
     "approved-input-search.json": "edee150a6bab7cc43cf2b97795402098b9f2869c9a53dbb01448074b5c2e0e08",
     "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend-contracts.log": "00c68520c2ce4f9bdbdc93c60e9a39d2e8539abb81dbefb6c2793ae199647e4c",
@@ -183,6 +185,15 @@
     "media-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
     "media-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "media-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "owner-denial-and-export-bounds.md": "aaa6a26cea0c645bb3d12ec1ea822e7c88119fcaad89a717f1f646cbfe19b060",
+    "owner-denial-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "owner-denial-contracts.log": "6ef52335f72ce346e68f0fd17f0f4ebf84cf781a3bf1072dbd4d033fa6ca7e15",
+    "owner-denial-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "owner-denial-health.json": "0dcbbea27689e60f25d37f271ad773d94d0bf82f0f839b14a751e3b66353e55c",
+    "owner-denial-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "owner-denial-parent-ci.json": "773b18f84fd80ad40e9ccc62b5ec79dba31a330ad216a6333dda7e6a85401659",
+    "owner-denial-parent-pr.json": "63143585838db93b78e4ae173936749151cb7259c4d2c8ea05e783576a6310a9",
+    "owner-denial-settings.png": "6ee992486d35bb02e2942be0804fac71d5d3580847e1244b9e23363c08fd232e",
     "proof-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
     "proof-contracts.log": "8b37f375ba86fde183d6f5e2b8949a47f970dc62430b27f30f4ab491256a7800",
     "proof-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
@@ -193,6 +204,10 @@
     "settings-after-stream-restart.png": "53c61aa4b61290dc9ecc051a57160d054df3a4abca72e982015983b8a345fa7a",
     "settings-phone.png": "52ede563add261f3ca7544ba61445bc0670eb37088085fc57f47ed8aabf9e9f4",
     "stream-0ade-ci.json": "8e8c00ef1ac61251b934d611ffde85c9d9224ab375ea537162e5fadb5c0fb341",
+    "stream-bounded-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "stream-bounded-contracts.log": "9ae1a1ace22e59b26b6aa9b0e97cf6c9a38274575f9f8e3ddd3217f2ced35181",
+    "stream-bounded-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "stream-bounded-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "stream-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
     "stream-contracts.log": "012c399349647e8592983ed086206e35b127e6a38c6625e211c4ab495caa91e8",
     "stream-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
@@ -211,7 +226,7 @@
     "web-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "web-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "managedSecretScan": "no complete managed key or connection URL appears in text evidence",
+  "managedSecretScan": "no complete managed key or connection URL appears in text evidence; supplied OpenAI configuration not opened",
   "verification": {
     "swiftExistingTests": 18,
     "swiftReferenceComparisons": 110,
@@ -315,7 +330,7 @@
   "privacyStreamingIntegration": {
     "sourceParent": "139c1567ebd658ba7059586696374f8f49e2632d",
     "ownerContract": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74",
-    "ownerCurrentReviewed": "884c35bb3e8725ee9f573531aacfe07c05fde71f",
+    "ownerCurrentReviewed": "b02c2aaf005e9934edb6a65adb8b919244fd89dc",
     "leasedTaskAuthorityRequired": true,
     "stableSnapshot": "repeatable read read only; existing sorted session fences acquired before snapshot; dedicated connection destroyed after completion/cancel",
     "sourceExhaustion": "zero-row EOF for every internal cursor",
@@ -332,11 +347,16 @@
     "originalContractChecks": 9,
     "actualEncryptedExportAcceptance": false,
     "actualVerifiedTaskCreated": false,
-    "implementationCommit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0"
+    "implementationCommit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0",
+    "serializedSourceRowLimitBytes": 262144,
+    "fetchRows": 16,
+    "encodedRecordLimitBytes": 524288,
+    "oversizedRow": "SQL payload withheld; owner throws; no completion receipt",
+    "largeObjectAcceptance": false
   },
   "currentRuntime": {
-    "apiProcess": 59003,
-    "apiExecSession": 13294,
+    "apiProcess": 74363,
+    "apiExecSession": 32431,
     "webProcess": 16845,
     "webExecSession": 19476,
     "database": "creator_w7_takeover_20260930",
@@ -348,13 +368,14 @@
     ],
     "foundationReady": true,
     "ready": false,
-    "protectedW8HostConfigured": false
+    "protectedW8HostConfigured": false,
+    "apiListenAddress": "127.0.0.1:4107"
   },
   "mergeBoundary": {
     "current": "all current-head repository CI checks pass and review complete; actual full W7/release acceptance remains tracked and gated",
     "founderRevisionReceived": true,
     "founderExactReply": "Yes, use incremental code merges",
-    "scope": "current PR2 code merge; does not waive current-head checks or approve release",
+    "scope": "existing PR2 and subsequent personally owned W7 increments; does not waive current-head CI/review or release gates",
     "PR": 2,
     "isDraft": false,
     "duplicatePRCreated": false,
@@ -401,7 +422,8 @@
           "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36798392122/job/110166990826"
         }
       ]
-    }
+    },
+    "latestFounderReply": "yea please keep going working on everything here and merge whatever PRs that you create and created when ready."
   },
   "browserAfterStreamingRestart": {
     "actor": "same canonical explicitly labeled development fan",
@@ -423,5 +445,249 @@
     "oldOutgoingTargetReplaced": true,
     "duplicateCreated": false,
     "notificationIntent": "meaningful changes only"
+  },
+  "latestOwnerDenialIncrement": {
+    "parent": "4af39cdbf7de88112e09a71c7a0bb6102b4c6ea7",
+    "reviewedW1": "e81d3e9b8293d022f50e6a71fa504ca652c4a8ec",
+    "productionActorAndThreadDenialsRequired": true,
+    "separateCreatorDenialRequired": true,
+    "callbacksExposedToFeatureRegistration": true,
+    "developmentAPILoopbackOnly": true,
+    "fullBackendBuild": "passed",
+    "changedSourceLint": "passed",
+    "format": "passed",
+    "existingContracts": 9,
+    "newTestCases": 0,
+    "actualProductionTrustAcceptance": false,
+    "parentCI": {
+      "conclusion": "",
+      "event": "pull_request",
+      "headSha": "4af39cdbf7de88112e09a71c7a0bb6102b4c6ea7",
+      "jobs": [
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "databaseId": 110170158529,
+          "name": "ios-foundation",
+          "startedAt": "2026-10-01T01:05:35Z",
+          "status": "queued",
+          "steps": [],
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36799410747/job/110170158529"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "databaseId": 110170158675,
+          "name": "web-visual",
+          "startedAt": "2026-10-01T01:05:35Z",
+          "status": "queued",
+          "steps": [],
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36799410747/job/110170158675"
+        },
+        {
+          "completedAt": "2026-10-01T01:13:53Z",
+          "conclusion": "success",
+          "databaseId": 110170158711,
+          "name": "android-runtime",
+          "startedAt": "2026-10-01T01:08:46Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-01T01:08:49Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-01T01:08:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:08:51Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-01T01:08:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:08:52Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@v4",
+              "number": 3,
+              "startedAt": "2026-10-01T01:08:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:08:52Z",
+              "conclusion": "success",
+              "name": "Enable KVM",
+              "number": 4,
+              "startedAt": "2026-10-01T01:08:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:13:49Z",
+              "conclusion": "success",
+              "name": "Run reactivecircus/android-emulator-runner@v2",
+              "number": 5,
+              "startedAt": "2026-10-01T01:08:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:13:50Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 6,
+              "startedAt": "2026-10-01T01:13:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:13:51Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@v4",
+              "number": 11,
+              "startedAt": "2026-10-01T01:13:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:13:51Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 12,
+              "startedAt": "2026-10-01T01:13:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:13:51Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "startedAt": "2026-10-01T01:13:51Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36799410747/job/110170158711"
+        },
+        {
+          "completedAt": "2026-10-01T01:09:36Z",
+          "conclusion": "success",
+          "databaseId": 110170158730,
+          "name": "web-and-backend",
+          "startedAt": "2026-10-01T01:07:37Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-01T01:07:39Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-01T01:07:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:07:54Z",
+              "conclusion": "success",
+              "name": "Initialize containers",
+              "number": 2,
+              "startedAt": "2026-10-01T01:07:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:07:56Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "startedAt": "2026-10-01T01:07:54Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:07:59Z",
+              "conclusion": "success",
+              "name": "Run pnpm/action-setup@v4",
+              "number": 4,
+              "startedAt": "2026-10-01T01:07:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:08:02Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@v4",
+              "number": 5,
+              "startedAt": "2026-10-01T01:07:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:08:04Z",
+              "conclusion": "success",
+              "name": "Run pnpm install --frozen-lockfile",
+              "number": 6,
+              "startedAt": "2026-10-01T01:08:02Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:34Z",
+              "conclusion": "success",
+              "name": "Run pnpm check",
+              "number": 7,
+              "startedAt": "2026-10-01T01:08:04Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:34Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@v4",
+              "number": 11,
+              "startedAt": "2026-10-01T01:09:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:34Z",
+              "conclusion": "success",
+              "name": "Post Run pnpm/action-setup@v4",
+              "number": 12,
+              "startedAt": "2026-10-01T01:09:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:34Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 13,
+              "startedAt": "2026-10-01T01:09:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:35Z",
+              "conclusion": "success",
+              "name": "Stop containers",
+              "number": 14,
+              "startedAt": "2026-10-01T01:09:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T01:09:35Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "startedAt": "2026-10-01T01:09:35Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36799410747/job/110170158730"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "databaseId": 110170158743,
+          "name": "android-foundation",
+          "startedAt": "2026-10-01T01:05:35Z",
+          "status": "queued",
+          "steps": [],
+          "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36799410747/job/110170158743"
+        }
+      ],
+      "status": "queued"
+    },
+    "ownerW4NoticeContract": "Owner confirmed no complete published pending/ack + recipient/current-state port at feba6e6; published request port in progress; public/pool/slot/spending mapping remains unavailable.",
+    "browser": "Canonical expired development-session recovery to original destination; saved quiet hours/zone/preview/channel exclusions preserved; no provider binding or feedback submission."
   }
 }

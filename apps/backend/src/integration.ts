@@ -16,6 +16,20 @@ import { IdentityProfiles } from "./modules/identity/profiles.js";
 import { PasskeyService } from "./modules/identity/passkeys.js";
 import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
+import type { Actor } from "./modules/identity/adapter.js";
+import { DomainError } from "./core/errors.js";
+
+export type BackendRuntime = {
+  pool: pg.Pool;
+  database: Database;
+  access: AccessService;
+  conversation: ConversationService;
+  signing: SignedActService;
+  identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
+  assertActorAllowed: (actor: Actor) => Promise<void>;
+  assertScopeAllowed: ScopeRestriction;
+  assertCreatorAllowed: (actor: Actor, creatorId: string) => Promise<void>;
+};
 
 /** Pantopus host imports this seam; adapter code is never inferred from a session token. */
 export async function createConfiguredBackend(input: {
@@ -23,39 +37,56 @@ export async function createConfiguredBackend(input: {
   identity: PantopusIdentityAdapter;
   guardrails: GuardrailProvider;
   signedSubjectPolicies?: readonly SignedSubjectPolicy[];
-  registerFeatures?: (runtime: {
-    pool: pg.Pool;
-    database: Database;
-    access: AccessService;
-    conversation: ConversationService;
-    signing: SignedActService;
-    identity:
-      | import("./modules/identity/router.js").IdentityRuntime
-      | undefined;
-  }) => Promise<readonly FeatureRegistration[]>;
-  assertActorAllowed?: (
-    actor: import("./modules/identity/adapter.js").Actor,
-  ) => Promise<void>;
+  registerFeatures?: (
+    runtime: BackendRuntime,
+  ) => Promise<readonly FeatureRegistration[]>;
+  assertActorAllowed?: (actor: Actor) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  /** Creator actions need their actual creator denial, separate from a thread. */
+  assertCreatorAllowed?: (actor: Actor, creatorId: string) => Promise<void>;
 }) {
   if (!input.config.featureEnabled || !input.config.databaseUrl)
     throw new Error(
       "Enable the feature and provide a non-owner runtime DATABASE_URL.",
     );
+  if (
+    input.identity.mode !== "development" &&
+    !(input.assertActorAllowed && input.assertScopeAllowed)
+  )
+    throw new Error(
+      "Configured identity requires both trust denial callbacks.",
+    );
+  const assertActorAllowed = async (actor: Actor) => {
+    await input.assertActorAllowed?.(actor);
+  };
+  const assertScopeAllowed: ScopeRestriction = async (...scope) => {
+    await input.assertScopeAllowed?.(...scope);
+  };
+  const assertCreatorAllowed = async (actor: Actor, creatorId: string) => {
+    await assertActorAllowed(actor);
+    if (input.assertCreatorAllowed)
+      await input.assertCreatorAllowed(actor, creatorId);
+    else if (input.identity.mode !== "development")
+      throw new DomainError(
+        "creator_denial_unconfigured",
+        "Creator actions require their current trust authority.",
+        503,
+      );
+  };
   const pool = new pg.Pool({
     connectionString: input.config.databaseUrl,
     max: 20,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
   });
-  const database = new Database(pool, undefined, input.assertScopeAllowed);
+  const database = new Database(pool, undefined, assertScopeAllowed);
   try {
     await database.assertRuntimeRole();
   } catch (error) {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, input.assertScopeAllowed);
+  const access = new AccessService(pool, undefined, assertScopeAllowed);
   const conversation = new ConversationService(
     database,
     access,
@@ -98,6 +129,9 @@ export async function createConfiguredBackend(input: {
         conversation,
         signing,
         identity: platformIdentity,
+        assertActorAllowed,
+        assertScopeAllowed,
+        assertCreatorAllowed,
       })) ?? [];
   } catch (error) {
     await pool.end();
@@ -112,9 +146,7 @@ export async function createConfiguredBackend(input: {
       signing,
       generationAvailable: false,
       features,
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
-        : {}),
+      assertActorAllowed,
     }),
   );
   const sockets = attachRealtime(
@@ -124,9 +156,7 @@ export async function createConfiguredBackend(input: {
     conversation,
     input.config.allowedOrigin,
     {
-      ...(input.assertActorAllowed
-        ? { assertActorAllowed: input.assertActorAllowed }
-        : {}),
+      assertActorAllowed,
       ...(sessions
         ? { resolveSession: (token: string) => sessions.resolve(token) }
         : {}),

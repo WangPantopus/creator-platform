@@ -5,7 +5,8 @@ import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
 
-// Production integration supplies dependencies through createApp; no local identity fallback exists.
+// Production hosts inject genuine identity and Trust through the configured host.
+// Development identity is selected explicitly and confined to loopback.
 const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
@@ -28,17 +29,28 @@ const configured =
           },
         },
         registerFeatures: async (runtime) => {
-          features.growth = await configureGrowthForBackend(runtime);
+          features.growth = await configureGrowthForBackend({
+            ...runtime,
+            assertAllowed: async (actor, creatorId) =>
+              creatorId
+                ? runtime.assertCreatorAllowed(actor, creatorId)
+                : runtime.assertActorAllowed(actor),
+          });
           return features.growth ? [features.growth.feature] : [];
         },
       })
     : undefined;
 features.growth?.start();
 const server = configured?.server ?? createServer(createApp(config));
-server.listen(config.port, () =>
-  process.stdout.write(
-    `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
-  ),
+server.listen(
+  {
+    port: config.port,
+    ...(config.identityAdapter === "development" ? { host: "127.0.0.1" } : {}),
+  },
+  () =>
+    process.stdout.write(
+      `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
+    ),
 );
 const shutdown = () => {
   void (async () => {

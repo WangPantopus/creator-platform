@@ -24,6 +24,9 @@ type Source = {
   value: string;
   map?: (row: Record<string, unknown>) => unknown;
 };
+const sourceRowBytes = 256 * 1024;
+const sourceFetchRows = 16;
+const encodedRecordBytes = 512 * 1024;
 
 /** Called only after W8's current leased task/ownership proof has been verified.
  * No source LIMIT/OFFSET, public artifact, device token or third-party Thanks. */
@@ -128,8 +131,10 @@ export function growthAccountExport(
     bytes = 0,
     sha256 = "";
   function* encode(record: unknown) {
-    const buffer = Buffer.from(`${JSON.stringify(record)}\n`, "utf8");
-    // A large JSON row can span chunks; concatenation retains valid NDJSON.
+    const encoded = `${JSON.stringify(record)}\n`;
+    if (Buffer.byteLength(encoded, "utf8") > encodedRecordBytes)
+      throw new Error("growth_export_record_capacity");
+    const buffer = Buffer.from(encoded, "utf8");
     for (let offset = 0; offset < buffer.length; offset += 512 * 1024) {
       signal.throwIfAborted();
       const data = buffer.subarray(offset, offset + 512 * 1024);
@@ -179,20 +184,31 @@ export function growthAccountExport(
         // Names/SQL come only from the internal fixed source list above.
         const cursor = `growth_export_${index}`;
         await client.query(
-          `DECLARE ${cursor} NO SCROLL CURSOR FOR ${source.sql}`,
+          // Measure in PostgreSQL and return no payload for an oversized row.
+          // Chunking after FETCH alone would still materialize unbounded pages.
+          `DECLARE ${cursor} NO SCROLL CURSOR FOR
+           SELECT CASE WHEN octet_length(convert_to(export_json::text,'UTF8')) <= ${sourceRowBytes}
+             THEN export_json ELSE NULL END AS export_data
+           FROM (SELECT row_to_json(export_source) AS export_json
+             FROM (${source.sql}) export_source) bounded_source`,
           [source.value],
         );
         for (;;) {
           signal.throwIfAborted();
-          const page = await client.query(`FETCH FORWARD 100 FROM ${cursor}`);
+          const page = await client.query(
+            `FETCH FORWARD ${sourceFetchRows} FROM ${cursor}`,
+          );
           // Explicit EOF, including after a short nonempty page, for every source.
           if (page.rows.length === 0) break;
-          for (const row of page.rows)
+          for (const row of page.rows) {
+            const data = row.export_data as Record<string, unknown> | null;
+            if (data === null) throw new Error("growth_export_record_capacity");
             yield* encode({
               collection: source.collection,
               ...(source.creatorId ? { creatorId: source.creatorId } : {}),
-              data: source.map ? source.map(row) : row,
+              data: source.map ? source.map(data) : data,
             });
+          }
         }
         await client.query(`CLOSE ${cursor}`);
       }
