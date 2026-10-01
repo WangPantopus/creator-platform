@@ -76,17 +76,12 @@
       // Keep capture independent of the attached display's calibration.
       window.colorSpace = .sRGB
       window.isReleasedWhenClosed = false
-      // Render at the reference pixel scale before AppKit caches its layers.
-      // Enlarging a1x cached bitmap alone also enlarges blurred text.
-      let captureScale = 2 / window.backingScaleFactor
-      let canvas = CGSize(width: size.width * captureScale, height: size.height * captureScale)
+      // Keep the real view in reference points. A larger 1x hosting canvas
+      // magnifies cached text; the bitmap itself must have two pixels per point.
       let host = NSHostingView(
         rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }
-          .frame(width: size.width, height: size.height)
-          .scaleEffect(captureScale, anchor: .topLeading)
-          .frame(width: canvas.width, height: canvas.height, alignment: .topLeading))
-      host.frame = NSRect(origin: .zero, size: canvas)
-      window.setContentSize(canvas)
+          .frame(width: size.width, height: size.height))
+      host.frame = NSRect(origin: .zero, size: size)
       window.contentView = host
       defer {
         window.contentView = nil
@@ -108,7 +103,6 @@
         layer.displayIfNeeded()
       }
       if let layer = host.layer { prepareLayer(layer) }
-      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas)")
       guard
         let context = CGContext(
           data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
@@ -121,9 +115,9 @@
         return
       }
       let bitmap = NSBitmapImageRep(cgImage: pixels)
-      bitmap.size = canvas
-      host.cacheDisplay(in: host.bounds, to: bitmap)
       bitmap.size = size
+      host.cacheDisplay(in: host.bounds, to: bitmap)
+      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), points=\(host.bounds.size), bitmapPixels=\(bitmap.pixelsWide)x\(bitmap.pixelsHigh), bitmapPoints=\(bitmap.size)")
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
       var imageStrategy = Snapshotting<NSImage, NSImage>.image
