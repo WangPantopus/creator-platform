@@ -27,7 +27,7 @@ export async function reserveCreatorCost(
   });
   return repository.transaction(scope, async (client) => {
     const usage = await client.query<{ total: string; unknown: string }>(
-      "SELECT coalesce(sum(cost_micros) FILTER(WHERE created_at>=date_trunc('day',now())),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','provider_unknown')",
+      "SELECT coalesce(sum(cost_micros) FILTER(WHERE created_at>=date_trunc('day',now())),0)::text AS total,count(*) FILTER(WHERE cost_micros IS NULL)::text AS unknown FROM creator.ai_usage WHERE creator_id=$1 AND category IN ('reply','guardrail','memory','provider_unknown')",
       [scope.creatorId],
     );
     const holds = await client.query<{ total: string }>(
