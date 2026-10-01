@@ -1,0 +1,55 @@
+{
+  "applicationRevision": "1e390c6ee01090fc5311186332497a117046468c",
+  "parentRevision": "fa68e0dd9c82c55bd927e1191862dfe0c6c4ccfe",
+  "mainSnapshot": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "sourceFiles": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "4a08b427ee402003094d53ad56c41ac379717dbdab64a5b78991a783bf53a352",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "a4ba8210bd1a91a1ffe26bccc7d7f80cf81614dc4bf5dde7ee3fdf0b12340af1",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/SecureSessionStorage.kt": "d5eb83fb00c95061037b238fbb1a3492763f6a2b3b8acc2914882d6e1c65de7a",
+    "apps/android/app/src/main/res/values/strings.xml": "002a9b28dff7be7dbeb5d55f7e7aae12840bf448fe7e4c4db9ad66aa3959c04e",
+    "apps/ios/Sources/Generated/Localizable.xcstrings": "a9462ceb41ac1c13c69deaabd00028e302740a29d160c12f65659f3fa7c74d36",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "e89735c2d3c5f64fe8af48fe5be44c8abf5a92ff15852c23e32cba749924dca7",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "7ef4fc63ffe5287799605e136f27d1f289cba4142f82663d94205f2663fb0f89",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3ResumeStorage.swift": "05e3b8596dfc8bfffab1d3ddf1914df58e42ca78ff2d857f61a76c8909772424",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "2565b4f77772d3964968022b292dc67e29799d716c8cfcadff8f2c1dcf98a44d",
+    "apps/ios/Sources/QelvoraUI/Growth.swift": "9801a5bedf31efad6a4d9473ce28fc43eab5cb85d1a8eddcfddc2ca6158d7deb",
+    "apps/ios/Sources/QelvoraUI/SessionStorage.swift": "ffc5076958e587780a44b24a39e50740b5fc8a2db0bd4f9024fc4d2e3677096c",
+    "config/copy.json": "c343a3de9068a8cb6745a830d36a88e657428af895759974c06b8f963bb6ee6f",
+    "packages/copy/src/index.ts": "3715a05b058c6e7b4a6a18e4c2f9cd2d5f7638b561ecbeaa11bc5058721a644a"
+  },
+  "existingCanonicalChecks": [
+    {
+      "command": "/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/generate-shared.mjs --check",
+      "exitCode": 0,
+      "stdout": "Verified 12 shared web, Swift and Kotlin resources.\n",
+      "stderr": ""
+    },
+    {
+      "command": "/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/generate-native-api.mjs --check",
+      "exitCode": 0,
+      "stdout": "Verified Swift/Kotlin API models and 98 operations from OpenAPI.\n",
+      "stderr": ""
+    }
+  ],
+  "copyCustody": {
+    "addedKeys": [
+      "identityPrivateClearFailed",
+      "identityPrivateClearRetry",
+      "identitySessionReadFailed",
+      "identitySessionSaveFailed"
+    ],
+    "previousKeysRemoved": [],
+    "previousValuesChanged": []
+  },
+  "iosReferenceCustody": {
+    "count": 110,
+    "changedFromParent": [],
+    "aggregateSha256": "3b40afc30ad17273e927890418a7cc14f97ad80b3a4781b1cf3d4773468a5bf8"
+  },
+  "compilerAndFormatChecks": "not run under cleanup restriction",
+  "actualAppAcceptance": "not run; native controls disabled",
+  "renameAcceptance": "not run at this revision",
+  "CI": "not inspected; Code Review GitHub connection previously unavailable",
+  "runtimeResourcesCreated": false,
+  "testsOrTestScriptsAdded": false
+}

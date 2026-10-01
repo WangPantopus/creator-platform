@@ -1,5 +1,11 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — native storage and private cleanup source
+
+Application `1e390c6e` personally repairs unchecked Keychain deletion/replacement and native cleanup failure paths. All feature credential clients share a process fence; private screens close before credential/W3 cleanup, failures remain visible with Retry, and another account cannot install until cleanup succeeds. Swift rotation requires the same stored credential; Android cleanup survives cancellation. Four canonical copy keys are generated with every prior value unchanged. Existing source checks pass for 12 resources/98 operations; all 110 iOS references match the parent. [Exact source review and limits](../../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md).
+
+This remains an uncompiled/unoperated draft under the controlling cleanup restriction. The process fence does not prove persistent deletion after OS failure or across restart. Consumer builds, current rename, actual storage/revocation/account/device/accessibility journeys and exact-head CI remain open. W1 also completed source reading of all 54 supplied component previews; no visual or participant acceptance is inferred. The peer-reported hosted image failure remains independently uninspected, with capture/reference/assertion bytes preserved. All seven original groups and H01–H20 remain active.
+
 ## October 1 — current public integrity and held-read integration
 
 Application `4fda909e` normally integrates main `c1c615e6` through all eight W1 branches, including W4's held creator financial-read guard. No genuine held producer is invented or bound; owner money remains unavailable without it. Current canonical resource/native API checks pass for 12 outputs/98 operations. [Current source/branch qualification](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md).

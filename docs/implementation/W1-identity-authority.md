@@ -72,6 +72,8 @@ Android root: FanAppShell with Keystore, same registrations, validated return in
 
 ## Device support and release gates
 
+Current native storage follow-up checks credential and W3 cursor deletion, updates existing Keychain credentials without deleting first, and shares a process credential-read fence across feature clients. Both shells attempt cleanup independently, retain failed-clear messages with Retry, and gate another account until cleanup succeeds. Swift rotation also requires the same prior stored credential; Android cleanup survives cancellation. This is uncompiled source with actual OS failure/restart/revocation/device acceptance outstanding; process fencing is not persistent deletion proof. [Exact source qualification](../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md).
+
 | Surface                                 | Implemented adapter                                                     | Current evidence limit                                                                   |
 | --------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Secure web on supported passkey browser | navigator.credentials create/get; UV, abort, base64url                  | Genuine RP/device enrollment and exact named-act publication remain unverified           |
