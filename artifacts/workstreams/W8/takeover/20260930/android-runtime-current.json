@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "9c9cbac6cf623a75b5bb77e0cf4cd75466134f43",
+  "job": "https://github.com/WangPantopus/creator-platform/actions/runs/36794499697/job/110154707581",
+  "conclusion": "success",
+  "observedAt": "2026-10-01T00:18:02.546281+00:00",
+  "actualLog": [
+    "2026-10-01T00:11:05.7241771Z Starting 4 tests on emulator-5554 - 14",
+    "2026-10-01T00:11:09.8240315Z Finished 4 tests on emulator-5554 - 14",
+    "2026-10-01T00:11:10.5284590Z BUILD SUCCESSFUL in 3m 14s"
+  ],
+  "limitations": [
+    "Existing four emulator checks are distinct from W8 personal native Report/auth/system-sheet acceptance.",
+    "No native UI control was available. No device or historical emulator was reused."
+  ]
+}

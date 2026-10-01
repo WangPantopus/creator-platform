@@ -1,0 +1,82 @@
+{
+  "observedAt": "2026-10-01T01:03:06.396503+00:00",
+  "sourceParent": "0f83b2d6d937cae80a9e225f733d1cf1ec610a61",
+  "ownerCommit": "0ade48d8ca6a4f9397a9dfd1e503f4c8fb6449e0",
+  "ownerScope": "Published streaming/deletion deltas only; existing event-source interface and original retention receipt text preserved. Owner native fixtures/tolerances/CI changes and unrelated owner docs not imported.",
+  "files": [
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "integratedSha256": "20a30a6172fb497bab69e432e62671002eb6526486e8972840070cddbe3159bb",
+      "ownerSourceSha256": "114add980eae82bd47aae968eb2cc957ec3cac875fc10cc9787292b7c3111392"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/database.ts",
+      "integratedSha256": "cca204ac57422b0226d65101cf309c492acd4a1da5894dbe9753f3b369d2d1ae",
+      "ownerSourceSha256": "cca204ac57422b0226d65101cf309c492acd4a1da5894dbe9753f3b369d2d1ae"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/erasure.ts",
+      "integratedSha256": "773c828a0aa9278dded4f1c0c2b95e57bec115c385eeab8ae0ebd7cc681cca56",
+      "ownerSourceSha256": "773c828a0aa9278dded4f1c0c2b95e57bec115c385eeab8ae0ebd7cc681cca56"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/lifecycle.ts",
+      "integratedSha256": "2791f97de4b53ff8370f6785a8e233821e91f1ee85615c6de974107121d316fa",
+      "ownerSourceSha256": "ecfb02745f295fa6bb70b4f7320af7ce6af018bf8b62ff4f7503f3b049b7c77e"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/privacy-export.ts",
+      "integratedSha256": "a55846e92b1513d801e3565c0d5bcc1070492005c60d5cf4e61c7e4c9091a8ce",
+      "ownerSourceSha256": "a55846e92b1513d801e3565c0d5bcc1070492005c60d5cf4e61c7e4c9091a8ce"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/runtime.ts",
+      "integratedSha256": "1a2645c22db0aa864c2ed7fdbcaf14a0a02907073cec0fe8e44987791735a0d8",
+      "ownerSourceSha256": "cf19e99c49b1135f467e15c4d1b3b23f56985f7236ec84e34137e28dad343bee"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/service.ts",
+      "integratedSha256": "a267d2ad73f5603ae1fe8bebff7ec47202f45a55bd684c10138579d4d076a0b4",
+      "ownerSourceSha256": "129328cdd74b6fd50e4c53506704055f25b9b9499465edfe41b4405ecd38a94a"
+    }
+  ],
+  "authorityBinding": "createPrivacyConsumers supplies privacyTaskAuthority(coordinatorPool) as the complete leased-task authority, with before/after revalidation; no legacy ownership callback can activate this stream.",
+  "stream": {
+    "snapshot": "Repeatable read/read only with sorted account/creator erasure fences acquired before BEGIN",
+    "sourcePaging": 100,
+    "explicitEof": true,
+    "maximumChunkBytes": 524288,
+    "singleUse": true,
+    "completion": "Only after all cursor EOF, COMMIT, full count/hash and current W8 persisted-byte/lease proof",
+    "cancellation": "Dedicated export connection destroyed; deletion transaction receives the same signal",
+    "largeRowLimit": "Producer materializes each JSON row and each 100-row fetch before encoding; whole-record/page memory bounds are not established by chunk size."
+  },
+  "verification": {
+    "backendBuild": "pass after preserving original receipt copy absent from the producer copy package",
+    "growthEslint": "pass",
+    "changedSourcePrettier": "pass",
+    "originalContracts": {
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 174
+    },
+    "activeMigrations": 40,
+    "allActiveEntriesAndBytesUnchangedFrom": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4"
+  },
+  "runtimeAcceptance": {
+    "growthEncryptionKeyRecovered": false,
+    "growthEnabled": false,
+    "privacyStoreConfigured": false,
+    "ownerStreamTaskRun": false,
+    "newJobOrRetry": false,
+    "retainedCiphertextChanged": false,
+    "actualC10Completion": false
+  },
+  "limitations": [
+    "No new tests or test-code changes",
+    "Current retained jobs/cases/blocks/tombstone unchanged",
+    "No real leased owner export/download, concurrent revoke, binary archive or retention acceptance",
+    "No native interaction claim",
+    "No paid OpenAI calls"
+  ]
+}

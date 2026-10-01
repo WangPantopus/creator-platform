@@ -134,21 +134,25 @@ export class ConversationWellbeing {
       "fan_required",
       "Only the fan can view their conversation time.",
     );
-    return this.db.withThread(scope, async (client) => {
-      const days = (
-        await client.query(
-          'SELECT day::text AS day,seconds,"companion_seconds" AS "companionSeconds" FROM creator.conversation_usage_day WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND day >= (now() AT TIME ZONE \'UTC\')::date-6 ORDER BY day LIMIT 7',
-          [scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows;
-      return {
-        timezone: "UTC",
-        days,
-        modeAvailable: Boolean(this.mode),
-        measurement:
-          "Estimated foreground time with the AI; overlapping devices count once.",
-      };
-    });
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        const days = (
+          await client.query(
+            'SELECT day::text AS day,seconds,"companion_seconds" AS "companionSeconds" FROM creator.conversation_usage_day WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND day >= (now() AT TIME ZONE \'UTC\')::date-6 ORDER BY day LIMIT 7',
+            [scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows;
+        return {
+          timezone: "UTC",
+          days,
+          modeAvailable: Boolean(this.mode),
+          measurement:
+            "Estimated foreground time with the AI; overlapping devices count once.",
+        };
+      },
+      "read",
+    );
   }
   /** Called before creating a new generation, after its fan message. */
   async notices(scope: ThreadScope, client: PoolClient): Promise<string[]> {

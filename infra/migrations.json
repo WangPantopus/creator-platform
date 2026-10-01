@@ -251,7 +251,9 @@
       "owner": "W6",
       "version": "0047_w6_creator_media",
       "path": "apps/backend/src/modules/media/creator-scope.sql",
-      "state": "reserved_unapplied"
+      "state": "reserved_unapplied",
+      "sourceCommit": "682766cdec3318a70aa949eda93a9834845f5f05",
+      "sourceSha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db"
     },
     {
       "id": "0048",
@@ -343,6 +345,23 @@
       "state": "reserved_unapplied",
       "sourceCommit": "3cda401692fab65fe1af36eb4a8c41ac81b01f8c",
       "sourceSha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911"
+    },
+    {
+      "id": "0059",
+      "owner": "W3",
+      "version": "0059_w3_recording_association",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
+      "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
+    },
+    {
+      "id": "0060",
+      "owner": "W8",
+      "version": "0060_w8_composed_signed_message",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
     }
   ]
 }

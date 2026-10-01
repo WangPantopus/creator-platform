@@ -1,0 +1,31 @@
+{
+  "observedAt": "2026-10-01T01:10:01.559725+00:00",
+  "sourceParent": "ad1797c520cfd24fa43ba2922b8b9646486afb24",
+  "path": "apps/backend/src/modules/growth/privacy-export.ts",
+  "sourceSha256": "2c6ea92dadd9d1aec11db9c90d9cce67fd2af330f9bcb659655bdb37c5416b7e",
+  "guards": {
+    "postgresRowUtf8Bytes": 262144,
+    "fetchRows": 16,
+    "nodeEncodedRecordUtf8Bytes": 524288,
+    "maximumFetchedRawJsonBytes": 4194304,
+    "oversizedPayloadReturned": false,
+    "oversizedExportOutcome": "Error before finish/seal; coordinator aborts the partial artifact. No omission or truncated completion."
+  },
+  "verification": {
+    "backendBuild": "pass",
+    "scopedEslint": "pass",
+    "scopedPrettier": "pass",
+    "existingContractChecks": {
+      "passed": 9,
+      "failed": 0,
+      "durationMs": 271
+    }
+  },
+  "limits": [
+    "No actual leased Growth task or protected source artifact ran",
+    "PostgreSQL serializes the source row to measure it; database-side peak memory is not established",
+    "JS object/transport overhead exceeds raw JSON bytes, but fetched payload size and row count have fixed bounds",
+    "Large individual records need a protected large-object adapter; this implementation refuses them",
+    "Missing retained Growth key remains a gate; no ciphertext/job/retry changed"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "observedAt": "2026-10-01T04:11:52.872613+00:00",
+  "incomingMain": "6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac",
+  "w8Parent": "35cbb30ee5853d3c37c9d510eaa747aedb833e4b",
+  "resolution": {
+    "threadAuthorization": "W8 write-first default and explicit read locks retained with main current-held authority",
+    "conversation": "Main exact lineage/correction/recording/team/recovery contracts retained, with explicit reviewed reads",
+    "context": "W8 one locked family snapshot includes bounded exclusions/provenance;3 base context reads retained with main canonical semantic identity/revision-aware append",
+    "fixtures": "Only previously approved scoped Android arrival/registered UUID/disposable canonical-registry setup and existing auth expectation corrections relative to main; exact iOS selector already matches merged main",
+    "ci": "Main standard per-event/ref concurrency and native capture setup retained; Intel macOS26 image/native signed UI flow alongside retained bootstatus and disabled parallelism",
+    "peerNativeReferences": "Exact already-merged main bytes retained; no W8 golden/tolerance edits"
+  },
+  "activeMigrations": {
+    "count": 40,
+    "entriesAndSourceBytesMatch61e07b1": true,
+    "newProposalState": "0060 remains reserved_unapplied"
+  },
+  "databaseOrPrivateEnvironmentModified": false,
+  "nativeRebuildAndActualAcceptance": "Pending combined revision builds/launches; earlier35c/3685 evidence stays dated",
+  "githubMainPolicy": {
+    "protected": false,
+    "rulesets": [],
+    "checkedViaAuthenticatedApi": true
+  },
+  "noAutomaticApprovalWaiverInferred": true,
+  "verification": {
+    "backendTypecheck": "pass",
+    "webTypecheck": "pass",
+    "generatedClientAndSharedChecks": "pass:49 operations/12 resources",
+    "resolvedSourceLint": "pass",
+    "backendBuild": "pass",
+    "conflictFormattingAndWhitespace": "pass"
+  }
+}

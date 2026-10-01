@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-01T01:10:01.559725+00:00",
+  "activation": false,
+  "appliedSqlChanged": false,
+  "reservedId": "0058",
+  "reviewedSource": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
+  "reviewedSqlSha256": "62d05887ccbeb5f496f42d5854d14b5665fc88f9ee2409c703432bd7756d2c67",
+  "ownerReportsNewUnpublishedDraft": true,
+  "oldHashPinned": false,
+  "finding": "This reviewed proposal replaces creator.require_signed_message with its foundation approved_draft fallback. Applied after reserved 0044 it would drop the exact current personal-Approval branch, including draft/version, creator/key epoch, verification/recovery/key revocation and delivered-message reuse checks. Preserve 0044 as well as old applied signing protections in the final additive composition.",
+  "requiredCustody": [
+    "Published immutable revised proposal; owner-reported new draft must not be treated as current source",
+    "W1 exact signing/immutable original/version/provenance review",
+    "Explicit composition with 0044 personal Approval, not replacement by foundation-only fallback",
+    "Fresh and preserved-upgrade behavior after every earlier reservation is resolved",
+    "No activation from callback registration or source review alone"
+  ]
+}

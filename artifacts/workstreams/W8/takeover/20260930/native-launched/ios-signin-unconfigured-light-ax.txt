@@ -1,0 +1,17 @@
+Application, 0x104204080, pid: 8771, label: 'Qelvora' <App element pid: 8771>
+  Window (Main), 0x10420f510, {{0.0, 0.0}, {402.0, 874.0}} <AX element pid: 8771, elementOrHash.elementID: 4415607360.3>
+    Other, 0x10420f8d0, {{0.0, 0.0}, {402.0, 874.0}} <AX element pid: 8771, elementOrHash.elementID: 4413484272.4>
+      Other, 0x10420f9f0, {{0.0, 0.0}, {402.0, 874.0}} <AX element pid: 8771, elementOrHash.elementID: 4412821056.5>
+        Other, 0x10420f630, {{0.0, 0.0}, {402.0, 874.0}} <AX element pid: 8771, elementOrHash.elementID: 4414528240.6>
+          Other, 0x10420f750, {{0.0, 0.0}, {402.0, 874.0}} <AX element pid: 8771, elementOrHash.elementID: 4563472416.7>
+            StaticText, 0x10420fb10, {{15.5, 77.5}, {371.0, 81.7}}, label: 'Account status, Pantopus sign-in is not connected in this local build.' <AX element pid: 8771, elementOrHash.elementID: 4413528672.15>
+              Other, 0x10420fc30, {{30.0, 91.0}, {16.0, 16.0}} <AX element pid: 8771, elementOrHash.elementID: 4413526320.16>
+              StaticText, 0x10420fd50, {{56.0, 90.0}, {102.3, 18.3}}, label: 'Account status' <AX element pid: 8771, elementOrHash.elementID: 4413527104.17>
+              StaticText, 0x10420fe70, {{56.0, 108.3}, {264.0, 38.3}}, label: 'Pantopus sign-in is not connected in this local build.' <AX element pid: 8771, elementOrHash.elementID: 4413527888.18>
+            ScrollView, 0x10420ff90, {{0.0, 174.7}, {402.0, 699.3}} <AX element pid: 8771, elementOrHash.elementID: 4471314944.8>
+              Other, 0x1044161d0, {{0.0, 174.7}, {402.0, 665.3}} <AX element pid: 8771, elementOrHash.elementID: 4415599440.9>
+                StaticText, 0x1044097c0, {{24.0, 238.7}, {67.7, 22.0}}, label: 'Qelvora' <AX element pid: 8771, elementOrHash.elementID: 4563438576.10>
+                StaticText, 0x104412b00, {{24.0, 395.2}, {354.0, 182.0}}, label: 'Her AI answers you now. She answers in person when you ask.' <AX element pid: 8771, elementOrHash.elementID: 4563439952.11>
+                StaticText, 0x10440b160, {{24.0, 605.2}, {351.7, 41.7}}, label: 'Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.' <AX element pid: 8771, elementOrHash.elementID: 4563440384.12>
+                Button, 0x1044145d0, {{24.0, 697.3}, {354.0, 56.0}}, identifier: 'continue-with-pantopus', label: 'Continue with Pantopus' <AX element pid: 8771, elementOrHash.elementID: 4563462944.13>
+                StaticText, 0x1044146f0, {{25.0, 767.3}, {352.0, 32.7}}, label: 'One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.' <AX element pid: 8771, elementOrHash.elementID: 4563455664.14>

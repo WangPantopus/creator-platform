@@ -34,7 +34,10 @@ if (ci && !["false", "0"].includes(ci.toLowerCase()) && !adminUrl) {
 describe.skipIf(!adminUrl)(
   "PostgreSQL foundation using the real non-owner role",
   () => {
-    const admin = new pg.Pool({ connectionString: adminUrl, max: 4 });
+    const bootstrap = new pg.Pool({ connectionString: adminUrl, max: 1 });
+    const fixtureDatabase = `creator_foundation_${randomUUID().replaceAll("-", "")}`;
+    let fixtureCreated = false;
+    let admin: pg.Pool;
     let runtime: pg.Pool;
     let db: Database;
     let access: AccessService;
@@ -67,10 +70,13 @@ describe.skipIf(!adminUrl)(
       const url = new URL(adminUrl!);
       if (!/test|foundation/u.test(url.pathname))
         throw new Error("Use a disposable test database.");
-      await admin.query(
-        "DROP SCHEMA IF EXISTS growth, creator_trust, creator CASCADE",
+      const existingRole = await bootstrap.query(
+        "SELECT 1 FROM pg_roles WHERE rolname='creator_runtime'",
       );
-      // Exercise the current schema and production grants through W8's checksum runner.
+      await bootstrap.query(`CREATE DATABASE "${fixtureDatabase}"`);
+      fixtureCreated = true;
+      url.pathname = `/${fixtureDatabase}`;
+      admin = new pg.Pool({ connectionString: url.toString(), max: 4 });
       await promisify(execFile)(
         process.execPath,
         [
@@ -81,14 +87,20 @@ describe.skipIf(!adminUrl)(
           ),
         ],
         {
-          env: { ...process.env, DATABASE_MIGRATION_URL: adminUrl! },
+          env: {
+            ...process.env,
+            DATABASE_MIGRATION_URL: url.toString(),
+            W8_LEGACY_ROOT_MIGRATIONS: "false",
+          },
           timeout: 60000,
         },
       );
-      // The canonical checksum runner installs0002 and0041/0042 exactly once.
-      await admin.query(
-        "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
-      );
+      // Configure only a newly created fixture role; never rotate a retained
+      // cluster's runtime credential when this suite is repeated.
+      if (!existingRole.rowCount)
+        await admin.query(
+          "ALTER ROLE creator_runtime PASSWORD 'foundation-test-only'",
+        );
       url.username = "creator_runtime";
       url.password = "foundation-test-only";
       runtime = new pg.Pool({ connectionString: url.toString(), max: 8 });
@@ -151,7 +163,10 @@ describe.skipIf(!adminUrl)(
     });
     afterAll(async () => {
       if (runtime) await runtime.end();
-      await admin.end();
+      if (admin) await admin.end();
+      if (fixtureCreated)
+        await bootstrap.query(`DROP DATABASE "${fixtureDatabase}"`);
+      await bootstrap.end();
     });
 
     it("T-11 denies unscoped read/write and leaves no tenant context on pooled connections", async () => {

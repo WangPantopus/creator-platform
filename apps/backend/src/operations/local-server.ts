@@ -39,6 +39,8 @@ import { PrivacyDomains } from "../modules/trust/contracts.js";
 import { GrowthDatabase } from "../modules/growth/database.js";
 import { GrowthService } from "../modules/growth/service.js";
 import { unavailableOwners } from "../modules/growth/contracts.js";
+import { attachRealtime } from "../realtime/gateway.js";
+import { PostgresWalObserver } from "./wal.js";
 
 // Explicit local harness, never imported by production bootstrap. No production identity fallback.
 if (
@@ -629,7 +631,21 @@ const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
     : telemetry.observe(signal, value),
 );
 await worker.start();
+const wal = new PostgresWalObserver(workerPool, telemetry);
+await wal.start();
 const server = createServer(app);
+const sockets = attachRealtime(
+  server,
+  nativeIdentity,
+  access,
+  conversation,
+  origin,
+  {
+    assertActorAllowed: (actor) => service.assertAllowed(actor),
+    resolveSession: (token) => nativeIdentity.resolve(token),
+    telemetry,
+  },
+);
 server.requestTimeout = 15_000;
 server.headersTimeout = 10_000;
 server.keepAliveTimeout = 5000;
@@ -642,8 +658,45 @@ let stopping = false;
 const stop = async () => {
   if (stopping) return;
   stopping = true;
-  await worker.stop();
-  await new Promise<void>((resolve) => server.close(() => resolve()));
+  const started = performance.now();
+  let forcedSockets = 0;
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_started",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      activeSockets: sockets.clients.size,
+    }),
+  );
+  for (const connection of sockets.clients)
+    connection.close(1001, "Server shutdown");
+  const drain = setTimeout(() => {
+    forcedSockets = sockets.clients.size;
+    if (forcedSockets)
+      telemetry.increment("realtime_shutdown_forced", forcedSockets);
+    for (const connection of sockets.clients) connection.terminate();
+  }, 5000);
+  drain.unref();
+  const elapsed = () => Number((performance.now() - started).toFixed(2));
+  const stages = { httpMs: 0, socketsMs: 0, workerMs: 0, walMs: 0, poolsMs: 0 };
+  // Stop intake before waiting for the current fenced worker task. Otherwise
+  // polling clients can keep obtaining tickets while shutdown is already active.
+  await Promise.all([
+    new Promise<void>((resolve) => server.close(() => resolve())).then(() => {
+      stages.httpMs = elapsed();
+    }),
+    new Promise<void>((resolve) => sockets.close(() => resolve())).then(() => {
+      stages.socketsMs = elapsed();
+    }),
+    worker.stop().then(() => {
+      stages.workerMs = elapsed();
+    }),
+    wal.stop().then(() => {
+      stages.walMs = elapsed();
+    }),
+  ]);
+  clearTimeout(drain);
   telemetry.close();
   await Promise.all([
     pool.end(),
@@ -651,6 +704,19 @@ const stop = async () => {
     conversationPool.end(),
     ...growthPools.map((current) => current.end()),
   ]);
+  stages.poolsMs = elapsed();
+  telemetry.write(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "trust_local_shutdown_completed",
+      environment: telemetry.environment,
+      release: telemetry.release,
+      durationMs: elapsed(),
+      activeSockets: sockets.clients.size,
+      forcedSockets,
+      stages,
+    }),
+  );
 };
 process.on("SIGTERM", () => void stop());
 process.on("SIGINT", () => void stop());

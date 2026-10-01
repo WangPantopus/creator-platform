@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-01T00:56:14.718885+00:00",
+  "sourceCommit": "bf92a8b13bc371b2bd87eea826a55d16c10f641c",
+  "runId": 36776061258,
+  "artifactDownload": "Normal authenticated gh run download succeeded; previous connector URL403 is historical.",
+  "webVisual": {
+    "jobId": 110094134973,
+    "artifactId": 11133904434,
+    "stats": {
+      "total": 13,
+      "expected": 6,
+      "unexpected": 7,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": false
+    },
+    "findings": [
+      "Three functional failures use obsolete fallback/free-text arrivals; those exact existing fixtures are already corrected at439c336.",
+      "Welcome Light/Night implementation pixel mismatches remain distinct from fixtures. Generic Home arrival shows generic authorship copy/no contextual Maya card, while the independent reference contains Maya arrival/name/context. Do not invent metadata or weaken the exact reference assertion.",
+      "Two creator-home captures timed out awaiting a heading; actual pages showed Temporarily unavailable/This feature is not connected yet. No current public Growth data/provider was configured.",
+      "Handle previews and all64 screen/all53 component export checks passed in this run."
+    ],
+    "captures": [
+      {
+        "path": "foundation-bf92-welcome-light-implementation.png",
+        "sha256": "c22c2371b348cec146b1294edc160c05f658b01a298838809374b4b9872a1b3d"
+      },
+      {
+        "path": "foundation-bf92-welcome-light-reference.png",
+        "sha256": "c208f54205720769f20ce171a6a88d8f00f5eb42c476779099035765812a0a92"
+      }
+    ]
+  },
+  "iosFoundation": {
+    "jobId": 110094134952,
+    "snapshotErrors": 110,
+    "findings": [
+      "Old-source CI ran its simulator suite; snapshot errors are actual failures, not merely a queued runner.",
+      "The new macos26/Xcode26.6 runner setup has separate current-head jobs; no capture/tolerance waiver is inferred."
+    ],
+    "privateLogSha256": "5e1d84f0129f4cc4eb9209fe8e00b69c796e61f222bb60b36ed842b545af4d76"
+  },
+  "androidFoundation": {
+    "jobId": 110094134836,
+    "tests": 19,
+    "failed": 4,
+    "failureCases": [
+      "threadStatesLight",
+      "threadStatesNight",
+      "componentsLight",
+      "componentsNight"
+    ],
+    "artifactId": 11132457025,
+    "capturedPngFiles": 0,
+    "findings": [
+      "Downloaded artifact contains HTML reports and debug APK; it contains no failed/reference PNG captures. No pixel root cause is inferred.",
+      "The passing Android emulator runtime job is separate from these snapshot assertions."
+    ],
+    "privateLogSha256": "93fbc592c1d0485dc0b6bcf49a5e822a5252a9e4e45dd3a30bbc83139f9a2376"
+  },
+  "testsGoldensTolerancesChanged": false,
+  "requiredChecksWaived": false
+}

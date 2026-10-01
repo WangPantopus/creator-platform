@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-10-01T03:03:20.073900+00:00",
+  "sourceCommit": "682766cdec3318a70aa949eda93a9834845f5f05",
+  "sourcePath": "apps/backend/src/modules/media/creator-scope.sql",
+  "sourceSha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+  "sourceBytes": 8446,
+  "fullSqlPersonallyRead": true,
+  "reservation": "0047_w6_creator_media",
+  "state": "reserved_unapplied",
+  "activeCount": 40,
+  "sqlAppliedOrCopied": false,
+  "sourceFindings": [
+    "Additive creator-only media/publication tables; random job_token/version/access_epoch and immutable identity/processed tuple/signing occurrence",
+    "Forced RLS. Owner mutation checks current creator/account; fan SELECT requires fan_profile ownership plus named ready/C2PA/signed media",
+    "Private fan SELECT does not itself check current license, Trust restriction, same-client current publication purpose or exact actual granted audience; source callback/held authority must compose without masquerading as completed RLS acceptance",
+    "Publication trigger binds consumed unwithdrawn named content_publication plus exact ready descriptor and signed command hash; canonical signer/current key authority and actual physical file proof remain separate",
+    "Publication FK prevents physical asset deletion until publication removed; metadata deleted state is not full binary purge or finite Q16 custody"
+  ],
+  "activationRequires": [
+    "Actual same-client W1 private-fan-purpose denial/RLS custodian and current W6 purpose adapter, no artificial owner account",
+    "Current signing/processed file-byte proof and licensed audience",
+    "Full actual leased C10 whole-account family/archive/export/delete/expiry custody and finite Q16 policy",
+    "Fresh/preserved-upgrade/owner/non-owner acceptance after earlier reservations resolved"
+  ],
+  "oldActiveSqlPoliciesGrantsChanged": false,
+  "newTestsWrittenOrExistingTestsChanged": false
+}

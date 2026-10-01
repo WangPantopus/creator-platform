@@ -103,21 +103,38 @@ export class GrowthDatabase {
   async transaction<T>(
     pool: Pool,
     work: (client: PoolClient) => Promise<T>,
+    signal?: AbortSignal,
   ): Promise<T> {
+    signal?.throwIfAborted();
     const client = await pool.connect();
+    let released = false;
+    const abort = () => {
+      if (!released) {
+        released = true;
+        client.release(true);
+      }
+    };
+    signal?.addEventListener("abort", abort, { once: true });
     try {
+      signal?.throwIfAborted();
       await client.query("BEGIN");
       await client.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
       );
       const value = await work(client);
+      signal?.throwIfAborted();
       await client.query("COMMIT");
+      signal?.throwIfAborted();
       return value;
     } catch (error) {
-      await client.query("ROLLBACK");
+      if (!released) await client.query("ROLLBACK").catch(() => {});
       throw error;
     } finally {
-      client.release();
+      signal?.removeEventListener("abort", abort);
+      if (!released) {
+        released = true;
+        client.release();
+      }
     }
   }
   /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
