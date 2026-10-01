@@ -14,7 +14,7 @@ struct CommerceFeature: View {
     var storeProductIDs: [String] = []
     @State private var overview: CommerceOverview?; @State private var detail: CommerceDetail?
     @State private var screen = "requests"; @State private var category = "Open"; @State private var creator = ""
-    @State private var amount = ""; @State private var choice = ""; @State private var reminders = true
+    @State private var amount = ""; @State private var choice = ""; @State private var reminders = false
     @State private var summary = ""; @State private var info = ""; @State private var selectedMode: String?
     @State private var includeSummary = true; @State private var includeMessages: [IncludeItem] = []
     @State private var visibility: String? = "private"; @State private var busy = false; @State private var failure = ""
