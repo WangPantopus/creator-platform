@@ -64,7 +64,7 @@ Keep the stack (Node/TypeScript backend, Next web, SwiftUI iOS, Compose Android)
    - Operate the action-error focus fix in a visible browser in Light and Night, at 1280×900 and 390-wide.
    - Merge it normally.
 2. Check the peers' current state:
-   - W1 PR59 (`playwright.config.ts` `visualWebURL`) and W1's `SessionUnavailableError` change. Re-verify it with a real normal stop of W2's DB while Studio is open.
+   - W1 PR59 (`playwright.config.ts` `visualWebURL`) and W1's `SessionUnavailableError` change ([PR66](https://github.com/WangPantopus/creator-platform/pull/66); W1 notes that `/api/auth/restore` still treats a 5xx refresh as signed out and that `retry()` did not re-render in Next dev). Re-verify it with a real normal stop of W2's DB while Studio is open.
    - W4 PR53 (iOS snapshot capture scale).
    - W3 `codex/w3-generation-host` / draft PR63: `composeConversationHost(runtime, config, { licenseVerifier, journalPolicy, ... })` consuming W2's development license, synthetic publish path and `developmentSyntheticJournalPolicy()`.
    - Registration of reserved 0048/0049 by W8/W4. 0048 is final, sha256 `16dddc80…`.

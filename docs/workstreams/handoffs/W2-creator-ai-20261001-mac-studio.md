@@ -152,7 +152,7 @@ Unset `W2_PG_SUPERUSER_PASSWORD` before launching. Add the provider env only aft
    - all-attempt known/unknown accounting and W4 weighted settlement (R04);
    - invalidation ≤5 s (R06);
    - p95 workloads (R13).
-4. Re-verify W1's session-unavailable fix with a real DB stop on the W2 runtime once it merges.
+4. Re-verify W1's session-unavailable fix, [PR66](https://github.com/WangPantopus/creator-platform/pull/66) (stacked on the W1 chain), with a real DB stop on the W2 runtime once it merges. W1 operated `/identity/account` showing "We can't reach your account right now". W1 recorded two open follow-ups for its successor: `/api/auth/restore` still treats a 5xx refresh as signed out, and `retry()` did not re-render in Next dev after recovery.
 5. Design and accessibility (R12) on the populated runtime:
    - artboards 4C-07/4D-02/03/04/08/5.4 at equal content;
    - actual 200% text, VoiceOver/TalkBack, reduced motion, offline;
