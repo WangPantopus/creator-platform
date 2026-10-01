@@ -147,7 +147,17 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.status in listOf(401,403))clearAuthority(); error = failure.message ?: "This action could not complete. Your input is kept." }
         finally { busy = false }
     }
-    LaunchedEffect(client, contentId) { load(); while (true) { delay(4000); if (!busy) load(false) } }
+    LaunchedEffect(client, contentId) {
+        var refreshStarted = SystemClock.elapsedRealtime()
+        load()
+        while (true) {
+            // Schedule from the read's start so network time does not consume
+            // the next refresh window and repeatedly unmount a focused editor.
+            delay((2000 - (SystemClock.elapsedRealtime() - refreshStarted)).coerceAtLeast(250))
+            refreshStarted = SystemClock.elapsedRealtime()
+            if (!busy) load(false)
+        }
+    }
     LaunchedEffect(client, contentId) { while (true) { delay(500); if (SystemClock.elapsedRealtime() - checkedAt >= 5000) suspendAccess() } }
     DisposableEffect(lifecycle, client, contentId) {
         val observer = LifecycleEventObserver { _, event ->

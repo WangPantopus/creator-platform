@@ -128,7 +128,18 @@ private struct ContentFanScreen: View {
                 }
                 }
             }.padding(16)
-        }.task { await load(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if !busy { await load(refreshThanks: false) } } }
+        }.task {
+            var refreshStarted = ProcessInfo.processInfo.systemUptime
+            await load()
+            while !Task.isCancelled {
+                // Count the read time inside the refresh interval; the separate
+                // five-second authority expiry still conceals stale content.
+                let remaining = max(0.25, 2 - (ProcessInfo.processInfo.systemUptime - refreshStarted))
+                try? await Task.sleep(for: .seconds(remaining))
+                refreshStarted = ProcessInfo.processInfo.systemUptime
+                if !busy { await load(refreshThanks: false) }
+            }
+        }
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
