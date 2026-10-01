@@ -6,7 +6,10 @@ struct W3Message: Decodable, Identifiable, Sendable {
     let text: String; let deliveryState: APIMessageDeliveryState; let controlEpoch: Int
     let sequence: Int; let signedActId: String?; let citations: [String]
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
+    let agentVersion: W3AgentVersion?; let feedback: String?
+    let correction: W3Correction?
     func authorLabel(name: String) -> String {
+        if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
         if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
         if authorKind == .fan { return "You" }
         if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
@@ -18,7 +21,16 @@ struct W3Page: Decodable, Sendable {
     let control: APIThreadControl; let epoch: Int; let cursor: Int; let revision: Int
     let generationSequences: [String: Int]; let messages: [W3Message]; let before: Int?
     let offTheRecord: Bool; let introShared: Bool; let consentCurrent: Bool; let canSend: Bool; let unavailableReason: String?
+    let feedbackPolicy: W3FeedbackPolicy?
 }
+struct W3AgentVersion: Codable, Sendable { let id: String; let hash: String }
+struct W3Correction: Decodable, Sendable { let originalMessageId: String; let originalVersion: Int }
+struct W3FeedbackPolicy: Decodable, Sendable { let version: String; let notice: String }
+struct W3FeedbackInput: Encodable { let messageVersion: Int; let agentVersion: W3AgentVersion; let rating: String?; let consent: Bool?; let policyVersion: String?
+    enum CodingKeys: String, CodingKey { case messageVersion, agentVersion, rating, consent, policyVersion }
+    func encode(to encoder: any Encoder) throws { var values = encoder.container(keyedBy: CodingKeys.self); try values.encode(messageVersion, forKey: .messageVersion); try values.encode(agentVersion, forKey: .agentVersion); if let rating { try values.encode(rating, forKey: .rating) } else { try values.encodeNil(forKey: .rating) }; try values.encodeIfPresent(consent, forKey: .consent); try values.encodeIfPresent(policyVersion, forKey: .policyVersion) }
+}
+struct W3FeedbackResult: Decodable, Sendable { let rating: String? }
 struct W3Provider: Decodable, Sendable { let name: String; let termsUrl: String; let noTraining: Bool; let noRetention: Bool }
 struct W3Policy: Decodable, Sendable { let version: String; let providers: [W3Provider]; let verified: Bool }
 struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String }
@@ -31,6 +43,7 @@ struct W3Audit: Decodable, Identifiable, Sendable { let id: String; let readerAc
 struct W3Failure: Error, Sendable { let message: String; let status: Int }
 private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
 struct W3Status: Decodable, Sendable { let accepted: Bool }
+struct W3StatusQuery: Encodable { let idempotencyKey: String }
 struct W3Preferences: Encodable { let offTheRecord: Bool; let introShared: Bool; let expectedRevision: Int }
 struct W3Decision: Encodable { let expectedRevision: Int; let action: String; let text: String? }
 struct W3Consent: Encodable { let version: String; let accepted: Bool }
@@ -119,7 +132,7 @@ final class W3ThreadModel: ObservableObject {
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
             await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
             offline = !transportReady; authorizationDenied = false; failure = ""
-            if let pending { let status: W3Status = try await client.request(root + "/messages/status/" + pending.key); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
+            if let pending { let status: W3Status = try await client.request(root + "/messages/status", body: JSONEncoder().encode(W3StatusQuery(idempotencyKey: pending.key))); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
         } catch { failed(error) }
     }
     func setActive(_ value: Bool) {
@@ -192,6 +205,18 @@ final class W3ThreadModel: ObservableObject {
         guard !busy, !offline, let page else { return }; busy = true; defer { busy = false }
         do { let body = try JSONSerialization.data(withJSONObject:["expectedRevision":page.revision]); let _: W3Page = try await client.request(root + "/messages/" + message.id + "/dont-remember",body:body); await refresh() }
         catch { failed(error) }
+    }
+    func feedback(_ message: W3Message, rating: String?) async {
+        guard active, !busy, !offline, let version = message.agentVersion, rating == nil || page?.feedbackPolicy != nil else { return }
+        let policy = page?.feedbackPolicy
+        busy = true; defer { busy = false }
+        do {
+            let body = try JSONEncoder().encode(W3FeedbackInput(messageVersion: message.version, agentVersion: version, rating: rating, consent: rating == nil ? nil : true, policyVersion: rating == nil ? nil : policy?.version))
+            let _: W3FeedbackResult = try await client.request(root + "/messages/" + message.id + "/feedback", body: body)
+            let refreshed: W3Message = try await client.request(root + "/messages/" + message.id)
+            older = older.map { $0.id == refreshed.id ? refreshed : $0 }
+            await refresh()
+        } catch { failed(error) }
     }
     private func failed(_ error: Error) {
         transportReady = false; offline = true

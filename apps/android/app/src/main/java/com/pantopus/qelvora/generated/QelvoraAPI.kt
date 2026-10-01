@@ -1667,6 +1667,12 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
 }
 
 @Serializable
+data class APIConversationAgentReplyVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
 data class APIConversationAuditEntry(
   val `id`: String,
   val `readerAccountId`: String,
@@ -1742,6 +1748,67 @@ enum class APIConversationConversationAuthorship {
 }
 
 @Serializable
+data class APIConversationConversationCorrectionCommand(
+  val `actType`: APIConversationConversationCorrectionCommandActType,
+  val `subjectId`: String,
+  val `content`: APIConversationConversationCorrectionCommandContent
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionCommandActType {
+  @SerialName("correction") CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionCommandContent(
+  val `kind`: APIConversationConversationCorrectionCommandContentKind,
+  val `creatorId`: String,
+  val `threadId`: String,
+  val `fanId`: String,
+  val `messageVersion`: Long,
+  val `text`: String
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionCommandContentKind {
+  @SerialName("conversation_correction") CONVERSATION_CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionInput(
+  val `command`: APIConversationConversationCorrectionInputCommand,
+  val `signedActId`: String,
+  val `idempotencyKey`: String
+)
+
+@Serializable
+data class APIConversationConversationCorrectionInputCommand(
+  val `actType`: APIConversationConversationCorrectionInputCommandActType,
+  val `subjectId`: String,
+  val `content`: APIConversationConversationCorrectionInputCommandContent
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionInputCommandActType {
+  @SerialName("correction") CORRECTION
+}
+
+@Serializable
+data class APIConversationConversationCorrectionInputCommandContent(
+  val `kind`: APIConversationConversationCorrectionInputCommandContentKind,
+  val `creatorId`: String,
+  val `threadId`: String,
+  val `fanId`: String,
+  val `messageVersion`: Long,
+  val `text`: String
+)
+
+@Serializable
+enum class APIConversationConversationCorrectionInputCommandContentKind {
+  @SerialName("conversation_correction") CONVERSATION_CORRECTION
+}
+
+@Serializable
 data class APIConversationConversationMessage(
   val `id`: String,
   val `threadId`: String,
@@ -1756,7 +1823,10 @@ data class APIConversationConversationMessage(
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
-  val `version`: Long
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationMessageAgentVersion? = null,
+  val `feedback`: APIConversationConversationMessageFeedback? = null,
+  val `correction`: APIConversationConversationMessageCorrection? = null
 )
 
 @Serializable
@@ -1782,6 +1852,24 @@ enum class APIConversationConversationMessageDeliveryState {
 }
 
 @Serializable
+data class APIConversationConversationMessageAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationMessageFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationMessageCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
 data class APIConversationConversationPage(
   val `threadId`: String,
   val `creatorId`: String,
@@ -1799,7 +1887,8 @@ data class APIConversationConversationPage(
   val `introShared`: Boolean,
   val `consentCurrent`: Boolean,
   val `canSend`: Boolean,
-  val `unavailableReason`: String? = null
+  val `unavailableReason`: String? = null,
+  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null
 )
 
 @Serializable
@@ -1826,7 +1915,10 @@ data class APIConversationConversationPageMessagesItem(
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
-  val `version`: Long
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationPageMessagesItemAgentVersion? = null,
+  val `feedback`: APIConversationConversationPageMessagesItemFeedback? = null,
+  val `correction`: APIConversationConversationPageMessagesItemCorrection? = null
 )
 
 @Serializable
@@ -1850,6 +1942,30 @@ enum class APIConversationConversationPageMessagesItemDeliveryState {
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
 }
+
+@Serializable
+data class APIConversationConversationPageMessagesItemAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationPageFeedbackPolicy(
+  val `version`: String,
+  val `notice`: String
+)
 
 @Serializable
 data class APIConversationConversationUsage(
@@ -1943,6 +2059,50 @@ data class APIConversationProviderPolicyProvidersItem(
   val `noTraining`: Boolean,
   val `noRetention`: Boolean
 )
+
+@Serializable
+data class APIConversationReplyFeedbackInput(
+  val `messageVersion`: Long,
+  val `agentVersion`: APIConversationReplyFeedbackInputAgentVersion,
+  val `rating`: APIConversationReplyFeedbackInputRating? = null,
+  val `consent`: APIConversationReplyFeedbackInputConsent? = null,
+  val `policyVersion`: String? = null
+)
+
+@Serializable
+data class APIConversationReplyFeedbackInputAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackInputRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable(with = APIConversationReplyFeedbackInputConsentSerializer::class)
+object APIConversationReplyFeedbackInputConsent { const val value: Boolean = true }
+object APIConversationReplyFeedbackInputConsentSerializer : KSerializer<APIConversationReplyFeedbackInputConsent> {
+  override val descriptor = PrimitiveSerialDescriptor("APIConversationReplyFeedbackInputConsent", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIConversationReplyFeedbackInputConsent {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIConversationReplyFeedbackInputConsent
+  }
+  override fun serialize(encoder: Encoder, value: APIConversationReplyFeedbackInputConsent) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APIConversationReplyFeedbackPolicy(
+  val `version`: String,
+  val `notice`: String
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
 
 @Serializable
 data class APIConversationTeamReply(

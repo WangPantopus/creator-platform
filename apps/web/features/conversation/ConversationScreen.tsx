@@ -12,6 +12,7 @@ import {
   AuthorLabel,
   Button,
   CitationChip,
+  Correction,
   IdentityStrip,
   Message,
   Notice,
@@ -34,6 +35,7 @@ type Pending = {
   state: "pending" | "uncertain" | "rejected";
 };
 function author(message: ConversationMessage, name: string) {
+  if (message.correction) return formatCopy("correctionAuthor", { name });
   switch (message.authorKind) {
     case "fan":
       return "You";
@@ -108,7 +110,8 @@ export function ConversationScreen({
       const item = latestPending.current;
       if (item) {
         const result = await request<{ accepted: boolean }>(
-          `${root}/messages/status/${item.key}`,
+          `${root}/messages/status`,
+          { idempotencyKey: item.key },
         );
         if (
           result.accepted &&
@@ -433,6 +436,51 @@ export function ConversationScreen({
       if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
   };
+  const feedback = async (
+    message: ConversationMessage,
+    rating: "helpful" | "not_helpful" | null,
+  ) => {
+    if (
+      busy ||
+      !online ||
+      !message.agentVersion ||
+      (rating !== null && !page?.feedbackPolicy)
+    )
+      return;
+    const revision = lifecycle.current;
+    setBusy(true);
+    try {
+      const result = await request<{
+        rating: "helpful" | "not_helpful" | null;
+      }>(`${root}/messages/${message.id}/feedback`, {
+        messageVersion: message.version,
+        agentVersion: message.agentVersion,
+        rating,
+        ...(rating !== null
+          ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
+          : {}),
+      });
+      if (mounted.current && lifecycle.current === revision) {
+        setOlder((items) =>
+          items.map((item) =>
+            item.id === message.id && item.version === message.version
+              ? { ...item, feedback: result.rating }
+              : item,
+          ),
+        );
+        await refresh();
+      }
+    } catch (error) {
+      if (mounted.current && lifecycle.current === revision)
+        setFailure(
+          error instanceof Error
+            ? error.message
+            : "Your response could not be saved. Try again.",
+        );
+    } finally {
+      if (mounted.current && lifecycle.current === revision) setBusy(false);
+    }
+  };
   if (!page)
     return (
       <main className="conversation-screen">
@@ -540,6 +588,25 @@ export function ConversationScreen({
           >
             {message.authorKind === "system" ? (
               <SystemLine>{message.text}</SystemLine>
+            ) : message.correction &&
+              all.some(
+                (original) =>
+                  original.id === message.correction?.originalMessageId &&
+                  original.version === message.correction.originalVersion &&
+                  original.authorKind === "ai",
+              ) ? (
+              <Correction
+                name={page.creatorName}
+                aiText={
+                  all.find(
+                    (original) =>
+                      original.id === message.correction?.originalMessageId,
+                  )!.text
+                }
+                signedActId={message.signedActId ?? undefined}
+              >
+                {message.text}
+              </Correction>
             ) : [
                 "fan",
                 "ai",
@@ -561,6 +628,7 @@ export function ConversationScreen({
                 signedActId={message.signedActId ?? undefined}
                 actions={false}
                 live={
+                  !message.correction &&
                   message.authorKind === "human_creator" &&
                   page.control === "human_active"
                 }
@@ -587,6 +655,21 @@ export function ConversationScreen({
                 }
               >
                 <span style={{ whiteSpace: "pre-wrap" }}>{message.text}</span>
+                {message.correction && (
+                  <div>
+                    <span>
+                      {formatCopy("correctionAuthor", {
+                        name: page.creatorName,
+                      })}
+                    </span>
+                    <a
+                      href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
+                    >
+                      Original AI reply · version{" "}
+                      {message.correction.originalVersion}
+                    </a>
+                  </div>
+                )}
                 {message.deliveryState === "failed" && (
                   <span className="qv-tag">
                     Reply unavailable · your allowance was released
@@ -633,6 +716,56 @@ export function ConversationScreen({
                   Don’t remember this
                 </button>
               ))}
+            {message.authorKind === "ai" &&
+              message.agentVersion &&
+              ["delivered", "interrupted"].includes(message.deliveryState) &&
+              page.feedbackPolicy && (
+                <details className="conversation-feedback">
+                  <summary>{formatCopy("thisHelped", {})}</summary>
+                  <p className="qv-help">{page.feedbackPolicy.notice}</p>
+                  <div className="conversation-actions">
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "helpful"}
+                      onClick={() => void feedback(message, "helpful")}
+                    >
+                      {formatCopy("thisHelped", {})}
+                    </button>
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      aria-pressed={message.feedback === "not_helpful"}
+                      onClick={() => void feedback(message, "not_helpful")}
+                    >
+                      Not helpful
+                    </button>
+                    {message.feedback && (
+                      <button
+                        className="qv-link-btn"
+                        disabled={busy || !online}
+                        onClick={() => void feedback(message, null)}
+                      >
+                        Remove my response
+                      </button>
+                    )}
+                  </div>
+                  {message.feedback && (
+                    <p className="qv-help" role="status">
+                      Your response is saved.
+                    </p>
+                  )}
+                </details>
+              )}
+            {message.feedback && !page.feedbackPolicy && (
+              <button
+                className="qv-link-btn"
+                disabled={busy || !online}
+                onClick={() => void feedback(message, null)}
+              >
+                Remove my response
+              </button>
+            )}
             {message.authorKind !== "fan" &&
               message.authorKind !== "system" && (
                 <div className="conversation-actions">

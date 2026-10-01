@@ -14,6 +14,9 @@ import type { ConversationAllowance } from "./allowance.js";
 import type { ProviderPolicy } from "../../../../../packages/api/src/conversation/contracts.js";
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
+import type { ConversationLineage } from "./lineage.js";
+import type { ConversationCorrections } from "./corrections.js";
+import { invariant } from "../../core/errors.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -26,6 +29,9 @@ export function createConversationRuntime(input: {
   firstConversation?: Pick<CommerceService, "openTrial">;
   semantics?: SemanticExclusionPort;
   mode?: ConversationMode;
+  /** Prepared only from registered schema bytes and current owner policies. */
+  lineage?: ConversationLineage;
+  corrections?: ConversationCorrections;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -34,6 +40,11 @@ export function createConversationRuntime(input: {
   ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
+  invariant(
+    !input.corrections || input.lineage,
+    "correction_lineage_unavailable",
+    "Signed corrections require the prepared original-message lineage projection.",
+  );
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
@@ -52,6 +63,7 @@ export function createConversationRuntime(input: {
     ...(input.assertReady ? { assertReady: input.assertReady } : {}),
     ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
     ...(input.citation ? { citation: input.citation } : {}),
+    ...(input.lineage ? { lineage: input.lineage } : {}),
   });
   const feature = new ConversationFeature(
     input.database,
@@ -72,6 +84,8 @@ export function createConversationRuntime(input: {
     input.citation,
     wellbeing,
     input.firstConversation,
+    input.lineage,
+    input.corrections,
   );
   return {
     feature,
@@ -79,6 +93,9 @@ export function createConversationRuntime(input: {
     memory,
     wellbeing,
     processor,
+    signedSubjectPolicies: input.corrections
+      ? [input.corrections.signedSubjectPolicy()]
+      : [],
     close: () => processor?.close(),
   };
 }

@@ -19,6 +19,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
@@ -111,7 +112,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = !transportReady; error = ""
-                pending?.let { item -> if (client.request("$root/messages/status/${item.key}").jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
+                pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
         } catch (failure: Throwable) { fail(failure) }
     }
@@ -194,7 +195,45 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
-                    ConversationMessageRow(message, current.creatorName, current.control, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    ConversationMessageRow(message, current.creatorName, current.control, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    val version = message.agentVersion
+                    val policy = current.feedbackPolicy
+                    if (message.feedback != null && policy == null && version != null) {
+                        Button("Remove my response", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
+                            busy = true
+                            try {
+                                client.request("$root/messages/${message.id}/feedback", buildJsonObject {
+                                    put("messageVersion", message.version); put("agentVersion", buildJsonObject { put("id", version.id); put("hash", version.hash) }); put("rating", JsonNull)
+                                }); older = older.map { if (it.id == message.id) it.copy(feedback = null) else it }; refresh()
+                            } catch (failure: Throwable) { fail(failure) } finally { busy = false }
+                        } }
+                    }
+                    if (message.authorKind == APIMessageAuthorKind.AI && version != null && policy != null && message.deliveryState in listOf(APIMessageDeliveryState.DELIVERED, APIMessageDeliveryState.INTERRUPTED)) {
+                        var expanded by remember(message.id) { mutableStateOf(false) }
+                        Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET) { expanded = !expanded }
+                        if (expanded) {
+                            BasicText(policy.notice, style = qText("caption"))
+                            val respond: (String?) -> Unit = { rating -> scope.launch {
+                                if (!busy && !offline && foreground) {
+                                    busy = true
+                                    try {
+                                        client.request("$root/messages/${message.id}/feedback", buildJsonObject {
+                                            put("messageVersion", message.version)
+                                            put("agentVersion", buildJsonObject { put("id", version.id); put("hash", version.hash) })
+                                            put("rating", rating?.let { JsonPrimitive(it) } ?: JsonNull)
+                                            if (rating != null) { put("consent", true); put("policyVersion", policy.version) }
+                                        }); older = older.map { if (it.id == message.id) it.copy(feedback = rating) else it }; refresh()
+                                    } catch (failure: Throwable) { fail(failure) } finally { busy = false }
+                                }
+                            } }
+                            Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "helpful") "Selected" else "Not selected" }) { respond("helpful") }
+                            Button("Not helpful", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "not_helpful") "Selected" else "Not selected" }) { respond("not_helpful") }
+                            if (message.feedback != null) {
+                                BasicText("Your response is saved.", style = qText("caption"))
+                                Button("Remove my response", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { respond(null) }
+                            }
+                        }
+                    }
                 }
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption")); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption")); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
@@ -212,13 +251,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
 }
 
-@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, onVerify: () -> Unit, onReport: () -> Unit, onForget: (() -> Unit)?, onCitation: (String) -> Unit) {
+@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, original: ConversationMessage?, onOriginal: () -> Unit, onVerify: () -> Unit, onReport: () -> Unit, onForget: (() -> Unit)?, onCitation: (String) -> Unit) {
     val kind = when (message.authorKind) { APIMessageAuthorKind.FAN -> MessageKind.FAN; APIMessageAuthorKind.AI -> MessageKind.AI; APIMessageAuthorKind.TEAM -> MessageKind.TEAM; APIMessageAuthorKind.HUMAN_CREATOR -> MessageKind.HUMAN_CREATOR; APIMessageAuthorKind.APPROVED_DRAFT -> MessageKind.APPROVED_DRAFT; else -> null }
     SelectionContainer {
         Column(Modifier.semantics { contentDescription = message.authorLabel(name) }) {
             if (message.authorKind == APIMessageAuthorKind.SYSTEM) SystemLine(text = message.text)
+            else if (message.correction != null && original != null) {
+                Correction(text = message.text, name = name, aiText = original.text, onVerify = onVerify)
+                Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
+            }
             else if (kind != null) {
-                Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
+                Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
+                if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label")); Button("Original AI reply · version ${message.correction.originalVersion}", variant = ButtonVariant.QUIET, onClick = onOriginal) }
                 if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText("Reply unavailable · your allowance was released", style = qText("caption"))
                 if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
                 if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption")) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }

@@ -61,12 +61,69 @@ export const MemoryItemSchema = z.strictObject({
   createdAt: z.string(),
 });
 export type MemoryItem = z.infer<typeof MemoryItemSchema>;
+export const AgentReplyVersionSchema = z.strictObject({
+  id: IdSchema,
+  hash: z.string().regex(/^[0-9a-f]{64}$/u),
+});
+export const ReplyFeedbackRatingSchema = z.enum(["helpful", "not_helpful"]);
+export const ReplyFeedbackPolicySchema = z.strictObject({
+  version: z.string().min(1).max(120),
+  notice: z.string().min(1).max(2000),
+});
+export type ReplyFeedbackPolicy = z.infer<typeof ReplyFeedbackPolicySchema>;
+export const ReplyFeedbackInputSchema = z
+  .strictObject({
+    messageVersion: z.number().int().positive(),
+    agentVersion: AgentReplyVersionSchema,
+    rating: ReplyFeedbackRatingSchema.nullable(),
+    consent: z.literal(true).optional(),
+    policyVersion: z.string().min(1).max(120).optional(),
+  })
+  .refine(
+    (body) =>
+      body.rating === null ||
+      (body.consent === true && body.policyVersion !== undefined),
+    {
+      message: "Review the current feedback notice before sending a response.",
+    },
+  );
+export type ReplyFeedbackInput = z.infer<typeof ReplyFeedbackInputSchema>;
+export const ConversationCorrectionCommandSchema = z.strictObject({
+  actType: z.literal("correction"),
+  subjectId: IdSchema,
+  content: z.strictObject({
+    kind: z.literal("conversation_correction"),
+    creatorId: IdSchema,
+    threadId: IdSchema,
+    fanId: IdSchema,
+    messageVersion: z.number().int().positive(),
+    text: z
+      .string()
+      .min(1)
+      .max(10000)
+      .refine((text) => text.trim().length > 0),
+  }),
+});
+export const ConversationCorrectionInputSchema = z.strictObject({
+  command: ConversationCorrectionCommandSchema,
+  signedActId: IdSchema,
+  idempotencyKey: z.string().min(8).max(128),
+});
 export const ConversationMessageSchema = MessageSchema.extend({
   citations: z.array(IdSchema),
   createdAt: z.string(),
   member: z.string().nullable(),
   offTheRecord: z.boolean(),
   version: z.number().int().positive(),
+  agentVersion: AgentReplyVersionSchema.nullable().optional(),
+  feedback: ReplyFeedbackRatingSchema.nullable().optional(),
+  correction: z
+    .strictObject({
+      originalMessageId: IdSchema,
+      originalVersion: z.number().int().positive(),
+    })
+    .nullable()
+    .optional(),
 });
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
 export const ConversationPageSchema = z.strictObject({
@@ -87,6 +144,7 @@ export const ConversationPageSchema = z.strictObject({
   consentCurrent: z.boolean(),
   canSend: z.boolean(),
   unavailableReason: z.string().nullable(),
+  feedbackPolicy: ReplyFeedbackPolicySchema.nullable().optional(),
 });
 export type ConversationPage = z.infer<typeof ConversationPageSchema>;
 export const ConversationAccountPageSchema = z.strictObject({

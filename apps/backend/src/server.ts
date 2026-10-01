@@ -48,6 +48,7 @@ const configured =
             ? createCommerceRuntime({ ...runtime, ...commerceConfiguration })
             : undefined;
           const conversation = createConversationRuntime(runtime);
+          runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
           const content = createContentStudio({
             pool: runtime.pool,
             owners: {
@@ -71,10 +72,15 @@ const configured =
     : undefined;
 features.growth?.start();
 const server = configured?.server ?? createServer(createApp(config));
-server.listen(config.port, () =>
-  process.stdout.write(
-    `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
-  ),
+server.listen(
+  {
+    port: config.port,
+    ...(config.identityAdapter === "development" ? { host: "127.0.0.1" } : {}),
+  },
+  () =>
+    process.stdout.write(
+      `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
+    ),
 );
 const shutdown = () => {
   void (async () => {

@@ -2182,6 +2182,15 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
   case `interrupted` = "interrupted"
 }
 
+public struct APIConversationAgentReplyVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
 public struct APIConversationAuditEntry: Codable, Sendable {
   public let `id`: String
   public let `readerAccountId`: String
@@ -2280,6 +2289,89 @@ public enum APIConversationConversationAuthorship: String, Codable, Sendable {
   case `system` = "system"
 }
 
+public struct APIConversationConversationCorrectionCommand: Codable, Sendable {
+  public let `actType`: APIConversationConversationCorrectionCommandActType
+  public let `subjectId`: String
+  public let `content`: APIConversationConversationCorrectionCommandContent
+  public init(actType: APIConversationConversationCorrectionCommandActType, subjectId: String, content: APIConversationConversationCorrectionCommandContent) {
+    self.actType = actType
+    self.subjectId = subjectId
+    self.content = content
+  }
+}
+
+public enum APIConversationConversationCorrectionCommandActType: String, Codable, Sendable {
+  case `correction` = "correction"
+}
+
+public struct APIConversationConversationCorrectionCommandContent: Codable, Sendable {
+  public let `kind`: APIConversationConversationCorrectionCommandContentKind
+  public let `creatorId`: String
+  public let `threadId`: String
+  public let `fanId`: String
+  public let `messageVersion`: Int
+  public let `text`: String
+  public init(kind: APIConversationConversationCorrectionCommandContentKind, creatorId: String, threadId: String, fanId: String, messageVersion: Int, text: String) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.threadId = threadId
+    self.fanId = fanId
+    self.messageVersion = messageVersion
+    self.text = text
+  }
+}
+
+public enum APIConversationConversationCorrectionCommandContentKind: String, Codable, Sendable {
+  case `conversation_correction` = "conversation_correction"
+}
+
+public struct APIConversationConversationCorrectionInput: Codable, Sendable {
+  public let `command`: APIConversationConversationCorrectionInputCommand
+  public let `signedActId`: String
+  public let `idempotencyKey`: String
+  public init(command: APIConversationConversationCorrectionInputCommand, signedActId: String, idempotencyKey: String) {
+    self.command = command
+    self.signedActId = signedActId
+    self.idempotencyKey = idempotencyKey
+  }
+}
+
+public struct APIConversationConversationCorrectionInputCommand: Codable, Sendable {
+  public let `actType`: APIConversationConversationCorrectionInputCommandActType
+  public let `subjectId`: String
+  public let `content`: APIConversationConversationCorrectionInputCommandContent
+  public init(actType: APIConversationConversationCorrectionInputCommandActType, subjectId: String, content: APIConversationConversationCorrectionInputCommandContent) {
+    self.actType = actType
+    self.subjectId = subjectId
+    self.content = content
+  }
+}
+
+public enum APIConversationConversationCorrectionInputCommandActType: String, Codable, Sendable {
+  case `correction` = "correction"
+}
+
+public struct APIConversationConversationCorrectionInputCommandContent: Codable, Sendable {
+  public let `kind`: APIConversationConversationCorrectionInputCommandContentKind
+  public let `creatorId`: String
+  public let `threadId`: String
+  public let `fanId`: String
+  public let `messageVersion`: Int
+  public let `text`: String
+  public init(kind: APIConversationConversationCorrectionInputCommandContentKind, creatorId: String, threadId: String, fanId: String, messageVersion: Int, text: String) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.threadId = threadId
+    self.fanId = fanId
+    self.messageVersion = messageVersion
+    self.text = text
+  }
+}
+
+public enum APIConversationConversationCorrectionInputCommandContentKind: String, Codable, Sendable {
+  case `conversation_correction` = "conversation_correction"
+}
+
 public struct APIConversationConversationMessage: Codable, Sendable {
   public let `id`: String
   public let `threadId`: String
@@ -2295,7 +2387,10 @@ public struct APIConversationConversationMessage: Codable, Sendable {
   public let `createdAt`: String
   public let `offTheRecord`: Bool
   public let `version`: Int
-  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int) {
+  public let `agentVersion`: APIConversationConversationMessageAgentVersion?
+  public let `feedback`: APIConversationConversationMessageFeedback?
+  public let `correction`: APIConversationConversationMessageCorrection?
+  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationMessageAgentVersion? = nil, feedback: APIConversationConversationMessageFeedback? = nil, correction: APIConversationConversationMessageCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2310,6 +2405,9 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
     self.version = version
+    self.agentVersion = agentVersion
+    self.feedback = feedback
+    self.correction = correction
   }
 }
 
@@ -2333,6 +2431,29 @@ public enum APIConversationConversationMessageDeliveryState: String, Codable, Se
   case `interrupted` = "interrupted"
 }
 
+public struct APIConversationConversationMessageAgentVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
+public enum APIConversationConversationMessageFeedback: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationConversationMessageCorrection: Codable, Sendable {
+  public let `originalMessageId`: String
+  public let `originalVersion`: Int
+  public init(originalMessageId: String, originalVersion: Int) {
+    self.originalMessageId = originalMessageId
+    self.originalVersion = originalVersion
+  }
+}
+
 public struct APIConversationConversationPage: Codable, Sendable {
   public let `threadId`: String
   public let `creatorId`: String
@@ -2351,7 +2472,8 @@ public struct APIConversationConversationPage: Codable, Sendable {
   public let `consentCurrent`: Bool
   public let `canSend`: Bool
   public let `unavailableReason`: String?
-  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil) {
+  public let `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationPageFeedbackPolicy? = nil) {
     self.threadId = threadId
     self.creatorId = creatorId
     self.fanId = fanId
@@ -2369,6 +2491,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.consentCurrent = consentCurrent
     self.canSend = canSend
     self.unavailableReason = unavailableReason
+    self.feedbackPolicy = feedbackPolicy
   }
 }
 
@@ -2395,7 +2518,10 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
   public let `createdAt`: String
   public let `offTheRecord`: Bool
   public let `version`: Int
-  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int) {
+  public let `agentVersion`: APIConversationConversationPageMessagesItemAgentVersion?
+  public let `feedback`: APIConversationConversationPageMessagesItemFeedback?
+  public let `correction`: APIConversationConversationPageMessagesItemCorrection?
+  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationPageMessagesItemFeedback? = nil, correction: APIConversationConversationPageMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -2410,6 +2536,9 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
     self.version = version
+    self.agentVersion = agentVersion
+    self.feedback = feedback
+    self.correction = correction
   }
 }
 
@@ -2431,6 +2560,38 @@ public enum APIConversationConversationPageMessagesItemDeliveryState: String, Co
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationPageMessagesItemAgentVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
+public enum APIConversationConversationPageMessagesItemFeedback: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationConversationPageMessagesItemCorrection: Codable, Sendable {
+  public let `originalMessageId`: String
+  public let `originalVersion`: Int
+  public init(originalMessageId: String, originalVersion: Int) {
+    self.originalMessageId = originalMessageId
+    self.originalVersion = originalVersion
+  }
+}
+
+public struct APIConversationConversationPageFeedbackPolicy: Codable, Sendable {
+  public let `version`: String
+  public let `notice`: String
+  public init(version: String, notice: String) {
+    self.version = version
+    self.notice = notice
+  }
 }
 
 public struct APIConversationConversationUsage: Codable, Sendable {
@@ -2557,6 +2718,59 @@ public struct APIConversationProviderPolicyProvidersItem: Codable, Sendable {
     self.noTraining = noTraining
     self.noRetention = noRetention
   }
+}
+
+public struct APIConversationReplyFeedbackInput: Codable, Sendable {
+  public let `messageVersion`: Int
+  public let `agentVersion`: APIConversationReplyFeedbackInputAgentVersion
+  public let `rating`: APIConversationReplyFeedbackInputRating?
+  public let `consent`: APIConversationReplyFeedbackInputConsent?
+  public let `policyVersion`: String?
+  public init(messageVersion: Int, agentVersion: APIConversationReplyFeedbackInputAgentVersion, rating: APIConversationReplyFeedbackInputRating? = nil, consent: APIConversationReplyFeedbackInputConsent? = nil, policyVersion: String? = nil) {
+    self.messageVersion = messageVersion
+    self.agentVersion = agentVersion
+    self.rating = rating
+    self.consent = consent
+    self.policyVersion = policyVersion
+  }
+}
+
+public struct APIConversationReplyFeedbackInputAgentVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
+public enum APIConversationReplyFeedbackInputRating: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackInputConsent: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APIConversationReplyFeedbackPolicy: Codable, Sendable {
+  public let `version`: String
+  public let `notice`: String
+  public init(version: String, notice: String) {
+    self.version = version
+    self.notice = notice
+  }
+}
+
+public enum APIConversationReplyFeedbackRating: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
 }
 
 public struct APIConversationTeamReply: Codable, Sendable {

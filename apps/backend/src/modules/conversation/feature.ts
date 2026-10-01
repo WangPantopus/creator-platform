@@ -19,11 +19,13 @@ import {
   type ProviderPolicy,
   type ConversationPage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
-import { IdSchema } from "@qelvora/api";
+import { IdSchema, SendMessageSchema } from "@qelvora/api";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
+import type { ConversationLineage } from "./lineage.js";
+import type { ConversationCorrections } from "./corrections.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -41,6 +43,8 @@ export class ConversationFeature {
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
     readonly wellbeing?: ConversationWellbeing,
     readonly firstConversation?: Pick<CommerceService, "openTrial">,
+    readonly lineage?: ConversationLineage,
+    readonly corrections?: ConversationCorrections,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -51,6 +55,7 @@ export class ConversationFeature {
       generationAvailable:
         this.generationAvailable && Boolean(this.policy?.verified),
       firstConversationAvailable: Boolean(this.firstConversation),
+      correctionsAvailable: Boolean(this.corrections),
       accessDisclosure,
     };
   }
@@ -174,12 +179,18 @@ export class ConversationFeature {
       invariant(t, "thread_unavailable", "This conversation is unavailable.");
       const rows = (
         await client.query(
-          `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
+          `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
           [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
         )
       ).rows;
       const hasOlder = rows.length > 50;
-      const messages = rows.slice(0, 50).reverse();
+      const selected = rows
+        .slice(0, 50)
+        .reverse()
+        .map((row) => ConversationMessageSchema.parse(row));
+      const messages = this.lineage
+        ? await this.lineage.enrich(scope, client, selected)
+        : selected;
       const generations = (
         await client.query<{ id: string; last_sequence: number }>(
           "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
@@ -230,6 +241,9 @@ export class ConversationFeature {
                 : !hasAccess
                   ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
                   : null,
+        feedbackPolicy: this.lineage
+          ? await this.lineage.policy(scope, client)
+          : null,
       };
     });
   }
@@ -492,19 +506,53 @@ export function conversationFeature(
         );
         res.json(await feature.page(scope));
       });
+      router.post(root + "/messages/:id/feedback", async (req, res) => {
+        const scope = await scopeFor(req);
+        invariant(
+          feature.lineage,
+          "feedback_unavailable",
+          "Feedback is not available yet.",
+        );
+        res.json(
+          await feature.lineage.feedback(
+            scope,
+            IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/messages/:id/corrections", async (req, res) => {
+        invariant(
+          feature.corrections,
+          "corrections_unavailable",
+          "Signed corrections are not available yet.",
+        );
+        res.json(
+          await feature.corrections.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
+            IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
       router.get(root + "/messages/:id", async (req, res) => {
         const scope = await scopeFor(req);
         const id = IdSchema.parse(req.params.id);
-        const row = await feature.db.withThread(
-          scope,
-          async (client) =>
-            (
-              await client.query(
-                `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
-                [scope.threadId, scope.creatorId, scope.fanId, id],
-              )
-            ).rows[0],
-        );
+        const row = await feature.db.withThread(scope, async (client) => {
+          const source = (
+            await client.query(
+              `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE id=$4 AND thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
+              [scope.threadId, scope.creatorId, scope.fanId, id],
+            )
+          ).rows[0];
+          if (!source) return undefined;
+          const message = ConversationMessageSchema.parse(source);
+          return feature.lineage
+            ? (await feature.lineage.enrich(scope, client, [message]))[0]
+            : message;
+        });
         invariant(
           row,
           "message_unavailable",
@@ -586,14 +634,24 @@ export function conversationFeature(
           await feature.conversations.fanReply(await scopeFor(req), req.body),
         ),
       );
-      router.get(root + "/messages/status/:key", async (req, res) => {
+      const messageStatus = async (
+        req: import("express").Request,
+        res: import("express").Response,
+      ) => {
         const scope = await scopeFor(req);
         invariant(
           scope.authority === "fan",
           "fan_required",
           "Only the sender can check their message.",
         );
-        const key = IdSchema.parse(req.params.key);
+        const key =
+          req.method === "POST"
+            ? z
+                .strictObject({
+                  idempotencyKey: SendMessageSchema.shape.idempotencyKey,
+                })
+                .parse(req.body).idempotencyKey
+            : SendMessageSchema.shape.idempotencyKey.parse(req.params.key);
         res.json(
           await feature.db.withThread(scope, async (client) => {
             const row = (
@@ -617,7 +675,10 @@ export function conversationFeature(
             };
           }),
         );
-      });
+      };
+      router.get(root + "/messages/status/:key", messageStatus);
+      // Keys remain in JSON when they cannot be represented as one path segment.
+      router.post(root + "/messages/status", messageStatus);
       router.post(root + "/takeover", async (req, res) =>
         res.json(
           await feature.conversations.changeControl(
