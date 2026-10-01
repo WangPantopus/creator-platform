@@ -4,15 +4,22 @@ import {
   MediaAssetSchema,
   MediaSignSchema,
   UploadRequestSchema,
+  ProcessedMediaEvidenceSchema,
   type MediaAsset,
   type MediaPolicy,
   type MediaPurpose,
+  type ProcessedMediaEvidence,
 } from "../../../../../packages/api/src/media.js";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { consumeSignedAct } from "../identity/signed-acts.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+} from "../identity/request-authority.js";
+import { contentHash } from "../../core/canonical.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { MediaTickets, PrivateMediaStorage } from "./storage.js";
 
@@ -37,6 +44,18 @@ export interface MediaAuthority {
     asset: MediaAsset,
     client: PoolClient,
   ): Promise<{ actType: "broadcast"; subjectId: string } | null>;
+  /** W1/W3 must verify the exact consumed, unwithdrawn private reply publication
+   * under this genuine fan scope and held non-owner client. Never impersonate
+   * its creator, open another transaction or call back into media reads. */
+  currentRecordingPublication?(
+    scope: ThreadScope,
+    recording: Readonly<{
+      asset: MediaAsset;
+      command: SignedActCommand;
+      signedActId: string;
+    }>,
+    client: PoolClient,
+  ): Promise<boolean>;
 }
 type AssetRow = {
   id: string;
@@ -80,6 +99,35 @@ export function assetView(row: AssetRow): MediaAsset {
     provenance: row.provenance,
   });
 }
+/** Credentials bind the original recording occurrence and every processed field. */
+function verifiedRecordingProvenance(row: AssetRow) {
+  const proof = row.provenance;
+  return Boolean(
+    row.signed_act_id &&
+      row.mime_type === "audio/mp4" &&
+      row.duration_ms !== null &&
+      Number.isSafeInteger(row.duration_ms) &&
+      row.duration_ms > 0 &&
+      proof?.schemaVersion === 1 &&
+      proof.kind === "human_recording" &&
+      proof.c2paVerified === true &&
+      proof.accountId === row.owner_account_id &&
+      proof.creatorId === row.creator_id &&
+      proof.fanId === row.fan_id &&
+      proof.threadId === row.thread_id &&
+      proof.purpose === row.purpose &&
+      proof.assetId === row.id &&
+      proof.assetVersion === row.version &&
+      proof.signedActId === row.signed_act_id &&
+      proof.processedMediaSha256 === row.output_sha256 &&
+      proof.processedMediaBytes === Number(row.bytes) &&
+      proof.processedMediaMimeType === row.mime_type &&
+      proof.processedMediaDurationMs === row.duration_ms &&
+      proof.transform === "aac_m4a" &&
+      typeof proof.fileSha256 === "string" &&
+      /^[a-f0-9]{64}$/u.test(proof.fileSha256),
+  );
+}
 export class MediaService {
   readonly chunkBytes = 1024 * 1024;
   constructor(
@@ -95,7 +143,7 @@ export class MediaService {
       "This media is available only to its participants.",
     );
     invariant(
-      !(await this.authority.denied(scope, client)),
+      (await this.authority.denied(scope, client)) === false,
       "media_revoked",
       "This media is no longer available.",
     );
@@ -106,6 +154,7 @@ export class MediaService {
     id: string,
     lock = false,
   ): Promise<AssetRow> {
+    assertThreadScope(scope);
     await this.allowed(scope, client);
     const rows = await client.query<AssetRow>(
       `SELECT * FROM creator.media_asset WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 ${lock ? "FOR UPDATE" : ""}`,
@@ -133,10 +182,12 @@ export class MediaService {
             scope,
             assetView(row),
             client,
-          )),
+          )) === true,
         "ai_audio_license_unavailable",
         "AI voice authorization changed.",
       );
+    if (scope.authority === "fan" && row.purpose === "human_reply")
+      await this.currentPublishedRecording(scope, client, row);
     return row;
   }
   /** Trusted provider ingestion still uses the canonical deny/purpose/retention policy. */
@@ -204,6 +255,7 @@ export class MediaService {
           policy.maxBytes <= 268435456 &&
           Number.isSafeInteger(policy.maxDurationMs) &&
           policy.maxDurationMs > 0 &&
+          policy.maxDurationMs <= 3_600_000 &&
           Number.isSafeInteger(policy.retentionSeconds) &&
           policy.retentionSeconds > 0,
         "media_policy_unavailable",
@@ -418,6 +470,10 @@ export class MediaService {
       scope.authority === "creator" &&
         row.owner_account_id === scope.actorAccountId &&
         row.state === "ready" &&
+        row.mime_type === "audio/mp4" &&
+        row.duration_ms !== null &&
+        Number.isSafeInteger(row.duration_ms) &&
+        row.duration_ms > 0 &&
         ["human_note", "human_reply"].includes(row.purpose),
       "media_not_signable",
       "This recording cannot be signed by this account.",
@@ -448,6 +504,168 @@ export class MediaService {
       this.command(scope, client, await this.row(scope, client, id)),
     );
   }
+  /** W3 prepares the first signature on its held client using a genuinely issued
+   * creator ThreadScope with the actual family RLS context. CreatorScope alone
+   * cannot substitute for this scope. This neither consumes nor publishes an act. */
+  async signingCommandInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    expected: ProcessedMediaEvidence,
+  ): Promise<SignedActCommand> {
+    assertThreadScope(scope);
+    const current = requestAuthority.getStore();
+    if (!current || current.accountId !== scope.actorAccountId)
+      throw new DomainError(
+        "creator_session_required",
+        "Reopen this recording with your current creator account.",
+        401,
+      );
+    invariant(
+      scope.authority === "creator" &&
+        scope.actorAccountId === scope.creatorAccountId,
+      "creator_required",
+      "Only the verified creator can sign this recording.",
+    );
+    await assertCurrentSession(client, scope.actorAccountId);
+    const owner = await client.query(
+      "SELECT 1 FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL AND cp.account_id=$4 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF t,cp",
+      [scope.threadId, scope.creatorId, scope.fanId, scope.actorAccountId],
+    );
+    invariant(
+      owner.rowCount === 1,
+      "media_signing_authority_unavailable",
+      "Current creator and conversation authority could not be confirmed.",
+    );
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const row = await this.row(scope, client, proof.assetId, true);
+    invariant(
+      row.owner_account_id === scope.actorAccountId &&
+        row.purpose === "human_reply" &&
+        row.state === "ready" &&
+        !row.signed_act_id &&
+        row.version === proof.version &&
+        row.output_sha256 === proof.sha256 &&
+        Number(row.bytes) === proof.bytes &&
+        row.mime_type === proof.mimeType &&
+        row.duration_ms === proof.durationMs,
+      "media_not_signable",
+      "This exact unsigned recording is no longer ready for signing.",
+    );
+    return this.command(scope, client, row);
+  }
+  /** W3 associates already-signed audio in its own transaction, without consuming its act twice. */
+  async publishedRecording(
+    scope: ThreadScope,
+    client: PoolClient,
+    expected: ProcessedMediaEvidence,
+  ) {
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const row = await this.row(scope, client, proof.assetId, true);
+    invariant(
+      scope.authority === "creator" &&
+        scope.actorAccountId === scope.creatorAccountId &&
+        row.owner_account_id === scope.actorAccountId &&
+        row.purpose === "human_reply" &&
+        row.state === "ready" &&
+        row.version === proof.version &&
+        row.output_sha256 === proof.sha256 &&
+        Number(row.bytes) === proof.bytes &&
+        row.mime_type === proof.mimeType &&
+        row.duration_ms === proof.durationMs &&
+        row.signed_act_id &&
+        verifiedRecordingProvenance(row),
+      "media_publication_unavailable",
+      "This exact signed recording is not ready for delivery.",
+    );
+    return this.currentPublishedRecording(scope, client, row);
+  }
+  /** W3 reads its immutable association against current media on its held client. */
+  async publishedRecordingRead(
+    scope: ThreadScope,
+    client: PoolClient,
+    expected: ProcessedMediaEvidence,
+  ) {
+    const proof = ProcessedMediaEvidenceSchema.parse(expected);
+    const row = await this.row(scope, client, proof.assetId);
+    invariant(
+      row.version === proof.version &&
+        row.output_sha256 === proof.sha256 &&
+        Number(row.bytes) === proof.bytes &&
+        row.mime_type === proof.mimeType &&
+        row.duration_ms === proof.durationMs,
+      "media_publication_unavailable",
+      "This recording is no longer the exact delivered recording.",
+    );
+    return this.currentPublishedRecording(scope, client, row);
+  }
+  private async currentPublishedRecording(
+    scope: ThreadScope,
+    client: PoolClient,
+    row: AssetRow,
+  ) {
+    invariant(
+      (scope.authority === "creator" || scope.authority === "fan") &&
+        row.owner_account_id === scope.creatorAccountId &&
+        row.purpose === "human_reply" &&
+        row.state === "ready" &&
+        row.signed_act_id &&
+        verifiedRecordingProvenance(row),
+      "media_publication_unavailable",
+      "This exact signed recording is unavailable.",
+    );
+    const command: SignedActCommand = {
+      actType: "reply",
+      subjectId: scope.threadId,
+      content: {
+        mediaAssetId: row.id,
+        version: row.version,
+        sha256: row.output_sha256!,
+        mimeType: row.mime_type,
+        durationMs: row.duration_ms,
+        bytes: Number(row.bytes),
+      },
+    };
+    const recording = {
+      asset: assetView(row),
+      command,
+      signedActId: row.signed_act_id,
+    };
+    if (scope.authority === "creator") {
+      invariant(
+        scope.actorAccountId === scope.creatorAccountId,
+        "creator_required",
+        "This recording is unavailable to this account.",
+      );
+      const published = await client.query(
+        "SELECT sa.id FROM creator.signed_act sa JOIN creator.signed_act_consumption sac ON sac.signed_act_id=sa.id AND sac.account_id=sa.account_id JOIN creator.signed_publication sp ON sp.signed_act_id=sa.id AND sp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.act_type=$4 AND sa.subject_id=$5 AND sa.content_hash=$6 AND sp.command=$7::jsonb AND sp.withdrawn_at IS NULL",
+        [
+          row.signed_act_id,
+          scope.creatorAccountId,
+          scope.creatorId,
+          command.actType,
+          command.subjectId,
+          contentHash(command),
+          JSON.stringify(command),
+        ],
+      );
+      invariant(
+        published.rowCount === 1,
+        "media_publication_unavailable",
+        "The recording's exact publication signature is unavailable.",
+      );
+    } else {
+      invariant(
+        (await this.authority.currentRecordingPublication?.(
+          scope,
+          recording,
+          client,
+        )) === true,
+        "media_publication_unavailable",
+        "The recording's current delivery authority is unavailable.",
+      );
+    }
+    return recording;
+  }
   async playback(scope: ThreadScope, id: string) {
     return this.db.withThread(scope, async (client) => {
       const row = await this.row(scope, client, id);
@@ -461,7 +679,7 @@ export class MediaService {
         ["human_note", "human_reply"].includes(row.purpose)
       )
         invariant(
-          row.signed_act_id && row.provenance?.c2paVerified === true,
+          verifiedRecordingProvenance(row),
           "media_provenance_pending",
           "This recording is awaiting its signature and content credentials.",
         );
@@ -495,15 +713,37 @@ export class MediaService {
       size: await this.storage.size(id),
     };
   }
+  /** An already-open response must also stop when current access or the asset version changes. */
+  async assertPlaybackCurrent(scope: ThreadScope, id: string, version: number) {
+    const current = await this.playback(scope, id);
+    invariant(
+      current.asset.version === version,
+      "media_version_changed",
+      "This media is no longer available.",
+    );
+  }
   async revoke(scope: ThreadScope, id: string) {
     await this.db.withThread(scope, async (client) => {
-      const row = await this.row(scope, client, id, true);
+      // Cleanup remains retryable after access expiry or a lost deletion response.
+      invariant(
+        scope.authority !== "triage",
+        "media_participant_required",
+        "Only a participant can remove this media.",
+      );
+      const row = (
+        await client.query<AssetRow>(
+          "SELECT * FROM creator.media_asset WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 FOR UPDATE",
+          [id, scope.threadId, scope.creatorId, scope.fanId],
+        )
+      ).rows[0];
+      invariant(row, "media_unavailable", "This media is unavailable.");
       invariant(
         row.owner_account_id === scope.actorAccountId ||
           scope.authority === "creator",
         "media_owner_required",
         "Only the media owner can remove this asset.",
       );
+      if (["revoked", "deleted"].includes(row.state)) return;
       await client.query(
         "UPDATE creator.media_asset SET state='revoked',version=version+1,job_available_at=now(),delete_pending=true WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
         [id, scope.creatorId, scope.fanId],

@@ -3,6 +3,7 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import { invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
+import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineage } from "./lineage.js";
 import { generationJournalInstalled } from "../agent/generation-journal.js";
 import type { GenerationAccountingLifecycle } from "../agent/journal-privacy.js";
@@ -108,6 +109,7 @@ export function conversationPrivacyHook(input: {
   authority: ConversationPrivacyAuthority;
   retention?: ConversationPrivacyRetention;
   lineage?: ConversationLineage;
+  recordings?: ConversationRecordings;
   accounting?: ConversationAccountingLifecycle;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
@@ -125,6 +127,15 @@ export function conversationPrivacyHook(input: {
         !lineageSchema || input.lineage,
         "conversation_lineage_unavailable",
         "This data request needs the prepared lineage export and deletion adapter.",
+      );
+      input.recordings?.assertPool(input.pool);
+      const recordingSchema = await input.pool.query(
+        "SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('creator.message') AND attname='recording_asset_id' AND NOT attisdropped",
+      );
+      invariant(
+        recordingSchema.rowCount === 0 || input.recordings,
+        "conversation_recordings_unavailable",
+        "This data request needs the prepared recording association adapter.",
       );
       const families = await input.authority.families(job);
       invariant(
@@ -263,6 +274,14 @@ export function conversationPrivacyHook(input: {
               ...(input.lineage
                 ? {
                     lineage: await input.lineage.exportMetadata(client, family),
+                  }
+                : {}),
+              ...(input.recordings
+                ? {
+                    recordings: await input.recordings.exportMetadata(
+                      client,
+                      family,
+                    ),
                   }
                 : {}),
               messages: messages.map((message) => ({

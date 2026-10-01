@@ -4,6 +4,7 @@ import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
+import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineageProjection } from "./lineage-projection.js";
 import { IdSchema } from "@qelvora/api";
 import {
@@ -37,6 +38,16 @@ export interface ReplyFeedbackAuthority {
 }
 
 export class ConversationLineage {
+  private recordings?: ConversationRecordings;
+  configureRecordings(recordings: ConversationRecordings) {
+    invariant(
+      !this.recordings,
+      "recordings_already_configured",
+      "Recording lineage is already configured.",
+    );
+    recordings.assertPool(this.db.pool);
+    this.recordings = recordings;
+  }
   private constructor(
     private readonly db: Database,
     private readonly feedbackAuthority?: ReplyFeedbackAuthority,
@@ -294,7 +305,7 @@ export class ConversationLineage {
     const ratings = new Map(
       feedback.rows.map((row) => [row.message_id, row.rating]),
     );
-    return messages.map((message) => {
+    const enriched = messages.map((message) => {
       const row = versions.get(message.id);
       return {
         ...message,
@@ -312,6 +323,9 @@ export class ConversationLineage {
             : null,
       };
     });
+    return this.recordings
+      ? this.recordings.enrich(scope, client, enriched)
+      : enriched;
   }
   async feedback(scope: ThreadScope, messageId: string, raw: unknown) {
     assertThreadScope(scope);

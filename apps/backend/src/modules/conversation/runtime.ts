@@ -16,6 +16,7 @@ import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import { invariant } from "../../core/errors.js";
 import type { ConversationLineage } from "./lineage.js";
+import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 
@@ -39,6 +40,7 @@ export function createConversationRuntime(input: {
   /** Prepared only after W8's real migration/checksum and lifecycle policy. */
   lineage?: ConversationLineage;
   corrections?: ConversationCorrections;
+  recordings?: ConversationRecordings;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -63,6 +65,15 @@ export function createConversationRuntime(input: {
     "trial_pool_mismatch",
     "First-conversation admission must use this actual conversation database pool.",
   );
+  invariant(
+    !input.recordings || input.lineage,
+    "recording_lineage_unavailable",
+    "Recordings require their actual prepared message lineage projection.",
+  );
+  if (input.recordings) {
+    input.recordings.assertRuntime(input.database, input.access);
+    input.lineage!.configureRecordings(input.recordings);
+  }
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);
@@ -130,6 +141,7 @@ export function createConversationRuntime(input: {
     input.lineage,
     input.corrections,
     input.assertReady,
+    input.recordings,
   );
   return {
     feature,

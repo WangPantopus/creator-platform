@@ -81,3 +81,16 @@ export type PlaybackTicket = {
   expiresAt: string;
   asset: MediaAsset;
 };
+
+/** Exact immutable processed bytes reviewed by the creator before W1 signs the publication. */
+export const ProcessedMediaEvidenceSchema = z.strictObject({
+  assetId: z.uuid(),
+  version: z.number().int().positive(),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/u),
+  bytes: z.number().int().positive().max(268_435_456),
+  mimeType: z.enum(["audio/mp4", "image/png"]),
+  durationMs: z.number().int().positive().max(3_600_000).nullable(),
+});
+export type ProcessedMediaEvidence = z.infer<
+  typeof ProcessedMediaEvidenceSchema
+>;

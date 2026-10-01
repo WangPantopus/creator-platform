@@ -30,6 +30,7 @@ import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
+import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
 
 export const accessDisclosure =
@@ -64,6 +65,7 @@ export class ConversationFeature {
       scope: ThreadScope,
       client: import("pg").PoolClient,
     ) => Promise<void>,
+    readonly recordings?: ConversationRecordings,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -81,6 +83,7 @@ export class ConversationFeature {
         Boolean(this.policy?.verified && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       correctionsAvailable: Boolean(this.corrections),
+      recordingDeliveryAvailable: Boolean(this.recordings),
       accessDisclosure,
     };
   }
@@ -583,6 +586,21 @@ export function conversationFeature(
             IdSchema.parse(req.params.creatorId),
             IdSchema.parse(req.params.fanId),
             IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/recordings", async (req, res) => {
+        invariant(
+          feature.recordings,
+          "recording_unavailable",
+          "Signed recording delivery is not connected yet.",
+        );
+        res.json(
+          await feature.recordings.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
             req.body,
           ),
         );
