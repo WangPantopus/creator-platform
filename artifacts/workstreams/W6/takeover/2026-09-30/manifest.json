@@ -217,5 +217,24 @@
     "iosSimulatorLibrary": "passed13.17s",
     "androidKotlin": "passed141s;compile only",
     "actualPermissionHardwareAcceptance": false
+  },
+  "latestContinuation": {
+    "recordedAt": "2026-10-01T02:08:22.158837+00:00",
+    "sourceCommit": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
+    "accountPins": "bbe1b309943ca2b31aa0715c7129d7bb4b3c7cdc",
+    "accountConsumer": "eceb62e61deea7947a401976dee8999e4fa62c9f",
+    "existingCaptureRepair": "58bed6a6385f64aaa71f11f2b9eebaf7c888d835",
+    "mergeGate": "Actual launched affected app/emulator/simulator journeys; not unit/compilation",
+    "iosReviewAvailable": false,
+    "webVisual": "Original run failed diagnosed screenshot caret/hydration race; affected existing current Light/Night rerun passes",
+    "capabilities": {
+      "media": false,
+      "calls": false,
+      "aiAudio": false
+    },
+    "pushed": false,
+    "mergedPRs": [],
+    "newTestCasesOrHarnesses": 0,
+    "nativeJourney": "Current shipping builds/runtime provisioning pending"
   }
 }
