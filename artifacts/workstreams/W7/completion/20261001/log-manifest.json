@@ -48,5 +48,60 @@
     "sha256": "23660b61be44ece9239e9b6fb272fd1267f305767f6128e0e74a27c645c794be",
     "gzip": "android-combined-events.log.gz",
     "sanitized": true
+  },
+  "workspace-owner-integration-check.log": {
+    "sha256": "02e76ef723ccb8a3676461cce241781a59611523aeb1b15adffa4c6f8314866a",
+    "gzip": "workspace-owner-integration-check.log.gz",
+    "sanitized": true
+  },
+  "swift-navigation-checks.log": {
+    "sha256": "4651e51de650840e59d3db08deb7e71ff8b2f48450d48584e3ddf3cb318c397f",
+    "gzip": "swift-navigation-checks.log.gz",
+    "sanitized": true
+  },
+  "ios-navigation-build.log": {
+    "sha256": "8ba8329a2d15aab9427eb4a8343a5d5ca657e005f74484a4b3423d4fbe82eb26",
+    "gzip": "ios-navigation-build.log.gz",
+    "sanitized": true
+  },
+  "ios-navigation-boot.log": {
+    "sha256": "b4664e9fb6e08df4c2b195764bd469f83296a2dc92e3599210ad0fe7ff650254",
+    "gzip": "ios-navigation-boot.log.gz",
+    "sanitized": true
+  },
+  "ios-navigation-boot-retry.log": {
+    "sha256": "c3d9dcf89030ce188b23d5aaed6c782ed6c7c8caa4c71c75900e4e6f19fcd4f5",
+    "gzip": "ios-navigation-boot-retry.log.gz",
+    "sanitized": true
+  },
+  "android-repeat-link-checks.log": {
+    "sha256": "e96e100dd51d9140e622da619dcffec39b3978d6b98425a813e1eb766fe90440",
+    "gzip": "android-repeat-link-checks.log.gz",
+    "sanitized": true
+  },
+  "android-navigation-checks.log": {
+    "sha256": "c7e73e66dd860d9e68d8d83049c5e3c40b3d0f517d3181559ccbf267bbbe5f24",
+    "gzip": "android-navigation-checks.log.gz",
+    "sanitized": true
+  },
+  "android-repeat-link-final-checks.log": {
+    "sha256": "6747258b4f73942044d281e70e84c1875f759a08111f73f5c63e6cd2c0788bf5",
+    "gzip": "android-repeat-link-final-checks.log.gz",
+    "sanitized": true
+  },
+  "android-navigation-events.log": {
+    "sha256": "268824c3dfad7a4a9d5532d181b5172603a770c16815fa3baf4cc855644bfd16",
+    "gzip": "android-navigation-events.log.gz",
+    "sanitized": true
+  },
+  "android-navigation-boot.log": {
+    "sha256": "ac6493819701323c1a0839a6f89c1ce524e092714bb8f43caccb11e90c3fde3d",
+    "gzip": "android-navigation-boot.log.gz",
+    "sanitized": true
+  },
+  "android-repeat-link-boot.log": {
+    "sha256": "58dc929371a9f437e1d9a118c61af84797e5b601ea6cc57d5cc524062c347666",
+    "gzip": "android-repeat-link-boot.log.gz",
+    "sanitized": true
   }
 }
