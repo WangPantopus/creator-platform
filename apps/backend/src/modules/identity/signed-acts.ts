@@ -315,6 +315,19 @@ export class SignedActService {
         "This signed act is unavailable.",
         404,
       );
+    const publicCommand = row.withdrawn ? null : row.public_command;
+    if (
+      publicCommand !== null &&
+      (typeof publicCommand !== "object" ||
+        Array.isArray(publicCommand) ||
+        publicCommand.actType !== row.act_type ||
+        contentHash(publicCommand) !== row.content_hash)
+    )
+      throw new DomainError(
+        "signature_content_unavailable",
+        "The exact signed content could not be verified. Try again later.",
+        503,
+      );
     return {
       signedActId: row.id,
       creatorName: row.creator_name,
@@ -328,8 +341,8 @@ export class SignedActService {
           : row.creator_revoked
             ? "creator_revoked"
             : "valid",
-      content: row.withdrawn ? null : row.public_command,
-      contentAvailable: !row.withdrawn && row.public_command !== null,
+      content: publicCommand,
+      contentAvailable: publicCommand !== null,
       explanation:
         "A signature proves an authorized key approved this exact act. It does not prove that every factual statement is true.",
     };
