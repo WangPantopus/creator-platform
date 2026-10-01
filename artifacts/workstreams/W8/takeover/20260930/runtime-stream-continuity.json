@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74",
+  "observedAt": "2026-10-01T00:27:42.985803+00:00",
+  "checks": [
+    {
+      "route": "/health/live",
+      "status": 200,
+      "correlationId": "86cac1b0-dae2-456d-ade7-6534cb04f18a",
+      "release": null
+    },
+    {
+      "route": "/health/ready",
+      "status": 503,
+      "correlationId": "0cc2bb82-ef32-47af-9f2a-d9a1cc6e83af",
+      "release": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74",
+      "ready": false
+    },
+    {
+      "route": "/v1/trust/status",
+      "status": 200,
+      "correlationId": "f03d8560-feb5-417d-82c2-339dffc8cb98",
+      "release": "3240da0e74403c56ae0d13aa9e4c72ab47fdfc74"
+    }
+  ],
+  "apiPid": 47391,
+  "apiSession": 64143,
+  "loopback": "127.0.0.1:4108",
+  "startup": "Initial launch could not resolve Node on shell PATH; successful launch uses the bundled absolute Node executable.",
+  "privacyArtifactsConfigured": false,
+  "ownerStreamsConfigured": false,
+  "databaseResetOrReseed": false,
+  "privateEnvChanged": false,
+  "oldGrowthCiphertextChanged": false,
+  "otherResourcesRestarted": false,
+  "preservedDatabase": {
+    "cases": 4,
+    "blocks": 1,
+    "migrations": 40,
+    "tombstones": 1,
+    "privacyJobs": [
+      {
+        "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+        "kind": "delete",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      }
+    ]
+  },
+  "preservationObservedAt": "2026-10-01T00:37:36.953075+00:00",
+  "browser": {
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "Light",
+    "path": "/support/privacy",
+    "actor": "Canonical development actor one",
+    "reauthentication": "Actual Continue with Pantopus link and Development actor one submission",
+    "completionHttp": {
+      "status": 200,
+      "correlationId": "8ae3c1ca-987e-410f-a7b6-f61069fc7dc9"
+    },
+    "controllerLimitation": "Submission reported CDP Runtime timeout; a fresh tab in the same browser verified the returned session and hydrated progress. No injected token or cleared cookies.",
+    "observedProgress": "Original export blocked; seven complete domains, content blocked; no Download control",
+    "screenshot": "privacy-reauthenticated-stream-source-light.jpg",
+    "newPrivacyRequest": false,
+    "pendingDomainRetried": false,
+    "newCurrentSessionCta": "Source correction uses the existing canonical /api/auth/continue route; current development verification mode does not display this CTA."
+  }
+}

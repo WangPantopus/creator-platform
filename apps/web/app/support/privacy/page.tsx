@@ -227,9 +227,9 @@ export default function PrivacyPage() {
       <TrustSession />
       {capability.data?.verificationMethod === "current_session" && (
         <p>
-          <Link href="/signin?returnTo=%2Fsupport%2Fprivacy">
+          <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
             Verify with Pantopus again
-          </Link>{" "}
+          </a>{" "}
           before requesting or downloading your data.
         </p>
       )}

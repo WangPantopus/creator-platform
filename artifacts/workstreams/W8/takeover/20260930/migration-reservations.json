@@ -48,7 +48,9 @@
       "owner": "W4",
       "version": "0049_w4_generation_cost_settlement",
       "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
-      "state": "reserved_unapplied"
+      "state": "reserved_unapplied",
+      "sourceCommit": "cff4ef456351c357bb8438c1379eda186bf21a9d",
+      "sourceSha256": "60ab295d660d4dc6192d811bd8a97c657433dea25d6a0f0759e03cf751505155"
     },
     {
       "id": "0050",
@@ -62,7 +64,9 @@
       "owner": "W5",
       "version": "0051_w5_media_publication",
       "path": "apps/backend/src/modules/content/schema-media-publication.sql",
-      "state": "reserved_unapplied"
+      "state": "reserved_unapplied",
+      "sourceCommit": "074290033b3d3041cec23910a40ef04564e20d10",
+      "sourceSha256": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e"
     },
     {
       "id": "0052",
@@ -96,11 +100,19 @@
       "id": "0056",
       "owner": "W3",
       "version": "0056_w3_correction_feedback_lineage",
-      "path": "apps/backend/src/modules/conversation/migrations/0056_w3_correction_feedback_lineage.sql",
-      "state": "reserved_unapplied"
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
+      "sourceSha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
     }
   ],
   "sqlApplied": false,
   "existingSqlChanged": false,
-  "existingPoliciesOrGrantsChanged": false
+  "existingPoliciesOrGrantsChanged": false,
+  "publishedProposalPins": [
+    "0049",
+    "0051",
+    "0056"
+  ],
+  "activeEntriesAndBytesComparedWith": "61e07b1a7938dd80c4062a82c84384ee7b9f83f4"
 }
