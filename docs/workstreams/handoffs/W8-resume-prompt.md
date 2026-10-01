@@ -1,5 +1,7 @@
 # W8 continuation prompt — current handoff, 2026-09-30
 
+**2026-10-01 post-cleanup override:** PR7 is merged and the original services/resources were deleted during the completed cleanup. The human subsequently resumed implementation. Start with [post-cleanup recovery](../../operations/W8-post-cleanup-recovery.md), [actual evidence](../../../artifacts/workstreams/W8/recovery/20261001/README.md) and the current status. Source fixes are on `codex/w8-post-cleanup-recovery`, based on merged `2f0319d`; inspect the actual tip. New durable recovery volume/private checkpoints are preserved, with owned temporary services stopped and restored application traffic closed. Do not launch from historical env/volume/PID/device instructions below or clear the owner-controlled database closure marker. The original full R1–R10 requirements and authority continue; no reseed, new test code, weakened grants or manufactured provider/privacy success is authorized.
+
 Copy the assignment below into the next agent's chat. This version replaces the historical resume instructions. It preserves the entire original assignment and identifies the exact current checkpoint.
 
 ---
