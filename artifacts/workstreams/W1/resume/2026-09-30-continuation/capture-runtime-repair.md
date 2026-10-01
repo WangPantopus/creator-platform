@@ -1,0 +1,9 @@
+# Existing native capture and simulator startup repair
+
+W1 personally adapted only the recursive layer/mask redraw from W7 immutable `139c1567ebd658ba7059586696374f8f49e2632d` onto W1 parent `7ff8ec9bd35574ade7f1cacdf98f0620976f140d`. Each hosted layer redraws at the original2x reference scale before W1's existing AppKit `cacheDisplay` composition. The bitmap remains780×1688 sRGB for the logical390×844 view. All110 original reference files and the entire comparator/failed-image closure are byte-identical to the parent (99.85% of pixels within eight channel units; exact dimensions). No new case, suite or reference was added.
+
+W7's published hosted diagnostics described blurred1x cached text, repeated mismatches and an iOS UI runner accessibility startup timeout before any case. The existing CI now waits for its selected simulator to boot and runs the existing normally signed UI cases without parallel simulator clones. The native Swift step has a20-minute bound and retains its always-upload failure artifacts. Assertions and pinned Actions/runners are unchanged.
+
+Existing macOS `NativeSnapshotTests`:3 methods/110 comparisons, zero failures,28.582s, completed September30 at17:26:07 PDT. Actual local backing scale was2, logical canvas390×844. Existing normally signed `FoundationFlowTests`:2 cases, zero failures,32.878s, completed17:28:08 PDT on the verified W1-owned iPhone17/iOS26.5 simulator365B7F5B-8151-43E5-AE5B-83BCCCB9F1C5. `simctl bootstatus -b` completed before `xcodebuild test ... -parallel-testing-enabled NO`.
+
+These are local existing-check results. Hosted1x capture, current-head CI, personally operated native controls/system sheets, physical devices, accessibility and genuine passkey/provider ceremonies remain unverified. Xcode's incidental Package.resolved update was restored; no dependency upgrade was adopted. Exact log hashes, reference digest and comparison digest are in [capture-runtime-source.json](capture-runtime-source.json).

@@ -57,6 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Verify native Swift package
+        timeout-minutes: 20
         run: |
           nativeTemporaryDirectory="${RUNNER_TEMP}/creator-native-${GITHUB_RUN_ID}-${GITHUB_JOB}"
           mkdir -p "$nativeTemporaryDirectory"
@@ -72,7 +73,9 @@ jobs:
           phone = next(d for runtime, entries in devices.items() if ".iOS-" in runtime for d in entries if d["name"].startswith("iPhone"))
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
-      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -resultBundlePath artifacts/ios/FoundationFlow.xcresult
+      - name: Wait for the selected simulator to finish booting
+        run: xcrun simctl bootstatus '${{ steps.simulator.outputs.id }}' -b
+      - run: xcodebuild test -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' -parallel-testing-enabled NO -resultBundlePath artifacts/ios/FoundationFlow.xcresult
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

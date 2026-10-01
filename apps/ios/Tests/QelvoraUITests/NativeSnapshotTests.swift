@@ -97,6 +97,18 @@
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
+      // Redraw hosted layers at the reference scale before compositing. A1x
+      // layer cache would otherwise magnify blurred text on a hosted display.
+      func prepareLayer(_ layer: CALayer) {
+        layer.contentsScale = 2
+        layer.rasterizationScale = 2
+        layer.setNeedsDisplay()
+        for child in layer.sublayers ?? [] { prepareLayer(child) }
+        if let mask = layer.mask { prepareLayer(mask) }
+        layer.displayIfNeeded()
+      }
+      if let layer = host.layer { prepareLayer(layer) }
+      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), canvas=\(canvas)")
       guard
         let context = CGContext(
           data: nil, width: Int(size.width * 2), height: Int(size.height * 2),
