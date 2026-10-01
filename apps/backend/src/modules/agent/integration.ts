@@ -32,6 +32,8 @@ export function createAgentDomain(input: {
   shadowFeed?: PrivacyParaphrasePort;
   trust?: AgentTrustAuthority;
   exports?: AgentExportArtifactSink;
+  /** Opt-in owner producer for W8's actual configured stream coordinator/store. */
+  coordinatorExportStream?: boolean;
   usageJournal?: PreparedGenerationJournal;
   settleDeparture?: (
     input: Parameters<EffectHook["run"]>[0],
@@ -61,7 +63,13 @@ export function createAgentDomain(input: {
       ? new ShadowReplay(service, input.shadowFeed)
       : undefined,
     privacy: input.trust
-      ? agentPrivacyHook(service, lifecycle, input.trust, input.exports)
+      ? agentPrivacyHook(
+          service,
+          lifecycle,
+          input.trust,
+          input.exports,
+          input.coordinatorExportStream,
+        )
       : undefined,
     effects:
       input.trust && input.settleDeparture
@@ -88,6 +96,9 @@ export function createAgentDomain(input: {
       shadow: Boolean(input.shadowFeed),
       trust: Boolean(input.trust && input.settleDeparture),
       exports: Boolean(input.exports),
+      exportStreamProducer: Boolean(
+        input.trust && input.coordinatorExportStream,
+      ),
       usageJournal: Boolean(input.usageJournal),
     },
   };

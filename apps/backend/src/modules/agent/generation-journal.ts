@@ -6,6 +6,22 @@ import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { CreatorScope } from "./repository.js";
 import type { ProviderExecution } from "./provider-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
+import type { PrivacyHook } from "../trust/contracts.js";
+
+export type JournalPrivacyFamily = {
+  creatorId: string;
+  threadId: string;
+  fanId: string;
+};
+export type JournalPrivacyJob = Parameters<PrivacyHook["run"]>[0];
+/** Exact structural consumer of W3's ConversationPrivacyAuthority. */
+export interface JournalPrivacyAuthority {
+  assertFamily(
+    client: PoolClient,
+    job: JournalPrivacyJob,
+    family: JournalPrivacyFamily,
+  ): Promise<void>;
+}
 
 export const GENERATION_JOURNAL_MIGRATION = "0048_w2_usage_lineage";
 export async function generationJournalInstalled(client: PoolClient) {
@@ -23,6 +39,7 @@ export async function generationJournalInstalled(client: PoolClient) {
 }
 export type GenerationJournalReceipt = {
   generationId: string;
+  custody: "missing" | "open" | "sealed";
   state: "known" | "unknown" | "no_request";
   costMicros: number | null;
   usageIds: string[];
@@ -41,7 +58,12 @@ type Admission = {
  * a policy reference is not an approval supplied by an HTTP caller. The host
  * must register matching C10 retention/export/purge hooks before activation. */
 export class PreparedGenerationJournal {
-  private constructor(readonly retentionPolicyVersion: string) {}
+  private constructor(
+    private readonly pool: Pool,
+    private readonly checksum: string,
+    private readonly database: string,
+    readonly retentionPolicyVersion: string,
+  ) {}
   static async prepare(
     pool: Pool,
     input: {
@@ -81,8 +103,36 @@ export class PreparedGenerationJournal {
       "The complete registered usage journal migration is required.",
     );
     await input.assertPrivacyRegistered();
-    return Object.freeze(
-      new PreparedGenerationJournal(input.retentionPolicyVersion),
+    const database = (
+      await pool.query<{ name: string }>("SELECT current_database() AS name")
+    ).rows[0]!.name;
+    const journal = new PreparedGenerationJournal(
+      pool,
+      input.migration.checksum,
+      database,
+      input.retentionPolicyVersion,
+    );
+    Object.freeze(journal);
+    return journal;
+  }
+  assertPool(pool: Pool) {
+    invariant(
+      pool === this.pool,
+      "usage_journal_pool_mismatch",
+      "Attach this prepared journal to its actual verified service pool.",
+    );
+  }
+  async assertClient(client: PoolClient) {
+    const ready = (
+      await client.query(
+        "SELECT version FROM creator.schema_migration WHERE version=$1 AND checksum=$2 AND current_database()=$3",
+        [GENERATION_JOURNAL_MIGRATION, this.checksum, this.database],
+      )
+    ).rowCount;
+    invariant(
+      ready,
+      "usage_journal_custody_changed",
+      "The callback client must share this journal's installed database custody.",
     );
   }
   /** W3 calls once INSIDE the actual generation acceptance transaction, before
@@ -94,6 +144,7 @@ export class PreparedGenerationJournal {
   ) {
     assertThreadScope(scope);
     z.uuid().parse(generationId);
+    await this.assertClient(client);
     await this.workspace(client, scope.creatorId);
     await client.query(
       "INSERT INTO creator.ai_generation_admission(creator_id,generation_id,thread_id,fan_id,actor_account_id,retention_policy_version) VALUES($1,$2,$3,$4,$5,$6)",
@@ -131,7 +182,10 @@ export class PreparedGenerationJournal {
     ).rows[0];
   }
   private matches(
-    scope: ThreadScope,
+    scope: Pick<
+      ThreadScope,
+      "creatorId" | "threadId" | "fanId" | "actorAccountId"
+    >,
     row: Admission | undefined,
     admittingActor = false,
   ) {
@@ -158,6 +212,7 @@ export class PreparedGenerationJournal {
     z.uuid().parse(execution.generationId);
     z.uuid().parse(execution.attemptId);
     z.uuid().parse(creatorHoldId);
+    await this.assertClient(client);
     await this.workspace(client, scope.creatorId);
     const row = this.matches(
       scope,
@@ -201,6 +256,7 @@ export class PreparedGenerationJournal {
     input: { versionHash: string; model: string; category: string },
     execution?: ProviderExecution,
   ) {
+    await this.assertClient(client);
     await this.workspace(client, scope.creatorId);
     let lineage:
       | {
@@ -265,6 +321,7 @@ export class PreparedGenerationJournal {
     usage: Usage,
     durationMs: number,
   ) {
+    await this.assertClient(client);
     const existing = (
       await client.query<{ generation_id: string | null }>(
         "SELECT generation_id FROM creator.ai_usage WHERE creator_id=$1 AND id=$2",
@@ -312,15 +369,22 @@ export class PreparedGenerationJournal {
    * Queued cancellation can also close a genuinely initialized zero-call fence. */
   async seal(scope: ThreadScope, client: PoolClient, generationId: string) {
     assertThreadScope(scope);
+    await this.assertClient(client);
+    return this.closeInitialized(scope, client, generationId);
+  }
+  private async closeInitialized(
+    scope: JournalPrivacyFamily & { actorAccountId: string },
+    client: PoolClient,
+    generationId: string,
+  ) {
     // Complete export and provider completion use this same lock order.
     await client.query(
       "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
       [scope.creatorId],
     );
-    const admission = this.matches(
-      scope,
-      await this.lock(client, scope.creatorId, generationId),
-    );
+    const existing = await this.lock(client, scope.creatorId, generationId);
+    if (!existing) return this.unknown(generationId, "missing");
+    const admission = this.matches(scope, existing);
     await client.query(
       "UPDATE creator.ai_generation_attempt SET state='sealed',closed_at=clock_timestamp() WHERE creator_id=$1 AND generation_id=$2 AND state='open'",
       [scope.creatorId, generationId],
@@ -330,6 +394,62 @@ export class PreparedGenerationJournal {
       [scope.creatorId, generationId],
     );
     return this.appendReceipt(client, scope.creatorId, generationId, admission);
+  }
+  /** Explicit canonical cleanup API: missing legacy custody remains unknown
+   * and does not block creator stop, mint a fence, or release an allowance. */
+  async sealIfInitialized(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+  ) {
+    return this.seal(scope, client, generationId);
+  }
+  async assertPrivacyFamily(
+    client: PoolClient,
+    job: JournalPrivacyJob,
+    family: JournalPrivacyFamily,
+    authority: JournalPrivacyAuthority,
+  ) {
+    z.uuid().parse(job.jobId);
+    z.uuid().parse(job.accountId);
+    z.uuid().parse(job.leaseToken);
+    z.uuid().parse(family.creatorId);
+    z.uuid().parse(family.threadId);
+    z.uuid().parse(family.fanId);
+    invariant(
+      (job.creatorId === null || job.creatorId === family.creatorId) &&
+        (job.threadId === null || job.threadId === family.threadId),
+      "privacy_scope_mismatch",
+      "This family must match the actual verified job.",
+    );
+    await authority.assertFamily(client, job, family);
+    await this.assertClient(client);
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+      [family.creatorId, family.fanId, job.accountId],
+    );
+  }
+  /** Actual W8 job family, never an invented interactive ThreadScope. */
+  async sealFamily(
+    client: PoolClient,
+    job: JournalPrivacyJob,
+    family: JournalPrivacyFamily,
+    generationId: string,
+    authority: JournalPrivacyAuthority,
+  ) {
+    invariant(
+      job.kind === "delete",
+      "privacy_kind_mismatch",
+      "Only verified deletion can close a privacy generation.",
+    );
+    await this.assertPrivacyFamily(client, job, family, authority);
+    const receipt = await this.closeInitialized(
+      { ...family, actorAccountId: job.accountId },
+      client,
+      generationId,
+    );
+    await authority.assertFamily(client, job, family);
+    return receipt;
   }
   private async appendReceipt(
     client: PoolClient,
@@ -403,10 +523,10 @@ export class PreparedGenerationJournal {
       attempts,
       usage,
     });
-    await client.query(
+    const appended = await client.query<{ id: string; revision: number }>(
       `INSERT INTO creator.ai_generation_receipt(creator_id,generation_id,thread_id,fan_id,state,cost_micros,usage_ids,attempt_ids,receipt_hash,revision)
        SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,coalesce(max(revision),0)+1 FROM creator.ai_generation_receipt WHERE creator_id=$1 AND generation_id=$2
-       ON CONFLICT(creator_id,generation_id,receipt_hash) DO NOTHING`,
+       ON CONFLICT(creator_id,generation_id,receipt_hash) DO NOTHING RETURNING id,revision`,
       [
         creatorId,
         generationId,
@@ -419,6 +539,26 @@ export class PreparedGenerationJournal {
         receiptHash,
       ],
     );
+    if (appended.rowCount) {
+      // Durable wakeup only. W4 must read current immutable custody and the
+      // original reservation policy, never settle from event/caller amounts.
+      await client.query(
+        "INSERT INTO creator.ai_event(creator_id,type,revision,payload) SELECT $1,'ai.generation_receipt',revision,$2 FROM creator.ai_workspace WHERE creator_id=$1",
+        [
+          creatorId,
+          {
+            schemaVersion: 1,
+            generationId,
+            threadId: admission.thread_id,
+            fanId: admission.fan_id,
+            receiptId: appended.rows[0]!.id,
+            receiptHash,
+            receiptRevision: appended.rows[0]!.revision,
+            state,
+          },
+        ],
+      );
+    }
     if (known) {
       const holds = attempts.map((attempt) => attempt.creator_hold_id);
       await client.query(
@@ -435,6 +575,7 @@ export class PreparedGenerationJournal {
     }
     return {
       generationId,
+      custody: "sealed",
       state,
       costMicros,
       usageIds: usage.map((call) => call.id),
@@ -450,16 +591,30 @@ export class PreparedGenerationJournal {
     generationId: string,
   ): Promise<GenerationJournalReceipt> {
     assertThreadScope(scope);
+    await this.assertClient(client);
+    return this.readCurrent(scope, client, generationId);
+  }
+  async currentFamily(
+    client: PoolClient,
+    job: JournalPrivacyJob,
+    family: JournalPrivacyFamily,
+    generationId: string,
+    authority: JournalPrivacyAuthority,
+  ) {
+    await this.assertPrivacyFamily(client, job, family, authority);
+    return this.readCurrent(
+      { ...family, actorAccountId: job.accountId },
+      client,
+      generationId,
+    );
+  }
+  private async readCurrent(
+    scope: JournalPrivacyFamily & { actorAccountId: string },
+    client: PoolClient,
+    generationId: string,
+  ): Promise<GenerationJournalReceipt> {
     const admission = await this.lock(client, scope.creatorId, generationId);
-    if (!admission)
-      return {
-        generationId,
-        state: "unknown",
-        costMicros: null,
-        usageIds: [],
-        attemptIds: [],
-        reference: "",
-      };
+    if (!admission) return this.unknown(generationId, "missing");
     this.matches(scope, admission);
     const row =
       admission.state === "sealed"
@@ -479,19 +634,27 @@ export class PreparedGenerationJournal {
     return row
       ? {
           generationId,
+          custody: "sealed",
           state: row.state,
           costMicros: row.cost_micros === null ? null : Number(row.cost_micros),
           usageIds: row.usage_ids,
           attemptIds: row.attempt_ids,
           reference: row.receipt_hash,
         }
-      : {
-          generationId,
-          state: "unknown",
-          costMicros: null,
-          usageIds: [],
-          attemptIds: [],
-          reference: "",
-        };
+      : this.unknown(generationId, admission.state);
+  }
+  private unknown(
+    generationId: string,
+    custody: GenerationJournalReceipt["custody"],
+  ): GenerationJournalReceipt {
+    return {
+      generationId,
+      custody,
+      state: "unknown",
+      costMicros: null,
+      usageIds: [],
+      attemptIds: [],
+      reference: "",
+    };
   }
 }

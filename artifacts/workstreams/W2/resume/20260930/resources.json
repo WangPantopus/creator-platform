@@ -44,16 +44,7 @@
   },
   "preflight": "Historical initial preflight: ports unused; Docker 29.8.1 responding. W1 ports 3001/4101/55431 preserved. See latestAvailability for current state.",
   "authorization": "Founder authorized W2 resumption, narrow shared integration edits, synthetic OpenAI verification and commits/push/merge when ready. No peer resources reused.",
-  "preservedPeerPorts": [
-    3001,
-    4101,
-    55431,
-    55435,
-    55438,
-    55443,
-    55444,
-    55447
-  ],
+  "preservedPeerPorts": [3001, 4101, 55431, 55435, 55438, 55443, 55444, 55447],
   "git": "Existing draft PR1 metadata successfully updated through authenticated local GitHub CLI; source pushed without force. Complete exact-head checks govern merge.",
   "nativeVerificationTools": {
     "source": "Official Adoptium Temurin 21 and Google Android command-line tools",
@@ -73,10 +64,10 @@
       "executionSession": 93852
     },
     "api": {
-      "pid": 42986,
-      "executionSession": 18971
+      "pid": 71623,
+      "executionSession": 28587
     },
-    "observedAt": "2026-10-01T00:23:25.011767+00:00",
+    "observedAt": "2026-10-01T01:21:16.678073+00:00",
     "warning": "Inspect current listener identity before any restart; PIDs are observations."
   },
   "currentDraft": {
@@ -109,24 +100,20 @@
     "record": "resource-cleanup.md",
     "allocatedKiBRemoved": 4744680,
     "privateDiagnostics": "Deleted /private/tmp/creator-w2-checks-20260930; use sanitized committed receipts or referenced CI artifacts",
-    "privateRuntimeFiles": [
-      "runtime.env",
-      "provider.env",
-      "postgres.env"
-    ],
+    "privateRuntimeFiles": ["runtime.env", "provider.env", "postgres.env"],
     "retained": "Historical cleanup-time inventory: review web/API/database, live web output, workspace dependencies, source/evidence, private runtime configuration and user-supplied secret. See latestAvailability for current runtime/configuration state."
   },
   "latestAvailability": {
-    "observedAt": "2026-10-01T00:23:25.011767+00:00",
+    "observedAt": "2026-10-01T01:21:16.678073+00:00",
     "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
-    "apiPort4102": "loopback listener,PID42986; restarted741d8dd provider admission/hold source",
+    "apiPort4102": "loopback listener,PID71623/session28587; restarted current source-hashed owner export follow-up",
     "postgresPort55442": "loopback Docker listener",
     "docker": "Shared engine already available when rechecked; no engine restart/prune",
     "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
-    "savedData": "123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
+    "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
     "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
     "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
-    "nextAction": "W8 exact0048 source custody/registration and canonical rollout; W3 acceptance fence, original W4 weighting and current C10 fan-accounting registration; complete final-head CI/native/visual acceptance remain pending"
+    "nextAction": "Publish prepared family ports to W3/W4/W8; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full new-head CI/native/visual acceptance pending"
   },
   "availabilityHistory": [
     {
@@ -142,13 +129,22 @@
       "sourceHashManifest": "All 63 entries unchanged",
       "volumeOwnershipCleanup": "Not verifiable while daemon offline; no volume deletion attempted",
       "nextAction": "After shared Docker is available, inspect saved named W2 container/volume, restore legitimate owned runtime configuration, then verify saved draft/evaluation before launch"
+    },
+    {
+      "observedAt": "2026-10-01T01:21:16.678073+00:00",
+      "webPort3002": "loopback listener, PID28947; exact WEB_ORIGIN configured",
+      "apiPort4102": "loopback listener,PID71623/session28587; restarted current source-hashed owner export follow-up",
+      "postgresPort55442": "loopback Docker listener",
+      "docker": "Shared engine already available when rechecked; no engine restart/prune",
+      "savedVolume": "77cd3078b4ee04715e4c851ffd38224ea6aa204c3c8cf42e3d3806eec3327571",
+      "savedData": "Rechecked123 sources,105 immutable versions,28 canonical ledger entries preserved; companion18 current and seven cases passed",
+      "privateRuntimeConfiguration": "Recovered ignored tmp/w2-runtime-20260930/runtime.env and provider.env, directory700 files600; own runtime-role password rotated with unchanged privileges",
+      "openAISecretReference": "Original supplied file loaded only through backend env-file; never printed/copied",
+      "nextAction": "Publish prepared family ports to W3/W4/W8; exact0048 registration/order and actual financial disposition/Q16/complete privacy job remain required; full new-head CI/native/visual acceptance pending"
     }
   ],
   "temporaryVisualVerification": {
-    "ports": [
-      3012,
-      3112
-    ],
+    "ports": [3012, 3112],
     "state": "Stopped after existing suite/followup; reference PNGs/assertions/tolerances unchanged; next-env drift restored",
     "receipt": "visual-origin-followup.json"
   }

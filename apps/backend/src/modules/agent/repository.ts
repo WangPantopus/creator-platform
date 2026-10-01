@@ -30,7 +30,9 @@ export class AgentRepository {
   constructor(
     readonly pool: Pool,
     readonly usageJournal?: PreparedGenerationJournal,
-  ) {}
+  ) {
+    usageJournal?.assertPool(pool);
+  }
   async transaction<T>(
     scope: CreatorScope,
     work: (
