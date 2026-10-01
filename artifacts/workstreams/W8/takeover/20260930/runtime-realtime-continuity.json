@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T01:30:03.346113+00:00",
+  "sourceCommit": "e33a56847fb85b726c55d9226018b17725bdbd77",
+  "api": {
+    "pid": 71438,
+    "session": 12993,
+    "port": 4108,
+    "entry": "apps/backend/src/operations/local-server.ts"
+  },
+  "web": {
+    "cliPid": 71446,
+    "serverPid": 71450,
+    "session": 63807,
+    "port": 3008,
+    "output": ".next-w8-resume",
+    "websocketUrl": "ws://127.0.0.1:4108/v1/realtime"
+  },
+  "restart": {
+    "verifiedOwnProcessesOnly": true,
+    "oldApiPid": 47391,
+    "oldWebCliPid": 10370,
+    "oldWebServerPid": 10397,
+    "privateEnvChange": "Only explicit W3_WEBSOCKET_URL loopback setting appended; existing generated keys/pool credentials preserved",
+    "otherResourcesRestarted": false
+  },
+  "health": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "correlationId": "11329631-e647-40fc-bb38-b6bee5d88b78",
+      "body": {
+        "alive": true
+      }
+    },
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "correlationId": "8d751c64-f4f8-4bae-b0c1-76bcecc12c17",
+      "body": {
+        "ready": false,
+        "environment": "local-development",
+        "release": "e33a56847fb85b726c55d9226018b17725bdbd77",
+        "capabilities": [
+          {
+            "name": "database",
+            "required": true,
+            "state": "available",
+            "code": "non_owner_rls_verified",
+            "checkedAt": "2026-10-01T01:16:39.015Z"
+          },
+          {
+            "name": "identity",
+            "required": true,
+            "state": "development",
+            "code": "synthetic_local_accounts",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "model",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "payments",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "calls",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "voice",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "push",
+            "required": true,
+            "state": "unavailable",
+            "code": "adapter_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_identity",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_conversation",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_agent",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_commerce",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_content",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_media",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_growth",
+            "required": true,
+            "state": "unavailable",
+            "code": "owner_hook_unconfigured",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          },
+          {
+            "name": "privacy_trust",
+            "required": true,
+            "state": "unavailable",
+            "code": "export_hook_registered_retention_gated",
+            "checkedAt": "2026-10-01T01:16:39.008Z"
+          }
+        ]
+      }
+    }
+  ],
+  "databaseObservedAt": "2026-10-01T01:30:03.347581+00:00",
+  "preservedDatabase": {
+    "cases": [
+      {
+        "id": "030868cc-e778-4fca-8731-02a4c817fcfa",
+        "state": "resolved",
+        "version": 2
+      },
+      {
+        "id": "27fbf5f9-7e9e-456e-8594-153a3ebcabfd",
+        "state": "open",
+        "version": 1
+      },
+      {
+        "id": "a19ec4ae-aae4-41cf-bae0-a4625aa64e70",
+        "state": "resolved",
+        "version": 4
+      },
+      {
+        "id": "a671d365-0dca-42f6-8678-1c6cc0ae7e4e",
+        "state": "resolved",
+        "version": 2
+      }
+    ],
+    "blocks": 1,
+    "tombstones": 1,
+    "privacyJobs": [
+      {
+        "id": "758588f9-de97-4eef-b820-5c6720fcb6a7",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "c263cf80-f80f-4bfd-8e07-4b4c13019869",
+        "kind": "export",
+        "scope": "account",
+        "state": "blocked"
+      },
+      {
+        "id": "d1a6d350-2033-4a05-8968-dbfa53e81135",
+        "kind": "delete",
+        "scope": "account",
+        "state": "blocked"
+      }
+    ],
+    "pendingDeletionTasks": 7
+  },
+  "browser": {
+    "browser": "Supported Codex in-app browser2",
+    "viewport": [
+      1280,
+      720
+    ],
+    "theme": "Light",
+    "canonicalActor": "Development actor two via normal W1 continuation",
+    "history": "One retained AI message, send disabled and model unavailable",
+    "report": "Actual Report link preserves creator20000000-0000-4000-8000-000000000001 and message50000000-0000-4000-8000-000000000002; hydrated report form and CASE-004 resolvedv2/own notice retained",
+    "newReportSubmitted": false,
+    "metricsAuthorization": "Fan denied; existing synthetic Ops supervisor accepted through current local actor selector",
+    "socketSnapshot": {
+      "connectionsOpened": 1,
+      "subscriptionsAccepted": 1,
+      "batchesCompleted": 216,
+      "connectionsClosed": 1,
+      "connectionsActive": 0,
+      "subscriptionsActive": 0,
+      "subscriptionsPending": 0,
+      "replaySamples": 216,
+      "replayMeanMs": 27.8
+    },
+    "controllerLimitation": "An old tab timed out after Continue; a fresh same-browser tab completed the canonical return and displayed history. No token injection. Ops actor switch then clears canonical session for isolation; a subsequent thread visit shows Welcome, not reconnect acceptance.",
+    "screenshots": [
+      {
+        "path": "realtime-canonical-history-light.jpg",
+        "sha256": "4816b10afa67691fe5242c51f1fcd0909041b4b62d401fa26776ba294f51d836"
+      },
+      {
+        "path": "realtime-report-retained-desktop.jpg",
+        "sha256": "102285756b0c3342ee17d4daac6cffc9d82469fda906112d783df6edff97ecc4"
+      },
+      {
+        "path": "realtime-metrics-first-light.jpg",
+        "sha256": "456dc3996b76d49762accf766963559d487f4d6ef2306ec6568fe8fab2899809"
+      }
+    ]
+  },
+  "selectedActualHttpReceipts": [
+    {
+      "timestamp": "2026-10-01T01:18:20.461Z",
+      "route": "/v1/identity/complete",
+      "status": 200,
+      "correlationId": "9dda3bb9-933d-4e98-8a92-2d4a38c5242b",
+      "durationMs": 16.06,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:18:22.362Z",
+      "route": "/v1/conversations/realtime-ticket",
+      "status": 200,
+      "correlationId": "8319e7fd-47cc-4c71-9803-c969668a978d",
+      "durationMs": 11.12,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:19:17.038Z",
+      "route": "/v1/trust/operations/metrics",
+      "status": 403,
+      "correlationId": "125ed162-eca0-462e-b967-3ca71f140db6",
+      "durationMs": 27.12,
+      "errorCode": "supervisor_required"
+    },
+    {
+      "timestamp": "2026-10-01T01:19:17.062Z",
+      "route": "/v1/trust/operations/metrics",
+      "status": 403,
+      "correlationId": "6f9cf52e-3dfa-489f-8f01-dfb4a4dcadbf",
+      "durationMs": 28.57,
+      "errorCode": "supervisor_required"
+    },
+    {
+      "timestamp": "2026-10-01T01:19:27.203Z",
+      "route": "/v1/trust/operations/metrics",
+      "status": 200,
+      "correlationId": "2a0169d2-8768-4e6a-b46d-049346fbc16a",
+      "durationMs": 9.87,
+      "errorCode": null
+    },
+    {
+      "timestamp": "2026-10-01T01:19:27.319Z",
+      "route": "/v1/trust/operations/metrics",
+      "status": 200,
+      "correlationId": "e59b6c31-17fd-4972-aae9-83f71315d7f1",
+      "durationMs": 10.32,
+      "errorCode": null
+    }
+  ],
+  "acceptance": {
+    "initialCanonicalBrowserSocket": true,
+    "actualReportReturnContext": true,
+    "supervisorMetricIsolation": true,
+    "providerGenerationVisibleSettlement": false,
+    "outgoingFrameOrClientReceipt": false,
+    "reconnect": false,
+    "shutdownDrain": false,
+    "nativeInteraction": false,
+    "fullC10": false,
+    "newSqlApplied": false,
+    "resetOrReseed": false,
+    "growthCiphertextChanged": false,
+    "privacyJobRetried": false,
+    "paidCalls": 0
+  },
+  "limitations": [
+    "This is development identity and seeded history, not provider generation",
+    "Replay batch mean is not p95/p99 or acceptance/visible/settlement SLO",
+    "Socket closure occurred on Report navigation; process-drain proof remains pending",
+    "Old Growth encryption key/artifact store/content retention remain unavailable; readiness503 is expected",
+    "The closed restore has eight requeued deletion tasks; the current retained job has seven incomplete tasks"
+  ]
+}

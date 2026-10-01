@@ -12,6 +12,12 @@ if (!/^[a-f0-9]{40}$/.test(revision ?? ""))
   throw new Error("An exact source commit is required.");
 if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? ""))
   throw new Error("An exact image digest is required.");
+const buildManifestBytes = readFileSync(join(root, "trust-build.json"));
+const buildManifest = JSON.parse(buildManifestBytes.toString("utf8"));
+if (buildManifest.sourceCommit !== revision)
+  throw new Error(
+    "Inventory revision does not match the image build manifest.",
+  );
 const properties = (values) =>
   Object.entries(values).map(([name, value]) => ({ name, value }));
 const npmPurl = (name, version) =>
@@ -145,6 +151,9 @@ process.stdout.write(
           version: pkg.version,
           properties: properties({
             "w8:source-commit": revision,
+            "w8:build-manifest-sha256": createHash("sha256")
+              .update(buildManifestBytes)
+              .digest("hex"),
             "w8:image-digest": digest,
             "w8:node-version": process.version,
             "w8:inventory-scope":

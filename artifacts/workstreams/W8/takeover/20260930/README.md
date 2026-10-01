@@ -1,5 +1,7 @@
 # W8 takeover evidence — 2026-09-30
 
+[Actual e33 runtime/browser continuity](runtime-realtime-continuity.json) verifies the initial canonical browser socket (one subscription,216 replay batches), navigation closure, exact Report context and authorized supervisor metrics, with the retained cases/jobs/block/tombstone unchanged. It supersedes only the pre-restart limits in the static transport receipt. The new [image revision binding source](image-revision-binding-source.json) distinguishes compiled source custody from a caller-supplied revision label; clean-image acceptance follows the commit.
+
 W8 personally continued from `61e07b1a7938dd80c4062a82c84384ee7b9f83f4` in the preserved28ed checkout. The full [R1–R10 assignment](../../../../../docs/workstreams/handoffs/W8-resume-prompt.md) remains active. This receipt supersedes historical missing-source, missing-Report-click, fixture-authorization and old temporary-resource claims only where actual evidence below establishes a change.
 
 [Transport implementation/static verification](realtime-implementation.json) records the existing gateway's new fixed aggregate collectors and local host mount. The current running API/source and browser acceptance are explicitly separate; no frame/visible/settlement or live-drain proof is inferred from compilation.

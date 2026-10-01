@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-01T01:30:03.353611+00:00",
+  "sourceParent": "e33a56847fb85b726c55d9226018b17725bdbd77",
+  "files": [
+    {
+      "path": "infra/containers/trust.Dockerfile",
+      "sha256": "9763a3e986ee394cd02105eeb1224a1f35566699b04fe13f022c8704bb8bc82a"
+    },
+    {
+      "path": "infra/containers/trust-sbom.mjs",
+      "sha256": "a0a9bbbbbd084a08adb5b3ab59df6b418c08a7e7904e88f9d1c643da1fa8a7d5"
+    },
+    {
+      "path": "apps/backend/src/operations/deploy.ts",
+      "sha256": "7c7a12247446667d44d65344e6138ad55a5e8f5b185e646fa28dd651ea299183"
+    }
+  ],
+  "change": "Mandatory exact build revision becomes a compiled constant, build manifest, OCI label and runtime default; deployment refuses a mismatched runtime revision before adapter import; installed SBOM requires the same build manifest source",
+  "verification": {
+    "backendBuild": "pass",
+    "sourceEslint": "pass",
+    "prettier": "pass",
+    "actualNewImage": "pending after clean commit"
+  },
+  "limitations": [
+    "Caller-supplied build arg cannot prove source checkout; clean Git/source tree/digest receipt required",
+    "No signing, canonical deployment, provider or paid call acceptance",
+    "Existing e33 image omitted an ARG and has no embedded revision; do not relabel it as this fix"
+  ]
+}
