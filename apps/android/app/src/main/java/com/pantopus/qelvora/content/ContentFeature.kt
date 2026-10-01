@@ -182,6 +182,20 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             else { QText(current.text("authorLabel"), "label"); QText(document.text("title"), "display-md", modifier = Modifier.semantics { heading() }); current["quotedText"]?.jsonPrimitive?.contentOrNull?.let { QText(it, "body");current["quotedHandle"]?.jsonPrimitive?.contentOrNull?.let{handle->QText("@$handle","caption")} }; QText(current.text("displayText"), "body"); if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) Button("Signed", ButtonVariant.QUIET) { signature = current["signedActId"]?.jsonPrimitive?.contentOrNull } }
             current["audienceCount"]?.jsonPrimitive?.intOrNull?.let { QText("Audience size · $it","caption") }
             if(current.text("displayText")!=document.text("text")) { QText(if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) "Signed original" else "Original text","label");QText(document.text("text"),"body") }
+            val media = document["media"]?.jsonArray
+            val publicationVersion = current["version"]?.jsonPrimitive?.intOrNull
+            if (baseURL != null && viewerAccountId != null && media != null && media.size <= 6 && publicationVersion != null && publicationVersion > 0) {
+                media.forEach { value ->
+                    val attachment = value.jsonObject
+                    val actualVersion = attachment["version"]?.jsonPrimitive?.intOrNull
+                    if (actualVersion != null && actualVersion > 0 && attachment["version"]?.jsonPrimitive?.isString == false) {
+                        val actual = ContentAttachmentValue(attachment.text("kind"), attachment.text("assetId"), actualVersion, attachment.text("sha256"), attachment["alt"]?.jsonPrimitive?.contentOrNull)
+                        key(viewerAccountId, current.text("id"), publicationVersion, actual.id, actual.version, actual.sha256) {
+                            NativeContentAttachment(context, baseURL, viewerAccountId!!, creatorId, current.text("id"), document.text("kind"), creator, actual)
+                        }
+                    } else QText("Attachment information is unavailable. Refresh current access.", "caption")
+                }
+            }
             if (document.text("kind") == "note") {
                 QText("Your private replies", "display-md", modifier = Modifier.semantics { heading() }); QText("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.", "caption")
                 ContentInput("Reply privately", replyText, 4000) { replyText = it }

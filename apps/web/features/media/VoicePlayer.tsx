@@ -6,7 +6,9 @@ import type {
   PlaybackTicket,
   CreatorMediaAsset,
   CreatorMediaPlaybackTicket,
+  PlaybackFile,
 } from "../../../../packages/api/src/media";
+import { PlaybackFileSchema } from "../../../../packages/api/src/media";
 import { mediaRequest } from "./api";
 import "./media.css";
 
@@ -64,6 +66,7 @@ export function CreatorVoicePlayer(
       key={`${props.expectedAccountId ?? ""}/${family}/${props.objectId}/${props.asset.id}/${props.asset.version}/${props.asset.sha256}`}
       {...props}
       family={family}
+      requireCredentialed={props.audience === true || !!props.fanId}
     />
   );
 }
@@ -74,6 +77,7 @@ function Player({
   time,
   family,
   expectedAccountId,
+  requireCredentialed = false,
 }: {
   asset: MediaAsset | CreatorMediaAsset;
   creatorName: string;
@@ -81,10 +85,12 @@ function Player({
   time?: string;
   family: string;
   expectedAccountId?: string;
+  requireCredentialed?: boolean;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const surface = useRef<HTMLElement | null>(null);
   const loadRequest = useRef<AbortController | null>(null);
+  const playbackFile = useRef<PlaybackFile | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -116,6 +122,7 @@ function Player({
   useEffect(() => {
     if (!src) return;
     const element = audio.current;
+    const proof = playbackFile.current;
     const visibility = () => {
       let hidden = document.hidden;
       for (let node = surface.current; node; node = node.parentElement)
@@ -157,7 +164,17 @@ function Player({
             current.id !== asset.id ||
             current.version !== asset.version ||
             current.sha256 !== asset.sha256 ||
-            current.state !== "ready"
+            current.state !== "ready" ||
+            current.bytes !== asset.bytes ||
+            current.mimeType !== asset.mimeType ||
+            current.durationMs !== asset.durationMs ||
+            !proof ||
+            (proof.variant === "processed"
+              ? current.provenance?.c2paVerified === true
+              : current.provenance?.c2paVerified !== true ||
+                current.provenance.fileVariant !== "credentialed" ||
+                current.provenance.fileSha256 !== proof.sha256 ||
+                current.provenance.fileBytes !== proof.bytes)
           )
             throw new Error(
               "This recording changed or is no longer available.",
@@ -186,6 +203,7 @@ function Player({
       element?.pause();
       element?.removeAttribute("src");
       element?.load();
+      if (playbackFile.current === proof) playbackFile.current = null;
     };
   }, [src, family, asset.id, asset.version, asset.sha256, expectedAccountId]);
   async function load() {
@@ -205,6 +223,7 @@ function Player({
           : {}),
       });
       const url = new URL(ticket.url);
+      const proof = PlaybackFileSchema.parse(ticket.playbackFile);
       // Same-origin HTTP-only cookie bridge; never a bearer token in a URL.
       const path = `${family}/${asset.id}/play`;
       if (
@@ -212,6 +231,25 @@ function Player({
         ticket.asset.id !== asset.id ||
         ticket.asset.version !== asset.version ||
         ticket.asset.sha256 !== asset.sha256 ||
+        ticket.asset.bytes !== asset.bytes ||
+        ticket.asset.mimeType !== asset.mimeType ||
+        ticket.asset.durationMs !== asset.durationMs ||
+        !Number.isFinite(Date.parse(ticket.expiresAt)) ||
+        Date.parse(ticket.expiresAt) <= Date.now() ||
+        (requireCredentialed &&
+          (proof.variant !== "credentialed" ||
+            asset.provenance?.c2paVerified !== true ||
+            asset.provenance.fileVariant !== "credentialed" ||
+            asset.provenance.fileSha256 !== proof.sha256 ||
+            asset.provenance.fileBytes !== proof.bytes)) ||
+        (proof.variant === "processed"
+          ? proof.sha256 !== ticket.asset.sha256 ||
+            proof.bytes !== ticket.asset.bytes ||
+            ticket.asset.provenance?.c2paVerified === true
+          : ticket.asset.provenance?.c2paVerified !== true ||
+            ticket.asset.provenance.fileVariant !== "credentialed" ||
+            ticket.asset.provenance.fileSha256 !== proof.sha256 ||
+            ticket.asset.provenance.fileBytes !== proof.bytes) ||
         !url.searchParams.has("ticket") ||
         [...url.searchParams.keys()].some((name) => name !== "ticket")
       )
@@ -221,6 +259,7 @@ function Player({
       setPlaying(false);
       if (expectedAccountId)
         url.searchParams.set("expectedAccountId", expectedAccountId);
+      playbackFile.current = proof;
       setSrc(`/api/w6/${path}${url.search}`);
       setPosition(0);
       setError(null);

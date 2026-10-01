@@ -865,6 +865,9 @@ function Compose({
     (creator.owned ||
       creator.roles.includes("drafter") ||
       creator.roles.includes("publisher"));
+  const canPublish =
+    creator.verification === "verified" &&
+    (creator.owned || creator.roles.includes("publisher"));
   const [document, setDocument] = useState<ContentBody>(
       emptyBody(post ? "post" : "note"),
     ),
@@ -1341,7 +1344,7 @@ function Compose({
                 (!creator.roles.includes("publisher") ||
                   document.kind !== "post" ||
                   document.media.length > 0)) ||
-              !canDraft ||
+              !canPublish ||
               action.busy ||
               !!pendingPublication ||
               (!document.text.trim() && !document.media.length) ||
@@ -1349,6 +1352,10 @@ function Compose({
             }
             onClick={() =>
               void action.run(async () => {
+                if (!canPublish)
+                  throw new Error(
+                    "Current creator verification and a publishing role are required.",
+                  );
                 const result = await save();
                 if (creator.owned)
                   setReview(
@@ -1380,7 +1387,7 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
-      {review && canDraft && (
+      {review && canPublish && (
         <Modal
           title={
             document.scheduledAt

@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-private struct ContentDocumentView: Decodable, Sendable { let kind: String; let title: String; let text: String }
-private struct ContentViewValue: Decodable, Sendable { let id: String; let creatorName: String; let displayText: String; let teamMember: String?; let authorLabel: String; let audienceLabel: String; let audienceCount: Int?; let signedActId: String?; let publishedAt: String?; let document: ContentDocumentView; let quotedText: String?; let quotedHandle: String? }
+private struct ContentDocumentView: Decodable, Sendable { let kind: String; let title: String; let text: String; let media: [ContentAttachmentValue] }
+private struct ContentViewValue: Decodable, Sendable { let id: String; let version: Int; let creatorName: String; let displayText: String; let teamMember: String?; let authorLabel: String; let audienceLabel: String; let audienceCount: Int?; let signedActId: String?; let publishedAt: String?; let document: ContentDocumentView; let quotedText: String?; let quotedHandle: String? }
 private struct ContentReaction: Decodable, Sendable { let kind: String; let signedActId: String }
 private struct ContentConsent: Decodable, Sendable { let shareText: Bool; let showHandle: Bool; let version: Int }
 private struct ContentReply: Decodable, Identifiable, Sendable { let safetyState:String?; let safetyReviewAvailable:Bool?; let id: String; let contentId: String; let version: Int; let text: String; let createdAt: String; let consent: ContentConsent; let reaction: ContentReaction? }
@@ -87,6 +87,7 @@ private struct ContentFanScreen: View {
                     }
                     if let count = content.audienceCount { Text("Audience size · \(count)").qText("caption") }
                     if content.displayText != content.document.text { DisclosureGroup(content.signedActId == nil ? "Original text" : "Signed original") { Text(content.document.text).qText("body") } }
+                    attachments(for: content)
                     if content.document.kind == "note" {
                         Text("Your private replies").qText("display-md").accessibilityAddTraits(.isHeader)
                         Text("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.").qText("caption")
@@ -140,6 +141,14 @@ private struct ContentFanScreen: View {
         }
         .sheet(isPresented: Binding(get: { signature != nil }, set: { if !$0 { signature = nil; signatureStatus = "" } })) {
             VStack(spacing: 16) { Text("Signature").qText("display-md"); Text(signatureStatus.isEmpty ? "Checking current signature…" : signatureStatus).qText("body"); Button("Done", variant: .secondary) { signature = nil; signatureStatus = "" } }.padding(24).task { await verify() }
+        }
+    }
+    @ViewBuilder private func attachments(for content: ContentViewValue) -> some View {
+        if let baseURL, let viewerAccountId, content.version > 0, content.document.media.count <= 6 {
+            ForEach(content.document.media) { attachment in
+                NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
+                    .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
+            }
         }
     }
     private func contentReset() { content = nil }

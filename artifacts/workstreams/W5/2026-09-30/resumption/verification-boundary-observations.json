@@ -1,7 +1,7 @@
 {
   "recordedAt": "2026-10-01T02:29:23.813194+00:00",
   "sourceSha256": {
-    "apps/web/features/studio/Studio.tsx": "bd3f9303790e70f1c7b6801dcd77868c66b8c42d015338593c3b625336db6cd4",
+    "apps/web/features/studio/Studio.tsx": "567d31614128b4b9a2107d0f885dc347039377667fa8474ad182f901feccebac",
     "apps/web/app/you/page.tsx": "5fe05cbcb0905d8b4d826567389a332c9cdcea1cd89575f8e1d09ed491256e50",
     "apps/backend/src/modules/conversation/service.ts": "9f76f3493e6dd40e16e5f9d12f09657562891619e5dc9714ef3c73a5a3f3dac8",
     "apps/backend/src/modules/conversation/lineage-projection.ts": "0489f71baf06252393116f798440095776dd54d2ed0658b2b242c8d5c01c2706",
@@ -38,7 +38,14 @@
     },
     "themes": "actual application theme=light/night query; manually typed independent local input in each freshly navigated theme",
     "viewportLimitation": "Changing the browser override did not resize the existing tab3. Preserved390px unchanged-viewport capture; newly created tab5 actually measured1280px.",
-    "laterSessionExpiry": "Actual session ended cleared private composer/input. No transport-restart input recovery is inferred from that later observation."
+    "laterSessionExpiry": "Actual session ended cleared private composer/input. No transport-restart input recovery is inferred from that later observation.",
+    "currentRoleRefresh": {
+      "source": "personal compatible W1 63ab560 canPublish refinement; current creator verification+owner/publisher, action guard and dialog guard",
+      "operation": "restored real development fan two through canonical UI, opened pending Studio/New Note, typed local text and clicked Refresh role",
+      "observed": "same exact local textarea text retained; focus on Refresh role; Photo/Voice/Save/review disabled; actual width1280 scrollWidth1280",
+      "capture": "pending-composer-role-refresh-1280-light.jpg",
+      "genuineSigningAttempted": false
+    }
   },
   "accountAlias": {
     "ownerLease": "W1 explicit no-query compatibility route; unsupported query intent must be preserved",
@@ -58,7 +65,8 @@
       "actual canonical base metadata columns",
       "W8 immutable aliases/fresh+upgrade custody",
       "genuine prepared owner instance"
-    ]
+    ],
+    "producerCompatibilityReview": "W3 personally confirmed cea5e07 same pool/scoped client/bounded page/schema/order/ID/thread/audited Studio-only compatibility; owner lease released after publication."
   },
   "validation": {
     "scope": "API/web types, backend/web production builds, changed lint/format pass; actual launched browser operations above",

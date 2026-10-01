@@ -1,0 +1,120 @@
+{
+  "recordedAt": "2026-10-01T03:03:43.926250+00:00",
+  "sourceParent": "3fa1d4789666305118383cb28941b43502dcda11",
+  "sourceSha256": {
+    "packages/api/src/media.ts": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
+    "packages/api/generated/openapi.json": "476295b7c9d2fa162b8778b4d6b5fbf43032e2c51a5d373164fdfe593eaa1639",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "1de9ed5bda3c8847678f795e830897d21d37d5e234d0b538033b5abe3cd93165",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "e2202b67b635e2bfcdf5311e5aacfe6aeccd7625a24c5fa2d3fc43fb8d3e2e50",
+    "apps/web/features/media/VoicePlayer.tsx": "941e4874a8678f82e67bf672119169fc6d0e73575a79c4ab6afded4df7c5ebfa",
+    "apps/web/features/content/MediaAttachments.tsx": "9bd92b0e886a8493e7e9a1dfec35eb3a5cc7a8d05a5c00e8f00d86ff54342b44",
+    "apps/web/features/studio/Studio.tsx": "567d31614128b4b9a2107d0f885dc347039377667fa8474ad182f901feccebac",
+    "apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift": "2b416fa7cffae899b4baaa1ffbc2b82bab04e7633fb8aeedcc4dc7fddcea7a22",
+    "apps/ios/Sources/QelvoraUI/Content/ContentAttachments.swift": "d459d237e89ac651e30f64e821cab6fdd16ce5289cf501c5053f1f33bbf5535d",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentFeature.kt": "e9e23940ccdea0f2492fc9240568ce6d92accfba19d4f856111f8b351e9e360f",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentAttachments.kt": "f588d9aae30809f7b276538ea2ee6fc2995d7a0da11d6b2d65427b410d6d8bb4"
+  },
+  "producer": {
+    "immutableLocalSource": "682766cdec3318a70aa949eda93a9834845f5f05",
+    "apiMediaFileIdentical": true,
+    "consumption": "Only exact PlaybackFile/mandatory ticket contract; no whole producer graph, storage, worker, root assembly or migrations imported",
+    "proof": "Actual served-file variant/SHA256/byte-count is distinct from immutable processed signing tuple; audience consumers require credentialed proof and genuine coherent provenance",
+    "mountedLocally": false
+  },
+  "generated": {
+    "operations": 78,
+    "completeOperationObjectsUnchangedFromParent": true,
+    "swiftAndKotlinCompleteClientSuffixUnchanged": true,
+    "navigationFilesUnchanged": true
+  },
+  "web": {
+    "finalTypesLintFormatProductionBuildExitCode": 0,
+    "log": "/private/tmp/creator-w5-final-file-web-audience.log",
+    "actualRoleRefreshCapture": "pending-composer-role-refresh-1280-light.jpg",
+    "mediaPlaybackVerified": false
+  },
+  "ios": {
+    "buildExitCode": 0,
+    "buildLog": "/private/tmp/creator-w5-native-audience-host/build-file-proof-corrected.log",
+    "host": "actual shipping FanAppShell normal root; no replacement test harness",
+    "simulator": "9E7B3B43-955F-4473-8CE0-6BFEAE685D27",
+    "device": "iPhone17 / iOS26.5",
+    "capturePixels": [
+      1206,
+      2622
+    ],
+    "logicalPoints": [
+      402,
+      874
+    ],
+    "registeredDestination": "/content/50000000-0000-0000-0000-000000000001/640f8ae2-ba01-4a51-9dab-2ca24c0a4fa3",
+    "launch": "Installed actual signed shipping simulator app; visibly genuine Pantopus sign-in in Light and Night",
+    "captures": [
+      "native-fan-final-file-light.png",
+      "native-fan-final-file-night.png"
+    ],
+    "authenticatedContentOrBytesVerified": false,
+    "resourceDisposition": "Own simulator gracefully shutdown after captures; data preserved. Actual own launchctl identified mediaanalysisdPID7373 consuming343.6% CPU; no W5 lingering native compiler found."
+  },
+  "android": {
+    "buildExitCode": 0,
+    "buildSeconds": 280,
+    "buildLog": "/private/tmp/creator-w5-native-file-proof-corrected-apk.log",
+    "apkSha256": "7cb4a2aaa07b2a99769376c94a1199ea3cad646bfda45b6b4e3cdda15b8f92c7",
+    "ownedAVD": "CreatorPlatform_W5_Continuation",
+    "apiLevel": 35,
+    "adbPort": 5045,
+    "emulatorPort": 5590,
+    "netsimInstance": 5,
+    "install": "Actual final APK installed successfully on own AVD",
+    "bootProperty": "sys.boot_completed=1",
+    "lightColdLaunch": {
+      "status": "ok",
+      "totalTimeMs": 19897,
+      "waitTimeMs": 20016,
+      "capture": "native-fan-android-cold-start-light.png",
+      "limitation": "First capture raced cold-start and shows splash only"
+    },
+    "nightColdLaunch": {
+      "status": "timeout",
+      "waitTimeMs": 26354,
+      "shellExitCode": 0,
+      "capture": "native-fan-android-content-system-anr-night.png",
+      "observation": "Actual genuine Pantopus sign-in behind System UI is not responding dialog"
+    },
+    "runtimeAcceptance": false,
+    "authenticatedContentOrBytesVerified": false,
+    "environment": "Own SDK overlay of verified readonly W6 emulator/image/platformtools; own AVD/userdata/tmp/ADB5045/5590/netsim5. NETSIM_INSTANCE5 retry still reports CPU hangs and netsim gRPC/Wifi fallback; SystemUI ANR retained, no dismissal/input workaround.",
+    "resourceDisposition": "Own API35 emulator gracefully stopped after failed capture; AVD/userdata preserved. W6 is provisioning officialAPI34 CI-profile image; no W5 SDK download/writes."
+  },
+  "failedObservationsPreserved": {
+    "invalidDestination": "Earlier web-like /creators/{id}/posts/{id} launch is not registered native route. Old captures renamed invalid-destination; no acceptance inferred",
+    "compileCorrection": "First web compile assumed absent ContentBody attachment bytes/MIME/duration fields and failed. Removed that assumption; full actual producer metadata is compared; final build passed. Logs preserved.",
+    "interruptedNativeBuilds": "Initial file-proof builds interrupted130 to correct source; later corrected final native builds passed; no interrupted build claimed passing",
+    "earlierIOSCaptures": {
+      "native-fan-host-light-launch.png": "Earlier transition, not screen acceptance",
+      "native-fan-host-light-current.png": "Earlier sign-in-only observation",
+      "native-fan-final-file-invalid-destination-light.png": "Unregistered earlierCLI destination; no intended-route acceptance",
+      "native-fan-final-file-invalid-destination-night.png": "Unregistered earlierCLI destination; no intended-route acceptance"
+    }
+  },
+  "ci": {
+    "currentPR9Parent": "3fa1d4789666305118383cb28941b43502dcda11",
+    "inspectedCounts": {
+      "success": 5,
+      "queued": 6
+    },
+    "queuedCause": "Unverified; repo actions/runners lists self-hosted only, cannot infer hosted eligibility",
+    "hostedLabelPrimaryReference": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+    "workflowChanged": false
+  },
+  "validationLimits": {
+    "newTestCodeFilesSuites": false,
+    "unitTestsRunThisContinuation": false,
+    "genuineSigning": "Human explicitly instructed keep blocked; no UV/passkey/identity fabrication",
+    "productionMediaProviderProof": false,
+    "endToEndMergeGatePassed": false,
+    "prMerged": false,
+    "paidAICalls": 0
+  }
+}

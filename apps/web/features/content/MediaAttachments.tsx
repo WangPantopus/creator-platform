@@ -5,6 +5,7 @@ import {
   CreatorMediaAssetSchema,
   CreatorMediaPlaybackTicketSchema,
   type CreatorMediaAsset,
+  type PlaybackFile,
 } from "../../../../packages/api/src/media";
 import { mediaRequest } from "../media/api";
 import { CreatorVoicePlayer } from "../media/VoicePlayer";
@@ -50,6 +51,7 @@ function CurrentAttachment({
     [busy, setBusy] = useState(false);
   const generation = useRef(0),
     checkedAt = useRef(0),
+    photoProof = useRef<PlaybackFile | null>(null),
     photoRequest = useRef<AbortController | null>(null);
   const family = `creators/${content.creatorId}/audience-media`;
   const matches = useCallback(
@@ -62,7 +64,17 @@ function CurrentAttachment({
       value.state === "ready" &&
       value.bytes > 0 &&
       value.provenance?.c2paVerified === true &&
+      value.provenance.assetId === value.id &&
+      value.provenance.assetVersion === value.version &&
+      value.provenance.creatorId === value.creatorId &&
+      value.provenance.objectId === value.objectId &&
+      value.provenance.accountId === value.ownerAccountId &&
+      value.signedActId !== null &&
+      value.provenance.signedActId === value.signedActId &&
       value.provenance.processedMediaSha256 === attachment.sha256 &&
+      value.provenance.processedMediaBytes === value.bytes &&
+      value.provenance.processedMediaMimeType === value.mimeType &&
+      value.provenance.processedMediaDurationMs === value.durationMs &&
       (attachment.kind === "photo"
         ? value.purpose === "post_photo" && value.mimeType === "image/png"
         : value.mimeType === "audio/mp4" &&
@@ -82,6 +94,7 @@ function CurrentAttachment({
     const revision = ++generation.current;
     setAsset(null);
     setPhoto(null);
+    photoProof.current = null;
     setError("");
     setBusy(false);
     if (!active) return;
@@ -91,6 +104,7 @@ function CurrentAttachment({
       if (performance.now() - checkedAt.current >= 5000) {
         setAsset(null);
         setPhoto(null);
+        photoProof.current = null;
       }
     }, 500);
     const read = async () => {
@@ -123,12 +137,23 @@ function CurrentAttachment({
               "Check current attachment access before continuing.",
             );
           setAsset(value);
+          const proof = photoProof.current;
+          if (
+            proof &&
+            (value.provenance?.fileVariant !== proof.variant ||
+              value.provenance.fileSha256 !== proof.sha256 ||
+              value.provenance.fileBytes !== proof.bytes)
+          ) {
+            setPhoto(null);
+            photoProof.current = null;
+          }
           setError("");
         }
       } catch (failure) {
         if (!abort.signal.aborted && revision === generation.current) {
           setAsset(null);
           setPhoto(null);
+          photoProof.current = null;
           setError(
             failure instanceof Error
               ? failure.message
@@ -180,6 +205,16 @@ function CurrentAttachment({
         path = `${family}/${attachment.assetId}/play`;
       if (
         !matches(ticket.asset) ||
+        ticket.asset.bytes !== asset.bytes ||
+        ticket.asset.mimeType !== asset.mimeType ||
+        ticket.asset.durationMs !== asset.durationMs ||
+        ticket.playbackFile.variant !== "credentialed" ||
+        ticket.asset.provenance?.fileVariant !== "credentialed" ||
+        ticket.asset.provenance.fileSha256 !== ticket.playbackFile.sha256 ||
+        ticket.asset.provenance.fileBytes !== ticket.playbackFile.bytes ||
+        asset.provenance?.fileSha256 !== ticket.playbackFile.sha256 ||
+        asset.provenance.fileBytes !== ticket.playbackFile.bytes ||
+        Date.parse(ticket.expiresAt) <= Date.now() ||
         url.pathname !== `/v1/w6/${path}` ||
         !url.searchParams.has("ticket") ||
         [...url.searchParams.keys()].some((name) => name !== "ticket")
@@ -192,8 +227,10 @@ function CurrentAttachment({
         !abort.signal.aborted &&
         revision === generation.current &&
         performance.now() - checkedAt.current < 5000
-      )
+      ) {
+        photoProof.current = ticket.playbackFile;
         setPhoto(`/api/w6/${path}${url.search}`);
+      }
     } catch (failure) {
       if (!abort.signal.aborted && revision === generation.current) {
         setPhoto(null);
