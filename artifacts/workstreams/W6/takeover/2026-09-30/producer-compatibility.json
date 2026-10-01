@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-10-01T03:26:24.651704+00:00",
+  "personallyReviewed": true,
+  "W1": {
+    "source": "c6490a05e3bda71bf0273e57ba201a889fecdc52",
+    "recordingSourceReceipt": "artifacts/workstreams/W1/resume/2026-09-30-continuation/recording-source.json",
+    "compatibleConsumedW6": [
+      "682766c final served file",
+      "9b4540e archive metadata",
+      "f3f3e2e genuine held signature preparation"
+    ],
+    "operationGraph": "Actual producer has49 operations, adds deliverConversationRecording;48 prior ids/paths/methods retained;5 old operation objects/parameters change",
+    "currentW6Graph": "48 canonical operations retained; W3 conversation foundation/contracts/runtime/feature graph is absent from this branch. No generated-only49 client copy or broad unrelated root overwrite. Coherent prerequisite composition and actual private-purpose adapter remain open."
+  },
+  "W5": {
+    "source": "e0995381cf3621d1bf862732d95e4029ef6b0f92",
+    "review": "Swift/Kotlin final-file hash/count, bounded actual ranges, account/current-publication/expiry, private file cleanup preserve W6 immutable processed signing tuple",
+    "finding": "Swift synthesized optional Decodable accepted absent required-nullable duration keys. Source finding sent to owner.",
+    "fixedSource": "a7a5c865f986b6435d8fca0f183506e49d5e6d35",
+    "personallyInspectedFix": "ContentAttachments.swift explicit keyed decode(Int?.self,forKey:) on both actual duration keys and required-nullable signedActId/provenance; source finding closed",
+    "actualPhotoPlaybackAcceptance": false,
+    "broadOwnerGraphCopied": false
+  },
+  "W3": {
+    "source": "bb2e1645d242882d3e2a0138ac6b67800edf2172",
+    "recordingAssociation": "Same genuine ThreadScope/client and unsigned immutable W6 processed tuple; no second signature consume or invented subject",
+    "migration": "Proposal unchanged reserved/unapplied; W8 allocation/control bridge remains owner gate"
+  },
+  "capabilitiesRemainFalse": true,
+  "newTests": false
+}

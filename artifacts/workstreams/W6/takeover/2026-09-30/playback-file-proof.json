@@ -1,0 +1,201 @@
+{
+  "recordedAt": "2026-10-01T02:44:11.531284+00:00",
+  "source": "682766cdec3318a70aa949eda93a9834845f5f05",
+  "archiveSource": "9b4540ecd20b580768e49836a15df5804d9e154e",
+  "contract": {
+    "requiredTicketField": "playbackFile",
+    "fields": [
+      "variant",
+      "sha256",
+      "bytes"
+    ],
+    "variants": [
+      "processed",
+      "credentialed"
+    ],
+    "persistedFinalFields": [
+      "fileVariant",
+      "fileSha256",
+      "fileBytes"
+    ],
+    "processedSigningTupleUnchanged": true,
+    "oldProoflessPlayTicket": "refresh required",
+    "incompleteCredentialedRow": "denied; no processed fallback",
+    "descriptor": "hash bounded actual bytes; retain same opened descriptor for response; close every response path",
+    "currentStream": "mandatory same current file/version/publication/purpose/denial checks",
+    "hashDeadlineMilliseconds": 5000
+  },
+  "canonicalOperations": [
+    "acceptTeamInvitation",
+    "audienceCreatorMediaPlayback",
+    "beginCreatorMedia",
+    "beginCreatorProof",
+    "beginPasskey",
+    "beginSignedAct",
+    "cancelPasskey",
+    "cancelSignedAct",
+    "completeIdentity",
+    "continueWithPantopus",
+    "creatorMediaPlayback",
+    "creatorProof",
+    "fanCreatorMediaPlayback",
+    "finishCreatorMedia",
+    "handback",
+    "health",
+    "identityCapabilities",
+    "identitySession",
+    "inviteTeamMember",
+    "logout",
+    "passkeys",
+    "playAudienceCreatorMedia",
+    "playCreatorMedia",
+    "playFanCreatorMedia",
+    "publicSignature",
+    "readAudienceCreatorMedia",
+    "readCreatorCallAvailability",
+    "readCreatorMedia",
+    "readCreatorMediaPolicy",
+    "readFanCreatorMedia",
+    "readThread",
+    "recoverPasskeys",
+    "refreshSession",
+    "registerPasskey",
+    "removeTeamMember",
+    "resumeCreatorMedia",
+    "revokeCreatorMedia",
+    "revokePasskey",
+    "revokeSessions",
+    "saveCreatorCallAvailability",
+    "saveCreatorProfile",
+    "saveFanProfile",
+    "sendHumanReply",
+    "sendMessage",
+    "submitCreatorProof",
+    "takeover",
+    "uploadCreatorMediaChunk",
+    "verifySignedAct"
+  ],
+  "sourceSHA256": {
+    "packages/api/src/media.ts": "d27f439e7285f2ced1d35e22bf168a2fe7d626dc9e2fcd68ba9666414305579f",
+    "packages/api/src/media-openapi.ts": "7dd9c9d85e611c55de9b3cec8cc999d8a675bceabde24efd6c42c757982d1368",
+    "packages/api/generated/openapi.json": "b119afb44131f952f7149dca346c60eb76cc6a986c75b60321b42cf98cc528cf",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "b92c64743e9421ec052a137fcfe0e2e02725ff7cf04cf0c0bb7722ce6c334030",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "aa437730ec36a1d938330b9cb11d02585de3053a5f7bf91138a0e4659f57cf1c",
+    "apps/web/features/media/VoicePlayer.tsx": "b9289436ca4cc5cb413271547e99da772e3d5c6a3cdcbc78fae5e17cba037268",
+    "apps/backend/src/modules/media/service.ts": "9b2a49fc51e7e0700c86579ee290a809749406679f68c2587816d5a92368c988",
+    "apps/backend/src/modules/media/creator-service.ts": "1c6c4de000fea6d668180b003a2aee77be11f5e5a1dc1168ac3a46ec95b53765",
+    "apps/backend/src/modules/media/storage.ts": "e2cad00e93ecd0b773e36781761e2950b77273b6004931216eee1ce90ba1c9a0",
+    "apps/backend/src/modules/media/router.ts": "aa52555f3f86aabb819371d27f6b0e7c04f5735cde7b3220d59ca35bc0fc29c1",
+    "apps/backend/src/modules/media/worker.ts": "4a7f8ce2941c1c16b287d57493af2edef1339833f5ddec959dca8bebba944596",
+    "apps/backend/src/modules/media/creator-worker.ts": "a5a4977c07c3615ff7ef49ab5f7a1b9823d92165b212e35ae8030876ea799b09",
+    "apps/backend/src/modules/media/ai-audio.ts": "54f34259cc12a83ba0800894712df60bd43e8e00743ee739f9300ef10b5dc979",
+    "apps/backend/src/modules/media/lifecycle.ts": "9f6367ce3f9fd37e03cca358571cfb7e954d15bf834a9a81a16a3cd2f5901e6c",
+    "apps/backend/src/modules/media/creator-lifecycle.ts": "de9ff425f04de730238da375b8f29db3fca017d078fbfc0833d07261774fb808"
+  },
+  "checks": {
+    "backendProduction": "passed",
+    "apiTypes": "passed",
+    "changedLintFormat": "passed",
+    "generationConsistency": "Passed:48 original paths/IDs/parameters/response refs preserved;3 playback descriptions and response schemas changed",
+    "webProduction": "passed",
+    "nativeGeneratedModelPackaging": "Current shipping iOS generic simulator build and strict signature verification passed; Android shipping/instrumentation APK build and signatures passed; native file playback not established",
+    "actualFileByteSigningPublicationPlayback": "not observed"
+  },
+  "logs": {
+    "playback-proof-final-build.log": {
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "playback-proof-api-types.log": {
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+    },
+    "playback-proof-lint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "playback-proof-final-format.log": {
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "playback-proof-generate-check.log": {
+      "sha256": "e721dc6eaae5e85203f9d760306671994f62c5522f4d500fbd882dc2d743a998"
+    },
+    "playback-proof-web-build.log": {
+      "sha256": "5c4074dcc7eb0ecd3e39c718ca319de829ef647461019f816d2d7e1f56824c6f"
+    },
+    "archive-file-proof-final-build.log": {
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "archive-file-proof-final-lint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "playback-proof-ios-current-build.log": {
+      "sha256": "410b23ed97d19ead86d80bbf71b12a4e8a52921cb8b8a0e160d7b3465ff0fc11"
+    },
+    "playback-proof-ios-signature.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "actualWeb": {
+    "origin": "http://127.0.0.1:3006",
+    "api": "http://127.0.0.1:4106",
+    "identityAndMedia": "unconfigured",
+    "viewport": [
+      390,
+      844
+    ],
+    "keyboard": [
+      "Enter follows actual AI gate link to recorder",
+      "Enter on Record entered pending permission",
+      "Browser actually denied microphone; status displayed, Record enabled,0:00 retained"
+    ],
+    "cancelAttemptAfterDenial": "no matching Cancel button because request had already resolved to denied; no forced retry",
+    "captures": [
+      "launched-apps/web-current-ai-gate.png",
+      "launched-apps/web-current-keyboard-denied.png"
+    ]
+  },
+  "newTestsOrChangedAssertionsReferences": false,
+  "appliedSQL": false,
+  "capabilities": {
+    "media": false,
+    "calls": false,
+    "aiAudio": false
+  },
+  "limits": [
+    "No genuine authenticated creator/fan final-file/signing/publication/drained archive/provider acceptance",
+    "No source CI ios-review yet; no W6 push/merge",
+    "Native generated model compilation alone is not native playback acceptance"
+  ],
+  "mergeReady": false,
+  "canonicalOperationComparison": {
+    "identicalPathsIdsParametersAndResponseRefs": true,
+    "operationObjectsByteIdentical": false,
+    "descriptionChanges": [
+      [
+        "get",
+        "/v1/w6/creators/{creatorId}/audience-media/{assetId}/play",
+        "playAudienceCreatorMedia"
+      ],
+      [
+        "get",
+        "/v1/w6/creators/{creatorId}/media/{assetId}/play",
+        "playCreatorMedia"
+      ],
+      [
+        "get",
+        "/v1/w6/threads/{creatorId}/{fanId}/creator-media/{assetId}/play",
+        "playFanCreatorMedia"
+      ]
+    ],
+    "responseSchema": "CreatorMediaPlaybackTicket gains required playbackFile; generated media models changed"
+  },
+  "currentHeldSigningSource": "f3f3e2ef3c9fad6399f8c17c81872d865ffca56e",
+  "producerLease": "Released to W1 for canonical generation; source stable",
+  "nativePackaging": {
+    "iosBuild": "BUILD SUCCEEDED",
+    "iosSignature": "strict verification exit0",
+    "androidShippingApkSha256": "8a96c91081d0fdcb4c14e5789ee712e2ee090f117b21a6aabfaaa45610627498",
+    "androidInstrumentationApkSha256": "46051ea8cbc99fe4e1535154dec001e8aa889cf6efdff643b0d7429502cb5339",
+    "androidLaunch": "Actual isolated Recorder launches Statusok12655ms but System UI ANR; existing shipping sign-in instrumentation reports Process crashed",
+    "nativePlaybackAcceptance": false
+  },
+  "androidJourneyReceipt": "android-launched-apps.json"
+}

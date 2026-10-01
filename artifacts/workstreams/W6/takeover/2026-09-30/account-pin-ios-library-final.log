@@ -1,0 +1,21 @@
+Building for debugging...
+[0/3] Copying Localizable.xcstrings
+[0/3] Write sources
+[2/4] Copying Glyphs.json
+[3/4] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Emitting module QelvoraUI
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+[6/8] Compiling QelvoraUI QelvoraAPI.swift
+[7/8] Compiling QelvoraUI QelvoraTokens.swift
+[8/8] Compiling QelvoraUI QelvoraCopy.swift
+[9/12] Compiling QelvoraUI NativeCallOffers.swift
+[10/12] Compiling QelvoraUI FanShell.swift
+[11/12] Compiling QelvoraUI CredentialSettings.swift
+[12/12] Compiling QelvoraUI CommerceFeature.swift
+Build of target: 'QelvoraUI' complete! (13.16s)

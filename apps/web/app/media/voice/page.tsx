@@ -2,7 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IdSchema, ReturnTargetSchema } from "@qelvora/api";
 import { Notice } from "@qelvora/ui-web";
-import { CreatorVoiceRecording } from "../../../features/media/VoiceRecorder";
+import {
+  CreatorVoiceRecording,
+  VoiceRecording,
+} from "../../../features/media/VoiceRecorder";
 import { MediaSession } from "../../../features/media/session";
 import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../features/identity/welcome";
@@ -18,8 +21,10 @@ export default async function VoicePage({
   const objectId = query.objectId;
   if (
     Object.keys(query).some(
-      (key) => !["creatorId", "objectId"].includes(key),
+      (key) => !["creatorId", "objectId", "theme"].includes(key),
     ) ||
+    (query.theme !== undefined &&
+      !["light", "night"].includes(String(query.theme))) ||
     (creatorId !== undefined && !IdSchema.safeParse(creatorId).success) ||
     (objectId !== undefined && !IdSchema.safeParse(objectId).success)
   )
@@ -42,7 +47,15 @@ export default async function VoicePage({
       : "/media/voice";
   if (!ReturnTargetSchema.safeParse(returnTo).success) notFound();
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session) {
+    if (creatorId === undefined && objectId === undefined)
+      return (
+        <main>
+          <VoiceRecording purpose="human_note" maxDurationMs={60_000} />
+        </main>
+      );
+    return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  }
   return (
     <IdentitySessionBoundary
       key={session.accountId}
@@ -57,6 +70,7 @@ export default async function VoicePage({
             <CreatorVoiceRecording
               creatorId={creatorId}
               objectId={objectId}
+              expectedAccountId={session.accountId}
               creatorName={session.creator.displayName}
             />
             <p className="qv-help">
