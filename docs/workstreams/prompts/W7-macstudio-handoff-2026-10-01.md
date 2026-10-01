@@ -57,6 +57,7 @@ Apply the 40 active migrations with `DATABASE_MIGRATION_URL` (migration-admin UR
 - W4 PR #53 (capture helper) and W1 PR #59 (`visualWebURL`) are open; PR #31 carries identical hunks.
 - W1 planned an H09 host-composition PR adding a Growth worker-pool `error` listener; PR #31 already has it in `growth/configured.ts`. Ensure only one identical hunk lands.
 - W5 will mirror `contentPublicProjection` effect wiring, export a canonical `CurrentThanksTarget`, and keep `contentThanksPermission`/`contentThanksWindow` signatures stable without telling W7. W5 needs the creator projection producer for follows/Notes.
+- W1's session ended (successor on codex/w1-session-truth-20261001, PR #66); W1 confirmed PR #31 owns the Growth worker-pool listener. W1 suggests changing `min-height: 844px` in apps/web/features/growth/growth.css (L327) to `min(844px, 100svh)` (as PR #66 did for Welcome/Handle) so bottom actions are not hidden under mobile Safari's toolbar; verify on a real phone viewport first.
 
 ## External inputs and truthfulness
 
