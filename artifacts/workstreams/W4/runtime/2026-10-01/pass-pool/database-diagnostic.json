@@ -1,0 +1,8 @@
+{
+  "canonicalMigrations": 40,
+  "packets": 0,
+  "ledger": 0,
+  "passes": 0,
+  "poolSchemaInstalled": false,
+  "payoutCustodyInstalled": false
+}

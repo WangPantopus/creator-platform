@@ -31,11 +31,62 @@ export type Workspace = {
   deleted_at: Date | null;
 };
 export class AgentRepository {
+  private storageReady: Promise<void> | undefined;
   constructor(
     readonly pool: Pool,
     readonly usageJournal?: PreparedGenerationJournal,
   ) {
     usageJournal?.assertPool(pool);
+  }
+  /** A restored schema can retain its data while losing grants or RLS. Check
+   * W2's actual storage before any creator transaction, including shared hosts. */
+  assertRuntimeRole(): Promise<void> {
+    this.storageReady ??= this.checkRuntimeRole().catch((error: unknown) => {
+      this.storageReady = undefined;
+      throw error;
+    });
+    return this.storageReady;
+  }
+  private async checkRuntimeRole() {
+    const required = [
+      "ai_workspace",
+      "ai_source",
+      "ai_chunk",
+      "ai_ingestion",
+      "ai_evaluation",
+      "ai_version",
+      "ai_license",
+      "ai_sponsor",
+      "ai_regression",
+      "ai_event",
+      "ai_usage",
+      "ai_command",
+      "ai_style_embedding",
+      "ai_cost_hold",
+      "ai_shadow_sample",
+      "ai_shadow_evaluation",
+      "ai_tombstone",
+    ];
+    const role = (
+      await this.pool.query<{ ready: boolean }>(
+        `SELECT NOT (r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolinherit)
+          AND has_schema_privilege(current_user,'creator','USAGE')
+          AND (SELECT count(*)=$2::integer FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='creator' AND c.relname=ANY($1::text[]) AND c.relkind='r')
+          AND NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='creator' AND c.relname LIKE 'ai\\_%' ESCAPE '\\' AND c.relkind IN ('r','p')
+              AND (pg_has_role(current_user,c.relowner,'MEMBER') OR NOT c.relrowsecurity OR NOT c.relforcerowsecurity
+                OR NOT has_table_privilege(current_user,c.oid,'SELECT')))
+          AS ready FROM pg_roles r WHERE r.rolname=current_user`,
+        [required, required.length],
+      )
+    ).rows[0];
+    if (!role?.ready)
+      throw new DomainError(
+        "unsafe_agent_storage",
+        "Creator AI requires its complete schema, canonical runtime grants and non-owner forced row security.",
+        503,
+      );
   }
   async transaction<T>(
     scope: CreatorScope,
@@ -46,6 +97,7 @@ export class AgentRepository {
     ) => Promise<T>,
     allowDeleted = false,
   ): Promise<T> {
+    await this.assertRuntimeRole();
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
