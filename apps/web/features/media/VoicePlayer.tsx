@@ -110,6 +110,7 @@ function Player({
   );
   useEffect(() => {
     if (!src) return;
+    const element = audio.current;
     const abort = new AbortController();
     let checking = false;
     const timer = setInterval(() => {
@@ -146,6 +147,9 @@ function Player({
     return () => {
       abort.abort();
       clearInterval(timer);
+      element?.pause();
+      element?.removeAttribute("src");
+      element?.load();
     };
   }, [src, family, asset.id, asset.version, asset.sha256]);
   async function load() {
@@ -294,6 +298,7 @@ function Player({
         )}
         {src && (
           <audio
+            key={src}
             ref={audio}
             preload="metadata"
             src={src}

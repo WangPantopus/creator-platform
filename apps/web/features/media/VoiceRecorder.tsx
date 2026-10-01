@@ -92,6 +92,7 @@ function RecordingForm({
     purpose?: "human_note" | "human_reply" | "post_audio";
   }) {
   const heading = useId();
+  const surface = useRef<HTMLElement | null>(null);
   const family =
     creatorId && (objectId || fanId)
       ? objectId
@@ -106,6 +107,7 @@ function RecordingForm({
     reason: null,
   });
   const [preview, setPreview] = useState<string | null>(null);
+  const previewAudio = useRef<HTMLAudioElement | null>(null);
   const [upload, setUpload] = useState<
     "idle" | "uploading" | "processing" | "failed"
   >("idle");
@@ -127,11 +129,35 @@ function RecordingForm({
     const value = new BrowserRecorder(maxDurationMs, setRecording);
     recorder.current = value;
     const visibility = () => {
-      if (document.hidden) value.pause(true);
+      let hidden = document.hidden;
+      for (let node = surface.current; node; node = node.parentElement) {
+        if (
+          node.hidden ||
+          node.inert ||
+          node.getAttribute("aria-hidden") === "true" ||
+          (node instanceof HTMLDialogElement && !node.open)
+        ) {
+          hidden = true;
+          break;
+        }
+      }
+      if (hidden) {
+        value.pause(true);
+        previewAudio.current?.pause();
+      }
     };
+    const observer = new MutationObserver(visibility);
+    for (let node = surface.current; node; node = node.parentElement) {
+      observer.observe(node, {
+        attributes: true,
+        attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
+      });
+    }
+    visibility();
     document.addEventListener("visibilitychange", visibility);
     return () => {
       document.removeEventListener("visibilitychange", visibility);
+      observer.disconnect();
       value.discard();
       recorder.current = null;
       controller.current?.abort();
@@ -146,6 +172,14 @@ function RecordingForm({
     setPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [recording.blob]);
+  useEffect(() => {
+    const element = previewAudio.current;
+    return () => {
+      element?.pause();
+      element?.removeAttribute("src");
+      element?.load();
+    };
+  }, [preview]);
   useEffect(() => {
     const abort = new AbortController();
     void mediaRequest<{
@@ -334,7 +368,7 @@ function RecordingForm({
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
   return (
-    <section className="w6-recorder" aria-labelledby={heading}>
+    <section ref={surface} className="w6-recorder" aria-labelledby={heading}>
       <div className="w6-author">
         {creatorName && <Seal size={28} />}
         <span>
@@ -406,6 +440,8 @@ function RecordingForm({
         <div className="w6-plate">
           <span>Private preview · your recording</span>
           <audio
+            key={preview}
+            ref={previewAudio}
             controls
             preload="metadata"
             src={preview}
