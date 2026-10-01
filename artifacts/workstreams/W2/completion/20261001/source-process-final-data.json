@@ -1,0 +1,42 @@
+{
+  "counts": {
+    "usage": 935,
+    "sources": 125,
+    "versions": 105,
+    "migrations": 40,
+    "evaluations": 25
+  },
+  "source": {
+    "id": "8c97be4b-d47d-4c78-9159-8fc4976da5a3",
+    "hash": "5f750a6f07b255a0a18a266056be0b7609875d044233bc9117bcf0acbd502c59",
+    "state": "revoked",
+    "progress": 0,
+    "revision": 4,
+    "indexState": "pending"
+  },
+  "capturedAt": "2026-10-01T13:09:41.176311+00:00",
+  "workspaces": [
+    {
+      "paused": true,
+      "revision": 19,
+      "creatorId": "20000000-0000-4000-8000-000000000002",
+      "liveVersionId": null,
+      "dailyCapMicros": 0
+    },
+    {
+      "paused": true,
+      "revision": 27,
+      "creatorId": "20000000-0000-4000-8000-000000000003",
+      "liveVersionId": null,
+      "dailyCapMicros": 0
+    }
+  ],
+  "sourceChunks": 0,
+  "interruptedUsage": {
+    "id": "4bf85bf3-6177-4758-bb23-0ea90e20fecc",
+    "model": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+    "createdAt": "2026-10-01T12:51:08.750062+00:00",
+    "costMicros": null,
+    "inputTokens": 0
+  }
+}
