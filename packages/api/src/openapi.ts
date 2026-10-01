@@ -74,11 +74,19 @@ function ownedPath(
   response: string,
   body?: string,
   query: string[] = [],
+  requiredQuery: string[] = [],
+  expectedAccountHeader = "x-qelvora-expected-account",
 ) {
   const parameters = scoped(
     Array.from(path.matchAll(/\{([^}]+)\}/gu), (match) => match[1]!),
     query,
   );
+  for (const name of requiredQuery) {
+    const parameter = parameters.find(
+      (p) => p.in === "query" && p.name === name,
+    );
+    if (parameter) parameter.required = true;
+  }
   contentPaths[path] = {
     ...((contentPaths[path] as object) ?? {}),
     parameters,
@@ -90,7 +98,7 @@ function ownedPath(
             parameters: [
               {
                 in: "header",
-                name: "x-qelvora-expected-account",
+                name: expectedAccountHeader,
                 required: false,
                 schema: { type: "string", format: "uuid" },
                 description:
@@ -101,6 +109,25 @@ function ownedPath(
     },
   };
 }
+ownedPath(
+  "/v1/commerce/creators/{creatorId}/earnings",
+  "get",
+  "creatorEarningsLedger",
+  "CommerceCreatorLedgerPage",
+  undefined,
+  ["currency", "cursor"],
+  ["currency"],
+);
+ownedPath(
+  "/v1/commerce/creators/{creatorId}/payout-onboarding",
+  "post",
+  "creatorPayoutOnboarding",
+  "CommercePayoutOnboardingResult",
+  "CommercePayoutOnboardingCommand",
+  [],
+  [],
+  "x-commerce-account-id",
+);
 const content = "/v1/content/{creatorId}";
 const page = ["cursor", "limit", "state", "query"];
 ownedPath(content, "get", "contentList", "ContentList", undefined, page);

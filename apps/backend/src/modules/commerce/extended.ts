@@ -49,7 +49,14 @@ export class ExtendedCommerce {
     readonly money?: import("./reconciliation.js").MoneyReconciliation,
     readonly settlement?: import("./accounting.js").CreatorSettlement,
     readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
-  ) {}
+    readonly poolJournal?: import("./pass-pool-journal.js").PassPoolJournal,
+  ) {
+    invariant(
+      !poolJournal || poolJournal.isForService(service),
+      "pool_graph_mismatch",
+      "Pool reads require this same prepared commerce graph.",
+    );
+  }
   async storePurchase(
     actor: Actor,
     input: { platform: "apple" | "google"; transaction: string },
@@ -344,7 +351,7 @@ export class ExtendedCommerce {
         [`credit_wallet:${record.fan_id}:${record.currency}`],
       );
       const read = await client.query(
-        `INSERT INTO creator.commerce_qualified_read(creator_id,fan_id,commitment_id,reader_account_id,evidence_id,period,credited) VALUES($1,$2,$3,$4,$5,date_trunc('month',now()),$6) ON CONFLICT DO NOTHING RETURNING id`,
+        `INSERT INTO creator.commerce_qualified_read(creator_id,fan_id,commitment_id,reader_account_id,evidence_id,period,credited) VALUES($1,$2,$3,$4,$5,date_trunc('month',now() AT TIME ZONE 'UTC')::date,$6) ON CONFLICT DO NOTHING RETURNING id`,
         [
           record.creator_id,
           record.fan_id,
@@ -357,7 +364,7 @@ export class ExtendedCommerce {
       if (!read.rowCount || !eligible) return { credited: 0 };
       const used = (
         await client.query<{ amount: string }>(
-          "SELECT coalesce(sum(amount),0)::text AS amount FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND kind='credit_issue' AND created_at>=date_trunc('month',now())",
+          "SELECT coalesce(sum(amount),0)::text AS amount FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND kind='credit_issue' AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC' AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'",
           [record.fan_id, record.currency],
         )
       ).rows[0]!;

@@ -1,0 +1,14 @@
+{
+  "apps/backend/dist/server.mjs": "98321d3bc99dfaef053cba96a883185a0fc0e2ebf3f9be04bd0e7569a3b5f5a3",
+  "apps/backend/dist/integration.mjs": "145cd202713bd9df74b8ddc786da8163b5b1caf269b6a4400539b6dab7f863f0",
+  "ios/QelvoraApp": "5312abdfc0a9accc12dd6287300e3614fdef53f183a37a09480190bf7d8aeb1b",
+  "android/app-debug.apk": "872227f558871bb13ba3eaa420389e1c7cbdbf8cf177369b59fff8d813327d07",
+  "web/BUILD_ID": "BpqReZVfoT33ehaPwoWQM",
+  "web/server-static-file-count": 1288,
+  "web/server-static-manifest-sha256": "1952af1fa600d236b106db4f70db20c6e75ab3b6d11277fb69d6acfaec556204",
+  "logs": {
+    "ios-pool-surfaces-final-build.log": "f6b13d20ab774e6088623a3661b21a034763188833d7bc320f20f2dbb6255092",
+    "android-pool-surfaces-final-build.log": "9164b484fbf68bac2ea6301b8b66e35fc033d2c2f9997a0082fc1c9b8d84cc7c",
+    "web-pool-surfaces-production-build.log": "d8ebe55bb9a83c2c4aae530366cdfc3f6a4a7657aaae2e4f3a44efccdbbf340b"
+  }
+}

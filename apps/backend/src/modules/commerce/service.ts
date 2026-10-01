@@ -105,6 +105,13 @@ export type CommerceTrialAdmission = Readonly<{
    * successful default. This must reject before the one-time window starts. */
   assertReady(scope: ThreadScope, client: PoolClient): Promise<void>;
 }>;
+/** Genuine current account/creator denials held until this exact transaction
+ * ends. A read-only check on another connection cannot satisfy this port. */
+export type CommerceCreatorReadAuthority = (
+  client: PoolClient,
+  actor: Actor,
+  creatorId: string,
+) => Promise<void>;
 const ModeCommand = z
   .strictObject({
     title: z.string().trim().min(1).max(100),
@@ -149,7 +156,51 @@ export class CommerceService {
     readonly provider?: PaymentProvider,
     private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
     private readonly trialAdmission?: CommerceTrialAdmission,
+    private readonly assertCreatorReadAllowed?: CommerceCreatorReadAuthority,
   ) {}
+  get creatorFinancialReadAvailable() {
+    return typeof this.assertCreatorReadAllowed === "function";
+  }
+  /** Owner financial projections have no thread and must not mint one to
+   * obtain authority. Check the genuine owner, then hold denial before profile
+   * locks and recheck verification/recovery through the entire read. */
+  async assertCreatorFinancialRead(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) {
+    const ownerQuery =
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required";
+    const values = [creatorId, actor.accountId];
+    const requireOwner = (count: number | null) => {
+      if (count !== 1)
+        throw new DomainError(
+          "creator_required",
+          "Earnings belong to the current verified creator account.",
+          403,
+        );
+    };
+    requireOwner((await client.query(ownerQuery, values)).rowCount);
+    if (!this.assertCreatorReadAllowed)
+      throw new DomainError(
+        "creator_financial_authority_unavailable",
+        "Current earnings authority is unavailable. Refresh before continuing.",
+        503,
+      );
+    try {
+      await this.assertCreatorReadAllowed(client, actor, creatorId);
+    } finally {
+      // The authority may read its own narrow scope; restore the real request
+      // account and clear pair scope before any financial projection runs.
+      await client.query(
+        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
+        [actor.accountId],
+      );
+    }
+    requireOwner(
+      (await client.query(`${ownerQuery} FOR SHARE`, values)).rowCount,
+    );
+  }
   get firstConversationAvailable() {
     return Boolean(
       this.trialAdmission &&
@@ -316,7 +367,11 @@ export class CommerceService {
       ],
     );
   }
-  async overview(actor: Actor, creatorId?: string) {
+  async overview(
+    actor: Actor,
+    creatorId?: string,
+    options?: { creatorFinance: boolean },
+  ) {
     return this.account(actor, async (client) => {
       const fan =
         (
@@ -333,10 +388,23 @@ export class CommerceService {
       ).rows;
       const owned = (
         await client.query(
-          "SELECT id,display_name,verification FROM creator.creator_profile WHERE account_id=$1",
+          "SELECT id,display_name,verification,recovery_required FROM creator.creator_profile WHERE account_id=$1",
           [actor.accountId],
         )
       ).rows;
+      const financialCreators: string[] = [];
+      if (options?.creatorFinance) {
+        for (const owner of owned) {
+          if (
+            owner.verification !== "verified" ||
+            owner.recovery_required ||
+            (creatorId && owner.id !== creatorId)
+          )
+            continue;
+          await this.assertCreatorFinancialRead(client, actor, owner.id);
+          financialCreators.push(owner.id);
+        }
+      }
       const packets = (
         await client.query(
           `SELECT p.*,c.id AS commitment_id,c.state AS commitment_state,c.due_at,c.delivered_at,c.outcome FROM creator.commerce_packet p LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id WHERE ($1::uuid IS NULL OR p.creator_id=$1) ORDER BY p.created_at DESC,p.id DESC LIMIT 50`,
@@ -375,16 +443,18 @@ export class CommerceService {
       const spendingNotices = fan
         ? await this.spendingNotices(client, fan.id, this.policy.currency)
         : [];
-      const payoutAccounts = owned.length
+      const payoutAccounts = financialCreators.length
         ? (
             await client.query(
-              "SELECT creator_id,state,details_due,version FROM creator.commerce_payout_account",
+              "SELECT creator_id,state,details_due,version FROM creator.commerce_payout_account WHERE creator_id=ANY($1::uuid[])",
+              [financialCreators],
             )
           ).rows
         : [];
       const ledger = (
         await client.query(
-          "SELECT * FROM creator.commerce_ledger ORDER BY created_at DESC,id DESC LIMIT 100",
+          "SELECT * FROM creator.commerce_ledger WHERE fan_id=$1 OR creator_id=ANY($2::uuid[]) ORDER BY created_at DESC,id DESC LIMIT 100",
+          [fan?.id ?? null, financialCreators],
         )
       ).rows;
       const pass = fan
@@ -498,8 +568,14 @@ export class CommerceService {
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
     const totals = (
-      await client.query<{ captured: string; held: string }>(
-        `SELECT coalesce(sum(CASE WHEN kind='capture' THEN amount ELSE 0 END),0)::text AS captured FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'`,
+      await client.query<{ captured: string; refunded: string; month: string }>(
+        `SELECT coalesce(sum(amount) FILTER(WHERE kind='capture'),0)::text AS captured,
+         coalesce(sum(amount) FILTER(WHERE kind='refund'),0)::text AS refunded,
+         to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month
+         FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2
+         AND kind IN('capture','refund')
+         AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+         AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
         [fanId, currency],
       )
     ).rows[0]!;
@@ -538,11 +614,14 @@ export class CommerceService {
       BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
-      total <= BigInt(Number.MAX_SAFE_INTEGER),
+      total <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        BigInt(totals.refunded) <= BigInt(Number.MAX_SAFE_INTEGER),
       "balance_reconciliation_required",
       "This balance needs reconciliation before new spending.",
     );
     return {
+      month: totals.month,
+      refunded: Number(totals.refunded),
       captured: Number(totals.captured),
       held: Number(heldTotal),
       total: Number(total),
