@@ -2470,7 +2470,9 @@ function Library({ creator }: { creator: Creator }) {
       ))}
       {!page.items.length && !action.busy && !action.error && (
         <EmptyState
-          title={query || filter ? "No matching items" : "Your library is empty"}
+          title={
+            query || filter ? "No matching items" : "Your library is empty"
+          }
           body={
             query || filter
               ? "Try another search or choose All states."
