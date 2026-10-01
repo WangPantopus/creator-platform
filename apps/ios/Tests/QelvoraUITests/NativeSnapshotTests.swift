@@ -5,6 +5,14 @@
   import XCTest
   @testable import QelvoraUI
 
+  /// The references hold two pixels per point. AppKit and SwiftUI rasterize
+  /// hosted text from the window's reported scale, so a 1x hosted display would
+  /// otherwise cache 1x glyphs. Capture renders the layer tree offscreen and
+  /// never reads the window server's backing store.
+  private final class ReferenceScaleWindow: NSWindow {
+    override var backingScaleFactor: CGFloat { 2 }
+  }
+
   @MainActor
   final class NativeSnapshotTests: XCTestCase {
     private let size = CGSize(width: 390, height: 844)
@@ -70,7 +78,7 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
-      let window = NSWindow(
+      let window = ReferenceScaleWindow(
         contentRect: NSRect(origin: .zero, size: size), styleMask: .borderless,
         backing: .buffered, defer: false)
       // Keep capture independent of the attached display's calibration.
@@ -117,7 +125,8 @@
       let bitmap = NSBitmapImageRep(cgImage: pixels)
       bitmap.size = size
       host.cacheDisplay(in: host.bounds, to: bitmap)
-      print("Native capture \(testName)/\(name): backing=\(window.backingScaleFactor), points=\(host.bounds.size), bitmapPixels=\(bitmap.pixelsWide)x\(bitmap.pixelsHigh), bitmapPoints=\(bitmap.size)")
+      let display = window.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 0
+      print("Native capture \(testName)/\(name): display=\(display), reported=\(window.backingScaleFactor), points=\(host.bounds.size), bitmapPixels=\(bitmap.pixelsWide)x\(bitmap.pixelsHigh)")
       let image = NSImage(size: size)
       image.addRepresentation(bitmap)
       var imageStrategy = Snapshotting<NSImage, NSImage>.image
