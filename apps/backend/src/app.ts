@@ -297,20 +297,15 @@ export function createApp(
         "Conversation authority is not connected.",
         503,
       );
-    const scope = await dependencies.access.openThread(
-      actor,
-      creatorId,
-      body.fanId,
+    res.json(
+      await dependencies.signing.beginThreadSubject(
+        actor,
+        creatorId,
+        body.fanId,
+        body.command,
+        dependencies.access,
+      ),
     );
-    if (
-      scope.authority !== "creator" ||
-      body.command.subjectId !== scope.threadId
-    )
-      throw new DomainError(
-        "signed_subject_unavailable",
-        "The creator cannot sign this subject.",
-      );
-    res.json(await dependencies.signing.begin(actor, creatorId, body.command));
   });
   app.post("/v1/identity/signed-acts/verify", async (req, res) => {
     const actor = await actorFor(req);

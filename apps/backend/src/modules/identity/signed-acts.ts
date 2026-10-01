@@ -4,11 +4,11 @@ import {
   type AuthenticationResponseJSON,
 } from "@simplewebauthn/server";
 import type { Pool, PoolClient } from "pg";
-import type { SignedActCommand } from "@qelvora/api";
+import { HumanReplySchema, type SignedActCommand } from "@qelvora/api";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
-import type { ThreadScope } from "../access/scope.js";
+import type { AccessService, ThreadScope } from "../access/scope.js";
 import { identityTransaction } from "./transaction.js";
 import {
   prepareSignedSubject,
@@ -51,19 +51,80 @@ export class SignedActService {
     creatorId: string,
     requested: SignedActCommand,
   ) {
-    const canonical = await identityTransaction(
-      this.pool,
-      actor.accountId,
-      (client) =>
-        prepareSignedSubject(
+    return this.accountTransaction(actor.accountId, async (client) => {
+      const canonical = await prepareSignedSubject(
+        client,
+        actor,
+        creatorId,
+        requested,
+        this.subjectPolicies,
+      );
+      return this.beginOnClient(client, actor, creatorId, canonical);
+    });
+  }
+  /** The selected fan is a lookup input. Only the canonical issuer supplies
+   * authority, on the same transaction as preparation and challenge creation. */
+  async beginThreadSubject(
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+    requested: SignedActCommand,
+    access: AccessService,
+  ) {
+    return this.accountTransaction(actor.accountId, async (client) => {
+      const scope = await access.openThreadInTransaction(
+        client,
+        actor,
+        creatorId,
+        fanId,
+        true,
+        "write",
+      );
+      invariant(
+        scope.authority === "creator" &&
+          requested.actType === "reply" &&
+          requested.subjectId === scope.threadId,
+        "signed_subject_unavailable",
+        "The creator cannot sign this conversation subject.",
+      );
+      // The retained core text reply has one exact content shape. Richer
+      // subjects, including recordings, require their registered domain policy.
+      const text = HumanReplySchema.pick({ text: true }).safeParse(
+        requested.content,
+      );
+      let canonical: SignedActCommand;
+      if (text.success) {
+        const active = await client.query(
+          "SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL AND control='human_active'",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        );
+        invariant(
+          active.rowCount === 1,
+          "takeover_required",
+          "Take over this conversation before signing a personal reply.",
+        );
+        canonical = {
+          actType: "reply",
+          subjectId: scope.threadId,
+          content: text.data,
+        };
+      } else {
+        canonical = await prepareSignedSubject(
           client,
           actor,
           creatorId,
           requested,
           this.subjectPolicies,
-        ),
-    );
-    return this.begin(actor, creatorId, canonical);
+          scope,
+        );
+      }
+      invariant(
+        contentHash(canonical) === contentHash(requested),
+        "signed_content_changed",
+        "Review the current exact reply before signing.",
+      );
+      return this.beginOnClient(client, actor, creatorId, canonical);
+    });
   }
   private async accountTransaction<T>(
     accountId: string,
@@ -72,56 +133,64 @@ export class SignedActService {
     return identityTransaction(this.pool, accountId, work);
   }
   async begin(actor: Actor, creatorId: string, command: SignedActCommand) {
-    return this.accountTransaction(actor.accountId, async (client) => {
-      const creator = await client.query(
-        "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification=$3 AND NOT recovery_required",
-        [creatorId, actor.accountId, "verified"],
-      );
-      invariant(
-        actor.adultEligible && creator.rowCount === 1,
-        "creator_required",
-        "Only the verified creator can sign this act.",
-      );
-      const credentials = await client.query<{ id: string }>(
-        "SELECT id FROM creator.passkey_credential WHERE account_id=$1 AND revoked_at IS NULL ORDER BY created_at,id LIMIT 100",
-        [actor.accountId],
-      );
-      invariant(
-        credentials.rowCount,
-        "passkey_required",
-        "A registered creator passkey is required.",
-      );
-      const hash = contentHash(command);
-      const challenge = Buffer.concat([
-        randomBytes(32),
-        Buffer.from(hash, "hex"),
-      ]).toString("base64url");
-      const saved = await client.query<{ id: string }>(
-        `INSERT INTO creator.signed_challenge(account_id,creator_id,act_type,subject_id,content_hash,challenge,expires_at,command) VALUES($1,$2,$3,$4,$5,$6,now()+interval '5 minutes',$7) RETURNING id`,
-        [
-          actor.accountId,
-          creatorId,
-          command.actType,
-          command.subjectId,
-          hash,
-          challenge,
-          JSON.stringify(command),
-        ],
-      );
-      return {
-        challengeId: saved.rows[0]!.id,
-        publicKey: {
-          challenge,
-          rpId: this.rpId,
-          timeout: 300000,
-          userVerification: "required" as const,
-          allowCredentials: credentials.rows.map((row) => ({
-            id: row.id,
-            type: "public-key" as const,
-          })),
-        },
-      };
-    });
+    return this.accountTransaction(actor.accountId, (client) =>
+      this.beginOnClient(client, actor, creatorId, command),
+    );
+  }
+  private async beginOnClient(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    command: SignedActCommand,
+  ) {
+    const creator = await client.query(
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification=$3 AND NOT recovery_required FOR SHARE",
+      [creatorId, actor.accountId, "verified"],
+    );
+    invariant(
+      actor.adultEligible && creator.rowCount === 1,
+      "creator_required",
+      "Only the verified creator can sign this act.",
+    );
+    const credentials = await client.query<{ id: string }>(
+      "SELECT id FROM creator.passkey_credential WHERE account_id=$1 AND revoked_at IS NULL ORDER BY created_at,id LIMIT 100",
+      [actor.accountId],
+    );
+    invariant(
+      credentials.rowCount,
+      "passkey_required",
+      "A registered creator passkey is required.",
+    );
+    const hash = contentHash(command);
+    const challenge = Buffer.concat([
+      randomBytes(32),
+      Buffer.from(hash, "hex"),
+    ]).toString("base64url");
+    const saved = await client.query<{ id: string }>(
+      `INSERT INTO creator.signed_challenge(account_id,creator_id,act_type,subject_id,content_hash,challenge,expires_at,command) VALUES($1,$2,$3,$4,$5,$6,now()+interval '5 minutes',$7) RETURNING id`,
+      [
+        actor.accountId,
+        creatorId,
+        command.actType,
+        command.subjectId,
+        hash,
+        challenge,
+        JSON.stringify(command),
+      ],
+    );
+    return {
+      challengeId: saved.rows[0]!.id,
+      publicKey: {
+        challenge,
+        rpId: this.rpId,
+        timeout: 300000,
+        userVerification: "required" as const,
+        allowCredentials: credentials.rows.map((row) => ({
+          id: row.id,
+          type: "public-key" as const,
+        })),
+      },
+    };
   }
   async verify(
     actor: Actor,

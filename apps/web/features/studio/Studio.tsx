@@ -935,8 +935,8 @@ function Compose({
           {creator.verification === "pending"
             ? "Your creator verification is pending."
             : "Your creator verification is not current."}{" "}
-          You can keep writing here. Saving and signing are unavailable until
-          verification is approved.
+          You can keep writing here. Saving, attaching media and signing are
+          unavailable until verification is approved.
         </Notice>
       )}
       <div className="w5-gutter">
@@ -1112,12 +1112,19 @@ function Compose({
           placeholder="Write in your own words"
         />
         <div className="w5-actions">
-          <Link className="qv-btn qv-btn--quiet" href="/media/voice">
-            Voice · up to 60 s
-          </Link>
+          {canDraft && creator.owned ? (
+            <Link className="qv-btn qv-btn--quiet" href="/media/voice">
+              Voice · up to 60 s
+            </Link>
+          ) : (
+            <button className="qv-btn qv-btn--quiet" type="button" disabled>
+              Voice · up to 60 s
+            </button>
+          )}
           <button
             className="qv-btn qv-btn--quiet"
             type="button"
+            disabled={!canDraft || !creator.owned}
             onClick={() =>
               action.setNotice(
                 "A processed creator-owned media revision is required. The media producer currently needs a thread scope; content-scoped photo uploads are awaiting its adapter.",
