@@ -44,7 +44,11 @@ for (const theme of ["light", "night"] as const) {
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      const expected = await reference.screenshot({ animations: "disabled" });
+      // Capture must not mutate input styles while React is still hydrating.
+      const expected = await reference.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       await page.goto(
         `http://localhost:3000/design/screens/${screen.group}/${screen.file.replace(".dc.html", "")}?raw=1&theme=${theme}&step=${process.env.VISUAL_STEP ?? 0}`,
       );
@@ -54,7 +58,10 @@ for (const theme of ["light", "night"] as const) {
         errors,
         `${screen.file} must render without client errors`,
       ).toEqual([]);
-      const actual = await page.screenshot({ animations: "disabled" });
+      const actual = await page.screenshot({
+        animations: "disabled",
+        caret: "initial",
+      });
       const comparison = compareCatalog(actual, expected);
       if (comparison.pixels !== 0) {
         await test.info().attach(`${screen.file}-implementation`, {
