@@ -35,7 +35,7 @@ export function AccountScreen({
   const [error, setError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     if (creatorId && fanId) return;
     let active = true;
@@ -91,13 +91,15 @@ export function AccountScreen({
           </button>
         </section>
       )}
-      <section>
-        <h2>Your intro</h2>
-        <p>{account?.fan.intro || "You haven’t added an intro yet."}</p>
-        <Button href="/identity/account" variant="quiet">
-          Edit handle and intro
-        </Button>
-      </section>
+      {account && (
+        <section>
+          <h2>Your intro</h2>
+          <p>{account.fan.intro || "You haven’t added an intro yet."}</p>
+          <Button href="/identity/account" variant="quiet">
+            Edit handle and intro
+          </Button>
+        </section>
+      )}
       <section>
         <nav aria-label="Your account">
           <article>

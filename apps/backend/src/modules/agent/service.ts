@@ -1,5 +1,6 @@
 import { indexStyleExamples } from "./style-index.js";
 import { withProviderUsage } from "./provider-usage.js";
+import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -1155,6 +1156,55 @@ export class AgentService {
             )
           ).rows,
       );
+      await array(
+        "usage",
+        async (after) =>
+          (
+            await client.query(
+              "SELECT * FROM creator.ai_usage WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+              [scope.creatorId, after],
+            )
+          ).rows,
+      );
+      if (await generationJournalInstalled(client)) {
+        await array(
+          "generationReceipts",
+          async (after) =>
+            (
+              await client.query(
+                "SELECT * FROM creator.ai_generation_receipt WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+                [scope.creatorId, after],
+              )
+            ).rows,
+        );
+        // Composite-key tables use a durable lexical cursor, without truncating
+        // the account's complete set to a display-page limit.
+        for (const table of [
+          "ai_generation_admission",
+          "ai_generation_attempt",
+        ]) {
+          await emit(`,"${table}":[`);
+          let cursor: string | null = null;
+          let firstRow = true;
+          for (;;) {
+            const rows: { cursor: string; document: unknown }[] = (
+              await client.query<{ cursor: string; document: unknown }>(
+                `SELECT generation_id::text${table === "ai_generation_attempt" ? "||':'||attempt_id::text" : ""} AS cursor,to_jsonb(t) AS document FROM creator.${table} t WHERE creator_id=$1 AND ($2::text IS NULL OR generation_id::text${table === "ai_generation_attempt" ? "||':'||attempt_id::text" : ""}>$2) ORDER BY cursor LIMIT 50`,
+                [scope.creatorId, cursor],
+              )
+            ).rows;
+            if (!rows.length) break;
+            for (const row of rows) {
+              await emit(
+                `${firstRow ? "" : ","}${JSON.stringify(row.document)}`,
+              );
+              firstRow = false;
+            }
+            cursor = rows[rows.length - 1]!.cursor;
+          }
+          await emit("]");
+        }
+      }
       await emit("}");
     });
   }

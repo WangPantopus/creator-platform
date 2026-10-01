@@ -31,6 +31,8 @@ import { TeamReplySchema } from "../../../../../packages/api/src/conversation/co
 import { crisisText } from "../agent/pipeline.js";
 import { contentHash } from "../../core/canonical.js";
 import type { ConversationLineage } from "./lineage.js";
+import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
+import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -91,6 +93,8 @@ export class ConversationService {
     citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
     wellbeing?: ConversationWellbeing;
     lineage?: ConversationLineage;
+    journal?: PreparedGenerationJournal;
+    reconciliation?: GenerationCostReconciliation;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
     this.delivery = delivery;
@@ -138,6 +142,14 @@ export class ConversationService {
     generation: GenerationRow,
     consumed: boolean,
   ) {
+    // Terminal closure precedes W4's original-policy settlement. The durable
+    // initialized admission, including queued zero-call cancellation, owns the
+    // receipt; last_sequence alone never proves that no request was made.
+    await this.delivery.journal?.sealIfInitialized(
+      scope,
+      client,
+      generation.id,
+    );
     if (generation.reservation_id) {
       invariant(
         this.delivery.allowance,
@@ -150,7 +162,15 @@ export class ConversationService {
         generation.reservation_id,
         consumed,
       );
-    } else
+    } else if (this.delivery.reconciliation)
+      await this.delivery.reconciliation.reconcile(
+        scope,
+        client,
+        generation.id,
+        generation.grant_id,
+        consumed,
+      );
+    else
       await this.access.settleAllowance(
         scope,
         client,
@@ -158,6 +178,42 @@ export class ConversationService {
         consumed,
         generation.id,
       );
+  }
+  /** W2's late-receipt consumer supplies an actual currently issued scope and
+   * its held core transaction. Only terminal persisted generations may replay
+   * weighted settlement; legacy fixed-unit accounting is never a fallback. */
+  async reconcileGenerationCostInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+  ) {
+    assertThreadScope(scope);
+    invariant(
+      this.delivery.reconciliation && this.delivery.journal,
+      "generation_cost_reconciliation_unavailable",
+      "The prepared original-policy cost and usage adapters are required.",
+    );
+    await this.lockThread(client, scope);
+    const generation = (
+      await client.query<GenerationRow>(
+        "SELECT * FROM creator.generation WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4 FOR UPDATE",
+        [generationId, scope.threadId, scope.creatorId, scope.fanId],
+      )
+    ).rows[0];
+    invariant(
+      generation &&
+        ["delivered", "interrupted", "failed"].includes(generation.state) &&
+        generation.reservation_id === null,
+      "generation_cost_reconciliation_unavailable",
+      "A terminal generation in this exact weighted-allowance family is required.",
+    );
+    await this.delivery.reconciliation.reconcile(
+      scope,
+      client,
+      generation.id,
+      generation.grant_id,
+      generation.last_sequence > 0,
+    );
   }
   async releaseApprovedSentence(
     scope: ThreadScope,
@@ -599,6 +655,11 @@ export class ConversationService {
                   scope.fanId,
                 ],
               );
+            await this.delivery.journal?.initializeGeneration(
+              scope,
+              client,
+              generationId,
+            );
             return { message: fan, generationId };
           },
         ),

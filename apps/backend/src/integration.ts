@@ -6,6 +6,7 @@ import { Database } from "./db/database.js";
 import {
   AccessService,
   type ScopeRestriction,
+  type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
 import { ConversationService } from "./modules/conversation/service.js";
 import type { GuardrailProvider } from "./modules/agent/providers.js";
@@ -31,11 +32,14 @@ export async function createConfiguredBackend(input: {
     identity:
       | import("./modules/identity/router.js").IdentityRuntime
       | undefined;
+    configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
   }) => Promise<readonly FeatureRegistration[]>;
   assertActorAllowed?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
   assertScopeAllowed?: ScopeRestriction;
+  /** Genuine current denial on the caller-held non-owner core transaction. */
+  assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
 }) {
   if (!input.config.featureEnabled || !input.config.databaseUrl)
     throw new Error(
@@ -54,18 +58,24 @@ export async function createConfiguredBackend(input: {
     await pool.end();
     throw error;
   }
-  const access = new AccessService(pool, undefined, input.assertScopeAllowed);
+  const access = new AccessService(
+    pool,
+    undefined,
+    input.assertScopeAllowed,
+    input.assertScopeAllowedInTransaction,
+  );
   const conversation = new ConversationService(
     database,
     access,
     input.guardrails,
   );
+  const subjects = [...(input.signedSubjectPolicies ?? [])];
   const signing = new SignedActService(
     pool,
     input.config.rpId,
     input.config.passkeyOrigins ?? [input.config.allowedOrigin],
     undefined,
-    input.signedSubjectPolicies,
+    subjects,
   );
   const sessions = input.config.identitySessionKey
     ? new SessionService(
@@ -96,7 +106,15 @@ export async function createConfiguredBackend(input: {
         access,
         conversation,
         identity: platformIdentity,
+        configureSignedSubjects: (policies) => {
+          for (const policy of policies) {
+            if (subjects.some((current) => current.name === policy.name))
+              throw new Error("Duplicate signed-subject registration.");
+            subjects.push(policy);
+          }
+        },
       })) ?? [];
+    Object.freeze(subjects);
   } catch (error) {
     await pool.end();
     throw error;

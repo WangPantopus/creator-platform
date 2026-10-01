@@ -82,8 +82,8 @@ export class LiveAgentRuntime {
     for (const controller of this.active.get(creatorId) ?? [])
       controller.abort();
   }
-  /** Creator-cap closure only, not a final generation-cost receipt. W3 invokes
-   * this on the same runtime/execution after extraction and before settlement. */
+  /** W3 invokes this same runtime/execution after extraction. A prepared journal
+   * additionally seals its durable receipt; original W4 weighting stays owned. */
   async sealExecution(scope: ThreadScope, execution: ProviderExecution) {
     assertThreadScope(scope);
     const held = this.executionHolds.get(execution);
@@ -99,17 +99,29 @@ export class LiveAgentRuntime {
       "This runtime has no matching generation cost hold.",
     );
     if (held.sealed) return;
-    await execution.sealAdmission((client) =>
-      settleCreatorCostInTransaction(
+    await execution.sealAdmission(async (client) => {
+      // Match completion/reservation lock order: workspace before the journal
+      // fence. Reversing these locks can deadlock with a late provider charge.
+      await client.query(
+        "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+        [scope.creatorId],
+      );
+      const receipt = await this.service.repository.usageJournal?.seal(
+        scope,
+        client,
+        execution.generationId,
+      );
+      await settleCreatorCostInTransaction(
         client,
         this.creatorScope(scope),
         held.hold,
-        held.completed,
+        receipt ? receipt.state !== "unknown" : held.completed,
         "configured",
         held.model,
         held.versionHash,
-      ),
-    );
+        Boolean(this.service.repository.usageJournal),
+      );
+    });
     held.sealed = true;
   }
   /** W3 invokes these inside its existing acceptance/release transaction. */
@@ -378,6 +390,15 @@ export class LiveAgentRuntime {
     };
     try {
       await assertCurrent();
+      if (execution && this.service.repository.usageJournal)
+        await admittedExecution!.admit((client) =>
+          this.service.repository.usageJournal!.beginAttempt(
+            scope,
+            client,
+            execution,
+            hold,
+          ),
+        );
       timer = setTimeout(() => {
         void monitor();
       }, 1000);

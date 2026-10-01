@@ -12,6 +12,7 @@ import { BoundedWorkerPool, workerBudgets } from "../../workers/pool.js";
 import { invariant } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PoolClient } from "pg";
+import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 
 /** W2 journals only its own attempt/usage/fence rows in these callbacks.
  * Provider network calls begin after the admission transaction commits. */
@@ -23,6 +24,8 @@ export interface GenerationExecution {
 }
 
 export interface ConversationGenerator {
+  /** The actual prepared journal used by this generator's AgentRepository. */
+  readonly journal?: PreparedGenerationJournal;
   /** Canonical W2 readiness after every call has attributed pre-call custody. */
   readonly executionAttributed?: boolean;
   seal?(scope: ThreadScope, execution: GenerationExecution): Promise<void>;

@@ -200,8 +200,10 @@ export class ConversationLineage {
       id: string;
       agent_version_id: string | null;
       agent_version_hash: string | null;
+      corrects_message_id: string | null;
+      corrects_message_version: number | null;
     }>(
-      "SELECT id,agent_version_id,agent_version_hash FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND id=ANY($4::uuid[])",
+      "SELECT id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND id=ANY($4::uuid[])",
       [
         scope.threadId,
         scope.creatorId,
@@ -238,6 +240,13 @@ export class ConversationLineage {
             ? { id: row.agent_version_id, hash: row.agent_version_hash }
             : null,
         feedback: ratings.get(message.id) ?? null,
+        correction:
+          row?.corrects_message_id && row.corrects_message_version
+            ? {
+                originalMessageId: row.corrects_message_id,
+                originalVersion: row.corrects_message_version,
+              }
+            : null,
       };
     });
   }

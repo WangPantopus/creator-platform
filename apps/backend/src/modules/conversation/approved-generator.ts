@@ -36,6 +36,7 @@ export function approvedConversationGenerator(input: {
     }
   >();
   return {
+    journal: input.agent.repository.usageJournal,
     async routeSafety(scope, text, context, signal, deliver) {
       return new LiveAgentRuntime(
         input.agent,

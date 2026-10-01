@@ -14,11 +14,13 @@ import java.net.URL
     val deliveryState: APIMessageDeliveryState, val controlEpoch: Long, val sequence: Long,
     val signedActId: String? = null, val citations: List<String>, val createdAt: String,
     val member: String? = null, val offTheRecord: Boolean, val version: Long,
-    val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null
+    val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null,
+    val correction: ConversationCorrection? = null
 )
+@Serializable data class ConversationCorrection(val originalMessageId: String, val originalVersion: Long)
 @Serializable data class ConversationAgentVersion(val id: String, val hash: String)
 @Serializable data class ConversationFeedbackPolicy(val version: String, val notice: String)
-fun ConversationMessage.authorLabel(name: String): String = when(authorKind) {
+fun ConversationMessage.authorLabel(name: String): String = if (correction != null) QelvoraCopy.text("correctionAuthor",mapOf("name" to name)) else when(authorKind) {
     APIMessageAuthorKind.FAN -> "You"
     APIMessageAuthorKind.AI -> QelvoraCopy.text("aiAuthor",mapOf("name" to name))
     APIMessageAuthorKind.APPROVED_DRAFT -> QelvoraCopy.text("approvedAuthor",mapOf("name" to name))

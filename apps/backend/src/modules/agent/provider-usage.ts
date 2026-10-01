@@ -25,6 +25,13 @@ async function openProviderUsage(
   signal.throwIfAborted();
   const started = performance.now();
   const insert = async (client: PoolClient) => {
+    if (repository.usageJournal)
+      return repository.usageJournal.open(
+        client,
+        scope,
+        { versionHash, model: model.fingerprint, category },
+        execution,
+      );
     const row = await client.query<{ id: string }>(
       "INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms) VALUES($1,$2,'configured',$3,0,0,NULL,$4,0) RETURNING id",
       [scope.creatorId, versionHash, model.fingerprint, category],
@@ -38,6 +45,14 @@ async function openProviderUsage(
     : await repository.transaction(scope, insert);
   return async (usage: Usage) => {
     await repository.transaction(scope, async (client) => {
+      if (repository.usageJournal)
+        return repository.usageJournal.finish(
+          client,
+          scope,
+          id,
+          usage,
+          Math.round(performance.now() - started),
+        );
       await client.query(
         "UPDATE creator.ai_usage SET provider=$3,model=$4,input_tokens=$5,output_tokens=$6,cost_micros=$7,duration_ms=$8 WHERE creator_id=$1 AND id=$2",
         [

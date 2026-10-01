@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import type { PreparedGenerationJournal } from "./generation-journal.js";
 import {
   DraftConfig,
   type Configuration,
@@ -26,7 +27,12 @@ export type Workspace = {
   deleted_at: Date | null;
 };
 export class AgentRepository {
-  constructor(readonly pool: Pool) {}
+  constructor(
+    readonly pool: Pool,
+    readonly usageJournal?: PreparedGenerationJournal,
+  ) {
+    usageJournal?.assertPool(pool);
+  }
   async transaction<T>(
     scope: CreatorScope,
     work: (

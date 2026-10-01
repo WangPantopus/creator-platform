@@ -88,6 +88,27 @@ export const ReplyFeedbackInputSchema = z
     },
   );
 export type ReplyFeedbackInput = z.infer<typeof ReplyFeedbackInputSchema>;
+export const ConversationCorrectionCommandSchema = z.strictObject({
+  actType: z.literal("correction"),
+  subjectId: IdSchema,
+  content: z.strictObject({
+    kind: z.literal("conversation_correction"),
+    creatorId: IdSchema,
+    threadId: IdSchema,
+    fanId: IdSchema,
+    messageVersion: z.number().int().positive(),
+    text: z
+      .string()
+      .min(1)
+      .max(10000)
+      .refine((text) => text.trim().length > 0),
+  }),
+});
+export const ConversationCorrectionInputSchema = z.strictObject({
+  command: ConversationCorrectionCommandSchema,
+  signedActId: IdSchema,
+  idempotencyKey: z.string().min(8).max(128),
+});
 export const ConversationMessageSchema = MessageSchema.extend({
   citations: z.array(IdSchema),
   createdAt: z.string(),
@@ -96,6 +117,13 @@ export const ConversationMessageSchema = MessageSchema.extend({
   version: z.number().int().positive(),
   agentVersion: AgentReplyVersionSchema.nullable().optional(),
   feedback: ReplyFeedbackRatingSchema.nullable().optional(),
+  correction: z
+    .strictObject({
+      originalMessageId: IdSchema,
+      originalVersion: z.number().int().positive(),
+    })
+    .nullable()
+    .optional(),
 });
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
 export const ConversationPageSchema = z.strictObject({

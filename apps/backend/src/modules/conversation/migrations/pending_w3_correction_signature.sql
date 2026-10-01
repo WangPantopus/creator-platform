@@ -21,8 +21,15 @@ DECLARE
  exact_command jsonb;
 BEGIN
  -- Delivered AI originals retain their exact text/version/lineage. Privacy
- -- may delete the row; memory flags and delivery metadata remain independent.
+ -- may delete the row; memory flags and off-record state remain independent.
  IF TG_OP='UPDATE' AND OLD.author_kind='ai' AND OLD.delivery_state IN('delivered','interrupted') AND (
+  NEW.id IS DISTINCT FROM OLD.id OR NEW.thread_id IS DISTINCT FROM OLD.thread_id OR
+  NEW.creator_id IS DISTINCT FROM OLD.creator_id OR NEW.fan_id IS DISTINCT FROM OLD.fan_id OR
+  NEW.author_kind IS DISTINCT FROM OLD.author_kind OR NEW.author_account_id IS DISTINCT FROM OLD.author_account_id OR
+  NEW.delivery_state IS DISTINCT FROM OLD.delivery_state OR NEW.sequence IS DISTINCT FROM OLD.sequence OR
+  NEW.control_epoch IS DISTINCT FROM OLD.control_epoch OR NEW.citations IS DISTINCT FROM OLD.citations OR
+  NEW.signed_act_id IS DISTINCT FROM OLD.signed_act_id OR NEW.signed_content_hash IS DISTINCT FROM OLD.signed_content_hash OR
+  NEW.signed_command IS DISTINCT FROM OLD.signed_command OR
   NEW.text IS DISTINCT FROM OLD.text OR NEW.version IS DISTINCT FROM OLD.version OR
   NEW.agent_version_id IS DISTINCT FROM OLD.agent_version_id OR NEW.agent_version_hash IS DISTINCT FROM OLD.agent_version_hash
  ) THEN
@@ -32,6 +39,8 @@ BEGIN
   NEW.id IS DISTINCT FROM OLD.id OR NEW.thread_id IS DISTINCT FROM OLD.thread_id OR
   NEW.creator_id IS DISTINCT FROM OLD.creator_id OR NEW.fan_id IS DISTINCT FROM OLD.fan_id OR
   NEW.author_kind IS DISTINCT FROM OLD.author_kind OR NEW.author_account_id IS DISTINCT FROM OLD.author_account_id OR
+  NEW.delivery_state IS DISTINCT FROM OLD.delivery_state OR NEW.sequence IS DISTINCT FROM OLD.sequence OR
+  NEW.control_epoch IS DISTINCT FROM OLD.control_epoch OR NEW.citations IS DISTINCT FROM OLD.citations OR
   NEW.text IS DISTINCT FROM OLD.text OR NEW.version IS DISTINCT FROM OLD.version OR
   NEW.corrects_message_id IS DISTINCT FROM OLD.corrects_message_id OR NEW.corrects_message_version IS DISTINCT FROM OLD.corrects_message_version OR
   NEW.signed_act_id IS DISTINCT FROM OLD.signed_act_id OR NEW.signed_content_hash IS DISTINCT FROM OLD.signed_content_hash OR

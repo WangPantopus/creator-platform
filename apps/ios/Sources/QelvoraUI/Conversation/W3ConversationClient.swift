@@ -7,7 +7,9 @@ struct W3Message: Decodable, Identifiable, Sendable {
     let sequence: Int; let signedActId: String?; let citations: [String]
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
     let agentVersion: W3AgentVersion?; let feedback: String?
+    let correction: W3Correction?
     func authorLabel(name: String) -> String {
+        if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
         if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
         if authorKind == .fan { return "You" }
         if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
@@ -22,6 +24,7 @@ struct W3Page: Decodable, Sendable {
     let feedbackPolicy: W3FeedbackPolicy?
 }
 struct W3AgentVersion: Codable, Sendable { let id: String; let hash: String }
+struct W3Correction: Decodable, Sendable { let originalMessageId: String; let originalVersion: Int }
 struct W3FeedbackPolicy: Decodable, Sendable { let version: String; let notice: String }
 struct W3FeedbackInput: Encodable { let messageVersion: Int; let agentVersion: W3AgentVersion; let rating: String?; let consent: Bool?; let policyVersion: String?
     enum CodingKeys: String, CodingKey { case messageVersion, agentVersion, rating, consent, policyVersion }

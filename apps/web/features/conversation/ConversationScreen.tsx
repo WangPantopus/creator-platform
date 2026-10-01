@@ -12,6 +12,7 @@ import {
   AuthorLabel,
   Button,
   CitationChip,
+  Correction,
   IdentityStrip,
   Message,
   Notice,
@@ -34,6 +35,7 @@ type Pending = {
   state: "pending" | "uncertain" | "rejected";
 };
 function author(message: ConversationMessage, name: string) {
+  if (message.correction) return formatCopy("correctionAuthor", { name });
   switch (message.authorKind) {
     case "fan":
       return "You";
@@ -617,6 +619,25 @@ export function ConversationScreen({
           >
             {message.authorKind === "system" ? (
               <SystemLine>{message.text}</SystemLine>
+            ) : message.correction &&
+              all.some(
+                (original) =>
+                  original.id === message.correction?.originalMessageId &&
+                  original.version === message.correction.originalVersion &&
+                  original.authorKind === "ai",
+              ) ? (
+              <Correction
+                name={page.creatorName}
+                aiText={
+                  all.find(
+                    (original) =>
+                      original.id === message.correction?.originalMessageId,
+                  )!.text
+                }
+                signedActId={message.signedActId ?? undefined}
+              >
+                {message.text}
+              </Correction>
             ) : [
                 "fan",
                 "ai",
@@ -638,6 +659,7 @@ export function ConversationScreen({
                 signedActId={message.signedActId ?? undefined}
                 actions={false}
                 live={
+                  !message.correction &&
                   message.authorKind === "human_creator" &&
                   page.control === "human_active"
                 }
@@ -664,6 +686,21 @@ export function ConversationScreen({
                 }
               >
                 <span style={{ whiteSpace: "pre-wrap" }}>{message.text}</span>
+                {message.correction && (
+                  <div>
+                    <span>
+                      {formatCopy("correctionAuthor", {
+                        name: page.creatorName,
+                      })}
+                    </span>
+                    <a
+                      href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
+                    >
+                      Original AI reply · version{" "}
+                      {message.correction.originalVersion}
+                    </a>
+                  </div>
+                )}
                 {message.deliveryState === "failed" && (
                   <span className="qv-tag">
                     Reply unavailable · your allowance was released

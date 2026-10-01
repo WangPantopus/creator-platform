@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PrivacyExportStream } from "./privacy-export.js";
 
 export const CaseKind = z.enum([
   "ai_report",
@@ -207,9 +208,12 @@ export type PrivacyHook = {
     creatorId: string | null;
     threadId: string | null;
     idempotencyKey: string;
+    leaseToken?: string;
+    signal?: AbortSignal;
   }): Promise<{
     receipt: Record<string, unknown>;
     data?: unknown;
+    stream?: PrivacyExportStream;
     retained?: { category: string; until: string | null; reason: string }[];
   }>;
 };
@@ -224,5 +228,6 @@ export type EffectHook = {
     reason: string;
     amountMinor?: number;
     idempotencyKey: string;
+    leaseToken?: string;
   }): Promise<{ receipt: Record<string, unknown> }>;
 };

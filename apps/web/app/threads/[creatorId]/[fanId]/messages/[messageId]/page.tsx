@@ -49,23 +49,34 @@ export default async function OriginalMessage({
     );
   const message = (await response.json()) as ConversationMessage;
   const page = (await timeline.json()) as ConversationPage;
-  const label = {
-    fan: "You",
-    ai: `${page.creatorName}’s AI`,
-    team: `${page.creatorName}’s team · ${message.member ?? "Authorized team member"}`,
-    human_creator: page.creatorName,
-    approved_draft: formatCopy("approvedAuthor", { name: page.creatorName }),
-    human_broadcast: `Note from ${page.creatorName}`,
-    human_reaction: `${page.creatorName} reacted`,
-    human_call: `Call with ${page.creatorName}`,
-    system: "Conversation update",
-  }[message.authorKind];
+  const label = message.correction
+    ? formatCopy("correctionAuthor", { name: page.creatorName })
+    : {
+        fan: "You",
+        ai: `${page.creatorName}’s AI`,
+        team: `${page.creatorName}’s team · ${message.member ?? "Authorized team member"}`,
+        human_creator: page.creatorName,
+        approved_draft: formatCopy("approvedAuthor", {
+          name: page.creatorName,
+        }),
+        human_broadcast: `Note from ${page.creatorName}`,
+        human_reaction: `${page.creatorName} reacted`,
+        human_call: `Call with ${page.creatorName}`,
+        system: "Conversation update",
+      }[message.authorKind];
   return (
     <main className="conversation-consent">
       <a href={`/threads/${creatorId}/${fanId}`}>Back to conversation</a>
       <h1>Where this came from</h1>
       <span className="qv-label">{label}</span>
       <p style={{ whiteSpace: "pre-wrap" }}>{message.text}</p>
+      {message.correction && (
+        <a
+          href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
+        >
+          Original AI reply · version {message.correction.originalVersion}
+        </a>
+      )}
       <p className="conversation-quiet">
         {message.createdAt} · {message.deliveryState}
       </p>

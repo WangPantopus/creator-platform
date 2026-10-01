@@ -30,6 +30,7 @@ private struct W3ThreadScreen: View {
     @ObservedObject var session: FanSession
     @State private var privacy = false
     @State private var source: W3Passage?
+    @State private var originalReply: W3Message?
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
     @Environment(\.scenePhase) private var scenePhase
@@ -73,7 +74,7 @@ private struct W3ThreadScreen: View {
                             .lineLimit(1...5).qText("body").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
-                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                     }
                     Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
                     HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } }
@@ -85,33 +86,42 @@ private struct W3ThreadScreen: View {
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(connectionRetry)") {
-                let active = scenePhase == .active && !privacy && source == nil
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)-\(connectionRetry)") {
+                let active = scenePhase == .active && !privacy && source == nil && originalReply == nil
                 model.setActive(active)
                 if active { await model.connect() }
             }
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)") {
-                if scenePhase == .active && !privacy && source == nil {
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)") {
+                if scenePhase == .active && !privacy && source == nil && originalReply == nil {
                     while !Task.isCancelled { try? await Task.sleep(for: .seconds(15)); if !Task.isCancelled { await model.refresh() } }
                 }
             }
-            .onChange(of: scenePhase) { _, value in model.setActive(value == .active && !privacy && source == nil) }
-            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil) }
-            .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value) }
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(model.page != nil)") {
-                if scenePhase != .active || privacy || source != nil { await model.presence(active: false) }
+            .onChange(of: scenePhase) { _, value in model.setActive(value == .active && !privacy && source == nil && originalReply == nil) }
+            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil) }
+            .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value && originalReply == nil) }
+            .onChange(of: originalReply != nil) { _, value in model.setActive(scenePhase == .active && !privacy && source == nil && !value) }
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)-\(model.page != nil)") {
+                if scenePhase != .active || privacy || source != nil || originalReply != nil { await model.presence(active: false) }
                 else { while !Task.isCancelled { await model.presence(active: true); try? await Task.sleep(for: .seconds(20)) } }
             }
             .onDisappear { model.setActive(false); Task { await model.presence(active: false) } }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, name: model.page?.creatorName ?? "the creator", session: session) }
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("meta"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
+            .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("meta"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system { SystemLine(children: message.text) }
+        else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
+            Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
+        }
         else if let kind = MessageKind(rawValue: message.authorKind.rawValue) {
-            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open("/support") }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
+            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.correction == nil && message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open("/support") }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
                 .accessibilityLabel(message.authorLabel(name: page.creatorName))
+            if let correction = message.correction {
+                Text(QelvoraCopy.text("correctionAuthor", values: ["name": page.creatorName])).qText("label")
+                Button("Original AI reply · version \(correction.originalVersion)", variant: .quiet) { Task { do { let original: W3Message = try await model.client.request(model.root + "/messages/" + correction.originalMessageId); guard original.id == correction.originalMessageId, original.version == correction.originalVersion, original.authorKind == .ai else { sourceFailure = "The original reply changed."; return }; originalReply = original } catch { sourceFailure = "No longer accessible to you" } } }
+            }
             if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
             if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open("/support") } }
             if message.authorKind == .ai, message.agentVersion != nil, message.deliveryState == .delivered || message.deliveryState == .interrupted, let policy = page.feedbackPolicy {

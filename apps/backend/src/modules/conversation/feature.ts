@@ -30,6 +30,7 @@ import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
+import type { ConversationCorrections } from "./corrections.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -55,6 +56,7 @@ export class ConversationFeature {
     ) => Promise<boolean>,
     readonly afterBoundary?: (scope: ThreadScope, epoch: number) => void,
     readonly lineage?: ConversationLineage,
+    readonly corrections?: ConversationCorrections,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
   }
@@ -65,6 +67,7 @@ export class ConversationFeature {
       generationAvailable:
         this.generationAvailable && Boolean(this.policy?.verified),
       firstConversationAvailable: Boolean(this.firstConversation),
+      correctionsAvailable: Boolean(this.corrections),
       accessDisclosure,
     };
   }
@@ -525,6 +528,22 @@ export function conversationFeature(
         res.json(
           await feature.lineage.feedback(
             scope,
+            IdSchema.parse(req.params.id),
+            req.body,
+          ),
+        );
+      });
+      router.post(root + "/messages/:id/corrections", async (req, res) => {
+        invariant(
+          feature.corrections,
+          "corrections_unavailable",
+          "Signed corrections are not available yet.",
+        );
+        res.json(
+          await feature.corrections.deliver(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
             IdSchema.parse(req.params.id),
             req.body,
           ),
