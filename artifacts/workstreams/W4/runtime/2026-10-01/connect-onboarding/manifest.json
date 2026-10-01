@@ -1,0 +1,78 @@
+{
+  "recordedAt": "2026-10-01T13:37:01.912348+00:00",
+  "baseline": "3de0f14ba82139c9d694ddd3cd676216103a036c",
+  "branch": "codex/w4-connect-onboarding-20261001",
+  "scope": "Existing real Connect account verification link, canonical owner/version/account fences and mandatory held creator restriction authority; no new account or money creation.",
+  "environment": {
+    "host": "macOS26.5 Intel",
+    "api": "final compiled server4104 restarted after mandatory authority gate",
+    "web": "final Next16.3.7 production3004",
+    "actor": "canonical development fan; no genuine verified owner or payout account",
+    "providers": "unconfigured; no external provider/OpenAI calls",
+    "browser": "1280x900 Light/Night final fan earnings and Refresh",
+    "native": "Shipping iOS normal simulator-sign build/iPhone16Pro iOS26.5; Android API35 compile;2 workers, no new native UI input"
+  },
+  "checks": {
+    "backendBuild": "passed final held-authority source",
+    "webProductionBuild": "passed final component/models/query proxy",
+    "webTypecheck": "passed after restoring own generated Next declaration path",
+    "generated": "12 resources/98 operations, Swift/Kotlin x-commerce-account-id parameter verified",
+    "scopedLintFormat": "passed",
+    "shippingIOS": "BUILD SUCCEEDED final98-operation generated models",
+    "shippingAndroid": "BUILD SUCCESSFUL1m19s,37 tasks4 executed",
+    "SQL": "Exact held owner, initial SHARE/final UPDATE account and version-bound state update EXPLAIN under non-owner; review transaction rolled back with no data execution",
+    "runtime": "40 canonical migrations; non-owner/no bypass/no creator relation ownership; accountless visible rows0 only; healthready:false; payoutOnboardingAvailable:false",
+    "actualBrowser": "Final production fan earnings Light/Night denies owner access, including Refresh. No onboarding link or fake account supplied."
+  },
+  "authorityAndCustody": {
+    "mandatory": "CreatorSettlement fifth argument PayoutOnboardingAuthority must hold current canonical account/creator restrictions on the exact client before owner/account locks in both reads. Missing actual producer leaves onboarding unavailable.",
+    "provider": "Same original PayoutProvider used by settlement; existing StripeConnectPayout.account/onboarding does actual bound provider reads/link call. Current countries and server-held provider_ref must match.",
+    "accountCreation": "No account creation/recovery, no invented account ID; genuine provisioned account remains required.",
+    "ephemeralLink": "Strict HTTPS/no credentials/hash, genuine future expiry, no raw provider reference in result, no command-history/local-storage persistence; user opens provider link explicitly with no referrer/opener.",
+    "fence": "Second current session/owner/denial check, direct account UPDATE lock and original version/reference check precede state/version write and link result. No shared-account lock upgrade in simultaneous final writes.",
+    "cash": "KYC/status/link result never grants transfer authority. Original cash/current funds/country/custody gates remain separate."
+  },
+  "preservedObservations": [
+    "Review found no held creator-wide commerce denial producer; mandatory new gate keeps this action unavailable until genuinely bound.",
+    "Xcode regenerated its own root resolution metadata/development snapshot dependencies; inspected and restored the pre-existing tracked lockfile. Next generated custom output paths likewise inspected/restored. No dependency or reference assertion changed."
+  ],
+  "limitations": [
+    "No genuine owner/provider account/onboarding link/KYC/market/callback/expiration/stale-account/concurrent provider acceptance.",
+    "No actual held restriction producer installed or creator financial/read authority inferred from the new callback contract.",
+    "New Swift/Kotlin model builds are supporting evidence; no new native input/sign-in/store/VoiceOver/TalkBack acceptance.",
+    "Query plans on an empty RLS population do not prove production scale or latency.",
+    "No new tests/cases/automated journey scripts/coverage or baseline/assertion changes."
+  ],
+  "migrationChanges": false,
+  "sourceHashes": {
+    "apps/backend/src/modules/commerce/payout-onboarding.ts": "d218bad13e53d4efe6ab3e316b07bc4ce3d02e6e19f9f53ef9ed69e1d37ecdb7",
+    "apps/backend/src/modules/commerce/accounting.ts": "829589e67079434ff107ea5a1909ea7c02ce394be097e12945d41f7b2e5f8a2e",
+    "apps/backend/src/modules/commerce/router.ts": "f396d7e71ccc9edbe1f1e9e1696d7e761f93ee74fe0bbc320dd1cd6798aeafb5",
+    "apps/web/features/commerce/PayoutAccount.tsx": "5c8e4c13b915bbba5469ae9234c48cd547077faa9ec321a85b2212b6644843b5",
+    "apps/web/features/commerce/CommerceScreen.tsx": "0e07e747946e3d842091cd80b100fde49be9485bf318957b9b35c2b83de38e53",
+    "apps/web/app/api/commerce/[...path]/route.ts": "c84d36702696fb9ecfe2dd7b53676b3288db400b285f8071e65fc50c71bf36b1",
+    "packages/api/src/commerce/contracts.ts": "16a129aff4314a365faf769dc32eb98e19d40ef768a977a925f543027182319a",
+    "packages/api/src/openapi.ts": "6856f77de5e776f14f3c8d6978c15fc144be900e6d172c64ce8dfa457e9e368c",
+    "packages/api/generated/openapi.json": "7b16daded7c46ee932ffea6c9204376a76c79831d4afa315d09c5b36bd6b969f",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "445e0f2d5b39bd21f3eb381fab2f94adbd8dfb5521a8ef282aa1bb3edb57c47e",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "55dd17a7bcdbfd51f3375159fa3d32e528085c7b7d03f4c72f3f66317cf25699"
+  },
+  "buildHashes": {
+    "backend/server.mjs": "9312913ac5bd29aacb76085f4b8ce1a4e3fda517fc6f4d2139148f24801f0d16",
+    "backend/integration.mjs": "fc1d6e8402cdb32fb96e3543f930220b334cef3a52d4a2a94a3b39ab0292a681",
+    "ios/QelvoraApp": "f4457e65183cec2bb7a10671eb6f3ced1492da856e8ffbf5593bc6d23df69d91",
+    "android/app-debug.apk": "dc1fd510f754ad1fa6f34a22261accf31181b3e762754d5a66d3382b1223f29b",
+    "web/BUILD_ID": "WcnpWiLKFqQLr9wjZu83J",
+    "web/server-static-manifest-sha256": "a14bab204e32e1202516038b56f9c79183c6075c09272195d9103f8059ba6e05",
+    "logs": {
+      "connect-backend-final-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "connect-web-build.log": "16a2bb8791b775186f999c29d37971569c1a2c8a0fffc82e5146c0e444eb91ec",
+      "connect-ios-build.log": "702b18ef03c08bc0b5e1c6251cabdef6843d4b6248fdd4c5effe0c054dc5f8ad",
+      "connect-android-build.log": "856adcc808ab706a5e6d970da1970cae6411269214dbf109ff2028ddf05d7796"
+    }
+  },
+  "screenshots": {
+    "earnings-fan-night.jpg": "30ad73422cdef2ac8a92e403b571e921063dae435deb87f24f34a8ca775c0d0d",
+    "earnings-fan-light.jpg": "2ec5c9a0a0795a830297cafffd404258785b062b6cffad6e2204c379e234bf05"
+  }
+}
