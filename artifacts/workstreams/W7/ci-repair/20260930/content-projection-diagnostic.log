@@ -1,0 +1,15 @@
+Synthetic direct library diagnostic; no W5 publication/signature/provider acceptance.
+{ current_user: 'growth_worker', rolsuper: false, rolbypassrls: false }
+PASS duplicate publication retains one current row
+PASS equal-version conflicting body returns409
+PASS same-version withdrawal removes publication
+PASS withdrawal retains no former or private body
+PASS delayed equal-version publication cannot resurrect
+PASS new revision uses its own publication timestamp
+PASS stale withdrawal cannot hide newer publication
+PASS publication cannot rebind creator
+PASS withdrawal cannot rebind creator
+PASS withdraw-before-publish blocks old and equal revisions
+PASS higher reviewed revision may publish after tombstone
+PASS concurrent equal-version withdrawal wins
+Diagnostic rows remaining: 0

@@ -73,6 +73,14 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       });
       return { providerRef: receipt.id };
     }
+    // A lost response is neither acceptance nor rejection. Preserve the
+    // original registration receipt for reconciliation and never resend it
+    // or hide it behind another device's successful response.
+    const uncertain = await service.db.worker.query(
+      "SELECT 1 FROM growth.provider_receipt WHERE delivery_id=$1 AND (state IN ('sending','unknown') OR (state='sent' AND (provider_ref IS NULL OR provider_ref=''))) LIMIT 1",
+      [input.idempotencyKey],
+    );
+    if (uncertain.rowCount) throw new Error("provider_outcome_unknown");
     const devices = await service.db.worker.query(
       "SELECT id,installation_id,platform,encrypted_token FROM growth.device WHERE account_id=$1 AND permission='granted' AND revoked_at IS NULL AND updated_at>now()-interval '270 days' ORDER BY id LIMIT 20",
       [input.accountId],
@@ -89,7 +97,10 @@ export class NativeDeliveryProvider implements DeliveryProvider {
         )
       ).rows[0];
       if (prior) {
-        if (prior.state === "sent") receipts.push(prior.provider_ref);
+        if (prior.state === "sent" && prior.provider_ref)
+          receipts.push(prior.provider_ref);
+        else if (prior.state !== "invalid")
+          throw new Error("provider_outcome_unknown");
         continue;
       }
       let sending = false;
@@ -146,6 +157,7 @@ export class NativeDeliveryProvider implements DeliveryProvider {
               "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
               [input.idempotencyKey, registrationHash],
             );
+            sending = false;
             await service.db.worker.query(
               "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
               [device.id],
@@ -172,6 +184,27 @@ export class NativeDeliveryProvider implements DeliveryProvider {
           [input.idempotencyKey, registrationHash, receipts.at(-1)],
         );
       } catch (error) {
+        if (
+          sending &&
+          error instanceof Error &&
+          [
+            "BadDeviceToken",
+            "DeviceTokenNotForTopic",
+            "Unregistered",
+            "ExpiredToken",
+          ].includes(error.message)
+        ) {
+          await service.db.worker.query(
+            "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+            [input.idempotencyKey, registrationHash],
+          );
+          sending = false;
+          await service.db.worker.query(
+            "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
+            [device.id],
+          );
+          continue;
+        }
         if (sending && error instanceof DeliveryFailure) {
           await service.db.worker.query(
             "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
@@ -184,21 +217,6 @@ export class NativeDeliveryProvider implements DeliveryProvider {
             "UPDATE growth.provider_receipt SET state='unknown',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
             [input.idempotencyKey, registrationHash],
           );
-        if (
-          error instanceof Error &&
-          [
-            "BadDeviceToken",
-            "DeviceTokenNotForTopic",
-            "Unregistered",
-            "ExpiredToken",
-          ].includes(error.message)
-        ) {
-          await service.db.worker.query(
-            "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-            [device.id],
-          );
-          continue;
-        }
         throw error;
       }
     }

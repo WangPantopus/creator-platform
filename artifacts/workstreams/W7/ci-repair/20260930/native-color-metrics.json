@@ -1,0 +1,38 @@
+[
+  {
+    "source": "local-explicit2x",
+    "theme": "light",
+    "referencePixels": [780, 1688],
+    "capturePixels": [780, 1688],
+    "pixelsExceeding8": 539,
+    "fractionExceeding8": 0.00040937537975452667,
+    "policyMaximumFraction": 0.0015
+  },
+  {
+    "source": "local-explicit2x",
+    "theme": "night",
+    "referencePixels": [780, 1688],
+    "capturePixels": [780, 1688],
+    "pixelsExceeding8": 571,
+    "fractionExceeding8": 0.00043367966946166,
+    "policyMaximumFraction": 0.0015
+  },
+  {
+    "source": "hosted-f406-macOS27",
+    "theme": "light",
+    "referencePixels": [780, 1688],
+    "capturePixels": [780, 1688],
+    "pixelsExceeding8": 81557,
+    "fractionExceeding8": 0.06194327986389598,
+    "policyMaximumFraction": 0.0015
+  },
+  {
+    "source": "hosted-f406-macOS27",
+    "theme": "night",
+    "referencePixels": [780, 1688],
+    "capturePixels": [780, 1688],
+    "pixelsExceeding8": 80638,
+    "fractionExceeding8": 0.06124529104386924,
+    "policyMaximumFraction": 0.0015
+  }
+]

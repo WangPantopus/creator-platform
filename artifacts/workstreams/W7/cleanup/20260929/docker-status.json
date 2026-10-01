@@ -1,0 +1,5 @@
+{
+  "command": "docker inspect creator-platform-w7 (mounts only)",
+  "timeoutSeconds": 12,
+  "status": "engine unavailable; no global restart or storage deletion"
+}

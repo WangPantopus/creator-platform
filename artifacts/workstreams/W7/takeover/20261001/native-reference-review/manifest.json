@@ -1,0 +1,48 @@
+{
+  "founderDecision": "can you make the best decision for the best of the app the product, whatever is the best for user experience, etc.",
+  "decision": "Retain accepted main four Android Composer refs, preserve exact originals and existing failure diffs. Keep all110 original iOS references and reviewed calibrated comparison.",
+  "existingChecksBeforeDecision": {
+    "total": 19,
+    "failed": 4,
+    "differencesPercent": [
+      7.91122,
+      7.577469,
+      5.267523,
+      5.074643
+    ]
+  },
+  "references": [
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesLight_composer_ended.png",
+      "originalSha256": "74bf120ec833dbcdbeb6d28f73d706ec320ef7ca15a2d46dc6cd1aad11eabb4c",
+      "acceptedMainSha256": "391cecc1f7031661e6065281de4c80b2b817d5e40f7d31f8c75b30c1df91ddf0",
+      "originalArchive": "original-com.pantopus.qelvora_NativeSnapshotsTest_threadStatesLight_composer_ended.png",
+      "source": "f6802e1",
+      "reason": "Accepted rounded ended panel and StepIn below, matching web/Swift and BUILD_PROMPT section9. No new rendering recorded as a reference by W7."
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_threadStatesNight_composer_ended.png",
+      "originalSha256": "9713f457da76a6c5fcf75d15d3adc6c31ea1eb1af1cfbf029a9b6b333d3a5819",
+      "acceptedMainSha256": "2cf415d95270b284f7fe33e17470b1cf5e87a6fb7996da5ece3442e9c56abe73",
+      "originalArchive": "original-com.pantopus.qelvora_NativeSnapshotsTest_threadStatesNight_composer_ended.png",
+      "source": "f6802e1",
+      "reason": "Accepted rounded ended panel and StepIn below, matching web/Swift and BUILD_PROMPT section9. No new rendering recorded as a reference by W7."
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsLight_composer.png",
+      "originalSha256": "b8fe680b24f88d2b13302f1e3f815c64bf07452530329dece74c3082529b6f48",
+      "acceptedMainSha256": "c5fe163d6b0643be229ab0ee4eef4ef8568b52c7f3587abc4b012d94a585e663",
+      "originalArchive": "original-com.pantopus.qelvora_NativeSnapshotsTest_componentsLight_composer.png",
+      "source": "f6802e1",
+      "reason": "Accepted rounded ended panel and StepIn below, matching web/Swift and BUILD_PROMPT section9. No new rendering recorded as a reference by W7."
+    },
+    {
+      "path": "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsNight_composer.png",
+      "originalSha256": "7abc515d6b3e21840db86c3d1ef1b36b626afc154745d322bba1d6b765af4dd5",
+      "acceptedMainSha256": "e4cd07c92c2f8e1165e5f97659e84f94efaa2d7d6e8797537effda52923098de",
+      "originalArchive": "original-com.pantopus.qelvora_NativeSnapshotsTest_componentsNight_composer.png",
+      "source": "f6802e1",
+      "reason": "Accepted rounded ended panel and StepIn below, matching web/Swift and BUILD_PROMPT section9. No new rendering recorded as a reference by W7."
+    }
+  ]
+}

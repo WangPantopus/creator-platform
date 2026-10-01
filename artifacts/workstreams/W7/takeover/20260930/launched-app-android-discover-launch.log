@@ -1,0 +1,7 @@
+Stopping: com.pantopus.qelvora
+Starting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }
+Status: timeout
+LaunchState: UNKNOWN (-1)
+Activity: com.pantopus.qelvora/.MainActivity
+WaitTime: 15366
+Complete

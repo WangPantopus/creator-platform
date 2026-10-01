@@ -1,0 +1,13 @@
+artifacts/workstreams/W7/cleanup/20260929/README.md
+artifacts/workstreams/W7/cleanup/20260929/commit-paths.txt
+artifacts/workstreams/W7/cleanup/20260929/device-actions.json
+artifacts/workstreams/W7/cleanup/20260929/docker-status.json
+artifacts/workstreams/W7/cleanup/20260929/documentation-sha256.txt
+artifacts/workstreams/W7/cleanup/20260929/local-removals.json
+artifacts/workstreams/W7/cleanup/20260929/local-verification.json
+artifacts/workstreams/W7/handoff/20260929/README.md
+docs/implementation/growth.md
+docs/workstreams/coordination/W7.md
+docs/workstreams/handoffs/W7.md
+docs/workstreams/prompts/W7-resume.md
+docs/workstreams/status/W7.md

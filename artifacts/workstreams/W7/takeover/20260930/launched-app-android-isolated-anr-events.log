@@ -1,0 +1,5 @@
+--------- beginning of events
+09-30 19:54:31.034 I/am_anr  (  606): [0,976,com.google.android.bluetooth,550026821,executing service com.google.android.bluetooth/com.android.bluetooth.btservice.AdapterService, waited 21400ms]
+09-30 19:54:43.410 I/am_anr  (  606): [0,849,com.android.systemui,550026765,executing service com.android.systemui/.SystemUIService, waited 20456ms]
+09-30 19:55:00.718 I/am_anr  (  606): [0,1873,com.google.android.apps.messaging,952876613,Broadcast of Intent { act=android.intent.action.SIM_STATE_CHANGED flg=0x15000010 cmp=com.google.android.apps.messaging/.shared.simstatetracker.AsyncTelephonySimStateReceiver (has extras) }]
+09-30 19:55:22.870 I/am_anr  (  606): [0,2394,com.google.android.apps.messaging,952876613,Broadcast of Intent { act=android.telephony.action.CARRIER_CONFIG_CHANGED flg=0x15000010 cmp=com.google.android.apps.messaging/.shared.simstatetracker.AsyncTelephonySimStateReceiver (has extras) }]

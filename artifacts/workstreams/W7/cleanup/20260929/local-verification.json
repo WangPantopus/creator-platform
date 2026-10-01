@@ -1,0 +1,10 @@
+{
+  "w7SimulatorRegistered": false,
+  "w7SimulatorDirectoryExists": false,
+  "w7AvdDirectoryExists": false,
+  "w7AvdIniExists": false,
+  "w7EmulatorListed": false,
+  "w7EmulatorProcesses": 0,
+  "w7TempPathsRemaining": 0,
+  "w7WebApiListeners": false
+}

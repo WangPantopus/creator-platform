@@ -1,0 +1,76 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+Building for debugging...
+[0/5] Write sources
+[1/5] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module QelvoraUITests
+[4/5] Compiling QelvoraUITests NativeSnapshotTests.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:163:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+161 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+162 |       }
+163 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+164 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+165 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[4/6] Write Objects.LinkFileList
+[5/6] Linking QelvoraNativePackageTests
+Build complete! (3.27s)
+Test Suite 'All tests' started at 2026-09-30 16:21:49.638.
+Test Suite 'QelvoraNativePackageTests.xctest' started at 2026-09-30 16:21:49.639.
+Test Suite 'DeliveryProtocolTests' started at 2026-09-30 16:21:49.639.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' passed (0.000 seconds).
+Test Suite 'DeliveryProtocolTests' passed at 2026-09-30 16:21:49.644.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'GeneratedContractTests' started at 2026-09-30 16:21:49.644.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' passed (0.000 seconds).
+Test Suite 'GeneratedContractTests' passed at 2026-09-30 16:21:49.646.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'IdentityTests' started at 2026-09-30 16:21:49.646.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' started.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' started.
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' started.
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' passed (0.000 seconds).
+Test Suite 'IdentityTests' passed at 2026-09-30 16:21:49.648.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'NativeSnapshotTests' started at 2026-09-30 16:21:49.648.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' passed (0.852 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' passed (26.275 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' passed (0.461 seconds).
+Test Suite 'NativeSnapshotTests' passed at 2026-09-30 16:22:17.237.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 27.588 (27.589) seconds
+Test Suite 'QelvoraNativePackageTests.xctest' passed at 2026-09-30 16:22:17.238.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 27.596 (27.598) seconds
+Test Suite 'All tests' passed at 2026-09-30 16:22:17.238.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 27.596 (27.600) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: x86_64-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -180,11 +180,13 @@ export class Retention {
   /** W2's creator surface reads this completed snapshot; no invented notification type. */
   async activation(actor: Actor) {
     const creatorId = await this.service.requireCreator(actor);
-    const result = await this.service.db.worker.query(
-      "SELECT agent_version,due_at,state,document,completed_at FROM growth.activation_job WHERE creator_id=$1 ORDER BY due_at DESC LIMIT 1",
-      [creatorId],
-    );
-    return result.rows[0] ?? null;
+    return this.service.db.workerActor(actor, creatorId, async (client) => {
+      const result = await client.query(
+        "SELECT agent_version,due_at,state,document,completed_at FROM growth.activation_job WHERE creator_id=$1 ORDER BY due_at DESC LIMIT 1",
+        [creatorId],
+      );
+      return result.rows[0] ?? null;
+    });
   }
   async drainActivation(source?: ActivationSource, limit = 20) {
     const leaseId = randomUUID();

@@ -869,7 +869,21 @@ object QelvoraCopy {
     "w6CreatorDidNotJoin" to "{value1} did not join.",
     "w6TimeOfDuration" to "{value1} of {value2}",
     "w6SharedFilesInZone" to "{value1} shared files · {value2}",
-    "w6BeingReconciled" to "being reconciled"
+    "w6BeingReconciled" to "being reconciled",
+    "growthErrorContentEffectUnconfigured" to "This content effect requires its owner adapter.",
+    "growthErrorContentVersionUnavailable" to "The current content version is unavailable.",
+    "growthSignedConversationUpdate" to "A signed reply is available in your conversation.",
+    "growthAiConversationUpdate" to "An AI reply is available in your conversation.",
+    "growthCurrentCallUpdate" to "Your call status has changed.",
+    "growthMeasurementDenominator" to "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.",
+    "growthMeasurementRetention" to "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.",
+    "growthRetainedClosedSnapshots" to "Irreversibly aggregated closed snapshots contain no identity or text.",
+    "growthRetainedErasureFence" to "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.",
+    "growthRetainedEventDedupe" to "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.",
+    "growthRetainedFanAggregates" to "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
+    "growthErrorQuietHoursPair" to "Both quiet-hour boundaries are required",
+    "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
+    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

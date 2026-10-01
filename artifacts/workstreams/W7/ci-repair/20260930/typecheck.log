@@ -1,0 +1,31 @@
+Scope: all 8 workspace projects
+✓ Lockfile passes supply-chain policies (verified 10h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 7.5s using pnpm v11.25.0
+$ turbo run typecheck
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running typecheck in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/copy:typecheck: cache hit, replaying logs f43d2687da1fb0db
+@qelvora/copy:typecheck: $ tsc --noEmit
+@qelvora/brand:typecheck: cache hit, replaying logs 82b6e60a5032143e
+@qelvora/api:typecheck: cache hit, replaying logs 14baa0f3ebd50467
+@qelvora/brand:typecheck: $ tsc --noEmit
+@qelvora/tokens:typecheck: cache hit, replaying logs 53cffeeeea9741bf
+@qelvora/api:typecheck: $ tsc --noEmit
+@qelvora/tokens:typecheck: $ tsc --noEmit
+@qelvora/ui-web:typecheck: cache hit, replaying logs fef8333e5c2ed469
+@qelvora/backend:typecheck: cache miss, executing d4a7daca14ec46ba
+@qelvora/ui-web:typecheck: $ tsc --noEmit
+@qelvora/web:typecheck: cache miss, executing 074f72adf5cbf217
+@qelvora/backend:typecheck: $ tsc --noEmit
+@qelvora/web:typecheck: $ tsc --noEmit
+
+ Tasks:    7 successful, 7 total
+Cached:    5 cached, 7 total
+  Time:    1m5.101s

@@ -368,13 +368,42 @@ export class Notifications {
             ).rowCount
           )
             return;
+          // Account controls use this same erasure fence. Read preferences
+          // after acquiring it and hold it through provider submission so a
+          // completed opt-out/mute cannot be bypassed by an earlier read.
+          const currentPrefs = Preferences.parse(
+            (
+              await client.query(
+                "SELECT document FROM growth.preference WHERE account_id=$1",
+                [job.account_id],
+              )
+            ).rows[0]?.document ?? defaultPreferences,
+          );
+          if (
+            !currentPrefs.push ||
+            currentPrefs.mutedCreators.includes(event.creatorId) ||
+            currentPrefs.disabledPushTypes.includes(event.type)
+          ) {
+            await client.query(
+              "UPDATE growth.delivery SET state='suppressed',lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+              [job.id, leaseId],
+            );
+            return;
+          }
+          if (quietNow(currentPrefs, new Date())) {
+            await client.query(
+              "UPDATE growth.delivery SET state='queued',available_at=now()+interval '15 minutes',attempts=greatest(0,attempts-1),lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+              [job.id, leaseId],
+            );
+            return;
+          }
           const delivered = await this.provider!.send({
             channel,
             accountId: job.account_id,
             notificationId: notification.id,
             idempotencyKey: job.id,
             sender: view.sender,
-            preview: prefs.hideSensitive
+            preview: currentPrefs.hideSensitive
               ? copy.growthHiddenUpdate
               : view.preview,
             destination: view.destination,
@@ -489,16 +518,10 @@ export class Notifications {
           if (quietNow(prefs, new Date())) throw new QuietDelivery();
           eligible.push(job);
           eligibleEvents.push(event);
-          entries.push({
-            ...view,
-            preview: prefs.hideSensitive
-              ? copy.growthHiddenUpdate
-              : view.preview,
-          });
+          entries.push(view);
         }
         if (!entries.length) continue;
         if (!this.provider) throw new DeliveryFailure(60);
-        const first = entries[0]!;
         await this.db.transaction(this.db.worker, async (client) => {
           await this.erasure.lockEvents(client, eligibleEvents);
           const current = await client.query(
@@ -507,20 +530,55 @@ export class Notifications {
           );
           // Purge may have completed while owners were being read. Rebuild on the next lease.
           if (current.rowCount !== eligible.length) return;
+          const currentPrefs = Preferences.parse(
+            (
+              await client.query(
+                "SELECT document FROM growth.preference WHERE account_id=$1",
+                [jobs[0]!.account_id],
+              )
+            ).rows[0]?.document ?? defaultPreferences,
+          );
+          const sendingJobs: typeof jobs = [];
+          const sendingEntries: typeof entries = [];
+          for (let index = 0; index < eligible.length; index++) {
+            const job = eligible[index]!,
+              event = eligibleEvents[index]!;
+            if (
+              !currentPrefs.email ||
+              currentPrefs.mutedCreators.includes(event.creatorId) ||
+              currentPrefs.disabledEmailTypes.includes(event.type)
+            ) {
+              await client.query(
+                "UPDATE growth.delivery SET state='suppressed',lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+                [job.id, leaseId],
+              );
+              continue;
+            }
+            sendingJobs.push(job);
+            sendingEntries.push({
+              ...entries[index]!,
+              preview: currentPrefs.hideSensitive
+                ? copy.growthHiddenUpdate
+                : entries[index]!.preview,
+            });
+          }
+          if (!sendingEntries.length) return;
+          if (quietNow(currentPrefs, new Date())) throw new QuietDelivery();
+          const first = sendingEntries[0]!;
           const result = await this.provider!.send({
             channel: "email",
             accountId: jobs[0]!.account_id,
-            notificationId: eligible[0]!.notification_id,
+            notificationId: sendingJobs[0]!.notification_id,
             idempotencyKey: jobs[0]!.digest_id,
             sender: copy.growthYourUpdates,
             preview: first.preview,
             destination: "/notifications",
             authorship: "system",
-            entries,
+            entries: sendingEntries,
           });
           await client.query(
             "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
-            [eligible.map((job) => job.id), leaseId, result.providerRef],
+            [sendingJobs.map((job) => job.id), leaseId, result.providerRef],
           );
         });
       } catch (error) {

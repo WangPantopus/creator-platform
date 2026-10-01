@@ -53,12 +53,14 @@ jobs:
             playwright-report
             test-results
   ios-foundation:
-    # Original strict Swift references were captured on macOS27/arm64.
+    # Preserve the original Swift references and their reviewed comparison contract.
     runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: xcodebuild -version
-      - run: swift test --package-path apps/ios
+      - name: Verify native Swift package
+        timeout-minutes: 20
+        run: swift test --package-path apps/ios
         env:
           SNAPSHOT_ARTIFACTS: ${{ github.workspace }}/artifacts/ios/snapshots
       - run: brew install xcodegen

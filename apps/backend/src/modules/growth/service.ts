@@ -96,6 +96,8 @@ export class GrowthService {
   }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
+    if (item.state === "withdrawn")
+      return this.withdrawContent(item.creatorId, item.id, item.version);
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
@@ -104,8 +106,38 @@ export class GrowthService {
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, item.creatorId))) return;
       await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.content:${item.id}`],
+      );
+      const prior = (
+        await client.query(
+          "SELECT creator_id,version,state,document FROM growth.content_public WHERE id=$1",
+          [item.id],
+        )
+      ).rows[0];
+      if (prior && prior.creator_id !== item.creatorId)
+        throw new DomainError(
+          "content_projection_conflict",
+          copy.growthErrorEntryIdConflict,
+          409,
+        );
+      if (
+        prior?.version > item.version ||
+        (prior?.version === item.version && prior.state === "withdrawn")
+      )
+        return;
+      if (prior?.version === item.version) {
+        if (contentHash(prior.document) !== contentHash(item))
+          throw new DomainError(
+            "content_projection_conflict",
+            copy.growthErrorEntryIdConflict,
+            409,
+          );
+        return;
+      }
+      await client.query(
         `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
-      ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document WHERE growth.content_public.version<excluded.version`,
+      ON CONFLICT(id) DO UPDATE SET version=excluded.version,state=excluded.state,document=excluded.document,published_at=excluded.published_at WHERE growth.content_public.version<excluded.version`,
         [
           item.id,
           item.creatorId,
@@ -113,6 +145,43 @@ export class GrowthService {
           item.state,
           item,
           item.publishedAt,
+        ],
+      );
+    });
+  }
+  /** W5 withdraws without changing the immutable content version. Negative
+   * state wins that version, including when it arrives before publication.
+   * Keep only an opaque tombstone, never a private replacement revision. */
+  async withdrawContent(creatorId: string, id: string, version: number) {
+    z.uuid().parse(creatorId);
+    z.uuid().parse(id);
+    z.int().positive().parse(version);
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, creatorId))) return;
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`growth.content:${id}`],
+      );
+      const prior = (
+        await client.query(
+          "SELECT creator_id FROM growth.content_public WHERE id=$1",
+          [id],
+        )
+      ).rows[0];
+      if (prior && prior.creator_id !== creatorId)
+        throw new DomainError(
+          "content_projection_conflict",
+          copy.growthErrorEntryIdConflict,
+          409,
+        );
+      await client.query(
+        `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,'withdrawn',$4,now())
+         ON CONFLICT(id) DO UPDATE SET version=excluded.version,state='withdrawn',document=excluded.document WHERE growth.content_public.version<=excluded.version`,
+        [
+          id,
+          creatorId,
+          version,
+          { id, creatorId, version, state: "withdrawn" },
         ],
       );
     });
@@ -745,52 +814,54 @@ export class GrowthService {
   }
   async funnel(actor: Actor) {
     const creatorId = await this.requireCreator(actor);
-    const result = await this.db.worker.query(
-      `SELECT type,count(DISTINCT actor_key)::int AS actors,count(*)::int AS events FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' AND type<>'capability_unavailable' GROUP BY type HAVING count(DISTINCT actor_key)>=5 ORDER BY type`,
-      [creatorId],
-    );
-    const cohorts = await this.db.worker.query(
-      `SELECT document->>'role' AS role,document->>'cohort' AS cohort,document->>'surface' AS surface,document->>'userState' AS user_state,type,count(DISTINCT actor_key)::int AS actors FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY 1,2,3,4,5 HAVING count(DISTINCT actor_key)>=5 ORDER BY 1,2,3,4,5`,
-      [creatorId],
-    );
-    const returns = [];
-    for (const day of [1, 7, 30]) {
-      const row = (
-        await this.db.worker.query(
-          `WITH first_arrivals AS (SELECT actor_key,(min(occurred_at) AT TIME ZONE 'UTC')::date AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), closed AS (SELECT * FROM first_arrivals WHERE started>=(now() AT TIME ZONE 'UTC')::date-60 AND started<(now() AT TIME ZONE 'UTC')::date-$2::int) SELECT count(*)::int AS eligible,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM growth.metric r WHERE r.creator_id=$1 AND r.actor_key=closed.actor_key AND r.type='return' AND r.document->>'capability'='available' AND (r.occurred_at AT TIME ZONE 'UTC')::date=closed.started+$2::int))::int AS returned FROM closed`,
-          [creatorId, day],
+    return this.db.workerActor(actor, creatorId, async (client) => {
+      const result = await client.query(
+        `SELECT type,count(DISTINCT actor_key)::int AS actors,count(*)::int AS events FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' AND type<>'capability_unavailable' GROUP BY type HAVING count(DISTINCT actor_key)>=5 ORDER BY type`,
+        [creatorId],
+      );
+      const cohorts = await client.query(
+        `SELECT document->>'role' AS role,document->>'cohort' AS cohort,document->>'surface' AS surface,document->>'userState' AS user_state,type,count(DISTINCT actor_key)::int AS actors FROM growth.metric WHERE creator_id=$1 AND occurred_at>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY 1,2,3,4,5 HAVING count(DISTINCT actor_key)>=5 ORDER BY 1,2,3,4,5`,
+        [creatorId],
+      );
+      const returns = [];
+      for (const day of [1, 7, 30]) {
+        const row = (
+          await client.query(
+            `WITH first_arrivals AS (SELECT actor_key,(min(occurred_at) AT TIME ZONE 'UTC')::date AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), closed AS (SELECT * FROM first_arrivals WHERE started>=(now() AT TIME ZONE 'UTC')::date-60 AND started<(now() AT TIME ZONE 'UTC')::date-$2::int) SELECT count(*)::int AS eligible,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM growth.metric r WHERE r.creator_id=$1 AND r.actor_key=closed.actor_key AND r.type='return' AND r.document->>'capability'='available' AND (r.occurred_at AT TIME ZONE 'UTC')::date=closed.started+$2::int))::int AS returned FROM closed`,
+            [creatorId, day],
+          )
+        ).rows[0];
+        const visible =
+          Number(row.eligible) >= 5 &&
+          (Number(row.returned) === 0 || Number(row.returned) >= 5);
+        returns.push({
+          day,
+          eligible: Number(row.eligible) >= 5 ? Number(row.eligible) : null,
+          returned: visible ? Number(row.returned) : null,
+          rate: visible ? Number(row.returned) / Number(row.eligible) : null,
+        });
+      }
+      const useful = (
+        await client.query(
+          `WITH arrivals AS (SELECT actor_key,min(occurred_at) AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), durations AS (SELECT a.actor_key,extract(epoch FROM min(m.occurred_at)-a.started) AS seconds FROM arrivals a JOIN growth.metric m USING(actor_key) WHERE m.creator_id=$1 AND m.type='useful_answer' AND m.document->>'capability'='available' AND m.occurred_at>=a.started AND a.started>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' GROUP BY a.actor_key,a.started) SELECT count(*)::int AS observations,percentile_cont(0.5) WITHIN GROUP(ORDER BY seconds) AS median_seconds FROM durations`,
+          [creatorId],
         )
       ).rows[0];
-      const visible =
-        Number(row.eligible) >= 5 &&
-        (Number(row.returned) === 0 || Number(row.returned) >= 5);
-      returns.push({
-        day,
-        eligible: Number(row.eligible) >= 5 ? Number(row.eligible) : null,
-        returned: visible ? Number(row.returned) : null,
-        rate: visible ? Number(row.returned) / Number(row.eligible) : null,
-      });
-    }
-    const useful = (
-      await this.db.worker.query(
-        `WITH arrivals AS (SELECT actor_key,min(occurred_at) AS started FROM growth.metric WHERE creator_id=$1 AND type='arrival' AND document->>'schemaVersion'='2' AND document->>'capability'='available' GROUP BY actor_key), durations AS (SELECT a.actor_key,extract(epoch FROM min(m.occurred_at)-a.started) AS seconds FROM arrivals a JOIN growth.metric m USING(actor_key) WHERE m.creator_id=$1 AND m.type='useful_answer' AND m.document->>'capability'='available' AND m.occurred_at>=a.started AND a.started>=(now() AT TIME ZONE 'UTC')::date-interval '30 days' GROUP BY a.actor_key,a.started) SELECT count(*)::int AS observations,percentile_cont(0.5) WITHIN GROUP(ORDER BY seconds) AS median_seconds FROM durations`,
-        [creatorId],
-      )
-    ).rows[0];
-    return {
-      schemaVersion: 2,
-      windowDays: 30,
-      minimumDistinctActors: 5,
-      counts: result.rows,
-      cohorts: cohorts.rows,
-      returns,
-      timeToUsefulAnswerSeconds:
-        Number(useful.observations) >= 5 ? Number(useful.median_seconds) : null,
-      denominator:
-        "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.",
-      retention:
-        "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.",
-    };
+      return {
+        schemaVersion: 2,
+        windowDays: 30,
+        minimumDistinctActors: 5,
+        counts: result.rows,
+        cohorts: cohorts.rows,
+        returns,
+        timeToUsefulAnswerSeconds:
+          Number(useful.observations) >= 5
+            ? Number(useful.median_seconds)
+            : null,
+        denominator: copy.growthMeasurementDenominator,
+        retention: copy.growthMeasurementRetention,
+      };
+    });
   }
   async experiments(actor: Actor) {
     const creatorId = await this.requireCreator(actor);
@@ -976,8 +1047,7 @@ export class GrowthService {
     );
     return {
       acknowledged: true,
-      retained:
-        "Irreversibly aggregated closed snapshots contain no identity or text.",
+      retained: copy.growthRetainedClosedSnapshots,
     };
   }
 }

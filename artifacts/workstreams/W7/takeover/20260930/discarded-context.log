@@ -1,0 +1,293 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+Fetching https://github.com/pointfreeco/swift-issue-reporting from cache
+Fetched https://github.com/pointfreeco/swift-issue-reporting from cache (0.01s)
+Creating working copy for https://github.com/pointfreeco/swift-issue-reporting
+Working copy of https://github.com/pointfreeco/swift-issue-reporting resolved at 2.1.1
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[1/5] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module QelvoraUITests
+[4/5] Compiling QelvoraUITests NativeSnapshotTests.swift
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:161:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+159 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+160 |       }
+161 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+162 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+163 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[4/6] Write Objects.LinkFileList
+[5/6] Linking QelvoraNativePackageTests
+Build complete! (3.29s)
+Test Suite 'Selected tests' started at 2026-09-30 16:20:12.270.
+Test Suite 'QelvoraNativePackageTests.xctest' started at 2026-09-30 16:20:12.272.
+Test Suite 'NativeSnapshotTests' started at 2026-09-30 16:20:12.272.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' passed (0.850 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' started.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Seal.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+7432 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Avatar.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+14839 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IdentityStrip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+7868 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ThreadHeader.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+14789 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CallChip.light" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+17590 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Seal.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+5844 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "Avatar.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+13560 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "IdentityStrip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+7291 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "ThreadHeader.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+13620 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+/Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:60: error: -[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes] : failed - Snapshot "CallChip.night" does not match reference.
+
+@−
+"file:///Users/yingpengwang/.codex/worktrees/0546/creator-platform/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png"
+@+
+"file:///var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png"
+
+To configure output for a custom diff tool, use 'withSnapshotTesting'. For example:
+
+    withSnapshotTesting(diffTool: .ksdiff) {
+      // ...
+    }
+
+15734 pixels exceed the native sRGB rounding bound. Newly-taken snapshot does not match reference.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' failed (25.237 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' passed (0.461 seconds).
+Test Suite 'NativeSnapshotTests' failed at 2026-09-30 16:20:38.821.
+	 Executed 3 tests, with 10 failures (0 unexpected) in 26.548 (26.549) seconds
+Test Suite 'QelvoraNativePackageTests.xctest' failed at 2026-09-30 16:20:38.821.
+	 Executed 3 tests, with 10 failures (0 unexpected) in 26.548 (26.549) seconds
+Test Suite 'Selected tests' failed at 2026-09-30 16:20:38.821.
+	 Executed 3 tests, with 10 failures (0 unexpected) in 26.548 (26.551) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: x86_64-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

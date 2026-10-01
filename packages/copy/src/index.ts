@@ -867,7 +867,21 @@ export const copy = {
   "w6CreatorDidNotJoin": "{value1} did not join.",
   "w6TimeOfDuration": "{value1} of {value2}",
   "w6SharedFilesInZone": "{value1} shared files · {value2}",
-  "w6BeingReconciled": "being reconciled"
+  "w6BeingReconciled": "being reconciled",
+  "growthErrorContentEffectUnconfigured": "This content effect requires its owner adapter.",
+  "growthErrorContentVersionUnavailable": "The current content version is unavailable.",
+  "growthSignedConversationUpdate": "A signed reply is available in your conversation.",
+  "growthAiConversationUpdate": "An AI reply is available in your conversation.",
+  "growthCurrentCallUpdate": "Your call status has changed.",
+  "growthMeasurementDenominator": "Distinct pseudonymous actors per event in the fixed last 30 days. Unavailable capabilities and legacy events are excluded. Cells below five actors are suppressed.",
+  "growthMeasurementRetention": "D1/D7/D30 use each actor's first available arrival in the last 60 calendar days, only after that UTC return day closes. The numerator is an observed return on that day. Small cohorts and positive numerators below five are suppressed.",
+  "growthRetainedClosedSnapshots": "Irreversibly aggregated closed snapshots contain no identity or text.",
+  "growthRetainedErasureFence": "Worker-only HMAC subject markers prevent delayed producer replay from recreating erased records; no raw account or creator ID is stored.",
+  "growthRetainedEventDedupe": "Only opaque event IDs and content hashes remain; recipient and aggregate metadata is erased.",
+  "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
+  "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
+  "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
+  "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

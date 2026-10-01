@@ -1,0 +1,82 @@
+▲ Next.js 16.3.7 (webpack)
+✓ Running next.config.ts took 106ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 28.4s
+  Running TypeScript ...
+  Finished TypeScript in 40s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/29) ...
+  Generating static pages using 15 workers (7/29)
+  Generating static pages using 15 workers (14/29)
+  Generating static pages using 15 workers (21/29)
+✓ Generating static pages using 15 workers (29/29) in 5.8s
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/auth/complete
+├ ƒ /api/auth/continue
+├ ƒ /api/commerce/[...path]
+├ ƒ /api/growth-development
+├ ƒ /api/growth/[...path]
+├ ƒ /api/platform/[...path]
+├ ƒ /api/studio/ai/[...path]
+├ ƒ /api/trust/[...path]
+├ ƒ /api/w6/[...path]
+├ ƒ /auth/continue
+├ ƒ /auth/development
+├ ƒ /calls/[creatorId]/[fanId]/[sessionId]
+├ ƒ /commerce/[screen]
+├ ƒ /creators/[handle]
+├ ƒ /creators/[handle]/chat
+├ ƒ /creators/[handle]/posts/[id]
+├ ƒ /creators/maya
+├ ○ /design
+├ ○ /design/components
+├ ƒ /design/components/[name]
+├ ○ /design/screens
+├ ƒ /design/screens/[group]/[id]
+├ ○ /design/studies/comprehension
+├ ƒ /discover
+├ ƒ /growth-development
+├ ƒ /home
+├ ○ /identity/account
+├ ƒ /invite/[id]
+├ ○ /media/ai-voice
+├ ƒ /media/voice
+├ ƒ /notifications
+├ ƒ /notifications/settings
+├ ƒ /onboarding/handle
+├ ○ /ops
+├ ○ /ops/audits
+├ ƒ /ops/cases/[id]
+├ ○ /ops/metrics
+├ ƒ /share/[id]
+├ ƒ /share/[id]/image
+├ ƒ /sitemap.xml
+├ ○ /status
+├ ƒ /studio/activation
+├ ƒ /studio/ai/[[...section]]
+├ ƒ /studio/calls/[creatorId]/[fanId]/[commitmentId]
+├ ƒ /studio/impact
+├ ƒ /studio/insights
+├ ○ /studio/launch
+├ ƒ /studio/measurement
+├ ○ /studio/setup
+├ ○ /support
+├ ○ /support/access
+├ ○ /support/feedback
+├ ○ /support/privacy
+├ ○ /trust
+├ ○ /trust/crisis
+├ ○ /trust/terms
+├ ƒ /unsubscribe/[token]
+├ ƒ /verify/[id]
+└ ƒ /you
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

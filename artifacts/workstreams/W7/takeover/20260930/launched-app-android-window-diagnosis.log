@@ -1,0 +1,12 @@
+  Window #6 Window{3ee5ac8 u0 Application Not Responding: com.android.systemui}:
+    WindowStateAnimator{f70ea97 Application Not Responding: com.android.systemui}:
+       mAnimationIsEntrance=true      mSurface=Surface(name=Application Not Responding: com.android.systemui)/@0x2581484
+  Window #8 Window{9cf8f80 u0 com.pantopus.qelvora/com.pantopus.qelvora.MainActivity}:
+    mOwnerUid=10209 showForAllUsers=false package=com.pantopus.qelvora appop=NONE
+    mBaseLayer=21000 mSubLayer=0    mToken=ActivityRecord{4c5f69e u0 com.pantopus.qelvora/.MainActivity t11}
+    mActivityRecord=ActivityRecord{4c5f69e u0 com.pantopus.qelvora/.MainActivity t11}
+    WindowStateAnimator{6ad7208 com.pantopus.qelvora/com.pantopus.qelvora.MainActivity}:
+      mSurface=Surface(name=com.pantopus.qelvora/com.pantopus.qelvora.MainActivity)/@0xac82da1
+  imeLayeringTarget in display# 0 Window{9cf8f80 u0 com.pantopus.qelvora/com.pantopus.qelvora.MainActivity}
+  imeInputTarget in display# 0 Window{2c9b5e2 u0 com.pantopus.qelvora/com.pantopus.qelvora.MainActivity}
+  imeControlTarget in display# 0 Window{2c9b5e2 u0 com.pantopus.qelvora/com.pantopus.qelvora.MainActivity}

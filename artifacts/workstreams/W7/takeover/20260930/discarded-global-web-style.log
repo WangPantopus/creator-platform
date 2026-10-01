@@ -1,0 +1,2254 @@
+[WebServer] (node:18202) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18210) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18216) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 13 tests using 1 worker
+
+(node:18231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/visual/auth-contract.spec.ts:22:5 › auth seam rejects external, nested backslash and control-character contexts (492ms)
+  ✓   2 tests/visual/auth-contract.spec.ts:41:5 › welcome and auth seam use the same context contract and preserve registered arrival (507ms)
+[WebServer] (node:18247) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18290) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18294) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18295) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18301) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18338) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18344) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18370) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18374) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18375) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18378) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18384) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18389) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18397) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18405) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18415) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18434) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in light (23.4s)
+(node:18435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18487) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18488) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18493) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18527) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18561) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18563) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18567) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18580) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18624) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18631) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18657) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18679) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18687) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18714) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18724) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   4 tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in light (25.5s)
+(node:18729) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18738) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18741) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18748) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18771) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18781) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18782) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18793) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18796) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18811) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18822) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:18872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19004) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19035) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   5 tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in night (23.1s)
+(node:19158) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19198) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19215) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19300) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19313) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19413) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19466) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19467) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19478) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19483) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19486) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19489) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19497) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19499) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19500) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19503) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19504) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19511) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19514) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19562) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19564) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19565) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19571) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   6 tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in night (30.1s)
+(node:19580) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light (374ms)
+(node:19587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 tests/visual/foundation.spec.ts:32:9 › creator-home matches approved design in light (902ms)
+  ✘   9 tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light (329ms)
+(node:19621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in night (760ms)
+[WebServer] (node:19632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 tests/visual/foundation.spec.ts:32:9 › creator-home matches approved design in night (769ms)
+[WebServer] (node:19636) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in night (632ms)
+  ✓  13 tests/visual/foundation.spec.ts:83:5 › unconfigured Pantopus sign-in does not create a local identity and preserves arrival (1.1s)
+
+
+  1) tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in light ───
+
+    Error: phase4a-fan-core/Invite.dc.html channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      94 |           `${screen.group}/${screen.file} channel delta in ${theme}`,
+      95 |         )
+    > 96 |         .toBeLessThanOrEqual(2);
+         |          ^
+      97 |       expect
+      98 |         .soft(
+      99 |           comparison.pixels,
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:96:10
+
+    Error: phase4a-fan-core/Invite.dc.html differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    19172
+
+      100 |           `${screen.group}/${screen.file} differing pixels in ${theme}`,
+      101 |         )
+    > 102 |         .toBeLessThanOrEqual(64);
+          |          ^
+      103 |       page.off("pageerror", capture);
+      104 |     }
+      105 |     await reference.close();
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:102:10
+
+    Error Context: test-results/catalog-all-64-exported-sc-75d60-erve-the-reference-in-light/error-context.md
+
+  2) tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in light 
+
+    Error: AccessLines channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: AccessLines differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    6240
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: AuditBanner channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: AuditBanner differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    4982
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: CapacityHeader channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    215
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: CapacityHeader differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    8880
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: CitationChip channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    138
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: CitationChip differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    1095
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Composer channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Composer differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    131545
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ContextCard channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    168
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ContextCard differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    4280
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: DigestItem channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: DigestItem differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    14404
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: EmptyState channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: EmptyState differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    13789
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: EtaLine channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    151
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: EtaLine differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    577
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: IdentityStrip channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: IdentityStrip differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    75400
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: IncludeList channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    237
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: IncludeList differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    59629
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: InsteadMenu channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: InsteadMenu differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    51849
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: LabelPreview channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    118
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: LabelPreview differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    1010
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: MemoryChip channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: MemoryChip differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    16159
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Message channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Message differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    32659
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ModeList channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ModeList differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    68619
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Note channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Note differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    142166
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Notice channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Notice differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    16973
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: QueueCard channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: QueueCard differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    24186
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ReactionChip channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ReactionChip differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    7171
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: RequestStatus channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    168
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: RequestStatus differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    15328
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ReservedLabel channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    118
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ReservedLabel differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    2415
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Segmented channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Segmented differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    8031
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Skeleton channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    17
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Skeleton differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    1008
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: SourceRow channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    237
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: SourceRow differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    75185
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: SpendLimit channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: SpendLimit differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    9696
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: StudioTabBar channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: StudioTabBar differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    11478
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: SystemLine channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    215
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: SystemLine differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    6612
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: TabBar channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: TabBar differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    9506
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: TermsBlock channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: TermsBlock differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    10360
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ThreadHeader channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    151
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ThreadHeader differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    894
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: VersionList channel delta in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: VersionList differing pixels in light
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    15915
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error Context: test-results/catalog-all-53-component-c-3101e-rves-the-reference-in-light/error-context.md
+
+  3) tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in night ───
+
+    Error: phase4a-fan-core/Invite.dc.html channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      94 |           `${screen.group}/${screen.file} channel delta in ${theme}`,
+      95 |         )
+    > 96 |         .toBeLessThanOrEqual(2);
+         |          ^
+      97 |       expect
+      98 |         .soft(
+      99 |           comparison.pixels,
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:96:10
+
+    Error: phase4a-fan-core/Invite.dc.html differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    18838
+
+      100 |           `${screen.group}/${screen.file} differing pixels in ${theme}`,
+      101 |         )
+    > 102 |         .toBeLessThanOrEqual(64);
+          |          ^
+      103 |       page.off("pageerror", capture);
+      104 |     }
+      105 |     await reference.close();
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:102:10
+
+    Error Context: test-results/catalog-all-64-exported-sc-3cee1-erve-the-reference-in-night/error-context.md
+
+  4) tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in night 
+
+    Error: AccessLines channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: AccessLines differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    6232
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: AuditBanner channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: AuditBanner differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    4994
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: CapacityHeader channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    218
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: CapacityHeader differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    8884
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: CitationChip channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    129
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: CitationChip differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    1085
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Composer channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Composer differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    129852
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ContextCard channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    143
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ContextCard differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    4280
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: DigestItem channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    209
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: DigestItem differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    14386
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: EmptyState channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: EmptyState differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    13617
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: EtaLine channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    143
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: EtaLine differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    574
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: IdentityStrip channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    218
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: IdentityStrip differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    75585
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: IncludeList channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: IncludeList differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    59969
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: InsteadMenu channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    203
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: InsteadMenu differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    51705
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: LabelPreview channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    108
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: LabelPreview differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    1000
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: MemoryChip channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    216
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: MemoryChip differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    16160
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Message channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    235
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Message differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    32700
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ModeList channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    219
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ModeList differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    69383
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Note channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    225
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Note differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    139243
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: Notice channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    235
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: Notice differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    16980
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: QueueCard channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    235
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: QueueCard differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    24184
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ReactionChip channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    231
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ReactionChip differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    7209
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: RequestStatus channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    143
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: RequestStatus differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    15323
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error: ReservedLabel channel delta in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 2
+    Received:    108
+
+      179 |       expect
+      180 |         .soft(comparison.maxChannelDelta, `${name} channel delta in ${theme}`)
+    > 181 |         .toBeLessThanOrEqual(2);
+          |          ^
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+      184 |         .toBeLessThanOrEqual(64);
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:181:10
+
+    Error: ReservedLabel differing pixels in night
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 64
+    Received:    2409
+
+      182 |       expect
+      183 |         .soft(comparison.pixels, `${name} differing pixels in ${theme}`)
+    > 184 |         .toBeLessThanOrEqual(64);
+          |          ^
+      185 |     }
+      186 |     await reference.close();
+      187 |   });
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/catalog.spec.ts:184:10
+
+    Error Context: test-results/catalog-all-53-component-c-c38ab-rves-the-reference-in-night/error-context.md
+
+  5) tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light ───────────────
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: welcome.light.png
+
+
+      55 |       await reference.evaluate(() => document.fonts.ready);
+      56 |       const expected = await reference.screenshot({ animations: "disabled" });
+    > 57 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      58 |         maxDiffPixels: 0,
+      59 |       });
+      60 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/foundation.spec.ts:57:24
+
+    attachment #1: welcome-light (image/png) ───────────────────────────────────────────────────────
+    Expected: tests/visual/baselines/welcome-light.png
+    Received: test-results/foundation-welcome-matches-approved-design-in-light/welcome-light-actual.png
+    Diff:     test-results/foundation-welcome-matches-approved-design-in-light/welcome-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-welcome-matches-approved-design-in-light/error-context.md
+
+  6) tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light ────────
+
+    Error: expect(Buffer).toMatchSnapshot(expected) failed
+
+      1 pixels (ratio 0.01 of all image pixels) are different.
+
+      Snapshot: handle-preview.light.png
+
+
+      55 |       await reference.evaluate(() => document.fonts.ready);
+      56 |       const expected = await reference.screenshot({ animations: "disabled" });
+    > 57 |       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
+         |                        ^
+      58 |         maxDiffPixels: 0,
+      59 |       });
+      60 |       await page.goto(
+        at /Users/yingpengwang/.codex/worktrees/0546/creator-platform/tests/visual/foundation.spec.ts:57:24
+
+    attachment #1: handle-preview-light (image/png) ────────────────────────────────────────────────
+    Expected: tests/visual/baselines/handle-preview-light.png
+    Received: test-results/foundation-handle-preview-matches-approved-design-in-light/handle-preview-light-actual.png
+    Diff:     test-results/foundation-handle-preview-matches-approved-design-in-light/handle-preview-light-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/foundation-handle-preview-matches-approved-design-in-light/error-context.md
+
+  6 failed
+    tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in light ────
+    tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in light 
+    tests/visual/catalog.spec.ts:23:7 › all 64 exported screens preserve the reference in night ────
+    tests/visual/catalog.spec.ts:107:7 › all 53 component compositions preserves the reference in night 
+    tests/visual/foundation.spec.ts:32:9 › welcome matches approved design in light ────────────────
+    tests/visual/foundation.spec.ts:32:9 › handle-preview matches approved design in light ─────────
+  7 passed (1.9m)

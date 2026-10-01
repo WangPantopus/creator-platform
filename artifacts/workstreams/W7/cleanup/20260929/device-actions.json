@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "web process",
+    "pid": 9940,
+    "action": "SIGTERM sent after cwd verification"
+  },
+  {
+    "resource": "web process",
+    "pid": 10281,
+    "action": "SIGTERM sent after cwd verification"
+  },
+  {
+    "resource": "W7 iOS simulator shutdown",
+    "exit": 0,
+    "detail": ""
+  },
+  {
+    "resource": "W7 iOS simulator delete",
+    "exit": 0,
+    "detail": ""
+  },
+  {
+    "resource": "W7 Android emulator stop",
+    "exit": 0,
+    "detail": "OK: killing emulator, bye bye\nOK"
+  },
+  {
+    "resource": "W7 Android AVD delete",
+    "exit": 0,
+    "detail": "AVD 'CreatorPlatform_W7' deleted."
+  }
+]

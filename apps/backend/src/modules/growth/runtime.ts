@@ -10,7 +10,7 @@ import {
 } from "./retention.js";
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
-import { GrowthRelay, type GrowthEventSource } from "./relay.js";
+import { GrowthRelay, type GrowthEventSources } from "./relay.js";
 import {
   growthPrivacyHook,
   type GrowthPrivacyScope,
@@ -25,7 +25,7 @@ export async function createGrowthRuntime(input: {
   secret: Buffer;
   owners: GrowthOwners;
   provider?: DeliveryProvider;
-  sources?: readonly GrowthEventSource[];
+  sources?: GrowthEventSources;
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
   privacyScope?: GrowthPrivacyScope;
@@ -60,11 +60,37 @@ export async function createGrowthRuntime(input: {
   let running: Promise<void> | null = null,
     timer: ReturnType<typeof setTimeout> | null = null,
     stopped = true;
+  let sourceCount: number | null =
+    typeof input.sources === "function" ? null : (input.sources?.length ?? 0);
+  let sourceReadiness:
+    | "unconfigured"
+    | "pending"
+    | "available"
+    | "unavailable" = input.sources ? "pending" : "unconfigured";
   async function tick() {
-    for (const source of input.sources ?? []) {
+    let sources: readonly import("./relay.js").GrowthEventSource[] = [];
+    try {
+      sources =
+        typeof input.sources === "function"
+          ? await input.sources()
+          : (input.sources ?? []);
+      if (sources.length > 100)
+        throw new Error("producer_scope_batch_exceeded");
+      sourceCount = sources.length;
+      sourceReadiness = input.sources ? "available" : "unconfigured";
+    } catch {
+      // Enumeration failure must not prevent existing leased inbox/delivery
+      // recovery. Those paths recheck current owner state independently.
+      sourceCount = null;
+      sourceReadiness = "unavailable";
+      sources = [];
+      input.observe?.("growth_worker_failure", 1);
+    }
+    for (const source of sources) {
       try {
         await relay.pull(source);
       } catch {
+        sourceReadiness = "unavailable";
         input.observe?.("growth_worker_failure", 1);
       }
     }
@@ -113,7 +139,8 @@ export async function createGrowthRuntime(input: {
     },
     readiness: () => ({
       persistence: "available" as const,
-      producerSources: input.sources?.length ?? 0,
+      producerSources: sourceCount,
+      producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),
       activationSource: Boolean(input.activationSource),
       privacyOwnership: Boolean(
