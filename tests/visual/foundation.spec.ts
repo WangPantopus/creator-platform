@@ -1,5 +1,6 @@
 import { visualWebURL, visualReferenceURL } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
+import { compareCatalog } from "./compare";
 const foundations = [
   {
     name: "welcome",
@@ -54,14 +55,14 @@ for (const theme of ["light", "night"] as const)
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      // These unfocused reference forms have no visible caret. Keep their
-      // inline styles intact while Next hydrates instead of injecting styles.
       const expected = await reference.screenshot({
         animations: "disabled",
         caret: "initial",
       });
       expect(expected).toMatchSnapshot(`${screen.name}.${theme}.png`, {
-        maxDiffPixels: 0,
+        // Allow two isolated rasterization pixels across Chromium host builds.
+        // The fresh source/implementation comparison below remains stricter.
+        maxDiffPixels: 2,
       });
       await page.goto(
         `${visualWebURL}${screen.path}${screen.path.includes("?") ? "&" : "?"}theme=${theme}`,

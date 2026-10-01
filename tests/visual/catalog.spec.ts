@@ -45,7 +45,6 @@ for (const theme of ["light", "night"] as const) {
         document.documentElement.dataset.theme = mode;
       }, theme);
       await reference.evaluate(() => document.fonts.ready);
-      // Capture must not mutate input styles while React is still hydrating.
       const expected = await reference.screenshot({
         animations: "disabled",
         caret: "initial",
@@ -138,6 +137,7 @@ for (const theme of ["light", "night"] as const) {
       await reference.evaluate(() => document.fonts.ready);
       const expected = await reference.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       await page.goto(
@@ -147,6 +147,7 @@ for (const theme of ["light", "night"] as const) {
       await page.evaluate(() => document.fonts.ready);
       const actual = await page.screenshot({
         animations: "disabled",
+        caret: "initial",
         fullPage: true,
       });
       const comparison = compareCatalog(actual, expected);
