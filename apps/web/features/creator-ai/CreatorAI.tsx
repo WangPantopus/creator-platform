@@ -1631,9 +1631,19 @@ export function CreatorAI({ section }: { section: string }) {
                                 </span>
                                 <button
                                   className="w2-case"
+                                  disabled={!("prompt" in item)}
+                                  aria-expanded={
+                                    selectedCase?.name === item.name
+                                  }
+                                  aria-controls={
+                                    selectedCase
+                                      ? "w2-case-transcript"
+                                      : undefined
+                                  }
                                   onClick={() =>
                                     setSelectedCase(
-                                      "prompt" in item
+                                      "prompt" in item &&
+                                        selectedCase?.name !== item.name
                                         ? (item as EvaluationCase)
                                         : null,
                                     )
@@ -1648,7 +1658,12 @@ export function CreatorAI({ section }: { section: string }) {
                             ))}
                         </ul>
                         {selectedCase && (
-                          <div className="qv-console__transcript">
+                          <div
+                            id="w2-case-transcript"
+                            role="region"
+                            aria-label={`${selectedCase.name} evaluation details`}
+                            className="qv-console__transcript"
+                          >
                             <span className="qv-meta">{selectedCase.name}</span>
                             <div className="qv-console__line">
                               <span className="qv-console__who">Fan</span>

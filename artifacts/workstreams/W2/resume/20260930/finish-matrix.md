@@ -1,5 +1,7 @@
 # R01–R14 current finish matrix
 
+**Evaluation disclosure accessibility:** [Actual keyboard source/receipt](evaluation-accessibility-followup.md) adds expanded/collapsed state, named transcript regions and keyboard toggling. Enter/Tab/focus were operated on the saved companion18 evaluation; full R12 accessibility/native/populated acceptance remains open.
+
 **Memory journal continuation:** [Current implementation and remaining receipt boundary](memory-journal-followup.md) adds pre-call durable memory extraction/sensitivity usage and current W3 authority checks; memory costs count toward the creator cap. W3 must adopt the required journal input and treat onUsage as diagnostic only. Generation receipts/cache columns still require W8 allocation and the same execution lease through memory/final seal. No weighted settlement readiness is claimed. On predecessor d2285ba, both root/backend and Android runtime jobs plus Trust pass; six native/visual contexts remain queued. Fresh final-head CI is required. All nine packages/R01–R14 and production gates are preserved.
 
 The [takeover follow-up](takeover-followup.md) supersedes runtime/accounting/evaluation details below: healthy preserved 3002/4102/55442, transaction-local delivery source, durable pre-call safety uncertainty, real nonzero discounted cache hits, expert17 and restored companion18 seven-case PASS. Fresh additive cache-counter/generation receipt allocation is pending with W8. Local GitHub CLI metadata access is available. All nine packages and R01–R14 remain binding.
