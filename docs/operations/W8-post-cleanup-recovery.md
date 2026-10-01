@@ -1,5 +1,7 @@
 # W8 recovery after resource cleanup
 
+**Mac Studio note, 2026-10-01:** the private inputs this procedure names are on the iMac, not on the Mac Studio, and PR17's recovery container and volume don't exist here either. The [Mac Studio re-verification](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) exercises the same closure mechanics on a labeled synthetic database and its closed copy. That is not a restoration of preserved data. Repeat the steps below only after the iMac material is copied here and its hashes verified.
+
 The human resumed implementation on 2026-10-01. The [actual recovery receipt](../../artifacts/workstreams/W8/recovery/20261001/receipt.json) supersedes historical resource availability, not the original R1–R10 release requirements. PR7 is already merged. No historical container, volume, PID, device or build identity is reusable.
 
 ## Preserve and identify the input

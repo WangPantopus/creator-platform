@@ -1,0 +1,256 @@
+{
+  "recordedDate": "2026-10-01",
+  "purpose": "Re-verify PR17 source on current main on a different host; not a repeat of the original-host data recovery.",
+  "source": {
+    "pr": 17,
+    "branch": "codex/w8-post-cleanup-recovery",
+    "verifiedRevision": "e7de7a18f88ea41d66e3cbf977173fe643e9ee7d",
+    "pr17HeadBeforeMerge": "bc809085e22d997cf868071c5cedab2992187005",
+    "mainMerged": "d6ea70e4778d716ce81ce0ede2c04910cd934052",
+    "conflictsResolved": [
+      "docs/workstreams/handoffs/W8-resume-prompt.md: kept main's rewritten prompt",
+      "docs/workstreams/status/W8.md: kept main's current authority; PR17 paragraph retained as a dated record"
+    ]
+  },
+  "host": {
+    "model": "Mac14,13",
+    "os": "macOS 27.0",
+    "node": "24.13.0",
+    "pnpm": "12.5.1",
+    "xcode": "27.0",
+    "differsFromHandoffHost": true
+  },
+  "custody": {
+    "privateRecoveryInputsPresent": false,
+    "absentPaths": [
+      "~/.config/creator-platform/cleanup-20261001/",
+      "~/.config/creator-platform/w8-local/",
+      "~/.config/creator-platform/recovery-20261001-active/",
+      "~/.config/creator-platform/secrets/openai.env"
+    ],
+    "search": "Bounded home-directory search (depth 7, Library/node_modules/.git excluded) and mounted volumes; no matches.",
+    "pr17RecoveryContainerOrVolumePresent": false,
+    "peerCorroboration": "W4 and W5 owners report their own archives absent on this host; W4 locates the original backups on the iMac's ~/.config/creator-platform.",
+    "preservedStateRestoredHere": false,
+    "requiredInput": "Copy the iMac's private ~/.config/creator-platform W8 directories (cleanup-20261001, w8-local, recovery-20261001-active) to this host with their 0700/0600 modes; then verify the recorded SHA-256 values before any restoration."
+  },
+  "syntheticEnvironment": {
+    "label": "synthetic local W8; not the preserved database",
+    "container": "creator-platform-w8-macstudio-20261001",
+    "volume": "creator-platform-w8-macstudio-20261001-data",
+    "image": "pgvector/pgvector@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d",
+    "postgres": "17.11",
+    "port": 55438,
+    "database": "creator_w8",
+    "canonicalMigrations": 40,
+    "seed": "infra/local/seed-w8.sql",
+    "postSeedBackfill": "0043 relationship statement re-run for the three seeded threads (seeded after the migration)",
+    "runtimeRoles": [
+      "creator_trust_runtime",
+      "creator_trust_worker",
+      "creator_runtime",
+      "growth_worker",
+      "growth_runtime"
+    ],
+    "privateEnvOutsideGit": "~/.config/creator-platform/w8-mac-studio-20261001 (0700; files 0600)"
+  },
+  "closedCopy": {
+    "container": "creator-platform-w8-closed-20261001",
+    "port": 55439,
+    "backupFormat": "CUSTOM",
+    "backupSha256": "ccc82c4675eccff7de5d1c742c8a8bd4db81274a05ee11ff922bedf83f36dfbd",
+    "restoreMs": 2223,
+    "tables": 146,
+    "rows": 65,
+    "perTableRowCountsMatchSource": true,
+    "closureMarker": "COMMENT ON DATABASE creator_w8 IS 'creator-platform:restored-traffic-closed' (owner role)",
+    "restoredEnvFlagsSet": false
+  },
+  "openSynthetic": {
+    "status": {
+      "desktop": "1280x900 Light and Night",
+      "restoration": "available / not_restored_local_harness",
+      "readiness": 503
+    },
+    "privacyExport": {
+      "viewport": "390x844 Light",
+      "actor": "synthetic local fan",
+      "create": 202,
+      "documentWidth": 390,
+      "tasks": {
+        "complete": [
+          "agent",
+          "commerce",
+          "conversation",
+          "identity",
+          "media",
+          "trust"
+        ],
+        "blocked": {
+          "content": "domain_hook_unavailable",
+          "growth": "privacy_artifact_unconfigured"
+        }
+      },
+      "downloadOffered": false
+    }
+  },
+  "privacyFormFix": {
+    "capabilitiesAborted": {
+      "submitDisabled": true
+    },
+    "capabilities503": {
+      "submitDisabled": true
+    },
+    "capabilityConfigured": {
+      "submitEnabled": true
+    }
+  },
+  "closedHttp": [
+    {
+      "method": "GET",
+      "path": "/health/live",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 503,
+      "restoration": "unavailable/restored_traffic_closed"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/identity/capabilities",
+      "status": 200,
+      "signInAvailable": false,
+      "developmentActors": 0
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trust/help",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trust/status",
+      "status": 200,
+      "ready": false
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trust/capabilities",
+      "status": 503,
+      "errorCode": "restoration_pending"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trust/privacy/jobs",
+      "status": 503,
+      "errorCode": "restoration_pending"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/threads",
+      "status": 503,
+      "errorCode": "restoration_pending"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/identity/continue",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "4a605b31-56c4-4a25-88df-ad901bea217b"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/trust/dev/session",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "068a772f-36fa-4c3f-8328-bacfb13191f4"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/trust/privacy/jobs",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "ca565460-3bf1-4a05-97ce-d5700e9cf398"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/trust/reports",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "c048ddc5-5574-46fb-8d6f-9c39e7e0ba97"
+    }
+  ],
+  "closedRealtime": {
+    "upgrade": "refused",
+    "status": 401
+  },
+  "closedWorker": "Privacy worker not started; non-owner worker role checked at startup.",
+  "closedBrowser": {
+    "status": "1280x900 Light and Night: restoration denial unavailable / restored traffic closed",
+    "privacy": "390x844 Light and Night: no local actor selector, restoration alert with reference, submit disabled, document width 390",
+    "correlatedLog": {
+      "correlationId": "d47adba2-72a5-40e2-a588-94d9417f4bbb",
+      "line": "GET route=unmatched status=503 errorCode=restoration_pending; no path, body or content"
+    },
+    "signIn": "/auth/continue?returnTo=%2Fsupport%2Fprivacy&error=identity_unconfigured"
+  },
+  "operation": "Headless Chromium through the repository's Playwright 1.63.0, driven by throwaway operator scripts outside Git; no test files added.",
+  "screenshots": [
+    "closed-status-desktop-light.jpg",
+    "closed-status-desktop-night.jpg",
+    "closed-privacy-phone-light.jpg",
+    "closed-privacy-phone-night.jpg",
+    "closed-signin-phone-light.jpg",
+    "capability-abort-phone-night.jpg",
+    "open-privacy-progress-phone-light.jpg",
+    "ios-closed-privacy-signin-light.jpg",
+    "ios-closed-trust-night-before-fix.jpg",
+    "ios-closed-trust-night-fixed.jpg"
+  ],
+  "checks": {
+    "frozenInstall": "passed",
+    "generatedResources": "passed (12 shared resources, 98 operations)",
+    "backendTypecheck": "passed",
+    "webTypecheck": "passed",
+    "newTests": "none"
+  },
+  "limits": [
+    "Synthetic data only; preserved W8 runtime, Foundation adoption, cases, block, tombstone, blocked jobs and journal not present on this host",
+    "No domain purge, completed C10, provider, staging, hardware, store or pilot acceptance",
+    "Local logical restore duration is not an RPO/RTO measurement",
+    "Development actors and synthetic confirmation are not canonical Pantopus identity evidence"
+  ],
+  "native": {
+    "ios": {
+      "simulator": "Creator Platform W8 (A3DBA471-82BB-43B6-9216-9A74BB5DB11C), iPhone 17, iOS 27.0",
+      "build": "xcodebuild Debug-iphonesimulator, normal simulator signing, DerivedData /private/tmp/creator-w8-ios-derived",
+      "launch": "xcrun simctl launch ... --api-url http://127.0.0.1:4108 --return-to <route> --appearance <theme>",
+      "closedPrivacy": "Welcome with Continue with Pantopus; no development actor chooser",
+      "closedTrustBeforeFix": "Crisis help showed 'Could not complete' (capabilities 503 blocked help); correlationId 089A3818-D654-4F0E-B493-480795595A72 route=unmatched 503 restoration_pending",
+      "fix": "Trust.swift load(): help independent; capabilities only on privacy route and cleared on failure; account-data failures scoped",
+      "closedTrustAfterFix": "Crisis help renders with help response ('Regional help resources are not configured in this environment.') and no error, Light and Night",
+      "panelControl": "Simulator panel access not granted during the run; operation was launch-argument routes plus simctl screenshots, no taps"
+    },
+    "android": {
+      "avd": "CreatorPlatform_W8_API34 (console 5568 / adb 5569), 2 cores / 2048 MB after adopting the shared budget",
+      "build": "./gradlew :app:assembleDebug -PcreatorBuildDir=/private/tmp/creator-w8-android-build: BUILD SUCCESSFUL including the Trust.kt fix",
+      "launchedJourney": "not operated in this run (emulator stopped under the shared device budget); first remaining acceptance item"
+    }
+  },
+  "screenshotSha256": {
+    "closed-status-desktop-light.jpg": "fc155a51ff00696db3756f36e18f6e858609bf6a04fdd370eefe1ab9096722cd",
+    "closed-status-desktop-night.jpg": "5f5ef8f42ed2391388814cd65957b101b5c823bc6d249a3fe02a960a16b5de73",
+    "closed-privacy-phone-light.jpg": "c87e9c1fac6a71c909292d28c43a1823c24692928155a901d9d28f611900b0bd",
+    "closed-privacy-phone-night.jpg": "65b1a66b4d2e9cfc65dabe358132b4e785a9f05a4626cc937c38bfe9942511b3",
+    "closed-signin-phone-light.jpg": "c67f868bb5dd5a233bdc372851e6bdd3735da34da4f63e453fbe3572ba9e2d00",
+    "capability-abort-phone-night.jpg": "322ad57b0beb95f76ef4ede2094a8ca64d2576808d7a52bf25c00e7074531a80",
+    "open-privacy-progress-phone-light.jpg": "d8b7e754d401e9415e18c16724421d2951582e87c99ff0d2eddc9dbcc9eead66",
+    "ios-closed-privacy-signin-light.jpg": "cff741fa55ced08b34c9a697af3c68967f2ea001c2ae0806610a9fc5baf1b9d5",
+    "ios-closed-trust-night-before-fix.jpg": "fbbf1d467232d972725e5a726cae266472cfefe70f84d3cc442671f3a8ebcde9",
+    "ios-closed-trust-night-fixed.jpg": "2694134c55063616250ef757ec77476d63bec40e95675397260e69e36a4f5063"
+  },
+  "sharedHostBudget": "Adopted W1's Mac Studio rule: one heavy native build at a time (/private/tmp/creator-platform-heavy-build.lock), at most two emulators and three booted simulators via slot directories; swap was 35.7/36.9 GB during the run.",
+  "servicesAtHandoff": "W8 API/web stopped; both W8 containers stopped with durable volumes retained; simulator shut down; emulator stopped."
+}

@@ -1,5 +1,52 @@
 # W8 resume prompt — complete the workstream
 
+## Latest update — Mac Studio session, 2026-10-01 (read first)
+
+This section supersedes conflicting facts below. Everything else, including the human's latest direction, R1–R10 and the acceptance standard, is unchanged. Exact inputs are in the [Mac Studio snapshot](../../../artifacts/workstreams/W8/handoff/20261001-mac-studio/snapshot.json) and [re-verification evidence](../../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md).
+
+**Host facts.** Work now happens on a Mac Studio. Peer streams share it, each in a sibling worktree under `/Users/yingpengwang/estimate-rescue/creator-platform/`; W8's is `w8-trust-operations-3e30cd`. The following live on the iMac and are **absent here**:
+- the private W8 archives (`cleanup-20261001`, `w8-local`, `recovery-20261001-active`);
+- `secrets/openai.env`;
+- PR17's recovery volume.
+
+Ask the human to copy them, then verify the hashes before any restore. Never reseed and call the result preserved state. Follow the shared budget recorded at the top of [the runbook](../../operations/W8-runbook.md): one heavy native build at a time via a lock directory, at most two emulators and three booted simulators via slot directories. Swap was near exhaustion during this session.
+
+**W8 resources here.** All are stopped; volumes are retained. Private env is in `~/.config/creator-platform/w8-mac-studio-20261001`. Restart commands are in the runbook.
+- Synthetic `creator_w8` on 55438.
+- Closed copy on 55439.
+- API 4108, web 3008.
+- Simulator "Creator Platform W8" `A3DBA471-82BB-43B6-9216-9A74BB5DB11C`.
+- AVD `CreatorPlatform_W8_API34` on 5568/5569.
+
+**Ordered next steps.**
+1. **Finish PR17.** It contains main's merge, the evidence, and a native crisis-help fix in `Trust.swift`/`Trust.kt` that this session found and verified on iOS.
+   - Take an emulator slot and boot the AVD at 2 cores/2 GB. Install `/private/tmp/creator-w8-android-build/outputs/apk/debug/app-debug.apk`.
+   - Start the API with `runtime-closed.env`. Launch `/trust` and `/support/privacy` with `--es api_url http://10.0.2.2:4108` in Light and Night. Confirm that crisis help renders without error and that privacy shows sign-in with no actors.
+   - Record the results in the receipt, merge main, mark the PR ready and merge it.
+2. **Deliver 0053 and the development-host trust composition** promised to W1/W3/W4/W6. This is on W3's generation critical path (draft PR63) and W4's verified-creator path.
+   - Add a loopback-only `local-development` trust mode, which needs a reviewed `createTrustRuntime` + `integration.ts` change.
+   - Add a `createDevelopmentTrust(runtime)` helper covering:
+     - `scopedTrustEvidence`, including verification;
+     - `verificationEffects` and `agentPauseEffects`;
+     - privacy consumers;
+     - development Ops actors;
+     - actor/scope/in-transaction denials.
+   - Add 0053 as a SECURITY DEFINER participant-bounded deny check executable by `creator_runtime`, plus `trustScopeRestrictionInTransaction()`.
+   - Then send W1 the export names and `server.ts` lines. W1 wires `server.ts`.
+3. **Open the single registry activation PR.** Inputs and hashes are in the snapshot.
+   - Review and merge W4 PR61 first, since it changes the 0049/0054 bytes.
+   - Activate ready entries in ascending waves and renumber unready ones above the wave.
+   - Resolve the 0058/0059 weakening of 0044 personal Approval before 0058–0060: revised bytes, a single-transaction wave, or a traffic-closed rollout.
+   - Register C10 accounting before 0048.
+   - Allocate W4 payout custody (0061), the W6 `creator_media_worker` ID, and W7 PR31's four pending proposals after security review.
+   - Send W2/W3/W4/W5/W6 the branch so each can verify on its own DB.
+4. **Implement W5's `reviewReply` producer** as a durable Ops review, and answer W6's open denial questions.
+5. **Continue R1–R10** per the sections below. Prioritize:
+   - C10 domain hooks: the content hook and the growth artifact store;
+   - real effect receipts;
+   - accessibility and design acceptance of `/ops`;
+   - the preserved-state restore and reconciliation once the iMac material arrives.
+
 Updated 2026-10-01, America/Los_Angeles. This is the current assignment. It supersedes older continuation pauses, draft-only dispositions, and blanket test/fixture freezes in W8 records. The original product scope and historical evidence remain intact. The [handoff snapshot](../../../artifacts/workstreams/W8/handoff/20261001/snapshot.json) records the exact observed repository, recovery and PR state; refresh changing facts when starting.
 
 ## Mission and latest human direction

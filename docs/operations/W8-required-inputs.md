@@ -1,5 +1,18 @@
 # W8 remaining environment and acceptance inputs
 
+**Mac Studio host, 2026-10-01 — first missing input:** copy the iMac's private W8 recovery material to this host, under the same paths and modes (directories 0700, files 0600):
+- `~/.config/creator-platform/cleanup-20261001/` (`manifest.json`, `creator-platform-w8-resume-20260930.sql.gz` with SHA-256 `fe09be66…2581f71`, and `creator-platform-w8-foundation-20260930-takeover.sql.gz` with SHA-256 `037c1b4d…0ef4`);
+- `~/.config/creator-platform/w8-local/`;
+- `~/.config/creator-platform/recovery-20261001-active/` (including `post-recovery-runtime.dump`, SHA-256 `1bf9de3d…2efd4`);
+- `~/.config/creator-platform/secrets/openai.env`.
+
+None of these exists here; W4 reports the old backups are on the iMac. Until they arrive:
+- the preserved runtime, cases, block, tombstone, blocked jobs and deletion journal can't be restored or reconciled;
+- old Growth ciphertext stays undecryptable;
+- no paid model call is possible.
+
+Independent work continues on the [synthetic environment](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md). Verify every hash before restoring anything.
+
 **Post-cleanup update, 2026-10-01:** local archive restoration, row/security/checksum verification, older-backup/newer-journal replay and restarted-host traffic refusal now have [actual evidence](../../artifacts/workstreams/W8/recovery/20261001/README.md). Original blocked privacy jobs remain intact. The reviewed staging adapter/project, retention/departure authority, original growth key, physical/provider/staffing/pilot inputs below remain absent; local recovery does not satisfy those release gates. The recovery host stays closed and owned temporary services stop after verification. The human was asked for the approved staging destination and adapter locations while independent recovery work continued.
 
 PR7 merged normally at `705215955415332e601adf5c42a2169cd0d173a5` after actual browser, iOS Simulator and Android emulator acceptance. The [merge receipt](../../artifacts/workstreams/W8/takeover/20260930/pr7-merged.json) distinguishes that completed source integration from the remaining R1–R10 inputs below. Their absence closes the dependent capability; it does not authorize synthetic success or broader database access.
