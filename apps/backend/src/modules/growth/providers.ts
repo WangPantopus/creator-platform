@@ -64,150 +64,174 @@ export class NativeDeliveryProvider implements DeliveryProvider {
     );
     if (uncertain.rowCount) throw new Error("provider_outcome_unknown");
     const devices = await service.db.worker.query(
-      `SELECT d.id,d.installation_id,d.platform,d.encrypted_token FROM growth.device d
+      `SELECT d.id,d.installation_id,d.platform,d.encrypted_token,d.token_hash FROM growth.device d
        WHERE d.account_id=$1 AND d.permission='granted' AND d.revoked_at IS NULL AND d.updated_at>now()-interval '270 days'
+       AND d.encrypted_token LIKE 'device-v1:%'
        AND NOT EXISTS(SELECT FROM growth.provider_receipt r WHERE r.delivery_id=$2 AND r.registration_hash=d.token_hash)
        ORDER BY d.id LIMIT 1`,
       [input.accountId, input.idempotencyKey],
     );
     const receipts: string[] = [];
     for (const device of devices.rows) {
-      const token = service.open(device.encrypted_token),
-        registrationHash = createHash("sha256").update(token).digest("hex");
-      let sending = false;
-      try {
-        if (device.platform === "ios") {
-          if (!this.config.apns) throw new Error("apns_unconfigured");
-          const id = createHash("sha256")
-            .update(`${input.idempotencyKey}:${device.installation_id}`)
-            .digest("hex")
-            .slice(0, 32)
-            .replace(
-              /^(........)(....)(....)(....)(............)$/u,
-              "$1-$2-$3-$4-$5",
-            );
-          const authorization = await this.bounded(() =>
-            this.config.apns!.authorization(),
-          );
-          await this.beginReceipt(input.idempotencyKey, registrationHash);
-          sending = true;
-          receipts.push(await this.sendAPNS(token, id, input, authorization));
-        } else {
-          if (!this.config.fcm) throw new Error("fcm_unconfigured");
-          const accessToken = await this.bounded(() =>
-            this.config.fcm!.accessToken(),
-          );
-          await this.beginReceipt(input.idempotencyKey, registrationHash);
-          sending = true;
-          const response = await fetch(
-            `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm.projectId)}/messages:send`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                message: {
-                  token,
-                  notification: { title: input.sender, body: input.preview },
-                  data: {
-                    destination: input.destination,
-                    notificationId: input.notificationId,
+      const result = await service.devices.withCurrent(
+        input.accountId,
+        device.encrypted_token,
+        device.token_hash,
+        device.installation_id,
+        device.platform,
+        async (token) => {
+          const registrationHash = device.token_hash as string;
+          let sending = false;
+          try {
+            if (device.platform === "ios") {
+              if (!this.config.apns) throw new Error("apns_unconfigured");
+              const id = createHash("sha256")
+                .update(`${input.idempotencyKey}:${device.installation_id}`)
+                .digest("hex")
+                .slice(0, 32)
+                .replace(
+                  /^(........)(....)(....)(....)(............)$/u,
+                  "$1-$2-$3-$4-$5",
+                );
+              const authorization = await this.bounded(() =>
+                this.config.apns!.authorization(),
+              );
+              await this.beginReceipt(input.idempotencyKey, registrationHash);
+              sending = true;
+              receipts.push(
+                await this.sendAPNS(token, id, input, authorization),
+              );
+            } else {
+              if (!this.config.fcm) throw new Error("fcm_unconfigured");
+              const accessToken = await this.bounded(() =>
+                this.config.fcm!.accessToken(),
+              );
+              await this.beginReceipt(input.idempotencyKey, registrationHash);
+              sending = true;
+              const response = await fetch(
+                `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm.projectId)}/messages:send`,
+                {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
                   },
-                  android: { ttl: "0s", collapse_key: input.notificationId },
+                  body: JSON.stringify({
+                    message: {
+                      token,
+                      notification: {
+                        title: input.sender,
+                        body: input.preview,
+                      },
+                      data: {
+                        destination: input.destination,
+                        notificationId: input.notificationId,
+                      },
+                      android: {
+                        ttl: "0s",
+                        collapse_key: input.notificationId,
+                      },
+                    },
+                  }),
+                  signal: AbortSignal.timeout(10000),
+                  redirect: "error",
                 },
-              }),
-              signal: AbortSignal.timeout(10000),
-              redirect: "error",
-            },
-          );
-          const data = (await response.json().catch(() => null)) as {
-            name?: string;
-            error?: { details?: { errorCode?: string }[] };
-          } | null;
-          if (
-            response.status === 404 &&
-            Array.isArray(data?.error?.details) &&
-            data.error.details.some((d) => d?.errorCode === "UNREGISTERED")
-          ) {
+              );
+              const data = (await response.json().catch(() => null)) as {
+                name?: string;
+                error?: { details?: { errorCode?: string }[] };
+              } | null;
+              if (
+                response.status === 404 &&
+                Array.isArray(data?.error?.details) &&
+                data.error.details.some((d) => d?.errorCode === "UNREGISTERED")
+              ) {
+                await service.db.worker.query(
+                  "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+                  [input.idempotencyKey, registrationHash],
+                );
+                sending = false;
+                await service.db.worker.query(
+                  "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
+                  [device.id],
+                );
+                return;
+              }
+              if (!response.ok) {
+                await service.db.worker.query(
+                  "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
+                  [input.idempotencyKey, registrationHash],
+                );
+                sending = false;
+                const retryAfter = response.headers.get("retry-after");
+                const delay = retryAfter
+                  ? /^\d+$/u.test(retryAfter)
+                    ? Number(retryAfter)
+                    : Math.ceil((Date.parse(retryAfter) - Date.now()) / 1000)
+                  : 60;
+                throw new DeliveryFailure(
+                  Number.isFinite(delay) ? Math.max(60, delay) : 60,
+                  response.status >= 400 &&
+                    response.status < 500 &&
+                    response.status !== 401 &&
+                    response.status !== 429,
+                );
+              }
+              // A 2xx response without FCM's message name is not a proven rejection.
+              // Retain the in-flight receipt as unknown; retrying it could resend.
+              if (
+                !data ||
+                data.error ||
+                typeof data.name !== "string" ||
+                data.name.length > 512 ||
+                !/^projects\/[^/\s]+\/messages\/[^/\s]+$/u.test(data.name)
+              )
+                throw new Error("provider_outcome_unknown");
+              receipts.push(data.name);
+            }
             await service.db.worker.query(
-              "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
-              [input.idempotencyKey, registrationHash],
+              "UPDATE growth.provider_receipt SET state='sent',provider_ref=$3,updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+              [input.idempotencyKey, registrationHash, receipts.at(-1)],
             );
-            sending = false;
-            await service.db.worker.query(
-              "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-              [device.id],
-            );
-            continue;
+          } catch (error) {
+            if (sending && error instanceof InvalidDeviceToken) {
+              await service.db.worker.query(
+                "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+                [input.idempotencyKey, registrationHash],
+              );
+              sending = false;
+              await service.db.worker.query(
+                "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
+                [device.id],
+              );
+              return;
+            }
+            if (sending && error instanceof DeliveryFailure) {
+              await service.db.worker.query(
+                "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
+                [input.idempotencyKey, registrationHash],
+              );
+              sending = false;
+            }
+            if (sending)
+              await service.db.worker.query(
+                "UPDATE growth.provider_receipt SET state='unknown',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
+                [input.idempotencyKey, registrationHash],
+              );
+            throw error;
           }
-          if (!response.ok) {
-            await service.db.worker.query(
-              "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
-              [input.idempotencyKey, registrationHash],
-            );
-            sending = false;
-            const retryAfter = response.headers.get("retry-after");
-            const delay = retryAfter
-              ? /^\d+$/u.test(retryAfter)
-                ? Number(retryAfter)
-                : Math.ceil((Date.parse(retryAfter) - Date.now()) / 1000)
-              : 60;
-            throw new DeliveryFailure(
-              Number.isFinite(delay) ? Math.max(60, delay) : 60,
-              response.status >= 400 &&
-                response.status < 500 &&
-                response.status !== 401 &&
-                response.status !== 429,
-            );
-          }
-          // A 2xx response without FCM's message name is not a proven rejection.
-          // Retain the in-flight receipt as unknown; retrying it could resend.
-          if (
-            !data ||
-            data.error ||
-            typeof data.name !== "string" ||
-            data.name.length > 512 ||
-            !/^projects\/[^/\s]+\/messages\/[^/\s]+$/u.test(data.name)
-          )
-            throw new Error("provider_outcome_unknown");
-          receipts.push(data.name);
-        }
+          return true;
+        },
+      );
+      if (result === null)
         await service.db.worker.query(
-          "UPDATE growth.provider_receipt SET state='sent',provider_ref=$3,updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
-          [input.idempotencyKey, registrationHash, receipts.at(-1)],
+          "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE id=$1 AND account_id=$2",
+          [device.id, input.accountId],
         );
-      } catch (error) {
-        if (sending && error instanceof InvalidDeviceToken) {
-          await service.db.worker.query(
-            "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
-            [input.idempotencyKey, registrationHash],
-          );
-          sending = false;
-          await service.db.worker.query(
-            "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-            [device.id],
-          );
-          continue;
-        }
-        if (sending && error instanceof DeliveryFailure) {
-          await service.db.worker.query(
-            "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2",
-            [input.idempotencyKey, registrationHash],
-          );
-          sending = false;
-        }
-        if (sending)
-          await service.db.worker.query(
-            "UPDATE growth.provider_receipt SET state='unknown',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
-            [input.idempotencyKey, registrationHash],
-          );
-        throw error;
-      }
     }
     const pending = await service.db.worker.query(
       `SELECT 1 FROM growth.device d WHERE d.account_id=$1 AND d.permission='granted' AND d.revoked_at IS NULL AND d.updated_at>now()-interval '270 days'
+       AND d.encrypted_token LIKE 'device-v1:%'
        AND NOT EXISTS(SELECT FROM growth.provider_receipt r WHERE r.delivery_id=$2 AND r.registration_hash=d.token_hash) LIMIT 1`,
       [input.accountId, input.idempotencyKey],
     );
@@ -216,6 +240,7 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       `SELECT r.provider_ref FROM growth.provider_receipt r JOIN growth.device d ON d.token_hash=r.registration_hash
        WHERE r.delivery_id=$1 AND r.state='sent' AND r.provider_ref IS NOT NULL AND r.provider_ref<>''
        AND d.account_id=$2 AND d.permission='granted' AND d.revoked_at IS NULL AND d.updated_at>now()-interval '270 days'
+       AND d.encrypted_token LIKE 'device-v1:%'
        ORDER BY r.registration_hash LIMIT 1`,
       [input.idempotencyKey, input.accountId],
     );

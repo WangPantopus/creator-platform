@@ -26,6 +26,7 @@ import {
 import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
+import { GrowthDeviceSessions } from "./device-session.js";
 
 const ShareSourceRecord = z.strictObject({
   id: z.uuid(),
@@ -47,6 +48,7 @@ const ShareSourceRecord = z.strictObject({
 export class GrowthService {
   readonly notifications: Notifications;
   readonly erasure: GrowthErasure;
+  readonly devices: GrowthDeviceSessions;
   constructor(
     readonly db: GrowthDatabase,
     readonly owners: GrowthOwners,
@@ -72,6 +74,11 @@ export class GrowthService {
     if (secret.length !== 32)
       throw new Error("Growth requires a 32-byte encryption/aggregation key");
     this.erasure = new GrowthErasure(secret);
+    this.devices = new GrowthDeviceSessions(
+      db,
+      (value) => this.seal(value),
+      (value) => this.open(value),
+    );
     db.actorFence = async (client, accountId, creatorId) => {
       if (
         !(await this.erasure.subjects(
@@ -672,7 +679,12 @@ export class GrowthService {
             value.installationId,
             value.platform,
             hash,
-            this.seal(value.token),
+            this.devices.capture(
+              actor.accountId,
+              value.token,
+              value.installationId,
+              value.platform,
+            ),
             value.permission,
           ],
         );
