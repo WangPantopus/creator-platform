@@ -49,7 +49,15 @@
   "compilerAndFormatChecks": "not run under cleanup restriction",
   "actualAppAcceptance": "not run; native controls disabled",
   "renameAcceptance": "not run at this revision",
-  "CI": "not inspected; Code Review GitHub connection previously unavailable",
+  "CI": {
+    "tool": "mcp__code_review__pull_requests_checks",
+    "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/48",
+    "isError": true,
+    "message": "Connect your GitHub account to continue",
+    "headRevisionReturned": null,
+    "accountReturned": null,
+    "passesClaimed": false
+  },
   "runtimeResourcesCreated": false,
   "testsOrTestScriptsAdded": false
 }
