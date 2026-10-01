@@ -1,0 +1,123 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -jobs 2 -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=09FA41B1-C300-4970-9F09-26F7CB884425" -derivedDataPath tmp/w2-native-20260930/ios-derived -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 -resultBundlePath tmp/w2-native-20260930/evidence/merged-ios-ui.xcresult CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+
+Build settings from command line:
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/apps/ios
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/tmp/w2-native-20260930/evidence/merged-ios-ui.xcresult
+
+2026-09-30 21:28:24.558009-0700 QelvoraUITests-Runner[67461:1466220] [Default] Running tests...
+2026-09-30 21:28:24.679946-0700 QelvoraUITests-Runner[67461:1467099] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-09-30 21:28:24.718626-0700 QelvoraUITests-Runner[67461:1467105] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'All tests' started at 2026-09-30 21:28:40.889.
+Test Suite 'QelvoraUITests.xctest' started at 2026-09-30 21:28:40.891.
+Test Suite 'FoundationFlowTests' started at 2026-09-30 21:28:40.891.
+Test Case '-[QelvoraUITests.FoundationFlowTests testCreatorAndAIRemainLabeledInNativeCatalog]' started.
+    t =     0.01s Start Test at 2026-09-30 21:28:40.897
+    t =     0.63s Set Up
+    t =     0.64s Open com.pantopus.qelvora
+    t =     0.65s     Launch com.pantopus.qelvora
+    t =     0.65s         Terminate com.pantopus.qelvora:67186
+2026-09-30 21:28:42.717 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-09-30 21:28:42.717 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     3.61s         Setting up automation session
+    t =     8.87s         Wait for com.pantopus.qelvora to idle
+    t =    11.76s Waiting 10.0s for "Message" StaticText to exist
+    t =    12.78s     Checking `Expect predicate `existsNoRetry == 1` for object "Message" StaticText`
+    t =    12.78s         Checking existence of `"Message" StaticText`
+    t =    13.13s Checking existence of `"Maya's AI" StaticText`
+    t =    13.23s Checking existence of `"Maya" StaticText`
+    t =    13.34s Checking existence of `Button (First Match)`
+    t =    13.46s Find the Target Application 'com.pantopus.qelvora'
+    t =    13.87s Added attachment named 'Native-Message-identities'
+    t =    13.87s Tear Down
+Test Case '-[QelvoraUITests.FoundationFlowTests testCreatorAndAIRemainLabeledInNativeCatalog]' passed (14.205 seconds).
+Test Case '-[QelvoraUITests.FoundationFlowTests testWelcomeSignInFailsClosedInBothThemes]' started.
+    t =     0.00s Start Test at 2026-09-30 21:28:55.102
+    t =     0.12s Set Up
+    t =     0.12s Open com.pantopus.qelvora
+    t =     0.12s     Launch com.pantopus.qelvora
+    t =     0.13s         Terminate com.pantopus.qelvora:67580
+2026-09-30 21:28:58.295 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-09-30 21:28:58.295 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     4.02s         Setting up automation session
+    t =     8.21s         Wait for com.pantopus.qelvora to idle
+    t =    10.68s Waiting 10.0s for "continue-with-pantopus" Button to exist
+    t =    11.70s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    11.70s         Checking existence of `"continue-with-pantopus" Button`
+    t =    11.78s Find the "continue-with-pantopus" Button
+    t =    11.86s Find the "continue-with-pantopus" Button
+    t =    11.94s Find the Target Application 'com.pantopus.qelvora'
+    t =    12.22s Added attachment named 'Welcome-Light'
+    t =    12.24s Tap "continue-with-pantopus" Button
+    t =    12.24s     Wait for com.pantopus.qelvora to idle
+    t =    12.25s     Find the "continue-with-pantopus" Button
+    t =    12.30s     Check for interrupting elements affecting "continue-with-pantopus" Button
+    t =    12.35s     Synthesize event
+    t =    12.81s     Wait for com.pantopus.qelvora to idle
+    t =    12.82s Waiting 5.0s for "Account status, Pantopus sign-in is not connected in this local build." StaticText to exist
+    t =    13.84s     Checking `Expect predicate `existsNoRetry == 1` for object "Account status, Pantopus sign-in is not connected in this local build." StaticText`
+    t =    13.84s         Checking existence of `"Account status, Pantopus sign-in is not connected in this local build." StaticText`
+    t =    13.88s Find the "continue-with-pantopus" Button
+    t =    13.92s Checking existence of `"handle" TextField`
+    t =    13.98s Find the Target Application 'com.pantopus.qelvora'
+    t =    14.30s Added attachment named 'SignIn-unconfigured-Light'
+    t =    14.30s Terminate com.pantopus.qelvora:67654
+    t =    15.40s Open com.pantopus.qelvora
+    t =    15.40s     Launch com.pantopus.qelvora
+2026-09-30 21:29:10.509 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-09-30 21:29:10.509 xcodebuild[67343:1464204] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    15.84s         Setting up automation session
+    t =    19.59s         Wait for com.pantopus.qelvora to idle
+    t =    21.77s Waiting 10.0s for "continue-with-pantopus" Button to exist
+    t =    22.82s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    22.83s         Checking existence of `"continue-with-pantopus" Button`
+    t =    22.98s Find the "continue-with-pantopus" Button
+    t =    23.06s Find the "continue-with-pantopus" Button
+    t =    23.12s Find the Target Application 'com.pantopus.qelvora'
+    t =    23.38s Added attachment named 'Welcome-Dark'
+    t =    23.39s Tap "continue-with-pantopus" Button
+    t =    23.39s     Wait for com.pantopus.qelvora to idle
+    t =    23.42s     Find the "continue-with-pantopus" Button
+    t =    23.46s     Check for interrupting elements affecting "continue-with-pantopus" Button
+    t =    23.54s     Synthesize event
+    t =    23.87s     Wait for com.pantopus.qelvora to idle
+    t =    23.88s Waiting 5.0s for "Account status, Pantopus sign-in is not connected in this local build." StaticText to exist
+    t =    24.90s     Checking `Expect predicate `existsNoRetry == 1` for object "Account status, Pantopus sign-in is not connected in this local build." StaticText`
+    t =    24.90s         Checking existence of `"Account status, Pantopus sign-in is not connected in this local build." StaticText`
+    t =    24.94s Find the "continue-with-pantopus" Button
+    t =    24.97s Checking existence of `"handle" TextField`
+    t =    25.01s Find the Target Application 'com.pantopus.qelvora'
+    t =    25.42s Added attachment named 'SignIn-unconfigured-Dark'
+    t =    25.42s Terminate com.pantopus.qelvora:67692
+    t =    26.52s Tear Down
+Test Case '-[QelvoraUITests.FoundationFlowTests testWelcomeSignInFailsClosedInBothThemes]' passed (26.830 seconds).
+Test Suite 'FoundationFlowTests' passed at 2026-09-30 21:29:21.932.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 41.034 (41.040) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-09-30 21:29:21.933.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 41.034 (41.043) seconds
+Test Suite 'All tests' passed at 2026-09-30 21:29:21.935.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 41.034 (41.046) seconds
+2026-09-30 21:29:22.302 xcodebuild[67343:1464204] [MT] IDETestOperationsObserverDebug: 68.019 elapsed -- Testing started completed.
+2026-09-30 21:29:22.302 xcodebuild[67343:1464204] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-09-30 21:29:22.302 xcodebuild[67343:1464204] [MT] IDETestOperationsObserverDebug: 68.019 sec, +68.019 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/worktrees/w2-resume/creator-platform/tmp/w2-native-20260930/evidence/merged-ios-ui.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

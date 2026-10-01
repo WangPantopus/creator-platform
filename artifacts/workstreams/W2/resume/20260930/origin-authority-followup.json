@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-09-30T23:53:35.791608+00:00",
+  "configuredOrigin": "http://127.0.0.1:3002",
+  "synthetic": true,
+  "operation": "Actual product BFF requests; all denied before any provider operation or draft mutation",
+  "newEngineeringTests": false,
+  "probes": [
+    {
+      "name": "missing_origin",
+      "status": 403,
+      "error": {
+        "code": "origin_invalid",
+        "message": "Open this action from Studio."
+      }
+    },
+    {
+      "name": "hostile_origin",
+      "status": 403,
+      "error": {
+        "code": "origin_invalid",
+        "message": "Open this action from Studio."
+      }
+    },
+    {
+      "name": "matching_hostile_host",
+      "status": 403,
+      "error": {
+        "code": "origin_invalid",
+        "message": "Open this action from Studio."
+      }
+    },
+    {
+      "name": "configured_origin_invalid_payload",
+      "status": 400,
+      "error": {
+        "code": "invalid_request",
+        "message": "Check the fields and try again."
+      }
+    }
+  ]
+}

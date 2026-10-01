@@ -1,11 +1,10 @@
 import { defineConfig } from "@playwright/test";
-const webPort = Number(process.env.CREATOR_VISUAL_WEB_PORT ?? 3000);
-const referencePort = Number(process.env.REFERENCE_PORT ?? 3101);
-for (const port of [webPort, referencePort])
-  if (!Number.isInteger(port) || port < 1024 || port > 65535)
-    throw new Error("Visual checks require a valid unprivileged port.");
-export const visualWebURL = `http://localhost:${webPort}`;
-export const visualReferenceURL = `http://127.0.0.1:${referencePort}`;
+const appPort = Number(
+  new URL(process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000").port || 80,
+);
+const referenceOrigin =
+  process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
+const referencePort = Number(new URL(referenceOrigin).port || 80);
 export default defineConfig({
   testDir: "./tests/visual",
   fullyParallel: false,
@@ -20,14 +19,14 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "node scripts/visual-reference.mjs",
-      url: `${visualReferenceURL}/phase4a-fan-core/Welcome.dc.html`,
+      command: `node scripts/visual-reference.mjs`,
+      env: { REFERENCE_PORT: String(referencePort) },
+      url: `${referenceOrigin}/phase4a-fan-core/Welcome.dc.html`,
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: `pnpm --filter @qelvora/web exec next dev -p ${webPort}`,
-      url: `${visualWebURL}/auth/continue`,
-      env: { QELVORA_API_URL: "" },
+      command: `pnpm --filter @qelvora/web exec next dev --webpack -p ${appPort}`,
+      url: `${process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000"}/auth/continue`,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },

@@ -5,13 +5,9 @@ import { randomUUID } from "node:crypto";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { resolveActor } from "../identity/adapter.js";
 import { Database } from "../../db/database.js";
-import { AgentRepository } from "./repository.js";
-import { AgentService } from "./service.js";
-import { SourceService } from "../sources/service.js";
-import { AgentPipeline } from "./pipeline.js";
 import { modelFromEnvironment } from "./model.js";
-import { IngestionWorker } from "../ingestion/worker.js";
-import { createAgentRouter } from "./router.js";
+import { createAgentDomain } from "./integration.js";
+import { agentFeature } from "./feature.js";
 import { DomainError } from "../../core/errors.js";
 
 if (
@@ -28,13 +24,9 @@ const identity = new DevelopmentIdentityAdapter(
   "http://localhost:3002",
   "development",
 );
-const repository = new AgentRepository(pool);
 const model = modelFromEnvironment();
-const service = new AgentService(
-  repository,
-  new AgentPipeline(repository, model),
-);
-const sources = new SourceService(repository);
+const domain = createAgentDomain({ pool, model });
+const feature = agentFeature({ domain, pool, development: true });
 const app = express();
 app.disable("x-powered-by");
 app.use((_req, res, next) => {
@@ -54,12 +46,9 @@ app.get("/health", (_req, res) =>
   }),
 );
 app.use(
-  "/v1/agent",
-  createAgentRouter({
-    service,
-    sources,
-    development: true,
-    resolveActor: async (req) => {
+  feature.path,
+  feature.router({
+    actorFor: async (req) => {
       const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
       if (!token)
         throw new DomainError(
@@ -68,6 +57,13 @@ app.use(
           401,
         );
       return resolveActor(identity, token);
+    },
+    scopeFor: async () => {
+      throw new DomainError(
+        "fan_delivery_unconfigured",
+        "This isolated Studio does not issue interactive fan scopes.",
+        503,
+      );
     },
   }),
 );
@@ -104,7 +100,7 @@ app.use(
 const creatorId = process.env.W2_CREATOR_ID;
 const accountId = process.env.W2_DEVELOPMENT_ACCOUNT_ID;
 const controller = new AbortController();
-const worker = new IngestionWorker(repository, model);
+const worker = domain.ingestion;
 const timer = setInterval(() => {
   if (creatorId && accountId)
     void worker

@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "startedAt": "2026-09-30T23:44:41.982817+00:00",
+  "observedAt": "2026-09-30T23:44:42.303843+00:00",
+  "operation": "Actual draft-preview POST disconnected after200ms",
+  "curlExitCode": 28,
+  "providerUsage": "Unknown preserved; not zero, no fake no-request receipt",
+  "rows": [
+    {
+      "id": "f281f248-cc05-4c25-b14b-772c8aeddf24",
+      "category": "preview",
+      "provider": "configured",
+      "model": "74f58d122a2e4c3abfe55f3c93eba10db1b0f1eb67c563e907092d92aad6e5fa",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_micros": null,
+      "duration_ms": 202,
+      "created_at": "2026-09-30T23:44:42.004497+00:00"
+    }
+  ]
+}

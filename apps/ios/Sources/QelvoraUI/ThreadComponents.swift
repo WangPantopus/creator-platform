@@ -136,8 +136,7 @@ public struct IdentityStrip: View {
           RoundedRectangle(cornerRadius: QelvoraTokens.token("strip-box-radius")).stroke(
             qColor(accent, scheme), lineWidth: QelvoraTokens.token("hairline")))
       }
-      (Text(phrase.0).fontWeight(.semibold).foregroundColor(qColor(accent, scheme))
-        + Text(phrase.1).foregroundColor(qColor(state == .human ? "on-maya" : "ink", scheme)))
+      Text("\(Text(phrase.0).fontWeight(.semibold).foregroundColor(qColor(accent, scheme)))\(Text(phrase.1).foregroundColor(qColor(state == .human ? "on-maya" : "ink", scheme)))")
         .qText("label", weight: .regular)
         .frame(maxWidth: .infinity, alignment: .leading)
     }.padding(.horizontal, QelvoraTokens.token("space-4")).padding(

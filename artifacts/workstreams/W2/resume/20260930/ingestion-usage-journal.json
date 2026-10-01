@@ -1,0 +1,31 @@
+{
+  "at": "2026-09-30T18:36:48.165Z",
+  "sourceId": "1b8fbe9c-e113-4496-a998-e1e3df9436c4",
+  "scope": "secondary synthetic W2 creator; primary seven-case draft untouched",
+  "pendingUsageObserved": [
+    {
+      "state": "processing",
+      "index_state": "pending",
+      "progress": 20,
+      "id": "76e18c66-ee7b-4086-81f4-4c7be246d1f6",
+      "provider": "configured",
+      "model": "0beb27b6dc24ac7f2054422424c9b55554fa84896eb2f9cc7bc75fa1a195938f",
+      "input_tokens": 0,
+      "cost_micros": null,
+      "duration_ms": 0
+    }
+  ],
+  "final": [
+    {
+      "state": "approved",
+      "index_state": "ready",
+      "progress": 100,
+      "id": "76e18c66-ee7b-4086-81f4-4c7be246d1f6",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 33,
+      "cost_micros": "1",
+      "duration_ms": 1241
+    }
+  ]
+}

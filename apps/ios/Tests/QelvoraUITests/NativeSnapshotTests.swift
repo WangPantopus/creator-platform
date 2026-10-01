@@ -6,24 +6,16 @@
   @testable import QelvoraUI
 
   @MainActor
+  private final class ReferenceWindow: NSWindow {
+    var referenceScale: CGFloat = 2
+    override var backingScaleFactor: CGFloat { referenceScale }
+  }
+
+  @MainActor
   final class NativeSnapshotTests: XCTestCase {
-    private final class CaptureWindow: NSWindow {
-      override var backingScaleFactor: CGFloat { 2 }
-    }
     private let size = CGSize(width: 390, height: 844)
     private var record: Bool {
       ProcessInfo.processInfo.environment["RECORD_NATIVE_SNAPSHOTS"] == "true"
-    }
-    private var captureColorSpace: NSColorSpace {
-      // All 110 original references have the same embedded profile. Use its
-      // encoding metadata, never its pixels, so strict comparisons do not
-      // inherit whichever display happens to be attached to the test host.
-      let reference = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-        .appendingPathComponent("__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png")
-      guard let data = try? Data(contentsOf: reference),
-        let representation = NSBitmapImageRep(data: data)
-      else { return .sRGB }
-      return representation.colorSpace
     }
 
     func testWelcomeThemes() async {
@@ -84,29 +76,54 @@
     ) async {
       _ = NSApplication.shared
       QelvoraFonts.register()
+      // AppKit otherwise captures in the attached monitor's ICC profile. The
+      // references were recorded on an LG display; CI and other Macs have a
+      // different monitor. Render in the reference's declared space so the
+      // comparison measures UI changes rather than display calibration.
+      let referenceURL = URL(fileURLWithPath: String(describing: file))
+        .deletingLastPathComponent().appendingPathComponent("__Snapshots__/NativeSnapshotTests")
+        .appendingPathComponent("\(testName.replacingOccurrences(of: "()", with: "")).\(name.replacingOccurrences(of: ".", with: "-")).png")
+      let referenceBitmap = NSImage(contentsOf: referenceURL)?.representations
+        .compactMap { $0 as? NSBitmapImageRep }.first
+      let displayScale = CGFloat(referenceBitmap?.pixelsWide ?? Int(size.width * 2)) / size.width
       let host = NSHostingView(
-        rootView: view.environment(\.displayScale, 2).transaction { $0.disablesAnimations = true }.frame(
-          width: size.width, height: size.height))
+        rootView: view.environment(\.displayScale, displayScale)
+          .transaction { $0.disablesAnimations = true }.frame(
+            width: size.width, height: size.height))
       host.frame = NSRect(origin: .zero, size: size)
-      let window = CaptureWindow(
+      let window = ReferenceWindow(
         contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
-      let colorSpace = captureColorSpace
-      window.colorSpace = colorSpace
+      window.referenceScale = displayScale
+      window.colorSpace = referenceBitmap?.colorSpace ?? .sRGB
+      window.appearance = NSAppearance(named: name.hasSuffix("night") ? .darkAqua : .aqua)
       window.contentView = host
       host.viewDidChangeBackingProperties()
       host.layoutSubtreeIfNeeded()
+      // The destination bitmap alone does not change SwiftUI/Core Animation's
+      // backing store. A 1x layer would otherwise be enlarged into a 2x PNG.
+      func configureScale(_ layer: CALayer) {
+        layer.contentsScale = displayScale
+        layer.rasterizationScale = displayScale
+        layer.setNeedsDisplay()
+        layer.sublayers?.forEach(configureScale)
+      }
+      if let layer = host.layer { configureScale(layer) }
       if delay {
         try? await Task.sleep(for: .milliseconds(500))
         host.layoutSubtreeIfNeeded()
       }
-      // The references use 2x pixels. CI's headless screen is 1x; letting
-      // AppKit choose its bitmap size makes every reference incomparable.
-      let bitmap = NSBitmapImageRep(
-        bitmapDataPlanes: nil, pixelsWide: Int(size.width * 2),
-        pixelsHigh: Int(size.height * 2), bitsPerSample: 8, samplesPerPixel: 4,
-        hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
-        bytesPerRow: 0, bitsPerPixel: 0
-      )!.retagging(with: colorSpace)!
+      // Headless CI uses a 1x virtual display, while references are 2x. Draw
+      // directly at reference resolution; never resize an already-rendered PNG.
+      let pixelsWide = referenceBitmap?.pixelsWide ?? Int(size.width * 2)
+      let pixelsHigh = referenceBitmap?.pixelsHigh ?? Int(size.height * 2)
+      guard let rawBitmap = NSBitmapImageRep(bitmapDataPlanes: nil,
+        pixelsWide: pixelsWide, pixelsHigh: pixelsHigh, bitsPerSample: 8,
+        samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+        colorSpaceName: .deviceRGB, bytesPerRow: pixelsWide * 4, bitsPerPixel: 32),
+        let bitmap = rawBitmap.retagging(with: window.colorSpace ?? .sRGB) else {
+        XCTFail("Cannot create the reference-resolution native bitmap")
+        return
+      }
       bitmap.size = size
       host.cacheDisplay(in: host.bounds, to: bitmap)
       let image = NSImage(size: size)

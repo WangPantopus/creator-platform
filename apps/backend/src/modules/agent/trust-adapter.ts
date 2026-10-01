@@ -8,6 +8,8 @@ import type { AgentService } from "./service.js";
 import type { AgentLifecycle } from "./lifecycle.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import { generationJournalInstalled } from "./generation-journal.js";
+import { agentExportStream } from "./privacy-stream.js";
 
 /** W1/W8 supply authoritative job and case projections; HTTP fields cannot mint these scopes. */
 export interface AgentTrustAuthority {
@@ -151,6 +153,7 @@ export function agentPrivacyHook(
   lifecycle: AgentLifecycle,
   authority: AgentTrustAuthority,
   artifacts?: AgentExportArtifactSink,
+  coordinatorStream = false,
 ): PrivacyHook {
   return {
     domain: "agent",
@@ -161,6 +164,16 @@ export function agentPrivacyHook(
         "privacy_scope_large",
         "Split this account operation into bounded creator jobs.",
       );
+      const accountingClient = await service.repository.pool.connect();
+      try {
+        invariant(
+          !(await generationJournalInstalled(accountingClient)),
+          "thread_accounting_privacy_unconfigured",
+          "Register authoritative account fan relationships and thread-accounting export/deletion before acknowledging this request.",
+        );
+      } finally {
+        accountingClient.release();
+      }
       if (input.scope === "thread") {
         invariant(
           !scopes.length,
@@ -193,6 +206,20 @@ export function agentPrivacyHook(
         );
       };
       if (input.kind === "export") {
+        if (coordinatorStream)
+          return {
+            receipt: {
+              domain: "agent",
+              jobId: input.jobId,
+              exportScopeCreators: scopes.length,
+            },
+            stream: agentExportStream(
+              service,
+              scopes,
+              assertCurrent,
+              input.signal,
+            ),
+          };
         if (scopes.length)
           invariant(
             artifacts,

@@ -1,0 +1,138 @@
+{
+  "observedAt": "2026-10-01T00:11:51.877738+00:00",
+  "head": "e3ea1480a477d18b76a018d955ebf3fa310adcf0",
+  "runs": [
+    {
+      "runId": 36794666580,
+      "jobs": [
+        {
+          "id": 110155243550,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "xcode-27"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        },
+        {
+          "id": 110155243756,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-26"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        },
+        {
+          "id": 110155243798,
+          "name": "android-runtime",
+          "status": "in_progress",
+          "conclusion": null,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 1000033357,
+          "runner_name": "GitHub Actions 1000033357",
+          "runner_group_name": "GitHub Actions"
+        },
+        {
+          "id": 110155243853,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 1000033356,
+          "runner_name": "GitHub Actions 1000033356",
+          "runner_group_name": "GitHub Actions"
+        },
+        {
+          "id": 110155243934,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        }
+      ]
+    },
+    {
+      "runId": 36794662510,
+      "jobs": [
+        {
+          "id": 110155232206,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-26"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        },
+        {
+          "id": 110155232407,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 1000033358,
+          "runner_name": "GitHub Actions 1000033358",
+          "runner_group_name": "GitHub Actions"
+        },
+        {
+          "id": 110155232451,
+          "name": "android-runtime",
+          "status": "in_progress",
+          "conclusion": null,
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 1000033349,
+          "runner_name": "GitHub Actions 1000033349",
+          "runner_group_name": "GitHub Actions"
+        },
+        {
+          "id": 110155232452,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        },
+        {
+          "id": 110155232495,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "xcode-27"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_name": ""
+        }
+      ]
+    }
+  ],
+  "supportedRunnerLabelsSource": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+  "interpretation": "Queued native/visual jobs have no assigned runner. Labels are officially supported; no failure or precise capacity cause is established. Do not relabel or weaken checks to bypass the queue."
+}

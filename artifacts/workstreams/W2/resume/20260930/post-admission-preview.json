@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-10-01T00:23:25.006906+00:00",
+  "runtimeSourceHead": "741d8ddf1c04f28299b9684e4ea15113c4c6ab81",
+  "synthetic": true,
+  "path": "Actual Studio draft preview after owned API restart; no fan or allowance exists",
+  "rows": [
+    {
+      "id": "8b55f144-8d76-4e2e-bfd2-e8dd2c6402ba",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 131,
+      "output_tokens": 24,
+      "cost_micros": 91,
+      "duration_ms": 1778,
+      "created_at": "2026-10-01T00:20:35.816891+00:00"
+    },
+    {
+      "id": "1945b615-a3f3-4a87-887f-e04ca6d6ab81",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 14,
+      "output_tokens": 0,
+      "cost_micros": 1,
+      "duration_ms": 635,
+      "created_at": "2026-10-01T00:20:37.598176+00:00"
+    },
+    {
+      "id": "b1fc499b-dfab-4a4e-b5db-b815b31c42ac",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-2025-04-14",
+      "input_tokens": 656,
+      "output_tokens": 76,
+      "cost_micros": 1920,
+      "duration_ms": 2174,
+      "created_at": "2026-10-01T00:20:38.247017+00:00"
+    },
+    {
+      "id": "0a5b4567-3093-44c1-8990-30e71292463d",
+      "category": "preview",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 597,
+      "output_tokens": 19,
+      "cost_micros": 270,
+      "duration_ms": 1024,
+      "created_at": "2026-10-01T00:20:39.370304+00:00"
+    }
+  ],
+  "summedKnownCostMicros": 2282,
+  "displayedCostMicros": 2282,
+  "pipelineMs": 4610,
+  "firstApprovedMs": 4581,
+  "latencyAcceptance": false,
+  "limitation": "One isolated process-restart observation exceeds original <3000ms first-approved target; no agreed warm/cold/load/p95 acceptance. It does not exercise licensed fan execution admission."
+}

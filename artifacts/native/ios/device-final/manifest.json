@@ -1,0 +1,59 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "7423D60A-426E-42D4-8A3B-1269D9F55D72",
+        "deviceName" : "Creator Platform Foundation",
+        "exportedFileName" : "98C8C56F-5AA1-4698-9FE9-B0A64F2D02C0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Native-Message-identities_0_EA804049-668A-4E9C-9974-A0D3D05F80E6.png",
+        "timestamp" : 1790717863.364
+      }
+    ],
+    "testIdentifier" : "FoundationFlowTests/testCreatorAndAIRemainLabeledInNativeCatalog()",
+    "testIdentifierURL" : "test://com.apple.xcode/QelvoraApp/QelvoraUITests/FoundationFlowTests/testCreatorAndAIRemainLabeledInNativeCatalog"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "7423D60A-426E-42D4-8A3B-1269D9F55D72",
+        "deviceName" : "Creator Platform Foundation",
+        "exportedFileName" : "42A7C47B-E035-4E44-9457-0AA8AAC0FDFE.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "SignIn-unconfigured-Dark_0_252A372D-2175-420A-AA9E-C79105B7B2F1.png",
+        "timestamp" : 1790717883.247
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "7423D60A-426E-42D4-8A3B-1269D9F55D72",
+        "deviceName" : "Creator Platform Foundation",
+        "exportedFileName" : "1BC14721-55E6-43F7-9E82-1BE8CE73036D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Welcome-Dark_0_15949AEE-F788-4E27-974C-E5804A81976C.png",
+        "timestamp" : 1790717881.69
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "7423D60A-426E-42D4-8A3B-1269D9F55D72",
+        "deviceName" : "Creator Platform Foundation",
+        "exportedFileName" : "B1720765-42CD-4CCF-9418-5E85C4CF750A.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "SignIn-unconfigured-Light_0_8CA1765F-010E-4F8D-84F2-9E810D11B99D.png",
+        "timestamp" : 1790717873.244
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "7423D60A-426E-42D4-8A3B-1269D9F55D72",
+        "deviceName" : "Creator Platform Foundation",
+        "exportedFileName" : "747FBDCD-95BC-44B0-9F4C-FF5B16931EEE.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Welcome-Light_0_8DC88A4D-BC6C-4FCD-87BE-7D9D347DA301.png",
+        "timestamp" : 1790717871.268
+      }
+    ],
+    "testIdentifier" : "FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes()",
+    "testIdentifierURL" : "test://com.apple.xcode/QelvoraApp/QelvoraUITests/FoundationFlowTests/testWelcomeSignInFailsClosedInBothThemes"
+  }
+]

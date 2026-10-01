@@ -1,0 +1,228 @@
+{
+  "capturedAt": "2026-09-30T21:38:21.862Z",
+  "failedHead": "c93d89de6adf808baca6b0904915cf67b4fcfcc9",
+  "workflowRun": 36779326830,
+  "job": 110105274636,
+  "remoteError": "PostgreSQL deadlock detected in ConversationService.lockThread",
+  "replica": {
+    "container": "creator-platform-w2-checks-20260930",
+    "database": "creator_w2_foundation_test",
+    "port": 55449,
+    "role": "creator_runtime (non-owner RLS)",
+    "migrations": ["0001_foundation.sql", "0002_w1_identity.sql"]
+  },
+  "before": {
+    "passed": 0,
+    "failed": 1,
+    "pending": 8,
+    "cases": [
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 denies unscoped read/write and leaves no tenant context on pooled connections",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 checks 10,000 random pairs against 1,000 real scoped threads",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-04/T-30 commits announced handback before new AI text and resumes with no duplicates",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-18/T-24 serializes simultaneous retries and last-unit allowance races",
+        "state": "failed",
+        "durationMs": 1054.017688
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-27 refuses stale extraction and never rebuilds a deleted fact",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-28 stores verified duplicate inbox events once and reconciles current state",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role commits outbox frames with state and retries publication in aggregate order after a crash",
+        "state": "skipped"
+      }
+    ]
+  },
+  "after": {
+    "passed": 1,
+    "failed": 0,
+    "pending": 8,
+    "cases": [
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 denies unscoped read/write and leaves no tenant context on pooled connections",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 checks 10,000 random pairs against 1,000 real scoped threads",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-04/T-30 commits announced handback before new AI text and resumes with no duplicates",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-18/T-24 serializes simultaneous retries and last-unit allowance races",
+        "state": "passed",
+        "durationMs": 111.78953599999977
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-27 refuses stale extraction and never rebuilds a deleted fact",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-28 stores verified duplicate inbox events once and reconciles current state",
+        "state": "skipped"
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role commits outbox frames with state and retries publication in aggregate order after a crash",
+        "state": "skipped"
+      }
+    ]
+  },
+  "fullAfter": {
+    "passed": 18,
+    "failed": 0,
+    "pending": 0,
+    "cases": [
+      {
+        "name": "authority boundaries T-01 rejects client and model authorship instead of silently stripping it",
+        "state": "passed",
+        "durationMs": 10.389282000000094
+      },
+      {
+        "name": "authority boundaries fails closed for a fabricated scope and an underage account",
+        "state": "passed",
+        "durationMs": 3.884627000000137
+      },
+      {
+        "name": "authority boundaries does not import extra Pantopus identity fields",
+        "state": "passed",
+        "durationMs": 0.7950059999998302
+      },
+      {
+        "name": "authority boundaries local backend exposes health and honestly refuses sign-in",
+        "state": "passed",
+        "durationMs": 131.58041500000013
+      },
+      {
+        "name": "delivery boundaries on every device T-23 discards old-epoch sentences after takeover on two devices",
+        "state": "passed",
+        "durationMs": 2.2395759999999427
+      },
+      {
+        "name": "delivery boundaries on every device T-30 arbitrary out-of-order duplicates replay once in committed cursor order",
+        "state": "passed",
+        "durationMs": 16.97127300000011
+      },
+      {
+        "name": "delivery boundaries on every device T-30 preserves the cursor on a generation gap so corrected replay can recover",
+        "state": "passed",
+        "durationMs": 0.8192320000000564
+      },
+      {
+        "name": "delivery boundaries on every device T-30 serializes generation sequence state so an app restart can resume the third sentence",
+        "state": "passed",
+        "durationMs": 0.5586630000000241
+      },
+      {
+        "name": "delivery boundaries on every device T-30 commits a buffered drain only when all contiguous frames can be returned",
+        "state": "passed",
+        "durationMs": 0.7879249999998592
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 denies unscoped read/write and leaves no tenant context on pooled connections",
+        "state": "passed",
+        "durationMs": 52.97035300000016
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-11 checks 10,000 random pairs against 1,000 real scoped threads",
+        "state": "passed",
+        "durationMs": 242466.188373
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames",
+        "state": "passed",
+        "durationMs": 225.35086999999476
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-04/T-30 commits announced handback before new AI text and resumes with no duplicates",
+        "state": "passed",
+        "durationMs": 123.26614900000277
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-18/T-24 serializes simultaneous retries and last-unit allowance races",
+        "state": "passed",
+        "durationMs": 166.74147700000321
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-27 refuses stale extraction and never rebuilds a deleted fact",
+        "state": "passed",
+        "durationMs": 83.45931600002223
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once",
+        "state": "passed",
+        "durationMs": 343.17826899999636
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role T-28 stores verified duplicate inbox events once and reconciles current state",
+        "state": "passed",
+        "durationMs": 11.550270000007004
+      },
+      {
+        "name": "PostgreSQL foundation using the real non-owner role commits outbox frames with state and retries publication in aggregate order after a crash",
+        "state": "passed",
+        "durationMs": 61.68801300000632
+      }
+    ]
+  },
+  "postgresEvidence": [
+    "2026-09-30 21:31:21.381 UTC [70] ERROR:  deadlock detected",
+    "2026-09-30 21:31:21.381 UTC [70] DETAIL:  Process 70 waits for ExclusiveLock on advisory lock [16384,4248065164,2482474861,1]; blocked by process 69.",
+    "\tProcess 69 waits for ShareLock on transaction 863; blocked by process 70.",
+    "2026-09-30 21:31:21.381 UTC [70] STATEMENT:  SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+    "2026-09-30 21:31:21.383 UTC [71] ERROR:  deadlock detected",
+    "2026-09-30 21:31:21.383 UTC [71] DETAIL:  Process 71 waits for ExclusiveLock on advisory lock [16384,4248065164,2482474861,1]; blocked by process 69.",
+    "\tProcess 69 waits for ShareLock on transaction 864; blocked by process 71.",
+    "2026-09-30 21:31:21.383 UTC [71] STATEMENT:  SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+    "2026-09-30 21:31:21.383 UTC [72] ERROR:  deadlock detected",
+    "2026-09-30 21:31:21.383 UTC [72] DETAIL:  Process 72 waits for ExclusiveLock on advisory lock [16384,4248065164,2482474861,1]; blocked by process 69.",
+    "\tProcess 69 waits for ShareLock on transaction 865; blocked by process 72.",
+    "2026-09-30 21:31:21.383 UTC [72] STATEMENT:  SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+    "2026-09-30 21:31:22.384 UTC [69] ERROR:  deadlock detected",
+    "2026-09-30 21:31:22.384 UTC [69] DETAIL:  Process 69 waits for ShareLock on transaction 866; blocked by process 73.",
+    "\tProcess 73 waits for ExclusiveLock on advisory lock [16384,4248065164,2482474861,1]; blocked by process 69.",
+    "2026-09-30 21:31:22.384 UTC [69] CONTEXT:  while locking tuple (0,21) in relation \"thread\"",
+    "2026-09-30 21:31:22.384 UTC [69] STATEMENT:  SELECT control,control_epoch,revision,event_cursor,processor_consent_version FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR UPDATE"
+  ],
+  "repair": {
+    "file": "apps/backend/src/db/database.ts",
+    "change": "FOR UPDATE OF t before idempotency/domain work, replacing initial FOR SHARE",
+    "reason": "Avoid shared-thread lock upgrade cycle with advisory idempotency lock",
+    "testsModified": false,
+    "migrationsModified": false,
+    "privilegesModified": false,
+    "retriesAdded": false
+  },
+  "acceptance": "Local existing suite passes all 18 cases, including all 10,000 RLS pairs and all 30,000 observed scoped statements. Exact latest-head remote CI remains required."
+}

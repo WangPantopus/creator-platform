@@ -1,0 +1,2 @@
+4dec2c5248d161aab477080481d8f7f6a6baf4131a86ff89c4c7426dcea1dcb4  apps/backend/src/modules/agent/memory-proposals.ts
+22440452ac9be5ea9eb72cb40fb7475c25c1503a87364ccc00c6be1933b2b4f2  apps/backend/src/modules/agent/budget.ts

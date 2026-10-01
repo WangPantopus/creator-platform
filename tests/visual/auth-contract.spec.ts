@@ -1,7 +1,6 @@
-import { visualWebURL } from "../../playwright.config";
 import { expect, test } from "@playwright/test";
 
-const origin = visualWebURL;
+const origin = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
 const fallback = "/home";
 const invalidPaths = [
   "//outside.invalid",
@@ -40,12 +39,12 @@ test("auth seam rejects external, nested backslash and control-character context
   }
 });
 
-test("welcome and auth seam preserve an opaque context without draft content", async ({
+test("welcome and auth seam preserve a registered creator arrival", async ({
   page,
   request,
 }) => {
   const returnTo =
-    "/creators/maya/requests?context=11111111-1111-4111-8111-111111111111";
+    "/creators/maya/requests?context=00000000-0000-4000-8000-000000000001";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
     name: "Continue with Pantopus",

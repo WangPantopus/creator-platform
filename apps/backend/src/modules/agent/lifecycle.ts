@@ -2,6 +2,7 @@ import type { AgentRepository, CreatorScope } from "./repository.js";
 import { bump, event, licenseRow } from "./repository.js";
 import type { LiveAgentRuntime } from "./runtime.js";
 import { invariant } from "../../core/errors.js";
+import { generationJournalInstalled } from "./generation-journal.js";
 
 /** Only the trusted W8 adapter calls this with a verified notice; not an unprotected HTTP route. */
 export class AgentLifecycle {
@@ -142,6 +143,20 @@ export class AgentLifecycle {
           "UPDATE creator.ai_workspace SET paused=true,live_version_id=NULL WHERE creator_id=$1",
           [scope.creatorId],
         );
+        if (await generationJournalInstalled(client)) {
+          // Usage references attempts; receipts reference admission. Remove
+          // all of them before a tombstone can acknowledge full deletion.
+          for (const table of [
+            "ai_generation_receipt",
+            "ai_usage",
+            "ai_generation_attempt",
+            "ai_generation_admission",
+          ])
+            await client.query(
+              `DELETE FROM creator.${table} WHERE creator_id=$1`,
+              [scope.creatorId],
+            );
+        }
         for (const table of [
           "ai_shadow_evaluation",
           "ai_shadow_sample",

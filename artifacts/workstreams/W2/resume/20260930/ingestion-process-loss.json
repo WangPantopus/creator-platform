@@ -1,0 +1,55 @@
+{
+  "at": "2026-09-30T18:40:15.982Z",
+  "sourceId": "b0524739-9afb-4c31-845d-37f049f44987",
+  "terminated": "Own verification-only Node worker on 4202; primary Studio API 4102 untouched",
+  "pending": {
+    "id": "601437df-21fc-43fc-b21c-0585a069e046",
+    "state": "running",
+    "attempts": 1,
+    "lease_until": "2026-09-30T18:43:15.898Z",
+    "usage_id": "c63df0cb-9606-4754-a621-648623135f71",
+    "cost_micros": null
+  },
+  "afterCrash": [
+    {
+      "source_state": "processing",
+      "state": "running",
+      "attempts": 1,
+      "lease_until": "2026-09-30T18:43:15.898Z",
+      "usage_id": "c63df0cb-9606-4754-a621-648623135f71",
+      "cost_micros": null
+    }
+  ],
+  "recovery": "Await original three-minute lease expiry; no manual lease edits",
+  "afterRecovery": [
+    {
+      "source_state": "approved",
+      "index_state": "ready",
+      "progress": 100,
+      "job_state": "completed",
+      "attempts": 2,
+      "lease_until": null,
+      "usage_id": "c63df0cb-9606-4754-a621-648623135f71",
+      "provider": "configured",
+      "model": "0beb27b6dc24ac7f2054422424c9b55554fa84896eb2f9cc7bc75fa1a195938f",
+      "input_tokens": 0,
+      "cost_micros": null,
+      "duration_ms": 0
+    },
+    {
+      "source_state": "approved",
+      "index_state": "ready",
+      "progress": 100,
+      "job_state": "completed",
+      "attempts": 2,
+      "lease_until": null,
+      "usage_id": "8f440dcc-f19e-46c5-907e-7cdb4bad85b7",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 2502,
+      "cost_micros": "51",
+      "duration_ms": 919
+    }
+  ],
+  "recoveredAt": "2026-09-30T18:45:28.963Z"
+}

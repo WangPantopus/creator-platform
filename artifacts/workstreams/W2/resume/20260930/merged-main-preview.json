@@ -1,0 +1,81 @@
+{
+  "observedAt": "2026-10-01T04:18:35.361Z",
+  "main": "6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac",
+  "usage": [
+    {
+      "id": "0cd2236f-dceb-47be-9340-09ad5bace15c",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 603,
+      "output_tokens": 19,
+      "cost_micros": "272",
+      "category": "preview",
+      "duration_ms": 1574,
+      "created_at": "2026-10-01T04:17:58.012Z"
+    },
+    {
+      "id": "2937c2ed-0bdc-47d4-a16f-9749c77493a9",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-2025-04-14",
+      "input_tokens": 653,
+      "output_tokens": 85,
+      "cost_micros": "1986",
+      "category": "preview",
+      "duration_ms": 2678,
+      "created_at": "2026-10-01T04:17:56.939Z"
+    },
+    {
+      "id": "040ac23a-7e2b-4ede-be73-f07e0c59f8c3",
+      "provider": "OpenAI",
+      "model": "text-embedding-3-small",
+      "input_tokens": 11,
+      "output_tokens": 0,
+      "cost_micros": "1",
+      "category": "preview",
+      "duration_ms": 895,
+      "created_at": "2026-10-01T04:17:56.016Z"
+    },
+    {
+      "id": "17d5f7b9-eb5d-45e8-8c3f-158d93b5532a",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 128,
+      "output_tokens": 24,
+      "cost_micros": "90",
+      "category": "preview",
+      "duration_ms": 1974,
+      "created_at": "2026-10-01T04:17:54.037Z"
+    }
+  ],
+  "sumCostMicros": 2349,
+  "saved": {
+    "sources": "1",
+    "versions": "0",
+    "migrations": "28"
+  },
+  "publishAvailable": false,
+  "savedGlobal": {
+    "sources": 123,
+    "immutableVersions": 105,
+    "appliedMigrations": 28
+  },
+  "savedDraft": {
+    "revision": 18,
+    "mode": "companion",
+    "evaluationId": "4173b485-8ff1-4943-ab01-cc3b27153824",
+    "state": "passed",
+    "cases": 7
+  },
+  "preview": {
+    "pipelineMs": 5586,
+    "firstApprovedMs": 5554,
+    "displayedCostMicros": 2349,
+    "citationOpened": true,
+    "coldTargetPassed": false
+  },
+  "guards": {
+    "productionPublication": false,
+    "liveFanGeneration": false,
+    "licensedVoice": false
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "baseline": "ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892",
+  "buildId": "WNrzX38z_NP3vl7f1npAt",
+  "os": "macOS27.0 /26A428",
+  "node": "v24.13.0",
+  "provider": "unconfigured",
+  "viewportScreenshots": ["1280x900 Light", "390x1300 Night"],
+  "state": {
+    "revision": 9,
+    "paused": true,
+    "verification": "pending",
+    "sourceStates": [
+      {
+        "id": "67082ac7-28a3-4e43-a5fb-03c2c4c21f8f",
+        "revision": 2,
+        "state": "revoked"
+      }
+    ],
+    "versionCount": 0,
+    "evaluation": null,
+    "status": {
+      "text": "Synthetic check-in: preparing new glaze demonstrations this week.",
+      "expiresAt": "2026-10-07T00:43:15.706Z"
+    },
+    "sponsors": [
+      {
+        "id": "429982c2-faac-4ae7-8393-51fc0a7606f9",
+        "brand": "Synthetic glaze partner",
+        "aliases": ["Synthetic glaze"],
+        "expiresAt": "2026-10-06T23:00:00.000Z",
+        "active": false
+      }
+    ]
+  },
+  "export": {
+    "schemaVersion": 1,
+    "sourceCount": 1,
+    "versionCount": 0,
+    "regressionCount": 1,
+    "hasInterview": true,
+    "hasFanMessages": false,
+    "hasFanMemory": false
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "webTypecheck": "passed",
+    "w2Lint": "passed",
+    "w2Format": "passed",
+    "backendBundle": "passed",
+    "nextProductionBuild": "passed"
+  },
+  "native": "W2 fan conversation path unavailable; not launched",
+  "releaseReady": false
+}

@@ -1,0 +1,150 @@
+{
+  "observedAt": "2026-09-30T23:27:43.840315+00:00",
+  "sourceHead": "eb0f6a043c96459e34d85cbef4637402b068449b",
+  "runs": [
+    {
+      "id": 36787721347,
+      "name": "Foundation checks",
+      "event": "pull_request",
+      "head_sha": "eb0f6a043c96459e34d85cbef4637402b068449b",
+      "status": "queued",
+      "conclusion": null,
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347",
+      "jobs": [
+        {
+          "id": 110133456858,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347/job/110133456858"
+        },
+        {
+          "id": 110133457206,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347/job/110133457206"
+        },
+        {
+          "id": 110133457313,
+          "name": "ios-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-26"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347/job/110133457313"
+        },
+        {
+          "id": 110133457374,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347/job/110133457374"
+        },
+        {
+          "id": 110133457425,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "xcode-27"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721347/job/110133457425"
+        }
+      ]
+    },
+    {
+      "id": 36787721376,
+      "name": "Trust release compilation",
+      "event": "pull_request",
+      "head_sha": "eb0f6a043c96459e34d85cbef4637402b068449b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721376",
+      "jobs": [
+        {
+          "id": 110133034814,
+          "name": "compile",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787721376/job/110133034814"
+        }
+      ]
+    },
+    {
+      "id": 36787717034,
+      "name": "Foundation checks",
+      "event": "push",
+      "head_sha": "eb0f6a043c96459e34d85cbef4637402b068449b",
+      "status": "queued",
+      "conclusion": null,
+      "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034",
+      "jobs": [
+        {
+          "id": 110133023835,
+          "name": "ios-foundation",
+          "status": "in_progress",
+          "conclusion": null,
+          "labels": [
+            "macos-26"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034/job/110133023835"
+        },
+        {
+          "id": 110133024054,
+          "name": "android-runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034/job/110133024054"
+        },
+        {
+          "id": 110133024133,
+          "name": "web-and-backend",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034/job/110133024133"
+        },
+        {
+          "id": 110133024176,
+          "name": "web-visual",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "xcode-27"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034/job/110133024176"
+        },
+        {
+          "id": 110133024202,
+          "name": "android-foundation",
+          "status": "queued",
+          "conclusion": null,
+          "labels": [
+            "macos-latest"
+          ],
+          "html_url": "https://github.com/WangPantopus/creator-platform/actions/runs/36787717034/job/110133024202"
+        }
+      ]
+    }
+  ],
+  "mergePermittedByChecks": false
+}
