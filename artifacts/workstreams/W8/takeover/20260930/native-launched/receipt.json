@@ -9,7 +9,7 @@
   "peerDevicesChanged": false,
   "derivedData": "/private/tmp/creator-w8-native-resume-20260930/ios/derived",
   "purpose": "Personally build/launch current W8 app; interaction/accessibility not inferred from creation or compilation.",
-  "recordedAt": "2026-10-01T02:34:27.340472+00:00",
+  "recordedAt": "2026-10-01T03:10:38.643240+00:00",
   "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
   "iosBuild": "BUILD SUCCEEDED",
   "iosBinarySha256": "1b97c475bb4ab865bf34988ab46119bd4ccb8b8bbfbe86efd7dbfb69cb3149e5",
@@ -40,14 +40,75 @@
         874
       ],
       "sha256": "8ac16785f2bf5a629d8f149b57b6a9a471ded69885a26d6a59bc9f1c5a1c5a3b"
+    },
+    {
+      "path": "ios-signin-unconfigured-light.png",
+      "sha256": "d696588f458117e8397fafaa2155f393223a8473296c5a235dee77725397fd17"
+    },
+    {
+      "path": "ios-signin-unconfigured-night.png",
+      "sha256": "159fc789362e5dc454759c806352d623865381a134f5524f2e13d700fc1c915c"
+    },
+    {
+      "path": "ios-welcome-light.png",
+      "sha256": "83e07580d1b01893e194a071cd531913d842d93550ade82b402b256bfd76aecf"
+    },
+    {
+      "path": "ios-welcome-night.png",
+      "sha256": "79b82a3408c6dfeff316a52d643d4266846ccf288e69969e7b744e2d90be518c"
+    },
+    {
+      "path": "ios-message-identities.png",
+      "sha256": "747e3934e0f1d1591abd69110c81999c4f1b4edf8f8f5da2233ac0b7eb8e6d35"
+    },
+    {
+      "path": "ios-crisis-night.png",
+      "pixelDimensions": [
+        1206,
+        2622
+      ],
+      "logicalDimensions": [
+        402,
+        874
+      ],
+      "sha256": "0614e3e533fab855c30d4be2b1119a0d16f750fd3bac59211ab805413e7e3394"
+    },
+    {
+      "path": "ios-report-arrival-light.png",
+      "pixelDimensions": [
+        1206,
+        2622
+      ],
+      "logicalDimensions": [
+        402,
+        874
+      ],
+      "sha256": "971048496b21cd12881f01de489873a1542070df6b6e2b6eeabf5f8be55b1eff"
     }
   ],
   "iosBootHistory": {
     "firstBoot": "NSPOSIX60, SimLaunchHostService4/unknownservice1102",
     "afterBuildRetry": "boot succeeded; data/system migration5m34s, without resetting shared engine or any device"
   },
-  "existingIosUiFlows": "Running unchanged original two tests. Welcome-unconfigured Light assertion16 failed: pantopus-unavailable staticText missing. No readiness inferred; current-source actual captures/triage pending.",
-  "androidBuild": "BUILD SUCCESSFUL in14m46s; :app:assembleDebug and :app:assembleDebugAndroidTest. Own SDK/emulator/API35 x86_64 and fresh AVD prepared, runtime not yet launched.",
+  "existingIosUiFlows": {
+    "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+    "originalTestsUnchanged": true,
+    "result": "Failed",
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "assertionFailures": 2,
+    "passedCase": "testCreatorAndAIRemainLabeledInNativeCatalog",
+    "failedCase": "testWelcomeSignInFailsClosedInBothThemes",
+    "failedAssertion": "Line16: app.staticTexts[\"pantopus-unavailable\"] missing in both Light/Night",
+    "actualUi": "Combined Notice and nested Text show exact Pantopus unconfigured copy; button remains enabled and no handle form appears. FanAppShell owns callback/error; standalone Welcome error ID is not rendered.",
+    "recordedSelectors": [
+      "Account status, Pantopus sign-in is not connected in this local build.",
+      "Pantopus sign-in is not connected in this local build."
+    ],
+    "correction": "Single existing selector only proposed, not applied; additional human exception required. Published W2 selector is matching dependency evidence, not W8 test-change authorization."
+  },
+  "androidBuild": "BUILD SUCCESSFUL in14m46s; :app:assembleDebug and :app:assembleDebugAndroidTest, own output/caches. App/emulator acceptance separate below.",
   "preservation": {
     "historicalDevicesReused": false,
     "peerDevicesOrCachesModified": false,
@@ -60,5 +121,272 @@
     "Signed app install/SDK launch and personally inspected help pixels are actual launched-app evidence, not authenticated Report/passkey/audio/background/system-sheet/accessibility acceptance.",
     "Existing native test failure remains a failure and is not covered by the five-fixture exception.",
     "402x874 is the actual iPhone17 viewport; not the390 reference matrix."
-  ]
+  ],
+  "iosAdditionalSdkLaunches": [
+    {
+      "route": "/trust/crisis",
+      "appearance": "night",
+      "pid": 13897,
+      "visible": "Crisis help protocol/public help, exact emergency copy and unconfigured regional contacts",
+      "personallyInspectedPixels": true,
+      "nativeAuthenticated": false
+    },
+    {
+      "route": "/support?creatorId=20000000-0000-4000-8000-000000000001&messageId=50000000-0000-4000-8000-000000000002",
+      "appearance": "light",
+      "pid": 16528,
+      "visible": "Welcome/Continue with Pantopus gate",
+      "personallyInspectedPixels": true,
+      "nativeAuthenticated": false,
+      "actualConversationReportClick": false
+    }
+  ],
+  "androidRuntime": {
+    "freshAvd": "CreatorPlatform_W8_Resume_20260930",
+    "api": 35,
+    "emulator": "37.1.11.0/build15917651",
+    "consolePort": 5568,
+    "devicePort": 5569,
+    "adbServerPort": 5048,
+    "cores": 2,
+    "ramMiB": 2048,
+    "firstAttempt": {
+      "pid": 12182,
+      "outcome": "Process absent/no5568/5569listener after NetsimWifiStream removed/socket closed; boot and app launch not established"
+    },
+    "secondAttempt": {
+      "pid": 16517,
+      "outcome": "Exited before boot; unknown option -netsim_args. Help section heading uses underscore but top-level executable option is -netsim-args"
+    },
+    "currentAttempt": {
+      "startedAt": "2026-10-01T02:38:09.528071+00:00",
+      "pid": 19294,
+      "args": [
+        "/private/tmp/creator-w8-native-resume-20260930/android/sdk/emulator/emulator",
+        "-avd",
+        "CreatorPlatform_W8_Resume_20260930",
+        "-port",
+        "5568",
+        "-memory",
+        "2048",
+        "-cores",
+        "2",
+        "-gpu",
+        "software",
+        "-netsim-args",
+        "--instance 8 --no-web-ui --no-cli-ui",
+        "-no-metrics",
+        "-crash-report-mode",
+        "never",
+        "-no-snapshot",
+        "-no-audio",
+        "-no-boot-anim",
+        "-no-window"
+      ],
+      "ports": {
+        "emulator": 5568,
+        "adbServer": 5048
+      },
+      "root": "/private/tmp/creator-w8-native-resume-20260930/android",
+      "freshAvd": true,
+      "peerOrHistoricalDeviceReused": false,
+      "engineOrPeerServerRestarted": false,
+      "iosExistingUiRunFinishedBeforeLaunch": true,
+      "retriedAt": "2026-10-01T02:56:03.293561+00:00",
+      "priorPid": 12182,
+      "log": "/private/tmp/creator-w8-native-resume-20260930/android/emulator-instance8-validflag.log",
+      "netsimInstance": 8,
+      "previousOutcome": "Process absent/no5568/5569listener, packet-stream Wifi gone in log. No boot/app/runtime success claimed.",
+      "sharedNetsimKilledOrRestarted": false,
+      "attempts": [
+        {
+          "pid": 16517,
+          "args": [
+            "/private/tmp/creator-w8-native-resume-20260930/android/sdk/emulator/emulator",
+            "-avd",
+            "CreatorPlatform_W8_Resume_20260930",
+            "-port",
+            "5568",
+            "-memory",
+            "2048",
+            "-cores",
+            "2",
+            "-gpu",
+            "software",
+            "-netsim_args",
+            "--instance 8 --no-web-ui --no-cli-ui",
+            "-no-snapshot",
+            "-no-audio",
+            "-no-boot-anim",
+            "-no-window"
+          ],
+          "log": "/private/tmp/creator-w8-native-resume-20260930/android/emulator-instance8.log",
+          "result": "Exited before boot: unknown option -netsim_args; top-level help spells -netsim-args",
+          "observedAt": "2026-10-01T02:56:03.293561+00:00"
+        }
+      ],
+      "attemptStartedAt": "2026-10-01T02:56:03.293561+00:00",
+      "metricsDisabled": true,
+      "crashReportsDisabled": true
+    },
+    "status": "Actual boot/install and Help render; system modal/launch timeout then original UI instrumentation aborts with startup ANR; no passing native journey.",
+    "peerOrSharedNetsimStopped": false,
+    "appInstalledOrLaunched": true,
+    "nativeInteractionVerified": false,
+    "acceptancePassed": false,
+    "actualBootCompletedMs": 179831,
+    "firstShippingLaunch": {
+      "recordedAt": "2026-10-01T03:01:55.292168+00:00",
+      "records": [
+        {
+          "startedAt": "2026-10-01T03:01:06.349057+00:00",
+          "finishedAt": "2026-10-01T03:01:06.402472+00:00",
+          "command": [
+            "emu",
+            "avd",
+            "name"
+          ],
+          "exit": 0,
+          "stdout": "CreatorPlatform_W8_Resume_20260930\nOK",
+          "stderr": ""
+        },
+        {
+          "startedAt": "2026-10-01T03:01:06.402692+00:00",
+          "finishedAt": "2026-10-01T03:01:06.663241+00:00",
+          "command": [
+            "shell",
+            "getprop",
+            "sys.boot_completed"
+          ],
+          "exit": 0,
+          "stdout": "1",
+          "stderr": ""
+        },
+        {
+          "startedAt": "2026-10-01T03:01:06.663455+00:00",
+          "finishedAt": "2026-10-01T03:01:07.104371+00:00",
+          "command": [
+            "shell",
+            "getprop",
+            "ro.build.fingerprint"
+          ],
+          "exit": 0,
+          "stdout": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+          "stderr": ""
+        },
+        {
+          "startedAt": "2026-10-01T03:01:07.104718+00:00",
+          "finishedAt": "2026-10-01T03:01:28.784007+00:00",
+          "command": [
+            "install",
+            "/private/tmp/creator-w8-native-resume-20260930/android/build/outputs/apk/debug/app-debug.apk"
+          ],
+          "exit": 0,
+          "stdout": "Performing Streamed Install\nSuccess",
+          "stderr": ""
+        },
+        {
+          "startedAt": "2026-10-01T03:01:28.784297+00:00",
+          "finishedAt": "2026-10-01T03:01:35.550509+00:00",
+          "command": [
+            "install",
+            "/private/tmp/creator-w8-native-resume-20260930/android/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+          ],
+          "exit": 0,
+          "stdout": "Performing Streamed Install\nSuccess",
+          "stderr": ""
+        },
+        {
+          "startedAt": "2026-10-01T03:01:35.550756+00:00",
+          "finishedAt": "2026-10-01T03:01:55.291942+00:00",
+          "command": [
+            "shell",
+            "am",
+            "start",
+            "-W",
+            "-n",
+            "com.pantopus.qelvora/.MainActivity",
+            "--es",
+            "api_url",
+            "http://10.0.2.2:4108",
+            "--es",
+            "return_to",
+            "/trust",
+            "--es",
+            "appearance",
+            "light"
+          ],
+          "exit": 0,
+          "stdout": "Starting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: timeout\nLaunchState: UNKNOWN (-1)\nActivity: com.pantopus.qelvora/.MainActivity\nWaitTime: 18713\nComplete",
+          "stderr": ""
+        }
+      ],
+      "serial": "emulator-5568",
+      "nativeInputAutomated": false,
+      "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+      "apks": [
+        {
+          "name": "app-debug.apk",
+          "sha256": "746def35b8c4a38af558744801577fc52a3f6a7177cea14ddc0b71c748f5d21b"
+        },
+        {
+          "name": "app-debug-androidTest.apk",
+          "sha256": "96c3a8741dcb16815d246a1181757827479577eeea39b1a7d45323d22beeb6ed"
+        }
+      ]
+    },
+    "shippingAppPid": 3077,
+    "firstFrame": {
+      "path": "android-help-first-light.png",
+      "pixelDimensions": [
+        1080,
+        2400
+      ],
+      "sha256": "a0abedf40cb755a1bf0d639d44bf62a3c9d69ff2fdfaeadc99d7cc7437cdcb85",
+      "personallyInspectedPixels": true,
+      "visible": "Live Crisis help protocol behind Process system is not responding/Close app/Wait modal",
+      "unobstructedReadyUi": false
+    },
+    "networkIsolationDisposition": "Official docs say netsim arguments apply to first instance only, shared by later emulators. Current --instance8 requested but separate daemon not established; isolation success not claimed. Own temporary namespace and GPU retry follow actual failure, preserving peers.",
+    "hostObservedLoadAverages": [
+      609.37,
+      427.85,
+      467.9
+    ],
+    "hostRootCause": "Heavy host load is observed; no sole/root cause established. Peer/default resources preserved.",
+    "existingUiRun": {
+      "startedAt": "2026-10-01T03:03:33.625879Z",
+      "finishedAt": "2026-10-01T03:04:28.437731Z",
+      "source": "3685c0acacb45b8acabf8d0ef097deca592b1026",
+      "testFilesUnchangedSinceAuthorized439c336": true,
+      "classNames": [
+        "com.pantopus.qelvora.NativeAcceptanceTest",
+        "com.pantopus.qelvora.DialogRuntimeTest"
+      ],
+      "result": "INSTRUMENTATION_RESULT: shortMsg=Process crashed. INSTRUMENTATION_CODE:0",
+      "testsCompleted": 0,
+      "passClaim": false,
+      "deviceExitReason": {
+        "pid": 3838,
+        "timestamp": "2026-09-30T20:04:24.803-07:00",
+        "reason": 6,
+        "name": "ANR",
+        "description": "bg anr: failed to complete startup",
+        "traceReference": "/data/system/procexitstore/anr_2026-09-30-20-04-15-201.gz"
+      },
+      "earlierAppExit": {
+        "pid": 3077,
+        "reason": 10,
+        "name": "USER REQUESTED/FORCE STOP",
+        "description": "Normal existing instrumentation startup stops preceding shipping activity"
+      },
+      "crashBufferRecords": 0,
+      "javaStackCauseEstablished": false,
+      "rootCause": "Android records startup ANR. Host high load observed, no sole/root cause established; no product identity/security rewrite to hide system failure."
+    },
+    "networkDocs": [
+      "https://developer.android.com/studio/run/emulator-networking-advanced",
+      "https://developer.android.com/studio/run/emulator-troubleshooting"
+    ]
+  }
 }
