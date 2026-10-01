@@ -1,0 +1,29 @@
+{
+  "recordedAt": "2026-10-01T03:02:42.899738+00:00",
+  "sourceHead": "bb2e1645d242882d3e2a0138ac6b67800edf2172",
+  "APKbuildSource": "600bfb01413b06be095f88ae994f022b7d7cf8ca native generated repair",
+  "ownEmulatorPID": 16491,
+  "ownAVD": "Creator_W3_Conversations_20260930",
+  "ownSerial": "emulator-5572",
+  "ownADBServerPort": 5043,
+  "bootCompleted": true,
+  "shippingAPKInstalled": true,
+  "launchStatus": "ok COLD",
+  "launchTotalMs": 14239,
+  "launchWaitMs": 15442,
+  "actualRenderedState": "Welcome behind System UI is not responding dialog on initial and later capture",
+  "cleanLaunch": false,
+  "interactiveNativeAcceptance": false,
+  "nativeDriverApproval": "pending; no driver install or input",
+  "hostObservation": {
+    "loadAverages": [363.67, 337.06, 447.7],
+    "swapUsedMiB": 8982.5,
+    "causeProven": false
+  },
+  "captures": {
+    "increment20-android-launch-screen.png": "fea1693bffd2fa4a312918e0b994987b0cf259c065bfd333956ebc4351e7b202",
+    "increment20-android-launch-screen-later.png": "371b801bda46f4f04d96b9c370ab36d209821cb550665aa0a94be009af576b8a"
+  },
+  "ownShutdown": "targeted adb emu kill after verifying exact own qemu command/listener and AVD name; data preserved",
+  "peerResourcesChanged": false
+}

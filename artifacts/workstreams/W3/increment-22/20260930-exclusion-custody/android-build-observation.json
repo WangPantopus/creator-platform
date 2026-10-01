@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-01T02:54:55.277214+00:00",
+  "sourceHead": "bb2e1645d242882d3e2a0138ac6b67800edf2172",
+  "nativeChangeSource": "600bfb01413b06be095f88ae994f022b7d7cf8ca canonical processed-media DTO",
+  "command": "./gradlew :app:assembleDebug --no-daemon --max-workers=2 -Pandroid.sdkDownload=false with own SDK/caches/output",
+  "shippingBuild": "PASS 2m44s",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "85130292b98ec2f05b883af8c04090f0d8af1b92ce7bd582e422d85e5469229b",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "c5fd8c52114d955ec2baa3dc83174a7fe1051511c8f0b3d6627c71950f645f78",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "5960ba7f3eda3419751ffaf34ff09a49d6ea7e21b0317e3cc59b0866a48e646e"
+  },
+  "APK": {
+    "path": "/private/tmp/creator-w3-continuation-android-20260930/app-build/outputs/apk/debug/app-debug.apk",
+    "sha256": "59da2b898052dea9d90a7041aa25dec1f009e83f0a499b7c77993c5e7595886a"
+  },
+  "unitChecksRun": false,
+  "actualNativeInput": false
+}

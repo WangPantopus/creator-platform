@@ -3,7 +3,7 @@ import { MemoryProposalSchema } from "../../../../../packages/api/src/conversati
 import type { Database } from "../../db/database.js";
 import type { ThreadScope } from "../access/scope.js";
 import type { ConversationService } from "./service.js";
-import type { MemoryService } from "./memory.js";
+import type { MemoryExclusionSnapshot, MemoryService } from "./memory.js";
 import type {
   ApprovedSentence,
   ConversationContextPort,
@@ -22,11 +22,18 @@ export interface GenerationExecution {
   readonly attemptId: string;
   admit<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
   sealAdmission<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+  /** One actual bounded snapshot for attributed classification after the held
+   * transaction commits. Missing retained material must stay uncertain in W2. */
+  memoryExclusions(
+    assertAuthority: (client: PoolClient) => Promise<void>,
+  ): Promise<MemoryExclusionSnapshot>;
   /** One classified extraction batch under this actual attempt's held fence.
    * The callback locks W2's current license/version/audience, with no provider I/O. */
   commitMemory(
     raws: readonly unknown[],
     assertAuthority: (client: PoolClient) => Promise<void>,
+    /** Only this attempt's actual issued snapshot after W2 classified survivors. */
+    exclusions?: MemoryExclusionSnapshot,
   ): Promise<{ written: number; revision: number | null }>;
 }
 
@@ -204,6 +211,8 @@ export class ConversationGenerationProcessor {
     let extractingMemory = false;
     let memorySignal: AbortSignal | undefined;
     let memoryBatchCommitted = false;
+    let memoryExclusionsRequested = false;
+    let memoryExclusions: MemoryExclusionSnapshot | undefined;
     let memoryBatchReceipt:
       | { written: number; revision: number | null }
       | undefined;
@@ -281,13 +290,53 @@ export class ConversationGenerationProcessor {
       attemptId: token,
       admit: (journal) => fence(journal, false),
       sealAdmission: (journal) => fence(journal, true),
-      commitMemory: async (raws, assertAuthority) => {
+      memoryExclusions: async (assertAuthority) => {
+        invariant(
+          extractingMemory &&
+            !memoryBatchCommitted &&
+            !memoryExclusionsRequested &&
+            emitted > 0,
+          "memory_admission_closed",
+          "This attempt's memory exclusions are not available.",
+        );
+        memorySignal!.throwIfAborted();
+        memoryExclusionsRequested = true;
+        const snapshot = await fence(async (client) => {
+          invariant(
+            extractingMemory,
+            "memory_admission_closed",
+            "This attempt's memory exclusions are not available.",
+          );
+          memorySignal!.throwIfAborted();
+          await assertAuthority(client);
+          const current = await this.memory.exclusionSnapshotInTransaction(
+            scope,
+            client,
+            expectedRevision + emitted,
+          );
+          invariant(
+            extractingMemory,
+            "memory_admission_closed",
+            "This attempt's memory exclusions are not available.",
+          );
+          memorySignal!.throwIfAborted();
+          return current;
+        }, false);
+        memoryExclusions = snapshot;
+        return snapshot;
+      },
+      commitMemory: async (raws, assertAuthority, exclusions) => {
         invariant(
           extractingMemory && !memoryBatchCommitted && emitted > 0,
           "memory_admission_closed",
           "This attempt's memory batch is not available.",
         );
         memorySignal!.throwIfAborted();
+        invariant(
+          !exclusions || exclusions === memoryExclusions,
+          "memory_exclusions_invalid",
+          "Use this attempt's actual classified exclusion snapshot.",
+        );
         invariant(
           raws.length <= 5,
           "memory_batch_large",
@@ -317,6 +366,7 @@ export class ConversationGenerationProcessor {
             scope,
             client,
             proposals,
+            exclusions,
           );
           invariant(
             result.revision === null ||
