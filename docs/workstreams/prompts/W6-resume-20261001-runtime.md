@@ -81,8 +81,8 @@ FIRST INCREMENT: FINISH HUMAN MEDIA (voice Note first; voice reply once W3 and W
    - Document that this is development trust only. A production KMS/HSM signer with a C2PA-trust-list certificate remains a real dependency; never use c2patool's bundled sample keys.
 3. Commit a policy file example and the run instructions:
    - Policy: thread.human_reply, plus creator.human_note ≤60 s, post_audio and post_photo. retentionSeconds is an open W8 decision; propose 12 months to match D-08 and record it as a proposal.
-   - API: NODE_ENV=development IDENTITY_ADAPTER=development CREATOR_FEATURE_ENABLED=true PORT=4106 WEB_ORIGIN=http://localhost:3006 IDENTITY_SESSION_KEY=… DATABASE_URL=postgresql://creator_runtime:…@127.0.0.1:55446/creator_w6 plus the MEDIA_* variables; run `node --import tsx apps/backend/src/server.ts`.
-   - Worker: same DATABASE_URL and MEDIA_* variables plus MEDIA_CLAMD_SOCKET, MEDIA_FFMPEG, MEDIA_FFPROBE and MEDIA_C2PA_*; run `node --import tsx apps/backend/src/workers/start.ts ingestion`.
+   - API: NODE*ENV=development IDENTITY_ADAPTER=development CREATOR_FEATURE_ENABLED=true PORT=4106 WEB_ORIGIN=http://localhost:3006 IDENTITY_SESSION_KEY=… DATABASE_URL=postgresql://creator_runtime:…@127.0.0.1:55446/creator_w6 plus the MEDIA*\* variables; run `node --import tsx apps/backend/src/server.ts`.
+   - Worker: same DATABASE*URL and MEDIA*_ variables plus MEDIA*CLAMD_SOCKET, MEDIA_FFMPEG, MEDIA_FFPROBE and MEDIA_C2PA*_; run `node --import tsx apps/backend/src/workers/start.ts ingestion`.
    - Web: QELVORA_API_URL=http://127.0.0.1:4106 WEB_ORIGIN=http://localhost:3006 pnpm --filter @qelvora/web exec next dev --webpack --port 3006.
    - Do not use `pnpm dev`; Turbo filters the environment.
 4. Seed development data with labeled SQL as the admin role, never in product code:
