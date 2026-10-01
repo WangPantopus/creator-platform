@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+**Observed account-switch correction:** W8 changes only its owned Trust BFF to reuse W1 current-token-only idempotent logout before development cookie replacement/removal. Unconfirmed sign-out returns503 and does not confirm an account switch. Exact port isolation, origin/content-type gate and all production paths remain. [Personal browser proof](../../../artifacts/workstreams/W8/takeover/20260930/realtime-account-switch.json) records actual reload, session logout200 and gateway revocation closure; no ConversationScreen/W1 issuer, SQL/grant or test edit. The live API remains e33.
+
+**Actual R7 image:** clean d1 source was built and independently inspected: baked manifest/compiled constant/OCI label/default revision match; runtime override and inventory mismatch refuse before adapter loading. [Unsigned inventory/digest evidence](../../../artifacts/workstreams/W8/takeover/20260930/trust-image-d1b880d2a22d.json) keeps local Trust image, live source API and canonical deployment distinct.
+
 **Actual R8 continuity:** [Runtime/browser evidence](../../../artifacts/workstreams/W8/takeover/20260930/runtime-realtime-continuity.json) supersedes the pre-restart static limit only for e33 source, initial canonical socket, retained Report references, supervisor isolation and preserved state. Fixed replay216 samples are not outgoing-frame/client-visible/settlement or in-flight-denial acceptance.
 
 **R7 image custody:** W8-owned Docker/deploy/SBOM now require matching baked source metadata; canonical source, live runtime and image observations remain distinct. No peer integration, secret, provider, SQL, grant or test change. A clean build/digest observation remains required after this source increment.

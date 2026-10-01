@@ -1,12 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sameRequestOrigin } from "../../../../lib/request-origin";
-import { sessionCookie } from "../../../../lib/session";
+import { platformFetch, sessionCookie } from "../../../../lib/session";
 import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 
 const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download(\/(identity|conversation|agent|commerce|content|media|growth|trust))?)?|operations\/(metrics|audits))$/i;
 const writable =
   /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
+async function endCanonicalSession(request: NextRequest) {
+  if (!request.cookies.has(sessionCookie)) return;
+  // Cookie removal alone leaves an issued socket token valid. Reuse W1's
+  // current-token-only, idempotent logout before ending this local session.
+  const result = await platformFetch("/v1/identity/logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(request.headers.get("x-correlation-id")
+        ? { "X-Correlation-Id": request.headers.get("x-correlation-id")! }
+        : {}),
+    },
+    body: "{}",
+  });
+  if (!result.ok || (await result.json()).done !== true)
+    throw new Error("Canonical sign-out was not confirmed.");
+}
+function signOutUnavailable() {
+  return NextResponse.json(
+    {
+      error: {
+        code: "signout_unavailable",
+        message:
+          "Sign-out could not be confirmed. Retry before changing your account.",
+      },
+    },
+    { status: 503, headers: { "Cache-Control": "no-store" } },
+  );
+}
 async function forward(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -48,6 +77,11 @@ async function forward(
       { status: 404 },
     );
   if (target === "dev/logout") {
+    try {
+      await endCanonicalSession(request);
+    } catch {
+      return signOutUnavailable();
+    }
     const response = NextResponse.json({ signedOut: true });
     response.cookies.delete(trustLocalSessionCookie);
     response.cookies.delete(sessionCookie);
@@ -160,6 +194,11 @@ async function forward(
     }
     const data = await result.json();
     if (target === "dev/session" && result.ok) {
+      try {
+        await endCanonicalSession(request);
+      } catch {
+        return signOutUnavailable();
+      }
       const response = NextResponse.json({ localDevelopment: true });
       response.cookies.set(trustLocalSessionCookie, String(data.token), {
         httpOnly: true,
