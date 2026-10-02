@@ -11,3 +11,5 @@ Personally operated against W2's actual canonical session on API4102/web3002/dat
 The database and API remained recoverable and the database is running again. No peer runtime, credential or device was changed. Raw session credentials/cookies were neither read nor injected. Exact PNGs and [sanitized receipt](receipt.json) record source hashes and outcomes.
 
 This is personal **development-mode** verification. W1's separate production evidence is inherited and source-qualified; it is not W2 personal production proof. Expired-token and interrupted successful-rotation cases were not injected here. Provider generation, licensed delivery, native recovery, full accessibility and named p95 targets remain open.
+
+[Milestone backup](backup-receipt.json) was listed, checksummed and separately restored with canonical draft/session readback.
