@@ -8,12 +8,14 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type RefObject,
   type ReactElement,
   type AnchorHTMLAttributes,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { copy } from "@qelvora/copy";
 import {
   AuthorLabel,
   AuditBanner,
@@ -44,6 +46,8 @@ import {
 } from "../../../../packages/api/src/conversation/contracts";
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
+import { ConversationVoiceReply } from "./ConversationVoiceReply";
+import { AvailabilityEditor } from "../calls/AvailabilityEditor";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
@@ -995,15 +999,20 @@ function Modal({
   onClose,
   children,
   closeDisabled = false,
+  restoreFocusTo,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   closeDisabled?: boolean;
+  restoreFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    const restore = document.activeElement as HTMLElement | null;
+    // An async save may disable the trigger before this modal mounts, moving
+    // focus to body. Preserve the explicit media trigger in that case.
+    const restore =
+      restoreFocusTo?.current ?? (document.activeElement as HTMLElement | null);
     const dialog = ref.current;
     if (!dialog) return;
     let resumeFocus: HTMLElement | null = null;
@@ -1037,7 +1046,7 @@ function Modal({
       dialog.close();
       restore?.focus();
     };
-  }, []);
+  }, [restoreFocusTo]);
   return (
     <dialog
       ref={ref}
@@ -1118,6 +1127,7 @@ function Compose({
     } | null>(null),
     [schedule, setSchedule] = useState(""),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
+    voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
@@ -1483,6 +1493,7 @@ function Compose({
             Photo
           </button>
           <button
+            ref={voiceTrigger}
             className="qv-btn qv-btn--quiet"
             type="button"
             disabled={
@@ -1758,7 +1769,11 @@ function Compose({
         </Modal>
       )}
       {voiceObjectId && canDraft && (
-        <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
+        <Modal
+          title="Your own voice"
+          onClose={() => setVoiceObjectId(null)}
+          restoreFocusTo={voiceTrigger}
+        >
           {(() => {
             const Recorder =
               document.kind === "post"
@@ -1766,6 +1781,7 @@ function Compose({
                 : CreatorVoiceRecording;
             return (
               <Recorder
+                embedded
                 creatorId={creator.id}
                 expectedAccountId={creator.viewerAccountId}
                 creatorName={creator.display_name}
@@ -2897,6 +2913,12 @@ function Team({ creator }: { creator: Creator }) {
   );
 }
 function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
+  const voiceTrigger = useRef<HTMLButtonElement | null>(null);
+  const [voiceReply, setVoiceReply] = useState<{
+    fanId: string;
+    threadId: string;
+  } | null>(null);
+  const [voicePending, setVoicePending] = useState(false);
   const [entries, setEntries] = useState<{
       items: {
         fanId: string;
@@ -3453,6 +3475,20 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                 >
                   Review signed reply
                 </button>
+                {creator.owned && fanId && (
+                  <button
+                    ref={voiceTrigger}
+                    className="qv-btn qv-btn--secondary"
+                    disabled={
+                      action.busy || data.timeline.control !== "human_active"
+                    }
+                    onClick={() =>
+                      setVoiceReply({ fanId, threadId: data.timeline.threadId })
+                    }
+                  >
+                    {copy.w6RecordAVoiceReply}
+                  </button>
+                )}
                 {!creator.owned && (
                   <>
                     <p className="qv-help">
@@ -3529,6 +3565,37 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         </div>
       </div>
       <div hidden={!threadCurrent} inert={!threadCurrent}>
+        {creator.owned &&
+          fanId &&
+          data &&
+          voiceReply?.fanId === fanId &&
+          voiceReply.threadId === data.timeline.threadId && (
+            <Modal
+              title={copy.w6RecordAVoiceReply}
+              closeDisabled={voicePending}
+              restoreFocusTo={voiceTrigger}
+              onClose={() => setVoiceReply(null)}
+            >
+              <ConversationVoiceReply
+                key={`${creator.viewerAccountId}:${creator.id}:${fanId}:${data.timeline.threadId}`}
+                creatorId={creator.id}
+                fanId={fanId}
+                threadId={data.timeline.threadId}
+                creatorName={creator.display_name}
+                expectedAccountId={creator.viewerAccountId}
+                current={
+                  threadCurrent && data.timeline.control === "human_active"
+                }
+                onPendingChange={setVoicePending}
+                onDelivered={() => {
+                  setVoiceReply(null);
+                  void action
+                    .run(load)
+                    .then(() => action.setNotice(copy.w6RecordingDelivered));
+                }}
+              />
+            </Modal>
+          )}
         {attachedCorrection && fanId && data && (
           <Modal
             title="Correct this answer"
@@ -3794,6 +3861,7 @@ function ThanksFeed({ creator }: { creator: Creator }) {
   );
 }
 function More({ creator }: { creator: Creator }) {
+  const { signal } = useIdentityRequest();
   return (
     <section className="w5-more">
       <header className="w5-heading">
@@ -3822,6 +3890,13 @@ function More({ creator }: { creator: Creator }) {
         Personal signing and commitments stay with the creator. Support access
         is scoped and audited.
       </p>
+      {creator.owned && creator.verification === "verified" && (
+        <AvailabilityEditor
+          creatorId={creator.id}
+          accountId={creator.viewerAccountId}
+          signal={signal}
+        />
+      )}
     </section>
   );
 }

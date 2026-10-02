@@ -1,0 +1,81 @@
+{
+  "readAt": "2026-10-02T08:13:54.503Z",
+  "sourceCommit": "6386cd752e44e974a5fd6558838ecafcdb714dad",
+  "waveProducer": "58b59fa0",
+  "packetSourceHashesVerified": 57,
+  "syntheticLocalData": true,
+  "originalHistoricalDatabaseAccepted": false,
+  "experimentalArchive": {
+    "bytes": 784837,
+    "sha256": "ed8f90f0e045bad7be8e5e54a7b44773623871ac7f84e95406e6fa803f52bbdf"
+  },
+  "backup": {
+    "bytes": 535211,
+    "sha256": "1746a8cdca532f36e83d9197aeb23a0160f724637a566bb3673525b7ace509ec"
+  },
+  "baseline": {
+    "ledgerRows": 40,
+    "ledgerSha256": "249d82107c26ec602f330a1fa1464618a4792366d254482f08e071aff717c4f1",
+    "schemaSha256": "c644f2e880991f1478bf372060ff42a95e2cb919fa8ef976d7a9fe37853cd1f9",
+    "dataSha256": "80416199254fa6578b4e12dd81cefb25d4ecdc2ea27299f95ecdada5033657d3",
+    "businessRows": 4,
+    "businessTables": 145
+  },
+  "restore": {
+    "ledgerSha256": "249d82107c26ec602f330a1fa1464618a4792366d254482f08e071aff717c4f1",
+    "schemaSha256": "c644f2e880991f1478bf372060ff42a95e2cb919fa8ef976d7a9fe37853cd1f9",
+    "dataSha256": "80416199254fa6578b4e12dd81cefb25d4ecdc2ea27299f95ecdada5033657d3"
+  },
+  "upgrade": {
+    "wave": "20261002",
+    "applied": [
+      "0044_w4_personal_approval",
+      "0045_w5_reply_review",
+      "0046_w6_call_availability",
+      "0047_w6_creator_media",
+      "0049_w4_generation_cost_settlement",
+      "0050_w3_account_relationship_index",
+      "0051_w5_media_publication",
+      "0053_w8_runtime_denial_projection",
+      "0054_w4_pass_purchase_effects",
+      "0055_w4_pass_pool_effects",
+      "0056_w3_correction_feedback_lineage",
+      "0057_w3_feedback_consent",
+      "0058_w3_correction_signature",
+      "0059_w3_recording_association",
+      "0060_w8_composed_signed_message",
+      "0061_w4_payout_custody",
+      "0062_w6_creator_media_worker"
+    ],
+    "priorLedgerRows": 40,
+    "ledgerRows": 57,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 4,
+    "originalTables": 145,
+    "oldRolesPreserved": true,
+    "afterSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "fresh": {
+    "ledgerRows": 57,
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97"
+  },
+  "upgradedSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "catalogMatches": true,
+  "allDomainReconciliationAccepted": false,
+  "appJourneysAccepted": false,
+  "publicationAccepted": false,
+  "trafficReopened": false,
+  "existingBackendChecks": {
+    "passed": 18,
+    "files": 2,
+    "postgresCases": 9,
+    "isolationPairs": 10000,
+    "durationSeconds": 58.55,
+    "fixture": "separate owned disposable PostgreSQL17 cluster on loopback55466",
+    "fixtureStoppedAfterCompletion": true,
+    "newUnitTestsWritten": false
+  }
+}
