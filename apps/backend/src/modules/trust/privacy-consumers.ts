@@ -14,11 +14,12 @@ import {
 import type { AgentService } from "../agent/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { CommerceService } from "../commerce/service.js";
-import {
-  commercePrivacyHook,
-  type CommerceOperationsAuthority,
-} from "../commerce/operations.js";
+import { commercePrivacyHook } from "../commerce/operations.js";
 import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  createCommercePrivacyAuthority,
+  type CommercePrivacyConfiguration,
+} from "../commerce/privacy-purpose.js";
 import { DomainError } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
@@ -49,6 +50,9 @@ export function createPrivacyConsumers(input: {
     artifacts?: AgentExportArtifactSink;
   };
   commerce?: CommerceService;
+  /** Exact registered job fence/function custody; absent configuration never issues a financial export scope. */
+  commercePrivacy?: CommercePrivacyConfiguration;
+  commerceArtifacts?: import("../commerce/financial-export.js").FinancialExportSink;
   growth?: GrowthService;
   content?: {
     purposePool: Pool;
@@ -112,23 +116,24 @@ export function createPrivacyConsumers(input: {
       ),
     );
   if (input.commerce) {
-    const authority: CommerceOperationsAuthority = {
-      async withCase() {
-        throw new DomainError(
-          "case_authority_required",
-          "Privacy consumers cannot authorize a refund.",
-          503,
-        );
-      },
-      async withPrivacyJob() {
-        throw new DomainError(
-          "commerce_privacy_authority_unavailable",
-          "Commerce privacy needs the prepared actorless task-purpose adapter.",
-          503,
-        );
+    const purpose = createCommercePrivacyAuthority(
+      input.commerce.pool,
+      input.commercePrivacy,
+    );
+    const authority = {
+      async withPrivacyJob<T>(
+        job: Parameters<PrivacyHook["run"]>[0],
+        work: Parameters<typeof purpose.withPrivacyJob<T>>[1],
+      ) {
+        await verify(job);
+        const result = await purpose.withPrivacyJob(job, work);
+        await verify(job);
+        return result;
       },
     };
-    hooks.push(commercePrivacyHook(input.commerce, authority));
+    hooks.push(
+      commercePrivacyHook(input.commerce, authority, input.commerceArtifacts),
+    );
   }
   if (input.growth) {
     const owner = growthPrivacyHook(input.growth, undefined, verify);
