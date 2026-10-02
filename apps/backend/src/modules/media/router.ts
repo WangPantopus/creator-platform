@@ -16,7 +16,10 @@ import type { SessionService } from "../session/service.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
-import type { CallSession } from "../../../../../packages/api/src/session.js";
+import {
+  AdmissionRedemptionSchema,
+  type CallSession,
+} from "../../../../../packages/api/src/session.js";
 
 export type W6RouterDependencies = {
   scopeFor: (request: Request) => Promise<ThreadScope>;
@@ -378,7 +381,7 @@ export function createW6Router(dependencies: W6RouterDependencies) {
   );
   router.post(`${root}/calls/:sessionId/redeem`, async (req, res) => {
     const service = session();
-    const body = z.strictObject({ nonce: z.uuid() }).parse(req.body);
+    const body = AdmissionRedemptionSchema.parse(req.body);
     res.json(
       await service.redeem(await scope(req), id(req, "sessionId"), body.nonce),
     );

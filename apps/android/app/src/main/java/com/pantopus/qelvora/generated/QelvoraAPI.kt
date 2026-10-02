@@ -972,6 +972,27 @@ enum class APIMediaUploadRequestMimeType {
 }
 
 @Serializable
+data class APICallAdmissionReceipt(
+  val `admitted`: APICallAdmissionReceiptAdmitted
+)
+
+@Serializable(with = APICallAdmissionReceiptAdmittedSerializer::class)
+object APICallAdmissionReceiptAdmitted { const val value: Boolean = true }
+object APICallAdmissionReceiptAdmittedSerializer : KSerializer<APICallAdmissionReceiptAdmitted> {
+  override val descriptor = PrimitiveSerialDescriptor("APICallAdmissionReceiptAdmitted", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APICallAdmissionReceiptAdmitted {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APICallAdmissionReceiptAdmitted
+  }
+  override fun serialize(encoder: Encoder, value: APICallAdmissionReceiptAdmitted) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APICallAdmissionRedemption(
+  val `nonce`: String
+)
+
+@Serializable
 data class APICallAvailabilityCommand(
   val `timeZone`: String,
   val `windows`: List<APICallAvailabilityCommandWindowsItem>,
@@ -4626,6 +4647,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun audienceCreatorMediaPlayback(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/playback", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
