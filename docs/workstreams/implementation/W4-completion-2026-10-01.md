@@ -1,3 +1,7 @@
+### Founder-requested safe resource cleanup — October 2, 2026
+
+All37 existing W4 PRs verified merged; current handoff source equals pushed659bf1f3. Removed two obsolete clean/remote-contained worktrees, four exclusive stopped review databases/volumes and rebuildable W4 dependencies/outputs/caches. Active source checkout, canonical61/private config/backup hash/native device state/evidence and shared tooling remain. Restart now requires `pnpm install --frozen-lockfile`, XcodeGen regeneration and normal native builds. [Actual cleanup receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No new runtime acceptance or completion inferred; all nine packages/R01–R15 remain assigned.
+
 ### Founder-requested successor checkpoint — October 2, 2026 afternoon
 
 Normal application synthetic proof → purpose-bound Ops approval completed once: one resolved case/version3, one complete effect, approved development proof, normal creator sign-out/new sign-in and Requests Light/Night390/1280 cold return. Original challenge/mock proof stayed private; no SQL business-row bypass or financial rows. This is labelled development workflow/empty-screen acceptance, not genuine external ownership, passkey, capture, fulfillment or release readiness. [Actual evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/synthetic-proof-ops/README.md). Preserve the fixture; do not replay approval.
