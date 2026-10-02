@@ -8,7 +8,10 @@ import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { modelFromEnvironment } from "../agent/model.js";
-import { GENERATION_JOURNAL_MIGRATION, PreparedGenerationJournal } from "../agent/generation-journal.js";
+import {
+  GENERATION_JOURNAL_MIGRATION,
+  PreparedGenerationJournal,
+} from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
@@ -275,7 +278,12 @@ export async function composeConversationHost(
     ...runtime,
     ...(policy ? { policy } : {}),
     ...(env.W3_OFFLINE_ISSUER_ORIGIN
-      ? { offlineIssuer: { origin: env.W3_OFFLINE_ISSUER_ORIGIN, environment: env.NODE_ENV } }
+      ? {
+          offlineIssuer: {
+            origin: env.W3_OFFLINE_ISSUER_ORIGIN,
+            environment: env.NODE_ENV,
+          },
+        }
       : {}),
     ...generation,
     ...(lineage ? { lineage } : {}),
