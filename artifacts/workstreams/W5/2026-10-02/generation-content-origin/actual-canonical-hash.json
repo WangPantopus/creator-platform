@@ -1,0 +1,37 @@
+{
+  "observedAt": "2026-10-02T13:01:51.407Z",
+  "sourceCommit": "307448af24c69f67dba2e4258cba92040eea0230",
+  "qualification": "Read-only administrator observation on the actual unsigned draft; not actor, worker, signing or privacy-receipt acceptance. Proposed0102 is uninstalled.",
+  "draft": {
+    "id": "170f95f9-2da6-42af-afe0-b7c3d88aba23",
+    "creatorId": "46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e",
+    "version": 3,
+    "state": "draft",
+    "kind": "note",
+    "audience": {
+      "kind": "followers"
+    }
+  },
+  "sourceHash": {
+    "postgres": "eca604690442b9fc59bd6afaeeea8b8aa6c5d17fab08b2191e2287a49deffe84",
+    "typescript": "eca604690442b9fc59bd6afaeeea8b8aa6c5d17fab08b2191e2287a49deffe84",
+    "same": true
+  },
+  "commandHash": {
+    "postgres": "25d48f7487beccb394b9f1dbcff6b3b3df7a29ed80d3f1c9cf0f92c9a6d1b67d",
+    "typescript": "25d48f7487beccb394b9f1dbcff6b3b3df7a29ed80d3f1c9cf0f92c9a6d1b67d",
+    "same": true
+  },
+  "exportMetadata": {
+    "sourceHash": null,
+    "commandHash": null,
+    "publicOwnText": null
+  },
+  "ledgerCount": 57,
+  "signedActs": 0,
+  "publications": 0,
+  "privateReplies": 0,
+  "passkeys": 0,
+  "approvedProofs": 0,
+  "originFunctionPresent": false
+}
