@@ -1,5 +1,7 @@
 # Actual SDK and provider development — October 2
 
+**Current main integration repeat:** Main3cfdde05 and W1's additive canonical99 admission contract are integrated at126f8610. The API was restarted on that exact revision. The normally signed Android app was built, installed and personally operated at200% text in Night: retained fan, all four tab taps, fan gate, real sign-out/creator sign-in, owner gate, creator cold return, real sign-out/fan restore and cold fan gate passed. Both accounts had no private fields and Save disabled; a disabled-Save tap did not change stored availability version4. Current normally signed Swift app packaging and actual fan/owner gate repeat passed in45.095seconds at Night AX3. Exported successful screenshots were personally inspected. Exact binaries, paths, failures and queued CI qualifications are in current-main-integration-receipt.json. Both native devices and exact leases/heavy guard are stopped/released. Earlier dated observations below remain qualified history.
+
 PR19 merged normally at9dd89e46 and PR20 at52a45d31. PR67 is now based on
 main; it remains guarded and incomplete. No new unit tests were written.
 The local UI driver operates the shipping application against the actual API.
