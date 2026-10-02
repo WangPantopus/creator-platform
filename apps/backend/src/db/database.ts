@@ -5,7 +5,10 @@ import {
 } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
 import { assertCurrentSession } from "../modules/identity/request-authority.js";
-import type { ScopeRestriction } from "../modules/access/scope.js";
+import type {
+  ScopeRestriction,
+  ScopeRestrictionInTransaction,
+} from "../modules/access/scope.js";
 
 export type ThreadLockMode = "read" | "write";
 
@@ -18,7 +21,11 @@ export class Database {
       parameters: readonly unknown[];
     }) => void,
     private readonly assertAllowed?: ScopeRestriction,
+    private readonly assertAllowedInTransaction?: ScopeRestrictionInTransaction,
   ) {}
+  get threadScopeInTransactionAvailable() {
+    return typeof this.assertAllowedInTransaction === "function";
+  }
   async assertRuntimeRole(): Promise<void> {
     const result = await this.pool.query<{
       rolsuper: boolean;
@@ -155,6 +162,27 @@ export class Database {
           creatorAccountId: scope.creatorAccountId,
         },
       );
+      // Only a callback using this exact client can hold current denials until
+      // commit. The outside-client check above remains a separate check.
+      if (this.assertAllowedInTransaction) {
+        try {
+          await this.assertAllowedInTransaction(
+            { accountId: scope.actorAccountId, adultEligible: true },
+            scope.creatorId,
+            scope.threadId,
+            {
+              fanAccountId: authority.rows[0]!.fan_account_id,
+              creatorAccountId: scope.creatorAccountId,
+            },
+            client,
+          );
+        } finally {
+          await client.query(
+            "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+            [scope.creatorId, scope.fanId, scope.actorAccountId],
+          );
+        }
+      }
       // Instrument the actual SQL method, so a future assembler query cannot omit its family predicate silently.
       const scopedClient = this.observeQuery
         ? new Proxy(client, {
