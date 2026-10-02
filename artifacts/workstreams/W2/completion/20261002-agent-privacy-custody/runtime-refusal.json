@@ -1,0 +1,33 @@
+{
+  "time": "2026-10-02T14:42:51.118Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "database": "creator_w2",
+  "source": "c532f30b plus unpublished Agent held-client changes",
+  "outcomes": [
+    {
+      "case": "actual restoration READ COMMITTED",
+      "restored": true
+    },
+    {
+      "case": "actual restoration REPEATABLE READ",
+      "restored": false
+    },
+    {
+      "case": "unregistered account export task",
+      "outcome": "privacy_commit_fence_unavailable"
+    },
+    {
+      "case": "unregistered thread export task",
+      "outcome": "privacy_commit_fence_unavailable"
+    }
+  ],
+  "ledger": {
+    "count": "57",
+    "privacy87": 0
+  },
+  "limits": [
+    "Negative UUIDs were deliberately nonexistent job tuples, not genuine verified or leased tasks. No ACK, job creation, export completion or deletion was attempted.",
+    "Actual READ COMMITTED restoration returned true on owned live canonical57; actual REPEATABLE READ returned false and remains closed.",
+    "0087 source is unregistered; no purpose activation or positive C10 acceptance is implied."
+  ]
+}
