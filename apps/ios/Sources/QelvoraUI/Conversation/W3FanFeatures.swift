@@ -49,7 +49,7 @@ private struct W3ThreadScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             if let page = model.page {
-                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: page.control == .human_active, onBack: { session.open("/you") }, onAbout: { privacy = true })
+                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.open("/you") }, onAbout: { privacy = true })
                 IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -104,7 +104,10 @@ private struct W3ThreadScreen: View {
                     while !Task.isCancelled { try? await Task.sleep(for: .seconds(15)); if !Task.isCancelled { await model.refresh() } }
                 }
             }
-            .onChange(of: scenePhase) { _, value in model.setActive(value == .active && !privacy && source == nil && originalReply == nil) }
+            .onChange(of: scenePhase) { _, value in
+                if value != .active { source = nil; originalReply = nil; sourceFailure = "" }
+                model.setActive(value == .active && !privacy && source == nil && originalReply == nil)
+            }
             .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil) }
             .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value && originalReply == nil) }
             .onChange(of: originalReply != nil) { _, value in model.setActive(scenePhase == .active && !privacy && source == nil && !value) }
@@ -125,7 +128,7 @@ private struct W3ThreadScreen: View {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
         }
         else if let kind = MessageKind(rawValue: message.authorKind.rawValue) {
-            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: message.correction == nil && message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open(reportDestination(message)) }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
+            Message(kind: kind, children: message.text, name: page.creatorName, member: message.member ?? "Authorized team member", delivery: message.deliveryState == .generating ? message.text.isEmpty ? .accepted : .streaming : message.deliveryState == .interrupted ? .interrupted : nil, citation: message.citations.isEmpty ? nil : AnyView(VStack { ForEach(message.citations, id: \.self) { id in CitationChip(title: "Source", meta: "Read the original passage") { Task { do { source = try await model.client.request(model.root + "/citations/" + id) } catch { sourceFailure = "No longer accessible to you" } } } } }), live: !model.offline && message.correction == nil && message.authorKind == .human_creator && page.control == .human_active, actions: false, onReport: { session.open(reportDestination(message)) }, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
                 .accessibilityLabel(message.authorLabel(name: page.creatorName))
             if let correction = message.correction {
                 Text(QelvoraCopy.text("correctionAuthor", values: ["name": page.creatorName])).qText("label")

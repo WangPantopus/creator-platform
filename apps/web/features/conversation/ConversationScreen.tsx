@@ -258,6 +258,9 @@ export function ConversationScreen({
     offlineStorage.current = cache;
     renewingOffline.current = false;
     const revoked = () => {
+      lifecycle.current++;
+      offlineShowing.current = false;
+      transportReady.current = false;
       cache.purge();
       concealThread();
     };
@@ -689,7 +692,7 @@ export function ConversationScreen({
           </a>
           <Avatar
             initial={page.creatorName.charAt(0)}
-            live={page.control === "human_active"}
+            live={online && page.control === "human_active"}
           />
           <div>
             <strong>{page.creatorName}</strong>
@@ -832,6 +835,7 @@ export function ConversationScreen({
                 signedActId={message.signedActId ?? undefined}
                 actions={false}
                 live={
+                  online &&
                   !message.correction &&
                   message.authorKind === "human_creator" &&
                   page.control === "human_active"

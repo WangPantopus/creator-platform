@@ -165,8 +165,8 @@ final class W3ThreadModel: ObservableObject {
         do {
             let data = try await client.requestData(root + "/offline")
             let snapshot = try JSONDecoder().decode(W3OfflineSnapshot.self,from:data)
-            guard active, transportReady, page?.cursor == snapshot.page.cursor, page?.revision == snapshot.page.revision, page?.epoch == snapshot.page.epoch else { return }
-            if !(try await W3OfflineStorage.shared.save(data,generation:context,started:started)) { offlineContext = nil }
+            guard active, transportReady, offlineContext == context, page?.cursor == snapshot.page.cursor, page?.revision == snapshot.page.revision, page?.epoch == snapshot.page.epoch else { return }
+            if !(try await W3OfflineStorage.shared.save(data,generation:context,started:started)), offlineContext == context { offlineContext = nil }
         } catch { await W3OfflineStorage.shared.purge(context); if offlineContext == context { offlineContext = nil } }
     }
     func setActive(_ value: Bool) {
