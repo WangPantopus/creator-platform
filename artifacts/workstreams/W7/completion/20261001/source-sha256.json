@@ -104,5 +104,20 @@
     "authOwnerSource": "587300ab0da004ec8bc95c17b7dcae30f6d63716",
     "wholeNewMainReviewed": false,
     "fullCombinedReviewComplete": false
+  },
+  "currentStudioHeldMap": {
+    "parent": "ee940199a566a5981dc642c6a5c283b95e73c571",
+    "ownerSource": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+    "heldMapSHA256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+    "privacyPacketSHA256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+    "sqlUnchangedSHA256": {
+      "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql": "85a36b0ca931e1f65b79f80c911ee0ffc66c3c55682e88ee6f1bbc788b11a866",
+      "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql": "533f31d49939feff6b0926511141333340c05982771d6f35a72cd0e5f7ca41c7",
+      "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql": "2e53d6f7b11cbe9fdae39fba17c4d99462ca1dfef62c3b804b9ec5ea51463321",
+      "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql": "ca984477d1d00bf23e706958492c4b9898d6e15e54a134286a21646093edf336",
+      "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796"
+    },
+    "sourceSHA256": "eabe1358a938e4c36b72ae0349f4db111a2336bf04f644fbe6262734bb031a7a",
+    "SQLActivated": false
   }
 }
