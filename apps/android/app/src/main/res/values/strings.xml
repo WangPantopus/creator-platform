@@ -897,4 +897,6 @@
   <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
   <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
 </resources>

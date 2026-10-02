@@ -9724,6 +9724,28 @@
           }
         }
       }
+    },
+    "We can't reach your account right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't reach your account right now"
+          }
+        }
+      }
+    },
+    "Your session is kept on this device. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session is kept on this device. Try again in a moment."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
