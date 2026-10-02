@@ -1,6 +1,6 @@
 import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "../trust/contracts.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
 import type { ConversationRecordings } from "./recordings.js";
@@ -12,6 +12,7 @@ import type {
   GenerationPrivacyJob,
 } from "../commerce/generation-privacy.js";
 import { z } from "zod";
+import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 function financialJob(job: Job): GenerationPrivacyJob {
@@ -27,7 +28,11 @@ function financialJob(job: Job): GenerationPrivacyJob {
   // same client; a parsed token does not grant or replace lifecycle authority.
   return job;
 }
-function authorLabel(kind: AuthorKind, name: string, member: string | null) {
+export function conversationAuthorLabel(
+  kind: AuthorKind,
+  name: string,
+  member: string | null,
+) {
   const fill = (value: string) =>
     value
       .replaceAll("{name}", name)
@@ -66,11 +71,29 @@ export type ConversationPrivacyFamily = {
  * These are lifecycle scopes, never fabricated interactive ThreadScopes. */
 export interface ConversationPrivacyAuthority {
   families(job: Job): Promise<readonly ConversationPrivacyFamily[]>;
+  /** W8's actual task lock and deferred commit-currentness check, on this same
+   * held domain client and before family locks. No separate-pool substitute. */
+  fenceTaskInTransaction?(client: PoolClient, job: Job): Promise<void>;
   assertFamily(
     client: PoolClient,
     job: Job,
     family: ConversationPrivacyFamily,
   ): Promise<void>;
+}
+export async function fenceConversationPrivacyTask(
+  authority: ConversationPrivacyAuthority,
+  client: PoolClient,
+  job: Job,
+) {
+  if (!authority.fenceTaskInTransaction)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "This data request needs the actual held task-lease commit barrier.",
+      503,
+    );
+  job.signal?.throwIfAborted();
+  await authority.fenceTaskInTransaction(client, job);
+  job.signal?.throwIfAborted();
 }
 export interface ConversationPrivacyRetention {
   retainedMessages(
@@ -101,10 +124,10 @@ export interface ConversationPrivacyRetention {
  * This port never creates an interactive or provider-admission ThreadScope. */
 export type ConversationAccountingLifecycle = Pick<
   GenerationAccountingLifecycle,
-  "exportMetadata" | "sealGeneration" | "purgeFamily"
+  "exportMetadataTo" | "sealGeneration" | "purgeFamilyPaged"
 >;
 
-export function conversationPrivacyHook(input: {
+export type ConversationPrivacyInput = {
   pool: Pool;
   authority: ConversationPrivacyAuthority;
   retention?: ConversationPrivacyRetention;
@@ -114,10 +137,26 @@ export function conversationPrivacyHook(input: {
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
-}): PrivacyHook {
+};
+export function conversationPrivacyHook(
+  input: ConversationPrivacyInput,
+): PrivacyHook {
   return {
     domain: "conversation",
     async run(job) {
+      invariant(
+        job.signal && z.uuid().safeParse(job.leaseToken).success,
+        "privacy_lease_required",
+        "Use the actual leased worker task and its cancellation signal.",
+      );
+      const signal = job.signal;
+      signal.throwIfAborted();
+      if (!input.authority.fenceTaskInTransaction)
+        throw new DomainError(
+          "privacy_commit_fence_unavailable",
+          "This data request needs the actual held task-lease commit barrier.",
+          503,
+        );
       const lineageSchema = (
         await input.pool.query(
           "SELECT to_regclass('creator.conversation_feedback') AS relation",
@@ -129,6 +168,7 @@ export function conversationPrivacyHook(input: {
         "This data request needs the prepared lineage export and deletion adapter.",
       );
       input.recordings?.assertPool(input.pool);
+      input.lineage?.assertPool(input.pool);
       const recordingSchema = await input.pool.query(
         "SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('creator.message') AND attname='recording_asset_id' AND NOT attisdropped",
       );
@@ -138,6 +178,7 @@ export function conversationPrivacyHook(input: {
         "This data request needs the prepared recording association adapter.",
       );
       const families = await input.authority.families(job);
+      signal.throwIfAborted();
       invariant(
         families.length <= 100 &&
           new Set(families.map((family) => family.threadId)).size ===
@@ -153,8 +194,18 @@ export function conversationPrivacyHook(input: {
         "conversation_retention_unavailable",
         "Conversation deletion needs the verified dispute-retention and allowance adapters.",
       );
+      if (job.kind === "export")
+        return {
+          receipt: {
+            schemaVersion: 2,
+            domain: "conversation",
+            jobId: job.jobId,
+            idempotencyKey: job.idempotencyKey,
+            sourceScopeThreads: families.length,
+          },
+          stream: conversationPrivacyExportStream(input, job, families, signal),
+        };
       const client = await input.pool.connect();
-      const data: unknown[] = [];
       const accountingReceipts: Record<string, unknown>[] = [];
       const financialDispositions: {
         threadId: string;
@@ -166,7 +217,12 @@ export function conversationPrivacyHook(input: {
         reason: string;
       }[] = [];
       try {
+        signal.throwIfAborted();
         await client.query("BEGIN");
+        await client.query(
+          "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
+        );
+        await fenceConversationPrivacyTask(input.authority, client, job);
         const accountingInstalled = await generationJournalInstalled(client);
         const weightedInstalled = (
           await client.query<{ installed: boolean }>(
@@ -188,6 +244,7 @@ export function conversationPrivacyHook(input: {
           "Weighted deletion requires the actual prepared generation journal and original-policy financial lifecycle.",
         );
         for (const family of families) {
+          signal.throwIfAborted();
           invariant(
             (job.creatorId === null || job.creatorId === family.creatorId) &&
               (job.threadId === null || job.threadId === family.threadId),
@@ -195,11 +252,13 @@ export function conversationPrivacyHook(input: {
             "This conversation is outside the verified data request.",
           );
           await input.authority.assertFamily(client, job, family);
+          signal.throwIfAborted();
           await client.query(
             "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
             [family.creatorId, family.fanId, job.accountId],
           );
           const pair = [family.threadId, family.creatorId, family.fanId];
+          signal.throwIfAborted();
           const thread = (
             await client.query(
               "SELECT t.id,t.creator_id,t.fan_id,t.control,t.control_epoch,t.revision,t.deleted_at,t.off_the_record,t.intro_shared,t.memory_revision,t.human_active_until,t.last_activity_at,t.session_started_at,t.last_reminder_at,cp.display_name FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR UPDATE OF t",
@@ -211,125 +270,6 @@ export function conversationPrivacyHook(input: {
             "privacy_family_unavailable",
             "The verified conversation scope is unavailable.",
           );
-          if (job.kind === "export") {
-            const messages = (
-              await client.query(
-                `SELECT id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",author_account_id AS "authorAccountId",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt" FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY sequence LIMIT 2001`,
-                pair,
-              )
-            ).rows;
-            const memories = (
-              await client.query(
-                "SELECT id,kind,text,state,semantic_key,provenance_message_id,sensitive_category,edited_by_fan,created_at FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY created_at,id LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const audit = (
-              await client.query(
-                "SELECT reader_account_id,role,read_at FROM creator.thread_audit WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY read_at,id LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const consents = (
-              await client.query(
-                "SELECT version,providers,consented_at,withdrawn_at FROM creator.processor_consent WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY consented_at,id LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const memoryConsents = (
-              await client.query(
-                "SELECT id,item_id,item_hash,category,consented_at,withdrawn_at FROM creator.memory_consent WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY consented_at,id LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const usageDays = (
-              await client.query(
-                "SELECT day,seconds,companion_seconds FROM creator.conversation_usage_day WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY day LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const events = (
-              await client.query(
-                "SELECT id,cursor,type,payload,actor_account_id,created_at,published_at FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY cursor LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const exclusions = (
-              await client.query(
-                "SELECT semantic_key,normalized_text FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY semantic_key LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            const generations = (
-              await client.query(
-                "SELECT id,fan_message_id,ai_message_id,grant_id,reservation_id,epoch,last_sequence,state,context_revision,accepted_at,first_visible_at,completed_at,failure_code FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 ORDER BY accepted_at,id LIMIT 2001",
-                pair,
-              )
-            ).rows;
-            invariant(
-              [
-                messages,
-                memories,
-                audit,
-                consents,
-                memoryConsents,
-                usageDays,
-                events,
-                exclusions,
-                generations,
-              ].every((rows) => rows.length <= 2000),
-              "bounded_subjob_required",
-              "This export needs a paginated conversation subjob.",
-            );
-            data.push({
-              thread,
-              ...(input.accounting
-                ? {
-                    accounting: await input.accounting.exportMetadata(
-                      client,
-                      job,
-                      family,
-                    ),
-                  }
-                : {}),
-              ...(input.lineage
-                ? {
-                    lineage: await input.lineage.exportMetadata(client, family),
-                  }
-                : {}),
-              ...(input.recordings
-                ? {
-                    recordings: await input.recordings.exportMetadata(
-                      client,
-                      family,
-                    ),
-                  }
-                : {}),
-              messages: messages.map((message) => ({
-                ...message,
-                authorLabel: authorLabel(
-                  message.authorKind,
-                  thread.display_name,
-                  message.member,
-                ),
-              })),
-              memories,
-              audit,
-              consents,
-              memoryConsents,
-              usageDays,
-              events,
-              exclusions,
-              generations,
-            });
-            invariant(
-              Buffer.byteLength(JSON.stringify(data), "utf8") <= 8_000_000,
-              "bounded_subjob_required",
-              "This export needs a smaller conversation subjob.",
-            );
-            await input.authority.assertFamily(client, job, family);
-            continue;
-          }
           const keep = await input.retention!.retainedMessages(
             client,
             job,
@@ -402,6 +342,8 @@ export function conversationPrivacyHook(input: {
             )
           ).rows;
           for (const generation of generations) {
+            signal.throwIfAborted();
+            await input.authority.assertFamily(client, job, family);
             await input.accounting?.sealGeneration(
               client,
               job,
@@ -443,52 +385,63 @@ export function conversationPrivacyHook(input: {
             await input.authority.assertFamily(client, job, family);
           }
           if (input.accounting) {
-            const accounting = await input.accounting.purgeFamily(
+            const accounting = await input.accounting.purgeFamilyPaged(
               client,
               job,
               family,
+              signal,
             );
             accountingReceipts.push(accounting.receipt);
             retained.push(...accounting.retained);
           }
           // Tombstoned thread remains as the minimal family identifier. Denial is
           // already immediate through W8; content and replay payloads are purged.
+          signal.throwIfAborted();
           await client.query(
             "UPDATE creator.thread SET deleted_at=coalesce(deleted_at,now()),control='closed',control_epoch=control_epoch+1,revision=revision+1,processor_consent_version=NULL,intro_shared=false WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.memory WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.memory_consent WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.memory_exclusion WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.processor_consent WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.event WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.thread_audit WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND NOT(id=ANY($4::uuid[]))",
             [...pair, keep.map((record) => record.messageId)],
           );
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.conversation_relationship WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3",
             pair,
@@ -497,11 +450,14 @@ export function conversationPrivacyHook(input: {
             "conversation_presence_client",
             "conversation_presence",
             "conversation_usage_day",
-          ] as const)
+          ] as const) {
+            signal.throwIfAborted();
             await client.query(
               `DELETE FROM creator.${table} WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3`,
               pair,
             );
+          }
+          signal.throwIfAborted();
           await client.query(
             "DELETE FROM creator.idempotency_key WHERE operation IN('send','fan_reply','human_reply','humanReply','team_reply','conversation_correction','takeover','handback','pause','control:human_active','control:ai_active','control:ai_paused') AND coalesce(response->'message'->>'threadId',response->>'threadId')=$1",
             [family.threadId],
@@ -526,6 +482,14 @@ export function conversationPrivacyHook(input: {
           "bounded_subjob_required",
           "This receipt needs a smaller conversation subjob.",
         );
+        signal.throwIfAborted();
+        for (const family of families) {
+          signal.throwIfAborted();
+          await input.authority.assertFamily(client, job, family);
+        }
+        // Empty verified scopes still require a current actual task.
+        if (!families.length) await input.authority.families(job);
+        signal.throwIfAborted();
         await client.query("COMMIT");
         return {
           receipt: {
@@ -538,7 +502,6 @@ export function conversationPrivacyHook(input: {
             ...(financialDispositions.length ? { financialDispositions } : {}),
             completedAt: new Date().toISOString(),
           },
-          ...(job.kind === "export" ? { data } : {}),
           retained,
         };
       } catch (error) {
