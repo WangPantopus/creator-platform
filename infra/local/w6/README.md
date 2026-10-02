@@ -146,3 +146,37 @@ purpose grants. The first57-entry wave does not contain them: actual startup on
 that database refuses `publication_schema_unconfigured`, and no publication is
 accepted. Quote, public/group packet fulfillment, live and displayed audience
 count purpose projections require their own genuine adapters and remain unavailable.
+
+For explicitly labelled self-hosted transport development, generate fresh keys
+and configuration in a new private directory:
+
+```sh
+NODE_ENV=development node infra/local/w6/provision-dev-livekit.mjs \
+  /tmp/qelvora-w6-livekit-development
+```
+
+Use its exact pinned official image/configuration. Publish only host loopback
+ports7886(TCP signaling),7887(TCP RTC),7888(UDP RTC), limit the container to
+one CPU/512MiB, and do not attach recording/egress or an agent. The configuration
+sends genuinely signed callbacks to the separate developer operator3106 via
+Docker's host address. Keys and SQLite remain outside Git with private modes.
+
+```sh
+NODE_ENV=development node --import tsx infra/local/w6/livekit-operator.mts \
+  /tmp/qelvora-w6-livekit-development
+```
+
+Open `http://localhost:3106`; its explicit buttons operate actual SDK room/token
+creation, transport connection, microphone capture, disconnect, replay and
+DeleteRoom. No canonical call, Actor, entitlement, settlement or full history is
+created. Browser transport-only operation is labelled and does not substitute
+for human voice or the real app journey. A short JWT and DeleteRoom do not
+provide single-use/revocation; actual replay was observed. Stop the exact owned
+operator/container afterward and preserve only redacted evidence.
+
+The web/Swift/Kotlin SDK adapters are not registered automatically. The backend
+provider advertises `supportsSingleUseAdmission=false`, leaving paid joins
+unavailable. Future0092 callback SQL is unregistered/unapplied and must be
+reviewed/activated by W8 with approved retention and actual CallCustody/C10
+adapters. Missing current schema or custody fails closed. The first57 wave and
+0082 availability/publication gates are independent of SDK installation.

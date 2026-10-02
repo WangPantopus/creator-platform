@@ -117,6 +117,51 @@ final class W6RuntimeJourney: XCTestCase {
         capture(app, name: "W6-actual-local-fan-account")
     }
 
+    /// Actual missing-denial-schema failure path; neither account may save.
+    func testActualMediaAvailabilityGate() {
+        let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        func launch(_ target: String) {
+            app.terminate()
+            app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", target]
+            app.launch()
+        }
+        let destination = "/studio/60000000-0000-4000-8000-000000000001/more"
+        launch("/identity/account")
+        if app.buttons["Sign out"].waitForExistence(timeout: 5) { app.buttons["Sign out"].tap() }
+        let initialWelcome = app.buttons["continue-with-pantopus"]
+        XCTAssertTrue(initialWelcome.waitForExistence(timeout: 15))
+        if !initialWelcome.isHittable { app.swipeUp() }
+        initialWelcome.tap()
+        XCTAssertTrue(app.buttons["Development actor two"].waitForExistence(timeout: 15))
+        app.buttons["Development actor two"].tap()
+        XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 15))
+        launch(destination)
+        func assertUnavailable(_ name: String) {
+            XCTAssertTrue(app.staticTexts["Availability could not be loaded."].waitForExistence(timeout: 15))
+            XCTAssertFalse(app.textFields["availability-zone"].exists)
+            let save = app.buttons["Save availability"]
+            for _ in 0..<5 { if save.isHittable { break }; app.swipeUp() }
+            XCTAssertTrue(save.exists)
+            XCTAssertFalse(save.isEnabled)
+            capture(app, name: name)
+        }
+        assertUnavailable("W6-sdk-fan-media-unavailable")
+        launch("/identity/account")
+        XCTAssertTrue(app.buttons["Sign out"].waitForExistence(timeout: 15))
+        app.buttons["Sign out"].tap()
+        let welcome = app.buttons["continue-with-pantopus"]
+        XCTAssertTrue(welcome.waitForExistence(timeout: 15))
+        if !welcome.isHittable { app.swipeUp() }
+        welcome.tap()
+        XCTAssertTrue(app.buttons["Development actor one"].waitForExistence(timeout: 15))
+        app.buttons["Development actor one"].tap()
+        // This older shell renders only a fan handle; W1 owns its creator
+        // profile correction. The actual selected development actor is used.
+        XCTAssertTrue(app.staticTexts["Your account"].waitForExistence(timeout: 15))
+        launch(destination)
+        assertUnavailable("W6-sdk-owner-media-unavailable")
+    }
+
     private func capture(_ app: XCUIApplication, name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name

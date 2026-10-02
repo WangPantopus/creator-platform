@@ -24,7 +24,7 @@ private struct NativeCallDocument: Decodable, Sendable {
 /** The genuine provider adapter owns capture, rendering and OS audio activation. No adapter is registered by default. */
 @MainActor public protocol NativeCallScreenTransport: AnyObject {
     var mediaView: AnyView { get }
-    func connect(admission: NativeCallAdmission, onState: @escaping @MainActor (String) -> Void) async throws
+    func connect(admission: NativeCallAdmission, camera: Bool, onState: @escaping @MainActor (String) -> Void) async throws
     func microphone(enabled: Bool) async throws
     func camera(enabled: Bool) async throws
     func disconnect() async
@@ -109,7 +109,7 @@ private struct NativeCallDocument: Decodable, Sendable {
                   admission.accountId.lowercased() == actorAccountID?.lowercased(),
                   expires > Date() else { throw URLError(.badServerResponse) }
             transport = adapter; camera = call.mediaMode == "video"
-            try await adapter.connect(admission: admission, onState: { if active && epoch == mediaEpoch { localState = $0 } })
+            try await adapter.connect(admission: admission, camera: camera, onState: { if active && epoch == mediaEpoch { localState = $0 } })
             if !active || epoch != mediaEpoch { await adapter.disconnect() }
         } catch {
             await adapter.disconnect()

@@ -30,7 +30,7 @@ data class CallAdmission(val token: String, val url: String, val nonce: String, 
 /** Genuine transport owns camera/audio, rendering, Telecom and foreground lifetime. No transport is registered by default. */
 interface NativeCallScreenTransport {
     @Composable fun Media()
-    suspend fun connect(admission: CallAdmission, onState: (String) -> Unit)
+    suspend fun connect(admission: CallAdmission, camera: Boolean, onState: (String) -> Unit)
     suspend fun microphone(enabled: Boolean)
     suspend fun camera(enabled: Boolean)
     fun disconnect()
@@ -105,7 +105,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             if (!active || epoch != mediaEpoch) return
             require(receipt.get("admitted") == true && expires.isAfter(Instant.now()) && admission.accountId == model.session?.accountId)
             transport = adapter; camera = value.getString("mediaMode") == "video"
-            adapter.connect(admission) { if (active && epoch == mediaEpoch) localState = it }
+            adapter.connect(admission, camera) { if (active && epoch == mediaEpoch) localState = it }
             if (!active || epoch != mediaEpoch) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
         catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
