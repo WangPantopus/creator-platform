@@ -17,7 +17,7 @@
     "iosCameraDescriptionPresent": true
   },
   "nativeOperationStatus": {
-    "decimalAndroidInput": "pending device/GUI availability; no keyboard acceptance inferred from build",
+    "decimalAndroidInput": "personally verified real decimal keyboard in Light/Night and cold return; android-decimal-input receipt",
     "ios": "CUA DeviceHub timeout; prepared alternative operational driver not run; explicit human authorization requested",
     "deviceAndGuiLeasesHeld": false
   },
