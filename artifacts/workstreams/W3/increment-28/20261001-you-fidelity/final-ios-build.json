@@ -1,0 +1,10 @@
+{
+  "sourceHead": "4870c7cab299eca4c38369b9a1ccab2955c0dc28",
+  "sourceSha256": "78a7445a7c1a14fb81e58f547ad5e1b9b8d9b579a25584d159f2184ffe399343",
+  "binarySha256": "c614cd055c7de3b0714abc9d70af3b19385ee2405bb1ac59fe399a2417f6a00d",
+  "build": "passed",
+  "log": "/private/tmp/w3-ios-you-final-build.log",
+  "destination": "E375E748-AE89-4701-AB12-44EA240D61A8",
+  "operation": "pending simulator capacity and Device Hub UI",
+  "signature": "development ad hoc; no production authority"
+}
