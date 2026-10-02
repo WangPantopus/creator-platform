@@ -1,10 +1,13 @@
 import { GoogleAuth, OAuth2Client } from "google-auth-library";
 import { z } from "zod";
 import { invariant } from "../../core/errors.js";
+import { contentHash } from "../../core/canonical.js";
+import type { StorePaidObservation } from "./paid-coverage.js";
 import type { Actor } from "../identity/adapter.js";
 import type {
   StoreEntitlementVerifier,
   VerifiedStoreEntitlement,
+  StorePaidHistoryReader,
 } from "./extended.js";
 import {
   StoreCatalog,
@@ -46,6 +49,14 @@ const Purchase = z.object({
     .min(1)
     .max(100),
 });
+const Money = z.object({
+  currencyCode: z.string().regex(/^[A-Z]{3}$/u),
+  units: z
+    .string()
+    .regex(/^-?\d{1,19}$/u)
+    .default("0"),
+  nanos: z.int().min(-999999999).max(999999999).default(0),
+});
 const Order = z.object({
   orderId: z.string(),
   purchaseToken: z.string(),
@@ -55,15 +66,102 @@ const Order = z.object({
     .array(
       z.object({
         productId: z.string(),
+        total: Money.optional(),
         subscriptionDetails: z.object({
           basePlanId: z.string(),
           servicePeriodStartTime: z.iso.datetime({ offset: true }),
           servicePeriodEndTime: z.iso.datetime({ offset: true }),
+          offerPhaseDetails: z
+            .object({
+              freeTrialDetails: z.object({}).optional(),
+              introductoryPriceDetails: z.object({}).optional(),
+              baseDetails: z.object({}).optional(),
+              prorationPeriodDetails: z
+                .object({ originalOfferPhase: z.string().optional() })
+                .optional(),
+            })
+            .optional(),
         }),
       }),
     )
     .min(1),
+  orderHistory: z
+    .object({
+      refundEvent: z.unknown().optional(),
+      partialRefundEvents: z.array(z.unknown()).max(1000).optional(),
+    })
+    .optional(),
 });
+
+function paidObservation(
+  order: z.infer<typeof Order>,
+  line: z.infer<typeof Order>["lineItems"][number],
+): StorePaidObservation {
+  const period = line.subscriptionDetails;
+  const refund =
+    order.orderHistory?.refundEvent !== undefined ||
+    Boolean(order.orderHistory?.partialRefundEvents?.length);
+  const proofHash = contentHash({
+    orderId: order.orderId,
+    state: order.state,
+    productId: line.productId,
+    basePlanId: period.basePlanId,
+    startsAt: period.servicePeriodStartTime,
+    endsAt: period.servicePeriodEndTime,
+    total: line.total ?? null,
+    phase: period.offerPhaseDetails ?? null,
+    refund,
+  });
+  const base = { reference: order.orderId, proofHash };
+  if (
+    refund ||
+    ["REFUNDED", "PARTIALLY_REFUNDED", "PENDING_REFUND"].includes(order.state)
+  )
+    return { ...base, kind: "denied", reason: "refund" };
+  if (["PENDING", "ORDER_STATE_UNSPECIFIED"].includes(order.state))
+    return { ...base, kind: "denied", reason: "unconfirmed" };
+  if (order.state !== "PROCESSED")
+    return { ...base, kind: "denied", reason: "revoked" };
+  const phase = period.offerPhaseDetails;
+  if (
+    phase?.freeTrialDetails !== undefined ||
+    (line.total && BigInt(line.total.units) === 0n && line.total.nanos === 0)
+  )
+    return { ...base, kind: "denied", reason: "unpaid" };
+  if (
+    !line.total ||
+    BigInt(line.total.units) < 0n ||
+    line.total.nanos < 0 ||
+    !phase ||
+    phase.prorationPeriodDetails !== undefined ||
+    Number(phase.baseDetails !== undefined) +
+      Number(phase.introductoryPriceDetails !== undefined) !==
+      1
+  )
+    return { ...base, kind: "denied", reason: "unconfirmed" };
+  const startsAt = new Date(period.servicePeriodStartTime),
+    endsAt = new Date(period.servicePeriodEndTime);
+  // Date transports milliseconds. Preserve exact adjacency by withholding
+  // finer nonzero timestamps instead of rounding an unpaid gap into coverage.
+  if (
+    [period.servicePeriodStartTime, period.servicePeriodEndTime].some((value) =>
+      /[1-9]/u.test((value.match(/\.(\d+)/u)?.[1] ?? "").slice(3)),
+    )
+  )
+    return { ...base, kind: "denied", reason: "unconfirmed" };
+  invariant(
+    endsAt > startsAt,
+    "store_period_invalid",
+    "The funded order period is invalid.",
+  );
+  return {
+    ...base,
+    kind: "paid",
+    startsAt,
+    endsAt,
+    qualification: "google_processed_positive_total",
+  };
+}
 
 export class GoogleStoreMembership implements StoreEntitlementVerifier {
   private readonly auth: GoogleAuth;
@@ -125,6 +223,7 @@ export class GoogleStoreMembership implements StoreEntitlementVerifier {
   async verifyAndFetchCurrent(
     input: { platform: "apple" | "google"; transaction: string },
     actor: Actor,
+    history?: StorePaidHistoryReader,
   ): Promise<VerifiedStoreEntitlement> {
     return storeOperation(async () => {
       invariant(
@@ -184,6 +283,37 @@ export class GoogleStoreMembership implements StoreEntitlementVerifier {
         root = previous;
         previous = (await this.purchase(previous, actor)).linkedPurchaseToken;
       }
+      invariant(
+        history,
+        "store_history_unconfigured",
+        "Store restoration requires the actual registered paid-period history.",
+      );
+      const paidObservations = [paidObservation(order, orderLines[0]!)];
+      const references = await history({
+        provider: "google",
+        originalReference: googlePurchaseReference(root),
+        ...binding,
+      });
+      for (const reference of references) {
+        if (reference === order.orderId) continue;
+        const historical = Order.parse(
+          await this.request(`orders/${encodeURIComponent(reference)}`),
+        );
+        const lines = historical.lineItems.filter(
+          (item) =>
+            item.productId === line.productId &&
+            item.subscriptionDetails.basePlanId ===
+              line.offerDetails.basePlanId,
+        );
+        invariant(
+          historical.orderId === reference &&
+            seen.has(historical.purchaseToken) &&
+            lines.length === 1,
+          "store_history_conflict",
+          "The retained order must match this exact owned subscription.",
+        );
+        paidObservations.push(paidObservation(historical, lines[0]!));
+      }
       const state: VerifiedStoreEntitlement["state"] =
         order.state === "REFUNDED"
           ? "refunded"
@@ -221,6 +351,7 @@ export class GoogleStoreMembership implements StoreEntitlementVerifier {
         endsAt,
         purchasedAt: new Date(purchase.startTime),
         cancelAtEnd: !line.autoRenewingPlan.autoRenewEnabled,
+        paidObservations,
       };
     });
   }

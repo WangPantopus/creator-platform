@@ -348,6 +348,7 @@ export function createApp(
         "/",
         "/v1/agent",
         "/v1/commerce",
+        "/v1/commerce-approvals",
         "/v1/w6",
         "/v1/growth",
         "/v1/content",

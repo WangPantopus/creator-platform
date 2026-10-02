@@ -55,11 +55,15 @@ export interface VerifiedStoreEntitlement {
   endsAt: Date;
   purchasedAt: Date;
   cancelAtEnd: boolean;
+  /** Server-verified paid periods and irreversible negative observations;
+   * entitlement expiry can include grace and cannot replace this evidence. */
+  paidObservations?: readonly import("./paid-coverage.js").StorePaidObservation[];
 }
 export interface StoreEntitlementVerifier {
   verifyAndFetchCurrent(
     input: { platform: "apple" | "google"; transaction: string },
     actor: Actor,
+    history?: StorePaidHistoryReader,
   ): Promise<VerifiedStoreEntitlement>;
   /** Only invoked after verified entitlement persistence, never before a grant. */
   acknowledge?(
@@ -67,10 +71,16 @@ export interface StoreEntitlementVerifier {
     actor: Actor,
   ): Promise<void>;
 }
+export type StorePaidHistoryReader = (
+  binding: Pick<
+    VerifiedStoreEntitlement,
+    "provider" | "originalReference" | "creatorId" | "tierId"
+  >,
+) => Promise<readonly string[]>;
 
 export class ExtendedCommerce {
   get storeConfigured() {
-    return Boolean(this.stores);
+    return Boolean(this.stores && this.paidCoverage);
   }
   constructor(
     private readonly service: CommerceService,
@@ -83,11 +93,17 @@ export class ExtendedCommerce {
     readonly passPurchases?: import("./pass-purchase-journal.js").PassPurchaseJournal,
     readonly poolJournal?: import("./pass-pool-journal.js").PassPoolJournal,
     private readonly qualifiedReads?: QualifiedReadAuthority,
+    private readonly paidCoverage?: import("./paid-coverage.js").PaidCoverageJournal,
   ) {
     invariant(
       !poolJournal || poolJournal.isForService(service),
       "pool_graph_mismatch",
       "Pool reads require this same prepared commerce graph.",
+    );
+    invariant(
+      !paidCoverage || paidCoverage.isForService(service),
+      "paid_coverage_graph_mismatch",
+      "Store paid coverage requires this same prepared commerce graph.",
     );
   }
   async storePurchase(
@@ -98,6 +114,11 @@ export class ExtendedCommerce {
       this.stores,
       "store_verification_unconfigured",
       "Store purchases cannot be verified yet. No access was granted.",
+    );
+    invariant(
+      this.paidCoverage,
+      "paid_coverage_unconfigured",
+      "Store purchases require registered paid-period and refund history. No access was changed.",
     );
     const before = await this.service.account(
       actor,
@@ -112,7 +133,11 @@ export class ExtendedCommerce {
     const versions = new Map(
       before.map((row) => [row.provider_ref, row.version]),
     );
-    const verified = await this.stores.verifyAndFetchCurrent(input, actor);
+    const verified = await this.stores.verifyAndFetchCurrent(
+      input,
+      actor,
+      (binding) => this.paidCoverage!.references(actor, binding),
+    );
     invariant(
       verified.provider === input.platform,
       "store_provider_conflict",
@@ -136,6 +161,7 @@ export class ExtendedCommerce {
         )
       ).rows[0];
       invariant(fan, "fan_profile_required", "Set up your profile first.");
+      await this.paidCoverage!.hold(client, actor, verified.creatorId, fan.id);
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`store:${verified.provider}:${verified.originalReference}`],
@@ -210,6 +236,22 @@ export class ExtendedCommerce {
         ["active", "grace", "cancelled"].includes(verified.state) &&
         verified.startsAt <= new Date() &&
         verified.endsAt > new Date();
+      const currentPaid = verified.paidObservations?.some(
+        (observation) =>
+          observation.kind === "paid" &&
+          observation.startsAt.getTime() === verified.startsAt.getTime() &&
+          observation.endsAt <= verified.endsAt &&
+          !verified.paidObservations!.some(
+            (denial) =>
+              denial.kind === "denied" &&
+              denial.reference === observation.reference,
+          ),
+      );
+      invariant(
+        !currentPeriod || currentPaid,
+        "store_paid_period_unconfirmed",
+        "The store has not confirmed this paid membership period. No access was granted; restore when its paid history is confirmed.",
+      );
       // Pausing sales preserves an already purchased tier, including renewals.
       // A new purchase still requires a currently offered tier.
       const tierAvailable =
@@ -298,6 +340,7 @@ export class ExtendedCommerce {
           [prior.grant_id, verified.creatorId, fan.id],
         );
       }
+      await this.paidCoverage!.record(client, actor, verified);
       return {
         serverVerified: true,
         accessGranted: active,

@@ -6,6 +6,9 @@ import {
   Type,
   InAppOwnershipType,
   AutoRenewStatus,
+  OfferDiscountType,
+  GetTransactionHistoryVersion,
+  ProductType,
   type JWSTransactionDecodedPayload,
 } from "@apple/app-store-server-library";
 import { invariant } from "../../core/errors.js";
@@ -15,6 +18,8 @@ import type {
   VerifiedStoreEntitlement,
 } from "./extended.js";
 import { StoreCatalog, storeOperation } from "./stores.js";
+import { contentHash } from "../../core/canonical.js";
+import type { StorePaidObservation } from "./paid-coverage.js";
 
 /** Genuine Apple API lookup plus certificate/JWS verification. No client expiry,
  * product, account, status or local receipt is an entitlement authority. */
@@ -70,6 +75,111 @@ export class AppleStoreMembership implements StoreEntitlementVerifier {
         transaction.expiresDate! > transaction.purchaseDate!,
       "purchase_link_conflict",
       "The verified subscription must belong to this account, application and sandbox product.",
+    );
+  }
+  private paidObservation(
+    transaction: JWSTransactionDecodedPayload,
+    revoked = false,
+  ): StorePaidObservation {
+    const proofHash = contentHash({
+      transactionId: transaction.transactionId,
+      purchaseDate: transaction.purchaseDate,
+      expiresDate: transaction.expiresDate,
+      productId: transaction.productId,
+      price: transaction.price ?? null,
+      currency: transaction.currency ?? null,
+      offerDiscountType: transaction.offerDiscountType ?? null,
+      offerType: transaction.offerType ?? null,
+      revocationDate: transaction.revocationDate ?? null,
+      isUpgraded: transaction.isUpgraded ?? false,
+      revoked,
+    });
+    const base = { reference: transaction.transactionId!, proofHash };
+    if (revoked || transaction.revocationDate)
+      return { ...base, kind: "denied", reason: "refund" };
+    if (transaction.isUpgraded)
+      return { ...base, kind: "denied", reason: "revoked" };
+    if (
+      transaction.offerDiscountType === OfferDiscountType.FREE_TRIAL ||
+      transaction.price === 0
+    )
+      return { ...base, kind: "denied", reason: "unpaid" };
+    if (
+      !Number.isSafeInteger(transaction.price) ||
+      transaction.price! <= 0 ||
+      !/^[A-Z]{3}$/u.test(transaction.currency ?? "") ||
+      (transaction.offerType !== undefined &&
+        transaction.offerDiscountType === undefined) ||
+      (transaction.offerDiscountType !== undefined &&
+        !Object.values(OfferDiscountType).includes(
+          transaction.offerDiscountType as OfferDiscountType,
+        ))
+    )
+      return { ...base, kind: "denied", reason: "unconfirmed" };
+    return {
+      ...base,
+      kind: "paid",
+      startsAt: new Date(transaction.purchaseDate!),
+      endsAt: new Date(transaction.expiresDate!),
+      qualification: "apple_signed_positive_price",
+    };
+  }
+  private async paidHistory(
+    transaction: JWSTransactionDecodedPayload,
+    actor: Actor,
+  ) {
+    const observations: StorePaidObservation[] = [];
+    const revisions = new Set<string>();
+    let revision: string | null = null;
+    for (let page = 0; page < 100; page++) {
+      const history = await this.client.getTransactionHistory(
+        transaction.originalTransactionId!,
+        revision,
+        {
+          productIds: [transaction.productId!],
+          productTypes: [ProductType.AUTO_RENEWABLE],
+        },
+        GetTransactionHistoryVersion.V2,
+      );
+      invariant(
+        history.environment === Environment.SANDBOX &&
+          history.bundleId === this.config.bundleId &&
+          typeof history.hasMore === "boolean" &&
+          history.signedTransactions,
+        "store_history_unavailable",
+        "The current signed store history is incomplete.",
+      );
+      for (const signed of history.signedTransactions) {
+        const entry = await this.verifier.verifyAndDecodeTransaction(signed);
+        this.owned(entry, actor);
+        invariant(
+          entry.originalTransactionId === transaction.originalTransactionId &&
+            entry.productId === transaction.productId &&
+            entry.subscriptionGroupIdentifier ===
+              transaction.subscriptionGroupIdentifier,
+          "store_history_conflict",
+          "The paid history must match this exact owned subscription.",
+        );
+        observations.push(this.paidObservation(entry));
+        invariant(
+          observations.length <= 998,
+          "store_history_reconciliation_required",
+          "The complete store history needs reconciliation before restoring access.",
+        );
+      }
+      if (!history.hasMore) return observations;
+      invariant(
+        history.revision && !revisions.has(history.revision),
+        "store_history_unavailable",
+        "The store history cursor did not advance.",
+      );
+      revisions.add(history.revision);
+      revision = history.revision;
+    }
+    invariant(
+      false,
+      "store_history_reconciliation_required",
+      "The complete store history needs reconciliation before restoring access.",
     );
   }
   async verifyAndFetchCurrent(
@@ -163,6 +273,11 @@ export class AppleStoreMembership implements StoreEntitlementVerifier {
         state = "grace";
         endsAt = renewal.gracePeriodExpiresDate;
       } else if (current.status === Status.BILLING_RETRY) state = "past_due";
+      const paidObservations = await this.paidHistory(transaction, actor);
+      paidObservations.push(
+        this.paidObservation(initial),
+        this.paidObservation(transaction, current.status === Status.REVOKED),
+      );
       return {
         provider: "apple",
         reference: transaction.transactionId!,
@@ -176,6 +291,7 @@ export class AppleStoreMembership implements StoreEntitlementVerifier {
           transaction.originalPurchaseDate ?? transaction.purchaseDate!,
         ),
         cancelAtEnd: renewal.autoRenewStatus === AutoRenewStatus.OFF,
+        paidObservations,
       };
     });
   }
