@@ -113,12 +113,19 @@ export async function configureGrowthForBackend(
           : {}),
       },
     });
+    let closeInFlight: Promise<void> | undefined;
     return {
       ...runtime,
       contentFollows: canonicalContentFollows(),
-      async close() {
-        await runtime.stop();
-        await worker.end();
+      close() {
+        closeInFlight ??= (async () => {
+          try {
+            await runtime.stop();
+          } finally {
+            await worker.end();
+          }
+        })();
+        return closeInFlight;
       },
     };
   } catch (error) {
