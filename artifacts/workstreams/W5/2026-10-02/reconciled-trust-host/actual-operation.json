@@ -1,0 +1,165 @@
+{
+  "source": "8eee65eec96d619a28476f920329387e16db70bd",
+  "at": "2026-10-02T15:20:25.497730+00:00",
+  "ownerSource": "Currentmain166d9ee6 exact W8 createDevelopmentTrust retained; no obsolete W5 composite-core extension",
+  "actualChecks": [
+    "backend types passed",
+    "scoped lint/format passed",
+    "actual API startup passed"
+  ],
+  "actualReadiness": {
+    "ready": false,
+    "environment": "local-development",
+    "release": "8eee65eec96d619a28476f920329387e16db70bd",
+    "capabilities": [
+      {
+        "name": "trust_database",
+        "required": true,
+        "state": "available",
+        "code": "non_owner_rls_verified",
+        "checkedAt": "2026-10-02T15:19:29.989Z"
+      },
+      {
+        "name": "restoration_denial",
+        "required": true,
+        "state": "available",
+        "code": "tombstone_replay_gate",
+        "checkedAt": "2026-10-02T15:19:29.984Z"
+      },
+      {
+        "name": "privacy_domains",
+        "required": true,
+        "state": "unavailable",
+        "code": "domain_hooks_missing",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_authority",
+        "required": true,
+        "state": "available",
+        "code": "verified_scope_and_ownership_required",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "identity",
+        "required": true,
+        "state": "development",
+        "code": "synthetic_canonical_sessions",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "model",
+        "required": true,
+        "state": "unavailable",
+        "code": "probe_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "payments",
+        "required": true,
+        "state": "unavailable",
+        "code": "probe_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "calls",
+        "required": true,
+        "state": "unavailable",
+        "code": "probe_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "voice",
+        "required": true,
+        "state": "unavailable",
+        "code": "probe_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "push",
+        "required": true,
+        "state": "unavailable",
+        "code": "probe_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_identity",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_conversation",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_agent",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_commerce",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_content",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_media",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_growth",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_trust",
+        "required": true,
+        "state": "unavailable",
+        "code": "owner_readiness_unconfigured",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      },
+      {
+        "name": "privacy_exports",
+        "required": true,
+        "state": "unavailable",
+        "code": "protected_storage_fresh_auth_and_owner_probe_required",
+        "checkedAt": "2026-10-02T15:19:29.982Z"
+      }
+    ]
+  },
+  "actualManualOperation": {
+    "actor": "retained creator session, DEVELOPMENT-ONLY SEEDED VERIFIED without proof/passkey",
+    "viewport": [
+      390,
+      844
+    ],
+    "appearance": "Night",
+    "observation": "Notes draft concealed; replies UNAVAILABLE; actual Studio/queue GET503; API logs identify scope_denial_unconfigured. Screenshot personally inspected. No new actions written."
+  },
+  "limits": [
+    "Canonical57 only;0074/0082 continuation packet not yet published or activated.",
+    "No proof, passkey, real review, signed publication, private reply isolation, payment or delivery acceptance.",
+    "Actual trust_database and restoration_denial available; privacy/provider/readiness remain unavailable.",
+    "No new tests."
+  ]
+}

@@ -1,5 +1,21 @@
 # Decisions and missing-design register
 
+## W1 purpose and product decisions — October 2, 2026
+
+Generation workers use their own LOGIN and genuine durable acceptance/session provenance, rather than an interactive Actor or ThreadScope. Legacy rows without provenance stay unavailable. A private nonce binds each claim/read to its exact full transaction ID, backend PID, login, job, worker token and five-second lifetime. The original live session, participant negatives, creator state, current processor consent, family epoch and lease are checked before and after purpose work. Provider I/O runs outside these short transactions. Original0072 SQL is immutable/unactivated; genuine0093 and distinct context, licence, output, memory, journal and settlement consumers must be reviewed and activated before useful generation. Visible-prefix crash reconciliation and translation still require their own purpose contracts.
+
+Each worker consumer pins its actual migration version/checksum, exact function signature, strict NOLOGIN owner and SHA-256 of PostgreSQL's executable function definition. PUBLIC execution, membership, table/schema ownership, raw worker table/column/sequence grants or an unregistered effective SECURITY DEFINER entrypoint refuse qualification. An owner may receive bounded private scope metadata only through an exact nonce/XID/PID/login/read-phase/age RLS policy, with current matches() bookends; the worker receives no scope-table access. Canonical57 has seven forced-RLS generation metadata tables. Its identity_session table resolves an unknown bearer before an account context exists; that existing catalogue shape is preserved, while generation functions receive only four exact session metadata columns. The earlier eight-table factory expectation was a caught preflight error, not evidence of activation.
+
+Signing policies distinguish signing_challenge, publication and review. A challenge's final source check follows actual passkey/creator work and challenge INSERT on the original client/XID/Actor/command, immediately before commit. Publication uses the actual newly consumed named act; a review is a current read of its exact stored tuple. Viewer/delivered-content gates cannot authorize unpublished owner content. Late signer-account leases are nonblocking; current signature metadata reads remain plain MVCC after that lease so they cannot wait below a writer's row locks.
+
+Call nonce redemption binds the actual call session, participant account and family, and may be performed by a fresh authenticated session for that same account. Every client checks the actual account/role/expiry and redeems before transport. This is application admission; no single-use provider-token guarantee is claimed. The provider capability stays unavailable until its real contract establishes replay-resistant custody.
+
+Content and the CommercePublicPacketHost use the existing canonical core Pool and Database authority. W7 will supply a bounded current-account/creator Follow metadata projection on that exact held client. Copying a callback from the separate Growth pool, a Boolean from an outside transaction, or creating a nominal Database on a broader composite role would not establish the private graph's custody. Follow-dependent reads stay unavailable until the reviewed producer is installed; Growth API endpoints retain their distinct pool.
+
+O19 / the native Studio portion of Q15 is decided: implement native daily creator work, with Notes first, replies/Threads, Requests, and current Team/account/security access. Full AI/source/licence, offer, earnings and insight configuration remains required in responsive web Studio. This extends the original fan-native scope under the founder's product authority; it does not omit original Studio obligations. Add the necessary native compositions using the supplied component system and honest current-role states, preserving original component references. Implementation, real creator/Team operation, 200% text, assistive technology, phone/desktop responsive acceptance and release readiness remain open. Additional locales, referral incentives and experiments are separate undecided policies.
+
+The main-compatible two-file cold recovery correction7400de38 preserves saved credentials during a 5xx and keeps Retry/automatic restore available. Its narrow dependency set permits coherent main integration before the full issuer-storage stack lands. Its successful shipping builds and W2-operated outages are supporting/producer evidence; full W1 storage, rotation, persistent purge, issuer isolation and personal iOS acceptance remain separate obligations. Native Account may show a fan handle only when the real fan profile exists; authenticated security settings do not require inventing a fan profile.
+
 These are implementation/release dependencies, not requests for the founder to answer everything before work can start. Owners prepare concrete options and evidence, continue independent work, and ask only when the choice becomes necessary. No pending choice is silently converted into a production default.
 
 ## Decisions already settled
@@ -83,3 +99,143 @@ The canonical core connection stays non-owner `creator_runtime` NOINHERIT for id
 ### W1 October 2 — saved spending-reminder truth
 
 Shared SpendLimit accepts saved remindersOn=true/false/null. True preserves the supplied on-state copy, false says reminders are off, and missing/unknown state promises only immediate lower limits. Unsaved form toggles must not claim persisted reminder delivery. Original supplied preview fixtures explicitly pass true; reference source/images and comparison limits remain intact. Both native shipping consumers compile with backward-compatible defaults. W1 also contains Android foreground secure-storage reads inside the existing refresh failure/purge path and repairs its duplicate Swift Growth navigation merge argument. Actual Android rotation, cold restore, sign-out and under-18 denial evidence is qualified separately from compilation and full W1 acceptance.
+
+### W1 October 2 — late signature metadata fence
+
+Reserved 0081 uses one signer-account shared advisory lease after the actual current-session, negative/audience/content and W4 mode/packet gates. Six identity/proof tables take the exclusive account lease in AFTER UPDATE/DELETE triggers. Final readers acquire no further identity/domain row locks and read bounded metadata until commit. After waiting, the reader rechecks current session expiry and the creator account. One creator family per transaction prevents unrelated final signature locks from accumulating. W4 supplies the exact stored signed-act IDs. This gate returns only a boolean and grants no object scope, assertion, credential or private content. Construction requires the exact canonical migration, role, functions and triggers, and refuses unsafe role memberships or private-column privileges.
+
+The definer is explicitly VOLATILE and requires READ COMMITTED, so metadata reads after a waiting lease get current snapshots ([PostgreSQL 17 volatility](https://www.postgresql.org/docs/17/xfunc-volatility.html)). AFTER row triggers execute at statement end within the writer transaction ([PostgreSQL 17 triggers](https://www.postgresql.org/docs/17/trigger-definition.html)). Lock errors roll back. The proposals pass installation and negative checks on a separate closed empty57-migration clone; W8 review/activation and actual concurrency/positive acceptance remain required. Both purpose migrations create missing roles conditionally and reject unsafe existing roles without resetting passwords or widening private permissions. 0071 explicitly resets the inherited migration role before role creation. Native Account/support/settings selects You based on the operated Home-highlight defect; component reference styles remain unchanged.
+
+
+### W1 October 2 — native retained-session recovery
+
+A cold offline identity read keeps the issuer-bound credential but has no current session projection. Showing Welcome implied sign-out during the operated Android outage. Both shells now show the same canonical recovery title/body/Retry used by web, preserve the original destination and retry while foreground. Public signed-out destinations remain accessible through their explicit registrations. Missing credentials, rejected refresh credentials and failed private cleanup retain their separate paths. A guarded single refresh excludes duplicate poll/Retry reads; an actual completed rotation performs its own fresh read. Current Android recovery and subsequent real rotation are personally verified. Normal iOS signing/build passes; iOS operation is still required.
+
+
+### W1 current authority and separate API custody — October 2, 2026
+
+W1's Database receives the composed held denial port used by Access; configuring W8 trust alone must not omit denials from subsequent domain transactions. Genuine session/participant resolution precedes negative keys, then positive family/role leases and currentness recheck. Original immutable denial SQL is unchanged; a separately reviewed nonblocking wrapper is needed for consumers entering below earlier family locks. Source and existing checks do not establish concurrency acceptance.
+
+Growth/content follow reads use a real separate API login inheriting only canonical core and Growth roles; core identity/conversation keeps its direct NOINHERIT login. W1 privately provisions that role on its owned database with effective inherited privilege checks and no direct private grants. The stored session signing key is retained during source restarts so existing real development sessions keep their original issuer and freshness. Trust and provider availability continue to report their actual configuration.
+
+
+### Public metadata, scope lifetime and late signature contention — October 2, 2026
+
+Public creator IDs authorize bounded public-purpose metadata, never a private owner account/Actor. W1 chooses one actual visitor-bound client, immutable exact proof objects, generated mode/cap columns and nonblocking positive leases. W2's actual license and processor purpose remain mandatory; unavailable metadata never becomes a successful empty/published version. The bounded1000-source metadata reader may report unavailable for larger snapshots; extending that reader requires a reviewed aggregate/paging plan without widening private content access.
+
+Purpose scope rows are transaction-only. Deferred cleanup constraints reject a commit retaining publication command or public-AI nonce metadata. A TTL is not deletion authority. Late signature currentness uses a shared try key because waiting below already held business locks could invert a writer's order. Contention returns retryable503 and rolls back every prior command/business mutation; only metadata/commit may follow success. No new unit test or applied migration is written.
+
+### W1 — preserve labels at large native text (October 2, 2026)
+
+`55058f90`: shared fan/Studio navigation retains the supplied standard row but allocates extra rows at large text sizes. Complete labels and minimum48-point/dp targets are preserved; text is never shrunk or truncated to fit the standard columns. Largest-size inline glyph/label rows avoid narrow word breaking. Personally operated Android at actual200% confirms all four destinations, while native Studio, maximum iOS and assistive technology remain separately unaccepted. Account now renders an @handle only when the current session actually has one; the unset state offers the existing Choose your handle action. Public-AI consumers also pin the exact issuing Pool object so metadata authority from another graph cannot certify the current service.
+
+
+### W1 — original-work settlement and unavailable sign-in (October 2, 2026)
+
+Terminal writes invalidate generation input permission, so0099 uses separate original-work custody, a fresh terminal nonce/token and exact durable participant/session/cursor/lease metadata. Completion requires current original positive eligibility; reconciliation separately handles real expiry/revocation/takeover without acquiring text or provider rights. Actual W2 journal and W4 original reservation assertions must bookend commit; unknown cost cannot become zero. Immutable checked consumer retention and effective catalogue column/sequence/executable denials prevent preparation drift. The source stays held until real owner negatives/consumers are composed and original-work acceptance succeeds.
+
+Missing production identity configuration must remain an honest product recovery state. A validated relative303 returns to Welcome with canonical unavailable/Retry/Back while preserving the original safe destination; it does not derive an origin from request Host/forwarded headers or loosen HTTPS. Actual local production browser operation verifies this failure state only.
+
+
+### W1 — late original-attempt usage after terminal delivery (October 2, 2026)
+
+A late real provider result belongs to the original pre-admission W2 completion capability. It may append an immutable correction/receipt wakeup against the original attempt and reservation after a terminal outcome; it must preserve prior accounting and cannot reopen generation, acquire text/lease/provider rights or mint an Actor/ThreadScope. Initial finalization remains0099/0100. W2 publishes actual fixed provenance/terminal-state checks, W4 supplies original-reservation idempotency, and W8 separately reviews accounting metadata/retention/restoration after denial or erasure. Unknown cost retains original custody until a qualified observed correction; no fake zero/no-request or invisible refund is inferred. Actual owner source/composition/acceptance remains required.
+
+
+### W1 — explicit usefulness and a durable intro opportunity (October 2, 2026)
+
+DI09 uses only the fan's actual consented helpful response to the exact delivered/interrupted AI lineage. A stable pending offer is account-wide and survives response loss; the UI's actual Save/Skip gets a separate durable acknowledgement. Existing outbox publication is not evidence a prompt was seen. A pre-existing intro suppresses the first opportunity, and saving an intro grants no per-creator provider consent. The current held session/client and approved account metadata policy are mandatory; absent policy leaves the feature unconfigured. W1 retains all-client implementation and acceptance.
+
+
+### October 2 — original terminal construction custody
+
+W1 pins the actual immutable99/100 SQL and seven installed PostgreSQL definitions in a frozen construction packet. This is a review receipt, not activation or positive work permission; genuine generation registry, held W8 recovery and actual W2/W4 settlement remain required. The factory requires the exact delivered100 name and uses CASE relation-kind guards before PostgreSQL type-specific privilege helpers. Personally installed only on empty closed proposal57, actual worker-login denials/unknown refusal/catalogue execution pass; no app/private data or applied canonical migration is changed.
+
+## W1 DI09 client disposition and profile concurrency — October2
+
+An explicit consented helpful write creates eligibility; only the actual server-issued pending offer is shown. All three clients recover a lost response through current authorized pending lookup and separately acknowledge explicit Save/Skip. Acknowledgement uncertainty leaves Finish available; a stored intro recovers as Finish, avoiding a repeat write. No UI arrival, generation terminal, elapsed timer or delivery state can fabricate eligibility.
+
+Save uses an intro-only identity operation against the original account/profile version. This preserves the current handle and rejects a conflicting edit. A repeated lost-response request can return the actual stored matching intro without mutation. Native freezes the issuer credential for that write and rechecks the original session afterward; web keeps the existing current-account BFF boundary. Saving an intro grants no AI use, provider, marketing or per-creator sharing consent. All three positive journeys remain unaccepted without the genuine policy inputs.
+
+## W1 transient provider failure preserves session — October2
+
+Session resolution previously revoked the local session for every upstream adapter error. W1 now revokes only an explicit401 rejection or authoritative adult-eligibility denial; transport,5xx and invalid/unconfirmed adapter responses return a sanitized503 and leave the session intact. Every request still fails closed until the original provider confirms authorization; there is no offline authorization cache. Account mismatch still revokes. This source repair complements the current web restore distinction between401 and unavailable5xx, and native retry preserving issuer-bound credentials. No real upstream provider outage outcome is inferred while production Pantopus credentials remain absent.
+
+## W1 effective debug API configuration — October2
+
+Personally launching the actual shipping Android build without command-line overrides exposed a configuration defect: the generated loopback BuildConfig origin was present but the entry point applied the Release HTTPS-only parser and discarded it. The app honestly refused sign-in despite the actual backend's seven-actor capability. Both native entry points now accept a configured loopback origin only in DEBUG, using the same existing explicit debug host/port/URL-shape guard. Release remains HTTPS-only, empty/invalid configuration unavailable, issuer-bound credential stores unchanged; explicit debug launch overrides still work. Build metadata alone was insufficient evidence and the original unconfigured launch remains a recorded failure.
+
+## W1 canonical error envelope matches the actual API — October2
+
+The personally operated shipping Android under18 flow displayed a generic reconnect failure. The actual API error middleware includes optional correlationId, while the canonical strict Error model omitted it; Android strict decoding therefore discarded the actionable message. Added the existing optional correlation field to the canonical schema and regenerated every consumer. This preserves strict authority payload validation while allowing the actual sanctioned diagnostic field. The under18 journey will be repeated after the shipping rebuild; the initial generic message remains a recorded UX failure.
+
+## W1 strict held request before family discovery — October2
+
+One-ID metadata bootstrap requires a current genuine request before its family is known. The new issuer refuses absent ALS, mismatched/stale current adult evidence, wrong/non-owner role, implicit transactions and another session binding. Its opaque result retains exact request/client/PID/full transaction custody; bookends reject cross-request/client or ended-transaction reuse and recheck actual session expiry. It cannot grant a family, Access, Trust or provider permission. Call metadata must stay internal until genuine same-client restoration, participant negatives, Access and current booking pass. See [the actual contract](../implementation/W1-current-request-session.md). Existing scoped host/job absence behavior is preserved separately.
+
+## W1 canonical enrollment exceptions and verification heading — October2
+
+The personally operated native public verification displayed a technical route identifier, and source inspection found Status/Ops still behind a fan-handle gate despite web's corrected guard. Canonical navigation now generates the same narrow Account/Status/Ops exemption for web, Swift and Kotlin; invalid destinations never qualify and explicit Handle enrollment stays explicit. This removes a persona dependency without granting any Ops membership. Public verification uses a clear shared heading and accessible page title, while exact act hashes remain available where they help inspect an actual signature. Earlier screenshots retain the original finding. Shipping rebuild/current personal acceptance are separately required.
+
+
+## W1 core Content, separate Growth projection and held privacy — October 2
+
+Canonical Content must retain its actual creator_runtime pool and service. The root host now consumes W7's reviewed separate publicProjection port rather than passing a Growth service from another pool into the strict Content composition seam. Follower metadata comes from the actual held core reader and stays unavailable while its migration is unregistered; a separate-pool Boolean or role inheritance cannot substitute for held authority. The projection still rechecks the original publisher, exact current Content version, signing and media proof.
+
+Growth privacy uses W8's genuine leased domain-task/restoration authority on the actual Growth worker client before domain locks and at export/delete bookends. An ownership snapshot, coordinator pool check or unknown job grants nothing. The cursor completes only after exhaustion and an accepted commit; cancellation destroys only its dedicated client. The existing prepared conversation/Agent consumers and W1 actor/adult/session capability are preserved. Normal source integration is distinct from actual migration activation, provider outcomes and W1's personal all-client acceptance.
+
+
+## W1 root host consumes prepared privacy and review producers — October 2
+
+Trust starts before feature composition, so its conversation hook resolves a deferred port to the actual canonical host's prepared lineage, recordings and optional original financial reconciliation. A missing owner remains unavailable; a missing retention/accounting policy still blocks deletion. No unprepared instance, public summary, invented job or successful no-op substitutes for an owner. Content also consumes the reviewed same-client reply-review producer, keeping exact text/version and current author verification inside its held write. Missing review infrastructure leaves the reply pending and unavailable rather than marking it allowed. Host cleanup now awaits actual asynchronous close callbacks.
+
+
+## W1 consumes corrected held names without changing history — October 2
+
+W1 reviewed W8's complete corrected fb1cbcaa ordering and matched the exact held packet SHA2338f48e and unchanged four-source wave SHA2d72120d. Held factory pins now use0159 generation,0167 signature fence,0170 public AI,0183 terminal and0184 terminal negatives; generation negatives require the exact0177 name. Actual W3 translation metadata63402a4d is consumed with its0168 allocation and unchanged original SQL path/hash. The previously personally qualified actual W8d12db34c terminal-negative SQL is now present unchanged in this combined checkout. No old ledger aliases, SQL edits, source-hash changes or new activation are created. W4 discovered embedded historical ledger guards in its held audience SQL; a metadata move alone cannot make those executables ready. All further held SQL requires actual owner dependency and function-body review.
+
+
+## W1 removes obsolete core-to-Growth role membership — October 2
+
+Personally operated closed57→61 rollout and separate fresh61 catalogue checks both refused0087. W1 isolated the actual cause: its retained creator_runtime role was NOINHERIT yet remained a member of growth_runtime. NOINHERIT does not remove SET ROLE authority. W1 deliberately revoked only this obsolete membership in its owned closed cluster, preserving all other role attributes and business/history data; the initial original wave had rolled back. Both refusal receipts remain recorded, and a new private backup plus separate restore matched all six custody digests after repair. The operator now refuses the same forbidden core role attributes/membership/settings before DDL. This is an explicit security repair; original-membership preservation is not claimed across it.
+
+## W1 drains shutdown once under overlapping signals — October 2
+
+W3's actual SIGINT operation exposed duplicate pg pool.end calls in the composed root host. W1 now shares one in-flight SIGINT/SIGTERM cleanup, awaits every feature close and attempts all remaining cleanup even after an individual failure, with sanitized stage-only errors and a failing exit status. Growth's own close also retains one promise and closes its worker pool if its timer drain fails. No raw provider/database failure enters logs. Current source checks pass; the actual combined process will be operated before shutdown acceptance is claimed.
+
+
+## W1 current generation and terminal catalogue on the held client — October 2
+
+Factory approval is a construction prerequisite, not continuing authority. Both original generation and terminal issuers now retain frozen review packets and reuse their complete factory catalogue on the actual explicit transaction before operations and at commit bookends. Generation rechecks the current worker/owner, registered source and every fixed consumer definition; terminal additionally rechecks its exact six definitions, W8 denial definition, trigger/role/ACL/column custody. The terminal issuer calls the genuine original generation issuer's current catalogue proof on that same client. The metadata proof creates no scope/input/provider or settlement permission; actual opaque issuance, current negatives and original owner settlement still apply. Missing future registry authority remains unavailable. Source checks and existing contracts pass; no positive future job or live drift acceptance is inferred.
+
+## W1 personally qualifies canonical61 while keeping traffic closed — October 2
+
+After the separately recorded obsolete-membership repair, W1 made a fresh private backup and separate closed restore with six matching custody digests, then used the official atomic four-source wave. All57 prior checksums/timestamps,27 original rows,161 original tables and the original sequence are preserved. The distinct fresh61 install matches the upgraded catalogue and security digest. Original, backup restore and fresh qualification databases remain closed. Only0074/0082/0087/0103 are added; no higher held purpose, real provider outcome or release admission is inferred. The earlier rejected upgrade/fresh catalogue receipts remain recorded.
+
+### W1 — integrate original terminal settlement without weakening current custody (October 2)
+
+Personally reviewed and integrated actual W4 e080cf94, including its original weighted-rule capture, W2 terminal journal and W4 settlement contracts, and the distinct renumbered audience SQL. The actual immutable earlier SQL stays unchanged and no held migration is activated. W1 retains its0220c457 complete same-client generation/terminal catalogue bookends through the merge; W4 preparation cannot replace current authorization. The settlement requires actual original journal/rule evidence and retains unknown holds. Backend types, scoped lint and nine existing contracts pass on this combined source; the prior0220 full18-check receipt is separately revision-qualified. Genuine combined owner composition and positive settlement acceptance remain open.
+
+### W1 — bind one-ID call lookup to the genuine prepared host (October 2)
+
+Personally reviewed and integrated W6 f802683f with its published73ab8bdd savepoint repair. The original BackendRuntime references and actual composed held Trust callbacks must remain unchanged from preparation through every read. One call ID yields only navigation coordinates after actual current session, restoration, participant negatives, Access, current booking and call-version checks. The exact mapped0197 source is still unregistered, so recovery remains unavailable; no booking, admission or provider permission is inferred. W1 preserves the actual separate Growth/core pools, conversation privacy ports and single-flight shutdown while adding the prepared metadata port. Canonical generation, backend/web types, scoped lint and nine existing contracts pass.
+
+### W1 — separate generation and terminal consumer registry custody (October 2)
+
+Actual source review confirmed that the old generic consumer proof required terminal-only roles to execute the original generation matcher, making the genuine0183/0188/0189 graph unpreparable. W1 implements an explicitly typed terminal packet with exact fixed signatures, owners, migration versions and immutable SQL hashes. Terminal mode proves its own matcher and refuses the original matcher; the generation registry retains its original proof. Terminal preparation and the actual W2/W4 factories consume the separate assertion. This corrects the registry seam without widening grants, changing SQL, aliasing a ledger or issuing a scope. Backend types, scoped lint and nine existing contracts pass. Full closed-catalogue qualification, genuine activation and positive composed settlement remain open.
+
+### W1 — retain the original core terminal compatibility bridge (October 2)
+
+Review of unchanged183 SQL line295 caught an error in c9812b25: the core terminal authority already has a legitimate original matcher compatibility grant. W1 now requires exact privilege equality to each fixed owner contract: the core183 bridge must be present;188/189 journal/settlement leaves must lack it. All terminal consumers still require the terminal matcher. No SQL, grant, scope issuance or ledger change occurs. Types, scoped lint, existing contracts and backend production build pass; unregistered positive purpose and live full-graph acceptance remain open.
+
+### W1 — announce route errors once while retaining focus and Retry (October 2)
+
+Personal web outage operation exposed nested app alerts: the focusable recovery wrapper and the existing error Notice both declared alert. The wrapper now retains programmatic focus without repeating the Notice alert. Installed Next16.3.7 error-file documentation confirms the stable retry callback re-fetches the segment; no guessed reset substitution is made. Existing typecheck and scoped lint pass. Actual development Account recovered through Retry after a real API stop/restart without another sign-in; production-build Retry and assistive-technology acceptance remain open.
+
+### W1 — preserve actual privacy restoration through lifecycle commit (October 2)
+
+Personally inspected and normally integrated W8 a5383ea2 ancestry. Identity, media and family discovery now check actual restoration and genuine cancellable task custody on their original held lifecycle client, including query/page and COMMIT bookends; cancellation destroys only that leased client. The merge preserves W1's original a7ce54d1 early core-role membership refusal and the current Growth generic query contract. Held0201 grants only version/checksum metadata to original isolated publication/callback logins and refuses broader custody; its unchanged SQL SHA2fce1ce5 is retained. No migration, role grant, ledger alias or positive app purpose is activated. Backend types, scoped lint and the nine existing contracts pass. Owner-operated receipts remain owner evidence; W1 still owes its own combined journey acceptance.
+
+### W1 — recover one-ID call destinations through current account authority (October 2)
+
+All three shipping clients now recognize the canonical `/calls/:sessionId` destination. They request only the genuine W6 account-bound navigation operation, validate the returned exact call ID and family, then enter the existing independently authorized call screen. Native lookups bind the original issuer credential, account, session, destination and cancellation state; a departed or rotated response cannot navigate. Web mounts both short and existing full call routes inside the actual identity/media cancellation boundary, preserves the sign-in/restore destination and refuses invalid selectors. The shared Next dynamic segment is reused so adding the short route cannot conflict with the existing long route. No Fan enrollment exception, participant default, provider admission, policy or migration activation is added. Missing metadata remains an explicit Retry/Open Requests state. Shared copy uses the existing component and typography system. Current web types and scoped lint pass; shipping compilation and personal refusal/positive journey evidence follow.

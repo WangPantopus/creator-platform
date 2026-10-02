@@ -1068,6 +1068,13 @@ data class APICallCallRevision(
 )
 
 @Serializable
+data class APICallCallRoute(
+  val `sessionId`: String,
+  val `creatorId`: String,
+  val `fanId`: String
+)
+
+@Serializable
 data class APICallCallSummaryNote(
   val `note`: String,
   val `expectedVersion`: Long,
@@ -1681,6 +1688,39 @@ object APIContentWithdrawResultWithdrawnSerializer : KSerializer<APIContentWithd
 }
 
 @Serializable
+data class APINoteReplyPolicy(
+  val `accountId`: String,
+  val `creatorId`: String,
+  val `limit`: JsonElement,
+  @Required
+  val `confirmedDays`: Long? = null,
+  @Required
+  val `milestone`: JsonElement? = null,
+  @Required
+  val `basis`: APINoteReplyPolicyBasis? = null,
+  val `historyComplete`: APINoteReplyPolicyHistoryComplete,
+  val `longerRepliesActive`: Boolean,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APINoteReplyPolicyBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APINoteReplyPolicyHistoryCompleteSerializer::class)
+object APINoteReplyPolicyHistoryComplete { const val value: Boolean = false }
+object APINoteReplyPolicyHistoryCompleteSerializer : KSerializer<APINoteReplyPolicyHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APINoteReplyPolicyHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APINoteReplyPolicyHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APINoteReplyPolicyHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APINoteReplyPolicyHistoryComplete) { encoder.encodeBoolean(false) }
+}
+
+@Serializable
 data class APIPrivateNoteReply(
   val `safetyState`: APIPrivateNoteReplySafetyState,
   val `safetyReviewAvailable`: Boolean,
@@ -2237,6 +2277,12 @@ data class APIFanProfileInput(
 )
 
 @Serializable
+data class APIFanIntroInput(
+  val `intro`: String,
+  val `expectedVersion`: Long
+)
+
+@Serializable
 data class APIFanProfile(
   val `id`: String,
   val `handle`: String,
@@ -2768,7 +2814,8 @@ data class APIError(
 data class APIErrorError(
   val `code`: String,
   val `message`: String,
-  val `requestId`: String
+  val `requestId`: String,
+  val `correlationId`: String? = null
 )
 
 @Serializable
@@ -3144,6 +3191,12 @@ data class APIConversationConversationCorrectionInputCommandContent(
 enum class APIConversationConversationCorrectionInputCommandContentKind {
   @SerialName("conversation_correction") CONVERSATION_CORRECTION
 }
+
+@Serializable
+data class APIConversationConversationIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
 
 @Serializable
 data class APIConversationConversationMessage(
@@ -3763,6 +3816,26 @@ enum class APIConversationReplyFeedbackRating {
 }
 
 @Serializable
+data class APIConversationReplyFeedbackResult(
+  @Required
+  val `rating`: APIConversationReplyFeedbackResultRating? = null,
+  @Required
+  val `introOffer`: APIConversationReplyFeedbackResultIntroOffer? = null
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackResultRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationReplyFeedbackResultIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
+
+@Serializable
 data class APIConversationTeamReply(
   val `text`: String,
   val `idempotencyKey`: String
@@ -4328,6 +4401,39 @@ object APIContentContentWithdrawResultWithdrawnSerializer : KSerializer<APIConte
 }
 
 @Serializable
+data class APIContentNoteReplyPolicy(
+  val `accountId`: String,
+  val `creatorId`: String,
+  val `limit`: JsonElement,
+  @Required
+  val `confirmedDays`: Long? = null,
+  @Required
+  val `milestone`: JsonElement? = null,
+  @Required
+  val `basis`: APIContentNoteReplyPolicyBasis? = null,
+  val `historyComplete`: APIContentNoteReplyPolicyHistoryComplete,
+  val `longerRepliesActive`: Boolean,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentNoteReplyPolicyBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentNoteReplyPolicyHistoryCompleteSerializer::class)
+object APIContentNoteReplyPolicyHistoryComplete { const val value: Boolean = false }
+object APIContentNoteReplyPolicyHistoryCompleteSerializer : KSerializer<APIContentNoteReplyPolicyHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentNoteReplyPolicyHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentNoteReplyPolicyHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentNoteReplyPolicyHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentNoteReplyPolicyHistoryComplete) { encoder.encodeBoolean(false) }
+}
+
+@Serializable
 data class APIContentPrivateNoteReply(
   val `safetyState`: APIContentPrivateNoteReplySafetyState,
   val `safetyReviewAvailable`: Boolean,
@@ -4770,6 +4876,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentPreference(creatorId: String): APIContentPreference = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "GET", authenticated = true))
   suspend fun muteContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIContentMuteCommand): APIContentMuteCommand = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun noteReplyPolicy(creatorId: String): APINoteReplyPolicy = json.decodeFromString(request("/v1/content/${segment(creatorId)}/reply-policy", "GET", authenticated = true))
   suspend fun myContentThanks(creatorId: String): APIContentThanksView = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "GET", authenticated = true))
   suspend fun saveContentThanks(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIThanksCommand): APIContentRevisionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioThanksFeed(creatorId: String): APIContentThanksFeed = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/thanks", "GET", authenticated = true))
@@ -4815,6 +4922,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun logout(): APIDone = json.decodeFromString(request("/v1/identity/logout", "POST", authenticated = true))
   suspend fun revokeSessions(): APIDone = json.decodeFromString(request("/v1/identity/revoke-sessions", "POST", authenticated = true))
   suspend fun saveFanProfile(body: APIFanProfileInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun saveFanIntro(body: APIFanIntroInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile/intro", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun saveCreatorProfile(body: APICreatorProfileInput): APICreatorProfile = json.decodeFromString(request("/v1/identity/creator-profile", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun creatorProof(creatorId: String): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "GET", authenticated = true))
   suspend fun beginCreatorProof(creatorId: String, body: APIProofInput): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "POST", body = json.encodeToString(body), authenticated = true))
@@ -4839,6 +4947,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun leaseOfflineConversation(creatorId: String, fanId: String): APIConversationConversationOfflineSnapshot = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/offline", "GET", authenticated = true))
+  suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
@@ -4860,10 +4969,11 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
 }
 
 object ApplicationDestination {
+  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?)$").matches(value.substringBefore('?'))
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
     val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$")
     val literalValues = mapOf("offer" to "1")

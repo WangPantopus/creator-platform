@@ -1,11 +1,11 @@
-import type { Session } from "@qelvora/api";
+import { requiresFanProfile, type Session } from "@qelvora/api";
 
-/** Ops authenticates and authorizes actual memberships in its own domain.
- * A reviewer must not create a fan persona merely to reach that guard. */
+/** Account security, public status and Ops membership guards do not require a
+ * fan persona. Callers first validate the actual canonical return target. */
 export function requiresFanHandle(
   session: Pick<Session, "fan">,
   returnTo: string,
   resumeHandle = false,
 ) {
-  return resumeHandle || (!session.fan && !/^\/ops(?:\/|$)/u.test(returnTo));
+  return resumeHandle || (!session.fan && requiresFanProfile(returnTo));
 }

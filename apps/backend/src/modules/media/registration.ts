@@ -5,7 +5,7 @@ import { createW6Router, type W6RouterDependencies } from "./router.js";
 export function mediaFeature(
   services: Omit<
     W6RouterDependencies,
-    "scopeFor" | "creatorScopeFor" | "audienceScopeFor"
+    "scopeFor" | "creatorScopeFor" | "audienceScopeFor" | "actorFor"
   >,
 ): FeatureRegistration {
   if (
@@ -25,6 +25,7 @@ export function mediaFeature(
       return createW6Router({
         ...services,
         scopeFor,
+        actorFor,
         creatorScopeFor: creatorIdentity
           ? async (req) =>
               creatorIdentity.open(

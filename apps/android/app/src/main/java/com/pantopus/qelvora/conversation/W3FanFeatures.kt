@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.identity.NativeIntroOffer
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -100,6 +101,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var offline by remember(root, accountId) { mutableStateOf(true) }
     var transportReady by remember(root, accountId) { mutableStateOf(false) }
     var busy by remember(root, accountId) { mutableStateOf(false) }
+    var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -280,6 +282,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
             IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                item(key = "intro-offer") {
+                    NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
+                        enabled = !busy && !offline && foreground && !privacy && source == null)
+                }
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
                 if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
@@ -329,12 +335,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                 if (!busy && !offline && foreground) {
                                     busy = true
                                     try {
-                                        client.request("$root/messages/${message.id}/feedback", buildJsonObject {
+                                        val response = client.request("$root/messages/${message.id}/feedback", buildJsonObject {
                                             put("messageVersion", message.version)
                                             put("agentVersion", buildJsonObject { put("id", version.id); put("hash", version.hash) })
                                             put("rating", rating?.let { JsonPrimitive(it) } ?: JsonNull)
                                             if (rating != null) { put("consent", true); put("policyVersion", policy.version) }
-                                        }); older = older.map { if (it.id == message.id) it.copy(feedback = rating) else it }; refresh()
+                                        })
+                                        introOfferId = response.jsonObject["introOffer"]?.takeUnless { it is JsonNull }?.jsonObject?.get("offerId")?.jsonPrimitive?.contentOrNull
+                                        older = older.map { if (it.id == message.id) it.copy(feedback = rating) else it }; refresh()
                                     } catch (failure: Throwable) { fail(failure) } finally { busy = false }
                                 }
                             } }

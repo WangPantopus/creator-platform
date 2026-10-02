@@ -1,0 +1,57 @@
+{
+  "recordedAt": "2026-10-02T08:32:22.404671+00:00",
+  "sourceBase": "a5eb973d",
+  "purpose": "Closed empty PG17 schema and negative-authority rehearsal; not canonical activation or genuine Signed acceptance",
+  "environment": {
+    "host": "Mac Studio",
+    "databaseImage": "pgvector/pgvector:pg17",
+    "container": "creator-platform-w1-purpose-review-20261002",
+    "database": "creator_w1_review_revision2",
+    "hostPorts": [],
+    "traffic": "closed",
+    "baselineOwnerSource": "58b59fa0",
+    "canonicalBaselineEntries": 57
+  },
+  "exactProposals": {
+    "0070": {
+      "source": "59b63b7a",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "sha256": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8"
+    },
+    "0071": {
+      "source": "current publication increment",
+      "path": "apps/backend/src/modules/identity/schema-publication-scope.sql",
+      "sha256": "0c185ecf4d26245adc5ea6674a72034bafa7eec8a59a16f11ad24621da06e659"
+    },
+    "0081": {
+      "source": "current publication increment",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "sha256": "ca084ffce88d23a5d0146b63bd1b2d4b28afbfd711b6fa89c4cc1db5b41653bd"
+    }
+  },
+  "checks": {
+    "exact57FreshInstallation": "passed",
+    "exact0070_0071_0081Installation": "passed atomically after resetting migration role in0071",
+    "strictExistingRoleReuse": "passed",
+    "sixAfterWriteFences": "passed",
+    "keyAndAssertionColumnsHidden": "passed",
+    "publicationRolesCannotReadFanMessagesOrSessionCredentials": "passed",
+    "missingAuthorityDenied": "passed",
+    "emptyRealPacketProjection": "passed",
+    "signatureMetadataQueryUnderActualDefinerRole": "planned successfully",
+    "exactFactoryReadinessWithoutActivatedLedger": "false as required",
+    "backendTypecheck": "passed",
+    "selectedLintAndFormat": "passed"
+  },
+  "failuresRetained": [
+    "First dependency batch incorrectly replayed already canonical personalApproval0044 and rolled back",
+    "Second batch found0071 inherited creator_owner from0070 and could not create roles; rolled back; unapplied0071 corrected with RESET ROLE"
+  ],
+  "limitations": [
+    "Retained original40 database unchanged",
+    "No canonical migration register or proposal ledger entries changed",
+    "No real verified creator, passkey assertion, content, packet, participant or signature fabricated",
+    "Positive admission and concurrent genuine revocation still require acceptance",
+    "Rehearsal role/database owner only applied actual producer source; application runtime never used migration credentials"
+  ]
+}

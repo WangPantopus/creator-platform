@@ -1,6 +1,10 @@
 import { z } from "zod";
 import navigation from "../../../config/navigation.json" with { type: "json" };
 const destinationPattern = new RegExp(navigation.pathPattern, "u");
+const fanHandleExemptPattern = new RegExp(
+  navigation.fanHandleExemptPathPattern,
+  "u",
+);
 const literalQueryValues: Readonly<Record<string, string>> =
   navigation.literalQueryValues;
 
@@ -35,6 +39,15 @@ export function validReturnTarget(value: string): boolean {
     );
   });
 }
+/** Account security, public status and independently guarded Ops membership
+ * do not depend on enrolling a fan persona. Destination validation remains
+ * mandatory; an invalid destination never receives this exception. */
+export function requiresFanProfile(value: string): boolean {
+  return (
+    !validReturnTarget(value) ||
+    !fanHandleExemptPattern.test(value.split("?")[0]!)
+  );
+}
 export const ReturnTargetSchema = z
   .string()
   .refine(
@@ -58,6 +71,11 @@ export const FanProfileSchema = z.strictObject({
   handle: z.string(),
   intro: z.string(),
   version: z.number().int().positive(),
+});
+/** An intro edit preserves the current handle and detects concurrent edits. */
+export const FanIntroInputSchema = z.strictObject({
+  intro: FanProfileInputSchema.shape.intro,
+  expectedVersion: z.number().int().positive(),
 });
 export const TeamRoleSchema = z.enum([
   "triage",
@@ -164,6 +182,7 @@ export const PublicSignatureSchema = z.strictObject({
 export const identitySchemas = {
   CompleteIdentity: CompleteIdentitySchema,
   FanProfileInput: FanProfileInputSchema,
+  FanIntroInput: FanIntroInputSchema,
   FanProfile: FanProfileSchema,
   CreatorProfileInput: CreatorProfileInputSchema,
   CreatorProfile: CreatorProfileSchema,

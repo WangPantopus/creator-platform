@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "source": "61db88ebba0ddcd420fa4e49144b77033dfc7dbd",
+  "environment": "Mac Studio; actual Chrome extension browser; owned local production Next bundle on127.0.0.1:3012",
+  "deviceOS": "desktop macOS; exact patch not recorded",
+  "viewport": {
+    "cssWidth": 1325,
+    "cssHeight": 873,
+    "devicePixelRatio": 2,
+    "browser200PercentZoom": "not verified"
+  },
+  "theme": "Night",
+  "provider": "production mode with deliberately absent/invalid HTTPS app origin; no real external identity provider",
+  "personallyPerformed": [
+    "Opened actual Welcome with validated Account returnTo.",
+    "Clicked Continue: actual unavailable Notice and Retry/Back replace raw JSON.",
+    "Clicked Retry: same unavailable product state retained original Account destination.",
+    "Clicked Back: Notice cleared and same validated Account destination retained."
+  ],
+  "persistedOutcome": "no authentication/private account change; safe same-origin relative303 and no-store recovery",
+  "checks": [
+    "web typecheck",
+    "scoped ESLint/Prettier",
+    "actual production build"
+  ],
+  "screenshot": "web-production-sign-in-unavailable.jpg",
+  "cleanup": "owned temporary3012 process stopped and owned browser tab closed",
+  "limitations": [
+    "Local HTTP failure state, not genuine production identity or domain association.",
+    "No phone/artboard/200-percent/assistive-technology acceptance inferred."
+  ],
+  "timings": {
+    "measured": false
+  }
+}

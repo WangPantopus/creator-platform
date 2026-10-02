@@ -975,4 +975,44 @@
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
   <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
   <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
+  <string name="identity_verification_page_title" formatted="false">Signature verification</string>
+  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
+  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="intro_offer_title" formatted="false">Tell creators’ AIs about yourself once</string>
+  <string name="intro_offer_body" formatted="false">Add a short intro in your own words. You choose, per creator, whether their AI may use it.</string>
+  <string name="intro_offer_label" formatted="false">A line about you · optional</string>
+  <string name="intro_offer_save" formatted="false">Save intro</string>
+  <string name="intro_offer_skip" formatted="false">Skip</string>
+  <string name="intro_offer_saving" formatted="false">Saving…</string>
+  <string name="intro_offer_finish" formatted="false">Finish</string>
+  <string name="intro_offer_saved_pending" formatted="false">Your intro is saved. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_skipped_pending" formatted="false">Your choice is kept on this screen. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_unavailable" formatted="false">Your intro could not be saved. Your input is kept. Reconnect and try again.</string>
+  <string name="intro_offer_ack_unavailable" formatted="false">This offer could not be dismissed. Reconnect and try again.</string>
+  <string name="intro_offer_acknowledging" formatted="false">Finishing…</string>
+  <string name="w5_content_status" formatted="false">Content status</string>
+  <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
+  <string name="w5_content_check_current_access" formatted="false">Check current access</string>
+  <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
+  <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
+  <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
+  <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
+  <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
+  <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
+  <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
+  <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
+  <string name="growth_back_to_reply" formatted="false">Back to reply</string>
+  <string name="growth_reply_image_export_help" formatted="false">The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.</string>
+  <string name="growth_preparing_reply_images" formatted="false">Preparing images…</string>
+  <string name="growth_reply_image_progress" formatted="false">Prepared {page} images…</string>
+  <string name="growth_reply_image_page" formatted="false">Page {page}</string>
+  <string name="growth_reply_images_ready" formatted="false">Your download is ready. Check your browser’s downloads.</string>
+  <string name="growth_reply_image_export_failed" formatted="false">The complete image export could not be prepared. Retry, or download the complete text.</string>
+  <string name="growth_weekly_impact_summary" formatted="false">This week: {people} people helped and {thanks} thanks.</string>
+  <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
+  <string name="w1_call_lookup_title" formatted="false">Your call</string>
+  <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
+  <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
 </resources>

@@ -1,13 +1,17 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  restoredPrivacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 
 /** Export account records through existing W1 RLS; credentials and upstream
  * tokens never enter an artifact. Erasure awaits the reviewed retention policy. */
 export function identityPrivacyHook(
   runtime: Pool,
   coordinator: Pool,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
 ): PrivacyHook {
   const verify = privacyTaskAuthority(coordinator);
   return {
@@ -25,8 +29,22 @@ export function identityPrivacyHook(
         "Relationship requests require a reviewed mapping of scoped identity proofs.",
       );
       const client = await runtime.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      input.signal!.addEventListener("abort", abort, { once: true });
       try {
+        input.signal!.throwIfAborted();
         await client.query("BEGIN");
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          assertRestoredInTransaction,
+        );
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           input.accountId,
         ]);
@@ -75,7 +93,11 @@ export function identityPrivacyHook(
             ],
           ] as const;
           for (const [name, sql] of sources) {
-            await verify(input);
+            await restoredPrivacyTaskAuthorityInTransaction(
+              client,
+              input,
+              assertRestoredInTransaction,
+            );
             const rows = (
               await client.query(sql + " LIMIT 1001", [input.accountId])
             ).rows;
@@ -85,10 +107,21 @@ export function identityPrivacyHook(
               "This identity export requires bounded subjobs; no truncated artifact was produced.",
             );
             data[name] = rows;
+            invariant(
+              Buffer.byteLength(JSON.stringify(data)) <= 3_000_000,
+              "bounded_subjob_required",
+              "This identity export needs a protected streaming artifact.",
+            );
           }
         }
-        await verify(input);
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          assertRestoredInTransaction,
+        );
+        input.signal!.throwIfAborted();
         await client.query("COMMIT");
+        input.signal!.throwIfAborted();
         return {
           receipt: {
             domain: "identity",
@@ -99,10 +132,14 @@ export function identityPrivacyHook(
           data,
         };
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK");
         throw error;
       } finally {
-        client.release();
+        input.signal!.removeEventListener("abort", abort);
+        if (!released) {
+          released = true;
+          client.release();
+        }
       }
     },
   };

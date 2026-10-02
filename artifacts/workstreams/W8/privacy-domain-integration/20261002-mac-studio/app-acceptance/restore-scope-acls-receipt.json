@@ -1,0 +1,9 @@
+{
+  "originalRecovery": false,
+  "trafficReady": false,
+  "targetClosed": true,
+  "restoredDefaultOwnerAclRepresentationOnly": true,
+  "privateScopes": 2,
+  "noPublicRuntimeOrWorkerGrant": true,
+  "exactOriginalSchemaSha256": "255db3760c978651763bdd3a528c6bb689f09885493b653da534ab6a00f00d3f"
+}

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Notice } from "@qelvora/ui-web";
+import { copy } from "@qelvora/copy";
 import { announceSessionEnd, useIdentityRequest } from "./session-boundary";
 
 export function AccountPanel() {
@@ -71,7 +72,9 @@ export function AccountPanel() {
           className="qv-btn qv-btn--secondary"
           href="/onboarding/handle?returnTo=%2Fidentity%2Faccount"
         >
-          {session.fan?.handle ? "Edit public profile" : "Choose your handle"}
+          {session.fan?.handle
+            ? copy.identityEditPublicProfile
+            : copy.identityChooseHandle}
         </a>
         <a className="qv-btn qv-btn--secondary" href="/studio/setup">
           {session.creator

@@ -75,23 +75,35 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         val current = generation
         refreshingSession = true; checkingSession = true
         try {
-            val token = try { currentToken() } catch (_: Exception) { if (current == generation && purge()) error = QelvoraCopy.text("identitySessionReadFailed"); return }
+            val token = try { currentToken() } catch (_: Exception) {
+                if (current == generation && purge()) error = QelvoraCopy.text("identitySessionReadFailed")
+                return
+            }
             if (current != generation) return
             hasSavedCredential = token != null
             if (token == null) { if (session != null) purge(); return }
-            val value = client.identitySession()
-            if (current != generation) return
-            if (session?.accountId != null && session?.accountId != value.accountId) { if (purge()) error = "The account changed. Continue with Pantopus again."; return }
-            session = value; error = ""
-        } catch (failure: CreatorAPIError) {
-            if (current != generation) return
-            if (failure.status == 401) {
-                if (!busy) { refreshingSession = false; refreshCredentials() }
-                else { if (purge()) error = "Your session ended. Continue with Pantopus again." }
-            } else error = message(failure)
-        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
-        finally { refreshingSession = false; checkingSession = false }
+            try {
+                val value = client.identitySession()
+                if (current != generation) return
+                if (session?.accountId != null && session?.accountId != value.accountId) {
+                    if (purge()) error = "The account changed. Continue with Pantopus again."
+                    return
+                }
+                session = value; error = ""
+            } catch (failure: CreatorAPIError) {
+                if (current != generation) return
+                if (failure.status == 401) {
+                    if (!busy) {
+                        // A completed rotation performs its own guarded fresh read.
+                        refreshingSession = false
+                        refreshCredentials()
+                    } else if (purge()) error = "Your session ended. Continue with Pantopus again."
+                } else error = message(failure)
+            } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (_: Exception) {
+                if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline."
+            }
+        } finally { refreshingSession = false; checkingSession = false }
     }
     suspend fun loadArrival() {
         val snapshot = destination; arrival = null; val origin = baseURL ?: return
@@ -137,6 +149,50 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
+    }
+    /** Preserves the current handle and never writes using a switched credential. */
+    suspend fun saveIntro(intro: String, accountId: String, sessionId: String): Boolean {
+        val origin = baseURL ?: return false
+        val current = session ?: return false
+        val fan = current.fan ?: return false
+        if (busy || current.accountId != accountId || current.sessionId != sessionId) return false
+        val snapshot = generation
+        val credential = currentToken() ?: return false
+        busy = true
+        try {
+            val text = intro.trim()
+            val client = CreatorAPIClient(origin) { credential }
+            val saved = client.saveFanIntro(APIFanIntroInput(text, fan.version))
+            currentCoroutineContext().ensureActive()
+            if (snapshot != generation || session?.accountId != accountId || session?.sessionId != sessionId || currentToken() != credential || saved.id != fan.id || saved.intro != text) return false
+            refresh()
+            return snapshot == generation && session?.accountId == accountId && session?.sessionId == sessionId
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (failure: Exception) { if (snapshot == generation) error = message(failure); return false }
+        finally { busy = false }
+    }
+    /** Navigation only. Reject responses for a departed destination, account or credential. */
+    suspend fun resolveCallDestination(callId: String, from: String): Boolean {
+        val origin = baseURL ?: return false
+        val active = session ?: return false
+        if (busy || purgingPrivateState || destination != from) return false
+        val id = runCatching { java.util.UUID.fromString(callId).also { require(it.toString().equals(callId, ignoreCase = true)) } }.getOrNull() ?: return false
+        val snapshot = generation
+        try {
+            val credential = currentToken() ?: return false
+            if (snapshot != generation || destination != from) return false
+            val client = CreatorAPIClient(origin) { credential }
+            val route = client.readAccountCallRoute(id.toString(), active.accountId)
+            currentCoroutineContext().ensureActive()
+            if (busy || snapshot != generation || destination != from || session?.accountId != active.accountId || session?.sessionId != active.sessionId || currentToken() != credential) return false
+            val returned = java.util.UUID.fromString(route.sessionId)
+            val creator = java.util.UUID.fromString(route.creatorId)
+            val fan = java.util.UUID.fromString(route.fanId)
+            if (returned != id || !creator.toString().equals(route.creatorId, ignoreCase = true) || !fan.toString().equals(route.fanId, ignoreCase = true)) return false
+            open("/calls/$creator/$fan/$id")
+            return true
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: Exception) { return false }
     }
     suspend fun logout(all: Boolean = false) {
         if (busy) return; val client = api ?: run { purge(); return }; busy = true
@@ -214,15 +270,15 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
             model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
-            model.session?.fan == null || model.destination == "/onboarding/handle" -> HandleForm(model)
+            (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> HandleForm(model)
             else -> {
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) Notice(title = "Development identity", children = "Synthetic account · actual local API.")
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     val feature = features.firstOrNull { it.matches(model.destination) }
                     if (model.destination == "/identity/account" || (model.destination == "/you" && feature == null)) Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         BasicText("Your account", style = qText("display-md").copy(color = qColor("ink")))
-                        BasicText("@" + model.session?.fan?.handle.orEmpty(), style = qText("body").copy(color = qColor("ink")))
-                        Button("Edit public profile", ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
+                        model.session?.fan?.handle?.let { handle -> BasicText("@$handle", style = qText("body").copy(color = qColor("ink"))) }
+                        Button(QelvoraCopy.text(if (model.session?.fan == null) "identityChooseHandle" else "identityEditPublicProfile"), ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
                         Button("Sign out", ButtonVariant.SECONDARY, block = true) { scope.launch { model.logout() } }
                         Button("Refresh session", ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.refreshCredentials() } }
                         Button("Sign out on all devices", ButtonVariant.QUIET, block = true) { scope.launch { model.logout(true) } }
@@ -234,7 +290,10 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
-                TabBar(labels.firstOrNull { it.second == model.destination.substringBefore('?') }?.let { QelvoraCopy.text(it.first) } ?: QelvoraCopy.text("navHome")) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
+                val path = model.destination.substringBefore('?')
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings"
+                val selectedTab = if (accountDestination) "navYou" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
+                TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
     }

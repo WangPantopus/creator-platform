@@ -110,6 +110,52 @@ public final class FanSession: ObservableObject {
         do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh(); return session?.fan != nil }
         catch { self.error = Self.message(error); return false }
     }
+    /// Save only the intro, against the original account/profile version.
+    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
+        guard let baseURL, !busy, let current = session, current.accountId == accountId,
+              current.sessionId == sessionId, let fan = current.fan else { return false }
+        let snapshot = generation
+        busy = true; defer { busy = false }
+        do {
+            guard let credential = try await storage.read() else { return false }
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            let client = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), token: { credential })
+            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
+            let saved = try await client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
+            guard !Task.isCancelled, snapshot == generation, session?.accountId == accountId,
+                  session?.sessionId == sessionId, try await storage.read() == credential,
+                  saved.id == fan.id, saved.intro == text else { return false }
+            await refresh()
+            return snapshot == generation && session?.accountId == accountId && session?.sessionId == sessionId
+        } catch {
+            if snapshot == generation { self.error = Self.message(error) }
+            return false
+        }
+    }
+    /// Recover navigation only with the credential and destination that opened it.
+    /// The call screen independently authorizes the booking and every action.
+    public func resolveCallDestination(_ callId: String, from target: String) async -> Bool {
+        guard let baseURL, let active = session, !busy, !purgingPrivateState,
+              destination == target, let id = UUID(uuidString: callId) else { return false }
+        let snapshot = generation
+        do {
+            guard let credential = try await storage.read(), !Task.isCancelled,
+                  snapshot == generation, destination == target else { return false }
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            let client = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), token: { credential })
+            let route = try await client.readAccountCallRoute(sessionId: id.uuidString.lowercased(), xQelvoraExpectedAccount: active.accountId)
+            let currentCredential = try await storage.read()
+            guard !Task.isCancelled, !busy, snapshot == generation, destination == target,
+                  session?.accountId == active.accountId, session?.sessionId == active.sessionId,
+                  currentCredential == credential,
+                  UUID(uuidString: route.sessionId) == id,
+                  let creator = UUID(uuidString: route.creatorId), let fan = UUID(uuidString: route.fanId) else { return false }
+            open("/calls/\(creator.uuidString.lowercased())/\(fan.uuidString.lowercased())/\(id.uuidString.lowercased())")
+            return true
+        } catch { return false }
+    }
     public func logout(all: Bool = false) async {
         guard !busy else { return }; busy = true; defer { busy = false }
         guard let api else { await purge(); return }
@@ -223,7 +269,7 @@ public struct FanAppShell: View {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id((model.session?.accountId ?? "") + model.destination)
-            } else if model.session?.fan == nil {
+            } else if model.session?.fan == nil, ApplicationDestination.requiresFanProfile(model.destination) {
                 NativeHandleForm(model: model)
             } else {
                 VStack(spacing: 0) {
@@ -232,8 +278,8 @@ public struct FanAppShell: View {
                     if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
                             Text("Your account").qText("display-md")
-                            Text("@" + (model.session?.fan?.handle ?? "")).qText("body")
-                            Button("Edit public profile", variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
+                            if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
+                            Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
                             Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
                             Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
                             Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }
@@ -279,7 +325,14 @@ public struct FanAppShell: View {
                 if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
-    private var tab: FanTab { FanTab.allCases.first(where: { model.destination.components(separatedBy: "?")[0] == "/" + $0.rawValue.lowercased() }) ?? .home }
+    private var tab: FanTab {
+        let path = model.destination.components(separatedBy: "?")[0]
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" { return .you }
+        return FanTab.allCases.first { tab in
+            let root = "/" + tab.rawValue.lowercased()
+            return path == root || path.hasPrefix(root + "/")
+        } ?? .home
+    }
 }
 
 struct NativeHandleForm: View {

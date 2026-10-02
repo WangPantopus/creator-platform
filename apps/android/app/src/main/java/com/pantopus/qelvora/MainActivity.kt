@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
         notificationID.value = GrowthPush.tapId(intent)
         destination.value = returnTarget(intent)
         val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
+            ?: if (BuildConfig.DEBUG) apiOrigin(BuildConfig.CREATOR_API_URL, loopback = true) else null
         debugAPIURL = if (BuildConfig.DEBUG) apiOrigin(if (intent.hasExtra("api_url")) intent.getStringExtra("api_url") else savedInstanceState?.getString("debug_api_url"), loopback = true) else null
         debugAppearance = if (BuildConfig.DEBUG) (if (intent.hasExtra("appearance")) intent.getStringExtra("appearance") else savedInstanceState?.getString("debug_appearance"))?.takeIf { it in listOf("light", "night") } else null
         val local = debugAPIURL

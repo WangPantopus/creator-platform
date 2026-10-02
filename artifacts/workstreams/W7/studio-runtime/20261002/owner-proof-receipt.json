@@ -1,0 +1,58 @@
+{
+  "recordedAt": "2026-10-02T12:00:31.158291+00:00",
+  "baseHead": "3f1359983a52da7e0aea96be40ad47f93993152e",
+  "ownerProof": {
+    "reviewedPeerSource": "5b95b8904e76ec7d8ec9f8388092eaf1a5c82aaf",
+    "exactSourceCherryPick": "f73793f3",
+    "phased9adfIntegrated": false
+  },
+  "primary": "W7 personally reviewed the owner diff and implemented the consumer; no agents/new test code",
+  "state": "Implemented/compiled. Genuine permitted creator publication, signing, projection and downstream runtime acceptance remain unobserved.",
+  "behavior": [
+    "No content.get(studio=false) or self-fan prerequisite",
+    "Current proof.view replaces preliminary Studio view only for exact content/creator and monotonic effect/current versions",
+    "Exact current document/stored canonical command, signed act and public signature hash, media readiness required",
+    "Current private/withdrawn proof withdraws; quote/packet projection refuses until actual retraction producers bind",
+    "Erasure and monotonic withdrawal remain binding; no fabricated signature/authority/consent"
+  ],
+  "checks": {
+    "backendBuild": "exit0",
+    "lint": "exit0",
+    "originalContracts": "9 passed, exit0",
+    "preservedFailure": "First vitest command selected nonexistent tests/growth.contract.test.ts: no tests ran, exit1; corrected to existing tests/contracts.test.ts",
+    "runtime": "No permitted creator publication exists on current owned host; no synthetic product claim"
+  },
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/content.ts",
+      "sha256": "d23f29a51c1aebc4b8ffe17a7abd051c93c6a57b7d04dcdd1f765fd6ed3ad2f6"
+    },
+    {
+      "path": "apps/backend/src/modules/content/service.ts",
+      "sha256": "2b610d6617c1cb2d48817770cda6119fe5fe484de35efb391d035a5201983a3b"
+    }
+  ],
+  "raw": [
+    {
+      "path": "owner-proof-raw/owner-proof-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "owner-proof-raw/owner-proof-existing-contracts-corrected.log",
+      "sha256": "c85697ee5c9a4181cf81e0a6d84f50f89613a84a2e7c675a7e8d01033a81b68f",
+      "bytes": 328
+    },
+    {
+      "path": "owner-proof-raw/owner-proof-existing-contracts.log",
+      "sha256": "886a81ac804ceff1b0aa0effc99f5964c220d398feddaf69e7b4e71cfb0073bf",
+      "bytes": 581
+    },
+    {
+      "path": "owner-proof-raw/owner-proof-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "cleanup": "All owned services/devices/leases remain stopped"
+}

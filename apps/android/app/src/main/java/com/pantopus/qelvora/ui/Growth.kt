@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import android.content.Intent
 import android.content.ClipData
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -62,6 +63,24 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
 }
 
 private fun JSONObject.objects(key: String): List<JSONObject> {val values = optJSONArray(key) ?: return emptyList(); return (0 until values.length()).mapNotNull { values.optJSONObject(it) }}
+
+@Composable
+private fun GrowthHomeHeader(onNotifications: () -> Unit) {
+    val enlargedText = LocalDensity.current.fontScale > 1.3f
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        if (enlargedText || maxWidth < 340.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                BasicText(QelvoraCopy.text("growthYourPeople"), style = qText("display-lg").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+                Button(QelvoraCopy.text("growthNotifications"), ButtonVariant.QUIET, block = true, onClick = onNotifications)
+            }
+        } else {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                BasicText(QelvoraCopy.text("growthYourPeople"), style = qText("display-lg").copy(color = qColor("ink")), modifier = Modifier.weight(1f).semantics { heading() })
+                Button(QelvoraCopy.text("growthNotifications"), ButtonVariant.QUIET, onClick = onNotifications)
+            }
+        }
+    }
+}
 
 /** W1 registers this fan feature and owns auth, deep-link resolution and permission prompts. */
 @Composable
@@ -275,7 +294,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                     }
                 }
                 route == "/home" && home != null -> {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {BasicText(QelvoraCopy.text("growthYourPeople"), style = qText("display-lg").copy(color = ink));Button(QelvoraCopy.text("growthNotifications"), ButtonVariant.QUIET) {navigate("/notifications")}}
+                    GrowthHomeHeader { navigate("/notifications") }
                     GrowthPostValuePrompt(client) { navigate(it) }
                     home!!.objects("entries").forEach {entry -> Button(entry.getString("creatorName") + " · " + entry.getString("label"), ButtonVariant.SECONDARY, block = true) {navigate(entry.getString("destination"))} }
                     if(home!!.has("nextThreadsCursor") && !home!!.isNull("nextThreadsCursor")) Button(QelvoraCopy.text("navMore") + ": " + QelvoraCopy.text("growthYourPeople"), ButtonVariant.SECONDARY, disabled = pagingHome) {pageHome(homePostsCursor, home!!.getString("nextThreadsCursor"))}

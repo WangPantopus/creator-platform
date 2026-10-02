@@ -1,0 +1,32 @@
+{
+  "wave": "20261002",
+  "applied": [
+    "0044_w4_personal_approval",
+    "0045_w5_reply_review",
+    "0046_w6_call_availability",
+    "0047_w6_creator_media",
+    "0049_w4_generation_cost_settlement",
+    "0050_w3_account_relationship_index",
+    "0051_w5_media_publication",
+    "0053_w8_runtime_denial_projection",
+    "0054_w4_pass_purchase_effects",
+    "0055_w4_pass_pool_effects",
+    "0056_w3_correction_feedback_lineage",
+    "0057_w3_feedback_consent",
+    "0058_w3_correction_signature",
+    "0059_w3_recording_association",
+    "0060_w8_composed_signed_message",
+    "0061_w4_payout_custody",
+    "0062_w6_creator_media_worker"
+  ],
+  "priorLedgerRows": 40,
+  "ledgerRows": 57,
+  "priorHistoryPreserved": true,
+  "originalDataPreserved": true,
+  "originalRows": 33,
+  "originalTables": 145,
+  "oldRolesPreserved": true,
+  "afterSchemaSha256": "cfbc894fd59dc3981ab4fa31d2ff7154e2865b452a71b79afd483abe94557ea3",
+  "trafficClosed": true,
+  "releaseReady": false
+}

@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-02T12:29:47.430Z",
+  "state": "Actual owned read-only catalogue, not positive product acceptance or purpose authority",
+  "core": {
+    "role": "creator_runtime",
+    "migrations": 40,
+    "verified_creators": 0,
+    "fan_profiles": 1,
+    "core_follow_installed": false,
+    "unbound_fan_context": null
+  },
+  "growth": {
+    "role": "growth_worker",
+    "impact_rows": 0,
+    "weekly_jobs": 0,
+    "weekly_notifications": 0
+  }
+}

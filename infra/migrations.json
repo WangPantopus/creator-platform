@@ -321,6 +321,26 @@
       "owner": "W6",
       "sourceCommit": "4e4e6aed7dd47600d4c19e9ddf3fd0b28c3b62a3",
       "sourceSha256": "abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a"
+    },
+    {
+      "version": "0074_w8_content_runtime_denial",
+      "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0082_w8_interactive_denial_try_fence",
+      "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0087_w8_privacy_task_commit_fence",
+      "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
+      "owner": "W8"
+    },
+    {
+      "version": "0103_w8_domain_privacy_task_fence",
+      "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
+      "owner": "W8"
     }
   ],
   "reserved": [
@@ -335,299 +355,557 @@
       "state": "producer_allocated_at_0041"
     },
     {
-      "id": "0063",
+      "id": "0151",
       "owner": "W7",
-      "version": "0063_w7_relationship_activity",
+      "version": "0151_w7_relationship_activity",
       "path": "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": [
+        "0063_w7_relationship_activity",
+        "0114_w7_relationship_activity"
+      ]
     },
     {
-      "id": "0064",
+      "id": "0152",
       "owner": "W7",
-      "version": "0064_w7_source_scan_checkpoint",
+      "version": "0152_w7_source_scan_checkpoint",
       "path": "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": [
+        "0064_w7_source_scan_checkpoint",
+        "0115_w7_source_scan_checkpoint"
+      ]
     },
     {
-      "id": "0065",
+      "id": "0153",
       "owner": "W7",
-      "version": "0065_w7_home_page_index",
+      "version": "0153_w7_home_page_index",
       "path": "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": [
+        "0065_w7_home_page_index",
+        "0116_w7_home_page_index"
+      ]
     },
     {
-      "id": "0066",
+      "id": "0154",
       "owner": "W7",
-      "version": "0066_w7_thanks_window_index",
+      "version": "0154_w7_thanks_window_index",
       "path": "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": [
+        "0066_w7_thanks_window_index",
+        "0117_w7_thanks_window_index"
+      ]
     },
     {
-      "id": "0068",
+      "id": "0155",
       "owner": "W4",
-      "version": "0068_w4_paid_coverage",
+      "version": "0155_w4_paid_coverage",
       "path": "apps/backend/src/modules/commerce/schema-paid-coverage.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": ["0068_w4_paid_coverage", "0118_w4_paid_coverage"]
     },
     {
-      "id": "0069",
+      "id": "0156",
       "owner": "W8",
-      "version": "0069_w8_reply_review",
+      "version": "0156_w8_reply_review",
       "path": "apps/backend/migrations/0069_w8_reply_review.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": ["0069_w8_reply_review", "0119_w8_reply_review"]
     },
     {
-      "id": "0070",
+      "id": "0157",
       "owner": "W4",
-      "version": "0070_w4_public_packet_read",
+      "version": "0157_w4_public_packet_read",
       "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
       "sourceCommit": "59b63b7ac432bad31153ad69e735f7423ae1775e",
-      "sourceSha256": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8"
+      "sourceSha256": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8",
+      "heldVersionHistory": [
+        "0070_w4_public_packet_read",
+        "0120_w4_public_packet_read"
+      ]
     },
     {
-      "id": "0071",
+      "id": "0158",
       "owner": "W1",
-      "version": "0071_w1_publication_worker_scope",
+      "version": "0158_w1_publication_worker_scope",
       "path": "apps/backend/src/modules/identity/schema-publication-scope.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
       "sourceCommit": "dce780db943d79c3417ca0dbcac32c05c24c44cc",
-      "sourceSha256": "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1"
+      "sourceSha256": "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1",
+      "heldVersionHistory": [
+        "0071_w1_publication_worker_scope",
+        "0121_w1_publication_worker_scope"
+      ]
     },
     {
-      "id": "0072",
+      "id": "0159",
       "owner": "W1",
-      "version": "0072_w1_generation_worker_scope",
+      "version": "0159_w1_generation_worker_scope",
       "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "heldVersionHistory": [
+        "0072_w1_generation_worker_scope",
+        "0122_w1_generation_worker_scope"
+      ]
     },
     {
-      "id": "0073",
+      "id": "0160",
       "owner": "W8",
-      "version": "0073_w8_publication_worker_denial",
+      "version": "0160_w8_publication_worker_denial",
       "path": "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "87f8766331b59a174e0cf7e837e3a3a9cdfd9d9a1662aa2b39ed9aa2dc308d80"
+      "sourceSha256": "87f8766331b59a174e0cf7e837e3a3a9cdfd9d9a1662aa2b39ed9aa2dc308d80",
+      "heldVersionHistory": [
+        "0073_w8_publication_worker_denial",
+        "0123_w8_publication_worker_denial"
+      ]
     },
     {
-      "id": "0074",
-      "owner": "W8",
-      "version": "0074_w8_content_runtime_denial",
-      "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
-      "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
-      "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3"
-    },
-    {
-      "id": "0075",
+      "id": "0161",
       "owner": "W6",
-      "version": "0075_w6_publication_media_scope",
+      "version": "0161_w6_publication_media_scope",
       "path": "apps/backend/src/modules/media/publication-scope.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
       "sourceCommit": "4e4e6aed7dd47600d4c19e9ddf3fd0b28c3b62a3",
-      "sourceSha256": "86fa7a8b8de890490ae9fc735d58b3581f1e7d158e3c51baa4ffa51ec33cc1df"
+      "sourceSha256": "86fa7a8b8de890490ae9fc735d58b3581f1e7d158e3c51baa4ffa51ec33cc1df",
+      "heldVersionHistory": [
+        "0075_w6_publication_media_scope",
+        "0124_w6_publication_media_scope"
+      ]
     },
     {
-      "id": "0076",
+      "id": "0162",
       "owner": "W8",
-      "version": "0076_w8_public_packet_denial",
+      "version": "0162_w8_public_packet_denial",
       "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql",
       "state": "reserved_unapplied",
-      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "a5cd1023aef38fced663b6154cf8a87a0332c112e0030255a001110f43599daa"
+      "sourceSha256": "a5cd1023aef38fced663b6154cf8a87a0332c112e0030255a001110f43599daa",
+      "heldVersionHistory": [
+        "0076_w8_public_packet_denial",
+        "0125_w8_public_packet_denial"
+      ]
     },
     {
-      "id": "0077",
+      "id": "0163",
       "owner": "W2",
-      "version": "0077_w2_usage_lineage",
+      "version": "0163_w2_usage_lineage",
       "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
       "state": "reserved_unapplied",
       "sourceCommit": "a010a030378a0c62a44d6c14e714cc397722e702",
       "sourceSha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
       "previousVersion": "0048_w2_usage_lineage",
-      "reason": "Held above this wave: actual C10 accounting/export/delete/expiry registration and approved policy."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Held above this wave: actual C10 accounting/export/delete/expiry registration and approved policy.",
+      "heldVersionHistory": ["0077_w2_usage_lineage", "0126_w2_usage_lineage"]
     },
     {
-      "id": "0078",
+      "id": "0164",
       "owner": "W8",
-      "version": "0078_w8_privacy_export_chunks",
+      "version": "0164_w8_privacy_export_chunks",
       "path": "apps/backend/migrations/0052_w8_privacy_export_chunks.sql",
       "state": "reserved_unapplied",
       "previousVersion": "0052_w8_privacy_export_chunks",
-      "reason": "Held above this wave: source and durable chunk/checkpoint design not implemented."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Held above this wave: source and durable chunk/checkpoint design not implemented.",
+      "heldVersionHistory": [
+        "0078_w8_privacy_export_chunks",
+        "0127_w8_privacy_export_chunks"
+      ]
     },
     {
-      "id": "0079",
+      "id": "0165",
       "owner": "W2",
-      "version": "0079_w2_usage_retention_expiry",
+      "version": "0165_w2_usage_retention_expiry",
       "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
       "state": "reserved_unapplied",
-      "reason": "Depends on held0077 usage lineage and actual policy/expiry/task authority; source bytes retain0067 filename.",
-      "previousVersion": "0067_w2_usage_retention_expiry"
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Depends on held0077 usage lineage and actual policy/expiry/task authority; source bytes retain0067 filename.",
+      "previousVersion": "0067_w2_usage_retention_expiry",
+      "heldVersionHistory": [
+        "0079_w2_usage_retention_expiry",
+        "0128_w2_usage_retention_expiry"
+      ]
     },
     {
-      "id": "0080",
+      "id": "0166",
       "owner": "W4",
-      "version": "0080_w4_fan_request_page_index",
+      "version": "0166_w4_fan_request_page_index",
       "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql",
       "state": "reserved_unapplied",
-      "reason": "Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending.",
       "sourceCommit": "3fc7040ab03a6ea760e2f2852a0a98d3a89a56a8",
-      "sourceSha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e"
+      "sourceSha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e",
+      "heldVersionHistory": [
+        "0080_w4_fan_request_page_index",
+        "0129_w4_fan_request_page_index"
+      ]
     },
     {
-      "id": "0081",
+      "id": "0167",
       "owner": "W1",
-      "version": "0081_w1_signature_read_fence",
+      "version": "0167_w1_signature_read_fence",
       "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
       "state": "reserved_unapplied",
-      "reason": "Allocated for actual shared signature read and withdrawal fences; exact source/security/integration review pending.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Allocated for actual shared signature read and withdrawal fences; exact source/security/integration review pending.",
       "sourceCommit": "dce780db943d79c3417ca0dbcac32c05c24c44cc",
-      "sourceSha256": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5"
+      "sourceSha256": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+      "heldVersionHistory": [
+        "0081_w1_signature_read_fence",
+        "0130_w1_signature_read_fence"
+      ]
     },
     {
-      "id": "0082",
-      "owner": "W8",
-      "version": "0082_w8_interactive_denial_try_fence",
-      "state": "reserved_unapplied",
-      "reason": "Nonwaiting interactive negatives; needs0074 metadata and exact held host integration.",
-      "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
-      "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
-    },
-    {
-      "id": "0083",
+      "id": "0168",
       "owner": "W3",
-      "version": "0083_w3_translation_worker_scope",
+      "version": "0168_w3_translation_worker_scope",
       "state": "reserved_unapplied",
-      "reason": "Actual durable translation job/token/session metadata proposal pending; no request-style ThreadScope."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual durable translation job/token/session metadata proposal pending; no request-style ThreadScope.",
+      "heldVersionHistory": [
+        "0083_w3_translation_worker_scope",
+        "0131_w3_translation_worker_scope"
+      ]
     },
     {
-      "id": "0084",
+      "id": "0169",
       "owner": "W8",
-      "version": "0084_w8_team_thread_denial",
+      "version": "0169_w8_team_thread_denial",
       "state": "reserved_unapplied",
-      "reason": "Actual triage Team candidate negative only; positive permission and real Team acceptance pending.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual triage Team candidate negative only; positive permission and real Team acceptance pending.",
       "path": "apps/backend/migrations/0084_w8_team_thread_denial.sql",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "7b7189c0a1d14d615abe7fc12c51de63781943e7447775bf439c842e44b07451"
+      "sourceSha256": "7b7189c0a1d14d615abe7fc12c51de63781943e7447775bf439c842e44b07451",
+      "heldVersionHistory": [
+        "0084_w8_team_thread_denial",
+        "0132_w8_team_thread_denial"
+      ]
     },
     {
-      "id": "0085",
+      "id": "0170",
       "owner": "W1",
-      "version": "0085_w1_public_ai_metadata_scope",
+      "version": "0170_w1_public_ai_metadata_scope",
       "state": "reserved_unapplied",
-      "reason": "Reviewed exact public metadata nonce/cleanup; genuine publicAI/License composed acceptance pending.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Reviewed exact public metadata nonce/cleanup; genuine publicAI/License composed acceptance pending.",
       "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
       "sourceCommit": "dce780db943d79c3417ca0dbcac32c05c24c44cc",
-      "sourceSha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+      "sourceSha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606",
+      "heldVersionHistory": [
+        "0085_w1_public_ai_metadata_scope",
+        "0133_w1_public_ai_metadata_scope"
+      ]
     },
     {
-      "id": "0086",
+      "id": "0171",
       "owner": "W8",
-      "version": "0086_w8_public_creator_denial",
+      "version": "0171_w8_public_creator_denial",
       "state": "reserved_unapplied",
-      "reason": "Requires0085 exact authority role; anonymous/current visitor negatives, no publication worker grant.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires0085 exact authority role; anonymous/current visitor negatives, no publication worker grant.",
       "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
+      "sourceSha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c",
+      "heldVersionHistory": [
+        "0086_w8_public_creator_denial",
+        "0134_w8_public_creator_denial"
+      ]
     },
     {
-      "id": "0087",
-      "owner": "W8",
-      "version": "0087_w8_privacy_task_commit_fence",
-      "state": "reserved_unapplied",
-      "reason": "Actual task/signal/held row fences and separate-COMMIT expiry; full paginated owner composition/policy pending.",
-      "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
-      "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef"
-    },
-    {
-      "id": "0088",
+      "id": "0172",
       "owner": "W5",
-      "version": "0088_w5_reply_tenure_cap",
+      "version": "0172_w5_reply_tenure_cap",
       "state": "reserved_unapplied",
-      "reason": "Policy-dependent actual paid tenure and mounted reviewer/schema gates; source/policy review pending."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Policy-dependent actual paid tenure and mounted reviewer/schema gates; source/policy review pending.",
+      "heldVersionHistory": [
+        "0088_w5_reply_tenure_cap",
+        "0135_w5_reply_tenure_cap"
+      ]
     },
     {
-      "id": "0089",
+      "id": "0173",
       "owner": "W8",
-      "version": "0089_w8_creator_fan_denial",
+      "version": "0173_w8_creator_fan_denial",
       "state": "reserved_unapplied",
-      "reason": "Actual owner/fan candidate only; no invented packet/thread or paid permission.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual owner/fan candidate only; no invented packet/thread or paid permission.",
       "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
-      "sourceSha256": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860"
+      "sourceSha256": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860",
+      "heldVersionHistory": [
+        "0089_w8_creator_fan_denial",
+        "0136_w8_creator_fan_denial"
+      ]
     },
     {
-      "id": "0090",
+      "id": "0174",
       "owner": "W4",
-      "version": "0090_w4_spending_notice_custody",
+      "version": "0174_w4_spending_notice_custody",
       "state": "reserved_unapplied",
-      "reason": "Pending owner exact fan/currency/month/limit metadata ACK and C10 export/delete/expiry custody."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Pending owner exact fan/currency/month/limit metadata ACK and C10 export/delete/expiry custody.",
+      "heldVersionHistory": [
+        "0090_w4_spending_notice_custody",
+        "0137_w4_spending_notice_custody"
+      ]
     },
     {
-      "id": "0091",
+      "id": "0175",
       "owner": "W8",
-      "version": "0091_w8_account_denial",
+      "version": "0175_w8_account_denial",
       "state": "reserved_unapplied",
-      "reason": "Actual interactive account/current session or separately reviewed durable notification purpose; exact worker contract pending."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual interactive account/current session or separately reviewed durable notification purpose; exact worker contract pending.",
+      "heldVersionHistory": ["0091_w8_account_denial", "0138_w8_account_denial"]
     },
     {
-      "id": "0092",
+      "id": "0176",
       "owner": "W6",
-      "version": "0092_w6_provider_callback_ingress",
+      "version": "0176_w6_provider_callback_ingress",
       "state": "reserved_unapplied",
-      "reason": "Actual authenticated callback and room/identity mapping; exact source/role/lease/C10 contract pending."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual authenticated callback and room/identity mapping; exact source/role/lease/C10 contract pending.",
+      "heldVersionHistory": [
+        "0092_w6_provider_callback_ingress",
+        "0139_w6_provider_callback_ingress"
+      ]
     },
     {
-      "id": "0093",
+      "id": "0177",
       "owner": "W8",
-      "version": "0093_w8_generation_worker_denial",
+      "version": "0177_w8_generation_worker_denial",
       "state": "reserved_unapplied",
-      "reason": "Requires exact W1 durablegeneration task/initiating provenance; no fake Actor/session/worker scope."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact W1 durablegeneration task/initiating provenance; no fake Actor/session/worker scope.",
+      "heldVersionHistory": [
+        "0093_w8_generation_worker_denial",
+        "0140_w8_generation_worker_denial"
+      ]
     },
     {
-      "id": "0094",
+      "id": "0178",
       "owner": "W4",
-      "version": "0094_w4_fulfillment_plan_custody",
+      "version": "0178_w4_fulfillment_plan_custody",
       "state": "reserved_unapplied",
-      "reason": "Actual private immutable packet and commitment list; opaque plan ID/hash/revision bound to genuine W5 signed act. Exact source and purpose/C10 review pending."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual private immutable packet and commitment list; opaque plan ID/hash/revision bound to genuine W5 signed act. Exact source and purpose/C10 review pending.",
+      "heldVersionHistory": [
+        "0094_w4_fulfillment_plan_custody",
+        "0141_w4_fulfillment_plan_custody"
+      ]
     },
     {
-      "id": "0095",
+      "id": "0179",
       "owner": "W3",
-      "version": "0095_w3_generation_purpose_consumers",
+      "version": "0179_w3_generation_purpose_consumers",
       "state": "reserved_unapplied",
-      "reason": "Requires exact W1 durable generation nonce/proof and private consumer RLS. No fabricated ThreadScope, legacy provenance or terminal lastSequence>0 use through claim purpose."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact W1 durable generation nonce/proof and private consumer RLS. No fabricated ThreadScope, legacy provenance or terminal lastSequence>0 use through claim purpose.",
+      "heldVersionHistory": [
+        "0095_w3_generation_purpose_consumers",
+        "0142_w3_generation_purpose_consumers"
+      ]
     },
     {
-      "id": "0096",
+      "id": "0180",
       "owner": "W2",
-      "version": "0096_w2_generation_input_consumers",
+      "version": "0180_w2_generation_input_consumers",
       "state": "reserved_unapplied",
-      "reason": "Reviewed compiled/license/approved-passage readers under actual W1 durable worker nonce/client. No raw private AI, memory, credential or money grants."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Reviewed compiled/license/approved-passage readers under actual W1 durable worker nonce/client. No raw private AI, memory, credential or money grants.",
+      "heldVersionHistory": [
+        "0096_w2_generation_input_consumers",
+        "0143_w2_generation_input_consumers"
+      ]
     },
     {
-      "id": "0097",
+      "id": "0181",
       "owner": "W2",
-      "version": "0097_w2_generation_attempt_admission",
+      "version": "0181_w2_generation_attempt_admission",
       "state": "reserved_unapplied",
-      "reason": "Actual pre-network all-attempt journal admission under exact W1 durable worker proof and reviewed consumer allowlist. Accounting retention policy and C10 custody remain explicit dependencies."
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual pre-network all-attempt journal admission under exact W1 durable worker proof and reviewed consumer allowlist. Accounting retention policy and C10 custody remain explicit dependencies.",
+      "heldVersionHistory": [
+        "0097_w2_generation_attempt_admission",
+        "0144_w2_generation_attempt_admission"
+      ]
+    },
+    {
+      "id": "0182",
+      "owner": "W4",
+      "version": "0182_w4_generation_allowance_audience",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Actual W1 generationId/workerToken purpose and current accepted allowance audience; exact immutable source/consumer review pending.",
+      "heldVersionHistory": [
+        "0098_w4_generation_allowance_audience",
+        "0145_w4_generation_allowance_audience"
+      ]
+    },
+    {
+      "id": "0183",
+      "owner": "W1",
+      "version": "0183_w1_generation_terminal_scope",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Distinct actual completion/reconciliation private nonce and same-transaction transition/commit fence; no prefix regeneration or new provider/body authority.",
+      "heldVersionHistory": [
+        "0099_w1_generation_terminal_scope",
+        "0146_w1_generation_terminal_scope"
+      ]
+    },
+    {
+      "id": "0184",
+      "owner": "W8",
+      "version": "0184_w8_generation_terminal_denial",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences.",
+      "heldVersionHistory": [
+        "0100_w8_generation_terminal_denial",
+        "0147_w8_generation_terminal_denial"
+      ]
+    },
+    {
+      "id": "0185",
+      "owner": "W7",
+      "version": "0185_w7_core_follow_metadata",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Initial narrow metadata review complete; requires revised genuine held-session/fan/context proof, strict all-role custody and actual unrelated-account/busy/denial/deletion verification. W7 may not self-allocate/apply above its human ceiling.",
+      "heldVersionHistory": [
+        "0101_w7_core_follow_metadata",
+        "0148_w7_core_follow_metadata"
+      ]
+    },
+    {
+      "id": "0186",
+      "owner": "W5",
+      "version": "0186_w5_generation_content_origin",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Fixed metadata-only current public-own-text origin projection under exact W1 durable worker nonce/client and real consumed signature. Immutable source/function/role/C10 review pending; no body/fan/paid authority or activation.",
+      "heldVersionHistory": [
+        "0102_w5_generation_content_origin",
+        "0149_w5_generation_content_origin"
+      ]
+    },
+    {
+      "id": "0187",
+      "owner": "W2",
+      "version": "0187_w2_generation_retrieval_context",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Actual bounded actorless retrieval/current creator/style projection under genuine W1 worker nonce, unchanged0096 and real0098/0102 current audience/origin fences. Exact signature/dispatcher/private role/source/C10 review pending; no activation or extra LOGIN worker surface.",
+      "heldVersionHistory": ["0104_w2_generation_retrieval_context"]
+    },
+    {
+      "id": "0188",
+      "owner": "W2",
+      "version": "0188_w2_generation_terminal_journal",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Actual original-attempt terminal journal seal/all-attempt immutable receipt under reviewed0099/0100. Exact source, retention/restoration and negative accounting custody pending; missing/unknown never no_request.",
+      "heldVersionHistory": ["0105_w2_generation_terminal_journal"]
+    },
+    {
+      "id": "0189",
+      "owner": "W4",
+      "version": "0189_w4_generation_terminal_settlement",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Genuine terminal scope and original weighted reservation/rule/cursor plus W2 actual all-attempt receipt. Exact owner source/idempotent settlement/assertSettled review pending; no caller amounts or recreated positive scope.",
+      "heldVersionHistory": ["0106_w4_generation_terminal_settlement"]
+    },
+    {
+      "id": "0190",
+      "owner": "W1",
+      "version": "0190_w1_generation_accounting_subject",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Distinct already-terminal original-generation/grant/reservation/participant/outcome/cursor metadata-only accounting subject. Exact genuine W2 immutable receipt/W4 owner custody and held restoration review pending; no input/lease/job/provider or transition authority.",
+      "heldVersionHistory": ["0108_w1_generation_accounting_subject"]
+    },
+    {
+      "id": "0191",
+      "owner": "W8",
+      "version": "0191_w8_generation_accounting_denial",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Separate retained-accounting current negative/retention/restoration projection for actual0108 subject and original0097 correction provenance. Concrete immutable owner source pending; no original positive permission or inferred zero/settlement.",
+      "heldVersionHistory": ["0109_w8_generation_accounting_denial"]
+    },
+    {
+      "id": "0192",
+      "owner": "W4",
+      "version": "0192_w4_generation_accounting_correction",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Distinct late immutable original-attempt accounting correction and original-reservation financial reconciliation after durable terminal state. No input/job/provider resurrection; exact purpose/source/retention/restoration review pending.",
+      "heldVersionHistory": ["0107_w4_generation_accounting_correction"]
+    },
+    {
+      "id": "0193",
+      "owner": "W3",
+      "version": "0193_w3_generation_terminal_finalization",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Genuine0099/0100 private terminal scope/client/XID original message+generation+cursor transition and durable frame only. Exact source/real acceptance provenance and W2/W4 owner settlement composition pending; no input/provider/financial permission.",
+      "heldVersionHistory": ["0110_w3_generation_terminal_finalization"]
+    },
+    {
+      "id": "0194",
+      "owner": "W1",
+      "version": "0194_w1_translation_worker_scope",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Distinct durable translation private issuer after actual W3 original job/provenance/signature/consent/lease/COMMIT contract. No request ThreadScope or generation row; source/C10/finite policy/activation/owner acceptance pending.",
+      "heldVersionHistory": ["0111_w1_translation_worker_scope"]
+    },
+    {
+      "id": "0195",
+      "owner": "W8",
+      "version": "0195_w8_translation_worker_denial",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Original translation participant negatives under actual W3 durable metadata and W1 private nonce/client. Unknown provenance and missing current restoration/consent refuse; no body/provider or activation. Exact source contract pending.",
+      "heldVersionHistory": ["0112_w8_translation_worker_denial"]
+    },
+    {
+      "id": "0196",
+      "owner": "W2",
+      "version": "0196_w2_privacy_export_snapshot",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Separate NoLogin fixed all-owned Agent export snapshot purpose; original real verified lifecycle job/token/immutable ownership/XID/PID and own scope/COMMIT custody.0087 scope ACL/isolated owner unchanged. Exact source, current restoration, C10/finite retention and actual owner acceptance pending.",
+      "heldVersionHistory": ["0113_w2_privacy_export_snapshot"]
+    },
+    {
+      "id": "0197",
+      "owner": "W6",
+      "version": "0197_w6_account_call_metadata",
+      "state": "reserved_unapplied",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Distinct genuine authenticated current-account/session-bound single-call metadata discovery; exact participant/booking/currentness, held restoration/Trust negatives and narrow NoLogin source/C10 review pending. No provider/document/token or worker authority, no fabricated family/scopes.",
+      "heldVersionHistory": ["0150_w6_account_call_metadata"]
+    },
+    {
+      "id": "0198",
+      "owner": "W5",
+      "version": "0198_w5_content_privacy_export",
+      "path": "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct fixed Content export metadata/data purpose under the genuine0087 cancellable task, immutable verified ownership and current held restoration. Exact isolated NoLogin role/function/column/RLS/source/compiler and real-row export review pending. No raw0087 scope ACL, fabricated Actor/ownership, retention or source revocation. Deletion remains unavailable until approved Q16, actual W2 revocation and original W4 group-plan FK handling."
+    },
+    {
+      "id": "0199",
+      "owner": "W4",
+      "version": "0199_w4_fulfillment_plan_read",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-plan-read.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct bounded original fulfillment-plan recipient metadata purpose. Actual current viewer/session, every original family/capture/share/signature, W8 negatives, W5 positive mode/packet fences and W1 signatures last remain required. Exact source/isolated role/ACL/column/RLS/compiler/currentness review pending. No private body/question, scalar plan or tier-group permission fallback. Original immutable group-plan family/message FKs and genuine finite retained-family detachment remain C10 dependencies; positive activation stays closed."
+    },
+    {
+      "id": "0200",
+      "owner": "W8",
+      "version": "0200_w8_fulfillment_view_denial",
+      "path": "apps/backend/migrations/0200_w8_fulfillment_view_denial.sql",
+      "state": "reserved_unapplied",
+      "reason": "Original-recipient Trust negatives; depends on actual0178 fulfillment plan and0199 genuine viewer metadata issuer. Exact concrete viewer/session/client/XID/plan/revision/original-recipient binding is pending owner source review. No fabricated family/Actor/nonce, NULL-packet permission, raw question/body or successful callback. Allocation only; current restoration and all-original negative custody remain required before positive viewing."
+    },
+    {
+      "id": "0201",
+      "owner": "W8",
+      "version": "0201_w8_worker_migration_metadata",
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+      "state": "reserved_unapplied",
+      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Exact rolled-back SQL/ACL/refusal qualification pending; not activation or positive ingress acceptance."
     }
   ]
 }

@@ -10,18 +10,33 @@ private struct ContentReplyPage: Decodable, Sendable { let items: [ContentReply]
 private struct ContentThanks: Decodable, Sendable { let version: Int; let text: String; let shareWithCreatorDigest: Bool; let showIdentity: Bool; let withdrawn: Bool }
 private struct ContentPreference: Decodable, Sendable {let accountId:String;let muted:Bool}
 private struct ContentReceipt: Decodable, Sendable { let version: Int? }
-private struct ContentFailure: Error { let message: String; var status: Int = 0; var code: String? = nil
+private struct ContentFailure: Error { var status: Int = 0; var code: String? = nil
     var accountChanged: Bool { ["content_account_changed", "session_account_changed", "session_changed"].contains(code ?? "") }
     var authorityDenied: Bool { status == 401 || status == 403 || accountChanged }
 }
-private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
+private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let code: String? }; let error: Failure }
+
+private func contentFailureCopy(_ error: Error, action: Bool = false) -> String {
+    let failure = error as? ContentFailure
+    let key: String
+    if failure?.accountChanged == true { key = "w5ContentAccountChanged" }
+    else if failure?.status == 401 { key = "w5ContentSessionEnded" }
+    else if ["reply_changed", "consent_changed", "thanks_changed"].contains(failure?.code ?? "") { key = "w5ContentChanged" }
+    else if failure?.code == "idempotency_conflict" { key = "w5ContentDuplicateChanged" }
+    else if failure?.code == "reply_withdrawn" { key = "w5ContentReplyWithdrawn" }
+    else if failure?.code == "fan_profile_required" { key = "w5ContentFanProfileRequired" }
+    else if [403, 404].contains(failure?.status ?? 0) || failure?.code?.hasSuffix("_unconfigured") == true { key = "w5ContentAccessUnavailable" }
+    else if action && failure?.code == "invalid_request" { key = "w5ContentInvalidRequest" }
+    else { key = action ? "w5ContentActionUnconfirmed" : "w5ContentRefreshUnavailable" }
+    return QelvoraCopy.text(key)
+}
 
 private actor ContentClient {
     let baseURL: URL
     private let storage: SecureSessionStorage
     init(baseURL: URL) { self.baseURL = baseURL; storage = SecureSessionStorage(issuer: baseURL) }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, expectedAccountId:String? = nil) async throws -> T {
-        guard let token = try await storage.read() else { throw ContentFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
+        guard let token = try await storage.read() else { throw ContentFailure(status: 401) }
         guard let url = URL(string: "v1/content/" + path, relativeTo: baseURL) else { throw URLError(.badURL) }
         var request = URLRequest(url: url); request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body
         request.cachePolicy = .reloadIgnoringLocalCacheData; request.timeoutInterval = 15
@@ -30,7 +45,7 @@ private actor ContentClient {
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
             let failure = try? JSONDecoder().decode(ContentErrorEnvelope.self, from: data).error
-            throw ContentFailure(message: failure?.message ?? "Content is unavailable. Reconnect to refresh current access.", status: (response as? HTTPURLResponse)?.statusCode ?? 0, code: failure?.code)
+            throw ContentFailure(status: (response as? HTTPURLResponse)?.statusCode ?? 0, code: failure?.code)
         }
         return try JSONDecoder().decode(T.self, from: data)
     }
@@ -77,10 +92,10 @@ private struct ContentFanScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if !error.isEmpty { Notice(tone: .error, title: "Content status", children: error) }
+                if !error.isEmpty { Notice(tone: .error, title: QelvoraCopy.text("w5ContentStatus"), children: error) }
                 if !currentAccess {
-                    Text("Checking current access. Your input is kept during a connection interruption.").qText("body")
-                    Button("Check current access", variant: .secondary, disabled: busy) { Task { await load(refreshThanks: false) } }
+                    Text(QelvoraCopy.text("w5ContentCheckingAccess")).qText("body")
+                    Button(QelvoraCopy.text("w5ContentCheckCurrentAccess"), variant: .secondary, disabled: busy) { Task { await load(refreshThanks: false) } }
                 } else {
                 if let content {
                     if content.document.kind == "note" {
@@ -182,7 +197,7 @@ private struct ContentFanScreen: View {
     }
     @MainActor private func load(refreshThanks: Bool = true) async {
         guard !loading else { return }; loading = true; defer { loading = false }
-        guard let baseURL else { suspendAccess(); error = "The content service is not connected."; return }
+        guard let baseURL else { suspendAccess(); error = QelvoraCopy.text("w5ContentRefreshUnavailable"); return }
         let creatorId = self.creatorId, contentId = self.contentId
         let cycleStartedAt = ProcessInfo.processInfo.systemUptime
         loadGeneration+=1;let generation=loadGeneration
@@ -192,7 +207,7 @@ private struct ContentFanScreen: View {
             var view:ContentViewValue?;var statuses:[String]=[]
             do {view=try await client.request(creatorId+"/"+contentId, expectedAccountId: before.accountId)} catch {
                 if let failure=error as? ContentFailure, failure.status==401 || failure.accountChanged {throw error}
-                statuses.append((error as? ContentFailure)?.message ?? "Reconnect to refresh content. Your input is kept.")
+                statuses.append(contentFailureCopy(error))
             }
             let depth = before.accountId == viewerAccountId ? replyDepth : 1
             var page:ContentReplyPage?;var currentReplies:[ContentReply]=[];var repliesAvailable=false
@@ -218,7 +233,7 @@ private struct ContentFanScreen: View {
             }
             let after:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: before.accountId)
             guard generation==loadGeneration else{return}
-            guard before.accountId==after.accountId else {clearAuthority();self.error="The signed-in account changed. Refresh before continuing.";return}
+            guard before.accountId==after.accountId else {clearAuthority();self.error=QelvoraCopy.text("w5ContentAccountChanged");return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
             viewerAccountId=before.accountId;content=view;replies=currentReplies;nextCursor=page?.nextCursor;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
@@ -230,7 +245,7 @@ private struct ContentFanScreen: View {
             suspendAccess()
             content=nil;replies=[];thanks=nil;nextCursor=nil
             if (error as? ContentFailure)?.authorityDenied == true {clearAuthority()}
-            self.error=(error as? ContentFailure)?.message ?? "Reconnect to refresh current access. Your input is kept."
+            self.error=contentFailureCopy(error)
         }
     }
     @MainActor private func mutate(_ path: String, _ body: [String: Any]) async -> Bool {
@@ -242,7 +257,7 @@ private struct ContentFanScreen: View {
             if let data=try? JSONSerialization.data(withJSONObject:command,options:.sortedKeys),let json=String(data:data,encoding:.utf8) { fingerprint=path+json;command["idempotencyKey"]=retryKeys[fingerprint!] ?? UUID().uuidString;retryKeys[fingerprint!]=command["idempotencyKey"] as? String }
         }
         do { let _: ContentReceipt = try await ContentClient(baseURL: baseURL).request(creatorId + "/" + path, body: JSONSerialization.data(withJSONObject: command), expectedAccountId:viewerAccountId); if let fingerprint { retryKeys.removeValue(forKey:fingerprint) }; error = ""; return true }
-        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if (error as? ContentFailure)?.authorityDenied == true { clearAuthority() }; self.error = (error as? ContentFailure)?.message ?? "This action could not complete. Your input is kept."; return false }
+        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if (error as? ContentFailure)?.authorityDenied == true { clearAuthority() }; self.error = contentFailureCopy(error, action: true); return false }
     }
     @MainActor private func sendReply() async { guard replyAccess else {return}; if await mutate(contentId + "/replies", ["text": replyText, "idempotencyKey": UUID().uuidString]) { replyText = ""; await load(refreshThanks: false) } }
     @MainActor private func withdraw(_ reply:ContentReply) async { if await mutate("replies/"+reply.id+"/withdraw",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } }

@@ -56,13 +56,15 @@ internal suspend fun growthReplyDocument(context: Context, source: JSONObject): 
             check(growthReplyRenderLock.tryLock())
             try {
                 val id = source.getString("id")
-                UUID.fromString(id)
+                require(Regex("[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}").matches(id))
                 val text = source.getString("text")
                 val author = source.getString("authorLabel")
                 val kind = source.getString("authorKind")
-                val version = source.getInt("version")
-                val verification = Uri.parse(source.getString("verificationURL"))
-                require(text.length <= 128000 && author.length <= 512 && version > 0 &&
+                val version = source.getLong("version")
+                val verificationURL = source.getString("verificationURL")
+                val verification = Uri.parse(verificationURL)
+                require(text.isNotEmpty() && text.length <= 128000 && author.isNotEmpty() && author.length <= 512 && version in 1..9_007_199_254_740_991L &&
+                    Regex("[a-f0-9]{64}").matches(source.getString("sourceHash")) && verificationURL.length <= 2048 &&
                     kind in listOf("human_creator", "approved_draft") && verification.scheme == "https" &&
                     !verification.host.isNullOrEmpty() && verification.userInfo == null &&
                     verification.path == "/share/$id" && verification.query == null && verification.fragment == null)
