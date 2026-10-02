@@ -220,10 +220,17 @@ export class GenerationIdentityAuthority {
               to_regprocedure('creator.end_generation_scope()')]::oid[])
               OR p.oid=ANY(ARRAY(SELECT to_regprocedure(c.signature)::oid
                FROM jsonb_to_recordset($5::jsonb) AS c(signature text)))))
-           AND (SELECT count(*)=8 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+           AND (SELECT count(*)=7 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname='creator' AND c.relkind='r' AND c.relname=ANY(ARRAY[
-             'generation','thread','creator_profile','fan_profile','identity_session','message','processor_consent','generation_worker_scope'])
+             'generation','thread','creator_profile','fan_profile','message','processor_consent','generation_worker_scope'])
             AND c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='creator_owner')
+           -- Canonical identity_session resolves an unknown bearer before any
+           -- account GUC exists. Preserve its reviewed catalogue shape; the
+           -- inaccessible purpose owner gets only four metadata columns and
+           -- every fixed function predicates the original account/session.
+           AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.identity_session')
+            AND relkind='r' AND pg_get_userbyid(relowner)='creator_owner'
+            AND NOT relrowsecurity AND NOT relforcerowsecurity)
            AND NOT has_column_privilege('creator_generation_authority','creator.message','text','SELECT')
            AND NOT has_column_privilege('creator_generation_authority','creator.memory','text','SELECT')
            AND NOT has_column_privilege('creator_generation_authority','creator.identity_session','token_hash','SELECT')
