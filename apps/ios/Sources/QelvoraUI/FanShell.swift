@@ -110,6 +110,29 @@ public final class FanSession: ObservableObject {
         do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh(); return session?.fan != nil }
         catch { self.error = Self.message(error); return false }
     }
+    /// Save only the intro, against the original account/profile version.
+    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
+        guard let baseURL, !busy, let current = session, current.accountId == accountId,
+              current.sessionId == sessionId, let fan = current.fan else { return false }
+        let snapshot = generation
+        busy = true; defer { busy = false }
+        do {
+            guard let credential = try await storage.read() else { return false }
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            let client = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), token: { credential })
+            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
+            let saved = try await client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
+            guard !Task.isCancelled, snapshot == generation, session?.accountId == accountId,
+                  session?.sessionId == sessionId, try await storage.read() == credential,
+                  saved.id == fan.id, saved.intro == text else { return false }
+            await refresh()
+            return snapshot == generation && session?.accountId == accountId && session?.sessionId == sessionId
+        } catch {
+            if snapshot == generation { self.error = Self.message(error) }
+            return false
+        }
+    }
     public func logout(all: Bool = false) async {
         guard !busy else { return }; busy = true; defer { busy = false }
         guard let api else { await purge(); return }

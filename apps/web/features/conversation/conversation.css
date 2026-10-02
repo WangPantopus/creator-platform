@@ -236,3 +236,28 @@
     transition: none !important;
   }
 }
+
+.identity-intro-offer {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.identity-intro-offer h2 {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+  margin: 0;
+}
+.identity-intro-offer textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+}
+.identity-intro-offer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

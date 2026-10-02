@@ -10527,6 +10527,127 @@
           }
         }
       }
+    },
+    "Tell creators’ AIs about yourself once": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tell creators’ AIs about yourself once"
+          }
+        }
+      }
+    },
+    "Add a short intro in your own words. You choose, per creator, whether their AI may use it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a short intro in your own words. You choose, per creator, whether their AI may use it."
+          }
+        }
+      }
+    },
+    "A line about you · optional": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A line about you · optional"
+          }
+        }
+      }
+    },
+    "Save intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save intro"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Finish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish"
+          }
+        }
+      }
+    },
+    "Your intro is saved. Reconnect to finish dismissing this offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your intro is saved. Reconnect to finish dismissing this offer."
+          }
+        }
+      }
+    },
+    "Your choice is kept on this screen. Reconnect to finish dismissing this offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your choice is kept on this screen. Reconnect to finish dismissing this offer."
+          }
+        }
+      }
+    },
+    "Your intro could not be saved. Your input is kept. Reconnect and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your intro could not be saved. Your input is kept. Reconnect and try again."
+          }
+        }
+      }
+    },
+    "This offer could not be dismissed. Reconnect and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This offer could not be dismissed. Reconnect and try again."
+          }
+        }
+      }
+    },
+    "Finishing…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finishing…"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

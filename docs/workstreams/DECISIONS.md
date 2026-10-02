@@ -150,3 +150,9 @@ DI09 uses only the fan's actual consented helpful response to the exact delivere
 ### October 2 — original terminal construction custody
 
 W1 pins the actual immutable99/100 SQL and seven installed PostgreSQL definitions in a frozen construction packet. This is a review receipt, not activation or positive work permission; genuine generation registry, held W8 recovery and actual W2/W4 settlement remain required. The factory requires the exact delivered100 name and uses CASE relation-kind guards before PostgreSQL type-specific privilege helpers. Personally installed only on empty closed proposal57, actual worker-login denials/unknown refusal/catalogue execution pass; no app/private data or applied canonical migration is changed.
+
+## W1 DI09 client disposition and profile concurrency — October2
+
+An explicit consented helpful write creates eligibility; only the actual server-issued pending offer is shown. All three clients recover a lost response through current authorized pending lookup and separately acknowledge explicit Save/Skip. Acknowledgement uncertainty leaves Finish available; a stored intro recovers as Finish, avoiding a repeat write. No UI arrival, generation terminal, elapsed timer or delivery state can fabricate eligibility.
+
+Save uses an intro-only identity operation against the original account/profile version. This preserves the current handle and rejects a conflicting edit. A repeated lost-response request can return the actual stored matching intro without mutation. Native freezes the issuer credential for that write and rechecks the original session afterward; web keeps the existing current-account BFF boundary. Saving an intro grants no AI use, provider, marketing or per-creator sharing consent. All three positive journeys remain unaccepted without the genuine policy inputs.

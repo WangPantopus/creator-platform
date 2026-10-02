@@ -973,4 +973,16 @@
   <string name="growth_share_complete_reply" formatted="false">Share complete reply</string>
   <string name="identity_choose_handle" formatted="false">Choose your handle</string>
   <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="intro_offer_title" formatted="false">Tell creators’ AIs about yourself once</string>
+  <string name="intro_offer_body" formatted="false">Add a short intro in your own words. You choose, per creator, whether their AI may use it.</string>
+  <string name="intro_offer_label" formatted="false">A line about you · optional</string>
+  <string name="intro_offer_save" formatted="false">Save intro</string>
+  <string name="intro_offer_skip" formatted="false">Skip</string>
+  <string name="intro_offer_saving" formatted="false">Saving…</string>
+  <string name="intro_offer_finish" formatted="false">Finish</string>
+  <string name="intro_offer_saved_pending" formatted="false">Your intro is saved. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_skipped_pending" formatted="false">Your choice is kept on this screen. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_unavailable" formatted="false">Your intro could not be saved. Your input is kept. Reconnect and try again.</string>
+  <string name="intro_offer_ack_unavailable" formatted="false">This offer could not be dismissed. Reconnect and try again.</string>
+  <string name="intro_offer_acknowledging" formatted="false">Finishing…</string>
 </resources>

@@ -403,6 +403,9 @@ export function createOpenApi() {
       "/v1/identity/fan-profile": {
         post: operation("saveFanProfile", "FanProfile", "FanProfileInput"),
       },
+      "/v1/identity/fan-profile/intro": {
+        post: operation("saveFanIntro", "FanProfile", "FanIntroInput"),
+      },
       "/v1/identity/creator-profile": {
         post: operation(
           "saveCreatorProfile",

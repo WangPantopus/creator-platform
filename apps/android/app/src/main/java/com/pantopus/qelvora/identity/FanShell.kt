@@ -150,6 +150,27 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
     }
+    /** Preserves the current handle and never writes using a switched credential. */
+    suspend fun saveIntro(intro: String, accountId: String, sessionId: String): Boolean {
+        val origin = baseURL ?: return false
+        val current = session ?: return false
+        val fan = current.fan ?: return false
+        if (busy || current.accountId != accountId || current.sessionId != sessionId) return false
+        val snapshot = generation
+        val credential = currentToken() ?: return false
+        busy = true
+        try {
+            val text = intro.trim()
+            val client = CreatorAPIClient(origin) { credential }
+            val saved = client.saveFanIntro(APIFanIntroInput(text, fan.version))
+            currentCoroutineContext().ensureActive()
+            if (snapshot != generation || session?.accountId != accountId || session?.sessionId != sessionId || currentToken() != credential || saved.id != fan.id || saved.intro != text) return false
+            refresh()
+            return snapshot == generation && session?.accountId == accountId && session?.sessionId == sessionId
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (failure: Exception) { if (snapshot == generation) error = message(failure); return false }
+        finally { busy = false }
+    }
     suspend fun logout(all: Boolean = false) {
         if (busy) return; val client = api ?: run { purge(); return }; busy = true
         try { if (all) client.revokeSessions() else client.logout(); purge() }

@@ -4253,6 +4253,15 @@ public struct APIFanProfileInput: Codable, Sendable {
   }
 }
 
+public struct APIFanIntroInput: Codable, Sendable {
+  public let `intro`: String
+  public let `expectedVersion`: Int
+  public init(intro: String, expectedVersion: Int) {
+    self.intro = intro
+    self.expectedVersion = expectedVersion
+  }
+}
+
 public struct APIFanProfile: Codable, Sendable {
   public let `id`: String
   public let `handle`: String
@@ -8883,6 +8892,9 @@ public actor CreatorAPIClient {
   }
   public func saveFanProfile(body: APIFanProfileInput) async throws -> APIFanProfile {
     try await request("/v1/identity/fan-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func saveFanIntro(body: APIFanIntroInput) async throws -> APIFanProfile {
+    try await request("/v1/identity/fan-profile/intro", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
   public func saveCreatorProfile(body: APICreatorProfileInput) async throws -> APICreatorProfile {
     try await request("/v1/identity/creator-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)

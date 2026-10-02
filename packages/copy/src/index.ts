@@ -969,7 +969,19 @@ export const copy = {
   "growthDownloadCompleteReply": "Download complete reply",
   "growthShareCompleteReply": "Share complete reply",
   "identityChooseHandle": "Choose your handle",
-  "identityEditPublicProfile": "Edit public profile"
+  "identityEditPublicProfile": "Edit public profile",
+  "introOfferTitle": "Tell creators’ AIs about yourself once",
+  "introOfferBody": "Add a short intro in your own words. You choose, per creator, whether their AI may use it.",
+  "introOfferLabel": "A line about you · optional",
+  "introOfferSave": "Save intro",
+  "introOfferSkip": "Skip",
+  "introOfferSaving": "Saving…",
+  "introOfferFinish": "Finish",
+  "introOfferSavedPending": "Your intro is saved. Reconnect to finish dismissing this offer.",
+  "introOfferSkippedPending": "Your choice is kept on this screen. Reconnect to finish dismissing this offer.",
+  "introOfferUnavailable": "Your intro could not be saved. Your input is kept. Reconnect and try again.",
+  "introOfferAckUnavailable": "This offer could not be dismissed. Reconnect and try again.",
+  "introOfferAcknowledging": "Finishing…"
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

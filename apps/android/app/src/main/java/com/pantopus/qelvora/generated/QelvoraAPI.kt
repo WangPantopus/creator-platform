@@ -2237,6 +2237,12 @@ data class APIFanProfileInput(
 )
 
 @Serializable
+data class APIFanIntroInput(
+  val `intro`: String,
+  val `expectedVersion`: Long
+)
+
+@Serializable
 data class APIFanProfile(
   val `id`: String,
   val `handle`: String,
@@ -4667,6 +4673,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun logout(): APIDone = json.decodeFromString(request("/v1/identity/logout", "POST", authenticated = true))
   suspend fun revokeSessions(): APIDone = json.decodeFromString(request("/v1/identity/revoke-sessions", "POST", authenticated = true))
   suspend fun saveFanProfile(body: APIFanProfileInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun saveFanIntro(body: APIFanIntroInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile/intro", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun saveCreatorProfile(body: APICreatorProfileInput): APICreatorProfile = json.decodeFromString(request("/v1/identity/creator-profile", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun creatorProof(creatorId: String): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "GET", authenticated = true))
   suspend fun beginCreatorProof(creatorId: String, body: APIProofInput): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "POST", body = json.encodeToString(body), authenticated = true))

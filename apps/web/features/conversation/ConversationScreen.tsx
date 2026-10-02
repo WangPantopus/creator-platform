@@ -26,6 +26,8 @@ import type {
 import { useConversationRequest, ConversationError } from "./api";
 import { formatCopy } from "@qelvora/copy";
 import { VoicePlayer } from "../media/VoicePlayer";
+import { IntroOffer } from "../identity/intro-offer";
+import { ReplyFeedbackResultSchema } from "../../../../packages/api/src/conversation/contracts";
 import "./conversation.css";
 
 type Pending = {
@@ -76,6 +78,7 @@ export function ConversationScreen({
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
+  const [introOfferId, setIntroOfferId] = useState<string | null>(null);
   const [older, setOlder] = useState<ConversationMessage[]>([]);
   const [before, setBefore] = useState<number | null>(null);
   const current = useRef<ConversationPage | null>(null);
@@ -159,6 +162,7 @@ export function ConversationScreen({
     mounted.current = true;
     lifecycle.current++;
     setPage(null);
+    setIntroOfferId(null);
     setOlder([]);
     setDraft("");
     setPending(null);
@@ -482,17 +486,19 @@ export function ConversationScreen({
     const revision = lifecycle.current;
     setBusy(true);
     try {
-      const result = await request<{
-        rating: "helpful" | "not_helpful" | null;
-      }>(`${root}/messages/${message.id}/feedback`, {
-        messageVersion: message.version,
-        agentVersion: message.agentVersion,
-        rating,
-        ...(rating !== null
-          ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
-          : {}),
-      });
+      const result = ReplyFeedbackResultSchema.parse(
+        await request<unknown>(`${root}/messages/${message.id}/feedback`, {
+          messageVersion: message.version,
+          agentVersion: message.agentVersion,
+          rating,
+          ...(rating !== null
+            ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
+            : {}),
+        }),
+      );
       if (mounted.current && lifecycle.current === revision) {
+        if (result.introOffer?.offerId)
+          setIntroOfferId(result.introOffer.offerId);
         setOlder((items) =>
           items.map((item) =>
             item.id === message.id && item.version === message.version
@@ -581,6 +587,13 @@ export function ConversationScreen({
         />
       </div>
       <div className="conversation-body">
+        <IntroOffer
+          key={`${accountId}:${root}`}
+          root={root}
+          offeredId={introOfferId}
+          enabled={!!page.feedbackPolicy}
+          online={online && !busy}
+        />
         <p className="conversation-disclosure">
           Conversations with a creator’s AI can be read by that creator and
           their authorized team. Those accesses are logged. You can delete any

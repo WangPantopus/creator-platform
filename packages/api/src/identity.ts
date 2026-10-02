@@ -59,6 +59,11 @@ export const FanProfileSchema = z.strictObject({
   intro: z.string(),
   version: z.number().int().positive(),
 });
+/** An intro edit preserves the current handle and detects concurrent edits. */
+export const FanIntroInputSchema = z.strictObject({
+  intro: FanProfileInputSchema.shape.intro,
+  expectedVersion: z.number().int().positive(),
+});
 export const TeamRoleSchema = z.enum([
   "triage",
   "drafter",
@@ -164,6 +169,7 @@ export const PublicSignatureSchema = z.strictObject({
 export const identitySchemas = {
   CompleteIdentity: CompleteIdentitySchema,
   FanProfileInput: FanProfileInputSchema,
+  FanIntroInput: FanIntroInputSchema,
   FanProfile: FanProfileSchema,
   CreatorProfileInput: CreatorProfileInputSchema,
   CreatorProfile: CreatorProfileSchema,
