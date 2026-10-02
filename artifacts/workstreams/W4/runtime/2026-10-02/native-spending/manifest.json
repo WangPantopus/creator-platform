@@ -21,7 +21,7 @@
   ],
   "builds": {
     "android": "assembleDebug passed after correction; installed and personally operated",
-    "ios": "previous normal-signed build passed; corrected amount source rebuild pending, personal operation pending"
+    "ios": "Corrected normal-signed QelvoraApp shipping build passed, installed and launched on owned BC8 simulator; CUA Device Hub bindings by actual bundle and path repeatedly timeout10005; no personal taps accepted"
   },
   "notVerified": [
     "24h passage/activation",
