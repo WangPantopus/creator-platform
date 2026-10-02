@@ -204,6 +204,30 @@ export async function exportCommerceFinancial(
             await page(name, `SELECT * FROM creator.${relation}`, scope, keys, [
               creator,
             ]);
+          const paidCoverageSchema = (
+            await client.query<{ count: string }>(
+              "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_paid_coverage','commerce_paid_coverage_denial')",
+            )
+          ).rows[0]!;
+          invariant(
+            paidCoverageSchema.count === "0" ||
+              paidCoverageSchema.count === "2",
+            "paid_coverage_schema_incomplete",
+            "Complete paid-period and denial history is required before this export can finish.",
+          );
+          if (paidCoverageSchema.count === "2") {
+            for (const [name, relation] of [
+              ["paidCoverage", "commerce_paid_coverage"],
+              ["paidCoverageDenials", "commerce_paid_coverage_denial"],
+            ] as const)
+              await page(
+                name,
+                `SELECT * FROM creator.${relation}`,
+                scope,
+                ["id"],
+                [creator],
+              );
+          }
           for (const [name, relation, keys] of [
             ["modes", "commerce_mode", ["id"]],
             ["capacity", "commerce_capacity", ["mode_id", "window_start"]],
@@ -278,7 +302,7 @@ export async function exportCommerceFinancial(
             await page(
               "poolCycles",
               "SELECT * FROM creator.commerce_pool_cycle",
-              "WHERE cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1))",
+              "cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1))",
               ["cycle"],
               [creator],
             );

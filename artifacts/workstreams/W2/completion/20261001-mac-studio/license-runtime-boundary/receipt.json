@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "at": "2026-10-02T07:55:53.099904+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "base": "109b4b4fb55df82449fa55ad5cc5087cf7531edc",
+  "actor": "fictional Maya / development actor one",
+  "creatorId": "97152450-4093-4b15-9148-b12c16053956",
+  "database": "creator_w2 on owned loopback 55442",
+  "role": "creator_runtime",
+  "poolMax": 1,
+  "sourceSha256": {
+    "service.ts": "b1e23629840675ad3beedf4362f772faeac7800200d4c46a8e5f4dbfaf1fb472",
+    "runtime.ts": "4162378d70bef76e00d13c7e22b03833696ccbcbc37692441e28a8f3c8d7ed6d",
+    "delivery-authority.ts": "25285b3dc1fb70ded9922e45aeff6a20a40694de2d1a3b34b337091c550ca2c5",
+    "development-license.ts": "0672e99a50cdeec4d7e049b2757271bcfab69773b80a8747bc0abc9a83122e26"
+  },
+  "checks": {
+    "heldClientDevelopmentLicense": "accepted",
+    "realScopeAtService": "refused",
+    "realScopeAtVerifier": "refused",
+    "foreignProof": "refused",
+    "aiVoice": "refused",
+    "unconfigured": "refused",
+    "productionEnvironment": "refused",
+    "disabledFlag": "refused",
+    "productionIdentity": "refused",
+    "externalOrigin": "refused"
+  },
+  "providerCalls": 0,
+  "durableWrites": 0,
+  "qualification": "guarded configured verifier only; no account-ID, JSON flag or stored-terms inference",
+  "limits": [
+    "No positive provider or fan delivery proof.",
+    "No reviewed production license or processor/retention approval.",
+    "Temporary operator check removed; no new unit tests."
+  ],
+  "verification": {
+    "typecheck": "passed",
+    "scopedLint": "passed",
+    "format": "passed",
+    "existingBackendSuite": {
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "T11": {
+        "pairs": 10000,
+        "queries": 30000,
+        "durationMs": 54053,
+        "limitMs": 300000
+      },
+      "initialAuthenticationFailurePreserved": true
+    }
+  }
+}
