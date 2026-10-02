@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Terminal negative source — 2026-10-02
+
+Reserved0100 now consumes W1 actual39c274a3/0099. [Personally executed closed source/compiler/ACL review](../../../artifacts/workstreams/W8/generation-terminal-denial/20261002-mac-studio/README.md) has zero diagnostics, no direct LOGIN/request execute, zero generations/scopes/activation rows and canonical57 retained. Original full provenance/cursor, sorted try-negatives, five-second nonce and current session/lease/control/consent/role/closure bookends preserve W1/W2/W3/W4 custody. [Contract](../../operations/W8-generation-terminal-denial.md) exports the existing worker restoration-only port; no Actor/ThreadScope or provider/cost/settlement is fabricated. Real activation/worker/job/provider/cost/concurrent denial acceptance remains open.
+
+PR142 draft publishes actual privacy/three-client/Ops increment atbd023eab. Terminal branch preserves exactPR13134c2b5cc worker restoration plus corrected held recovery callbacks; no runtime fallback returns. All app services/devices/slots are stopped and retained databases stay intact.
+
+
 ## Initial57 merged; durable worker denial continuation — 2026-10-02
 
 PR95 merged normally at5ec5cb07, reviewedc7bbcbcd. Both backend checks, compile and both Android runtime checks passed; six Mac checks remained queued, not passed. [Merge observation](../../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/final-acceptance/merge.json) and final real-three-client receipts are published; peers are taking their own actual backup/restore and canonical upgrade. Future purposes stay unapplied.

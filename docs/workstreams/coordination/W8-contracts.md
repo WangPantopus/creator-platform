@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+Reserved0100 now supplies `creator_trust.generation_terminal_denial(uuid)` against exactW1 actual0099; only its NoLogin terminal authority can call it. [Contract/source/actual hashes](../../operations/W8-generation-terminal-denial.md) retain W2 journal, W3 original transition, W4 original settlement and real W1 held restoration. No source/body/provider/money/retention permission is inferred; unregistered purposes remain unavailable.
+
 Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
 
 Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.
