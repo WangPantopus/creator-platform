@@ -1,0 +1,65 @@
+{
+  "label": "exact proposal DDL and actual non-owner negative probes; no public-packet positive acceptance",
+  "base": "synthetic initial-wave57 clone; not original iMac recovery",
+  "sql": [
+    {
+      "path": "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
+      "sha256": "87f8766331b59a174e0cf7e837e3a3a9cdfd9d9a1662aa2b39ed9aa2dc308d80"
+    },
+    {
+      "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
+      "sha256": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3"
+    },
+    {
+      "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql",
+      "sha256": "a5cd1023aef38fced663b6154cf8a87a0332c112e0030255a001110f43599daa"
+    }
+  ],
+  "ddl": {
+    "files": 3,
+    "exit": 0,
+    "canonicalLedgerWritten": false
+  },
+  "probes": {
+    "label": "actual non-owner connections; missing packet/session refusal only; no source receipt invented",
+    "core": {
+      "role": "creator_runtime",
+      "privateprojection": false,
+      "runtimeprojection": true,
+      "workerinternal": false,
+      "rawtrust": false,
+      "rawpacket": true,
+      "metadatamember": false,
+      "noSession": "unavailable",
+      "missingRequest": 401
+    },
+    "publication": {
+      "role": "creator_publication_worker",
+      "privateprojection": false,
+      "runtimeprojection": false,
+      "workerinternal": false,
+      "rawtrust": false,
+      "rawpacket": false,
+      "metadatamember": false,
+      "noFamily": "unavailable"
+    }
+  },
+  "savedState": {
+    "ledgerRows": 57,
+    "publications": 0,
+    "metadataRoleSafe": true,
+    "restoredMarkerStillClosed": true
+  },
+  "connectionLimitAfterProbe": 0,
+  "verification": {
+    "backendTypecheck": "passed",
+    "newUnitTests": false
+  },
+  "open": [
+    "actual signed public packet/current original fan denial and lock-contention operation",
+    "W1 exact0071 installation and identity issuance",
+    "W4/W5/W6 real composed consumers",
+    "web/iOS/Android integrated packet operation"
+  ],
+  "releaseReady": false
+}

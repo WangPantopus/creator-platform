@@ -46,6 +46,11 @@ export type BackendRuntime = {
     actor: import("./modules/identity/adapter.js").Actor,
     creatorId: string,
   ) => Promise<void>;
+  holdPublicPacketNegativeAuthority?: (
+    client: pg.PoolClient,
+    actor: import("./modules/identity/adapter.js").Actor,
+    tuple: import("./modules/trust/scope-restriction.js").TrustPublicPacketTuple,
+  ) => Promise<boolean>;
   assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -288,6 +293,23 @@ export async function createConfiguredBackend(input: {
               client,
               actor,
               creatorId,
+            );
+          },
+          holdPublicPacketNegativeAuthority: async (
+            client: pg.PoolClient,
+            actor: import("./modules/identity/adapter.js").Actor,
+            tuple: import("./modules/trust/scope-restriction.js").TrustPublicPacketTuple,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current public request authority is unavailable.",
+                503,
+              );
+            return trust.holdPublicPacketNegativeAuthority(
+              client,
+              actor,
+              tuple,
             );
           },
           assertCreatorAllowedInTransaction: async (

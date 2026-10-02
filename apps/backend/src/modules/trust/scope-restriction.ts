@@ -1,4 +1,6 @@
 import type { Pool, PoolClient } from "pg";
+import { z } from "zod";
+import { ContentAudience } from "../../../../../packages/api/src/content.js";
 import type {
   ScopeRestriction,
   ScopeRestrictionInTransaction,
@@ -126,6 +128,67 @@ export function trustContentRestrictionInTransaction() {
       "SELECT creator_trust.runtime_content_denial($1) AS denial",
       [creatorId],
     );
+  };
+}
+
+const PacketTuple = z.strictObject({
+  creatorId: z.uuid(),
+  packetId: z.uuid(),
+  contentId: z.uuid(),
+  contentVersion: z.int().positive(),
+  audience: ContentAudience,
+});
+export type TrustPublicPacketTuple = z.infer<typeof PacketTuple>;
+
+/** W4's early negative preparation. Call before content/positive family locks.
+ * False means a recorded current denial; missing authority or contention is
+ * unavailable and must never be rendered as a successful empty view. */
+export function trustPublicPacketDenial() {
+  return async (
+    client: PoolClient,
+    actor: Actor,
+    raw: TrustPublicPacketTuple,
+  ): Promise<boolean> => {
+    const tuple = PacketTuple.parse(raw);
+    const current = requestAuthority.getStore();
+    if (
+      !actor.adultEligible ||
+      !current ||
+      current.accountId !== actor.accountId
+    )
+      throw new DomainError(
+        "content_session_required",
+        "Continue with Pantopus for this content.",
+        401,
+      );
+    await assertCurrentSession(client, actor.accountId);
+    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
+      current.sessionId,
+    ]);
+    const account = await client.query<{ account: string }>(
+      "SELECT nullif(current_setting('app.account_id',true),'') AS account",
+    );
+    if (account.rows[0]?.account !== actor.accountId)
+      throw new DomainError("scope_unavailable", "This scope is unavailable.");
+    const result = await denialQuery(
+      client,
+      "SELECT creator_trust.runtime_packet_denial($1,$2,$3,$4,$5::jsonb) AS denial",
+      [
+        tuple.creatorId,
+        tuple.packetId,
+        tuple.contentId,
+        String(tuple.contentVersion),
+        JSON.stringify(tuple.audience),
+      ],
+    );
+    if (result === "denied") return false;
+    if (result !== "allowed")
+      throw new DomainError(
+        "public_packet_denial_unavailable",
+        "Current public request authority is unavailable. Try again.",
+        503,
+      );
+    return true;
   };
 }
 
