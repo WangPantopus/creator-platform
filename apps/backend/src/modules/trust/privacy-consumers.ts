@@ -14,17 +14,23 @@ import {
 import type { AgentService } from "../agent/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { CommerceService } from "../commerce/service.js";
-import {
-  commercePrivacyHook,
-  type CommerceOperationsAuthority,
-} from "../commerce/operations.js";
+import { commercePrivacyHook } from "../commerce/operations.js";
 import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  createCommercePrivacyAuthority,
+  type CommercePrivacyConfiguration,
+} from "../commerce/privacy-purpose.js";
 import { DomainError } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
+
+export type ConversationPrivacyOwnerPorts = Omit<
+  Parameters<typeof conversationPrivacyHook>[0],
+  "pool" | "authority" | "retention"
+>;
 
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
@@ -33,12 +39,20 @@ export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
   conversationRetention?: ConversationPrivacyRetention;
+  /** Prepared owner instances; the coordinator fixes the pool, actual task
+   * authority and reviewed retention after spreading these owner ports. */
+  conversation?:
+    | ConversationPrivacyOwnerPorts
+    | (() => ConversationPrivacyOwnerPorts | undefined);
   agent?: {
     service: AgentService;
     lifecycle: AgentLifecycle;
     artifacts?: AgentExportArtifactSink;
   };
   commerce?: CommerceService;
+  /** Exact registered job fence/function custody; absent configuration never issues a financial export scope. */
+  commercePrivacy?: CommercePrivacyConfiguration;
+  commerceArtifacts?: import("../commerce/financial-export.js").FinancialExportSink;
   growth?: GrowthService;
   content?: {
     purposePool: Pool;
@@ -52,17 +66,34 @@ export function createPrivacyConsumers(input: {
   additional?: PrivacyHook[];
 }) {
   const verify = privacyTaskAuthority(input.coordinatorPool);
+  const conversationAuthority = conversationPrivacyAuthority(
+    input.runtimePool,
+    input.coordinatorPool,
+  );
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool),
     identityPrivacyHook(input.runtimePool, input.coordinatorPool),
-    conversationPrivacyHook({
-      pool: input.runtimePool,
-      authority: conversationPrivacyAuthority(
-        input.runtimePool,
-        input.coordinatorPool,
-      ),
-      retention: input.conversationRetention,
-    }),
+    {
+      domain: "conversation",
+      async run(job) {
+        const owners =
+          typeof input.conversation === "function"
+            ? input.conversation()
+            : input.conversation;
+        if (typeof input.conversation === "function" && !owners)
+          throw new DomainError(
+            "conversation_privacy_unavailable",
+            "Conversation privacy owners are not composed yet.",
+            503,
+          );
+        return conversationPrivacyHook({
+          ...owners,
+          pool: input.runtimePool,
+          authority: conversationAuthority,
+          retention: input.conversationRetention,
+        }).run(job);
+      },
+    },
     mediaPrivacyHook({
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,
@@ -85,25 +116,24 @@ export function createPrivacyConsumers(input: {
       ),
     );
   if (input.commerce) {
-    const authority: CommerceOperationsAuthority = {
-      async withCase() {
-        throw new DomainError(
-          "case_authority_required",
-          "Privacy consumers cannot authorize a refund.",
-          503,
-        );
-      },
-      async withPrivacyJob(job, work) {
+    const purpose = createCommercePrivacyAuthority(
+      input.commerce.pool,
+      input.commercePrivacy,
+    );
+    const authority = {
+      async withPrivacyJob<T>(
+        job: Parameters<PrivacyHook["run"]>[0],
+        work: Parameters<typeof purpose.withPrivacyJob<T>>[1],
+      ) {
         await verify(job);
-        const result = await work({
-          accountId: job.accountId,
-          adultEligible: true,
-        });
+        const result = await purpose.withPrivacyJob(job, work);
         await verify(job);
         return result;
       },
     };
-    hooks.push(commercePrivacyHook(input.commerce, authority));
+    hooks.push(
+      commercePrivacyHook(input.commerce, authority, input.commerceArtifacts),
+    );
   }
   if (input.growth) {
     const owner = growthPrivacyHook(input.growth, undefined, verify);
