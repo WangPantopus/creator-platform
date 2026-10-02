@@ -1,0 +1,44 @@
+{
+  "observedAt": "2026-10-02T16:19:51.245961+00:00",
+  "source": "22f9fc1b26c23568c043c4a31234df5a32a37061",
+  "normalBackendBuildExit": 0,
+  "sequentialHeavyNativeBuilds": true,
+  "normalSignedIOSBuildExit": 0,
+  "iosAdHocDevelopmentSignatureVerified": true,
+  "normalAndroidBuildExit": 0,
+  "files": {
+    "iosBinary": {
+      "path": "/Users/yingpengwang/Library/Caches/creator-platform-w3/ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "bytes": 40144,
+      "sha256": "9b4199e613cb15b239c51daa01f82eca773d487c51eaff5d95826dc65acf962c"
+    },
+    "androidAPK": {
+      "path": "/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build/outputs/apk/debug/app-debug.apk",
+      "bytes": 73153352,
+      "sha256": "8653bbcfa2a9df4a0bb1aef57e536afa31aacc1d83fdd6c44d9b4a854ebe24da"
+    },
+    "iosBuildLog": {
+      "path": "/private/tmp/w3-ios-system-link-build.log",
+      "bytes": 82101,
+      "sha256": "c7ef4aaa29daf1d9c6507f343b5212d65089feb512dd12185bb918e145456d40"
+    },
+    "androidBuildLog": {
+      "path": "/private/tmp/w3-android-system-link-build.log",
+      "bytes": 2301,
+      "sha256": "651c2bfa744925b4b302c9e1cae19a0d8a85148f18e7379e13061bc5a7423b7c"
+    },
+    "backendBuildLog": {
+      "path": "/private/tmp/w3-backend-system-link-build.log",
+      "bytes": 41,
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    }
+  },
+  "newTestsWritten": false,
+  "nativePurposeLinkUIOperated": false,
+  "iosApplicationUIOperated": false,
+  "iosSupportedControlLimit": "Prior increment52 Device Hub binding timed out twice; no alternate control authorized.",
+  "backendStopRequested": true,
+  "backendShutdownExit": 1,
+  "backendShutdownError": "Called end on pool more than once at growth/configured.ts:121 then server.ts:269; cause not yet qualified.",
+  "webShutdownExit": 0
+}

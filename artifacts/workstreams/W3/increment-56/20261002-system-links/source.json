@@ -1,0 +1,44 @@
+{
+  "source": "22f9fc1b26c23568c043c4a31234df5a32a37061",
+  "ownerSource": "58d39e671609750fac88a3fa11f22ab9d2eccd51",
+  "ownerFiles": [
+    {
+      "path": "apps/backend/src/modules/commerce/fulfillment-plans.ts",
+      "bytes": 50897,
+      "sha256": "05947cd47700c3c1861570e9ec3956f0553010f32570df3ca7617b665a157f51",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/fulfillment-catalogue.ts",
+      "bytes": 3833,
+      "sha256": "8aabff1354b4ccf756c58590eb0da9ba703df42ef6ef8be29224f3919b95b723",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/original-service.ts",
+      "bytes": 6592,
+      "sha256": "7b265c6ca912a5f18412658e33ba305b3bd75c9af118d561c845c8b47dc696f6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-plans.sql",
+      "bytes": 18928,
+      "sha256": "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1",
+      "unchanged": true
+    },
+    {
+      "path": "packages/api/src/commerce/fulfillment.ts",
+      "bytes": 1751,
+      "sha256": "8e4079e264038b5a18fa3eef80a18d9339c3b37c92c7b183a830961224bbd50e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/implementation/W4-fulfillment-plans.md",
+      "bytes": 6232,
+      "sha256": "3eeac7e606760c8c67c0bd9ec1d782296c77af6936ebb726b659fa5c81e0a143",
+      "unchanged": true
+    }
+  ],
+  "sqlActivated": false,
+  "positiveDeliveryObserved": false
+}

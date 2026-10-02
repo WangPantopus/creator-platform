@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-02T16:04:29.542974+00:00",
+  "source": "22f9fc1b26c23568c043c4a31234df5a32a37061",
+  "custody": {
+    "token": "54560e56-ed50-4028-aa0f-ca95903fcf33",
+    "inode": 241120078,
+    "pid": 17645,
+    "slot": "/private/tmp/creator-platform-emulator-slot-1",
+    "serial": "emulator-5584"
+  },
+  "coldLaunchStatus": "ok",
+  "coldLaunchTotalMs": 1052,
+  "coldLaunchWaitMs": 1057,
+  "uiTreeShowedSavedAccount": true,
+  "screenshotSucceeded": false,
+  "screenshotBytes": 0,
+  "deviceAbsent": true,
+  "ownedProcessAbsent": true,
+  "cause": "unknown",
+  "emulatorLogSHA256": "96fc864fbbd3078915135edb6c993e6f8766a9a239433eca28a79008650ca5cf",
+  "settingsChanged": false,
+  "leaseReleasedAfterExactTokenAndInodeCheck": true
+}
