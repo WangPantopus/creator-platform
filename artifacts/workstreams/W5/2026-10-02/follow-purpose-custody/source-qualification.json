@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "8d9487ff7af9ebb088553ad9e408adfd3a65872c",
+  "capturedMain": "02dcd5ec5e24d999bdfdd1d98d6727293da1be6d",
+  "ownerSource": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+  "fileSha256": "eabe1358a938e4c36b72ae0349f4db111a2336bf04f644fbe6262734bb031a7a",
+  "checks": {
+    "backendTypecheck": "passed",
+    "scopedLintFormat": "passed",
+    "diffCheck": "passed"
+  },
+  "change": "held purpose descriptor0101\u21920185 from exact owner source; original SQL/history unchanged",
+  "activation": false,
+  "genuineRegisteredDefinitionReceiptSupplied": false,
+  "positiveAudienceOrHomeAcceptance": false,
+  "releaseReady": false
+}
