@@ -182,7 +182,7 @@ struct NativeHandleForm: View {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
                             SwiftUI.Button { model.destination = "/you" } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("caption", weight: .semibold)
+                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("data-sm")
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
@@ -191,7 +191,7 @@ struct NativeHandleForm: View {
                             Text("Creators and their teams see your handle, never your name or city unless you share them in a request.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                         }
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("A LINE ABOUT YOU · OPTIONAL").qText("caption", weight: .semibold)
+                            Text("A LINE ABOUT YOU · OPTIONAL").qText("data-sm")
                             TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel("A line about you, optional").onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
                             Text("You choose, per creator, whether their AI may use this.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                         }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))
