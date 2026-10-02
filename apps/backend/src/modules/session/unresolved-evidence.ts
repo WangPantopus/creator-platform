@@ -39,9 +39,9 @@ export type UnresolvedCallTransportEvidence = z.infer<typeof schema>;
  * reviewed authority adapter before it can call an owner evidence port.
  */
 export function createUnresolvedCallEvidenceReader(sessions: SessionService) {
-  return async (
+  const lookup = async (
     scope: ThreadScope,
-    sessionId: string,
+    selector: { kind: "session" | "commitment"; id: string },
   ): Promise<UnresolvedCallTransportEvidence | null> => {
     const request = requestAuthority.getStore();
     if (!request || request.accountId !== scope.actorAccountId)
@@ -50,7 +50,7 @@ export function createUnresolvedCallEvidenceReader(sessions: SessionService) {
         "Reopen this call with your current account.",
         401,
       );
-    if (!z.uuid().safeParse(sessionId).success)
+    if (!z.uuid().safeParse(selector.id).success)
       throw new DomainError(
         "call_evidence_invalid",
         "Call evidence is unavailable.",
@@ -59,9 +59,26 @@ export function createUnresolvedCallEvidenceReader(sessions: SessionService) {
     return sessions.db.withThread(
       scope,
       async (client) => {
+        let sessionId = selector.id;
+        if (selector.kind === "commitment") {
+          const matches = await client.query<{ id: string }>(
+            "SELECT id FROM creator.call_session WHERE commitment_id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4 ORDER BY id LIMIT 2",
+            [selector.id, scope.creatorId, scope.fanId, scope.threadId],
+          );
+          if (!matches.rowCount) return null;
+          if (matches.rowCount !== 1)
+            throw new DomainError(
+              "call_evidence_unconfirmed",
+              "Call evidence requires current owner confirmation.",
+              503,
+            );
+          sessionId = matches.rows[0]!.id;
+        }
         const session = await sessions.lifecycleRow(scope, client, sessionId);
         if (
           !session ||
+          (selector.kind === "commitment" &&
+            session.document.commitmentId !== selector.id) ||
           session.document.state !== "ended" ||
           session.document.outcome !== null ||
           session.document.reconciliation !== "blocked"
@@ -122,4 +139,12 @@ export function createUnresolvedCallEvidenceReader(sessions: SessionService) {
       "read",
     );
   };
+  return Object.assign(
+    (scope: ThreadScope, sessionId: string) =>
+      lookup(scope, { kind: "session", id: sessionId }),
+    {
+      forCommitment: (scope: ThreadScope, commitmentId: string) =>
+        lookup(scope, { kind: "commitment", id: commitmentId }),
+    },
+  );
 }
