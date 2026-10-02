@@ -344,33 +344,64 @@ private struct W3AccountScreen: View {
     @State private var account: W3Account?; @State private var failure = ""
     @State private var cursor: String?; @State private var loading = false
     @State private var revision = 0
+    @State private var commerce: CommerceOverview?
+    @ScaledMetric(relativeTo: .title2) private var metricSize: CGFloat = 24
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     var body: some View {
-        ScrollView { VStack(alignment: .leading, spacing: 28) {
-            Text("You").qText("title")
-            if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
-            Text(account.map { "@" + $0.fan.handle } ?? "Your account").qText("display-md")
-            Text(account.map { $0.fan.intro ?? "You haven’t added an intro yet." } ?? (failure.isEmpty ? "Loading your account…" : "Your intro is unavailable.")).qText("body")
-            Button("Handle and intro", variant: .quiet) { session.open("/identity/account") }
-            Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce/requests") }
-            Button("Spend and time", variant: .quiet, block: true) { session.open("/commerce/spending") }
-            Button("Notifications", variant: .quiet, block: true) { session.open("/notifications/settings") }
-            Text("Me and privacy").qText("display-md")
-            Text(QelvoraCopy.text("conversationAccess")).qText("caption")
-            Text("Memory and conversation access by creator").qText("body")
-            if let account, account.threads.isEmpty { Text("No conversations yet.").qText("body") }
-            ForEach(account?.threads ?? []) { thread in
-                Button(thread.name, variant: .quiet, block: true) { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) }
-                Button("Memory and access · " + thread.name, variant: .quiet, block: true) { session.open("/you?creatorId=" + thread.creatorId + "&fanId=" + thread.fanId) }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(account.map { "@" + $0.fan.handle } ?? "You").qText("display-lg")
+                        Text(session.session?.mode == .development ? "Synthetic local account · development" : "Signed in with Pantopus")
+                            .qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+                    }
+                    if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
+                    HStack(alignment: .top, spacing: 12) {
+                        accountMetric("THIS MONTH", value: monthAmount, detail: limitDescription)
+                        accountMetric("MEMBERSHIPS", value: commerce.map { String($0.memberships.count) } ?? "—", detail: commerce == nil ? "Currently unavailable" : "Saved memberships")
+                    }
+                    accountPanel {
+                        accountRow("Me and privacy", detail: "Memories, who opened your conversations, consents") { proxy.scrollTo("account-privacy", anchor: .top) }
+                        accountDivider
+                        accountRow("Spending and time", detail: "Your limit, receipts, time with each AI") { session.open("/commerce/spending") }
+                        accountDivider
+                        accountRow("Memberships", detail: "Manage your memberships") { session.open("/commerce/membership") }
+                        accountDivider
+                        accountRow("Notifications", detail: "Push and email, per creator, quiet hours") { session.open("/notifications/settings") }
+                        accountDivider
+                        accountRow("Receipts", detail: "Your purchases and deliveries") { session.open("/commerce/requests") }
+                        accountDivider
+                        accountRow("Help and safety", detail: "Report, block, crisis support") { session.open("/support") }
+                    }.accessibilityLabel("Your account")
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Your intro").qText("title")
+                        Text(account.map { $0.fan.intro ?? "You haven’t added an intro yet." } ?? (failure.isEmpty ? "Loading your account…" : "Your intro is unavailable.")).qText("body")
+                        Button("Edit handle and intro", variant: .quiet) { session.open("/identity/account") }
+                    }
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Me and privacy").qText("display-md")
+                        Text(QelvoraCopy.text("conversationAccess")).qText("caption")
+                        Text("Memory and conversation access by creator").qText("body")
+                        if let account, account.threads.isEmpty { Text("No conversations yet.").qText("body") }
+                        ForEach(account?.threads ?? []) { thread in
+                            accountPanel {
+                                accountRow(thread.name, detail: "Open conversation") { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) }
+                                accountDivider
+                                accountRow("Memory and access", detail: thread.name) { session.open("/you?creatorId=" + thread.creatorId + "&fanId=" + thread.fanId) }
+                            }
+                        }
+                        if loading { Text("Loading your conversations…").qText("caption") }
+                        if let next = account?.nextCursor { Button("More conversations", variant: .quiet, disabled: loading || !failure.isEmpty) { Task { await refresh(before: next) } } }
+                        if cursor != nil { Button("Back to first page", variant: .quiet, disabled: loading) { Task { await refresh() } } }
+                        if !failure.isEmpty { Button("Try again", variant: .quiet, disabled: loading) { Task { await refresh(before: cursor) } } }
+                        Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
+                    }.id("account-privacy")
+                }.padding(.horizontal, 16).padding(.top, 28).padding(.bottom, 24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            if loading { Text("Loading your conversations…").qText("caption") }
-            if let next = account?.nextCursor { Button("More conversations", variant: .quiet, disabled: loading || !failure.isEmpty) { Task { await refresh(before: next) } } }
-            if cursor != nil { Button("Back to first page", variant: .quiet, disabled: loading) { Task { await refresh() } } }
-            if !failure.isEmpty { Button("Try again", variant: .quiet, disabled: loading) { Task { await refresh(before: cursor) } } }
-            Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
-            Button("Help and safety", variant: .quiet) { session.open("/support") }
-        }.padding(16) }.frame(maxWidth: 390).background(qColor("ground",scheme)).foregroundStyle(qColor("ink",scheme))
+        }.frame(maxWidth: 390).background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
             .task(id: "\(accountId)-\(scenePhase)") {
                 if scenePhase == .active { await refresh(before: cursor) }
                 else { conceal() }
@@ -379,8 +410,47 @@ private struct W3AccountScreen: View {
             .onDisappear { conceal() }
             .refreshable { await refresh() }
     }
+    private var monthAmount: String {
+        guard let exposure = commerce?.exposure else { return "—" }
+        return CommerceAmount.display(exposure.captured, exposure.currency)
+    }
+    private var limitDescription: String {
+        guard let commerce else { return "Currently unavailable" }
+        guard let limit = commerce.limits.first(where: { $0.currency == commerce.policy.currency }) else { return "Choose your limit" }
+        if limit.explicit_none { return "No limit" }
+        guard let amount = limit.amount.flatMap(Int64.init) else { return "Limit unavailable" }
+        return "of your " + CommerceAmount.display(amount, limit.currency) + " limit"
+    }
+    private func accountMetric(_ title: String, value: String, detail: String) -> some View {
+        accountPanel {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).qText("meta").foregroundStyle(qColor("ink-muted", scheme))
+                Text(value).font(QelvoraFonts.font("mono", size: metricSize)).minimumScaleFactor(0.8)
+                Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+            }.padding(14).frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    private var accountDivider: some View { Rectangle().fill(qColor("line", scheme)).frame(height: 1).accessibilityHidden(true) }
+    private func accountPanel<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 0, content: content)
+            .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+            .overlay(RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg).stroke(qColor("line", scheme), lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+    }
+    private func accountRow(_ title: String, detail: String, action: @escaping () -> Void) -> some View {
+        SwiftUI.Button(action: action) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).qText("body-strong")
+                    Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+                }.frame(maxWidth: .infinity, alignment: .leading)
+                QelvoraGlyph(name: "chevron", size: 16).accessibilityHidden(true)
+            }.padding(.horizontal, 16).padding(.vertical, 10).frame(minHeight: 56)
+                .contentShape(Rectangle())
+        }.buttonStyle(.plain).accessibilityElement(children: .combine)
+    }
     private func conceal() {
-        revision += 1; account = nil; loading = false
+        revision += 1; account = nil; commerce = nil; loading = false
     }
     private func refresh(before: String? = nil) async {
         conceal()
@@ -392,6 +462,9 @@ private struct W3AccountScreen: View {
             let fresh: W3Account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account" + (before.map { "?cursor=" + $0 } ?? ""))
             guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId else { return }
             account = fresh; cursor = before
+            let overview: CommerceOverview? = try? await CommerceClient(baseURL: baseURL, accountId: accountId).request("overview")
+            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId else { return }
+            if let overview, overview.fan?.id == fresh.fan.id { commerce = overview }
         } catch {
             if !Task.isCancelled, revision == currentRevision, scenePhase == .active { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." }
         }
