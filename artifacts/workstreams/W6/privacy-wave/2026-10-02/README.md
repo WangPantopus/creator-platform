@@ -16,7 +16,7 @@ The unchanged18 existing PostgreSQL/contract checks pass against the exact W8 ca
 
 [Actual PostgreSQL operational probe](metadata-catalogue-unactivated.json) executes the whole catalogue query in an administrative, rolled-back transaction with the original runtime selected. The real function definition SHA is `7307cc97902322401cccbc94c02c682fb579756150378fdbbc216ae75848715b`; SQL SHA is `8f4cebbdee2649a97b2e8e7e31173cbe4563dd6f951dd677f51cd61b50befc1a`. Missing0197 ledger is refused as `call_metadata_unconfigured`; no-current-request direct SQL returns zero rows. Rollback restores absent role/function and61 migrations. This proves query compilation and refusal, not positive issuer or app integration.
 
-Current source backend typecheck, scoped lint, contract generation and combined candidate backend build pass. Production web build passes and the built app was launched and operated. No new unit tests were added.
+Current source backend typecheck, scoped lint, contract generation and combined candidate backend build pass. After unrelated W5 main integration, backend build, web types, generation and scoped formatting pass; the unchanged18 PG/contracts pass again in74.06seconds on a separate disposable instance, normally stopped afterward ([exact integrated check receipt](integrated-source-checks.json)). Production web build passes and the built app was launched and operated. No new unit tests were added.
 
 ## Personally operated app journeys
 
