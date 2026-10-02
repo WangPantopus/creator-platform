@@ -1,7 +1,10 @@
 import type { Pool } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
 import { z } from "zod";
 
@@ -37,6 +40,7 @@ export function mediaPrivacyHook(input: {
       let callCount = 0;
       try {
         await client.query("BEGIN");
+        await privacyTaskAuthorityInTransaction(client, job);
         for (const family of families) {
           await authority.assertFamily(client, job, family);
           const pair = [family.creatorId, family.fanId];
@@ -102,6 +106,7 @@ export function mediaPrivacyHook(input: {
           );
         }
         await verify(job);
+        job.signal?.throwIfAborted();
         await client.query("COMMIT");
       } catch (error) {
         await client.query("ROLLBACK");

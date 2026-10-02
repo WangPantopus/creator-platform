@@ -31,6 +31,11 @@ import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
 
+export type ConversationPrivacyOwnerPorts = Omit<
+  Parameters<typeof conversationPrivacyHook>[0],
+  "pool" | "authority" | "retention"
+>;
+
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
  * SELECT on peer private tables or an interactive grant. */
@@ -40,6 +45,11 @@ export function createPrivacyConsumers(input: {
   /** Actual restoration on the owner's held client, as supplied by W8. */
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
+  /** Prepared owner instances; the coordinator fixes the pool, actual task
+   * authority and reviewed retention after spreading these owner ports. */
+  conversation?:
+    | ConversationPrivacyOwnerPorts
+    | (() => ConversationPrivacyOwnerPorts | undefined);
   agent?: {
     service: AgentService;
     lifecycle: AgentLifecycle;
@@ -64,17 +74,34 @@ export function createPrivacyConsumers(input: {
   additional?: PrivacyHook[];
 }) {
   const verify = privacyTaskAuthority(input.coordinatorPool);
+  const conversationAuthority = conversationPrivacyAuthority(
+    input.runtimePool,
+    input.coordinatorPool,
+  );
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool),
     identityPrivacyHook(input.runtimePool, input.coordinatorPool),
-    conversationPrivacyHook({
-      pool: input.runtimePool,
-      authority: conversationPrivacyAuthority(
-        input.runtimePool,
-        input.coordinatorPool,
-      ),
-      retention: input.conversationRetention,
-    }),
+    {
+      domain: "conversation",
+      async run(job) {
+        const owners =
+          typeof input.conversation === "function"
+            ? input.conversation()
+            : input.conversation;
+        if (typeof input.conversation === "function" && !owners)
+          throw new DomainError(
+            "conversation_privacy_unavailable",
+            "Conversation privacy owners are not composed yet.",
+            503,
+          );
+        return conversationPrivacyHook({
+          ...owners,
+          pool: input.runtimePool,
+          authority: conversationAuthority,
+          retention: input.conversationRetention,
+        }).run(job);
+      },
+    },
     mediaPrivacyHook({
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,

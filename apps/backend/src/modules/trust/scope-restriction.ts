@@ -88,20 +88,21 @@ async function denialQuery(
   }
 }
 
-/** 0082 tries the exact negative keys before reusing0053's pinned predicates.
- * Only the genuine current participant is eligible for this negative gate. */
+/** 0082 tries the exact participant keys before reusing0053's pinned predicates.
+ * A non-participant uses0084's separate genuine current Team-triage candidate
+ * check; W1/W4 still lease and verify every positive family/role permission. */
 export function trustScopeRestrictionInTransaction(): ScopeRestrictionInTransaction {
   return async (actor, creatorId, threadId, participants, client) => {
-    if (
-      ![participants.fanAccountId, participants.creatorAccountId].includes(
-        actor.accountId,
-      )
-    )
-      throw new DomainError("scope_unavailable", "This scope is unavailable.");
+    const participant = [
+      participants.fanAccountId,
+      participants.creatorAccountId,
+    ].includes(actor.accountId);
     await projectedDenial(
       client,
       actor,
-      "SELECT creator_trust.interactive_denial('thread',$1,$2) AS denial",
+      participant
+        ? "SELECT creator_trust.interactive_denial('thread',$1,$2) AS denial"
+        : "SELECT creator_trust.team_thread_denial($1,$2) AS denial",
       [creatorId, threadId],
     );
   };
@@ -141,6 +142,87 @@ export function trustContentRestrictionInTransaction() {
       "SELECT creator_trust.interactive_denial('content',$1,$2) AS denial",
       [creatorId, null],
     );
+  };
+}
+
+/** Exact actual creator/fan candidate, never an invented packet/thread tuple.
+ * Only the real creator owner or fan is eligible; the owner still leases every
+ * positive tenure/content permission after this bounded negative projection. */
+export function trustCreatorFanRestrictionInTransaction() {
+  return async (
+    client: PoolClient,
+    actor: Actor,
+    tuple: { creatorId: string; fanId: string },
+  ): Promise<void> => {
+    const pair = z
+      .strictObject({ creatorId: z.uuid(), fanId: z.uuid() })
+      .parse(tuple);
+    await projectedDenial(
+      client,
+      actor,
+      "SELECT creator_trust.creator_fan_denial($1,$2) AS denial",
+      [pair.creatorId, pair.fanId],
+    );
+  };
+}
+
+/** Public metadata negative gate: actual current visitor or genuinely anonymous
+ * caller. No Actor/CreatorScope is constructed. The public issuer owns every
+ * positive profile/License/version check and the host's held restoration gate.
+ * Call before positive family/domain leases. */
+export function trustPublicCreatorDenial() {
+  return async (client: PoolClient, creatorId: string): Promise<boolean> => {
+    const creator = z.uuid().parse(creatorId);
+    const authority = requestAuthority.getStore();
+    await client.query("SAVEPOINT w8_public_creator_denial");
+    try {
+      if (authority) {
+        await assertCurrentSession(client, authority.accountId);
+        await client.query(
+          "SELECT set_config('app.identity_session_id',$1,true)",
+          [authority.sessionId],
+        );
+      }
+      const bound = (
+        await client.query<{ account: string | null; session: string | null }>(
+          `SELECT nullif(current_setting('app.account_id',true),'') AS account,
+           nullif(current_setting('app.identity_session_id',true),'') AS session`,
+        )
+      ).rows[0];
+      if (
+        !bound ||
+        (authority
+          ? bound.account !== authority.accountId ||
+            bound.session !== authority.sessionId
+          : bound.account !== null || bound.session !== null)
+      )
+        throw new DomainError(
+          "public_creator_context_unavailable",
+          "Current public creator authority is unavailable.",
+          503,
+        );
+      const result = await denialQuery(
+        client,
+        "SELECT creator_trust.public_creator_denial($1) AS denial",
+        [creator],
+      );
+      if (result === "denied") {
+        await client.query("ROLLBACK TO SAVEPOINT w8_public_creator_denial");
+        return false;
+      }
+      if (result !== "allowed")
+        throw new DomainError(
+          "public_creator_denial_unavailable",
+          "Current public creator authority is unavailable. Try again.",
+          503,
+        );
+      return true;
+    } catch (error) {
+      await client.query("ROLLBACK TO SAVEPOINT w8_public_creator_denial");
+      throw error;
+    } finally {
+      await client.query("RELEASE SAVEPOINT w8_public_creator_denial");
+    }
   };
 }
 

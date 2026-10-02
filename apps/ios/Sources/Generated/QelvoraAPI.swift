@@ -1891,6 +1891,17 @@ public struct APICallCallRevision: Codable, Sendable {
   }
 }
 
+public struct APICallCallRoute: Codable, Sendable {
+  public let `sessionId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public init(sessionId: String, creatorId: String, fanId: String) {
+    self.sessionId = sessionId
+    self.creatorId = creatorId
+    self.fanId = fanId
+  }
+}
+
 public struct APICallCallSummaryNote: Codable, Sendable {
   public let `note`: String
   public let `expectedVersion`: Int
@@ -9046,6 +9057,9 @@ public actor CreatorAPIClient {
   }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallRoute {
+    try await request("/v1/w6/calls/\(segment(sessionId))/route", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallAdmissionRedemption) async throws -> APICallAdmissionReceipt {
     try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/redeem", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
