@@ -1,4 +1,10 @@
 import { z } from "zod";
+import type { PoolClient } from "pg";
+import {
+  PublicAIIdentityAuthority,
+  type PublicAIReadFacts,
+  type PublicAIReadScope,
+} from "../identity/public-ai-scope.js";
 import { invariant } from "../../core/errors.js";
 import { licenseRow, type CreatorScope } from "./repository.js";
 import type { AgentService } from "./service.js";
@@ -182,4 +188,126 @@ export async function relayAgentEvents(input: {
     delivered++;
   }
   return { delivered };
+}
+
+export interface PublicAgentPurposeAuthority {
+  /** Actual current processor/purpose policy, held on this metadata client.
+   * No network or transaction is permitted here. False means a current policy
+   * refusal; unavailable authority must throw. Separate fan consent is not inferred. */
+  current(
+    client: PoolClient,
+    scope: PublicAIReadScope,
+    facts: PublicAIReadFacts,
+  ): Promise<boolean>;
+}
+export type PublicCreatorAIState = Readonly<{
+  state: "published" | "paused" | "unpublished" | "revoked";
+  mode: "expert" | "companion" | "expert_and_companion";
+  topics: readonly string[];
+  sourceSummary: string;
+}>;
+export interface PublicCreatorAIProjection {
+  current(creatorId: string): Promise<PublicCreatorAIState | null>;
+}
+
+/** The actual visitor keeps their account/session throughout. W1 alone issues
+ * bounded frozen metadata on this private pool; no creator Actor, owner GUC,
+ * private source/configuration read or workspace creation is substituted. */
+export function agentPublicProjection(
+  service: AgentService,
+  identity: PublicAIIdentityAuthority,
+  purpose: PublicAgentPurposeAuthority,
+): PublicCreatorAIProjection {
+  invariant(
+    identity instanceof PublicAIIdentityAuthority &&
+      typeof purpose?.current === "function",
+    "public_agent_purpose_unconfigured",
+    "Actual public AI identity and processor/purpose authority are required.",
+  );
+  identity.assertPool(service.repository.pool);
+  const currentPurpose = purpose.current.bind(purpose);
+  const authorize = identity.authorizeInTransaction.bind(identity);
+  const withPublicAI = identity.withPublicAI.bind(identity);
+  const unavailable = (
+    state: "paused" | "unpublished" | "revoked",
+  ): PublicCreatorAIState =>
+    Object.freeze({
+      state,
+      mode: "expert" as const,
+      topics: Object.freeze([] as string[]),
+      sourceSummary: "",
+    });
+  return Object.freeze({
+    async current(creatorId: string): Promise<PublicCreatorAIState | null> {
+      z.uuid().parse(creatorId);
+      await service.repository.assertRuntimeRole();
+      // withPublicAI releases only after its final genuine scope recheck,
+      // purpose cleanup and COMMIT. This callback performs no provider I/O.
+      return withPublicAI(creatorId, async (client, scope, facts) => {
+        await authorize(scope, client, facts);
+        if (facts.tombstoned || facts.workspace?.deleted) return null;
+        const version = facts.version;
+        if (
+          !facts.workspace?.liveVersionId ||
+          !version ||
+          facts.workspace.liveVersionId !== version.id ||
+          scope.versionId !== version.id
+        )
+          return unavailable("unpublished");
+        const context = Object.freeze({ identity, scope, facts });
+        if (!(await service.currentPublicLicense(context, client)))
+          return unavailable("revoked");
+        if ((await currentPurpose(client, scope, facts)) !== true)
+          return unavailable("revoked");
+        if (facts.workspace.paused || version.state === "paused")
+          return unavailable("paused");
+        if (
+          version.state !== "live" ||
+          !version.publishedAt ||
+          version.pipelineHash !== service.pipeline.fingerprint ||
+          !service.pipeline.model?.pricingConfigured ||
+          (version.dailyCostCapMicros ?? 0) <= 0 ||
+          !version.mode ||
+          new Set(version.sourceSet.map((source) => source.id)).size !==
+            version.sourceSet.length ||
+          !version.sourceSet.every((expected) =>
+            facts.sources.some(
+              (source) =>
+                source.id === expected.id &&
+                source.revision === expected.revision &&
+                source.hash === expected.hash &&
+                source.ready,
+            ),
+          )
+        )
+          return unavailable("unpublished");
+        await authorize(scope, client, facts);
+        if (
+          (await currentPurpose(client, scope, facts)) !== true ||
+          !(await service.currentPublicLicense(context, client))
+        )
+          return unavailable("revoked");
+        const publicSources = facts.sources.filter((source) => source.public);
+        return Object.freeze({
+          state: "published" as const,
+          mode:
+            version.mode === "blend"
+              ? ("expert_and_companion" as const)
+              : version.mode,
+          topics: Object.freeze(
+            [
+              ...new Set(
+                publicSources
+                  .map((source) =>
+                    Array.from(source.title.trim()).slice(0, 80).join(""),
+                  )
+                  .filter(Boolean),
+              ),
+            ].slice(0, 30),
+          ),
+          sourceSummary: `${publicSources.length} approved public ${publicSources.length === 1 ? "source" : "sources"}`,
+        });
+      });
+    },
+  });
 }
