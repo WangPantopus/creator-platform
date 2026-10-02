@@ -16,14 +16,44 @@ export function contentSignedSubjects(
 ): SignedSubjectPolicy {
   return {
     name: "content",
+    requiresFinalization: true,
+    async finalizeBeforeCommit(
+      client,
+      actor,
+      creatorId,
+      canonical,
+      finalization,
+    ) {
+      const body = z
+        .object({ kind: z.string(), creatorId: z.uuid() })
+        .parse(canonical.content);
+      invariant(
+        body.creatorId === creatorId,
+        "publication_source_changed",
+        "The exact signing creator is required.",
+      );
+      if (body.kind !== "content_publication") return;
+      await service.publicationSources.finalize(client, actor, {
+        stage: "signing_challenge",
+        publicationSignedActId: null,
+        challengeId: finalization.challengeId,
+      });
+    },
     async prepare(client, actor, creatorId, requested) {
       const content = z
         .object({ kind: z.enum(["content_publication", "content_reaction"]) })
         .safeParse(requested.content);
       if (!content.success) return null;
       await service.assertCurrentAllowed(client, actor, creatorId);
-      if (content.data.kind === "content_publication")
+      if (content.data.kind === "content_publication") {
+        await service.publicationSources.prepare(
+          client,
+          actor,
+          creatorId,
+          requested.subjectId,
+        );
         await service.authorizeMedia(client, actor, creatorId);
+      }
       await service.role(client, actor, creatorId);
       if (content.data.kind === "content_reaction") {
         await service.assertReplyReviewInstalled(client);
