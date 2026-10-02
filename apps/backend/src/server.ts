@@ -117,6 +117,12 @@ try {
             const contentDependencies = {
               mediaPublication: mediaHost?.contentPublication,
               assertAllowed: runtime.assertCreatorAllowed,
+              ...(runtime.assertContentAllowedInTransaction
+                ? {
+                    assertAllowedInTransaction:
+                      runtime.assertContentAllowedInTransaction,
+                  }
+                : {}),
               follows: async (
                 ...args: Parameters<
                   NonNullable<
