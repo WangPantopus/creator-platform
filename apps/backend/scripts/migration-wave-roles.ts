@@ -196,13 +196,14 @@ export async function assertWaveRoleSafety(
               "creator.discover_media_jobs(text, integer)",
             ].includes(c.object));
       if (c.kind === "column" && c.privilege === "SELECT")
-        allowed =
+        allowed = Boolean(
           (c.role === "creator_trust_denial" &&
             installed.trust &&
             metadata[c.object]?.includes(c.column)) ||
-          (c.role === "creator_media_discovery" &&
-            installed.media &&
-            discovery[c.object]?.includes(c.column));
+            (c.role === "creator_media_discovery" &&
+              installed.media &&
+              discovery[c.object]?.includes(c.column)),
+        );
       if (
         c.role === "creator_media_worker" &&
         installed.media &&
