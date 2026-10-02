@@ -28,5 +28,35 @@
   ],
   "operatorCorrections": [
     "Initial audit listed obsolete guessed table names; corrected directly from the pinned CREATE TABLE sources and the altered existing allowance table, without changing schema or expected source behavior"
-  ]
+  ],
+  "guardReview": {
+    "sourceCommit": "a71994f5",
+    "metadataOnly": true,
+    "already57Targets": [
+      "preserved-upgrade",
+      "fresh"
+    ],
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "passed": true,
+    "sqlNotReplayed": true,
+    "runtimeNotReopened": true
+  },
+  "effectiveGuardReview": {
+    "sourceCommit": "064fa55e",
+    "metadataOnly": true,
+    "already57Targets": [
+      "preserved-upgrade",
+      "fresh"
+    ],
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "publicCapabilities": 327,
+    "pinnedPublicFunctions": 23,
+    "passed": true,
+    "sqlNotReplayed": true,
+    "runtimeNotReopened": true
+  }
 }

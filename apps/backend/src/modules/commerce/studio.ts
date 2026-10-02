@@ -25,6 +25,7 @@ export async function createCommerceStudio(input: {
     database: Database;
     access: AccessService;
     conversation: ConversationService;
+    migration: { version: string; checksum: string };
   };
 }) {
   const tables = [
@@ -57,7 +58,8 @@ export async function createCommerceStudio(input: {
     );
   if (
     input.approvals &&
-    (input.approvals.access !== input.owners.access ||
+    (input.approvals.database.pool !== input.pool ||
+      input.approvals.access !== input.owners.access ||
       input.approvals.conversation !== input.owners.conversation)
   )
     throw new Error(
@@ -74,7 +76,7 @@ export async function createCommerceStudio(input: {
     },
   });
   const approval = input.approvals
-    ? createCommerceApprovals(input.approvals)
+    ? await createCommerceApprovals(input.approvals)
     : undefined;
   return {
     ...content,
