@@ -1,0 +1,24 @@
+{
+  "wave": "20261002",
+  "sourceCommit": "58b59fa0e5b8937af7cd0cb7272ae5b5662d7ee7",
+  "privateBackupAndSeparateRestore": true,
+  "sourceLedgerRows": 40,
+  "upgradeLedgerRows": 57,
+  "freshLedgerRows": 57,
+  "originalRows": 15,
+  "originalTables": 145,
+  "oldLedgerPreserved": true,
+  "oldDataPreserved": true,
+  "oldRolesPreserved": true,
+  "sourceUntouched": true,
+  "exactWave": true,
+  "schemaMatches": true,
+  "upgradeSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "freshSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "releaseReady": false,
+  "notVerified": [
+    "Activated application runtime/native/provider acceptance",
+    "Real verified creator/passkey, paid receipts, successful transactions",
+    "Canonical held accounting/source waves and C10 policy"
+  ]
+}
