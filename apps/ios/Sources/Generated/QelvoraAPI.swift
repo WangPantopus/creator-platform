@@ -5072,10 +5072,12 @@ public struct APIErrorError: Codable, Sendable {
   public let `code`: String
   public let `message`: String
   public let `requestId`: String
-  public init(code: String, message: String, requestId: String) {
+  public let `correlationId`: String?
+  public init(code: String, message: String, requestId: String, correlationId: String? = nil) {
     self.code = code
     self.message = message
     self.requestId = requestId
+    self.correlationId = correlationId
   }
 }
 

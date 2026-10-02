@@ -164,3 +164,7 @@ Session resolution previously revoked the local session for every upstream adapt
 ## W1 effective debug API configuration — October2
 
 Personally launching the actual shipping Android build without command-line overrides exposed a configuration defect: the generated loopback BuildConfig origin was present but the entry point applied the Release HTTPS-only parser and discarded it. The app honestly refused sign-in despite the actual backend's seven-actor capability. Both native entry points now accept a configured loopback origin only in DEBUG, using the same existing explicit debug host/port/URL-shape guard. Release remains HTTPS-only, empty/invalid configuration unavailable, issuer-bound credential stores unchanged; explicit debug launch overrides still work. Build metadata alone was insufficient evidence and the original unconfigured launch remains a recorded failure.
+
+## W1 canonical error envelope matches the actual API — October2
+
+The personally operated shipping Android under18 flow displayed a generic reconnect failure. The actual API error middleware includes optional correlationId, while the canonical strict Error model omitted it; Android strict decoding therefore discarded the actionable message. Added the existing optional correlation field to the canonical schema and regenerated every consumer. This preserves strict authority payload validation while allowing the actual sanctioned diagnostic field. The under18 journey will be repeated after the shipping rebuild; the initial generic message remains a recorded UX failure.

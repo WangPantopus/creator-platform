@@ -2774,7 +2774,8 @@ data class APIError(
 data class APIErrorError(
   val `code`: String,
   val `message`: String,
-  val `requestId`: String
+  val `requestId`: String,
+  val `correlationId`: String? = null
 )
 
 @Serializable

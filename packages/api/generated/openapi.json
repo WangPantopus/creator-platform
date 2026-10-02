@@ -19460,6 +19460,9 @@
               },
               "requestId": {
                 "type": "string"
+              },
+              "correlationId": {
+                "type": "string"
               }
             },
             "required": [
