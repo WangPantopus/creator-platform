@@ -89,6 +89,13 @@ export function composeContentHost(input: {
     ...(input.growth?.follows?.count || input.paidAudienceCount
       ? {
           audienceCount: async (client, creatorId, audience) => {
+            // W4's count is creator authoring metadata. A fan or Team view
+            // must neither call that owner-only port nor substitute its owner.
+            const owner = await client.query<{ owned: boolean }>(
+              "SELECT account_id=nullif(current_setting('app.account_id',true),'')::uuid AS owned FROM creator.creator_profile WHERE id=$1",
+              [creatorId],
+            );
+            if (owner.rows[0]?.owned !== true) return null;
             const reader =
               audience.kind === "followers"
                 ? input.growth?.follows?.count
