@@ -651,7 +651,10 @@
       "owner": "W8",
       "version": "0100_w8_generation_terminal_denial",
       "state": "reserved_unapplied",
-      "reason": "Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences."
+      "reason": "Actual0099 original nonce/task/client/XID/PID/cursor negatives; terminal NoLogin-only EXECUTE, closed empty SQL/compiler/ACL review complete. Genuine activation/worker/job/provider/original settlement/current denial race acceptance pending.",
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "sourceCommit": "d12db34c7c83dd9df9cdd830557e3dcc0c5a6bdb",
+      "sourceSha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
     },
     {
       "id": "0101",
