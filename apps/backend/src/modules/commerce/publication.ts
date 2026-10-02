@@ -60,11 +60,28 @@ export async function commercePublicPacket(
     },
     client,
   );
+  return holdCommercePublicationPermission(
+    client,
+    actor,
+    creatorId,
+    packetId,
+    pointer.mode_id,
+  );
+}
+
+/** Already prepared owner positives. No session or negative lock is acquired here. */
+export async function holdCommercePublicationPermission(
+  client: PoolClient,
+  actor: Actor,
+  creatorId: string,
+  packetId: string,
+  modeId: string,
+): Promise<boolean> {
   // Studio already holds its content/creator locks. A writer can hold a
   // packet row while waiting for its BEFORE-write fence, or edit a batch in a
   // different order. Never wait for either advisory or row locks below Studio.
   for (const key of [
-    `commerce.mode:${pointer.mode_id}`,
+    `commerce.mode:${modeId}`,
     `commerce.public-packet:${packetId}`,
   ]) {
     const held = (
@@ -82,7 +99,7 @@ export async function commercePublicPacket(
       `SELECT p.id FROM creator.commerce_packet p
        JOIN creator.creator_profile cp ON cp.id=p.creator_id AND cp.account_id=$3
        WHERE p.id=$1 AND p.creator_id=$2 AND p.mode_id=$4 FOR SHARE OF p NOWAIT`,
-      [packetId, creatorId, actor.accountId, pointer.mode_id],
+      [packetId, creatorId, actor.accountId, modeId],
     );
     if (packet.rowCount !== 1) return false;
     const commitment = await client.query<{ id: string }>(
@@ -97,8 +114,35 @@ export async function commercePublicPacket(
       "SELECT commitment_id FROM creator.commerce_share_grant WHERE commitment_id=$1 FOR SHARE NOWAIT",
       [commitment.rows[0]!.id],
     );
-    const result = await client.query(
-      `SELECT p.id FROM creator.commerce_packet p
+    return readCommercePublicationPermission(
+      client,
+      actor,
+      creatorId,
+      packetId,
+      modeId,
+    );
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "55P03"
+    )
+      throw changing();
+    throw error;
+  }
+}
+
+/** Plain MVCC only: safe after the final signer lease. */
+export async function readCommercePublicationPermission(
+  client: PoolClient,
+  actor: Actor,
+  creatorId: string,
+  packetId: string,
+  modeId: string,
+): Promise<boolean> {
+  const result = await client.query(
+    `SELECT p.id FROM creator.commerce_packet p
      JOIN creator.creator_profile cp ON cp.id=p.creator_id AND cp.account_id=$3
      JOIN creator.commerce_mode mode ON mode.id=p.mode_id AND mode.creator_id=p.creator_id
      JOIN creator.commerce_commitment c ON c.packet_id=p.id AND c.creator_id=p.creator_id AND c.fan_id=p.fan_id
@@ -120,21 +164,9 @@ export async function commercePublicPacket(
       AND l.amount=(p.snapshot->>'amount')::bigint AND l.currency=p.snapshot->>'currency')
      AND NOT EXISTS(SELECT 1 FROM creator.commerce_ledger l WHERE l.packet_id=p.id AND l.kind='refund')
      AND NOT EXISTS(SELECT 1 FROM creator.commerce_effect effect WHERE effect.packet_id=p.id AND effect.operation='refund' AND effect.state<>'failed')`,
-      [packetId, creatorId, actor.accountId, pointer.mode_id],
-    );
-    // This is owner permission, before W5's media/signing work. It does not
-    // deliver a service or replace the viewer's final source-signature lease.
-    return result.rowCount === 1;
-  } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "55P03"
-    )
-      throw changing();
-    throw error;
-  }
+    [packetId, creatorId, actor.accountId, modeId],
+  );
+  return result.rowCount === 1;
 }
 
 export function createCommercePublicationPermission(
