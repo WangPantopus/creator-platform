@@ -509,6 +509,7 @@ export class ContentService {
     key: string,
     body: unknown,
     work: () => Promise<T>,
+    onReplay?: (response: T) => Promise<void>,
   ): Promise<T> {
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `${actor.accountId}:content:${operation}:${key}`,
@@ -527,6 +528,7 @@ export class ContentService {
         "idempotency_conflict",
         "This retry key was used for different content.",
       );
+      await onReplay?.(prior.response);
       return prior.response;
     }
     const result = await work();
@@ -1247,6 +1249,67 @@ export class ContentService {
                 : "published",
             signedActId: signature,
           };
+        },
+        async (receipt) => {
+          // A saved response is not a current publication grant. Reacquire the
+          // stored source positives before the same final W4 fence as a first
+          // publication, without consuming the signature or writing again.
+          const row = await this.index(client, creatorId, id, true);
+          invariant(
+            receipt.id === id &&
+              receipt.version === input.version &&
+              row.version === input.version &&
+              ["published", "scheduled", "media_pending"].includes(row.state),
+            "publication_changed",
+            "This publication changed. Refresh before retrying.",
+          );
+          const publication = (
+            await client.query<{
+              signed_act_id: string | null;
+              author_account_id: string;
+              author_kind: string;
+              media_evidence: unknown;
+            }>(
+              "SELECT * FROM creator.content_publication WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+              [id, creatorId, row.version],
+            )
+          ).rows[0];
+          invariant(
+            publication?.author_account_id === actor.accountId &&
+              publication.signed_act_id === receipt.signedActId &&
+              (publication.author_kind === "team") === team,
+            "publication_changed",
+            "The stored publication no longer matches this retry.",
+          );
+          const view = await this.view(client, actor, row, false);
+          invariant(
+            view.document.kind === row.kind &&
+              contentHash(view.document.audience) ===
+                contentHash(row.audience) &&
+              view.document.packetId === row.packet_id &&
+              (view.document.quote?.replyId ?? null) === row.quote_reply_id &&
+              (view.document.quote?.consentVersion ?? null) ===
+                row.quote_consent_version,
+            "publication_evidence_changed",
+            "The stored publication source changed. Refresh before retrying.",
+          );
+          const current = await this.validatePublication(
+            client,
+            actor,
+            row,
+            view.document,
+          );
+          invariant(
+            contentHash(current.mediaEvidence) ===
+              contentHash(
+                z
+                  .array(ProcessedMediaEvidenceSchema)
+                  .max(10)
+                  .parse(publication.media_evidence ?? []),
+              ),
+            "publication_evidence_changed",
+            "The signed media revision changed. Refresh before retrying.",
+          );
         },
       );
       await this.publicationSources.finalize(client, actor, {
