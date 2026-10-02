@@ -12,6 +12,7 @@ import {
   agentPauseEffects,
 } from "./domain-adapters.js";
 import { createPrivacyConsumers } from "./privacy-consumers.js";
+import { trustLocalRestorationInTransaction } from "./restoration.js";
 
 /** W1 adds these to its development adapter. These are labels, never tokens,
  * membership grants, production identities or a second session issuer. */
@@ -245,6 +246,7 @@ export async function createDevelopmentTrust(
         );
         return state.rows.length === 1 && state.rows[0]?.closed !== true;
       },
+      restoreReadyInTransaction: trustLocalRestorationInTransaction(env),
       crisisResources: [],
     };
   } catch (error) {
