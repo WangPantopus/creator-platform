@@ -2,11 +2,12 @@ import { z } from "zod";
 import { SignedActCommandSchema } from "@qelvora/api";
 import type { FeatureRegistration } from "../../app.js";
 import type { SignedSubjectPolicy } from "../identity/subjects.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { createCommerceRouter } from "./router.js";
 import type { CommerceService } from "./service.js";
 import type { ExtendedCommerce } from "./extended.js";
 import { callOfferCommand } from "./scheduling.js";
+import { tryLockCommitmentPacketForRead } from "./packet-locks.js";
 
 /** W1 consumes this registration through registerFeatures; identity remains canonical. */
 export function commerceFeature(
@@ -45,12 +46,29 @@ export const commerceSignedSubjects: SignedSubjectPolicy = {
       })
       .safeParse(requested.content);
     if (call.success) {
-      const row = (
-        await client.query(
-          "SELECT c.*,p.thread_id,p.version AS authorization_version,p.payment_state FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND c.creator_id=$2 AND cp.account_id=$3 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF c,p,cp",
-          [call.data.commitmentId, creatorId, actor.accountId],
+      await tryLockCommitmentPacketForRead(client, call.data.commitmentId);
+      let row;
+      try {
+        row = (
+          await client.query(
+            "SELECT c.*,p.thread_id,p.version AS authorization_version,p.payment_state FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND c.creator_id=$2 AND cp.account_id=$3 AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF c NOWAIT",
+            [call.data.commitmentId, creatorId, actor.accountId],
+          )
+        ).rows[0];
+      } catch (error) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          error.code === "55P03"
         )
-      ).rows[0];
+          throw new DomainError(
+            "call_preparation_busy",
+            "This call is changing. Refresh before signing times.",
+            503,
+          );
+        throw error;
+      }
       invariant(
         row &&
           ["due", "in_progress"].includes(row.state) &&

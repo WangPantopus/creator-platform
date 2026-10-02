@@ -207,7 +207,12 @@ export async function createConfiguredBackend(input: {
     await input.assertActorAllowed?.(actor);
     await trust?.assertActorAllowed(actor);
   };
-  const database = new Database(pool, undefined, assertScopeAllowed);
+  const database = new Database(
+    pool,
+    undefined,
+    assertScopeAllowed,
+    input.assertScopeAllowedInTransaction,
+  );
   try {
     await database.assertRuntimeRole();
   } catch (error) {
