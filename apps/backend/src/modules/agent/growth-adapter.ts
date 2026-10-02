@@ -66,7 +66,7 @@ export function agentActivationSource(
             const license = await licenseRow(client, scope.creatorId);
             const state =
               creator.verification !== "verified" ||
-              !(await service.currentLicense(scope, license))
+              !(await service.currentLicense(scope, license, client))
                 ? "revoked"
                 : workspace.paused || version.state === "paused"
                   ? "paused"
