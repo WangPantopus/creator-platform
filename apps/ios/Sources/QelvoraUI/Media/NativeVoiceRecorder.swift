@@ -40,9 +40,14 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             state = .failed; reason = QelvoraCopy.text("w6MicrophoneRecordingIsUnavailableInThisAppBuild"); return
         }
         state = .requesting
-        let allowed = await AVAudioApplication.requestRecordPermission()
+        let allowed = (try? await NativeMediaDevicePermissions.request(camera: false)) == true
         guard requestGeneration == generation else { return }
-        guard allowed else { state = .denied; reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry"); return }
+        guard allowed else {
+            let access = NativeMediaDevicePermissions.granted(camera: false)
+            state = access ? .failed : .denied
+            reason = QelvoraCopy.text(access ? "w6TheMicrophoneIsUnavailableTryAgain" : "w6MicrophoneAccessIsOffAllowItInSettingsThenTry")
+            return
+        }
         #endif
         do {
             #if os(iOS)
@@ -149,7 +154,10 @@ public struct MediaRecordingView: View {
                 Text(QelvoraCopy.text("w6UploadingAndExactMediaSigningRequireAConfiguredAccountAnd")).qText("caption")
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
-            .onChange(of: scenePhase) { _, phase in if phase != .active { recorder.pause(interrupted: true); recorder.pausePreview() } }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .background || (phase == .inactive && recorder.state != .requesting) { recorder.pause(interrupted: true) }
+                if phase != .active { recorder.pausePreview() }
+            }
             .onDisappear { recorder.discard() }
     }
 }
