@@ -33,7 +33,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
-import com.pantopus.qelvora.generated.QelvoraCopy
 import java.time.Instant
 
 private class ContentFailure(val status:Int,val code:String?=null):Exception() {
