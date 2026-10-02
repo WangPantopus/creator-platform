@@ -3086,6 +3086,12 @@ enum class APIConversationConversationAuthorship {
 }
 
 @Serializable
+data class APIConversationConversationCallControl(
+  val `idempotencyKey`: String,
+  val `expectedEpoch`: Long
+)
+
+@Serializable
 data class APIConversationConversationCorrectionCommand(
   val `actType`: APIConversationConversationCorrectionCommandActType,
   val `subjectId`: String,

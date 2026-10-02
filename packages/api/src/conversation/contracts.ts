@@ -34,6 +34,12 @@ export const ConsentInputSchema = z.strictObject({
   version: z.string().max(120),
   accepted: z.boolean(),
 });
+/** Server-to-server interactive call composition, on its caller-held request
+ * transaction. This does not authorize a provider callback or worker. */
+export const ConversationCallControlSchema = z.strictObject({
+  idempotencyKey: z.string().min(8).max(128),
+  expectedEpoch: z.int().nonnegative(),
+});
 export const ThreadPreferencesSchema = z.strictObject({
   offTheRecord: z.boolean(),
   introShared: z.boolean(),

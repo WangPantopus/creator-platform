@@ -28,6 +28,7 @@ import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
 import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
+import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -132,6 +133,15 @@ try {
             );
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            // Preparing the genuine graph does not configure a provider, worker
+            // purpose or arrival policy. Calls remain unmounted until those
+            // separate producers exist; no request Actor is invented.
+            const callControl = await InteractiveCallControl.prepare(runtime);
+            process.stdout.write(
+              callControl
+                ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
+                : "Call control: unavailable; canonical held request authority is not activated.\n",
+            );
             features.conversationPrivacy = {
               ...(conversation.feature.lineage
                 ? { lineage: conversation.feature.lineage }

@@ -20212,6 +20212,27 @@
           "system"
         ]
       },
+      "ConversationConversationCallControl": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "expectedEpoch": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "idempotencyKey",
+          "expectedEpoch"
+        ],
+        "additionalProperties": false
+      },
       "ConversationConversationCorrectionCommand": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

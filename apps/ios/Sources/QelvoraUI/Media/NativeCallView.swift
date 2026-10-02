@@ -48,6 +48,9 @@ private struct NativeCallDocument: Decodable, Sendable {
     @State private var transport: (any NativeCallScreenTransport)?
     @State private var mediaEpoch = 0
     @State private var active = true
+    @State private var automaticRefresh = true
+    @State private var pollDelay = 1000
+    @State private var refreshVersion = 0
     public init(baseURL: URL?, destination: String, actorAccountID: String?, open: @escaping (String) -> Void = { _ in }) {
         route = NativeCallRoute(destination: destination); self.actorAccountID = actorAccountID; self.open = open
         client = baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: { guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
@@ -64,16 +67,22 @@ private struct NativeCallDocument: Decodable, Sendable {
     }
     private func refresh() async {
         guard !fetching, !busy, let client, let route else { return }; fetching = true; defer { fetching = false }
+        guard let account = actorAccountID.flatMap({ UUID(uuidString: $0) }) else { automaticRefresh = false; return }
         do {
-            let value = try JSONDecoder().decode(NativeCallDocument.self, from: await client.request(path: route.path))
+            let value = try JSONDecoder().decode(NativeCallDocument.self, from: await client.request(path: route.path, expectedAccountId: account))
             try Task.checkCancellation()
             guard active else { return }
-            if value.version >= (call?.version ?? 0) { call = value }; stale = false
+            if value.version >= (call?.version ?? 0) { call = value }; stale = false; error = nil
+            pollDelay = ["ended", "cancelled"].contains(value.state) ? 30000 : 1000
             if ["ending", "ended", "cancelled"].contains(value.state) { await disconnectMedia() }
         } catch is CancellationError { }
         catch {
-            guard active else { return }
-            if let failure = error as? NativeMediaRequestError, [401, 403, 404].contains(failure.status) { await disconnectMedia(); call = nil }
+            guard active, !Task.isCancelled else { return }
+            if let failure = error as? NativeMediaRequestError {
+                if [401, 403, 404, 409].contains(failure.status) { await disconnectMedia(); call = nil; automaticRefresh = false }
+                if ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(failure.code ?? "") { automaticRefresh = false }
+            }
+            pollDelay = min(pollDelay * 2, 30000)
             stale = true; self.error = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
         }
     }
@@ -180,14 +189,24 @@ private struct NativeCallDocument: Decodable, Sendable {
                         Button(QelvoraCopy.text("w6ViewRequestsForSettlement"), variant: .secondary) { open("/requests") }
                     }
                 } else {
-                    Text(QelvoraCopy.text("w6ThisCallIsUnavailable")).qText("display-md")
-                    Text(route == nil ? QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") : QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess")).qText("body")
+                    Text(QelvoraCopy.text(route != nil && error == nil ? "w6OpeningYourCall" : "w6ThisCallIsUnavailable")).qText("display-md")
+                    if route == nil || error == nil {
+                        Text(route == nil ? QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") : QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess")).qText("body")
+                    }
                 }
                 if let error { Text(error).qText("caption") }
-                Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { Task { await refresh() } }
+                Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { refreshVersion += 1 }
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
-            .task { while !Task.isCancelled { await refresh(); do { try await Task.sleep(for: .seconds(1)) } catch { return } } }
+            .task(id: "\(route?.path ?? ""):\(actorAccountID ?? ""):\(refreshVersion):\(scenePhase)") {
+                guard scenePhase == .active else { return }
+                automaticRefresh = true; pollDelay = 1000
+                while !Task.isCancelled && automaticRefresh {
+                    await refresh()
+                    if !automaticRefresh { return }
+                    do { try await Task.sleep(for: .milliseconds(pollDelay)) } catch { return }
+                }
+            }
             .onAppear { active = true }
             .onChange(of: actorAccountID) { _, _ in Task { await disconnectMedia(); call = nil; stale = true } }
             .onChange(of: scenePhase) { _, phase in
