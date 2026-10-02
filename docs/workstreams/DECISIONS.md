@@ -94,3 +94,10 @@ The definer is explicitly VOLATILE and requires READ COMMITTED, so metadata read
 ### W1 October 2 — native retained-session recovery
 
 A cold offline identity read keeps the issuer-bound credential but has no current session projection. Showing Welcome implied sign-out during the operated Android outage. Both shells now show the same canonical recovery title/body/Retry used by web, preserve the original destination and retry while foreground. Public signed-out destinations remain accessible through their explicit registrations. Missing credentials, rejected refresh credentials and failed private cleanup retain their separate paths. A guarded single refresh excludes duplicate poll/Retry reads; an actual completed rotation performs its own fresh read. Current Android recovery and subsequent real rotation are personally verified. Normal iOS signing/build passes; iOS operation is still required.
+
+
+### W1 current authority and separate API custody — October 2, 2026
+
+W1's Database receives the composed held denial port used by Access; configuring W8 trust alone must not omit denials from subsequent domain transactions. Genuine session/participant resolution precedes negative keys, then positive family/role leases and currentness recheck. Original immutable denial SQL is unchanged; a separately reviewed nonblocking wrapper is needed for consumers entering below earlier family locks. Source and existing checks do not establish concurrency acceptance.
+
+Growth/content follow reads use a real separate API login inheriting only canonical core and Growth roles; core identity/conversation keeps its direct NOINHERIT login. W1 privately provisions that role on its owned database with effective inherited privilege checks and no direct private grants. The stored session signing key is retained during source restarts so existing real development sessions keep their original issuer and freshness. Trust and provider availability continue to report their actual configuration.
