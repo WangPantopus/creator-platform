@@ -208,7 +208,7 @@ export class AgentService {
         const gates: string[] = [];
         if (creator.verification !== "verified")
           gates.push("Creator verification is pending.");
-        if (!(await this.currentLicense(scope, license)))
+        if (!(await this.currentLicense(scope, license, client)))
           gates.push(
             this.licenseVerifier?.synthetic && this.licensingServes(scope)
               ? "Record the labeled development license. It is not a reviewed license."
@@ -878,6 +878,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active reviewed license is required.",
@@ -1023,6 +1024,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active license is required.",
