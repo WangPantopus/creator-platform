@@ -1,7 +1,7 @@
 import type { PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 
-export const ORIGINAL_COST_MIGRATION = "0106_w4_generation_terminal_settlement";
+export const ORIGINAL_COST_MIGRATION = "0189_w4_generation_terminal_settlement";
 export const ORIGINAL_COST_SCHEMA_SHA256 =
   "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9";
 const Body = "d000a6fd25efb52555ad16b4455b7b45e4e091949f142a5ed8a2915d72d5a77b";

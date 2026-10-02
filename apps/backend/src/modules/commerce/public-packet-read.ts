@@ -14,7 +14,7 @@ const Tuple = z.strictObject({
   audience: ContentAudience,
 });
 export type PublicPacketReadTuple = z.infer<typeof Tuple>;
-export const PUBLIC_PACKET_READ_MIGRATION = "0070_w4_public_packet_read";
+export const PUBLIC_PACKET_READ_MIGRATION = "0157_w4_public_packet_read";
 
 /** W8 resolves original participants privately and holds all current negative
  * keys BEFORE W5 takes its content object lock. No participant is constructed

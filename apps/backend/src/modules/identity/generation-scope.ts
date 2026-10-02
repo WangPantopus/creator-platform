@@ -6,7 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
-export const GENERATION_SCOPE_MIGRATION = "0072_w1_generation_worker_scope";
+export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const consumerSchema = z.strictObject({
   migration: z.strictObject({
@@ -148,7 +148,9 @@ export class GenerationIdentityAuthority {
     if (
       input.migration.version !== GENERATION_SCOPE_MIGRATION ||
       !Hash.safeParse(input.migration.checksum).success ||
-      !/^0093_w8_[a-z_]+$/u.test(input.denialMigration.version) ||
+      !/^0177_w8_generation_worker_denial$/u.test(
+        input.denialMigration.version,
+      ) ||
       !Hash.safeParse(input.denialMigration.checksum).success ||
       typeof input.assertAllowed !== "function" ||
       typeof input.assertDiscoveryAllowed !== "function"

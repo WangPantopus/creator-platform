@@ -10,9 +10,9 @@ import {
 import { requestAuthority } from "./request-authority.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
-  "0099_w1_generation_terminal_scope";
+  "0183_w1_generation_terminal_scope";
 export const GENERATION_TERMINAL_DENIAL_MIGRATION =
-  "0100_w8_generation_terminal_denial";
+  "0184_w8_generation_terminal_denial";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Instant = z.iso
   .datetime({ offset: true })

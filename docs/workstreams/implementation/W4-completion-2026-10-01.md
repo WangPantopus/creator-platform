@@ -1,3 +1,9 @@
+### Corrected held source custody — October 2, 2026
+
+Actual corrected W8 assignments now pin W4 factories and their narrow consumed owners. Original proposals/SQL/ledger remain exact. The audience's embedded registration defect is repaired in a distinct complete successor source, using182/159/177 plus original0049; actual function compilation and unregistered denial pass inside rollback, original definition/ledger57/zero business state restored. [Source/hash/failure evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/held-purpose-renumbering/README.md). Future owner activation and positive generation/fulfillment/C10 acceptance remain open.
+
+The actual W2 terminal-journal source now retains current custody descriptors and checks them before/after same-client read/seal. Three real metadata drifts deny and roll back to exact original catalogue/definitions without business rows or prepared-scope fabrication. W1's actual current183 issuer bookend remains to be consumed. [Journal evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/generation-terminal-settlement/journal-drift.json).
+
 ### Independent privacy-wave qualification — October 2, 2026
 
 Exact W8 fb1cbca PR159 passes personal fresh61 and independently restored original57→61 qualification. Schema/grants/RLS/ownership/roles/security match;57 prior ledger records,26 current development rows across161 tables, old roles/memberships and original sequence are preserved. Live55444 remains57 with identical before/after custody. The first shared-cluster fresh install changed global role metadata and the upgrade refused; repeating on a separate cluster passes unchanged SQL. All review copies are closed/stopped. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/privacy-wave-review/README.md). Actual task/app/native/privacy/C10 release acceptance and future held producers remain open; corrected held mapping alone does not repair embedded audience registration guards.

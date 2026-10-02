@@ -15,7 +15,7 @@ import { PreparedGenerationJournal } from "./generation-journal.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 
 export const GENERATION_TERMINAL_JOURNAL_MIGRATION =
-  "0105_w2_generation_terminal_journal";
+  "0188_w2_generation_terminal_journal";
 export const GENERATION_TERMINAL_JOURNAL_SIGNATURES = [
   "creator.generation_agent_journal_receipt(uuid,uuid)",
   "creator.generation_seal_agent_journal(uuid,uuid)",
@@ -51,6 +51,11 @@ export class PreparedGenerationTerminalJournal {
     private readonly terminal: GenerationTerminalAuthority,
     private readonly journal: PreparedGenerationJournal,
     private readonly hostPool: Pool,
+    private readonly custody: Readonly<{
+      consumers: readonly GenerationPurposeConsumer[];
+      privateHelperDefinitionChecksum: string;
+      catalogueChecksum: string;
+    }>,
   ) {}
 
   assertHostPool(pool: Pool): void {
@@ -97,7 +102,14 @@ export class PreparedGenerationTerminalJournal {
       "generation_terminal_journal_pool_mismatch",
       "Use distinct canonical host and worker logins on the same database.",
     );
-    const receipts = [...input.consumers];
+    const receipts = Object.freeze(
+      input.consumers.map((receipt) =>
+        Object.freeze({
+          ...receipt,
+          migration: Object.freeze({ ...receipt.migration }),
+        }),
+      ),
+    );
     invariant(
       receipts.length === GENERATION_TERMINAL_JOURNAL_SIGNATURES.length &&
         Hash.safeParse(input.privateHelperDefinitionChecksum).success &&
@@ -119,9 +131,47 @@ export class PreparedGenerationTerminalJournal {
     );
     for (const receipt of receipts)
       input.identity.assertConsumerRegistered(receipt);
+    const terminalJournal = new PreparedGenerationTerminalJournal(
+      input.terminal,
+      input.journal,
+      input.hostPool,
+      Object.freeze({
+        consumers: receipts,
+        privateHelperDefinitionChecksum: input.privateHelperDefinitionChecksum,
+        catalogueChecksum: input.catalogueChecksum,
+      }),
+    );
+    const client = await input.workerPool.connect();
+    try {
+      const hostDatabase = (
+        await input.hostPool.query<{ databaseOid: number }>(
+          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+        )
+      ).rows[0];
+      const workerDatabase = (
+        await client.query<{ databaseOid: number }>(
+          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+        )
+      ).rows[0];
+      invariant(
+        hostDatabase?.databaseOid === workerDatabase?.databaseOid,
+        "generation_terminal_journal_pool_mismatch",
+        "Use the same actual canonical database.",
+      );
+      await terminalJournal.assertCustody(client);
+      return terminalJournal;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Current fixed-consumer custody on the actual held worker client. Factory
+   * preparation does not authorize a subsequently changed executable/ACL. */
+  private async assertCustody(client: PoolClient) {
+    const receipts = this.custody.consumers;
     try {
       const ready = (
-        await input.workerPool.query<{ ready: boolean; databaseOid: number }>(
+        await client.query<{ ready: boolean; databaseOid: number }>(
           `SELECT (SELECT oid FROM pg_database WHERE datname=current_database()) AS "databaseOid",
            session_user='creator_generation_worker' AND current_user=session_user
            AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
@@ -150,15 +200,7 @@ export class PreparedGenerationTerminalJournal {
           ],
         )
       ).rows[0];
-      const hostDatabase = (
-        await input.hostPool.query<{ databaseOid: number }>(
-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
-        )
-      ).rows[0];
-      if (
-        ready?.ready !== true ||
-        ready.databaseOid !== hostDatabase?.databaseOid
-      )
+      if (ready?.ready !== true)
         throw new Error("Unreviewed original journal custody");
       for (const signature of [
         ...GENERATION_TERMINAL_JOURNAL_SIGNATURES,
@@ -166,7 +208,7 @@ export class PreparedGenerationTerminalJournal {
       ]) {
         const privateHelper = signature === PrivateHelper;
         const row = (
-          await input.workerPool.query<{ ready: boolean; definition: string }>(
+          await client.query<{ ready: boolean; definition: string }>(
             `SELECT p.prosecdef=$3 AND p.provolatile='v' AND p.prokind='f'
              AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$2
              AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
@@ -179,7 +221,7 @@ export class PreparedGenerationTerminalJournal {
           )
         ).rows[0];
         const expected = privateHelper
-          ? input.privateHelperDefinitionChecksum
+          ? this.custody.privateHelperDefinitionChecksum
           : receipts.find((r) => r.signature === signature)!.definitionChecksum;
         if (
           row?.ready !== true ||
@@ -188,9 +230,8 @@ export class PreparedGenerationTerminalJournal {
           throw new Error("Unreviewed original journal executable");
       }
       if (
-        contentHash(
-          await generationConsumerCatalogue(input.workerPool, Owner),
-        ) !== input.catalogueChecksum
+        contentHash(await generationConsumerCatalogue(client, Owner)) !==
+        this.custody.catalogueChecksum
       )
         throw new Error("Unreviewed original journal catalogue");
     } catch {
@@ -200,11 +241,6 @@ export class PreparedGenerationTerminalJournal {
         503,
       );
     }
-    return new PreparedGenerationTerminalJournal(
-      input.terminal,
-      input.journal,
-      input.hostPool,
-    );
   }
 
   private async read(
@@ -213,6 +249,7 @@ export class PreparedGenerationTerminalJournal {
     seal: boolean,
   ): Promise<GenerationTerminalJournalReceipt> {
     await this.terminal.authorizeInTransaction(scope, client, true);
+    await this.assertCustody(client);
     await this.journal.assertClient(client);
     const raw = (
       await client.query<{ receipt: unknown }>(
@@ -248,6 +285,7 @@ export class PreparedGenerationTerminalJournal {
       "generation_terminal_journal_changed",
       "The genuine original all-attempt journal and retention custody must match.",
     );
+    await this.assertCustody(client);
     await this.terminal.authorizeInTransaction(scope, client, true);
     return Object.freeze({
       ...value,
