@@ -1,0 +1,21 @@
+{
+  "webSource": "87578f8c7e40767decd07fe44c134b91071faf5a",
+  "labelledSynthetic": true,
+  "readOnlyQueryVerification": true,
+  "newUnitTests": false,
+  "errors": [
+    "Bounded query presentation mismatch: unknown-kind"
+  ],
+  "valid": {
+    "expectedKind": "verification",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  },
+  "invalid-id": {
+    "expectedKind": "support",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  }
+}
