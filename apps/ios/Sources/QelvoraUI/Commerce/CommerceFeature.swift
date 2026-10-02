@@ -32,7 +32,7 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
                     if screen != "requests" { Button("Back", variant: .quiet) { screen = "requests"; detail = nil } }
-                    Spacer(); Text(title.uppercased()).qText("caption", weight: .semibold); Spacer()
+                    Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
                     Button("Refresh", variant: .quiet, disabled: busy) { Task { await refresh() } }
                 }
                 if !failure.isEmpty { Notice(tone: .error, title: "Connection status", children: failure) }
@@ -159,9 +159,10 @@ struct CommerceFeature: View {
     private func spending(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Spending and time").qText("display-md")
-            Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency)).qText("spend-total")
+            Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency))
+                .modifier(QelvoraTextStyle(style: .init(family: "mono", size: 44, lineHeight: 48, weight: 400, letterSpacing: 0)))
             Text("Charged this UTC calendar month").qText("caption")
-            if let month = data.exposure?.month { Text(month + " · UTC").qText("caption", weight: .semibold) }
+            if let month = data.exposure?.month { Text(month + " · UTC").qText("data-sm") }
             let limit = data.limits.first { $0.currency == data.policy.currency }
             panel {
                 row("Current limit", limit.map { $0.explicit_none ? "No limit" : CommerceAmount.display(Int64($0.amount ?? "0") ?? 0, $0.currency) } ?? "Choose before your first paid action")
