@@ -917,7 +917,9 @@ export const copy = {
   "w5ContentDuplicateChanged": "This retry differs from the earlier action. Refresh before trying again.",
   "w5ContentReplyWithdrawn": "This reply was withdrawn. It cannot be shared again.",
   "w5ContentFanProfileRequired": "Set up your fan profile before continuing.",
-  "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept."
+  "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept.",
+  "identityProofReviewSupport": "Request verification review",
+  "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

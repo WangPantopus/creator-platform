@@ -919,7 +919,9 @@ object QelvoraCopy {
     "w5ContentDuplicateChanged" to "This retry differs from the earlier action. Refresh before trying again.",
     "w5ContentReplyWithdrawn" to "This reply was withdrawn. It cannot be shared again.",
     "w5ContentFanProfileRequired" to "Set up your fan profile before continuing.",
-    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept."
+    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept.",
+    "identityProofReviewSupport" to "Request verification review",
+    "identityProofReviewSupportBody" to "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
