@@ -4,16 +4,29 @@ import type {
   ConversationPrivacyAuthority,
   ConversationPrivacyFamily,
 } from "../conversation/privacy.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+  type PrivacyTaskInput,
+} from "./privacy-authority.js";
+import type { PoolClient } from "pg";
 
 /** Enumerate metadata, then use existing pair RLS. No interactive ThreadScope,
  * runtime grant or denial bypass is issued to a client by this worker adapter. */
 export function conversationPrivacyAuthority(
   runtime: Pool,
   coordinator: Pool,
-): ConversationPrivacyAuthority {
+): ConversationPrivacyAuthority & {
+  fenceTaskInTransaction(
+    client: PoolClient,
+    job: PrivacyTaskInput,
+  ): Promise<void>;
+} {
   const verify = privacyTaskAuthority(coordinator);
   return {
+    async fenceTaskInTransaction(client, job) {
+      await privacyTaskAuthorityInTransaction(client, job);
+    },
     async families(job) {
       const owned = await verify(job);
       const client = await runtime.connect();
@@ -83,7 +96,7 @@ export function conversationPrivacyAuthority(
       }
     },
     async assertFamily(client, job, family) {
-      const owned = await verify(job);
+      const owned = await privacyTaskAuthorityInTransaction(client, job);
       invariant(
         (!job.creatorId || job.creatorId === family.creatorId) &&
           (!job.threadId || job.threadId === family.threadId),

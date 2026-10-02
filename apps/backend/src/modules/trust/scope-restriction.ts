@@ -145,6 +145,27 @@ export function trustContentRestrictionInTransaction() {
   };
 }
 
+/** Exact actual creator/fan candidate, never an invented packet/thread tuple.
+ * Only the real creator owner or fan is eligible; the owner still leases every
+ * positive tenure/content permission after this bounded negative projection. */
+export function trustCreatorFanRestrictionInTransaction() {
+  return async (
+    client: PoolClient,
+    actor: Actor,
+    tuple: { creatorId: string; fanId: string },
+  ): Promise<void> => {
+    const pair = z
+      .strictObject({ creatorId: z.uuid(), fanId: z.uuid() })
+      .parse(tuple);
+    await projectedDenial(
+      client,
+      actor,
+      "SELECT creator_trust.creator_fan_denial($1,$2) AS denial",
+      [pair.creatorId, pair.fanId],
+    );
+  };
+}
+
 /** Public metadata negative gate: actual current visitor or genuinely anonymous
  * caller. No Actor/CreatorScope is constructed. The public issuer owns every
  * positive profile/License/version check and the host's held restoration gate.
