@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { canonical } from "../../core/canonical.js";
@@ -8,6 +8,22 @@ import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
 export const GENERATION_SCOPE_MIGRATION = "0072_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
+const consumerSchema = z.strictObject({
+  migration: z.strictObject({
+    version: z.string().regex(/^\d{4}_[a-z][a-z0-9_]+$/u),
+    checksum: Hash,
+  }),
+  signature: z
+    .string()
+    .regex(/^(creator|creator_trust)\.[a-z][a-z0-9_]+\([^()]*\)$/u),
+  owner: z.string().regex(/^creator_generation_[a-z][a-z0-9_]+$/u),
+  /** SHA-256 of PostgreSQL's actual pg_get_functiondef, after reviewed install. */
+  definitionChecksum: Hash,
+});
+/** Reviewed server configuration, never a worker/job supplied permission. */
+export type GenerationPurposeConsumer = Readonly<
+  z.infer<typeof consumerSchema>
+>;
 const Instant = z.iso
   .datetime({ offset: true })
   .transform((value) => new Date(value).toISOString());
@@ -124,6 +140,9 @@ export class GenerationIdentityAuthority {
     denialMigration: { version: string; checksum: string };
     assertAllowed: GenerationRestriction;
     assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
+    /** Only activated, individually reviewed narrow entrypoints. Empty by
+     * default; a migration receipt alone does not authorize an executable. */
+    consumers?: readonly GenerationPurposeConsumer[];
   }): Promise<GenerationIdentityAuthority> {
     if (
       input.migration.version !== GENERATION_SCOPE_MIGRATION ||
@@ -139,6 +158,24 @@ export class GenerationIdentityAuthority {
         503,
       );
     try {
+      const consumers = z
+        .array(consumerSchema)
+        .max(32)
+        .parse(input.consumers ?? []);
+      if (
+        new Set(consumers.map((consumer) => consumer.signature)).size !==
+          consumers.length ||
+        consumers.some(
+          (consumer) =>
+            consumer.owner === "creator_generation_authority" ||
+            consumer.owner === "creator_generation_worker" ||
+            consumer.migration.version === input.migration.version ||
+            consumer.migration.version === input.denialMigration.version,
+        )
+      )
+        throw new Error(
+          "Generation consumers require distinct reviewed custody",
+        );
       const installed = (
         await input.pool.query<{ installed: boolean }>(
           `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -163,20 +200,26 @@ export class GenerationIdentityAuthority {
             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname IN('creator','creator_trust') AND c.relkind IN('r','p','v','m','f')
+            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema'
+             AND c.relkind IN('r','p','v','m','f')
              AND NOT(n.nspname='creator' AND c.relname='schema_migration')
              AND (has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
               OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
            AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=current_user))
+           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema'
+             AND c.relkind='S' AND has_sequence_privilege(current_user,c.oid,'USAGE,SELECT,UPDATE'))
            AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-            WHERE n.nspname IN('creator','creator_trust') AND p.prosecdef
+            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema' AND p.prosecdef
              AND has_function_privilege(current_user,p.oid,'EXECUTE')
              AND NOT(p.oid=ANY(ARRAY[
               to_regprocedure('creator.pending_generation_tasks(integer)'),
               to_regprocedure('creator.claim_generation_task(uuid,uuid)'),
               to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),
               to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
-              to_regprocedure('creator.end_generation_scope()')]::oid[])))
+              to_regprocedure('creator.end_generation_scope()')]::oid[])
+              OR p.oid=ANY(ARRAY(SELECT to_regprocedure(c.signature)::oid
+               FROM jsonb_to_recordset($5::jsonb) AS c(signature text)))))
            AND (SELECT count(*)=8 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname='creator' AND c.relkind='r' AND c.relname=ANY(ARRAY[
              'generation','thread','creator_profile','fan_profile','identity_session','message','processor_consent','generation_worker_scope'])
@@ -225,11 +268,53 @@ export class GenerationIdentityAuthority {
             input.migration.checksum,
             input.denialMigration.version,
             input.denialMigration.checksum,
+            JSON.stringify(consumers),
           ],
         )
       ).rows[0]?.ready;
       if (ready !== true)
         throw new Error("Generation authority is not reviewed");
+      for (const consumer of consumers) {
+        const proof = (
+          await input.pool.query<{ ready: boolean; definition: string }>(
+            `SELECT
+             session_user='creator_generation_worker' AND current_user=session_user
+             AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
+             AND p.prokind='f' AND p.prosecdef AND p.provolatile IN('s','v')
+             AND l.lanname IN('sql','plpgsql') AND p.proconfig=ARRAY['search_path=pg_catalog']
+             AND pg_get_userbyid(p.proowner)=$4
+             AND NOT r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
+             AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+             AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
+             AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
+             AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+              WHERE a.grantee=0 AND a.privilege_type='EXECUTE')
+             AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
+              WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
+             AND has_function_privilege(current_user,p.oid,'EXECUTE')
+             AND has_function_privilege($4,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
+             AS ready,pg_get_functiondef(p.oid) AS definition
+             FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
+             WHERE p.oid=to_regprocedure($1)`,
+            [
+              consumer.signature,
+              consumer.migration.version,
+              consumer.migration.checksum,
+              consumer.owner,
+            ],
+          )
+        ).rows[0];
+        if (
+          proof?.ready !== true ||
+          createHash("sha256").update(proof.definition).digest("hex") !==
+            consumer.definitionChecksum
+        )
+          throw new Error(
+            "Generation consumer executable differs from its review",
+          );
+      }
     } catch {
       throw new DomainError(
         "generation_scope_unconfigured",
