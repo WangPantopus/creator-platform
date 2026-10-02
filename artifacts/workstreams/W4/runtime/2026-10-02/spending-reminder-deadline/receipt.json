@@ -1,0 +1,40 @@
+{
+  "recordedAt": "2026-10-02T08:31:45.627Z",
+  "operator": "Primary W4 personally operated actual CUA web and Android shipping app; read-only private persisted assertions",
+  "verified": [
+    "Reminders opt-in Save preserves original future No limit activation and7USD current cap",
+    "Opt-out Save preserves same future deadline and7USD cap",
+    "Return visit/reload preserves final opted-out reminder setting and original pending activation",
+    "Web saved notice names actual activation time rather than claiming24more hours",
+    "Android saved-off caption remains off during unsaved on toggle, and becomes on only after Save",
+    "Android saved-on caption remains on during unsaved off toggle, and becomes off only after Save",
+    "Android on/off saves preserve exact original future pending activation and7USD current cap",
+    "Android force-stop/cold Night return preserves saved off caption,7USD cap and original pending activation"
+  ],
+  "source": [
+    "Preserve same pending value deadline in serialized setLimit UPDATE",
+    "Consume exact09bec60a shared reminder-state13hunks and pass actual saved Android remindersOn"
+  ],
+  "builds": {
+    "android": "Shipping assembleDebug passed after shared-state correction",
+    "ios": "Normal-signed shipping build passed after shared-state correction"
+  },
+  "pending": [
+    "Actual iOS taps remain CUA Device Hub blocked",
+    "Real24hour passage, provider receipts/payments/threshold notifications unverified"
+  ],
+  "files": [
+    {
+      "path": "web-saved-off-night.png",
+      "sha256": "2ff4cc2e2697197cf1600907f3dfd4a5d875c5eeaaa3df2bf1ff0ffa5ce7ce04"
+    },
+    {
+      "path": "android-saved-on-night.png",
+      "sha256": "f83838d97bd141eb07c9593b87dfa8e1a31d7804aad0fa79dee2ef2cc9c78f31"
+    },
+    {
+      "path": "android-cold-return-off-night.png",
+      "sha256": "0db8ed402a03c4fdad13b04808f3b23fc57a9aaf421ad129237cbc68cbefc817"
+    }
+  ]
+}

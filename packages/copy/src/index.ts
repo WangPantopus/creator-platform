@@ -190,6 +190,8 @@ export const copy = {
   "writtenBy": "Written by {name}",
   "monthlyLimitLegend": "Monthly limit for requests and memberships",
   "limitReminders": "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
+  "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+  "limitRemindersUnknown": "Lowering a limit is immediate.",
   "noLimit": "No limit",
   "navChat": "Chat",
   "navPosts": "Posts",

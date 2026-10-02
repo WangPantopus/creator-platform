@@ -20,5 +20,13 @@
     "Activated application runtime/native/provider acceptance",
     "Real verified creator/passkey, paid receipts, successful transactions",
     "Canonical held accounting/source waves and C10 policy"
+  ],
+  "additionalW4Audit": [
+    "10 actual new W4 tables plus altered allowance reservation retain creator_owner ownership and forced RLS",
+    "Runtime has no owner/trust metadata/media discovery/worker membership",
+    "No PUBLIC table grants on those11 W4 tables"
+  ],
+  "operatorCorrections": [
+    "Initial audit listed obsolete guessed table names; corrected directly from the pinned CREATE TABLE sources and the altered existing allowance table, without changing schema or expected source behavior"
   ]
 }
