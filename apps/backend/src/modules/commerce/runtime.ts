@@ -11,7 +11,11 @@ import {
   MembershipBilling,
   type MembershipBillingProvider,
 } from "./billing.js";
-import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
+import {
+  ExtendedCommerce,
+  type StoreEntitlementVerifier,
+  type QualifiedReadAuthority,
+} from "./extended.js";
 import { commerceFeature } from "./registration.js";
 import {
   CommerceGenerationAllowance,
@@ -39,6 +43,7 @@ import {
   createCommerceAudience,
   type GroupAudienceReader,
 } from "./audience.js";
+import { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
@@ -61,6 +66,9 @@ export async function createCommerceRuntime(input: {
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
   stores?: StoreEntitlementVerifier;
+  /** W3's actual prepared exact association and W6 recording reader. */
+  voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
+  qualifiedReads?: QualifiedReadAuthority;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
@@ -135,6 +143,13 @@ export async function createCommerceRuntime(input: {
         })
       : undefined,
     input.assertCreatorReadAllowed,
+    input.voiceRecordings
+      ? await CommerceVoiceFulfillment.prepare({
+          database: input.database,
+          access: input.access,
+          recordings: input.voiceRecordings,
+        })
+      : undefined,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);
@@ -181,6 +196,7 @@ export async function createCommerceRuntime(input: {
     settlement,
     passPurchases,
     poolJournal,
+    input.qualifiedReads,
   );
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
