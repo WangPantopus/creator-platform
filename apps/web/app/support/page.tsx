@@ -51,6 +51,16 @@ export default function SupportPage() {
     const uuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (creator && uuid.test(creator)) setCreatorId(creator);
+    // Setup supplies presentation context only. The report API still verifies
+    // the current creator and snapshots its actual owner proof.
+    if (
+      params.get("kind") === "verification" &&
+      creator &&
+      uuid.test(creator) &&
+      !reportedMessage &&
+      !params.get("requestId")
+    )
+      setKind("verification");
     if (
       creator &&
       reportedMessage &&
