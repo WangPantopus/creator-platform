@@ -1,3 +1,7 @@
+### Current terminal issuer and separate registry — October 2, 2026
+
+Personally consumed W1 current same-client issuer bookends and separate fixed terminal registry. The core183 compatibility matcher remains required exactly as its unchanged SQL grants it;188/189 leaf roles must lack the original matcher. Actual worker metadata and two rolled-back permission mutations verify that distinction; unregistered189 remains refused with ledger57/zero generation/journal rows. Source types and scoped lint/format pass. Positive prepared authority, real combined terminal/last-write/COMMIT and provider/race acceptance remain open. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/generation-terminal-settlement/terminal-registry.json).
+
 ### Corrected held source custody — October 2, 2026
 
 Actual corrected W8 assignments now pin W4 factories and their narrow consumed owners. Original proposals/SQL/ledger remain exact. The audience's embedded registration defect is repaired in a distinct complete successor source, using182/159/177 plus original0049; actual function compilation and unregistered denial pass inside rollback, original definition/ledger57/zero business state restored. [Source/hash/failure evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/held-purpose-renumbering/README.md). Future owner activation and positive generation/fulfillment/C10 acceptance remain open.
