@@ -11,7 +11,11 @@ import {
   MembershipBilling,
   type MembershipBillingProvider,
 } from "./billing.js";
-import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
+import {
+  ExtendedCommerce,
+  type StoreEntitlementVerifier,
+  type QualifiedReadAuthority,
+} from "./extended.js";
 import { commerceFeature } from "./registration.js";
 import {
   CommerceGenerationAllowance,
@@ -64,6 +68,7 @@ export async function createCommerceRuntime(input: {
   stores?: StoreEntitlementVerifier;
   /** W3's actual prepared exact association and W6 recording reader. */
   voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
+  qualifiedReads?: QualifiedReadAuthority;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
@@ -191,6 +196,7 @@ export async function createCommerceRuntime(input: {
     settlement,
     passPurchases,
     poolJournal,
+    input.qualifiedReads,
   );
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),

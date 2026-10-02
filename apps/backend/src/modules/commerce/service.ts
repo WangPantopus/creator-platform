@@ -2077,6 +2077,24 @@ export class CommerceService {
     cause: string,
     outcome: string,
   ) {
+    const effectId = await this.account(actor, (client) =>
+      this.queueRefundInTransaction(client, actor, id, amount, cause, outcome),
+    );
+    await this.runEffect(actor, effectId);
+    return this.packet(actor, id);
+  }
+
+  /** Persist an original refund obligation on the caller's genuine authorized
+   * transaction. The caller commits before runEffect; this performs no provider
+   * I/O, issues no actor/worker authority, and is never exposed as a client route. */
+  async queueRefundInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    id: string,
+    amount: number,
+    cause: string,
+    outcome: string,
+  ): Promise<string> {
     invariant(
       Number.isSafeInteger(amount) &&
         amount > 0 &&
@@ -2085,72 +2103,88 @@ export class CommerceService {
       "invalid_refund",
       "The refund instruction is invalid.",
     );
-    const effectId = await this.account(actor, (client) =>
-      this.command(
-        client,
-        actor,
-        "commerce.refund",
-        cause,
-        { id, amount, outcome },
-        async () => {
-          const p = await this.lockPacket(client, id);
-          const c = (
-            await client.query(
-              "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
-              [id],
-            )
-          ).rows[0];
-          invariant(
-            c &&
-              p.intent_ref &&
-              ["captured", "refund_pending"].includes(p.payment_state),
-            "refund_unavailable",
-            "A confirmed captured commitment is required.",
-          );
-          const pending = (
-            await client.query<{ amount: string }>(
-              "SELECT coalesce(sum((request->>'amount')::bigint),0)::text AS amount FROM creator.commerce_effect WHERE packet_id=$1 AND operation='refund' AND state<>'failed'",
-              [id],
-            )
-          ).rows[0]!;
-          invariant(
-            BigInt(pending.amount) + BigInt(amount) <=
-              BigInt(p.snapshot.amount),
-            "refund_exceeds_balance",
-            "The refund exceeds the remaining captured amount.",
-          );
-          const result = (
-            await client.query<{ id: string }>(
-              "INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request) VALUES($1,$2,$3,'refund',$4,$5) RETURNING id",
-              [
-                p.creator_id,
-                p.fan_id,
-                p.id,
-                `${p.id}:refund:${cause}`,
-                JSON.stringify({
-                  intentId: p.intent_ref,
-                  amount,
-                  currency: p.snapshot.currency,
-                  returnState:
-                    c.state === "delivered" ? "delivered" : "resolved",
-                }),
-              ],
-            )
-          ).rows[0]!;
-          await client.query(
-            "UPDATE creator.commerce_packet SET payment_state='refund_pending',version=version+1 WHERE id=$1",
-            [id],
-          );
-          await client.query(
-            "UPDATE creator.commerce_commitment SET state=CASE WHEN state='delivered' THEN state ELSE 'refund_pending' END,outcome=$2,version=version+1 WHERE id=$1",
-            [c.id, outcome],
-          );
-          return result.id;
-        },
-      ),
+    const binding = (
+      await client.query<
+        Pick<PacketRow, "thread_id" | "creator_id" | "fan_id">
+      >(
+        "SELECT thread_id,creator_id,fan_id FROM creator.commerce_packet WHERE id=$1",
+        [id],
+      )
+    ).rows[0];
+    invariant(binding, "request_unavailable", "This request is unavailable.");
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+      [binding.creator_id, binding.fan_id],
     );
-    await this.runEffect(actor, effectId);
-    return this.packet(actor, id);
+    const thread = await client.query(
+      "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+      [binding.thread_id, binding.creator_id, binding.fan_id],
+    );
+    invariant(
+      thread.rowCount === 1,
+      "thread_unavailable",
+      "This conversation is unavailable.",
+    );
+    const p = await this.lockPacket(client, id);
+    const c = (
+      await client.query(
+        "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
+        [id],
+      )
+    ).rows[0];
+    return this.command(
+      client,
+      actor,
+      "commerce.refund",
+      cause,
+      { id, amount, outcome },
+      async () => {
+        invariant(
+          c &&
+            p.intent_ref &&
+            ["captured", "refund_pending"].includes(p.payment_state),
+          "refund_unavailable",
+          "A confirmed captured commitment is required.",
+        );
+        const pending = (
+          await client.query<{ amount: string }>(
+            "SELECT coalesce(sum((request->>'amount')::bigint),0)::text AS amount FROM creator.commerce_effect WHERE packet_id=$1 AND operation='refund' AND state<>'failed'",
+            [id],
+          )
+        ).rows[0]!;
+        invariant(
+          BigInt(pending.amount) + BigInt(amount) <= BigInt(p.snapshot.amount),
+          "refund_exceeds_balance",
+          "The refund exceeds the remaining captured amount.",
+        );
+        const result = (
+          await client.query<{ id: string }>(
+            "INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request) VALUES($1,$2,$3,'refund',$4,$5) RETURNING id",
+            [
+              p.creator_id,
+              p.fan_id,
+              p.id,
+              `${p.id}:refund:${cause}`,
+              JSON.stringify({
+                intentId: p.intent_ref,
+                amount,
+                currency: p.snapshot.currency,
+                returnState: c.state === "delivered" ? "delivered" : "resolved",
+              }),
+            ],
+          )
+        ).rows[0]!;
+        await client.query(
+          "UPDATE creator.commerce_packet SET payment_state='refund_pending',version=version+1 WHERE id=$1",
+          [id],
+        );
+        await client.query(
+          "UPDATE creator.commerce_commitment SET state=CASE WHEN state='delivered' THEN state ELSE 'refund_pending' END,outcome=$2,version=version+1 WHERE id=$1",
+          [c.id, outcome],
+        );
+        return result.id;
+      },
+    );
   }
 
   /** Claim durably, commit, then call the provider. No capacity/spend lock spans network I/O. */
