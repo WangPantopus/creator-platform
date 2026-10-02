@@ -92,27 +92,51 @@ export function identityPrivacyHook(
               "SELECT id,mode,created_at,expires_at,revoked_at FROM creator.identity_session WHERE account_id=$1",
             ],
           ] as const;
-          for (const [name, sql] of sources) {
+          // One fixed cursor gives all ten account projections the same MVCC
+          // snapshot. Separate held task/restore bookends remain current under
+          // READ COMMITTED; a retained repeatable-read snapshot is not authority.
+          const projection = sources
+            .map(([name, sql]) => {
+              data[name] = [];
+              return `SELECT '${name}'::text AS source,to_jsonb(item) AS row FROM (${sql} LIMIT 1001) item`;
+            })
+            .join(" UNION ALL ");
+          await client.query(
+            `DECLARE w8_identity_export NO SCROLL CURSOR FOR ${projection}`,
+            [input.accountId],
+          );
+          for (;;) {
             await restoredPrivacyTaskAuthorityInTransaction(
               client,
               input,
               assertRestoredInTransaction,
             );
-            const rows = (
-              await client.query(sql + " LIMIT 1001", [input.accountId])
-            ).rows;
-            invariant(
-              rows.length <= 1000,
-              "bounded_subjob_required",
-              "This identity export requires bounded subjobs; no truncated artifact was produced.",
+            const page = await client.query<{ source: string; row: unknown }>(
+              "FETCH FORWARD 16 FROM w8_identity_export",
             );
-            data[name] = rows;
+            input.signal!.throwIfAborted();
+            if (page.rows.length === 0) break;
+            for (const item of page.rows) {
+              const rows = data[item.source];
+              invariant(
+                rows,
+                "identity_export_source_changed",
+                "The fixed identity export source is unavailable.",
+              );
+              rows.push(item.row);
+              invariant(
+                rows.length <= 1000,
+                "bounded_subjob_required",
+                "This identity export requires bounded subjobs; no truncated artifact was produced.",
+              );
+            }
             invariant(
               Buffer.byteLength(JSON.stringify(data)) <= 3_000_000,
               "bounded_subjob_required",
               "This identity export needs a protected streaming artifact.",
             );
           }
+          await client.query("CLOSE w8_identity_export");
         }
         await restoredPrivacyTaskAuthorityInTransaction(
           client,
@@ -127,6 +151,7 @@ export function identityPrivacyHook(
             domain: "identity",
             jobId: input.jobId,
             complete: true,
+            snapshot: "single-cursor-read-committed",
             scope: input.scope,
           },
           data,

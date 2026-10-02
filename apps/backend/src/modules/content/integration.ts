@@ -7,7 +7,10 @@ import { createCommercePublicationPermission } from "../commerce/publication.js"
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
-import { createContentTenureHost } from "./tenure.js";
+import {
+  createContentCreatorTenureHost,
+  createContentTenureHost,
+} from "./tenure.js";
 import {
   ContentPublicationWorker,
   type ContentPublicationDependencies,
@@ -77,6 +80,7 @@ export function composeContentHost(input: {
   followReaders?: ContentFollowReaders;
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   tenure?: Parameters<typeof createContentTenureHost>[0];
+  creatorTenure?: Parameters<typeof createContentCreatorTenureHost>[0];
   /** Use W7's contentPublicProjection bound to this exact Content service.
    * This producer is neither a recipient grant nor a background purpose. */
   publicProjection?: NonNullable<ContentDependencies["effect"]>;
@@ -110,6 +114,9 @@ export function composeContentHost(input: {
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
+    ...(input.creatorTenure
+      ? createContentCreatorTenureHost(input.creatorTenure)
+      : {}),
     ...(input.publicationSource
       ? { publicationSource: input.publicationSource }
       : {}),
