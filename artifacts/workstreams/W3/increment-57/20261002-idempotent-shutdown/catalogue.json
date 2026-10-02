@@ -1,0 +1,55 @@
+{
+  "observedAt": "2026-10-02T16:40:28.907Z",
+  "source": "38a0cd591f062f6f5357d4fab3a7804232044f93",
+  "catalogue": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "database_marker": "creator-platform:synthetic-development-copy",
+    "original_closed": true,
+    "runtime_roles": [
+      {
+        "role": "creator_runtime",
+        "login": true,
+        "inherit": false,
+        "bypassRLS": false,
+        "superuser": false,
+        "memberships": 0
+      },
+      {
+        "role": "growth_worker",
+        "login": true,
+        "inherit": false,
+        "bypassRLS": false,
+        "superuser": false,
+        "memberships": 0
+      },
+      {
+        "role": "w3_growth_api",
+        "login": true,
+        "inherit": true,
+        "bypassRLS": false,
+        "superuser": false,
+        "memberships": 2
+      }
+    ]
+  },
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T16:40:28.904Z"
+        }
+      ]
+    }
+  },
+  "sqlApplied": false,
+  "credentialsPrinted": false,
+  "rolesChangedByW3": false
+}
