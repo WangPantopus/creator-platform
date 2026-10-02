@@ -239,7 +239,7 @@ struct NativeHandleForm: View {
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Handle").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
+                            Text("Handle").qText("caption", weight: .semibold).foregroundStyle(qColor("ink-muted", scheme))
                             handleField.qText("body").textFieldStyle(.plain).padding(.horizontal, 12).frame(minHeight: 44).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12)).overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor("control-line", scheme), lineWidth: 1)).accessibilityLabel("Public handle").accessibilityHint("A pseudonym is allowed. Three to thirty letters, numbers or underscores.")
                             Text("Creators and their teams see your handle, never your name or city unless you share them in a request.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                         }
