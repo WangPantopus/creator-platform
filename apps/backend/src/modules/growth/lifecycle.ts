@@ -3,15 +3,21 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import type { GrowthService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import {
   growthAccountExport,
   type GrowthPrivacyExportStream,
 } from "./privacy-export.js";
 
 type GrowthPrivacyInput = Parameters<PrivacyHook["run"]>[0];
-/** W8 verifies the exact live task, binding and captured ownership. */
+/** W8 verifies the exact live task, binding, restoration and captured ownership
+ * on the domain worker's actual held transaction before any domain locks. */
 export type GrowthPrivacyTaskAuthority = (
+  client: PoolClient,
   input: GrowthPrivacyInput & { leaseToken: string; signal: AbortSignal },
+) => Promise<readonly string[]>;
+export type GrowthPrivacyHeldAuthority = (
+  client: PoolClient,
 ) => Promise<readonly string[]>;
 export type GrowthPrivacyHook = Omit<PrivacyHook, "run"> & {
   run(input: GrowthPrivacyInput): Promise<
@@ -49,37 +55,35 @@ export function growthPrivacyHook(
           copy.growthErrorGrowthAccountScopeRequired,
           503,
         );
-      const currentTask = {
+      const currentTask = Object.freeze({
         ...input,
         leaseToken: input.leaseToken,
         signal: input.signal,
-      };
+      });
       input.signal.throwIfAborted();
-      const ownedCreators = z
-        .array(z.uuid())
-        .max(100)
-        .parse(await taskAuthority(currentTask));
-      const ownership = [...new Set(ownedCreators)].sort().join(",");
-      const assertAuthority = async () => {
+      let ownership: string | undefined;
+      const assertAuthority: GrowthPrivacyHeldAuthority = async (client) => {
         currentTask.signal.throwIfAborted();
         const current = z
           .array(z.uuid())
           .max(100)
-          .parse(await taskAuthority(currentTask));
-        if ([...new Set(current)].sort().join(",") !== ownership)
+          .parse(await taskAuthority(client, currentTask));
+        const captured = [...new Set(current)].sort();
+        const binding = captured.join(",");
+        if (ownership !== undefined && binding !== ownership)
           throw new DomainError(
             "growth_privacy_ownership_changed",
             copy.growthErrorGrowthAccountScopeRequired,
             503,
           );
+        ownership = binding;
         currentTask.signal.throwIfAborted();
+        return captured;
       };
-      await assertAuthority();
       if (input.kind === "delete")
         return {
           receipt: await service.privacyDelete(
             input.accountId,
-            ownedCreators,
             input.signal,
             assertAuthority,
           ),
@@ -106,7 +110,6 @@ export function growthPrivacyHook(
         stream: growthAccountExport(
           service,
           input.accountId,
-          ownedCreators,
           input.signal,
           assertAuthority,
         ),

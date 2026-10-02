@@ -156,6 +156,7 @@ export async function createDevelopmentTrust(
     };
     const agent =
       options.agent ?? createAgentDomain({ pool: runtime.pool, model: null });
+    const restoreReadyInTransaction = trustLocalRestorationInTransaction(env);
     return {
       environment: "local-development",
       identityMode: "development",
@@ -192,6 +193,14 @@ export async function createDevelopmentTrust(
         runtimePool: runtime.pool,
         coordinatorPool: workerPool,
         ...options.consumers,
+        assertRestoredInTransaction: async (client) => {
+          if (!(await restoreReadyInTransaction(client)))
+            throw new DomainError(
+              "restoration_pending",
+              "This environment is unavailable while recovery is verified.",
+              503,
+            );
+        },
         agent: options.consumers?.agent ?? agent,
       }),
       effectHooks: [
@@ -246,7 +255,7 @@ export async function createDevelopmentTrust(
         );
         return state.rows.length === 1 && state.rows[0]?.closed !== true;
       },
-      restoreReadyInTransaction: trustLocalRestorationInTransaction(env),
+      restoreReadyInTransaction,
       crisisResources: [],
     };
   } catch (error) {

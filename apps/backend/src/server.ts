@@ -22,6 +22,7 @@ import { canonicalHomePage } from "./modules/growth/home-composition.js";
 import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -52,7 +53,34 @@ try {
           },
           signedSubjectPolicies: [commerceSignedSubjects],
           ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-            ? { trust: createDevelopmentTrust }
+            ? {
+                trust: (
+                  runtime: Parameters<typeof createDevelopmentTrust>[0],
+                ) =>
+                  createDevelopmentTrust(runtime, {
+                    consumers: {
+                      additional:
+                        process.env.GROWTH_ENABLED === "true"
+                          ? [
+                              {
+                                domain: "growth",
+                                async run(job) {
+                                  // Trust is composed first; resolve the actual
+                                  // owner only after feature composition completes.
+                                  if (!features.growth)
+                                    throw new DomainError(
+                                      "privacy_commit_fence_unavailable",
+                                      "The actual Growth privacy owner is unavailable.",
+                                      503,
+                                    );
+                                  return features.growth.privacyHook.run(job);
+                                },
+                              },
+                            ]
+                          : [],
+                    },
+                  }),
+              }
             : {}),
           registerFeatures: async (runtime) => {
             const mediaEnvironment = readMediaEnvironment();
@@ -96,6 +124,20 @@ try {
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              privacyTaskAuthority: async (client, job) => {
+                if (!runtime.assertRestoredInTransaction)
+                  throw new DomainError(
+                    "privacy_commit_fence_unavailable",
+                    "Current held restoration authority is required.",
+                    503,
+                  );
+                return domainPrivacyTaskAuthorityInTransaction(
+                  client,
+                  job,
+                  "growth",
+                  runtime.assertRestoredInTransaction,
+                );
+              },
               assertAllowed: async (actor, creatorId) =>
                 creatorId
                   ? runtime.assertCreatorAllowed(actor, creatorId)

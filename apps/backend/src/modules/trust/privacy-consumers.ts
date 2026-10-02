@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
 import { identityPrivacyHook } from "./identity-privacy-hook.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
@@ -26,6 +26,7 @@ import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
@@ -33,6 +34,8 @@ import { contentPrivacyHook } from "../content/privacy.js";
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
+  /** Real restoration authority on the domain owner's held client. */
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
   agent?: {
     service: AgentService;
@@ -57,7 +60,7 @@ export function createPrivacyConsumers(input: {
 }) {
   const verify = privacyTaskAuthority(input.coordinatorPool);
   const hooks: PrivacyHook[] = [
-    trustPrivacyHook(input.coordinatorPool),
+    trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
     identityPrivacyHook(input.runtimePool, input.coordinatorPool),
     conversationPrivacyHook({
       pool: input.runtimePool,
@@ -109,18 +112,23 @@ export function createPrivacyConsumers(input: {
     );
   }
   if (input.growth) {
-    const owner = growthPrivacyHook(input.growth, undefined, verify);
-    hooks.push({
-      domain: "growth",
-      async run(job) {
-        await verify(job);
-        // The owner receives the complete current task, including its lease,
-        // cancellation signal and immutable pre-deletion ownership binding.
-        const result = await owner.run(job);
-        await verify(job);
-        return result;
-      },
-    });
+    const restore = input.assertRestoredInTransaction;
+    hooks.push(
+      growthPrivacyHook(input.growth, undefined, async (client, job) => {
+        if (!restore)
+          throw new DomainError(
+            "privacy_commit_fence_unavailable",
+            "Current held restoration authority is required.",
+            503,
+          );
+        return domainPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          "growth",
+          restore,
+        );
+      }),
+    );
   }
   if (input.content) {
     const owner = contentPrivacyHook(

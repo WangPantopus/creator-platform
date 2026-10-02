@@ -929,5 +929,11 @@
       }
     ],
     "custody": "Actual output/primary-operated screenshots; narrated failures separately identified; private full API/process/env logs excluded, successful Swift host Contacts storage URI metadata redacted."
+  },
+  "privacyHeld": {
+    "privacy-held-raw/workspace-check-final.log": "599ced56427e9bb2d0643576094da3e5b133c5bc932fe2187dfb329844702e00",
+    "privacy-held-raw/preserved-tool-outcomes.txt": "dfac1b1d29fecf63f8d3dfe950f33dd25a342e9e4c7f47f00a2409ace9945e6a",
+    "privacy-held-raw/workspace-check.log": "7d691adff4dcbd6e02471733de4d18e2688830278c933c6e20a8a7272b5349ae",
+    "privacy-held-raw/receipt.json": "841f40780c66d49119ecd76f66f09530ed8b003cd6da11b664bdc43d86b021e8"
   }
 }
