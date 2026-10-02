@@ -2505,6 +2505,8 @@ data class APIProof(
   val `code`: String,
   val `platform`: APIProofPlatform,
   val `accountUrl`: String,
+  @Required
+  val `postUrl`: String? = null,
   val `expiresAt`: String,
   val `state`: APIProofState,
   @Required
