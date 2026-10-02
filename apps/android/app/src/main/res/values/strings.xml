@@ -644,6 +644,7 @@
   <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
   <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
   <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
   <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
   <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
   <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>

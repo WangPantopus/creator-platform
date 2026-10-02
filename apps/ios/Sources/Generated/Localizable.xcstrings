@@ -6986,6 +6986,17 @@
         }
       }
     },
+    "Uploads and signing are unavailable here. Your preview stays on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploads and signing are unavailable here. Your preview stays on this device."
+          }
+        }
+      }
+    },
     "This recording limit does not match the current saved content.": {
       "extractionState": "manual",
       "localizations": {

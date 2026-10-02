@@ -42,6 +42,8 @@ export type CreatorVoiceRecordingProps = {
   objectId: string;
   expectedAccountId?: string;
   creatorName?: string;
+  /** The Studio dialog already supplies this surface's visible heading. */
+  embedded?: boolean;
   /** Client host owns saving the attachment and signing the complete Note. */
   onReady?: (
     asset: CreatorMediaAsset,
@@ -91,6 +93,7 @@ function RecordingForm({
   onReady,
   beforeDiscard,
   expectedAccountId,
+  embedded = false,
 }: Omit<ThreadRecordingProps, "purpose"> &
   Omit<CreatorVoiceRecordingProps, "creatorId" | "objectId"> & {
     objectId?: string;
@@ -395,16 +398,23 @@ function RecordingForm({
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
   return (
-    <section ref={surface} className="w6-recorder" aria-labelledby={heading}>
+    <section
+      ref={surface}
+      className="w6-recorder"
+      aria-labelledby={embedded ? undefined : heading}
+      aria-label={embedded ? copy.w6YourOwnVoice : undefined}
+    >
       <div className="w6-author">
-        {creatorName && <Seal size={28} />}
+        {creatorName && (
+          <Seal size={28} initial={Array.from(creatorName.trim())[0]} />
+        )}
         <span>
           {creatorName
             ? formatCopy("w6RecordAVoiceNoteAs", { value1: creatorName })
             : copy.w6RecordAVoiceNote}
         </span>
       </div>
-      <h1 id={heading}>{copy.w6YourOwnVoice}</h1>
+      {!embedded && <h1 id={heading}>{copy.w6YourOwnVoice}</h1>}
       <p>{copy.w6RecordListenAndSignTheExactRecordingBeforeItIs}</p>
       <div
         className="w6-data"
@@ -566,7 +576,7 @@ function RecordingForm({
         )}
       {(!available || !family) && (
         <p className="qv-help">
-          {copy.w6SignInToAConfiguredCreatorAccountToUploadAnd}
+          {copy.w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice}
         </p>
       )}
     </section>

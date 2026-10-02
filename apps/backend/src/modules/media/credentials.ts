@@ -19,7 +19,10 @@ const Report = z.object({
   manifests: z.record(
     z.string(),
     z.object({
-      format: z.string(),
+      // Claim v2 omits dc:format. The exact signed occurrence still contains
+      // the processed MIME type, and the matching hard binding proves its file.
+      format: z.string().optional(),
+      claim_version: z.union([z.literal(1), z.literal(2)]).optional(),
       assertions: z.array(z.object({ label: z.string(), data: z.unknown() })),
       ingredients: z.array(z.unknown()).optional(),
     }),
@@ -53,7 +56,9 @@ export function verifyMediaCredentialReport(
   if (
     Object.keys(report.manifests).length !== 1 ||
     !active ||
-    active.format !== tuple.processedMediaMimeType ||
+    (active.format !== undefined
+      ? active.format !== tuple.processedMediaMimeType
+      : active.claim_version !== 2) ||
     (active.ingredients?.length ?? 0) !== 0 ||
     (report.validation_results.ingredientDeltas?.length ?? 0) !== 0 ||
     (report.validation_status?.length ?? 0) !== 0 ||
@@ -229,6 +234,11 @@ export class C2PAToolCredentialSigner implements ContentCredentialSigner {
         source,
         "--manifest",
         definition,
+        // This is the first platform credential for the immutable processed
+        // output. Do not invent parent provenance for its unsigned input or
+        // claim that an imported photo was captured by this platform's camera.
+        "--create",
+        "empty",
         "--signer-path",
         this.config.signerExecutable,
         "--output",

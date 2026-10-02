@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type RefObject,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -821,15 +822,20 @@ function Modal({
   onClose,
   children,
   closeDisabled = false,
+  restoreFocusTo,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   closeDisabled?: boolean;
+  restoreFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    const restore = document.activeElement as HTMLElement | null;
+    // An async save may disable the trigger before this modal mounts, moving
+    // focus to body. Preserve the explicit media trigger in that case.
+    const restore =
+      restoreFocusTo?.current ?? (document.activeElement as HTMLElement | null);
     const dialog = ref.current;
     if (!dialog) return;
     let resumeFocus: HTMLElement | null = null;
@@ -863,7 +869,7 @@ function Modal({
       dialog.close();
       restore?.focus();
     };
-  }, []);
+  }, [restoreFocusTo]);
   return (
     <dialog
       ref={ref}
@@ -944,6 +950,7 @@ function Compose({
     } | null>(null),
     [schedule, setSchedule] = useState(""),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
+    voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
@@ -1309,6 +1316,7 @@ function Compose({
             Photo
           </button>
           <button
+            ref={voiceTrigger}
             className="qv-btn qv-btn--quiet"
             type="button"
             disabled={
@@ -1582,7 +1590,11 @@ function Compose({
         </Modal>
       )}
       {voiceObjectId && canDraft && (
-        <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
+        <Modal
+          title="Your own voice"
+          onClose={() => setVoiceObjectId(null)}
+          restoreFocusTo={voiceTrigger}
+        >
           {(() => {
             const Recorder =
               document.kind === "post"
@@ -1590,6 +1602,7 @@ function Compose({
                 : CreatorVoiceRecording;
             return (
               <Recorder
+                embedded
                 creatorId={creator.id}
                 expectedAccountId={creator.viewerAccountId}
                 creatorName={creator.display_name}

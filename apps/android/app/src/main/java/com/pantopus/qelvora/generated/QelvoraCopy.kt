@@ -644,6 +644,7 @@ object QelvoraCopy {
     "w6ThisFileCouldNotBeProcessedRecordAgain" to "This file could not be processed. Record again.",
     "w6UploadedProcessingBeforeSharing" to "Uploaded · processing before sharing",
     "w6SignInToAConfiguredCreatorAccountToUploadAnd" to "Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.",
+    "w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice" to "Uploads and signing are unavailable here. Your preview stays on this device.",
     "w6ThisRecordingLimitDoesNotMatchTheCurrentSavedContent" to "This recording limit does not match the current saved content.",
     "w6MediaIsUnavailableTryAgain" to "Media is unavailable. Try again.",
     "w6ThisUploadDoesNotBelongToTheCurrentContentRefresh" to "This upload does not belong to the current content. Refresh before continuing.",

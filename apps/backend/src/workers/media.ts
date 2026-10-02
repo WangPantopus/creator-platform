@@ -1,7 +1,6 @@
 import pg from "pg";
 import type { PoolClient } from "pg";
 import { Database } from "../db/database.js";
-import { AccessService, type ThreadScope } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
 import { CreatorIdentityAuthority } from "../modules/identity/creator-scope.js";
 import { readMediaWorkerEnvironment } from "../modules/media/environment.js";
@@ -21,15 +20,13 @@ import {
   PrivateMediaStorage,
 } from "../modules/media/storage.js";
 import { workerBudgets } from "./pool.js";
+import {
+  MediaWorkerDatabase,
+  type MediaWorkerDenial,
+  type MediaWorkerFamily,
+} from "../modules/media/worker-access.js";
 
-type Family =
-  | Readonly<{
-      kind: "thread";
-      creatorId: string;
-      fanId: string;
-      ownerAccountId: string;
-    }>
-  | Readonly<{ kind: "creator"; creatorId: string; ownerAccountId: string }>;
+type Family = MediaWorkerFamily;
 const familyKey = (family: Family) =>
   family.kind === "thread"
     ? `thread:${family.creatorId}:${family.fanId}:${family.ownerAccountId}`
@@ -41,23 +38,43 @@ const JOBS_PER_TURN = 16;
 
 /** Ingestion-pool media runtime. Never runs in the interactive API process:
  * scanning, decoding, transcoding and content credentials execute only here. */
-export async function startMediaWorker(env: NodeJS.ProcessEnv = process.env) {
+export async function startMediaWorker(
+  env: NodeJS.ProcessEnv = process.env,
+  denied?: MediaWorkerDenial,
+) {
   const environment = readMediaWorkerEnvironment(env);
   if (!environment)
     throw new Error(
       "Media is unconfigured: set MEDIA_STORAGE_ROOT, MEDIA_TICKET_SECRET, MEDIA_TICKET_ORIGIN and MEDIA_POLICY_FILE.",
     );
-  if (!env.DATABASE_URL)
-    throw new Error("The media worker requires a non-owner DATABASE_URL.");
+  if (!env.MEDIA_WORKER_DATABASE_URL)
+    throw new Error(
+      "The media worker requires a dedicated MEDIA_WORKER_DATABASE_URL.",
+    );
   const pool = new pg.Pool({
-    connectionString: env.DATABASE_URL,
+    connectionString: env.MEDIA_WORKER_DATABASE_URL,
     max: workerBudgets.ingestion.connections,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
   });
   const database = new Database(pool);
-  await database.assertRuntimeRole();
-  const access = new AccessService(pool);
+  const workerDatabase = new MediaWorkerDatabase(
+    pool,
+    denied ??
+      (async () => {
+        throw new DomainError(
+          "media_worker_denial_unavailable",
+          "Current media ingestion denial authority is unavailable.",
+          503,
+        );
+      }),
+  );
+  try {
+    await workerDatabase.ready();
+  } catch (error) {
+    await pool.end();
+    throw error;
+  }
   const storage = new PrivateMediaStorage(environment.storageRoot);
   // The worker reads no policy and serves nothing; deny every interactive path.
   const media = new MediaService(
@@ -92,40 +109,15 @@ export async function startMediaWorker(env: NodeJS.ProcessEnv = process.env) {
     credentials,
     environment.ffmpeg,
     environment.ffprobe,
+    (scope, work) =>
+      workerDatabase.transaction({ kind: "thread", ...scope }, work),
   );
-  // Restore the uploader's scoped non-owner RLS family in every transaction and
-  // recheck that the account still owns the creator profile it uploaded under.
-  const creatorTransaction = async <T>(
+  // Restore only purpose-specific worker RLS, including after request/session,
+  // profile verification, owner or thread authority has been revoked.
+  const creatorTransaction = <T>(
     scope: CreatorMediaWorkerScope,
     work: (client: PoolClient) => Promise<T>,
-  ): Promise<T> => {
-    const client = await pool.connect();
-    try {
-      await client.query("BEGIN");
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true),set_config('app.fan_id','',true)",
-        [scope.creatorId, scope.ownerAccountId],
-      );
-      const owner = await client.query(
-        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-        [scope.creatorId, scope.ownerAccountId],
-      );
-      if (owner.rowCount !== 1)
-        throw new DomainError(
-          "creator_unavailable",
-          "The uploading creator account no longer owns this profile.",
-          404,
-        );
-      const value = await work(client);
-      await client.query("COMMIT");
-      return value;
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
-  };
+  ) => workerDatabase.transaction({ kind: "creator", ...scope }, work);
   const creatorWorker = new CreatorMediaWorker(
     creatorMedia,
     creatorTransaction,
@@ -145,47 +137,27 @@ export async function startMediaWorker(env: NodeJS.ProcessEnv = process.env) {
       `${JSON.stringify({ at: new Date().toISOString(), event, ...detail })}\n`,
     );
 
-  const threadScope = (family: Extract<Family, { kind: "thread" }>) =>
-    // Process-local scope for this queued family only, resolved from the
-    // durable uploader identity. Outside a request, session checks defer to
-    // the job; RLS and every lease/version fence still apply.
-    access.openThread(
-      { accountId: family.ownerAccountId, adultEligible: true },
-      family.creatorId,
-      family.fanId,
-      false,
-    ) as Promise<ThreadScope>;
-  const pendingAfter = async (family: Family) => {
-    if (family.kind === "thread") {
-      const scope = await threadScope(family);
-      return database.withThread(scope, async (client) =>
-        Boolean(
-          (
-            await client.query(
-              "SELECT 1 FROM creator.media_asset WHERE creator_id=$1 AND fan_id=$2 AND job_available_at IS NOT NULL AND (state IN('quarantined','processing','revoked') OR manifest_pending OR delete_pending) LIMIT 1",
-              [family.creatorId, family.fanId],
-            )
-          ).rowCount,
-        ),
-      );
-    }
-    return creatorTransaction(family, async (client) =>
+  const pendingAfter = async (family: Family) =>
+    workerDatabase.transaction(family, async (client) =>
       Boolean(
         (
           await client.query(
-            "SELECT 1 FROM creator.creator_media_asset WHERE creator_id=$1 AND owner_account_id=$2 AND job_available_at IS NOT NULL AND (state IN('quarantined','processing','revoked') OR manifest_pending OR delete_pending) LIMIT 1",
-            [family.creatorId, family.ownerAccountId],
+            family.kind === "thread"
+              ? "SELECT 1 FROM creator.media_asset WHERE creator_id=$1 AND fan_id=$2 AND job_available_at IS NOT NULL AND (state IN('quarantined','processing','revoked') OR manifest_pending OR delete_pending) LIMIT 1"
+              : "SELECT 1 FROM creator.creator_media_asset WHERE creator_id=$1 AND owner_account_id=$2 AND job_available_at IS NOT NULL AND (state IN('quarantined','processing','revoked') OR manifest_pending OR delete_pending) LIMIT 1",
+            [
+              family.creatorId,
+              family.kind === "thread" ? family.fanId : family.ownerAccountId,
+            ],
           )
         ).rowCount,
       ),
     );
-  };
   const runFamily = async (family: Family) => {
     const started = Date.now();
     let processed = 0;
     if (family.kind === "thread") {
-      const scope = await threadScope(family);
-      while (processed < JOBS_PER_TURN && (await threadWorker.process(scope)))
+      while (processed < JOBS_PER_TURN && (await threadWorker.process(family)))
         processed++;
     } else
       while (processed < JOBS_PER_TURN && (await creatorWorker.process(family)))
@@ -266,9 +238,40 @@ export async function startMediaWorker(env: NodeJS.ProcessEnv = process.env) {
     );
   };
 
+  let discoveryRunning = false;
+  let discoveryCursor = "";
+  const discover = async () => {
+    if (stopping || discoveryRunning || queued.size >= 768) return;
+    discoveryRunning = true;
+    try {
+      const jobs = await workerDatabase.discover(discoveryCursor);
+      for (const job of jobs) enqueue(job.family);
+      discoveryCursor =
+        jobs.length === 128 ? jobs[jobs.length - 1]!.cursor : "";
+    } catch {
+      log("media_discovery_failed");
+    } finally {
+      discoveryRunning = false;
+    }
+  };
+  const discoveryTimer = setInterval(() => void discover(), 10_000).unref();
   let listener: pg.Client | undefined;
+  let listenerRetry: NodeJS.Timeout | undefined;
+  const retryListener = () => {
+    if (stopping || listenerRetry) return;
+    listenerRetry = setTimeout(() => {
+      listenerRetry = undefined;
+      void listen().catch(() => {
+        log("media_listener_retry_failed");
+        retryListener();
+      });
+    }, 2000).unref();
+  };
   const listen = async (): Promise<void> => {
-    const client = new pg.Client({ connectionString: env.DATABASE_URL });
+    const client = new pg.Client({
+      connectionString: env.MEDIA_WORKER_DATABASE_URL,
+      connectionTimeoutMillis: 5000,
+    });
     client.on("notification", (message) => {
       if (message.channel !== MEDIA_JOB_CHANNEL || !message.payload) return;
       try {
@@ -294,24 +297,45 @@ export async function startMediaWorker(env: NodeJS.ProcessEnv = process.env) {
     client.on("error", () => {
       if (stopping) return;
       log("media_listener_lost");
-      listener = undefined;
+      if (listener === client) listener = undefined;
       void client.end().catch(() => {});
-      setTimeout(() => void listen().catch(() => {}), 2000).unref();
+      retryListener();
     });
-    await client.connect();
-    await client.query(`LISTEN ${MEDIA_JOB_CHANNEL}`);
+    try {
+      await client.connect();
+      await client.query(`LISTEN ${MEDIA_JOB_CHANNEL}`);
+    } catch (error) {
+      await client.end().catch(() => {});
+      throw error;
+    }
+    if (stopping) {
+      await client.end().catch(() => {});
+      return;
+    }
     listener = client;
     log("media_worker_listening", {
       credentials: Boolean(credentials),
       concurrency: workerBudgets.ingestion.concurrency,
     });
   };
-  await listen();
+  try {
+    await listen();
+    await discover();
+  } catch (error) {
+    stopping = true;
+    clearInterval(discoveryTimer);
+    if (listenerRetry) clearTimeout(listenerRetry);
+    await listener?.end().catch(() => {});
+    await pool.end();
+    throw error;
+  }
 
   return {
     enqueue,
     async close() {
       stopping = true;
+      clearInterval(discoveryTimer);
+      if (listenerRetry) clearTimeout(listenerRetry);
       for (const timer of retries.values()) clearTimeout(timer);
       retries.clear();
       queued.clear();

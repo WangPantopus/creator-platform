@@ -641,6 +641,7 @@
   "w6ThisFileCouldNotBeProcessedRecordAgain": "This file could not be processed. Record again.",
   "w6UploadedProcessingBeforeSharing": "Uploaded · processing before sharing",
   "w6SignInToAConfiguredCreatorAccountToUploadAnd": "Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.",
+  "w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice": "Uploads and signing are unavailable here. Your preview stays on this device.",
   "w6ThisRecordingLimitDoesNotMatchTheCurrentSavedContent": "This recording limit does not match the current saved content.",
   "w6MediaIsUnavailableTryAgain": "Media is unavailable. Try again.",
   "w6ThisUploadDoesNotBelongToTheCurrentContentRefresh": "This upload does not belong to the current content. Refresh before continuing.",
