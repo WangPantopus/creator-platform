@@ -256,26 +256,50 @@ export const ContentPreference = z.strictObject({
   accountId: z.uuid(),
   muted: z.boolean(),
 });
-export const NoteReplyPolicy = z.strictObject({
-  accountId: z.uuid(),
-  creatorId: z.uuid(),
-  limit: z.union([
-    z.literal(4000),
-    z.literal(6000),
-    z.literal(8000),
-    z.literal(12000),
-  ]),
-  confirmedDays: z.int().nonnegative().nullable(),
-  milestone: z
-    .union([z.literal(50), z.literal(100), z.literal(365)])
-    .nullable(),
-  basis: z
-    .enum(["confirmed_stripe_paid_periods", "confirmed_paid_periods"])
-    .nullable(),
-  historyComplete: z.literal(false),
-  longerRepliesActive: z.boolean(),
-  checkedAt: z.iso.datetime({ offset: true }),
-});
+export const NoteReplyPolicy = z
+  .strictObject({
+    accountId: z.uuid(),
+    creatorId: z.uuid(),
+    limit: z.union([
+      z.literal(4000),
+      z.literal(6000),
+      z.literal(8000),
+      z.literal(12000),
+    ]),
+    confirmedDays: z.int().nonnegative().nullable(),
+    milestone: z
+      .union([z.literal(50), z.literal(100), z.literal(365)])
+      .nullable(),
+    basis: z
+      .enum(["confirmed_stripe_paid_periods", "confirmed_paid_periods"])
+      .nullable(),
+    historyComplete: z.literal(false),
+    longerRepliesActive: z.boolean(),
+    checkedAt: z.iso.datetime({ offset: true }),
+  })
+  .refine((policy) => {
+    const milestone =
+      policy.confirmedDays === null || policy.confirmedDays < 50
+        ? null
+        : policy.confirmedDays >= 365
+          ? 365
+          : policy.confirmedDays >= 100
+            ? 100
+            : 50;
+    const limit =
+      !policy.longerRepliesActive || milestone === null
+        ? 4000
+        : milestone === 365
+          ? 12000
+          : milestone === 100
+            ? 8000
+            : 6000;
+    return (
+      policy.milestone === milestone &&
+      policy.limit === limit &&
+      (policy.confirmedDays === null || policy.basis !== null)
+    );
+  }, "Membership recognition and the reply limit must agree.");
 export const ContentThanksQuery = z.strictObject({
   targetKind: z.enum(["content", "message"]),
   targetId: z.uuid(),
