@@ -8,13 +8,13 @@
     "Unscoped mode function returned NULL and unscoped evidence returned no rows",
     "Runtime has no membership in metadata role",
     "Full inner evidence query plans under creator_commerce_public_read with column-only grants and exact published-tuple policies",
-    "Final backend typecheck, changed-file lint and formatting pass including all six trigger readiness checks"
+    "Final backend typecheck, changed-file lint and formatting pass including six trigger readiness checks and separate bounded-page positive preparation"
   ],
   "authoritiesRequired": [
     "W8 0076 exact original-participant negative authority before content locks",
     "W1 actual signed-source shared lease with exclusive withdrawal/key/profile fences, acquired last",
     "W5 early metadata preparation and actual audience-before-final-reader integration",
-    "For lists/multiple proofs: all candidate content/quote/audience locks before the first final signature gate"
+    "For lists/multiple proofs: all candidate content/quote/audience and W4 preparePositive mode/packet fences before the first final signature gate"
   ],
   "behavior": [
     "Retains actual account/session and exact same-client transaction tuple binding",
@@ -24,7 +24,8 @@
     "Exact consumed creator publication command/version and actual acceptance/delivery signatures required",
     "Actual group service requires durable SYSTEM message and exact published group evidence; no publication inference from a draft",
     "Shared mode then packet fence; no packet FOR SHARE row locks underneath; final source lease last",
-    "No private packet disclosure, fan identity, credential bytes, assertion or payment reference returned"
+    "No private packet disclosure, fan identity, credential bytes, assertion or payment reference returned",
+    "Separate preparePositive holds every mode/packet fence before final read; final read takes no session/domain/advisory lock, and further preparation in that transaction is rejected"
   ],
   "notVerified": [
     "Positive original creator/fan/viewer journeys",
