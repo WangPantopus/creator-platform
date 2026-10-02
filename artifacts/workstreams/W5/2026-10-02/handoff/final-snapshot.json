@@ -387,11 +387,12 @@
   "resources": {
     "ownAPI41055": "stopped",
     "ownWeb30055": "stopped",
-    "ownBrowser47905": "stopped; preserved profiles at /private/tmp/creator-w5-shell-operator/profiles",
+    "ownBrowser47905": "stopped after explicitly closing both actual profiles; initial SIGTERM left HTTP listener alive, so only the custody-checked owned server was terminated",
     "ownSimulator": "78C3590E-6D36-4A73-9E46-D23563EF0134 shut down",
     "ownEmulator": "CreatorPlatform_W5_API34 shut down; no current lease",
     "ownHeavyOrGuiOrDeviceLease": "none",
-    "peerAtLastObservation": "W2 5554/slot2/gui; W6 5582/slot1 and3E02 simulator/slot3. Recheck current custody; never touch peers."
+    "peerAtLastObservation": "W2 5554/slot2/gui; W6 5582/slot1 and3E02 simulator/slot3. Recheck current custody; never touch peers.",
+    "actualOwnListenersAfterCleanup": "No listeners on41055/30055/47905"
   },
   "acceptanceBoundaries": {
     "implemented": "All personally authored current increments committed; group creator consumer and guarded owner composition source are on main.",
@@ -401,5 +402,11 @@
     "releaseReady": false
   },
   "identity": "DEVELOPMENT-ONLY SEEDED VERIFIED at2026-10-01T20:44:26Z; no proof/passkey/acceptance.",
-  "next": "Read handoff, recheck actual current main and live owner PRs/successors, then personally consume actual204/205/208 and finish the nine packages. The separate handoff-doc PR must use normal checks; its later live state supersedes this checkpoint."
+  "next": "Read handoff, recheck actual current main and live owner PRs/successors, then personally consume actual204/205/208 and finish the nine packages. The separate handoff-doc PR must use normal checks; its later live state supersedes this checkpoint.",
+  "resourceCleanupRecheckedAt": "2026-10-02T20:29:41.144836+00:00",
+  "documentationPullRequest": {
+    "number": 190,
+    "url": "https://github.com/WangPantopus/creator-platform/pull/190",
+    "stateAtRecord": "OPEN; normal CI pending; recheck live state"
+  }
 }
