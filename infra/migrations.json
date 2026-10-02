@@ -669,7 +669,10 @@
       "owner": "W8",
       "version": "0103_w8_domain_privacy_task_fence",
       "state": "reserved_unapplied",
-      "reason": "Actorless Trust/Growth private worker same-client job/task ownership/lease and separate-COMMIT custody. Exact dedicated domain issuer/role/source/C10 review pending; no widening0087 caller or scope ACL."
+      "reason": "Dedicated Trust/Growth private worker same-client lease/ownership/restoration and separate COMMIT source reviewed on closed canonical57; actual activation/owner/app/expiry acceptance remains open.0087 unchanged.",
+      "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
+      "sourceCommit": "ccc4474b57b1dd4e0d1b1d1157c6ef4a77e7e07d",
+      "sourceSha256": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d"
     },
     {
       "id": "0104",
@@ -719,6 +722,27 @@
       "version": "0110_w3_generation_terminal_finalization",
       "state": "reserved_unapplied",
       "reason": "Genuine0099/0100 private terminal scope/client/XID original message+generation+cursor transition and durable frame only. Exact source/real acceptance provenance and W2/W4 owner settlement composition pending; no input/provider/financial permission."
+    },
+    {
+      "id": "0111",
+      "owner": "W1",
+      "version": "0111_w1_translation_worker_scope",
+      "state": "reserved_unapplied",
+      "reason": "Distinct durable translation private issuer after actual W3 original job/provenance/signature/consent/lease/COMMIT contract. No request ThreadScope or generation row; source/C10/finite policy/activation/owner acceptance pending."
+    },
+    {
+      "id": "0112",
+      "owner": "W8",
+      "version": "0112_w8_translation_worker_denial",
+      "state": "reserved_unapplied",
+      "reason": "Original translation participant negatives under actual W3 durable metadata and W1 private nonce/client. Unknown provenance and missing current restoration/consent refuse; no body/provider or activation. Exact source contract pending."
+    },
+    {
+      "id": "0113",
+      "owner": "W2",
+      "version": "0113_w2_privacy_export_snapshot",
+      "state": "reserved_unapplied",
+      "reason": "Separate NoLogin fixed all-owned Agent export snapshot purpose; original real verified lifecycle job/token/immutable ownership/XID/PID and own scope/COMMIT custody.0087 scope ACL/isolated owner unchanged. Exact source, current restoration, C10/finite retention and actual owner acceptance pending."
     },
     {
       "id": "0201",

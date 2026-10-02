@@ -1,0 +1,22 @@
+{
+  "label": "Actual shipping iOS canonical retained session; same web-saved synthetic export; missing103 refusal only",
+  "backendRevision": "ccc4474b",
+  "newUnitTests": false,
+  "errors": [],
+  "light": {
+    "sameSavedWebJob": true,
+    "jobHash": "18f952ad8b653e0dab774ef8b3076182f7656b79765b01d80a97a5e9471b1b76",
+    "identityFenceBlocked": true,
+    "mediaFenceBlocked": true,
+    "trustFenceBlocked": true,
+    "downloadOffered": false
+  },
+  "night": {
+    "sameSavedWebJob": true,
+    "jobHash": "18f952ad8b653e0dab774ef8b3076182f7656b79765b01d80a97a5e9471b1b76",
+    "identityFenceBlocked": true,
+    "mediaFenceBlocked": true,
+    "trustFenceBlocked": true,
+    "downloadOffered": false
+  }
+}
