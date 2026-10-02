@@ -154,7 +154,7 @@ public struct TrustFanFeature: View {
         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
         Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { Task { await privacyCommand("export") } }
         Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
-        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state, variant: .quiet, block: true) { Task { await jobDetail(job.id) } } }
+        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } } }
         if let selectedJob { jobProgress(selectedJob) }
     } }
     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
@@ -168,8 +168,8 @@ public struct TrustFanFeature: View {
         }
     }
     private func taskDescription(_ task: TrustTask) -> String {
-        let failure = task.error_code.map { " · " + $0 } ?? ""
-        return task.domain + ": " + task.state + failure
+        let failure = task.error_code.map { " · " + $0.replacingOccurrences(of: "_", with: " ") } ?? ""
+        return task.domain + ": " + task.state.replacingOccurrences(of: "_", with: " ") + failure
     }
     private func retainedRecord(_ item: TrustRetained) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -189,7 +189,20 @@ public struct TrustFanFeature: View {
         var failure: Error?
         do { help = try await client.request("help") } catch { failure = error }
         if route.contains("privacy") { do { capability = try await client.request("capabilities") } catch { capability = nil; failure = failure ?? error } }
-        do { if route.hasPrefix("/trust") || route.contains("feedback") { } else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items } else if route.contains("privacy") { let page: TrustItems<TrustJob> = try await client.request("privacy/jobs"); jobs = page.items } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items } } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
+        do {
+            if route.hasPrefix("/trust") || route.contains("feedback") { }
+            else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items }
+            else if route.contains("privacy") {
+                exportPayload = nil
+                let page: TrustItems<TrustJob> = try await client.request("privacy/jobs")
+                jobs = page.items
+                if let selectedId = selectedJob?.id, jobs.contains(where: { $0.id == selectedId }) {
+                    let detail: TrustJob = try await client.request("privacy/jobs/" + selectedId)
+                    selectedJob = detail
+                    jobs = jobs.map { $0.id == selectedId ? detail : $0 }
+                } else { selectedJob = nil }
+            } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items }
+        } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         error = failure?.localizedDescription ?? ""
     }
     private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? { guard let client, !busy else { return nil }; busy = true; defer { busy = false }; do { let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); error = ""; commandKey = UUID().uuidString; return ack } catch { self.error = error.localizedDescription; return nil } }
@@ -199,7 +212,17 @@ public struct TrustFanFeature: View {
     }
     private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your appeal is saved for a different reviewer."; reason = ""; await load() } }
     private func privacyCommand(_ kind: String) async { var input: [String: Any] = ["kind": kind, "scope": scope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]; if scope != "account" { input["creatorId"] = creatorID.lowercased() }; if scope == "thread" { input["threadId"] = threadID.lowercased() }; if let ack = await perform("privacy/jobs", input) { result = "Request saved; inspect each domain's progress."; await load(); if let id = ack.id { await jobDetail(id) } } }
-    private func jobDetail(_ id: String) async { guard let client else { return }; exportPayload = nil; do { selectedJob = try await client.request("privacy/jobs/" + id); error = "" } catch { selectedJob = nil; self.error = error.localizedDescription } }
+    private func jobDetail(_ id: String) async {
+        guard let client, !busy else { return }
+        busy = true; defer { busy = false }
+        exportPayload = nil
+        do {
+            let detail: TrustJob = try await client.request("privacy/jobs/" + id)
+            selectedJob = detail
+            jobs = jobs.map { $0.id == id ? detail : $0 }
+            error = ""
+        } catch { selectedJob = nil; self.error = error.localizedDescription }
+    }
     private func download(_ id: String) async { guard let client, !busy else { return }; busy = true; defer { busy = false }; do { exportPayload = TrustExport(data: try await client.bytes("privacy/jobs/" + id + "/download")); error = "" } catch { exportPayload = nil; self.error = error.localizedDescription } }
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
