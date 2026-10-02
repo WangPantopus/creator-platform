@@ -4,7 +4,7 @@ import type { FeatureRegistration } from "../../app.js";
 import type { Database } from "../../db/database.js";
 import type { AccessService } from "../access/scope.js";
 import type { ConversationService } from "../conversation/service.js";
-import { DomainError } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import {
   CommerceApprovals,
   commerceApprovalSignedSubjects,
@@ -13,11 +13,63 @@ import {
 /** W1/W8 install this only after allocating/applying the additive Approval
  * schema. The same producer powers C02 review, C06 persistence and W3 delivery.
  */
-export function createCommerceApprovals(input: {
+export const COMMERCE_APPROVAL_MIGRATION = "0044_w4_personal_approval";
+
+export async function createCommerceApprovals(input: {
   database: Database;
   access: AccessService;
   conversation: ConversationService;
+  migration: { version: string; checksum: string };
 }) {
+  invariant(
+    input.migration.version === COMMERCE_APPROVAL_MIGRATION &&
+      /^[a-f0-9]{64}$/u.test(input.migration.checksum),
+    "approval_unconfigured",
+    "Personal Approval requires its exact activated migration.",
+  );
+  invariant(
+    input.access.isForPool(input.database.pool) &&
+      input.conversation.isFor(input.database, input.access) &&
+      input.access.threadScopeInTransactionAvailable &&
+      input.database.threadScopeInTransactionAvailable,
+    "approval_authority_unconfigured",
+    "Personal Approval requires one conversation graph with held current authority.",
+  );
+  await input.database.assertRuntimeRole();
+  const ready = (
+    await input.database.pool.query<{ ready: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
+       AND (SELECT count(*)=2 FROM pg_class t JOIN pg_namespace n ON n.oid=t.relnamespace
+        WHERE n.nspname='creator' AND t.relname IN('commerce_reply_draft','commerce_approval')
+        AND t.relkind='r' AND t.relrowsecurity AND t.relforcerowsecurity
+        AND pg_get_userbyid(t.relowner)='creator_owner'
+        AND has_table_privilege(current_user,t.oid,'SELECT')
+        AND has_table_privilege(current_user,t.oid,'INSERT')
+        AND has_table_privilege(current_user,t.oid,'UPDATE'))
+       AND (SELECT count(*)=5 FROM pg_attribute a JOIN pg_class t ON t.oid=a.attrelid
+        JOIN pg_namespace n ON n.oid=t.relnamespace WHERE n.nspname='creator' AND NOT a.attisdropped
+        AND ((t.relname IN('creator_profile','passkey_credential')
+          AND a.attname IN('commerce_approval_epoch','commerce_approval_changed_at'))
+         OR (t.relname='message' AND a.attname='approval_id')))
+       AND (SELECT count(*)=6 FROM pg_trigger trigger JOIN pg_class t ON t.oid=trigger.tgrelid
+        JOIN pg_namespace n ON n.oid=t.relnamespace JOIN pg_proc f ON f.oid=trigger.tgfoid
+        JOIN (VALUES ('commerce_reply_draft','validate_draft_source'),
+          ('commerce_approval','validate_personal_approval'),
+          ('commerce_reply_draft','invalidate_draft_approval'),
+          ('commerce_approval','freeze_approval_snapshot'),
+          ('creator_profile','invalidate_creator_approvals'),
+          ('passkey_credential','invalidate_key_approvals')) expected(relation,name)
+         ON t.relname=expected.relation AND trigger.tgname=expected.name
+        WHERE n.nspname='creator' AND NOT trigger.tgisinternal AND trigger.tgenabled='O'
+         AND pg_get_userbyid(f.proowner)='creator_owner') AS ready`,
+      [input.migration.version, input.migration.checksum],
+    )
+  ).rows[0]?.ready;
+  invariant(
+    ready === true,
+    "approval_unconfigured",
+    "The current Personal Approval schema is not installed.",
+  );
   const approvals = new CommerceApprovals(input.database);
   input.conversation.configureApprovals(approvals);
   const feature: FeatureRegistration = {
@@ -83,5 +135,61 @@ export function createCommerceApprovals(input: {
       return router;
     },
   };
-  return { approvals, feature, signedSubjects: commerceApprovalSignedSubjects };
+  const signedSubjects: typeof commerceApprovalSignedSubjects = {
+    name: commerceApprovalSignedSubjects.name,
+    async prepare(client, actor, creatorId, requested) {
+      if (requested.actType !== "approved_draft") return null;
+      invariant(
+        requested.content &&
+          typeof requested.content === "object" &&
+          !Array.isArray(requested.content),
+        "draft_required",
+        "Choose the exact saved draft before signing.",
+      );
+      const approval = requested.content.approval;
+      invariant(
+        approval &&
+          typeof approval === "object" &&
+          !Array.isArray(approval) &&
+          typeof approval.draftId === "string",
+        "draft_required",
+        "Choose the exact saved draft before signing.",
+      );
+      const pointer = (
+        await client.query<{ fan_id: string }>(
+          `SELECT d.fan_id FROM creator.commerce_reply_draft d
+           JOIN creator.creator_profile owner ON owner.id=d.creator_id
+           WHERE d.id=$1 AND d.thread_id=$2 AND d.creator_id=$3 AND owner.account_id=$4`,
+          [
+            z.uuid().parse(approval.draftId),
+            requested.subjectId,
+            creatorId,
+            actor.accountId,
+          ],
+        )
+      ).rows[0];
+      invariant(pointer, "draft_unavailable", "This draft is unavailable.");
+      const current = await input.access.openThreadInTransaction(
+        client,
+        actor,
+        creatorId,
+        pointer.fan_id,
+        false,
+        "read",
+      );
+      invariant(
+        current.authority === "creator" &&
+          current.threadId === requested.subjectId,
+        "creator_required",
+        "Only the creator can personally approve this draft.",
+      );
+      return commerceApprovalSignedSubjects.prepare(
+        client,
+        actor,
+        creatorId,
+        requested,
+      );
+    },
+  };
+  return { approvals, feature, signedSubjects };
 }

@@ -6,6 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import type {
   StoreEntitlementVerifier,
   VerifiedStoreEntitlement,
+  StorePaidHistoryReader,
 } from "./extended.js";
 
 export const StoreProducts = z
@@ -128,6 +129,7 @@ export class StoreMembershipProviders implements StoreEntitlementVerifier {
   async verifyAndFetchCurrent(
     input: { platform: "apple" | "google"; transaction: string },
     actor: Actor,
+    history?: StorePaidHistoryReader,
   ): Promise<VerifiedStoreEntitlement> {
     const provider = this.providers[input.platform];
     invariant(
@@ -135,7 +137,7 @@ export class StoreMembershipProviders implements StoreEntitlementVerifier {
       "store_verification_unconfigured",
       "This store is not configured. No access was granted.",
     );
-    return provider.verifyAndFetchCurrent(input, actor);
+    return provider.verifyAndFetchCurrent(input, actor, history);
   }
   async acknowledge(
     input: { platform: "apple" | "google"; transaction: string },

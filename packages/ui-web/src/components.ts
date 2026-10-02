@@ -1731,7 +1731,11 @@ export function SpendLimit(p: SpendLimitProps) {
     h(
       "div",
       { className: "qv-help" },
-      "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
+      p.remindersOn === true
+        ? copy.limitReminders
+        : p.remindersOn === false
+          ? copy.limitRemindersOff
+          : copy.limitRemindersUnknown,
     ),
   );
 }

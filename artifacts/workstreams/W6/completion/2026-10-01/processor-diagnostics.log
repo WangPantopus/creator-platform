@@ -1,0 +1,3 @@
+{"input":"diagnostic-tone.wav","inputBytes":176478,"inputSha256":"6ea19f9c21aad4a67e55f3e126f2d0b558b13515d001bb69bde1424b4fe71033","capMs":60000,"outputBytes":25722,"mimeType":"audio/mp4","durationMs":2000,"waveformPoints":51,"elapsedMs":14806}
+{"input":"diagnostic-gray.png","inputBytes":3162,"inputSha256":"4b74edadfe020b409e5e52fc9c538d271342111784233779a15aaabecd89c1a8","capMs":0,"outputBytes":3162,"mimeType":"image/png","durationMs":null,"waveformPoints":0,"elapsedMs":12851}
+{"input":"diagnostic-tone.wav","capMs":1000,"result":"media_duration_invalid","elapsedMs":12144}

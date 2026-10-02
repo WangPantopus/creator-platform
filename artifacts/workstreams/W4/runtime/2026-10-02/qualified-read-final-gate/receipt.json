@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T10:35:08.323520+00:00",
+  "workstream": "W4",
+  "state": "implemented consumer integration; genuine producer and paid acceptance unavailable",
+  "changes": [
+    "QualifiedReadAuthority separates early actual current purpose/reader/family/audience custody from final exact source-signature authorization on the same client/transaction/caller/tuple",
+    "Dedupe, ineligible and exhausted-cap branches all reach the final source gate; false or503 rolls back every staged read/credit write",
+    "No domain locks or journal writes after the final source gate; actual context restoration only",
+    "Credit permission uses current mode and original snapshot, real explicit share grant or original public choice, exact accepted captured payment, no refund/pending refund/dispute",
+    "Cap-zero qualified rows no longer claim credited=true",
+    "Call signing preparation locks packet then commitment with NOWAIT and returns503 on contention",
+    "Provider money reconciliation explicitly locks packet before the exact original commitment"
+  ],
+  "validation": {
+    "backendTypecheck": "PASS",
+    "ownedLint": "PASS",
+    "format": "PASS",
+    "sqlPlanning": {
+      "role": "creator_runtime",
+      "postgres": 17,
+      "statements": 34,
+      "byFile": {
+        "packet-locks.ts": 2,
+        "registration.ts": 3,
+        "reconciliation.ts": 6,
+        "extended.ts": 23
+      },
+      "analyze": false,
+      "businessWrites": 0,
+      "result": "PASS"
+    },
+    "personallyOperatedWeb": {
+      "origin": "http://localhost:3004",
+      "api": "owned4104 restarted on this source",
+      "viewport": "390x844",
+      "appearance": "Night",
+      "account": "existing synthetic development fan two with newly pending development creator profile",
+      "result": "Fan financial view remains available: current7USD, original pending No limit activation Oct2 23:44 local, reminders off, zero cash/holds/refunds; usage unavailable",
+      "scope": "Retained fan regression, not qualified-read or payment acceptance"
+    }
+  },
+  "coordination": "W7 confirms no real qualified-read producer exists and agrees final source authorization must follow W4 writes with full rollback on failure. The old single callback is rejected.",
+  "limits": [
+    "No fabricated read/actor/purpose/consent/credit/store receipt/transaction",
+    "No positive credit, anti-farming, concurrency, payment/provider/signature acceptance",
+    "No new unit tests or schema/registry activation",
+    "All nine packages and R01\u2013R15 remain assigned; no release readiness"
+  ],
+  "files": [
+    {
+      "path": "apps/backend/src/modules/commerce/extended.ts",
+      "sha256": "64a7c39462cddb4f8a92fc5303e2cda6691a6fe717ca5af04f7975e87d66623f"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/packet-locks.ts",
+      "sha256": "783b05e532f72aea26043622b8b396386d97d4592ff60fdeda0f047f65ada906"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/registration.ts",
+      "sha256": "7f0dea4f352f6da9d541d0f7926f322d74bf1f0bca7d25dd1ebff30126bce1f4"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/reconciliation.ts",
+      "sha256": "85b8523c34a5951e10141928820130b4e15c2361d5e4e0de11b404b0583ba1de"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/qualified-read-final-gate/fan-return-night.png",
+      "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
+    }
+  ]
+}

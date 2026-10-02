@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-10-02T07:06:00Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "baseSource": "dd582cdb04b7294236f8ed95b08285fe5218a28f",
+  "inheritedW1Source": "a2f059803b9cbc63c6d527af38fb11a25cdefd28",
+  "sourceSha256": {
+    "apps/web/lib/session.ts": "19c2b54ea67cb7cc0127649f4d684c0b99eefa71c790c95692c26d4f1374d58a",
+    "apps/web/lib/session-digest.ts": "d8026b40782fb337f22717d597aa54b97fcf03aff231f0804d9dfb1632e5cb5f",
+    "apps/web/app/error.tsx": "fbf405e6806303034cd99350ab943a6df9b582c5fc5d1896b51166934dc59b74",
+    "apps/web/app/auth/restore/page.tsx": "5d60d14101f8661ea156bc987f0ddf10b6e20a750c54a929abc594c672a3d567",
+    "apps/web/app/api/auth/restore/route.ts": "9d70f712194961442eef6eceea7fd608ccf6a1125a5ec447833d88471cbcda85"
+  },
+  "runtime": {
+    "api": 4102,
+    "web": 3002,
+    "database": 55442,
+    "container": "creator-platform-w2-20261001",
+    "mode": "development"
+  },
+  "actor": "fictional Maya, development actor one / w2_studio_creator",
+  "providerCalls": 0,
+  "actions": [
+    "read actual saved account",
+    "stop only W2 database",
+    "reload own account route in Light/Night at 390x900 and 1280x900",
+    "focused recovery alert, no Welcome, usable Retry56px on phone",
+    "operate real auth restore GET during non401 database failure",
+    "unavailable route retains /identity/account destination",
+    "restart W2 DB; initial readiness probe unready, subsequent probe ready",
+    "click actual Retry link; same account restored without sign-in",
+    "load populated Studio in Night1280x900",
+    "stop only W2 DB again; reload own Studio",
+    "restart and verify database readiness",
+    "click root Retry button; same populated draft restored without page reload/sign-in"
+  ],
+  "outcomes": {
+    "allFourAccountOutageViewsFocusedAlert": true,
+    "allFourHorizontalOverflow": false,
+    "welcomeDuringOutage": false,
+    "refreshRecoverySameAccount": true,
+    "rootRetryRestoredStudio": true,
+    "studioExamples": 20,
+    "draftRevision": 15
+  },
+  "screenshots": {
+    "session-outage-light-phone.png": "2c9e99cbc640dc8fabffcf94d9c37299e99503142feec687f0d32089e4079931",
+    "session-outage-night-phone.png": "869077845c28bf72c1af08f772d05b76a3bdf994a56e3dacad5be8fb1a63a601",
+    "session-outage-light-desktop.png": "03cf1a4ed1ccf071e87968d3cf80e861b662a04cc66bcc0475e401913ba28934",
+    "session-outage-night-desktop.png": "7329a47914e889e86eaf8485567945a54341f2e4a75c2687bc381cad431cb586",
+    "session-restore-unavailable-phone.png": "a3e0a60430d0e87d472a6b541bf37f2451d2af31d26375c1c4589fd7ccfe7ab0",
+    "session-restore-recovered-phone.png": "4edd1ac56fcdb61ada003cf9032b5fd5eeae3bc674d803c6390d4b6316f89bde",
+    "studio-outage-night-desktop.png": "bde451e3897e1c1d6c8dfa9580fd59f8840936654ff54c83cfade1f7747e040f",
+    "studio-retry-recovered-night-desktop.png": "267462b6fe2163ca14d1bbe820e47fd2ed538f228c9f1083dfcacf27f2dd3542"
+  },
+  "checks": {
+    "webTypecheck": "pass",
+    "scopedEslint": "pass",
+    "prettier": "pass",
+    "sharedGeneration": "12 resources verified",
+    "newTests": 0
+  },
+  "limits": [
+    "Personally operated development runtime, not W2 production-mode acceptance.",
+    "W1 implementation authorship/source preserved; inherited W1 production evidence is separate.",
+    "No expired-token or interrupted successful rotation was injected; these cases are source-reviewed, not personally verified here.",
+    "No provider, publication, native delivery, screen-reader or p95 claim.",
+    "W2 database is running again; no peer database/device was stopped."
+  ]
+}

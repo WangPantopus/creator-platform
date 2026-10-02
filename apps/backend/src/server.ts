@@ -60,6 +60,9 @@ const configured =
             ? await createCommerceStudio({
                 assertScopeAllowedInTransaction:
                   runtime.assertScopeAllowedInTransaction,
+                ...(commerce?.publicPacketRead
+                  ? { publicPacketRead: commerce.publicPacketRead }
+                  : {}),
                 pool: runtime.pool,
                 owners: {
                   commerce: commerce?.service,
