@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T11:04:39.135945+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "authorCheckpoint": "ea25161059998c8e08c6f8a7a2e0eb208f025b13",
+  "consumedCommit": "6c8f25d2",
+  "baseMain": "5b597230b27c156baa0badb5b2db495817309eea",
+  "endpoint": "http://127.0.0.1:4102/health/ready",
+  "before": {
+    "status": 404,
+    "runtimeMain": "ad47dfe5"
+  },
+  "after": {
+    "databaseUpStatus": 503,
+    "databaseDownStatus": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T10:59:37.820Z"
+        }
+      ]
+    },
+    "outageBody": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T11:01:27.091Z"
+        }
+      ]
+    }
+  },
+  "database": "owned creator_w2/55442,40 migrations",
+  "recovery": {
+    "firstPgReadyExit": 1,
+    "firstMessage": "rejecting connections",
+    "subsequentPgReadyExit": 0
+  },
+  "verification": {
+    "backendTypecheck": "passed"
+  },
+  "providerCalls": 0,
+  "durableWrites": 0,
+  "limits": [
+    "Missing Trust remains unavailable; this fallback does not claim registered Trust/readiness or live DB health monitoring.",
+    "No provider approval or production readiness."
+  ]
+}

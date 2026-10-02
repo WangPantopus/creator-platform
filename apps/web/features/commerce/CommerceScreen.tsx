@@ -191,6 +191,7 @@ type Overview = {
 };
 type Detail = {
   packet: Packet;
+  callTransport?: commerceContracts.CallTransportStatus | null;
   commitment: {
     id: string;
     state: string;
@@ -1616,6 +1617,25 @@ function CommerceAccountScreen({
                         )?.display_name ?? "The creator",
                       )}
                     />
+                    {detail.callTransport && (
+                      <section
+                        className="commerce-card"
+                        aria-label="Call transport status"
+                      >
+                        <h2>System · call status</h2>
+                        <p>
+                          {detail.callTransport.state === "closed_unresolved"
+                            ? "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved."
+                            : "Current call status is unavailable. Your recorded receipt remains available."}
+                        </p>
+                        {detail.callTransport.state === "closed_unresolved" && (
+                          <p>
+                            Recorded {date(detail.callTransport.recordedAt)}.
+                            Check the current receipt for billing status.
+                          </p>
+                        )}
+                      </section>
+                    )}
                     {detail.packet.state === "more_info" &&
                       detail.packet.question && (
                         <section className="commerce-card">
@@ -1710,7 +1730,16 @@ function CommerceAccountScreen({
                               detail.commitment.evidence?.authorKind ===
                               "approved_draft"
                                 ? `Prepared by AI · approved by ${data.creators.find((c) => c.id === detail.packet.creator_id)?.display_name ?? "the creator"}`
-                                : `${detail.packet.snapshot.title} · personally fulfilled by the creator`
+                                : detail.commitment.evidence?.authorKind ===
+                                    "human_creator"
+                                  ? `${detail.packet.snapshot.title} · personally fulfilled by the creator`
+                                  : detail.commitment.evidence?.authorKind ===
+                                      "human_call"
+                                    ? "Personal call · provider-confirmed outcome"
+                                    : detail.commitment.evidence?.authorKind ===
+                                        "system"
+                                      ? "System delivery notice"
+                                      : "Delivery recorded"
                             }
                           />
                           {detail.commitment.evidence?.signedActId && (
