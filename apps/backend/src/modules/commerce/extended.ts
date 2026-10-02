@@ -386,6 +386,13 @@ export class ExtendedCommerce {
         "qualified_read_binding_mismatch",
         "The durable read must match its original evidence identity.",
       );
+      // The authority's temporary context was restored above. Scope our own
+      // thread reads to the validated canonical receipt, retaining the real
+      // caller account for commerce RLS and the command/ledger custody.
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+        [evidence.creatorId, evidence.fanId],
+      );
       const thread = await client.query(
         "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
         [evidence.threadId, evidence.creatorId, evidence.fanId],

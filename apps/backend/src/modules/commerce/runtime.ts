@@ -2,7 +2,11 @@ import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { PaymentProvider } from "../payments/provider.js";
-import { CommerceService, type CommercePolicy } from "./service.js";
+import {
+  CommerceService,
+  type CommercePolicy,
+  type CommerceCreatorReadAuthority,
+} from "./service.js";
 import {
   MembershipBilling,
   type MembershipBillingProvider,
@@ -76,6 +80,9 @@ export async function createCommerceRuntime(input: {
   assertActorAllowed?: (
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
+  /** Actual W8 creator-wide denial held on the owner projection transaction.
+   * No default or outside-client creator check enables earnings. */
+  assertCreatorReadAllowed?: CommerceCreatorReadAuthority;
 }) {
   invariant(
     !input.generationCostUnits,
@@ -132,6 +139,7 @@ export async function createCommerceRuntime(input: {
           assertReady: input.trialReadiness.bind(input),
         })
       : undefined,
+    input.assertCreatorReadAllowed,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);
