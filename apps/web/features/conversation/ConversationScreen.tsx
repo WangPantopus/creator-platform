@@ -26,6 +26,44 @@ import type {
 import { useConversationRequest, ConversationError } from "./api";
 import { formatCopy } from "@qelvora/copy";
 import { VoicePlayer } from "../media/VoicePlayer";
+import { ConversationSystemLinkSchema } from "../../../../packages/api/src/conversation/system-link";
+
+function SystemMessage({
+  message,
+  creatorId,
+  online,
+}: {
+  message: ConversationMessage;
+  creatorId: string;
+  online: boolean;
+}) {
+  const parsed = ConversationSystemLinkSchema.safeParse(message.systemLink);
+  const link =
+    online &&
+    message.authorKind === "system" &&
+    message.deliveryState === "delivered" &&
+    message.signedActId === null &&
+    message.authorAccountId == null &&
+    message.text === "Answered publicly." &&
+    parsed.success &&
+    parsed.data.creatorId === creatorId
+      ? parsed.data
+      : null;
+  return (
+    <SystemLine>
+      {link ? (
+        <a
+          href={`/content/${link.creatorId}/${link.contentId}`}
+          aria-label="System update: Answered publicly. Open answer"
+        >
+          {link.label}
+        </a>
+      ) : (
+        message.text
+      )}
+    </SystemLine>
+  );
+}
 import "./conversation.css";
 
 type Pending = {
@@ -619,7 +657,11 @@ export function ConversationScreen({
             aria-label={author(message, page.creatorName)}
           >
             {message.authorKind === "system" ? (
-              <SystemLine>{message.text}</SystemLine>
+              <SystemMessage
+                message={message}
+                creatorId={page.creatorId}
+                online={online}
+              />
             ) : message.recording ? (
               message.recording.state === "available" &&
               message.threadId === page.threadId &&

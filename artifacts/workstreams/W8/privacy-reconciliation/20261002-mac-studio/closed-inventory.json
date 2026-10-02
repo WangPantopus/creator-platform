@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T12:41:36.213Z",
+  "kind": "read-only-closed-target-inventory",
+  "trafficReady": false,
+  "closureVerified": true,
+  "ledger": {
+    "rows": 57,
+    "sha256": "d1387f507c2ac415b0b3f6043e84fdcefa7d3c8ab457f64bcfe6e2bd3f699a5e"
+  },
+  "roles": {
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "publicCapabilities": 327,
+    "pinnedPublicFunctions": 23
+  },
+  "security": {
+    "records": 14685,
+    "sha256": "9cec9da8b44f60bff53dd6f99bf5032a1b6063d991a5717047c609e4322e936b"
+  },
+  "sequence": {
+    "sequences": 1,
+    "sha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71"
+  },
+  "privacy": {
+    "jobs": 1,
+    "tombstones": 0,
+    "unverified_jobs": 0,
+    "unknown_ownership": 0,
+    "deletion_jobs_without_tombstones": 0,
+    "mismatched_tombstones": 0,
+    "jobs_missing_domains": 0,
+    "unexpected_domains": 0,
+    "expired_running_tasks": 0,
+    "inconsistent_complete_jobs": 0,
+    "invalid_complete_receipts": 0,
+    "indefinite_retention_records": 0,
+    "expired_retention_records": 0
+  },
+  "domains": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "count": 1
+    },
+    {
+      "domain": "commerce",
+      "state": "complete",
+      "count": 1
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "count": 1
+    },
+    {
+      "domain": "conversation",
+      "state": "complete",
+      "count": 1
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "count": 1
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "count": 1
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "count": 1
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "count": 1
+    }
+  ],
+  "effects": [],
+  "relations": {
+    "creator.generation": 0,
+    "creator.commerce_packet": 0,
+    "creator.commerce_ledger": 0,
+    "creator.commerce_effect": 0,
+    "creator_trust.privacy_commit_scope": null,
+    "creator.generation_worker_scope": null
+  },
+  "unverifiedGates": [
+    "independently trusted journal provenance and replay",
+    "actual owner purge/export receipts and stored artifact verification",
+    "approved purpose-specific retention and expiry",
+    "original financial/provider reconciliation and capability readiness",
+    "current genuine family/acceptance/denial authority",
+    "launched web, Android and iOS acceptance at the candidate revision"
+  ]
+}

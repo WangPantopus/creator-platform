@@ -1068,6 +1068,13 @@ data class APICallCallRevision(
 )
 
 @Serializable
+data class APICallCallRoute(
+  val `sessionId`: String,
+  val `creatorId`: String,
+  val `fanId`: String
+)
+
+@Serializable
 data class APICallCallSummaryNote(
   val `note`: String,
   val `expectedVersion`: Long,
@@ -2615,6 +2622,8 @@ data class APIProof(
   val `code`: String,
   val `platform`: APIProofPlatform,
   val `accountUrl`: String,
+  @Required
+  val `postUrl`: String? = null,
   val `expiresAt`: String,
   val `state`: APIProofState,
   @Required
@@ -2965,7 +2974,8 @@ data class APIMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIMessageSystemLink? = null
 )
 
 @Serializable
@@ -2991,6 +3001,25 @@ enum class APIMessageDeliveryState {
 }
 
 @Serializable
+data class APIMessageSystemLink(
+  val `kind`: APIMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
   @Required
@@ -3009,7 +3038,8 @@ data class APIAcceptedMessageMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIAcceptedMessageMessageSystemLink? = null
 )
 
 @Serializable
@@ -3035,6 +3065,25 @@ enum class APIAcceptedMessageMessageDeliveryState {
 }
 
 @Serializable
+data class APIAcceptedMessageMessageSystemLink(
+  val `kind`: APIAcceptedMessageMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIAcceptedMessageMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIFrame(
   val `threadId`: String,
   val `cursor`: Long,
@@ -3046,7 +3095,8 @@ data class APIFrame(
   @Required
   val `generationId`: String? = null,
   val `sequence`: Long,
-  val `control`: APIFrameControl? = null
+  val `control`: APIFrameControl? = null,
+  val `systemLink`: APIFrameSystemLink? = null
 )
 
 @Serializable
@@ -3078,6 +3128,25 @@ enum class APIFrameControl {
   @SerialName("ai_paused") AI_PAUSED,
   @SerialName("closed") CLOSED,
   @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIFrameSystemLink(
+  val `kind`: APIFrameSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIFrameSystemLinkLabel
+)
+
+@Serializable
+enum class APIFrameSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIFrameSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3126,7 +3195,8 @@ data class APIThreadTimelineMessagesItem(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIThreadTimelineMessagesItemSystemLink? = null
 )
 
 @Serializable
@@ -3149,6 +3219,25 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIThreadTimelineMessagesItemSystemLink(
+  val `kind`: APIThreadTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIThreadTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3315,6 +3404,7 @@ data class APIConversationConversationMessage(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationMessageSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3345,6 +3435,25 @@ enum class APIConversationConversationMessageDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationMessageSystemLink(
+  val `kind`: APIConversationConversationMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3412,6 +3521,7 @@ data class APIConversationConversationPageMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationPageMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3442,6 +3552,25 @@ enum class APIConversationConversationPageMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemSystemLink(
+  val `kind`: APIConversationConversationPageMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationPageMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3561,6 +3690,7 @@ data class APIConversationConversationTimelineMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationTimelineMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3591,6 +3721,25 @@ enum class APIConversationConversationTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemSystemLink(
+  val `kind`: APIConversationConversationTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -4975,6 +5124,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
