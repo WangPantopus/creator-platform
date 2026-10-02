@@ -51,6 +51,8 @@ export type CreatorVoiceRecordingProps = {
   objectId: string;
   expectedAccountId?: string;
   creatorName?: string;
+  /** The Studio dialog already supplies this surface's visible heading. */
+  embedded?: boolean;
   /** Client host owns saving the attachment and signing the complete Note. */
   onReady?: (
     asset: CreatorMediaAsset,
@@ -605,7 +607,7 @@ function RecordingForm({
         )}
       {(!available || !family) && (
         <p className="qv-help">
-          {copy.w6SignInToAConfiguredCreatorAccountToUploadAnd}
+          {copy.w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice}
         </p>
       )}
     </section>

@@ -22,6 +22,7 @@ import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
+import { canonicalContentFollows } from "../growth/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -201,6 +202,7 @@ const backend = await createConfiguredBackend({
             growth: {
               service: growth.service,
               signing: runtime.identity.signing,
+              follows: { follows: canonicalContentFollows() },
             },
           }
         : {}),
@@ -235,42 +237,19 @@ const backend = await createConfiguredBackend({
   },
 });
 features.growth?.start();
-let sweeping = false;
-const worker =
-  process.env.W5_CONTENT_WORKER === "1"
-    ? setInterval(() => {
-        if (sweeping) return;
-        sweeping = true;
-        void (async () => {
-          for (const identityActor of identity.developmentActors) {
-            const actor = await identity.resolveSession(
-              `development:${identityActor.id}`,
-            );
-            const current = await studio.session(actor);
-            for (const creator of current.creators)
-              if (creator.owned && creator.verification === "verified") {
-                await content.runScheduled(actor, creator.id);
-                await content.drainEffects(actor, creator.id);
-              }
-          }
-        })()
-          .catch((failure) =>
-            process.stderr.write(
-              `W5 worker deferred: ${failure instanceof DomainError ? failure.code : "owner_unavailable"}\n`,
-            ),
-          )
-          .finally(() => {
-            sweeping = false;
-          });
-      }, 5000)
-    : undefined;
+// Development identity is interactive only. Background publication must be
+// mounted with W1's separate activated purpose issuer and W8's held denial.
+// Never synthesize a development creator session to sweep stored signatures.
+if (process.env.W5_CONTENT_WORKER === "1")
+  process.stderr.write(
+    "W5 publication worker unavailable: the separate W1/W8 purpose authority is not configured in this host.\n",
+  );
 backend.server.listen(apiPort, "127.0.0.1", () =>
   process.stdout.write(
     `W5 API${apiPort} · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n`,
   ),
 );
 const stop = () => {
-  if (worker) clearInterval(worker);
   void (async () => {
     await features.growth?.close();
     await features.agentPool?.end();

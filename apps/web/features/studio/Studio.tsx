@@ -8,8 +8,8 @@ import {
   useRef,
   useState,
   type ReactNode,
-  type ReactElement,
   type RefObject,
+  type ReactElement,
   type AnchorHTMLAttributes,
 } from "react";
 import Link from "next/link";
@@ -47,6 +47,7 @@ import {
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ConversationVoiceReply } from "./ConversationVoiceReply";
+import { AvailabilityEditor } from "../calls/AvailabilityEditor";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
@@ -1008,6 +1009,8 @@ function Modal({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
+    // An async save may disable the trigger before this modal mounts, moving
+    // focus to body. Preserve the explicit media trigger in that case.
     const restore =
       restoreFocusTo?.current ?? (document.activeElement as HTMLElement | null);
     const dialog = ref.current;
@@ -1124,6 +1127,7 @@ function Compose({
     } | null>(null),
     [schedule, setSchedule] = useState(""),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
+    voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
@@ -1489,6 +1493,7 @@ function Compose({
             Photo
           </button>
           <button
+            ref={voiceTrigger}
             className="qv-btn qv-btn--quiet"
             type="button"
             disabled={
@@ -1764,7 +1769,11 @@ function Compose({
         </Modal>
       )}
       {voiceObjectId && canDraft && (
-        <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
+        <Modal
+          title="Your own voice"
+          onClose={() => setVoiceObjectId(null)}
+          restoreFocusTo={voiceTrigger}
+        >
           {(() => {
             const Recorder =
               document.kind === "post"
@@ -1772,6 +1781,7 @@ function Compose({
                 : CreatorVoiceRecording;
             return (
               <Recorder
+                embedded
                 creatorId={creator.id}
                 expectedAccountId={creator.viewerAccountId}
                 creatorName={creator.display_name}
@@ -3923,6 +3933,7 @@ function ThanksFeed({ creator }: { creator: Creator }) {
   );
 }
 function More({ creator }: { creator: Creator }) {
+  const { signal } = useIdentityRequest();
   return (
     <section className="w5-more">
       <header className="w5-heading">
@@ -3951,6 +3962,13 @@ function More({ creator }: { creator: Creator }) {
         Personal signing and commitments stay with the creator. Support access
         is scoped and audited.
       </p>
+      {creator.owned && creator.verification === "verified" && (
+        <AvailabilityEditor
+          creatorId={creator.id}
+          accountId={creator.viewerAccountId}
+          signal={signal}
+        />
+      )}
     </section>
   );
 }

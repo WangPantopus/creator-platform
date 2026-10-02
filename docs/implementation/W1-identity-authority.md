@@ -127,6 +127,7 @@ JAVA_HOME='/Applications/Android Studio.app/Contents/jbr/Contents/Home' ANDROID_
 
 Historically, the appearance argument selected night for the app's debug theme, and Android required process relaunch to apply changed theme/API arguments. Former AVD/recovery paths above are historical and must not be treated as retained devices. No native device was allocated in this October1 W1 run. Supported native UI control remains unavailable; CLI install/launch or a compiler result is not interactive acceptance, and disabled controls must not be circumvented.
 
+Replace only the appearance argument with night for the app's debug theme. Android requires process relaunch to apply changed theme/API arguments. W1's original AVD data is retained at /private/tmp/creator-w1-avd; the current same-serial recovery uses /private/tmp/creator-w1-android-recovery with host GPU,2cores,2048MB and no snapshots. See the run manifest for the actual launch/capture outcome; CLI launch is not interactive acceptance.
 
 ## Publication worker issuer proposal — October 2, 2026
 

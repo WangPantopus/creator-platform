@@ -1,0 +1,36 @@
+{
+  "headRefOid": "c9c8b46d9193e410eb6becbcee947931347f47bd",
+  "mergeCommit": {
+    "oid": "8e07dd43120a0c771a6ebad45dee3d826e61510d"
+  },
+  "mergedAt": "2026-10-02T13:12:27Z",
+  "state": "MERGED",
+  "checksAtMerge": [
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": ""
+    },
+    {
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": ""
+    },
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": ""
+    }
+  ],
+  "qualification": "Normal GitHub merge with affected backend/web and Android runtime success; three Mac jobs remained queued, not accepted. GitHub main branch protection API reported unprotected."
+}
