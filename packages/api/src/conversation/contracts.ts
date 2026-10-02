@@ -10,6 +10,8 @@ import {
 
 export const ProviderPolicySchema = z.strictObject({
   version: z.string().min(1).max(120),
+  /** An explicit policy reference is metadata, never proof of review. */
+  reference: z.string().min(1).max(120).optional(),
   providers: z
     .array(
       z.strictObject({

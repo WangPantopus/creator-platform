@@ -13,6 +13,7 @@ import {
   PreparedGenerationJournal,
 } from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
+import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
@@ -28,6 +29,10 @@ import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
 import { createConversationRuntime } from "./runtime.js";
+import {
+  DevelopmentConversationPolicy,
+  SYNTHETIC_PROVIDER_REFERENCE,
+} from "./development-policy.js";
 
 const migrations = {
   journal: GENERATION_JOURNAL_MIGRATION,
@@ -133,7 +138,36 @@ export async function composeConversationHost(
         JSON.parse(await readFile(env.W3_PROVIDER_POLICY_FILE, "utf8")),
       )
     : undefined;
-  if (!policy?.verified) missing.push("named provider policy");
+  let developmentPolicy: DevelopmentConversationPolicy | undefined;
+  if (
+    requested &&
+    producers.licenseVerifier instanceof DevelopmentLicenseVerifier
+  ) {
+    invariant(
+      !policy?.verified,
+      "synthetic_policy_unreviewed_required",
+      "Synthetic development policy must remain unreviewed. It cannot represent provider approval.",
+    );
+    if (
+      policy?.reference === SYNTHETIC_PROVIDER_REFERENCE &&
+      runtime.identity?.sessions
+    )
+      developmentPolicy = DevelopmentConversationPolicy.prepare({
+        pool: runtime.pool,
+        policy,
+        verifier: producers.licenseVerifier,
+        sessions: runtime.identity.sessions,
+        reference: env.W2_PROVIDER_POLICY_REFERENCE,
+        host: {
+          environment: env.NODE_ENV,
+          enabled: env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+          identityMode: config.identityAdapter,
+          webOrigin: config.allowedOrigin,
+        },
+      });
+  }
+  if (!policy?.verified && !developmentPolicy)
+    missing.push("named provider policy");
   const economics =
     requested && env.W3_DEVELOPMENT_ECONOMICS_FILE
       ? DevelopmentEconomicsSchema.parse(
@@ -261,13 +295,36 @@ export async function composeConversationHost(
             bound = conversationAgentGenerator(runtime.database, agent);
             return bound.generator;
           },
-          assertReady: (scope: ThreadScope, client: PoolClient) =>
-            current().assertReady(scope, client),
+          assertReady: (scope: ThreadScope, client: PoolClient) => {
+            invariant(
+              !developmentPolicy ||
+                developmentPolicy.allowsAccounts(
+                  scope.actorAccountId,
+                  scope.fanAccountId,
+                  scope.creatorAccountId,
+                ),
+              "synthetic_accounts_required",
+              "Use configured fictional development accounts.",
+            );
+            return current().assertReady(scope, client);
+          },
           assertApproved: (
             scope: ThreadScope,
             client: PoolClient,
             sentence: ApprovedSentence,
-          ) => current().assertApproved(scope, client, sentence),
+          ) => {
+            invariant(
+              !developmentPolicy ||
+                developmentPolicy.allowsAccounts(
+                  scope.actorAccountId,
+                  scope.fanAccountId,
+                  scope.creatorAccountId,
+                ),
+              "synthetic_accounts_required",
+              "Use configured fictional development accounts.",
+            );
+            return current().assertApproved(scope, client, sentence);
+          },
           citation: (scope: ThreadScope, id: string) =>
             current().citation(scope, id),
           generationCostReconciliation: commerce.generationCostReconciliation,
@@ -277,6 +334,7 @@ export async function composeConversationHost(
   const conversation = createConversationRuntime({
     ...runtime,
     ...(policy ? { policy } : {}),
+    ...(developmentPolicy ? { developmentPolicy } : {}),
     ...(env.W3_OFFLINE_ISSUER_ORIGIN
       ? {
           offlineIssuer: {
@@ -330,7 +388,7 @@ export async function composeConversationHost(
   if (requested)
     process.stdout.write(
       available
-        ? "Fan generation: available (development configuration).\n"
+        ? "Fan generation: available (development configuration; unreviewed policy; fictional accounts only).\n"
         : `Fan generation: unavailable; missing ${missing.join(", ") || "configured runtime"}.\n`,
     );
   return {

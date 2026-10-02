@@ -760,6 +760,28 @@
         }
       }
     },
+    "Unreviewed development policy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unreviewed development policy"
+          }
+        }
+      }
+    },
+    "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply."
+          }
+        }
+      }
+    },
     "Want me to remember this? Only if you say yes.": {
       "extractionState": "manual",
       "localizations": {

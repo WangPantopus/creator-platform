@@ -16,6 +16,7 @@ import type { ProviderPolicy } from "../../../../../packages/api/src/conversatio
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import { invariant } from "../../core/errors.js";
+import { DevelopmentConversationPolicy } from "./development-policy.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
@@ -26,6 +27,7 @@ export function createConversationRuntime(input: {
   access: AccessService;
   conversation: ConversationService;
   policy?: ProviderPolicy;
+  developmentPolicy?: DevelopmentConversationPolicy;
   offlineIssuer?: { origin: string; environment: string | undefined };
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
@@ -51,6 +53,14 @@ export function createConversationRuntime(input: {
   ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
+  invariant(
+    !input.developmentPolicy ||
+      (input.developmentPolicy instanceof DevelopmentConversationPolicy &&
+        input.policy &&
+        input.developmentPolicy.isFor(input.database.pool, input.policy)),
+    "synthetic_policy_pool_mismatch",
+    "The development policy must belong to this conversation database and exact policy.",
+  );
   invariant(
     !(input.allowance && input.generationCostReconciliation),
     "allowance_conflict",
@@ -116,7 +126,7 @@ export function createConversationRuntime(input: {
         input.citation &&
         input.assertReady &&
         input.assertApproved &&
-        input.policy?.verified,
+        (input.policy?.verified || input.developmentPolicy),
     ),
     (scope) => processor?.schedule(scope),
     conversationSocketTickets,
@@ -150,6 +160,7 @@ export function createConversationRuntime(input: {
           input.offlineIssuer.environment,
         )
       : undefined,
+    input.developmentPolicy,
   );
   return {
     feature,

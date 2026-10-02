@@ -42,8 +42,8 @@ fun ConversationMessage.authorLabel(name: String): String = if (correction != nu
     val unavailableReason: String? = null, val feedbackPolicy: ConversationFeedbackPolicy? = null
 )
 @Serializable data class ConversationProvider(val name: String, val termsUrl: String, val noTraining: Boolean, val noRetention: Boolean)
-@Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean)
-@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String)
+@Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean, val reference: String? = null)
+@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String, val developmentSynthetic: Boolean = false)
 @Serializable data class ConversationMemory(val id: String, val kind: String, val text: String, val provenanceMessageId: String, val sensitiveCategory: String? = null, val state: String, val editedByFan: Boolean, val createdAt: String)
 @Serializable data class ConversationMemories(val revision: Long, val offTheRecord: Boolean, val introShared: Boolean, val items: List<ConversationMemory>)
 @Serializable data class ConversationAudit(val id: String, val readerAccountId: String, val role: String, val readAt: String)

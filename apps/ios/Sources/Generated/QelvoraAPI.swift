@@ -6879,10 +6879,12 @@ public enum APIConversationMemoryProposalKind: String, Codable, Sendable {
 
 public struct APIConversationProviderPolicy: Codable, Sendable {
   public let `version`: String
+  public let `reference`: String?
   public let `providers`: [APIConversationProviderPolicyProvidersItem]
   public let `verified`: Bool
-  public init(version: String, providers: [APIConversationProviderPolicyProvidersItem], verified: Bool) {
+  public init(version: String, reference: String? = nil, providers: [APIConversationProviderPolicyProvidersItem], verified: Bool) {
     self.version = version
+    self.reference = reference
     self.providers = providers
     self.verified = verified
   }
