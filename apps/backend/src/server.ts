@@ -14,7 +14,10 @@ import {
 import { mediaFeature } from "./modules/media/registration.js";
 import { readMediaEnvironment } from "./modules/media/environment.js";
 import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
-import { createDevelopmentTrust } from "./modules/trust/development.js";
+import {
+  createDevelopmentTrust,
+  developmentTrustActors,
+} from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { DomainError } from "./core/errors.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
@@ -23,6 +26,22 @@ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js"
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
+function canonicalDevelopmentIdentity() {
+  const identity = new DevelopmentIdentityAdapter(
+    config.allowedOrigin,
+    process.env.NODE_ENV,
+  );
+  if (process.env.TRUST_LOCAL_DEVELOPMENT === "true") {
+    const labels = new Map(
+      developmentTrustActors.map((actor) => [actor.id, actor.label]),
+    );
+    // Labels describe existing synthetic accounts; the real Ops membership
+    // check and canonical session issuer still decide every permission.
+    for (const actor of identity.developmentActors)
+      actor.label = labels.get(actor.id) ?? actor.label;
+  }
+  return identity;
+}
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   close: (() => void)[];
@@ -35,10 +54,7 @@ const configured =
   config.identityAdapter === "development"
     ? await createConfiguredBackend({
         config,
-        identity: new DevelopmentIdentityAdapter(
-          config.allowedOrigin,
-          process.env.NODE_ENV,
-        ),
+        identity: canonicalDevelopmentIdentity(),
         guardrails: {
           checkSentence: async () => {
             throw new Error("AI generation is unconfigured.");
