@@ -9,7 +9,7 @@
     "runtime.ts": "070de74671f76445ff735d0d00c15efadd05d1292c9c246fd75a191b2eabe466",
     "pipeline.ts": "50c9a4d0e24ddf76ee46d495020a7f0fead3fb5e0d0a667487ca8c32abbc652a",
     "provider-usage.ts": "2cc6232f94419236023986801c531ae58061b1c57945e4cc46e57d589188101a",
-    "generation-journal.ts": "21f762c67dec722b520d4752a50d040359196a95822beab451677e3cc39476d3"
+    "generation-journal.ts": "587760904e7dcdc62f793bc4b5d2a640ba91178f6016a61eeb1815e1481d86e3"
   },
   "implementation": {
     "sourceKinds": [
@@ -58,5 +58,6 @@
     "Predefined deterministic crisis text remains canonical English; multilingual safety copy acceptance remains open.",
     "No native/web translation UX or named p95 acceptance claimed.",
     "No new unit tests or fabricated signature/consent/lease authority."
-  ]
+  ],
+  "reconciledMain": "5e39b41d8e369f51fb033e5197864072513f58a3"
 }

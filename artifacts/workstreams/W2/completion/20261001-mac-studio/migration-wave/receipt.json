@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "source": "W8 PR95 exact58b59fa0e5b8937af7cd0cb7272ae5b5662d7ee7",
+  "host": "Yingpengs-Mac-Studio.local",
+  "ownedDatabase": "creator_w2_wave_20261002 on55442",
+  "liveCreatorW2": "untouched canonical40",
+  "backup": {
+    "bytes": 541857,
+    "sha256": "206415d467c57f4790e813d807bc01da2c6eaf8d50983383db13e6fb3a11bc14",
+    "private": true,
+    "list": "passed",
+    "separateRestore": "creator_w2_wave_restore_20261002",
+    "ledgerCatalogDataMatch": true
+  },
+  "upgrade": {
+    "trafficClosed": true,
+    "connectionLimit": 0,
+    "priorLedger": 40,
+    "finalLedger": 57,
+    "previousChecksumTimestampsPreserved": true,
+    "originalBusinessRows": 42,
+    "originalTables": 145,
+    "originalDataPreserved": true,
+    "oldRoleAttributesPreserved": true,
+    "oneTransactionApplied": 17
+  },
+  "fresh": {
+    "database": "creator_w2_wave_fresh_20261002",
+    "ledger": 57,
+    "transactionCatalogMatchesUpgrade": true,
+    "catalogSha256": "fea364febf838ca396a921dfb86b9a80be14eac513c6e68ba7d1e07211efbe18"
+  },
+  "rollbackRuntimeProbe": {
+    "role": "creator_runtime",
+    "fictionalOwnerNegativeProjection": "allowed (absence of denial only)",
+    "absentCreator": "unavailable",
+    "ownAiWorkspace": 1,
+    "privateTrustSelect": false,
+    "internalDenialExecute": false
+  },
+  "reviewFinding": "Initial wave did not reject unsafe pre-existing colliding definer/discovery roles; W8 accepted and is adding preflight custody without editing pinned SQL.",
+  "limits": [
+    "No initial-wave activation-ready claim until role/grant preflight review is closed.",
+    "No native/web/provider/C10 or original iMac recovery acceptance.",
+    "0077/0079 accounting and0078 chunks stay held; no aliases or history rewrites."
+  ],
+  "roleGuardFollowup": {
+    "source": "a71994f5",
+    "method": "assertWaveRoleSafety in BEGIN on already57 closed target; no SQL replay",
+    "baseline": {
+      "roles": 3,
+      "pinnedFunctions": 7,
+      "directCapabilities": 82
+    },
+    "bypassRlsRoleDrift": "refused",
+    "publicSelectOnPrivateAiSourceDrift": "accepted (remaining defect)",
+    "allProbesRolledBack": true,
+    "privateSourceRowsRead": 0,
+    "liveRuntimeChanged": false,
+    "W8Notified": true
+  }
+}
