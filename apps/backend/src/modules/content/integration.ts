@@ -7,7 +7,10 @@ import { createCommercePublicationPermission } from "../commerce/publication.js"
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
-import { createContentTenureHost } from "./tenure.js";
+import {
+  createContentCreatorTenureHost,
+  createContentTenureHost,
+} from "./tenure.js";
 import {
   ContentPublicationWorker,
   type ContentPublicationDependencies,
@@ -42,6 +45,7 @@ export type CurrentThanksTarget = (input: {
   fanAccountId: string;
   targetKind: string;
   targetId: string;
+  signal?: AbortSignal;
 }) => Promise<boolean>;
 
 export type ContentFollowReaders = {
@@ -72,6 +76,7 @@ export function composeContentHost(input: {
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   tenure?: Parameters<typeof createContentTenureHost>[0];
+  creatorTenure?: Parameters<typeof createContentCreatorTenureHost>[0];
   publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
@@ -101,6 +106,9 @@ export function composeContentHost(input: {
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
+    ...(input.creatorTenure
+      ? createContentCreatorTenureHost(input.creatorTenure)
+      : {}),
     ...(input.publicationSource
       ? { publicationSource: input.publicationSource }
       : {}),

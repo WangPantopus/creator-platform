@@ -2550,9 +2550,10 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
   public let `text`: String
   public let `version`: Int
   public let `createdAt`: String
+  public let `tenure`: APIContentReplyListItemsItemTenure?
   public let `consent`: APIContentReplyListItemsItemConsent
   public let `reaction`: APIContentReplyListItemsItemReaction?
-  public init(safetyState: APIContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
+  public init(safetyState: APIContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, tenure: APIContentReplyListItemsItemTenure? = nil, consent: APIContentReplyListItemsItemConsent, reaction: APIContentReplyListItemsItemReaction? = nil) {
     self.safetyState = safetyState
     self.safetyReviewAvailable = safetyReviewAvailable
     self.read = read
@@ -2563,6 +2564,7 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
     self.text = text
     self.version = version
     self.createdAt = createdAt
+    self.tenure = tenure
     self.consent = consent
     self.reaction = reaction
   }
@@ -2577,6 +2579,7 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
     case `text`
     case `version`
     case `createdAt`
+    case `tenure`
     case `consent`
     case `reaction`
   }
@@ -2592,6 +2595,7 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
     self.text = try container.decode(String.self, forKey: .text)
     self.version = try container.decode(Int.self, forKey: .version)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.tenure = try container.decodeIfPresent(APIContentReplyListItemsItemTenure.self, forKey: .tenure)
     self.consent = try container.decode(APIContentReplyListItemsItemConsent.self, forKey: .consent)
     self.reaction = try container.decode(APIContentReplyListItemsItemReaction?.self, forKey: .reaction)
   }
@@ -2607,6 +2611,7 @@ public struct APIContentReplyListItemsItem: Codable, Sendable {
     try container.encode(text, forKey: .text)
     try container.encode(version, forKey: .version)
     try container.encode(createdAt, forKey: .createdAt)
+    try container.encodeIfPresent(tenure, forKey: .tenure)
     try container.encode(consent, forKey: .consent)
     try container.encode(reaction, forKey: .reaction)
   }
@@ -2616,6 +2621,59 @@ public enum APIContentReplyListItemsItemSafetyState: String, Codable, Sendable {
   case `pending` = "pending"
   case `allowed` = "allowed"
   case `flagged` = "flagged"
+}
+
+public struct APIContentReplyListItemsItemTenure: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentReplyListItemsItemTenureBasis
+  public let `historyComplete`: APIContentReplyListItemsItemTenureHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIContentReplyListItemsItemTenureBasis, historyComplete: APIContentReplyListItemsItemTenureHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentReplyListItemsItemTenureBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentReplyListItemsItemTenureHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentReplyListItemsItemTenureBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentReplyListItemsItemTenureHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public struct APIContentReplyListItemsItemConsent: Codable, Sendable {
@@ -2721,6 +2779,59 @@ public struct APIContentScheduledResult: Codable, Sendable {
   public init(published: Int) {
     self.published = published
   }
+}
+
+public struct APIContentTenureRecognition: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentTenureRecognitionBasis
+  public let `historyComplete`: APIContentTenureRecognitionHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIContentTenureRecognitionBasis, historyComplete: APIContentTenureRecognitionHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentTenureRecognitionBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentTenureRecognitionHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentTenureRecognitionBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentTenureRecognitionHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public typealias APIContentThanksFeed = [APIContentThanksFeedValueItem]
@@ -3185,9 +3296,10 @@ public struct APIPrivateNoteReply: Codable, Sendable {
   public let `text`: String
   public let `version`: Int
   public let `createdAt`: String
+  public let `tenure`: APIPrivateNoteReplyTenure?
   public let `consent`: APIPrivateNoteReplyConsent
   public let `reaction`: APIPrivateNoteReplyReaction?
-  public init(safetyState: APIPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
+  public init(safetyState: APIPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, tenure: APIPrivateNoteReplyTenure? = nil, consent: APIPrivateNoteReplyConsent, reaction: APIPrivateNoteReplyReaction? = nil) {
     self.safetyState = safetyState
     self.safetyReviewAvailable = safetyReviewAvailable
     self.read = read
@@ -3198,6 +3310,7 @@ public struct APIPrivateNoteReply: Codable, Sendable {
     self.text = text
     self.version = version
     self.createdAt = createdAt
+    self.tenure = tenure
     self.consent = consent
     self.reaction = reaction
   }
@@ -3212,6 +3325,7 @@ public struct APIPrivateNoteReply: Codable, Sendable {
     case `text`
     case `version`
     case `createdAt`
+    case `tenure`
     case `consent`
     case `reaction`
   }
@@ -3227,6 +3341,7 @@ public struct APIPrivateNoteReply: Codable, Sendable {
     self.text = try container.decode(String.self, forKey: .text)
     self.version = try container.decode(Int.self, forKey: .version)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.tenure = try container.decodeIfPresent(APIPrivateNoteReplyTenure.self, forKey: .tenure)
     self.consent = try container.decode(APIPrivateNoteReplyConsent.self, forKey: .consent)
     self.reaction = try container.decode(APIPrivateNoteReplyReaction?.self, forKey: .reaction)
   }
@@ -3242,6 +3357,7 @@ public struct APIPrivateNoteReply: Codable, Sendable {
     try container.encode(text, forKey: .text)
     try container.encode(version, forKey: .version)
     try container.encode(createdAt, forKey: .createdAt)
+    try container.encodeIfPresent(tenure, forKey: .tenure)
     try container.encode(consent, forKey: .consent)
     try container.encode(reaction, forKey: .reaction)
   }
@@ -3251,6 +3367,59 @@ public enum APIPrivateNoteReplySafetyState: String, Codable, Sendable {
   case `pending` = "pending"
   case `allowed` = "allowed"
   case `flagged` = "flagged"
+}
+
+public struct APIPrivateNoteReplyTenure: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIPrivateNoteReplyTenureBasis
+  public let `historyComplete`: APIPrivateNoteReplyTenureHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIPrivateNoteReplyTenureBasis, historyComplete: APIPrivateNoteReplyTenureHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIPrivateNoteReplyTenureBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIPrivateNoteReplyTenureHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIPrivateNoteReplyTenureBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIPrivateNoteReplyTenureHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public struct APIPrivateNoteReplyConsent: Codable, Sendable {
@@ -7309,9 +7478,10 @@ public struct APIContentContentReplyListItemsItem: Codable, Sendable {
   public let `text`: String
   public let `version`: Int
   public let `createdAt`: String
+  public let `tenure`: APIContentContentReplyListItemsItemTenure?
   public let `consent`: APIContentContentReplyListItemsItemConsent
   public let `reaction`: APIContentContentReplyListItemsItemReaction?
-  public init(safetyState: APIContentContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentContentReplyListItemsItemConsent, reaction: APIContentContentReplyListItemsItemReaction? = nil) {
+  public init(safetyState: APIContentContentReplyListItemsItemSafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, tenure: APIContentContentReplyListItemsItemTenure? = nil, consent: APIContentContentReplyListItemsItemConsent, reaction: APIContentContentReplyListItemsItemReaction? = nil) {
     self.safetyState = safetyState
     self.safetyReviewAvailable = safetyReviewAvailable
     self.read = read
@@ -7322,6 +7492,7 @@ public struct APIContentContentReplyListItemsItem: Codable, Sendable {
     self.text = text
     self.version = version
     self.createdAt = createdAt
+    self.tenure = tenure
     self.consent = consent
     self.reaction = reaction
   }
@@ -7336,6 +7507,7 @@ public struct APIContentContentReplyListItemsItem: Codable, Sendable {
     case `text`
     case `version`
     case `createdAt`
+    case `tenure`
     case `consent`
     case `reaction`
   }
@@ -7351,6 +7523,7 @@ public struct APIContentContentReplyListItemsItem: Codable, Sendable {
     self.text = try container.decode(String.self, forKey: .text)
     self.version = try container.decode(Int.self, forKey: .version)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.tenure = try container.decodeIfPresent(APIContentContentReplyListItemsItemTenure.self, forKey: .tenure)
     self.consent = try container.decode(APIContentContentReplyListItemsItemConsent.self, forKey: .consent)
     self.reaction = try container.decode(APIContentContentReplyListItemsItemReaction?.self, forKey: .reaction)
   }
@@ -7366,6 +7539,7 @@ public struct APIContentContentReplyListItemsItem: Codable, Sendable {
     try container.encode(text, forKey: .text)
     try container.encode(version, forKey: .version)
     try container.encode(createdAt, forKey: .createdAt)
+    try container.encodeIfPresent(tenure, forKey: .tenure)
     try container.encode(consent, forKey: .consent)
     try container.encode(reaction, forKey: .reaction)
   }
@@ -7375,6 +7549,59 @@ public enum APIContentContentReplyListItemsItemSafetyState: String, Codable, Sen
   case `pending` = "pending"
   case `allowed` = "allowed"
   case `flagged` = "flagged"
+}
+
+public struct APIContentContentReplyListItemsItemTenure: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentContentReplyListItemsItemTenureBasis
+  public let `historyComplete`: APIContentContentReplyListItemsItemTenureHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIContentContentReplyListItemsItemTenureBasis, historyComplete: APIContentContentReplyListItemsItemTenureHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentContentReplyListItemsItemTenureBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentContentReplyListItemsItemTenureHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentContentReplyListItemsItemTenureBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentContentReplyListItemsItemTenureHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public struct APIContentContentReplyListItemsItemConsent: Codable, Sendable {
@@ -7480,6 +7707,59 @@ public struct APIContentContentScheduledResult: Codable, Sendable {
   public init(published: Int) {
     self.published = published
   }
+}
+
+public struct APIContentContentTenureRecognition: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentContentTenureRecognitionBasis
+  public let `historyComplete`: APIContentContentTenureRecognitionHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIContentContentTenureRecognitionBasis, historyComplete: APIContentContentTenureRecognitionHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentContentTenureRecognitionBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentContentTenureRecognitionHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentContentTenureRecognitionBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentContentTenureRecognitionHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public typealias APIContentContentThanksFeed = [APIContentContentThanksFeedValueItem]
@@ -7944,9 +8224,10 @@ public struct APIContentPrivateNoteReply: Codable, Sendable {
   public let `text`: String
   public let `version`: Int
   public let `createdAt`: String
+  public let `tenure`: APIContentPrivateNoteReplyTenure?
   public let `consent`: APIContentPrivateNoteReplyConsent
   public let `reaction`: APIContentPrivateNoteReplyReaction?
-  public init(safetyState: APIContentPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, consent: APIContentPrivateNoteReplyConsent, reaction: APIContentPrivateNoteReplyReaction? = nil) {
+  public init(safetyState: APIContentPrivateNoteReplySafetyState, safetyReviewAvailable: Bool, read: Bool, id: String, contentId: String, fanId: String, handle: String, text: String, version: Int, createdAt: String, tenure: APIContentPrivateNoteReplyTenure? = nil, consent: APIContentPrivateNoteReplyConsent, reaction: APIContentPrivateNoteReplyReaction? = nil) {
     self.safetyState = safetyState
     self.safetyReviewAvailable = safetyReviewAvailable
     self.read = read
@@ -7957,6 +8238,7 @@ public struct APIContentPrivateNoteReply: Codable, Sendable {
     self.text = text
     self.version = version
     self.createdAt = createdAt
+    self.tenure = tenure
     self.consent = consent
     self.reaction = reaction
   }
@@ -7971,6 +8253,7 @@ public struct APIContentPrivateNoteReply: Codable, Sendable {
     case `text`
     case `version`
     case `createdAt`
+    case `tenure`
     case `consent`
     case `reaction`
   }
@@ -7986,6 +8269,7 @@ public struct APIContentPrivateNoteReply: Codable, Sendable {
     self.text = try container.decode(String.self, forKey: .text)
     self.version = try container.decode(Int.self, forKey: .version)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.tenure = try container.decodeIfPresent(APIContentPrivateNoteReplyTenure.self, forKey: .tenure)
     self.consent = try container.decode(APIContentPrivateNoteReplyConsent.self, forKey: .consent)
     self.reaction = try container.decode(APIContentPrivateNoteReplyReaction?.self, forKey: .reaction)
   }
@@ -8001,6 +8285,7 @@ public struct APIContentPrivateNoteReply: Codable, Sendable {
     try container.encode(text, forKey: .text)
     try container.encode(version, forKey: .version)
     try container.encode(createdAt, forKey: .createdAt)
+    try container.encodeIfPresent(tenure, forKey: .tenure)
     try container.encode(consent, forKey: .consent)
     try container.encode(reaction, forKey: .reaction)
   }
@@ -8010,6 +8295,59 @@ public enum APIContentPrivateNoteReplySafetyState: String, Codable, Sendable {
   case `pending` = "pending"
   case `allowed` = "allowed"
   case `flagged` = "flagged"
+}
+
+public struct APIContentPrivateNoteReplyTenure: Codable, Sendable {
+  public let `confirmedDays`: Int
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentPrivateNoteReplyTenureBasis
+  public let `historyComplete`: APIContentPrivateNoteReplyTenureHistoryComplete
+  public let `checkedAt`: String
+  public init(confirmedDays: Int, milestone: APIJSONValue? = nil, basis: APIContentPrivateNoteReplyTenureBasis, historyComplete: APIContentPrivateNoteReplyTenureHistoryComplete, checkedAt: String) {
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.confirmedDays = try container.decode(Int.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentPrivateNoteReplyTenureBasis.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentPrivateNoteReplyTenureHistoryComplete.self, forKey: .historyComplete)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentPrivateNoteReplyTenureBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentPrivateNoteReplyTenureHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public struct APIContentPrivateNoteReplyConsent: Codable, Sendable {

@@ -198,6 +198,28 @@ export const ContentView = z.strictObject({
   quotedText: z.string().nullable(),
   quotedHandle: z.string().nullable(),
 });
+export const ContentTenureRecognition = z
+  .strictObject({
+    confirmedDays: z.int().nonnegative(),
+    milestone: z
+      .union([z.literal(50), z.literal(100), z.literal(365)])
+      .nullable(),
+    basis: z.enum(["confirmed_stripe_paid_periods", "confirmed_paid_periods"]),
+    historyComplete: z.literal(false),
+    checkedAt: z.iso.datetime({ offset: true }),
+  })
+  .refine(
+    (tenure) =>
+      tenure.milestone ===
+      (tenure.confirmedDays >= 365
+        ? 365
+        : tenure.confirmedDays >= 100
+          ? 100
+          : tenure.confirmedDays >= 50
+            ? 50
+            : null),
+  );
+export type ContentTenureRecognition = z.infer<typeof ContentTenureRecognition>;
 export const PrivateNoteReply = z.strictObject({
   safetyState: z.enum(["pending", "allowed", "flagged"]),
   safetyReviewAvailable: z.boolean(),
@@ -209,6 +231,7 @@ export const PrivateNoteReply = z.strictObject({
   text: z.string(),
   version: z.int().positive(),
   createdAt: z.iso.datetime({ offset: true }),
+  tenure: ContentTenureRecognition.nullable().optional(),
   consent: z.strictObject({
     shareText: z.boolean(),
     showHandle: z.boolean(),
