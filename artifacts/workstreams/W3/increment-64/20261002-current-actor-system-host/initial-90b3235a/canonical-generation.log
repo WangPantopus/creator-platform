@@ -1,0 +1,17 @@
+$ pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check
+$ tsx scripts/generate-openapi.ts --check
+/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/packages/api/scripts/generate-openapi.ts:9
+    throw new Error(
+          ^
+
+Error: OpenAPI is stale; run pnpm --filter @qelvora/api generate.
+    at <anonymous> (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/packages/api/scripts/generate-openapi.ts:9:11)
+
+Node.js v24.13.0
+[ELIFECYCLE] Command failed with exit code 1.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in /Users/yingpengwang/estimate-rescue/
+  │ creator-platform/w3-fan-conversations-chat-55cfcc/packages/api
+
+[ELIFECYCLE] Command failed with exit code 1.

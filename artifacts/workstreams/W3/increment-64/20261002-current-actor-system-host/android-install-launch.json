@@ -1,0 +1,50 @@
+{
+  "source": "7327e6460d305f5a7d021b97bf9594b31577da90",
+  "serial": "emulator-5584",
+  "avd": "Qelvora_W3_API34",
+  "apkSHA256": "4452df9629887d2b53afe6e425fc48f5b78a5063e729d7bcd03f5b9f78d97645",
+  "backendSource": "7327e6460d305f5a7d021b97bf9594b31577da90",
+  "operations": [
+    {
+      "command": [
+        "/Users/yingpengwang/Library/Android/sdk/platform-tools/adb",
+        "-s",
+        "emulator-5584",
+        "install",
+        "-r",
+        "/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build/outputs/apk/debug/app-debug.apk"
+      ],
+      "startedAt": "2026-10-02T19:23:06.671691+00:00",
+      "completedAt": "2026-10-02T19:23:16.460362+00:00",
+      "exitCode": 0,
+      "output": "Performing Streamed Install\nSuccess\n"
+    },
+    {
+      "command": [
+        "/Users/yingpengwang/Library/Android/sdk/platform-tools/adb",
+        "-s",
+        "emulator-5584",
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        "com.pantopus.qelvora/.MainActivity",
+        "--es",
+        "api_url",
+        "http://10.0.2.2:4103",
+        "--es",
+        "return_to",
+        "/you",
+        "--es",
+        "appearance",
+        "light"
+      ],
+      "startedAt": "2026-10-02T19:23:16.460410+00:00",
+      "completedAt": "2026-10-02T19:23:20.075246+00:00",
+      "exitCode": 0,
+      "output": "Starting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }\nStatus: ok\nLaunchState: COLD\nActivity: com.pantopus.qelvora/.MainActivity\nTotalTime: 3398\nWaitTime: 3412\nComplete\n"
+    }
+  ],
+  "uiInputPerformed": false
+}

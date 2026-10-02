@@ -1,0 +1,19 @@
+{
+  "source": "90b3235aef2146f2176c89791304a396b217e5af",
+  "operation": "api",
+  "supervisorPid": 18138,
+  "commandPid": 18820,
+  "command": [
+    "pnpm",
+    "exec",
+    "tsx",
+    "src/server.ts"
+  ],
+  "startedAt": "2026-10-02T19:15:14.920502+00:00",
+  "exitStatusQualified": true,
+  "completedAt": "2026-10-02T19:16:01.313156+00:00",
+  "exitCode": 0,
+  "logSHA256": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6",
+  "duplicatePoolCloseObserved": false,
+  "shutdownFailureObserved": false
+}
