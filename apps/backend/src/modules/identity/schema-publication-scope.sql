@@ -12,7 +12,7 @@ CREATE TABLE creator.publication_worker_scope (
  backend_pid integer NOT NULL, login_name name NOT NULL,
  creator_id uuid NOT NULL, content_id uuid NOT NULL, version integer NOT NULL CHECK(version>0),
  publisher_account_id uuid NOT NULL, signed_act_id uuid, command_hash text NOT NULL CHECK(command_hash~'^[a-f0-9]{64}$'),
- command jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now()
+ command jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
 CREATE INDEX publication_scope_expiry ON creator.publication_worker_scope(created_at);
 ALTER TABLE creator.publication_worker_scope ENABLE ROW LEVEL SECURITY;
@@ -152,7 +152,7 @@ BEGIN
    CASE WHEN proof->'mediaEvidence'='[]'::jsonb THEN '{}'::jsonb ELSE jsonb_build_object('mediaEvidence',proof->'mediaEvidence') END);
  IF command_text::jsonb IS DISTINCT FROM expected OR
    (s IS NOT NULL AND (proof->>'commandHash' IS DISTINCT FROM h OR proof->'command' IS DISTINCT FROM expected)) THEN RETURN false; END IF;
- DELETE FROM creator.publication_worker_scope WHERE created_at<now()-interval '1 day';
+ DELETE FROM creator.publication_worker_scope WHERE created_at<clock_timestamp()-interval '1 day';
  INSERT INTO creator.publication_worker_scope(transaction_id,backend_pid,login_name,creator_id,content_id,version,publisher_account_id,signed_act_id,command_hash,command)
  VALUES(pg_current_xact_id(),pg_backend_pid(),session_user,c,o,v,p,s,h,expected) RETURNING id INTO nonce;
  PERFORM set_config('publication.scope_id',nonce::text,true);
@@ -167,7 +167,7 @@ BEGIN
  SELECT * INTO sealed FROM creator.publication_worker_scope
  WHERE id=nullif(current_setting('publication.scope_id',true),'')::uuid AND transaction_id=pg_current_xact_id()
    AND backend_pid=pg_backend_pid() AND login_name=session_user AND creator_id=c AND content_id=o AND version=v
-   AND created_at>now()-interval '5 minutes';
+   AND created_at>clock_timestamp()-interval '5 minutes';
  IF NOT FOUND THEN RETURN false; END IF;
  proof := creator.publication_task_proof(c,o,v,sealed.publisher_account_id,sealed.signed_act_id,'issue',sealed.command_hash,true);
  IF proof IS NULL THEN RETURN false; END IF;
