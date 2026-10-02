@@ -44,9 +44,16 @@ export function createCommerceRouter(input: {
       passEnabled: input.extended?.pass?.configured ?? false,
       passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
+      voiceFulfillmentAvailable:
+        input.service?.voiceFulfillmentAvailable ?? false,
       payoutOnboardingAvailable:
         input.extended?.settlement?.onboardingConfigured ?? false,
-      poolEarningsAvailable: Boolean(input.extended?.poolJournal),
+      creatorEarningsAvailable:
+        input.service?.creatorFinancialReadAvailable ?? false,
+      poolEarningsAvailable: Boolean(
+        input.extended?.poolJournal &&
+          input.service?.creatorFinancialReadAvailable,
+      ),
     }),
   );
   router.get("/overview", async (req, res) => {
@@ -54,6 +61,10 @@ export function createCommerceRouter(input: {
     const value = await service().overview(
       actor,
       req.query.creatorId ? id(req.query.creatorId) : undefined,
+      {
+        creatorFinance:
+          req.query.creatorEarnings === "1" || req.query.poolEarnings === "1",
+      },
     );
     const poolCreator = req.query.creatorId
       ? id(req.query.creatorId)
@@ -84,9 +95,16 @@ export function createCommerceRouter(input: {
         ...value.capabilities,
         storePurchasesAvailable: input.extended?.storeConfigured ?? false,
         membershipAvailable: input.extended?.billing?.configured ?? false,
+        voiceFulfillmentAvailable:
+          input.service?.voiceFulfillmentAvailable ?? false,
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
-        poolEarningsAvailable: Boolean(input.extended?.poolJournal),
+        creatorEarningsAvailable:
+          input.service?.creatorFinancialReadAvailable ?? false,
+        poolEarningsAvailable: Boolean(
+          input.extended?.poolJournal &&
+            input.service?.creatorFinancialReadAvailable,
+        ),
         payoutOnboardingAvailable:
           input.extended?.settlement?.onboardingConfigured ?? false,
       },

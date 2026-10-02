@@ -45,16 +45,7 @@ function decodeCursor(encoded: string) {
 export class CreatorEarningsReader {
   constructor(private readonly service: CommerceService) {}
   private async owner(client: PoolClient, actor: Actor, creatorId: string) {
-    const result = await client.query(
-      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
-      [creatorId, actor.accountId],
-    );
-    if (result.rowCount !== 1)
-      throw new DomainError(
-        "creator_required",
-        "Earnings belong to the current verified creator account.",
-        403,
-      );
+    await this.service.assertCreatorFinancialRead(client, actor, creatorId);
   }
   private async page(
     client: PoolClient,

@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-01T13:56:31.944978+00:00",
+  "baseline": "4c2ea26867d27ba7466e0ac7446216fe0a49b24f",
+  "branch": "codex/w4-held-earnings-20261001",
+  "scope": "Owner ledger/pool/overview financial reads require genuine current creator-wide denial held on their exact transaction, then current owner verification/recovery locked through the projection.",
+  "sourceHashes": {
+    "apps/backend/src/modules/commerce/service.ts": "290bb5b6441de59a621508897bc8fda7ed30b17d1a6971c3592e25ef01fd8db8",
+    "apps/backend/src/modules/commerce/runtime.ts": "5b63f7e59e2e68d34926d9abb9846d2b2aaa38676c7601a8fbb9b8cb1e825117",
+    "apps/backend/src/modules/commerce/creator-earnings.ts": "24acb611d5c8f76b4a45d927d1cd720b406e74643ceedab95c13ed86fffc4924",
+    "apps/backend/src/modules/commerce/pass-pool-journal.ts": "28f8cf00a28c6a47d499ca3cc8a9b7cfdf99a18db0987ac34ba52ed66a54b0a5",
+    "apps/backend/src/modules/commerce/router.ts": "0337a1e057b0f2cc396deb67c6f71fbf6222b9d89c8831e2db85b932492dbbd1"
+  },
+  "checks": {
+    "finalTypecheck": "passed",
+    "scopedLint": "passed",
+    "format": "passed",
+    "diffWhitespace": "passed",
+    "backendBuild": "Earlier guard revision built before overview narrowing; not final source build proof."
+  },
+  "authority": {
+    "binding": "createCommerceRuntime.assertCreatorReadAllowed / CommerceService eighth argument; missing binding gates owner financial reads with503, known wrong owner403. No no-op or thread/actor issuer.",
+    "overview": "Owner money requested only by earnings/pool query flags and guarded there. Baseline fan receipts are explicitly fan_id bound; creator financial rows/account statuses cannot return through the old unguarded overview.",
+    "pool": "Same exact service guard precedes schema and complete projection; no fabricated slot/creator/history."
+  },
+  "runtime": {
+    "status": "Stopped for cleanup coordination after PR37 merged. No restarted web/API/database/native build. Final new guard has no actual application/SQL execution evidence.",
+    "ports": {
+      "3004": "no listener",
+      "4104": "no listener",
+      "55444": "no listener"
+    },
+    "archive": "Prior W4 private archive exists. New export attempt found container unavailable and exported zero databases; current database state is not claimed preserved.",
+    "observedShutdownFailure": "Previously compiled API exited on PostgreSQL57P01 with an unhandled idle-pool error after database disappeared. No current production reliability acceptance; W1 pool lifecycle remains a concrete integration issue. Raw connection object is excluded from this evidence."
+  },
+  "limitations": [
+    "No genuine held creator authority producer bound. Outside-connection account-only/creator checks do not satisfy the port.",
+    "No final changed-source browser/native/SQL/provider acceptance while runtimes are unavailable.",
+    "No migrations/registry/applied bytes, tests/cases/references/assertions changed.",
+    "Earlier dated UI evidence remains historical, not final-source runtime proof."
+  ],
+  "releaseReady": false,
+  "finalVerification": {
+    "at": "2026-10-01T15:41:05.779757+00:00",
+    "reviewedHead": "9d6469dda096938a94bf244725773365290a417f",
+    "mergeCommit": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+    "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/39",
+    "backendTypecheckAndBundle": "passed on final guarded source before merge",
+    "webMode": "Next16.3.7 development on3004; no production journey claim for these captures",
+    "apiMode": "canonical TSX server4104; actual development identity; no fabricated current creator-read callback",
+    "database": "owned pgvector17 fresh40 canonical creator_w4, actual old archived fan data copied atomically; old28-entry ledger retained separately, not claimed upgraded",
+    "actions": [
+      "Refresh fan Earnings after actual API restart",
+      "Inspect Creator access required in1280x720 Light and Night"
+    ],
+    "observed": "Earnings belong to the verified creator account; no creator rows/cash/provider acceptance",
+    "screenshots": {
+      "restored-fan-light.jpg": "019037567348c4c06456d58f10c0a0f8bdb776372c4841cb31543921dd33106d",
+      "restored-fan-night.jpg": "fe6bb87d571a929d4b18c79775bf35ffc1d776dff540db94bddc05f1b02f99fa"
+    },
+    "ciAtMerge": "two web/backend and two Android runtime SUCCESS; six visual/native foundation QUEUED; no branch rules at inspection",
+    "limitations": "Genuine held creator authority/provider/positive owner financial acceptance unavailable. Earlier cleanup failure remains recorded above; current final proof supersedes only the old no-final-build/no-runtime observation."
+  }
+}

@@ -2,12 +2,20 @@ import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { PaymentProvider } from "../payments/provider.js";
-import { CommerceService, type CommercePolicy } from "./service.js";
+import {
+  CommerceService,
+  type CommercePolicy,
+  type CommerceCreatorReadAuthority,
+} from "./service.js";
 import {
   MembershipBilling,
   type MembershipBillingProvider,
 } from "./billing.js";
-import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
+import {
+  ExtendedCommerce,
+  type StoreEntitlementVerifier,
+  type QualifiedReadAuthority,
+} from "./extended.js";
 import { commerceFeature } from "./registration.js";
 import {
   CommerceGenerationAllowance,
@@ -35,6 +43,7 @@ import {
   createCommerceAudience,
   type GroupAudienceReader,
 } from "./audience.js";
+import { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
@@ -57,6 +66,9 @@ export async function createCommerceRuntime(input: {
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
   stores?: StoreEntitlementVerifier;
+  /** W3's actual prepared exact association and W6 recording reader. */
+  voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
+  qualifiedReads?: QualifiedReadAuthority;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
@@ -71,6 +83,9 @@ export async function createCommerceRuntime(input: {
   assertActorAllowed?: (
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
+  /** Actual W8 creator-wide denial held on the owner projection transaction.
+   * No default or outside-client creator check enables earnings. */
+  assertCreatorReadAllowed?: CommerceCreatorReadAuthority;
 }) {
   invariant(
     !input.generationCostUnits,
@@ -127,6 +142,14 @@ export async function createCommerceRuntime(input: {
           assertReady: input.trialReadiness.bind(input),
         })
       : undefined,
+    input.assertCreatorReadAllowed,
+    input.voiceRecordings
+      ? await CommerceVoiceFulfillment.prepare({
+          database: input.database,
+          access: input.access,
+          recordings: input.voiceRecordings,
+        })
+      : undefined,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);
@@ -173,6 +196,7 @@ export async function createCommerceRuntime(input: {
     settlement,
     passPurchases,
     poolJournal,
+    input.qualifiedReads,
   );
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
