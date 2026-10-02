@@ -1,0 +1,18 @@
+{
+  "pid": 54240,
+  "startedAt": "2026-10-02T10:07:11.259071+00:00",
+  "resumedAt": "2026-10-02T10:07:39.363724+00:00",
+  "durationSeconds": 28.104,
+  "signals": "platform signal.SIGSTOP/SIGCONT",
+  "nativeSource": "8f7340a7bcd7a3655d53e20cad8cd2bee91998c1",
+  "apiSource": "9a0c90b442a339a106fdfdecbc739aea9b92c1f0",
+  "capturedAt": "2026-10-02T10:07:28.341Z",
+  "stoppedProcessObserved": true,
+  "endpointDuringPause": "curl timeout28",
+  "beforeMuted": false,
+  "afterMute": true,
+  "afterUnmute": false,
+  "publications": 0,
+  "privateReplies": 0,
+  "thanks": 0
+}

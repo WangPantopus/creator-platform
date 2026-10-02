@@ -738,6 +738,50 @@
         }
       }
     },
+    "Membership · at least {days} continuous days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Membership · at least {days} continuous days"
+          }
+        }
+      }
+    },
+    "{used} / {limit} characters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{used} / {limit} characters"
+          }
+        }
+      }
+    },
+    "This draft is over your current limit. Shorten it to send; your words are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This draft is over your current limit. Shorten it to send; your words are kept."
+          }
+        }
+      }
+    },
+    "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current membership recognition is unavailable. The reply limit stays at 4,000 characters."
+          }
+        }
+      }
+    },
     "Paid partnership: {name} is paid by {brand}.": {
       "extractionState": "manual",
       "localizations": {
