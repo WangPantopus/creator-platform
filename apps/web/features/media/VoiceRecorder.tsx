@@ -6,7 +6,12 @@ import {
   VoiceRecorder as BrowserRecorder,
   type RecordingSnapshot,
 } from "./recorder";
-import { mediaRequest, uploadCreatorMedia, uploadRecording } from "./api";
+import {
+  MediaRequestError,
+  mediaRequest,
+  uploadCreatorMedia,
+  uploadRecording,
+} from "./api";
 import type {
   MediaAsset,
   UploadTicket,
@@ -27,6 +32,10 @@ type ThreadRecordingProps = {
   maxDurationMs: number;
   /** Current host account precondition; it never supplies identity authority. */
   expectedAccountId?: string;
+  embedded?: boolean;
+  /** Host retains the actual server projection, including credential completion. */
+  onAssetChange?: (asset: MediaAsset | null) => void;
+  actionsDisabled?: boolean;
 };
 export function VoiceRecording(props: ThreadRecordingProps) {
   return (
@@ -91,6 +100,9 @@ function RecordingForm({
   onReady,
   beforeDiscard,
   expectedAccountId,
+  embedded = false,
+  onAssetChange,
+  actionsDisabled = false,
 }: Omit<ThreadRecordingProps, "purpose"> &
   Omit<CreatorVoiceRecordingProps, "creatorId" | "objectId"> & {
     objectId?: string;
@@ -122,6 +134,10 @@ function RecordingForm({
     null,
   );
   const [available, setAvailable] = useState(false);
+  useEffect(() => {
+    if (!objectId)
+      onAssetChange?.(asset && !("objectId" in asset) ? asset : null);
+  }, [asset, objectId, onAssetChange]);
   const recorder = useRef<BrowserRecorder | null>(null);
   const controller = useRef<AbortController | null>(null);
   const ticket = useRef<UploadTicket | CreatorMediaUploadTicket | undefined>(
@@ -223,7 +239,12 @@ function RecordingForm({
     if (
       !asset ||
       !family ||
-      !["quarantined", "processing"].includes(asset.state)
+      (!["quarantined", "processing"].includes(asset.state) &&
+        !(
+          asset.state === "ready" &&
+          asset.signedActId &&
+          asset.provenance?.c2paVerified !== true
+        ))
     )
       return;
     const abort = new AbortController();
@@ -311,6 +332,7 @@ function RecordingForm({
   async function send() {
     if (!recording.blob || !creatorId || !family || pendingUpload.current)
       return;
+    const firstAttempt = uploadKey.current === undefined;
     uploadKey.current ??= crypto.randomUUID();
     const abort = new AbortController();
     controller.current = abort;
@@ -348,6 +370,15 @@ function RecordingForm({
       setAsset(result);
       setUpload("processing");
     } catch (e) {
+      // A definitive rejection of the first opening request allocated no
+      // ticket. A lost response or any later retry remains unconfirmed.
+      if (
+        firstAttempt &&
+        !ticket.current &&
+        e instanceof MediaRequestError &&
+        [400, 403, 404, 413, 415, 422].includes(e.status)
+      )
+        uploadKey.current = undefined;
       setUpload("failed");
       setError(
         abort.signal.aborted
@@ -395,16 +426,23 @@ function RecordingForm({
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
   return (
-    <section ref={surface} className="w6-recorder" aria-labelledby={heading}>
+    <section
+      ref={surface}
+      className="w6-recorder"
+      aria-labelledby={embedded ? undefined : heading}
+      aria-label={embedded ? copy.w6YourOwnVoice : undefined}
+    >
       <div className="w6-author">
-        {creatorName && <Seal size={28} />}
+        {creatorName && (
+          <Seal size={28} initial={Array.from(creatorName.trim())[0]} />
+        )}
         <span>
           {creatorName
             ? formatCopy("w6RecordAVoiceNoteAs", { value1: creatorName })
             : copy.w6RecordAVoiceNote}
         </span>
       </div>
-      <h1 id={heading}>{copy.w6YourOwnVoice}</h1>
+      {!embedded && <h1 id={heading}>{copy.w6YourOwnVoice}</h1>}
       <p>{copy.w6RecordListenAndSignTheExactRecordingBeforeItIs}</p>
       <div
         className="w6-data"
@@ -423,7 +461,7 @@ function RecordingForm({
         <button
           ref={recordingAction}
           className={`qv-btn ${active || recording.state === "requesting" ? "qv-btn--secondary" : "qv-btn--maya"}`}
-          disabled={upload === "uploading" || discarding}
+          disabled={actionsDisabled || upload === "uploading" || discarding}
           onClick={(event) => {
             restoreRecordingFocus.current =
               document.activeElement === event.currentTarget;
@@ -473,7 +511,7 @@ function RecordingForm({
           />
           <button
             className="qv-btn qv-btn--quiet"
-            disabled={discarding}
+            disabled={actionsDisabled || discarding}
             onClick={(event) => {
               restoreRecordingFocus.current =
                 document.activeElement === event.currentTarget;
@@ -509,7 +547,7 @@ function RecordingForm({
       {preview && upload !== "uploading" && !asset && (
         <button
           className="qv-btn qv-btn--maya"
-          disabled={!available || !family || discarding}
+          disabled={actionsDisabled || !available || !family || discarding}
           onClick={() => {
             if (pendingUpload.current) return;
             const work = send();
@@ -561,6 +599,7 @@ function RecordingForm({
               expectedAccountId={expectedAccountId}
               fanId={fanId}
               onSigned={setAsset}
+              disabled={actionsDisabled}
             />
           </>
         )}

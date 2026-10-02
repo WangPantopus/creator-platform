@@ -6,6 +6,7 @@ import {
   UploadRequestSchema,
   ProcessedMediaEvidenceSchema,
   PlaybackFileSchema,
+  ThreadRecordingPolicySchema,
   type MediaAsset,
   type MediaPolicy,
   type MediaPurpose,
@@ -177,6 +178,36 @@ export class MediaService {
       "media_revoked",
       "This media is no longer available.",
     );
+  }
+  async recordingPolicy(scope: ThreadScope) {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can record this reply.",
+    );
+    return this.db.withThread(scope, async (client) => {
+      await this.allowed(scope, client);
+      const policy = await this.authority.policy(
+        scope,
+        "human_reply",
+        "upload",
+        client,
+      );
+      invariant(
+        policy,
+        "media_policy_unavailable",
+        "Recording is not available for this conversation.",
+      );
+      return ThreadRecordingPolicySchema.parse({
+        creatorId: scope.creatorId,
+        fanId: scope.fanId,
+        threadId: scope.threadId,
+        purpose: "human_reply",
+        maxBytes: policy.maxBytes,
+        maxDurationMs: policy.maxDurationMs,
+      });
+    });
   }
   async row(
     scope: ThreadScope,

@@ -956,7 +956,16 @@ public enum QelvoraCopy {
     "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
     "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
     "growthDownloadCompleteReply": "Download complete reply",
-    "growthShareCompleteReply": "Share complete reply"
+    "growthShareCompleteReply": "Share complete reply",
+    "w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice": "Uploads and signing are unavailable here. Your preview stays on this device.",
+    "w6RecordAVoiceReply": "Record a voice reply",
+    "w6DeliverThisRecording": "Deliver this recording",
+    "w6RecordingCredentialsAreProcessing": "Your signature is saved. Content credentials are processing before delivery.",
+    "w6RecordingDeliveryIsUnconfirmed": "Delivery is unconfirmed. Retry this same recording before starting another.",
+    "w6RecordingDelivered": "Your signed recording was delivered to this conversation.",
+    "w6VoiceReplyUnavailable": "Voice replies are unavailable for this conversation. Your text draft is kept.",
+    "w6SelectedConversationChanged": "This recording belongs to another conversation. Reopen the selected thread.",
+    "w6RetryRecordingDelivery": "Retry this recording delivery"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
