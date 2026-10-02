@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "at": "2026-10-02T09:28:38.445191+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "base": "66dfb1ee83dee45d3abd820a4a87227ef00cdd03",
+  "sourceSha256": {
+    "creator-ai.css": "8979811302fc7536437807652f0a5b88c687c65535556d229fd25c98302d149d"
+  },
+  "actor": "fictional Maya / actual development actor-one Studio session",
+  "creatorId": "97152450-4093-4b15-9148-b12c16053956",
+  "runtime": "owned web3002 API4102 DB55442",
+  "operation": {
+    "beforeDesktopSidebarTargetPx": 40,
+    "afterDesktopSidebarTargetsPx": [44, 44, 44, 44, 44, 44, 44, 44, 44],
+    "desktopThemes": ["Light", "Night"],
+    "desktopViewport": [1280, 900],
+    "sidebarWidthPx": 248,
+    "desktopHorizontalOverflow": false,
+    "shortNightViewport": [900, 450],
+    "shortSidebar": {
+      "clientHeight": 450,
+      "scrollHeight": 578,
+      "scrollTopAfterKeyboardTab": 128,
+      "active": "Team",
+      "activeTop": 350,
+      "activeBottom": 394,
+      "activeHeight": 44,
+      "visible": true
+    },
+    "phoneViewport": [390, 1300],
+    "phoneThemes": ["Light", "Night"],
+    "phoneGutterPx": 16,
+    "phoneTargetHeightsPx": [44, 44, 44, 44, 44],
+    "phoneHorizontalOverflow": false
+  },
+  "persistedAfter": {
+    "canonicalMigrations": 40,
+    "draftRevision": 15,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0
+  },
+  "checks": {
+    "webTypecheck": "passed",
+    "format": "passed",
+    "newUnitTests": 0
+  },
+  "captures": {
+    "overview-night-phone.png": {
+      "bytes": 48465,
+      "sha256": "829eb3109c5a334058bc2d15035596e5506c8a70915bbc2cc707d782c6dcdda3"
+    },
+    "style-light-desktop.png": {
+      "bytes": 110784,
+      "sha256": "4a076f75435c133a2d5c92212d1a379f3c7523b45c71ca6c142074fa0c6c918b"
+    },
+    "overview-light-phone.png": {
+      "bytes": 48980,
+      "sha256": "c4cdf3bfe7167a401ab429133a65e838b37860e3db42ad15938d371867289301"
+    },
+    "style-night-desktop.png": {
+      "bytes": 108004,
+      "sha256": "21b34026b3ac5bf36d60806b9444b57595af8f47325d91d2de0079f1467ade0a"
+    },
+    "overview-night-loading-original.png": {
+      "bytes": 9428,
+      "sha256": "db9b97f2d9f61120bae6d73fdd0a8f811ff7f32d49247d25777c7fafeb8536f4"
+    },
+    "short-night-keyboard.png": {
+      "bytes": 42714,
+      "sha256": "33f63f090c09619140f9fc388a94a190d21d995570203d841d922da0a2f8d490"
+    }
+  },
+  "limits": [
+    "Actual browser200% zoom not verified: tab/native keys did not change geometry; View menu timeout, native binding subsequently noWindowsAvailable; optional launch_app API absent. No simulated CSS zoom claimed.",
+    "Night first capture contained the genuine loading skeleton; original preserved and populated capture repeated after actual Maya data appeared.",
+    "No VoiceOver/TalkBack, full artboard pixel fidelity or native licensed fan delivery acceptance.",
+    "Provider credential and genuine publication/composition remain absent; no calls/writes."
+  ]
+}
