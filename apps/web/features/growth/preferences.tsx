@@ -109,6 +109,9 @@ export function PreferenceForm({
         } catch {
           timeZone = true;
         }
+        // Keep the rejected visible snapshot editable too. Rendering an error
+        // must not restore an older controlled value over a cleared boundary.
+        setValue(submitted);
         setInvalid({ quietHours, quietFormat, timeZone });
         if (quietHours || timeZone) {
           const input = quietHours
@@ -119,7 +122,6 @@ export function PreferenceForm({
           input.current?.focus();
           return;
         }
-        setValue(submitted);
         setBusy(true);
         setRequiresSignIn(false);
         try {
