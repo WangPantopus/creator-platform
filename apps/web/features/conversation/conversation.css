@@ -204,6 +204,50 @@
 }
 .conversation-account .account-title {
   padding: 28px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.conversation-you {
+  gap: 24px;
+}
+.conversation-you .account-title > p {
+  font-size: 13px;
+  line-height: 18px;
+}
+.conversation-you .account-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.account-metrics article {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.account-metric-value {
+  font: 24px/28px var(--font-mono);
+}
+.conversation-you nav a {
+  padding: 10px 16px;
+}
+.account-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.account-row-label strong {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+}
+.conversation-you nav svg {
+  flex-shrink: 0;
 }
 .conversation-memory {
   padding: 14px 16px;
