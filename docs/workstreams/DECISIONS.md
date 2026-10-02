@@ -128,3 +128,10 @@ Purpose scope rows are transaction-only. Deferred cleanup constraints reject a c
 ### W1 — preserve labels at large native text (October 2, 2026)
 
 `55058f90`: shared fan/Studio navigation retains the supplied standard row but allocates extra rows at large text sizes. Complete labels and minimum48-point/dp targets are preserved; text is never shrunk or truncated to fit the standard columns. Largest-size inline glyph/label rows avoid narrow word breaking. Personally operated Android at actual200% confirms all four destinations, while native Studio, maximum iOS and assistive technology remain separately unaccepted. Account now renders an @handle only when the current session actually has one; the unset state offers the existing Choose your handle action. Public-AI consumers also pin the exact issuing Pool object so metadata authority from another graph cannot certify the current service.
+
+
+### W1 — original-work settlement and unavailable sign-in (October 2, 2026)
+
+Terminal writes invalidate generation input permission, so0099 uses separate original-work custody, a fresh terminal nonce/token and exact durable participant/session/cursor/lease metadata. Completion requires current original positive eligibility; reconciliation separately handles real expiry/revocation/takeover without acquiring text or provider rights. Actual W2 journal and W4 original reservation assertions must bookend commit; unknown cost cannot become zero. Immutable checked consumer retention and effective catalogue column/sequence/executable denials prevent preparation drift. The source stays held until real owner negatives/consumers are composed and original-work acceptance succeeds.
+
+Missing production identity configuration must remain an honest product recovery state. A validated relative303 returns to Welcome with canonical unavailable/Retry/Back while preserving the original safe destination; it does not derive an origin from request Host/forwarded headers or loosen HTTPS. Actual local production browser operation verifies this failure state only.
