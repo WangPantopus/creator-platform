@@ -2003,6 +2003,12 @@ export class ContentService {
         input.idempotencyKey,
         { creatorId, ...input },
         async () => {
+          // A missing first row cannot be FOR UPDATE locked. Serialize the
+          // unique fan/target before checking its expected consent version.
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`content.thanks:${fan.id}:${input.targetKind}:${input.targetId}`],
+          );
           const prior = (
             await client.query(
               "SELECT * FROM creator.content_thanks WHERE fan_id=$1 AND target_kind=$2 AND target_id=$3 FOR UPDATE",

@@ -27,6 +27,7 @@ import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
+import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 
 export type CommercePolicy = {
   currency: string;
@@ -157,7 +158,20 @@ export class CommerceService {
     private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
     private readonly trialAdmission?: CommerceTrialAdmission,
     private readonly assertCreatorReadAllowed?: CommerceCreatorReadAuthority,
-  ) {}
+    private readonly voiceFulfillment?: CommerceVoiceFulfillment,
+  ) {
+    voiceFulfillment?.assertRuntime(db, access);
+  }
+  get voiceFulfillmentAvailable() {
+    return Boolean(this.voiceFulfillment);
+  }
+  private fulfillmentAvailable(kind: string) {
+    return (
+      kind === "written_reply" ||
+      (Boolean(this.policy.fulfillmentModes?.includes(kind)) &&
+        (kind !== "voice_note" || this.voiceFulfillmentAvailable))
+    );
+  }
   get creatorFinancialReadAvailable() {
     return typeof this.assertCreatorReadAllowed === "function";
   }
@@ -723,9 +737,7 @@ export class CommerceService {
   ) {
     const body = ModeCommand.parse(input);
     invariant(
-      body.state !== "offered" ||
-        body.kind === "written_reply" ||
-        this.policy.fulfillmentModes?.includes(body.kind),
+      body.state !== "offered" || this.fulfillmentAvailable(body.kind),
       "fulfillment_unavailable",
       "This mode needs its verified delivery service before it can be offered.",
     );
@@ -1008,8 +1020,7 @@ export class CommerceService {
             "Shared intro disclosure is not connected yet.",
           );
           invariant(
-            mode.kind === "written_reply" ||
-              this.policy.fulfillmentModes?.includes(mode.kind),
+            this.fulfillmentAvailable(mode.kind),
             "fulfillment_unavailable",
             "This promised service is not connected yet.",
           );
@@ -1403,6 +1414,11 @@ export class CommerceService {
             "That action does not fulfill the requested mode.",
           );
           invariant(
+            this.fulfillmentAvailable(p.snapshot.mode),
+            "fulfillment_unavailable",
+            "This promised service is not connected yet.",
+          );
+          invariant(
             body.signedActId,
             "signed_act_required",
             "Sign the exact acceptance first.",
@@ -1638,8 +1654,7 @@ export class CommerceService {
             "Current access does not include this offer.",
           );
           invariant(
-            mode.kind === "written_reply" ||
-              this.policy.fulfillmentModes?.includes(mode.kind),
+            this.fulfillmentAvailable(mode.kind),
             "fulfillment_unavailable",
             "This promised service is not connected yet.",
           );
@@ -1784,6 +1799,7 @@ export class CommerceService {
               id: string;
               version: number;
               state: string;
+              mode: string;
               due_at: Date;
             }>(
               "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
@@ -1793,7 +1809,10 @@ export class CommerceService {
           invariant(
             c &&
               c.version === body.version &&
-              ["due", "in_progress"].includes(c.state),
+              ["due", "in_progress"].includes(c.state) &&
+              p.state === "accepted" &&
+              p.payment_state === "captured" &&
+              p.accepted_at,
             "commitment_unavailable",
             "This commitment changed. Refresh first.",
           );
@@ -1803,7 +1822,13 @@ export class CommerceService {
             "The deadline passed. Refund reconciliation is required.",
           );
           invariant(
-            p.snapshot.mode === "written_reply",
+            c.mode === p.snapshot.mode,
+            "mode_mismatch",
+            "The original promised service must match this commitment.",
+          );
+          invariant(
+            p.snapshot.mode === "written_reply" ||
+              (p.snapshot.mode === "voice_note" && this.voiceFulfillment),
             "media_evidence_required",
             "This mode needs verified media, session, published group or review evidence.",
           );
@@ -1814,8 +1839,9 @@ export class CommerceService {
               signed_act_id: string;
               text: string;
               version: number;
+              recording_asset_id?: string | null;
             }>(
-              `SELECT m.* FROM creator.message m JOIN creator.signed_act sa ON sa.id=m.signed_act_id JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.revoked_at IS NULL JOIN creator.creator_profile cp ON cp.id=m.creator_id AND cp.verification='verified' WHERE m.id=$1 AND m.thread_id=$2 AND m.creator_id=$3 AND m.fan_id=$4 AND m.author_account_id=$5 AND m.author_kind IN ('human_creator','approved_draft') AND m.delivery_state='delivered' AND m.created_at >= $6`,
+              `SELECT m.* FROM creator.message m JOIN creator.signed_act sa ON sa.id=m.signed_act_id AND sa.account_id=m.author_account_id AND sa.creator_id=m.creator_id AND sa.subject_id=m.thread_id AND sa.content_hash=m.signed_content_hash AND sa.act_type=CASE WHEN m.author_kind='approved_draft' THEN 'approved_draft' ELSE 'reply' END JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.account_id=sa.account_id AND pc.revoked_at IS NULL JOIN creator.creator_profile cp ON cp.id=m.creator_id AND cp.verification='verified' AND NOT cp.recovery_required WHERE m.id=$1 AND m.thread_id=$2 AND m.creator_id=$3 AND m.fan_id=$4 AND m.author_account_id=$5 AND m.author_kind IN ('human_creator','approved_draft') AND m.delivery_state='delivered' AND m.created_at >= $6 FOR SHARE OF m,pc,cp`,
               [
                 body.messageId,
                 scope.threadId,
@@ -1831,6 +1857,12 @@ export class CommerceService {
             "signed_delivery_required",
             "A delivered exact creator-signed reply is required.",
           );
+          invariant(
+            p.snapshot.mode !== "written_reply" ||
+              (message.text.trim().length > 0 && !message.recording_asset_id),
+            "written_delivery_required",
+            "A written request requires a signed written reply.",
+          );
           await client.query(
             "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
             [`commerce.delivery:${message.id}`],
@@ -1844,6 +1876,10 @@ export class CommerceService {
             "delivery_already_used",
             "This reply already fulfilled another paid commitment. Deliver the promised reply for this request.",
           );
+          const voiceEvidence =
+            p.snapshot.mode === "voice_note"
+              ? await this.voiceFulfillment!.read(scope, client, message.id)
+              : undefined;
           if (message.author_kind === "approved_draft") {
             const available = (
               await client.query<{ relation: string | null }>(
@@ -1883,14 +1919,20 @@ export class CommerceService {
             [
               c.id,
               message.id,
-              JSON.stringify({
-                messageId: message.id,
-                messageVersion: message.version,
-                signedActId: message.signed_act_id,
-                authorKind: message.author_kind,
-                contentHash: contentHash({ text: message.text }),
-              }),
+              JSON.stringify(
+                voiceEvidence ?? {
+                  messageId: message.id,
+                  messageVersion: message.version,
+                  signedActId: message.signed_act_id,
+                  authorKind: message.author_kind,
+                  contentHash: contentHash({ text: message.text }),
+                },
+              ),
             ],
+          );
+          await client.query(
+            "UPDATE creator.commerce_packet SET version=version+1,updated_at=now() WHERE id=$1",
+            [p.id],
           );
           await this.event(
             client,
