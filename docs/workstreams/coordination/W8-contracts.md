@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+`createTrustReplyReviewer()` now exposes `.maxTextLength=12000`, matching `TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH`.0069 has no text ceiling and its original SQL bytes remain unchanged. Capacity does not grant policy/tenure/Note publication; W5 retains4000 until genuine owner gates and schema activation are available. Exact version/hash and recorded reviewer decision are mandatory.
+
 **Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
 
 ## Exact Note reply review and new reservations — 2026-10-01

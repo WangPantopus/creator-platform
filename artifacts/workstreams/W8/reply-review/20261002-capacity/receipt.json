@@ -1,0 +1,15 @@
+{
+  "label": "negative transport probe; no fabricated reply/session or paid-tenure permission",
+  "maxTextLength": 12000,
+  "parsed12000ButMissingSession": {
+    "code": "reply_session_required",
+    "status": 401
+  },
+  "over12000Refused": true,
+  "genuineOpsDecision": false,
+  "paidTenure": false,
+  "recordedAt": "2026-10-02T10:34:15.799332+00:00",
+  "sql0069Sha256": "008336be882c546b193b898b7176ea6f6417ec7fe4cee3fca81d18bfa65e0890",
+  "newUnitTests": false,
+  "positiveReplyAcceptance": false
+}
