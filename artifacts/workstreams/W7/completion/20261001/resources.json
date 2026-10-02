@@ -142,14 +142,14 @@
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "Owned API4107 PID13109/session40577; development web3007 PID72333/session15471. Current production build was launched/operated and then normally stopped for actual authenticated development preferences. Verify listeners before reuse."
+      "note": "Owned API4107 PID34841/session10018; development web3007 PID72333/session15471. Native devices and leases stopped/released. Verify listeners before reuse."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Shipping signed dylib52417387 personally operated cold Light/cold Night/warm ID unavailable; real sign-out\u2192cold ID\u2192development sign-in preserves ID; reads web-saved22:30/08:15/AmericaLosAngeles. App terminated/simulator shut down; exact slot3 UUID/inode released; own idb55076 stopped; app data retained."
+      "state": "Shipping signed dylib52417387 personally operated cold Light/cold Night/warm ID unavailable; real sign-out→cold ID→development sign-in preserves ID; reads web-saved22:30/08:15/AmericaLosAngeles. App terminated/simulator shut down; exact slot3 UUID/inode released; own idb55076 stopped; app data retained."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
@@ -187,10 +187,10 @@
     },
     "nativeBuild": "Signed shipping iOS build and Android assemble/testDebugUnitTest/verifyPaparazziDebug pass. Original18 Swift checks/110 comparisons pass after first heavy-slot busy refusal. No W7 native build/device/GUI/lease held. No new test/ref/tolerance.",
     "api": {
-      "pid": 13109,
-      "session": 40577,
-      "source": "17483213 plus notification edits at startup; reviewed main66dfb1ee and final connecting-state hunk compiled afterward; restart needed for exact final source",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/notification-api.log"
+      "pid": 34841,
+      "session": 10018,
+      "source": "099c7c53 plus exact provider-lock receipt source hashes; restarted after personally reviewed main66dfb1ee",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/provider-lock-api.log"
     },
     "web": {
       "pid": 72333,

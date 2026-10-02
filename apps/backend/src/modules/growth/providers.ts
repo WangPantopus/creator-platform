@@ -73,8 +73,8 @@ export class NativeDeliveryProvider implements DeliveryProvider {
     );
     const receipts: string[] = [];
     for (const device of devices.rows) {
-      // Secret-management latency must not extend the live-session lock.
-      // The session is checked afterward and held only for bounded submission.
+      // Credential lookup and submission never hold database connections.
+      // Recheck the actual captured session/device after both lookups below.
       const authorization = await this.authorization(device.platform);
       const result = await service.devices.withCurrent(
         input.accountId,
@@ -87,8 +87,24 @@ export class NativeDeliveryProvider implements DeliveryProvider {
           let sending = false;
           let reserved = false;
           try {
+            if (
+              device.platform === "ios" ? !this.config.apns : !this.config.fcm
+            )
+              throw new Error("push_provider_unconfigured");
+            await this.beginReceipt(input.idempotencyKey, registrationHash);
+            reserved = true;
+            await input.beforeSubmit();
+            const current = await service.devices.withCurrent(
+              input.accountId,
+              device.encrypted_token,
+              device.token_hash,
+              device.installation_id,
+              device.platform,
+              async () => true,
+            );
+            if (!current) throw new DeliveryFailure(1);
+            signal.throwIfAborted();
             if (device.platform === "ios") {
-              if (!this.config.apns) throw new Error("apns_unconfigured");
               const id = createHash("sha256")
                 .update(`${input.idempotencyKey}:${device.installation_id}`)
                 .digest("hex")
@@ -97,21 +113,14 @@ export class NativeDeliveryProvider implements DeliveryProvider {
                   /^(........)(....)(....)(....)(............)$/u,
                   "$1-$2-$3-$4-$5",
                 );
-              await this.beginReceipt(input.idempotencyKey, registrationHash);
-              reserved = true;
-              signal.throwIfAborted();
               sending = true;
               receipts.push(
                 await this.sendAPNS(token, id, input, authorization, signal),
               );
             } else {
-              if (!this.config.fcm) throw new Error("fcm_unconfigured");
-              await this.beginReceipt(input.idempotencyKey, registrationHash);
-              reserved = true;
-              signal.throwIfAborted();
               sending = true;
               const response = await fetch(
-                `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm.projectId)}/messages:send`,
+                `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm!.projectId)}/messages:send`,
                 {
                   method: "POST",
                   headers: {
@@ -354,7 +363,21 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       if (inserted.rowCount !== ids.length)
         throw new Error("provider_outcome_unknown");
     });
+    let sending = false;
     try {
+      await input.beforeSubmit();
+      // Address rotation, bounce and unsubscribe during credential lookup
+      // invalidate this batch before any transport bytes are submitted.
+      if (
+        !(
+          await service.db.worker.query(
+            "SELECT 1 FROM growth.email WHERE account_id=$1 AND encrypted_address=$2 AND bounced_at IS NULL AND unsubscribed_at IS NULL",
+            [input.accountId, result.rows[0].encrypted_address],
+          )
+        ).rowCount
+      )
+        throw new DeliveryFailure(1);
+      sending = true;
       const receipt = await this.bounded((signal) =>
         config.transport.send({
           to: service.open(result.rows[0].encrypted_address),
@@ -376,7 +399,7 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       );
       return { providerRef: receipt.id };
     } catch (error) {
-      if (error instanceof DeliveryFailure)
+      if (!sending || error instanceof DeliveryFailure)
         await service.db.worker.query(
           "DELETE FROM growth.provider_receipt WHERE delivery_id=ANY($1::uuid[]) AND registration_hash=$2 AND state='sending'",
           [ids, key],
