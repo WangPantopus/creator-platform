@@ -146,7 +146,7 @@ public struct TrustFanFeature: View {
     private var privacy: some View { VStack(alignment: .leading, spacing: 16) {
         Text("Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.").qText("body")
         Link("Manage Apple subscriptions", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
-        Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu)
+        Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
         if scope != "account" { field("Creator ID", $creatorID) }; if scope == "thread" { field("Conversation ID", $threadID) }
         if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
         else if capability?.verificationMethod == "current_session" { Text("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.").qText("caption") }
@@ -179,7 +179,7 @@ public struct TrustFanFeature: View {
         }
     }
     private var privacyDisabled: Bool { busy || capability?.actorVerification != "configured" || (capability?.localDevelopment == true ? proof != "LOCAL DEVELOPMENT" : capability?.verificationMethod != "current_session" && proof.isEmpty) || (scope != "account" && UUID(uuidString: creatorID) == nil) || (scope == "thread" && UUID(uuidString: threadID) == nil) }
-    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).qDisableAutoCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).accessibilityLabel(title) } }
+    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).qDisableAutoCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).frame(minHeight: 44).contentShape(Rectangle()).accessibilityLabel(title) } }
     // Public crisis help never waits on capability or account data: a restored or
     // degraded host can refuse those while help stays available. A failed capability
     // read clears the old value so data requests cannot submit on stale verification.
@@ -203,4 +203,3 @@ public struct TrustFanFeature: View {
     private func download(_ id: String) async { guard let client, !busy else { return }; busy = true; defer { busy = false }; do { exportPayload = TrustExport(data: try await client.bytes("privacy/jobs/" + id + "/download")); error = "" } catch { exportPayload = nil; self.error = error.localizedDescription } }
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
-

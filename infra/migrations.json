@@ -325,22 +325,26 @@
     {
       "version": "0074_w8_content_runtime_denial",
       "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3"
     },
     {
       "version": "0082_w8_interactive_denial_try_fence",
       "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
     },
     {
       "version": "0087_w8_privacy_task_commit_fence",
       "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef"
     },
     {
       "version": "0103_w8_domain_privacy_task_fence",
       "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d"
     }
   ],
   "reserved": [
