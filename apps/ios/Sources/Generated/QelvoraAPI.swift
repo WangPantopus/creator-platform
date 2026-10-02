@@ -5432,7 +5432,8 @@ public struct APIMessage: Codable, Sendable {
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
-  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
+  public let `systemLink`: APIMessageSystemLink?
+  public init(id: String, threadId: String, authorKind: APIMessageAuthorKind, text: String, deliveryState: APIMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIMessageSystemLink? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -5443,6 +5444,7 @@ public struct APIMessage: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
   }
   private enum CodingKeys: String, CodingKey {
     case `id`
@@ -5455,6 +5457,7 @@ public struct APIMessage: Codable, Sendable {
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -5468,6 +5471,7 @@ public struct APIMessage: Codable, Sendable {
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decodeIfPresent(String.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIMessageSystemLink.self, forKey: .systemLink)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -5481,6 +5485,7 @@ public struct APIMessage: Codable, Sendable {
     try container.encode(signedActId, forKey: .signedActId)
     try container.encodeIfPresent(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
   }
 }
 
@@ -5502,6 +5507,29 @@ public enum APIMessageDeliveryState: String, Codable, Sendable {
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIMessageSystemLink: Codable, Sendable {
+  public let `kind`: APIMessageSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIMessageSystemLinkLabel
+  public init(kind: APIMessageSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIMessageSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIMessageSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIMessageSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIAcceptedMessage: Codable, Sendable {
@@ -5538,7 +5566,8 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
-  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
+  public let `systemLink`: APIAcceptedMessageMessageSystemLink?
+  public init(id: String, threadId: String, authorKind: APIAcceptedMessageMessageAuthorKind, text: String, deliveryState: APIAcceptedMessageMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIAcceptedMessageMessageSystemLink? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -5549,6 +5578,7 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
   }
   private enum CodingKeys: String, CodingKey {
     case `id`
@@ -5561,6 +5591,7 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -5574,6 +5605,7 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decodeIfPresent(String.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIAcceptedMessageMessageSystemLink.self, forKey: .systemLink)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -5587,6 +5619,7 @@ public struct APIAcceptedMessageMessage: Codable, Sendable {
     try container.encode(signedActId, forKey: .signedActId)
     try container.encodeIfPresent(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
   }
 }
 
@@ -5610,6 +5643,29 @@ public enum APIAcceptedMessageMessageDeliveryState: String, Codable, Sendable {
   case `interrupted` = "interrupted"
 }
 
+public struct APIAcceptedMessageMessageSystemLink: Codable, Sendable {
+  public let `kind`: APIAcceptedMessageMessageSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIAcceptedMessageMessageSystemLinkLabel
+  public init(kind: APIAcceptedMessageMessageSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIAcceptedMessageMessageSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIAcceptedMessageMessageSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIAcceptedMessageMessageSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
+}
+
 public struct APIFrame: Codable, Sendable {
   public let `threadId`: String
   public let `cursor`: Int
@@ -5621,7 +5677,8 @@ public struct APIFrame: Codable, Sendable {
   public let `generationId`: String?
   public let `sequence`: Int
   public let `control`: APIFrameControl?
-  public init(threadId: String, cursor: Int, epoch: Int, kind: APIFrameKind, messageId: String, authorKind: APIFrameAuthorKind, text: String, generationId: String? = nil, sequence: Int, control: APIFrameControl? = nil) {
+  public let `systemLink`: APIFrameSystemLink?
+  public init(threadId: String, cursor: Int, epoch: Int, kind: APIFrameKind, messageId: String, authorKind: APIFrameAuthorKind, text: String, generationId: String? = nil, sequence: Int, control: APIFrameControl? = nil, systemLink: APIFrameSystemLink? = nil) {
     self.threadId = threadId
     self.cursor = cursor
     self.epoch = epoch
@@ -5632,6 +5689,7 @@ public struct APIFrame: Codable, Sendable {
     self.generationId = generationId
     self.sequence = sequence
     self.control = control
+    self.systemLink = systemLink
   }
   private enum CodingKeys: String, CodingKey {
     case `threadId`
@@ -5644,6 +5702,7 @@ public struct APIFrame: Codable, Sendable {
     case `generationId`
     case `sequence`
     case `control`
+    case `systemLink`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -5657,6 +5716,7 @@ public struct APIFrame: Codable, Sendable {
     self.generationId = try container.decode(String?.self, forKey: .generationId)
     self.sequence = try container.decode(Int.self, forKey: .sequence)
     self.control = try container.decodeIfPresent(APIFrameControl.self, forKey: .control)
+    self.systemLink = try container.decodeIfPresent(APIFrameSystemLink.self, forKey: .systemLink)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -5670,6 +5730,7 @@ public struct APIFrame: Codable, Sendable {
     try container.encode(generationId, forKey: .generationId)
     try container.encode(sequence, forKey: .sequence)
     try container.encodeIfPresent(control, forKey: .control)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
   }
 }
 
@@ -5699,6 +5760,29 @@ public enum APIFrameControl: String, Codable, Sendable {
   case `ai_paused` = "ai_paused"
   case `closed` = "closed"
   case `blocked` = "blocked"
+}
+
+public struct APIFrameSystemLink: Codable, Sendable {
+  public let `kind`: APIFrameSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIFrameSystemLinkLabel
+  public init(kind: APIFrameSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIFrameSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIFrameSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIFrameSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APISubscribe: Codable, Sendable {
@@ -5758,7 +5842,8 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
-  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil) {
+  public let `systemLink`: APIThreadTimelineMessagesItemSystemLink?
+  public init(id: String, threadId: String, authorKind: APIThreadTimelineMessagesItemAuthorKind, text: String, deliveryState: APIThreadTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIThreadTimelineMessagesItemSystemLink? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -5769,6 +5854,7 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
   }
   private enum CodingKeys: String, CodingKey {
     case `id`
@@ -5781,6 +5867,7 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -5794,6 +5881,7 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decodeIfPresent(String.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIThreadTimelineMessagesItemSystemLink.self, forKey: .systemLink)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -5807,6 +5895,7 @@ public struct APIThreadTimelineMessagesItem: Codable, Sendable {
     try container.encode(signedActId, forKey: .signedActId)
     try container.encodeIfPresent(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
   }
 }
 
@@ -5828,6 +5917,29 @@ public enum APIThreadTimelineMessagesItemDeliveryState: String, Codable, Sendabl
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIThreadTimelineMessagesItemSystemLink: Codable, Sendable {
+  public let `kind`: APIThreadTimelineMessagesItemSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIThreadTimelineMessagesItemSystemLinkLabel
+  public init(kind: APIThreadTimelineMessagesItemSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIThreadTimelineMessagesItemSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIThreadTimelineMessagesItemSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIThreadTimelineMessagesItemSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIConversationAgentReplyVersion: Codable, Sendable {
@@ -6074,6 +6186,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
+  public let `systemLink`: APIConversationConversationMessageSystemLink?
   public let `citations`: [String]
   public let `createdAt`: String
   public let `offTheRecord`: Bool
@@ -6082,7 +6195,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
   public let `feedback`: APIConversationConversationMessageFeedback?
   public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationMessageCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationMessageAgentVersion? = nil, feedback: APIConversationConversationMessageFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationMessageCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationMessageAuthorKind, text: String, deliveryState: APIConversationConversationMessageDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIConversationConversationMessageSystemLink? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationMessageAgentVersion? = nil, feedback: APIConversationConversationMessageFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationMessageCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -6093,6 +6206,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
     self.citations = citations
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
@@ -6113,6 +6227,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
     case `citations`
     case `createdAt`
     case `offTheRecord`
@@ -6134,6 +6249,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decode(String?.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIConversationConversationMessageSystemLink.self, forKey: .systemLink)
     self.citations = try container.decode([String].self, forKey: .citations)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
     self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
@@ -6155,6 +6271,7 @@ public struct APIConversationConversationMessage: Codable, Sendable {
     try container.encode(signedActId, forKey: .signedActId)
     try container.encode(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
     try container.encode(citations, forKey: .citations)
     try container.encode(createdAt, forKey: .createdAt)
     try container.encode(offTheRecord, forKey: .offTheRecord)
@@ -6184,6 +6301,29 @@ public enum APIConversationConversationMessageDeliveryState: String, Codable, Se
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationMessageSystemLink: Codable, Sendable {
+  public let `kind`: APIConversationConversationMessageSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIConversationConversationMessageSystemLinkLabel
+  public init(kind: APIConversationConversationMessageSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIConversationConversationMessageSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIConversationConversationMessageSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIConversationConversationMessageSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIConversationConversationMessageAgentVersion: Codable, Sendable {
@@ -6331,6 +6471,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
+  public let `systemLink`: APIConversationConversationPageMessagesItemSystemLink?
   public let `citations`: [String]
   public let `createdAt`: String
   public let `offTheRecord`: Bool
@@ -6339,7 +6480,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
   public let `feedback`: APIConversationConversationPageMessagesItemFeedback?
   public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationPageMessagesItemCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationPageMessagesItemCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIConversationConversationPageMessagesItemSystemLink? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationPageMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -6350,6 +6491,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
     self.citations = citations
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
@@ -6370,6 +6512,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
     case `citations`
     case `createdAt`
     case `offTheRecord`
@@ -6391,6 +6534,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decode(String?.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIConversationConversationPageMessagesItemSystemLink.self, forKey: .systemLink)
     self.citations = try container.decode([String].self, forKey: .citations)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
     self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
@@ -6412,6 +6556,7 @@ public struct APIConversationConversationPageMessagesItem: Codable, Sendable {
     try container.encode(signedActId, forKey: .signedActId)
     try container.encode(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
     try container.encode(citations, forKey: .citations)
     try container.encode(createdAt, forKey: .createdAt)
     try container.encode(offTheRecord, forKey: .offTheRecord)
@@ -6441,6 +6586,29 @@ public enum APIConversationConversationPageMessagesItemDeliveryState: String, Co
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationPageMessagesItemSystemLink: Codable, Sendable {
+  public let `kind`: APIConversationConversationPageMessagesItemSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIConversationConversationPageMessagesItemSystemLinkLabel
+  public init(kind: APIConversationConversationPageMessagesItemSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIConversationConversationPageMessagesItemSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIConversationConversationPageMessagesItemSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIConversationConversationPageMessagesItemSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIConversationConversationPageMessagesItemAgentVersion: Codable, Sendable {
@@ -6596,6 +6764,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
+  public let `systemLink`: APIConversationConversationTimelineMessagesItemSystemLink?
   public let `citations`: [String]
   public let `createdAt`: String
   public let `offTheRecord`: Bool
@@ -6604,7 +6773,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
   public let `feedback`: APIConversationConversationTimelineMessagesItemFeedback?
   public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationTimelineMessagesItemCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationTimelineMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationTimelineMessagesItemAgentVersion? = nil, feedback: APIConversationConversationTimelineMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationTimelineMessagesItemCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationTimelineMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationTimelineMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIConversationConversationTimelineMessagesItemSystemLink? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationTimelineMessagesItemAgentVersion? = nil, feedback: APIConversationConversationTimelineMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationTimelineMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -6615,6 +6784,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
     self.citations = citations
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
@@ -6635,6 +6805,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
     case `citations`
     case `createdAt`
     case `offTheRecord`
@@ -6656,6 +6827,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decode(String?.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIConversationConversationTimelineMessagesItemSystemLink.self, forKey: .systemLink)
     self.citations = try container.decode([String].self, forKey: .citations)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
     self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
@@ -6677,6 +6849,7 @@ public struct APIConversationConversationTimelineMessagesItem: Codable, Sendable
     try container.encode(signedActId, forKey: .signedActId)
     try container.encode(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
     try container.encode(citations, forKey: .citations)
     try container.encode(createdAt, forKey: .createdAt)
     try container.encode(offTheRecord, forKey: .offTheRecord)
@@ -6706,6 +6879,29 @@ public enum APIConversationConversationTimelineMessagesItemDeliveryState: String
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationTimelineMessagesItemSystemLink: Codable, Sendable {
+  public let `kind`: APIConversationConversationTimelineMessagesItemSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIConversationConversationTimelineMessagesItemSystemLinkLabel
+  public init(kind: APIConversationConversationTimelineMessagesItemSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIConversationConversationTimelineMessagesItemSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIConversationConversationTimelineMessagesItemSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIConversationConversationTimelineMessagesItemSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIConversationConversationTimelineMessagesItemAgentVersion: Codable, Sendable {

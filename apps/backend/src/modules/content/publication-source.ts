@@ -1,4 +1,4 @@
-import type { PoolClient } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { ContentAudience } from "../../../../../packages/api/src/content.js";
 import type { Actor } from "../identity/adapter.js";
@@ -6,6 +6,11 @@ import { requestAuthority } from "../identity/request-authority.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { ContentPacketRead } from "./service.js";
+import type { ContentBody } from "../../../../../packages/api/src/content.js";
+import {
+  ContentGroupPublication,
+  type ContentGroupPublicationOwners,
+} from "./group-publication.js";
 
 export type ContentSourceFinalization =
   | {
@@ -49,15 +54,24 @@ type Held = {
   hash: string | null;
   state: string | null;
   finalized: boolean;
+  group: boolean;
 };
 
 /** W5's consumer binding. This retains the real request/client/xid and stored
  * tuple; it never creates an owner, fan, thread or authority for a worker. */
 export class ContentPublicationSources {
   private readonly held = new WeakMap<PoolClient, Held>();
+  private readonly groups?: ContentGroupPublication;
   constructor(
     private readonly controller?: ContentPublicationSourceController,
-  ) {}
+    groupOwners?: ContentGroupPublicationOwners,
+    pool?: Pool,
+  ) {
+    if (groupOwners) {
+      if (!pool) throw new Error("Canonical Content pool is required.");
+      this.groups = new ContentGroupPublication(pool, groupOwners);
+    }
+  }
 
   private async context(client: PoolClient, actor: Actor) {
     const request = requestAuthority.getStore();
@@ -106,8 +120,11 @@ export class ContentPublicationSources {
         packet_id: string | null;
         audience: unknown;
         state: string;
+        plan_ref: unknown;
       }>(
-        "SELECT version,packet_id,audience,state FROM creator.content_index WHERE creator_id=$1 AND id=$2",
+        `SELECT i.version,i.packet_id,i.audience,i.state,r.document->'planRef' AS plan_ref
+         FROM creator.content_index i JOIN creator.content_revision r ON r.content_id=i.id AND r.version=i.version
+         WHERE i.creator_id=$1 AND i.id=$2`,
         [creatorId, contentId],
       )
     ).rows[0];
@@ -121,6 +138,21 @@ export class ContentPublicationSources {
         }
       : null;
     const hash = tuple ? contentHash(tuple) : null;
+    if (row?.plan_ref) {
+      if (tuple || !this.groups)
+        throw new DomainError(
+          "fulfillment_plan_unconfigured",
+          "Current fulfillment is unavailable. Your draft is kept.",
+          503,
+        );
+      await this.groups.prepare(client, actor, {
+        creatorId,
+        contentId,
+        version: row.version,
+        state: row.state,
+        planRef: row.plan_ref,
+      });
+    }
     if (tuple) {
       if (!this.controller)
         throw new DomainError(
@@ -144,7 +176,71 @@ export class ContentPublicationSources {
       hash,
       state: row?.state ?? null,
       finalized: false,
+      group: Boolean(row?.plan_ref),
     });
+  }
+
+  async prepareSave(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      expectedVersion: number;
+      document: ContentBody;
+      idempotencyKey: string;
+    },
+  ) {
+    if (!input.document.planRef) return;
+    if (!this.groups)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current fulfillment is unavailable. Your draft is kept.",
+        503,
+      );
+    await this.groups.prepareSave(client, actor, input);
+  }
+
+  async groupPositive(client: PoolClient, actor: Actor) {
+    if (!this.groups)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current fulfillment is unavailable. Your draft is kept.",
+        503,
+      );
+    await this.groups.positive(client, actor);
+  }
+
+  async assertGroupPublisher(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      version: number;
+      state: string;
+      planRef: unknown;
+    },
+  ) {
+    if (!this.groups)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current access to this answer is unavailable.",
+        503,
+      );
+    await this.groups.assertPublisher(client, actor, input);
+  }
+
+  async emitGroup(client: PoolClient, actor: Actor) {
+    if (!this.groups)
+      throw new Error("Actual group publication owner required.");
+    await this.groups.emit(client, actor);
+  }
+
+  async finalizeSave(client: PoolClient, actor: Actor) {
+    if (!this.groups)
+      throw new Error("Actual group publication owner required.");
+    await this.groups.finalizeSave(client, actor);
   }
 
   private async current(client: PoolClient, actor: Actor) {
@@ -187,9 +283,9 @@ export class ContentPublicationSources {
       | { stage: "publication"; publicationSignedActId: string | null },
   ) {
     const held = await this.current(client, actor);
-    if (!held.tuple) return;
+    if (!held.tuple && !held.group) return;
     invariant(
-      this.controller,
+      held.group ? this.groups : this.controller,
       "publication_source_authority_unconfigured",
       "Current publication source authority is not connected.",
     );
@@ -225,9 +321,13 @@ export class ContentPublicationSources {
       "The publication stage cannot downgrade its stored source authority.",
     );
     held.finalized = true;
+    if (held.group) {
+      await this.groups!.finalize(client, actor, stage);
+      return;
+    }
     invariant(
-      (await this.controller.finalize(client, actor, {
-        ...held.tuple,
+      (await this.controller!.finalize(client, actor, {
+        ...held.tuple!,
         ...stage,
       })) === true,
       "publication_source_unavailable",

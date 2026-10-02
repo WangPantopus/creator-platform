@@ -170,6 +170,7 @@ export interface ContentDependencies {
   ) => Promise<number | null>;
   mediaPublication?: ContentPublicationMedia;
   publicationSource?: ContentPublicationSourceController;
+  groupPublication?: import("./group-publication.js").ContentGroupPublicationOwners;
   /** W1 withdrawal-only registry. Must verify this exact consumed act and
    * persist a durable audit for the actual publisher on this held client.
    * It cannot issue signing authority or disclose a new public command. */
@@ -310,6 +311,8 @@ export class ContentService {
   ) {
     this.publicationSources = new ContentPublicationSources(
       dependencies.publicationSource,
+      dependencies.groupPublication,
+      pool,
     );
   }
   private async consentRecord(
@@ -585,11 +588,45 @@ export class ContentService {
     creatorId: string,
     contentId: string,
   ) {
+    await this.requireOrdinaryRead(client, creatorId, contentId);
     await this.dependencies.preparePublicPacketRead?.(client, actor, {
       creatorId,
       contentId,
     });
     await this.dependencies.prepareAudienceRead?.(client, actor, creatorId);
+  }
+  private async hasFulfillmentPlan(
+    client: PoolClient,
+    creatorId: string,
+    contentId: string,
+    version?: number,
+  ) {
+    // Tuple metadata only. A plan's group ID cannot enter ordinary tier-group
+    // eligibility or disclose its body before the genuine viewer is prepared.
+    return (
+      (
+        await client.query(
+          `SELECT FROM creator.content_index i JOIN creator.content_revision r
+         ON r.content_id=i.id AND r.creator_id=i.creator_id AND r.version=i.version
+         WHERE i.creator_id=$1 AND i.id=$2 AND ($3::integer IS NULL OR i.version=$3)
+         AND r.document->'planRef' IS NOT NULL AND r.document->'planRef'<>'null'::jsonb`,
+          [creatorId, contentId, version ?? null],
+        )
+      ).rowCount === 1
+    );
+  }
+  private async requireOrdinaryRead(
+    client: PoolClient,
+    creatorId: string,
+    contentId: string,
+    version?: number,
+  ) {
+    if (await this.hasFulfillmentPlan(client, creatorId, contentId, version))
+      throw new DomainError(
+        "fulfillment_view_unconfigured",
+        "Current access to this answer is unavailable.",
+        503,
+      );
   }
   async index(
     client: PoolClient,
@@ -632,6 +669,7 @@ export class ContentService {
     actor: Actor,
     row: Index,
   ) {
+    await this.requireOrdinaryRead(client, row.creator_id, row.id, row.version);
     const creator = (
       await client.query(
         "SELECT verification,recovery_required FROM creator.creator_profile WHERE id=$1",
@@ -759,6 +797,20 @@ export class ContentService {
     row: Index,
     authoring = true,
   ): Promise<ContentView> {
+    const metadata = (
+      await client.query<{ plan_ref: unknown }>(
+        "SELECT document->'planRef' AS plan_ref FROM creator.content_revision WHERE content_id=$1 AND version=$2",
+        [row.id, row.version],
+      )
+    ).rows[0];
+    if (metadata?.plan_ref)
+      await this.publicationSources.assertGroupPublisher(client, actor, {
+        creatorId: row.creator_id,
+        contentId: row.id,
+        version: row.version,
+        state: row.state,
+        planRef: metadata.plan_ref,
+      });
     const revision = (
       await client.query(
         "SELECT document FROM creator.content_revision WHERE content_id=$1 AND version=$2",
@@ -767,12 +819,7 @@ export class ContentService {
     ).rows[0];
     invariant(revision, "content_unavailable", "This revision is unavailable.");
     const document = ContentDocument.parse(revision.document);
-    if (document.planRef)
-      throw new DomainError(
-        "fulfillment_plan_unconfigured",
-        "Current access to this answer is unavailable.",
-        503,
-      );
+
     const creator = (
       await client.query(
         "SELECT display_name,handle FROM creator.creator_profile WHERE id=$1",
@@ -871,19 +918,30 @@ export class ContentService {
   }
   async save(actor: Actor, creatorId: string, raw: unknown) {
     const input = SaveContent.parse(raw);
-    if (input.document.planRef)
+    if (input.document.planRef && input.document.aiUseIntent)
       throw new DomainError(
-        "fulfillment_plan_unconfigured",
-        "Current fulfillment is unavailable. Your draft is kept.",
+        "fulfillment_source_unconfigured",
+        "Current approval for reusing this answer is unavailable.",
         503,
       );
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepareSave(client, actor, {
+        creatorId,
+        contentId: input.id,
+        expectedVersion: input.expectedVersion,
+        document: input.document,
+        idempotencyKey: input.idempotencyKey,
+      });
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, [
         "drafter",
         "publisher",
       ]);
-      return this.command(
+      if (input.document.planRef) {
+        await this.index(client, creatorId, input.id, true);
+        await this.publicationSources.groupPositive(client, actor);
+      }
+      const result = await this.command(
         client,
         actor,
         "save",
@@ -936,7 +994,7 @@ export class ContentService {
               "Choose tiers from this creator.",
             );
           }
-          if (document.audience.kind === "groups") {
+          if (document.audience.kind === "groups" && !document.planRef) {
             const tiers = (
               await client.query(
                 "SELECT catalog FROM creator.commerce_tier WHERE creator_id=$1",
@@ -1012,6 +1070,9 @@ export class ContentService {
           return { id: input.id, version, state: "draft" };
         },
       );
+      if (input.document.planRef)
+        await this.publicationSources.finalizeSave(client, actor);
+      return result;
     });
   }
   async validatePublication(
@@ -1020,12 +1081,27 @@ export class ContentService {
     row: Index,
     document: ContentBody,
   ) {
-    if (document.planRef)
-      throw new DomainError(
-        "fulfillment_plan_unconfigured",
-        "Current fulfillment is unavailable. Your draft is kept.",
-        503,
-      );
+    if (document.planRef) {
+      await this.publicationSources.assertGroupPublisher(client, actor, {
+        creatorId: row.creator_id,
+        contentId: row.id,
+        version: row.version,
+        state: row.state,
+        planRef: document.planRef,
+      });
+      if (document.media.length)
+        throw new DomainError(
+          "fulfillment_media_task_unconfigured",
+          "Current recorded-answer fulfillment is unavailable. Your draft is kept.",
+          503,
+        );
+      if (document.aiUseIntent)
+        throw new DomainError(
+          "fulfillment_source_unconfigured",
+          "Current approval for reusing this answer is unavailable.",
+          503,
+        );
+    }
     invariant(
       document.text.length > 0 || document.media.length > 0,
       "content_empty",
@@ -1147,6 +1223,8 @@ export class ContentService {
         row,
         view.document,
       );
+      if (view.document.planRef)
+        await this.publicationSources.groupPositive(client, actor);
       const result = {
         command: publicationCommand(row, view.document, mediaEvidence),
         view,
@@ -1230,6 +1308,8 @@ export class ContentService {
               signature,
               command,
             );
+          if (document.planRef)
+            await this.publicationSources.groupPositive(client, actor);
           const scheduled = document.scheduledAt !== null;
           const mediaPending = quote.mediaEvidence.length > 0;
           if (mediaPending) {
@@ -1295,6 +1375,8 @@ export class ContentService {
               await this.effect(client, row, "source_candidate");
             // Keep exact command private on generic verification pages; C08 checks current access.
           }
+          if (document.planRef)
+            await this.publicationSources.emitGroup(client, actor);
           return {
             id,
             version: row.version,
@@ -1355,6 +1437,8 @@ export class ContentService {
             row,
             view.document,
           );
+          if (view.document.planRef)
+            await this.publicationSources.groupPositive(client, actor);
           invariant(
             contentHash(current.mediaEvidence) ===
               contentHash(
@@ -1573,6 +1657,10 @@ export class ContentService {
     if (!studio)
       await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
+      const planned =
+        studio && (await this.hasFulfillmentPlan(client, creatorId, id));
+      if (planned)
+        await this.publicationSources.prepare(client, actor, creatorId, id);
       const row = await this.index(
         client,
         creatorId,
@@ -1581,7 +1669,15 @@ export class ContentService {
         studio ? undefined : actor,
       );
       await this.authorizeRead(client, actor, row, studio);
-      return this.view(client, actor, row, studio);
+      const view = await this.view(client, actor, row, studio);
+      if (planned) {
+        await this.publicationSources.groupPositive(client, actor);
+        await this.publicationSources.finalize(client, actor, {
+          stage: "review",
+          publicationSignedActId: view.signedActId,
+        });
+      }
+      return view;
     });
   }
   /** Internal W7 owner proof port. A publisher does not become its own fan.
@@ -1617,7 +1713,7 @@ export class ContentService {
       // real phased owner fence and each source's retraction producer must be
       // composed before these proofs are available. Do not take late negative
       // leases below the creator/content positives or call a viewer as owner.
-      if (current.document.quote)
+      if (current.document.quote || current.document.planRef)
         throw new DomainError(
           "publication_source_authority_unconfigured",
           "Current publication source authority is not connected.",
@@ -1674,6 +1770,8 @@ export class ContentService {
           )
             mediaReady = false;
       }
+      if (current.document.planRef)
+        await this.publicationSources.groupPositive(client, actor);
       const result = {
         view: current,
         command,
@@ -1692,13 +1790,6 @@ export class ContentService {
     if (!studio)
       await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
-      if (studio)
-        await this.role(client, actor, creatorId, [
-          "triage",
-          "drafter",
-          "publisher",
-          "scheduler",
-        ]);
       const rows = (
         await client.query<Index>(
           "SELECT * FROM creator.content_index WHERE creator_id=$1 AND ($2::uuid IS NULL OR (created_at,id)<(SELECT created_at,id FROM creator.content_index WHERE id=$2 AND creator_id=$1)) AND ($3::text IS NULL OR state=$3) ORDER BY created_at DESC,id DESC LIMIT $4",
@@ -1710,6 +1801,18 @@ export class ContentService {
           ],
         )
       ).rows;
+      // The owner publication preparation holds one actual plan. A bounded
+      // mixed Studio page requires its own multi-plan owner preparation; never
+      // clone that scope or silently omit a current answer from this feed.
+      for (const row of rows.slice(0, page.limit))
+        await this.requireOrdinaryRead(client, creatorId, row.id, row.version);
+      if (studio)
+        await this.role(client, actor, creatorId, [
+          "triage",
+          "drafter",
+          "publisher",
+          "scheduler",
+        ]);
       const items: ContentView[] = [];
       // Resolve every bounded page family's negatives before the first content
       // lock. Never prepare a second family after a prior row's source fence.
