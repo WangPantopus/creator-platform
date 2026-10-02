@@ -47,6 +47,7 @@ struct CommercePacket: Decodable, Identifiable, Sendable {
     let commitment_state: String?; let delivered_at: String?
 }
 struct CommerceDetail: Decodable, Sendable {
+    struct CallTransport: Decodable, Sendable { let state: String; let authorKind: String; let recordedAt: String? }
     struct Ledger: Decodable, Sendable { let kind: String; let amount: String; let currency: String }
     struct Commitment: Decodable, Sendable {
         struct Evidence: Decodable, Sendable { let signedActId: String?; let authorKind: String? }
@@ -54,7 +55,7 @@ struct CommerceDetail: Decodable, Sendable {
         let accept_act_id: String?; let evidence: Evidence?
     }
     struct Share: Decodable, Sendable { let version: Int; let fan_choice: Bool; let revoked_at: String? }
-    let packet: CommercePacket; let commitment: Commitment?; let share: Share?; let ledger: [Ledger]
+    let packet: CommercePacket; let commitment: Commitment?; let share: Share?; let ledger: [Ledger]; let callTransport: CallTransport?
 }
 struct CommerceFailure: Error { let message: String; let status: Int }
 private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
