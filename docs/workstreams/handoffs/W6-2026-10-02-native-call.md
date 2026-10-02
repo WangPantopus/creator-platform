@@ -16,6 +16,8 @@ Prior W6 deliveries are PR19/20, PR67 (`4d6470b6`), PR139 (`cc33407d`), PR160 (`
 
 There are no unresolved source conflicts. The global shared Git stash also contains peers' entries: never use a numeric stash blindly. W6's restored `W6-owned-native-call-OS-and-capture-integration` is an obsolete safety snapshot after source restoration; all of its implemented source is committed. Do not drop another stream's stash.
 
+The ready delivery is [PR193](https://github.com/WangPantopus/creator-platform/pull/193), targeting main. All implementation and handoff changes are committed and pushed; these final documentation changes do not change the personally installed source. Read the actual PR head, `state`, `mergeCommit` and exact-head `statusCheckRollup` before resuming. At handoff preparation its backend/web and Android-runtime checks are running, while six shared native/visual foundation checks are queued. The final owner report records the actual delivery result; no queued check is claimed as passing and no automatic/admin merge bypass is authorized by this note.
+
 ## What this increment actually changed and verified
 
 Read `artifacts/workstreams/W6/native-call-custody/2026-10-02/README.md` first. It gives exact installed hashes and scope. Both native clients now consume the real W1 model-issued `FanSessionRequestCapture` and immutable captured generated client, with expected-account pinning and original credential/navigation/session currentness before/after requests, callback application and external handoffs. No replacement token storage is reconstructed. One-ID account lookup remains W1-owned. Typed call session/offer/admission schemas and nine call operations are generated from the canonical API.
