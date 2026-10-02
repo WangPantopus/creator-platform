@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-02T15:36:58.651Z",
+  "source": "d097b68b6ed4582d783503da36ddf977d6516f6e",
+  "database": "creator_w6_canonical_fresh_20261002",
+  "readOnlyAdministrativeInspection": true,
+  "state": {
+    "migrations": 57,
+    "calls": 0,
+    "admissions": 0,
+    "media": 0,
+    "creator_media": 0,
+    "call_effects": 0,
+    "call_events": 0,
+    "interactive_denial": false,
+    "runtime_memberships": 0
+  },
+  "threads": [
+    {
+      "id": "60000000-0000-4000-8000-000000000004",
+      "control": "human_active",
+      "control_epoch": 0
+    }
+  ],
+  "activeDenialEntries": 0
+}
