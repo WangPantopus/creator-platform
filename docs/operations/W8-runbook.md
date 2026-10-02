@@ -1,5 +1,9 @@
 # Trust operation and recovery
 
+**Canonical development trust experiment, 2026-10-01:** PR17 is merged. The [development receipt](../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) records a separate synthetic clone `creator_w8_devtrust_v2_20261001` with forty canonical ledger rows and manually applied experimental0053; it is not a preserved upgrade or migration activation. Private `runtime-devtrust.env` uses canonical development identity and three separate non-owner pools. The scratch canonical host is `/private/tmp/creator-w8-devtrust-20261001/host.mts`, with actual `createConfiguredBackend`/`createDevelopmentTrust`; W1 owns the eventual `server.ts` composition. Start it from `apps/backend` with `RELEASE_REVISION=$(git rev-parse HEAD) node --env-file=$HOME/.config/creator-platform/w8-mac-studio-20261001/runtime-devtrust.env --import tsx /private/tmp/creator-w8-devtrust-20261001/host.mts`. Use `.next-w8-devtrust` for this experiment's web output. These services and W8 devices are stopped after verification; keep the original and cloned data.
+
+Emulator37 can silently raise `-memory 2048` to2560MB. W8's measured two-core/2026148KiB launch uses `-cores 2 -memory 2048 -no-snapshot-save -no-audio -no-boot-anim -gpu host -qemu -m 2048` on its explicit AVD/port5568 after obtaining a slot. Release that slot when stopped.
+
 **Mac Studio host, 2026-10-01 (current):** this host does not have the iMac's private W8 archives, env files or Docker volumes. Read [the re-verification record](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) before reusing any older instruction below.
 
 - **W8 resources on this host** (all stopped at handoff; volumes retained):
@@ -22,6 +26,7 @@
   - Android: `adb -s emulator-5568 shell am start -n com.pantopus.qelvora/.MainActivity --es api_url http://10.0.2.2:4108 --es return_to /trust`.
 
 **Shared Mac Studio budget (adopted by W8 as environment coordinator):**
+
 - Run one heavy native build at a time. Hold `mkdir /private/tmp/creator-platform-heavy-build.lock` plus an `owner` line, and remove it when done.
 - Run at most two creator-platform emulators (`/private/tmp/creator-platform-emulator-slot-{1,2}`; 2 cores, ≤2048 MB, `-no-snapshot-save`; kill when idle).
 - Boot at most three creator-platform simulators (`/private/tmp/creator-platform-simulator-slot-{1,2,3}`; shut down after 10 idle minutes).
@@ -35,9 +40,7 @@
 
 **Latest owned Android recovery:** preserve the failed startup ANR and same AVD data. Host-graphics/owned TMPDIR+ANDROID_TMP retry on5568/5569/5048 has actual shipping Help Light/crisis Night and four original UI flows passed13.36s; native authenticated/private Report/system-save remains open. Netsim gRPC did not initialize and networking fell back; no Bluetooth or instance isolation is accepted. Never stop the default/peer netsim to change its first-instance arguments. The existing iOS selector proposal remains pending. [Phone Metrics correction](../../artifacts/workstreams/W8/takeover/20260930/metrics-phone-overflow.json) has actual390 Light/Night wrapping/main keyboard focus; preserve full fixed route labels and values.
 
-
 **Current personally observed native/WAL continuation:** use [the fresh device/SDK receipt](../../artifacts/workstreams/W8/takeover/20260930/native-launched/receipt.json), not historical deleted-device IDs. W8 iOS27D0D594-A376-425D-966F-914ED2D3A4A0 and Androidconsole5568/ADBdevice5569/own server5048 use private/tmp/creator-w8-native-resume-20260930; peers/default ADB/netsim must not be stopped. Explicitly confirm W8 AVD identity, never select the first adb device. Android first boot/install/Help render still has a system ANR and launch timeout, so no successful journey. Existing iOS selector correction is separately proposed/pending; do not change tests/goldens under general continuation. API PID12506/sourcef64f165 uses the retained private env. Ops metrics now exposes cluster WAL sample/reset/availability/errors and archiving off; fixed aggregate counters are not archive recovery acceptance. [Current preservation](../../artifacts/workstreams/W8/takeover/20260930/preservation-post-wal.json) verifies all40 migrations and durable state without mutations.
-
 
 **Current takeover preservation, Sep30:** [the new receipt](../../artifacts/workstreams/W8/takeover/20260930/runtime-stream-continuity.json) supersedes historical temporary env/backup and da03 runtime statements below. Durable private directory `/Users/yingpengwang/.config/creator-platform/w8-local` is0700, `runtime.env` and logical dumps/journal are0600 outside Git. The former temporary files are missing; the retained growth ciphertext was not rekeyed. Current API source3240da0 uses the bundled absolute Node `/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --import tsx apps/backend/src/operations/local-server.ts`, cwd28ed, privately loaded env, loopback4108. Live200/ready503; web3008 and preserved database55438 are unchanged. Four cases/one block/one tombstone/three blocked jobs/all40 migrations remain. New stream storage/owner streams are unconfigured, so no complete C10/download is claimed. Verify the owned process and lease before any narrow restart; never echo private env or load migration credentials into the runtime.
 
