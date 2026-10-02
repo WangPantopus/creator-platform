@@ -1115,7 +1115,9 @@ export class SessionService {
         await withDeadline(this.provider.state(revoked.room_id), 5000),
       );
       invariant(
-        truth.closed && !truth.recording,
+        truth.closed &&
+          !truth.recording &&
+          truth.presentAccountIds.length === 0,
         "call_revocation_unconfirmed",
         "Call closure is awaiting provider confirmation.",
       );
@@ -1179,6 +1181,7 @@ export class SessionService {
       typeof provider.complete === "boolean" &&
         typeof provider.closed === "boolean" &&
         typeof provider.reference === "string" &&
+        provider.reference.length <= 2000 &&
         (!provider.complete || provider.reference.trim().length > 0) &&
         Array.isArray(provider.participants) &&
         provider.participants.every(
@@ -1268,23 +1271,34 @@ export class SessionService {
       clocks.reconnectUsedMilliseconds >= doc.reconnectBudgetSeconds * 1000
         ? "failure"
         : "timer");
-    const outcome =
+    const transportClosed = Boolean(
       endDue &&
-      state.closed &&
-      !state.recording &&
-      state.presentAccountIds.length === 0 &&
-      provider.closed &&
-      provider.complete
-        ? determineOutcome({
-            ...clocks,
-            durationSeconds: doc.durationSeconds,
-            endedBy,
-            fanEndedByChoice: row.fan_ended_by_choice,
-            creatorJoinedByGrace,
-            fanJoinedByGrace,
-            graceElapsed: measuredUntil >= graceAt,
-          })
-        : null;
+        state.closed &&
+        !state.recording &&
+        state.presentAccountIds.length === 0 &&
+        provider.closed &&
+        provider.complete,
+    );
+    const outcome = transportClosed
+      ? determineOutcome({
+          ...clocks,
+          durationSeconds: doc.durationSeconds,
+          endedBy,
+          fanEndedByChoice: row.fan_ended_by_choice,
+          creatorJoinedByGrace,
+          fanJoinedByGrace,
+          graceElapsed: measuredUntil >= graceAt,
+        })
+      : null;
+    // Transport closure is a provider fact. Both missed arrival grace has no
+    // approved economic outcome, so stop polling the closed room while keeping
+    // settlement explicitly unresolved and its original commitment untouched.
+    const unresolvedTransport =
+      transportClosed &&
+      noShow &&
+      !creatorJoinedByGrace &&
+      !fanJoinedByGrace &&
+      outcome === null;
     return this.db.withThread(scope, async (client) => {
       const fresh = await this.row(scope, client, id, true);
       // A consent/end mutation while provider polling was in-flight requires another current-state pass.
@@ -1309,15 +1323,17 @@ export class SessionService {
         ...doc,
         ...clocks,
         present,
-        state: outcome
-          ? "ended"
-          : endDue
-            ? "ending"
-            : present.length === 2 && Date.now() >= Date.parse(doc.scheduledAt)
-              ? "connected"
-              : clocks.connectedMilliseconds
-                ? "reconnecting"
-                : "waiting",
+        state:
+          outcome || unresolvedTransport
+            ? "ended"
+            : endDue
+              ? "ending"
+              : present.length === 2 &&
+                  Date.now() >= Date.parse(doc.scheduledAt)
+                ? "connected"
+                : clocks.connectedMilliseconds
+                  ? "reconnecting"
+                  : "waiting",
         outcome,
         reconciliation: outcome ? "complete" : endDue ? "blocked" : "pending",
         recordingState: state.recording
@@ -1337,6 +1353,44 @@ export class SessionService {
             `${id}:recording-denied:${doc.version}`,
           ],
         );
+      if (unresolvedTransport && doc.state !== "ended") {
+        // The held session row serializes this immutable, tenant-scoped fact.
+        // This is neither call_outcome evidence nor a financial instruction.
+        await client.query(
+          "INSERT INTO creator.call_event(session_id,creator_id,fan_id,type,payload,actor_account_id) VALUES($1,$2,$3,'transport_closed_unresolved',$4,$5)",
+          [
+            id,
+            scope.creatorId,
+            scope.fanId,
+            JSON.stringify({
+              schemaVersion: 1,
+              reason: "both_missed_arrival_grace",
+              sessionId: id,
+              commitmentId: doc.commitmentId,
+              scheduledAt: doc.scheduledAt,
+              arrivalGraceSeconds: doc.graceSeconds,
+              arrivalGraceEndedAt: new Date(graceAt).toISOString(),
+              creatorJoinedByGrace,
+              fanJoinedByGrace,
+              ...clocks,
+              roomClosed: true,
+              recording: false,
+              presentAccountIds: [],
+              providerHistoryComplete: true,
+              providerName: this.provider.name,
+              providerHistoryReference: provider.reference,
+              reconciledAt: now,
+              outcome: null,
+              settlementResolved: false,
+            }),
+            scope.actorAccountId,
+          ],
+        );
+        await client.query(
+          "UPDATE creator.call_slot SET active=false WHERE creator_id=$1 AND fan_id=$2 AND offer_id IN(SELECT id FROM creator.call_offer WHERE commitment_id=$3 AND creator_id=$1 AND fan_id=$2)",
+          [scope.creatorId, scope.fanId, doc.commitmentId],
+        );
+      }
       if (outcome) {
         if (
           !["ready", "deleted"].includes(doc.summaryState ?? "absent") &&

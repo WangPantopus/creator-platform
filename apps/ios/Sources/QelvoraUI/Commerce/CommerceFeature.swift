@@ -237,13 +237,25 @@ struct CommerceFeature: View {
             }
             if ["submitting", "submitted", "more_info", "offer_pending"].contains(packet.state) { Button("Withdraw request", variant: .secondary, block: true, disabled: busy) { Task { await mutate("packets/\(packet.id)/withdraw", values: ["version": packet.version], message: "Hold release is being confirmed.") } } }
             if packet.payment_state == "unknown" || packet.payment_state == "requires_action" { Notice(title: "Payment processing", children: "The provider must confirm payment. No completion is inferred from this screen.") }
+            if let transport = detail.callTransport {
+                Notice(title: "System · call status", children: transport.state == "closed_unresolved" ? "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded \(when(transport.recordedAt)). Check the current receipt for billing status." : "Current call status is unavailable. Your recorded receipt remains available.")
+            }
             if detail.commitment?.delivered_at != nil, ["delivered", "refunded", "resolved"].contains(detail.commitment?.state ?? "") {
-                Receipt(reqId: reqID(packet.id), title: packet.snapshot.title, rows: [ReceiptRow(id: "amount", label: "Charged", value: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency)), ReceiptRow(id: "delivery", label: "Delivered", value: when(detail.commitment?.delivered_at))] + (refund > 0 ? [ReceiptRow(id: "refund", label: "Refund confirmed", value: CommerceAmount.display(refund, packet.snapshot.currency))] : []), label: detail.commitment?.evidence?.authorKind == "approved_draft" ? "Prepared by AI · approved by \(name)" : "\(packet.snapshot.title) · personally fulfilled by \(name)", name: name)
+                Receipt(reqId: reqID(packet.id), title: packet.snapshot.title, rows: [ReceiptRow(id: "amount", label: "Charged", value: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency)), ReceiptRow(id: "delivery", label: "Delivered", value: when(detail.commitment?.delivered_at))] + (refund > 0 ? [ReceiptRow(id: "refund", label: "Refund confirmed", value: CommerceAmount.display(refund, packet.snapshot.currency))] : []), label: fulfillmentLabel(detail.commitment?.evidence?.authorKind, title: packet.snapshot.title, name: name), name: name)
                 if let signedActId = detail.commitment?.evidence?.signedActId ?? detail.commitment?.accept_act_id {
                     Button(detail.commitment?.evidence?.signedActId != nil ? "Open signed verification" : "Open signed acceptance", variant: .quiet, block: true) { session.destination = "/verify/" + signedActId }
                 }
                 if detail.commitment?.state == "delivered" || detail.share?.fan_choice == true { Button(detail.share?.fan_choice == true ? "Revoke sharing" : "Allow sharing without your handle", variant: .secondary, block: true, disabled: busy || (!packet.snapshot.shareable && detail.share?.fan_choice != true) || detail.share?.revoked_at != nil) { Task { await mutate("packets/\(packet.id)/share", values: ["version": detail.share?.version ?? 1, "enabled": detail.share?.fan_choice != true, "handleDisplay": "hidden"], message: "Your sharing choice is saved.") } } }
             }
+        }
+    }
+    private func fulfillmentLabel(_ kind: String?, title: String, name: String) -> String {
+        switch kind {
+        case "approved_draft": return "Prepared by AI · approved by \(name)"
+        case "human_creator": return "\(title) · personally fulfilled by \(name)"
+        case "human_call": return "Personal call · provider-confirmed outcome"
+        case "system": return "System delivery notice"
+        default: return "Delivery recorded"
         }
     }
     private func membership(_ data: CommerceOverview) -> some View {

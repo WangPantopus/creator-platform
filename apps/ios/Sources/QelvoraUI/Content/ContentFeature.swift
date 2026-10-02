@@ -155,10 +155,14 @@ private struct ContentFanScreen: View {
         }
     }
     @ViewBuilder private func attachments(for content: ContentViewValue) -> some View {
-        if let baseURL, let viewerAccountId, content.version > 0, content.document.media.count <= 6 {
-            ForEach(content.document.media) { attachment in
-                NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
-                    .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
+        if let baseURL, let viewerAccountId, content.version > 0 {
+            if content.document.media.count <= 10 {
+                ForEach(content.document.media) { attachment in
+                    NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
+                        .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
+                }
+            } else {
+                Text("Attachment information is unavailable. Refresh current access.").qText("caption")
             }
         }
     }

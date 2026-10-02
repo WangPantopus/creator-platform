@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T11:11:55.117363+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "authorCheckpoint": "7400de3829d48a5e0760c50a5e9ffadd3ad927a2",
+  "consumedCommit": "2b6376a5",
+  "androidBuildSource": "2b6376a5",
+  "androidApkSha256": "476a2c7f95e4700ed2f327ffe6f5800bcb7970426ab9ca674f8eb72b10516051",
+  "build": {
+    "shippingDebug": "passed",
+    "seconds": 15,
+    "tasks": 37,
+    "heavyGuard": "acquired and released own exact lease"
+  },
+  "backendRuntimeSource": "6c8f25d2",
+  "device": {
+    "serial": "emulator-5554",
+    "avd": "Qelvora_W2_API34",
+    "fontScale": 2.0,
+    "reducedMotion": true,
+    "animatorDurationScale": 0.0,
+    "resolution": [
+      1080,
+      2400
+    ],
+    "density": 420
+  },
+  "actor": "synthetic development actor two / w2_native_fan",
+  "actualJourneys": [
+    {
+      "theme": "Light",
+      "kind": "cold DB outage",
+      "actions": "Stop owned DB; force-stop and cold-launch app; saved-session recovery shown; tap Retry while DB down; restart DB; automatically recovers; tap You",
+      "outcome": "Same persisted w2_native_fan; no Welcome/sign-in/credential injection"
+    },
+    {
+      "theme": "Night",
+      "kind": "cold DB outage",
+      "actions": "Stop owned DB; force-stop/cold-launch; saved-session recovery shown; restore DB; automatically recovers before any positive manual Retry; tap You",
+      "outcome": "Same persisted w2_native_fan; no Welcome/sign-in"
+    },
+    {
+      "theme": "Night",
+      "kind": "warm DB outage",
+      "actions": "Stay in You; stop only owned DB; observe account-status unavailable with retained profile; restore DB",
+      "outcome": "Same fan and notice clears automatically"
+    }
+  ],
+  "captures": {
+    "cold-recovery-light-same-fan.png": {
+      "bytes": 579860,
+      "sha256": "bbce2d2a2a6e1f11cb701ce04b8a4d3d013229a47926ff772d98e448e9516648"
+    },
+    "warm-recovery-night-restored.png": {
+      "bytes": 579204,
+      "sha256": "b5c37bea579ef24af142680e2261683fe6e5640f90be1485e50ad468076d29eb"
+    },
+    "cold-recovery-light-outage.png": {
+      "bytes": 501814,
+      "sha256": "81b09238e27345483a1d28a73e4f3a5b08ed7185bf31d75cb131a94bb6f26ef2"
+    },
+    "warm-recovery-night-outage.png": {
+      "bytes": 571052,
+      "sha256": "898a1800d15a4d4880642ac267fdce34e4a65def5c5970afd1d8a899525c17d0"
+    },
+    "cold-recovery-night-same-fan.png": {
+      "bytes": 579160,
+      "sha256": "f1a21c30b7c84379f244a52629bc1d25a3c8be0e2feef6611c0c21d4c1e2647e"
+    },
+    "cold-recovery-night-outage.png": {
+      "bytes": 500816,
+      "sha256": "74bd26f60dcf7acf79cb8251ae0841d1736d10918a9bee94ed4cc7bc749ccdcc"
+    }
+  },
+  "resourcesAfter": {
+    "database": "restored and ready",
+    "emulator5554": "verified exact AVD then stopped; adb confirmed absent",
+    "slot2": "released own exact inode/token only",
+    "nativeUiLease": "released own exact inode/token only",
+    "simulatorBC8": "stopped",
+    "heavyBuild": "not held by W2"
+  },
+  "limits": [
+    "Not a p95 workload; timings of GUI tools do not establish recovery or invalidation latency.",
+    "No positive manual Retry after DB restore was claimed because automatic polling had already recovered.",
+    "iOS personally operated recovery remains unverified; W1-source build status is separate evidence.",
+    "W1 broader storage/purge/issuer changes were not copied or claimed.",
+    "TalkBack is off pending actual full-control permission confirmation.",
+    "No real provider, licensed fan delivery, production identity/signature/processor approval or full W2 completion."
+  ],
+  "supportingPeerEvidence": {
+    "owner": "W1",
+    "source": "7400de3829d48a5e0760c50a5e9ffadd3ad927a2",
+    "shippingIOSDebugBuild": "passed, as reported by author W1",
+    "strictCodesign": "passed, as reported by W1",
+    "binarySha256": "57b8892e7c402338f7065acda961a4e1e8383841119087994f8b08dc45303355",
+    "W2PersonalIOSInputAcceptance": false
+  },
+  "localChecks": {
+    "backendTypecheck": "passed",
+    "scopedAppLint": "passed",
+    "diffWhitespace": "passed",
+    "newUnitTests": 0
+  }
+}

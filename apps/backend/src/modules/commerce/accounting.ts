@@ -2,6 +2,7 @@ import type { Actor } from "../identity/adapter.js";
 import type { CommerceService } from "./service.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { PoolClient } from "pg";
+import { lockCommitmentPacket } from "./packet-locks.js";
 import { allocateSlotDayPool } from "./extended.js";
 import { createHash } from "node:crypto";
 import {
@@ -472,9 +473,10 @@ export class CreatorSettlement {
     );
     const verifiedBalance = await this.provider.reconciledBalance(commitmentId);
     const id = await this.service.account(actor, async (client) => {
+      await lockCommitmentPacket(client, commitmentId);
       const c = (
         await client.query(
-          "SELECT c.*,p.snapshot,p.intent_ref,p.payment_state,cp.account_id,cp.verification,cp.recovery_required FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c,p",
+          "SELECT c.*,p.snapshot,p.intent_ref,p.payment_state,cp.account_id,cp.verification,cp.recovery_required FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c",
           [commitmentId],
         )
       ).rows[0];
@@ -618,7 +620,7 @@ export class CreatorSettlement {
         async (client) =>
           (
             await client.query(
-              "SELECT c.dispute_open,c.state,c.packet_id,p.intent_ref,p.payment_state,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND cp.account_id=$2 AND cp.verification='verified' AND NOT cp.recovery_required",
+              "SELECT c.dispute_open,c.state,c.packet_id,p.intent_ref,p.payment_state,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id JOIN creator.creator_profile cp ON cp.id=c.creator_id WHERE c.id=$1 AND cp.account_id=$2 AND cp.verification='verified' AND NOT cp.recovery_required",
               [effect.commitment_id, actor.accountId],
             )
           ).rows[0],
@@ -701,10 +703,11 @@ export class CreatorSettlement {
           "Current available funds no longer match the original payout.",
         );
         await this.service.account(actor, async (client) => {
+          await lockCommitmentPacket(client, effect.commitment_id);
           await this.fence(client, effect);
           const c = (
             await client.query(
-              "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c,p FOR SHARE OF a",
+              "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c FOR SHARE OF a",
               [effect.commitment_id],
             )
           ).rows[0];
@@ -784,10 +787,11 @@ export class CreatorSettlement {
         Math.abs(Date.now() - afterBalance.reconciledAt.getTime()) >= 60000;
       // Persist the reference before post-provider eligibility checks; crash retries fetch current truth.
       const held = await this.service.account(actor, async (client) => {
+        await lockCommitmentPacket(client, effect.commitment_id);
         await this.fence(client, effect);
         const c = (
           await client.query(
-            "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c,p",
+            "SELECT c.state,c.dispute_open,p.payment_state,p.intent_ref,a.provider_ref FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id LEFT JOIN creator.commerce_payout_account a ON a.creator_id=c.creator_id WHERE c.id=$1 FOR UPDATE OF c",
             [effect.commitment_id],
           )
         ).rows[0];
