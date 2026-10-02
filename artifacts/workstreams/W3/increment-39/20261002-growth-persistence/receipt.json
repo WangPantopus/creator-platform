@@ -8,10 +8,7 @@
   "web": {
     "personallyOperated": true,
     "width": 390,
-    "appearances": [
-      "light",
-      "night"
-    ],
+    "appearances": ["light", "night"],
     "quietStart": "22:00",
     "quietEnd": "08:00",
     "timeZone": "America/Los_Angeles",
@@ -29,8 +26,27 @@
   "android": {
     "shippingBuild": "passed",
     "apkSha256": "a4d1f5afb1f422990156df5ca689da7762d6b490d29ceb4bf6da9d9baa891a80",
-    "personallyOperatedThisSource": false,
-    "deviceOperation": "awaiting free lease; both slots occupied at fresh inventory"
+    "personallyOperatedThisSource": true,
+    "deviceOperation": "actual shipping APK; personally saved changed pair, web readback, web restoration and Android cold reread",
+    "avd": "Qelvora_W3_API34",
+    "serial": "emulator-5584",
+    "slot": "creator-platform-emulator-slot-1",
+    "widthDp": 390,
+    "appearances": ["light", "night"],
+    "textScales": [1, 2],
+    "initialWebPair": ["22:00", "08:00"],
+    "androidSavedPair": ["22:15", "08:15"],
+    "webReadbackMatched": true,
+    "restoredWebPair": ["22:00", "08:00"],
+    "androidColdReadMatchedRestoration": true,
+    "timeZone": "America/Los_Angeles",
+    "night200SaveSuccessObserved": true,
+    "appANREventsSinceBoot": 0,
+    "fontScaleRestored": 1,
+    "ownedGuestStopped": true,
+    "exactOwnedLeaseReleased": true,
+    "unsavedInputMisfocusCorrectedBeforeSave": true,
+    "sharedRequestsTabWrapsAt200": true
   },
   "heavyBuild": {
     "iosThenAndroid": true,
