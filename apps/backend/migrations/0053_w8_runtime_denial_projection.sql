@@ -44,6 +44,9 @@ CREATE FUNCTION creator_trust.runtime_thread_denial(c uuid, t uuid)
 RETURNS text LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE fan_account uuid; owner_account uuid; caller uuid;
 BEGIN
+  -- A snapshot taken before waiting for the denial lock cannot certify current
+  -- authority. Caller-held mutation transactions must use READ COMMITTED.
+  IF current_setting('transaction_isolation')<>'read committed' THEN RETURN 'unavailable'; END IF;
   caller := nullif(current_setting('app.account_id',true),'')::uuid;
   SELECT f.account_id,p.account_id INTO fan_account,owner_account
     FROM creator.thread r JOIN creator.fan_profile f ON f.id=r.fan_id
@@ -58,6 +61,7 @@ CREATE FUNCTION creator_trust.runtime_audience_denial(c uuid, fan uuid)
 RETURNS text LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE fan_account uuid; owner_account uuid; caller uuid;
 BEGIN
+  IF current_setting('transaction_isolation')<>'read committed' THEN RETURN 'unavailable'; END IF;
   caller := nullif(current_setting('app.account_id',true),'')::uuid;
   SELECT f.account_id,p.account_id INTO fan_account,owner_account
     FROM creator.fan_profile f CROSS JOIN creator.creator_profile p
@@ -70,6 +74,7 @@ CREATE FUNCTION creator_trust.runtime_creator_denial(c uuid)
 RETURNS text LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE owner_account uuid; caller uuid;
 BEGIN
+  IF current_setting('transaction_isolation')<>'read committed' THEN RETURN 'unavailable'; END IF;
   caller := nullif(current_setting('app.account_id',true),'')::uuid;
   SELECT account_id INTO owner_account FROM creator.creator_profile WHERE id=c AND account_id=caller;
   IF NOT FOUND THEN RETURN 'unavailable'; END IF;
@@ -82,7 +87,8 @@ CREATE FUNCTION creator_trust.media_worker_denial(kind text,c uuid,fan uuid,asse
 RETURNS text LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE fan_account uuid; creator_account uuid; t uuid;
 BEGIN
-  IF kind NOT IN('creator','thread') OR
+  IF current_setting('transaction_isolation')<>'read committed' THEN RETURN 'unavailable'; END IF;
+  IF kind IS NULL OR c IS NULL OR asset_owner IS NULL OR kind NOT IN('creator','thread') OR
     c IS DISTINCT FROM nullif(current_setting('media.creator_id',true),'')::uuid OR
     asset_owner IS DISTINCT FROM nullif(current_setting('media.owner_account_id',true),'')::uuid OR
     fan IS DISTINCT FROM nullif(current_setting('media.fan_id',true),'')::uuid THEN
