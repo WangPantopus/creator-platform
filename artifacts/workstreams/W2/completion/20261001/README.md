@@ -23,6 +23,13 @@ Held0097 accounting source now uses genuine W1 purpose plus current W2 inputs/W3
 Actual native Chrome200% Light/Night on populatedMaya20 now personally verified:1280×900→640×450 CSS, no horizontal overflow, Tone/20th example/44px label/bottom44pxNotes keyboard reachable. Native Zoom Reset100% and originalNight restored; matching shared GUI leases released. Source7bf3 reconciles main4d6470; backend/web types passed after isolated dependencies refreshed. This does not establish390-wide200%, all artboards, screen readers/native/provider/p95 acceptance. [Browser receipt](../20261001-mac-studio/browser-text-200/README.md).
 
 
+Historical PR143 opening receipt follows; its CI/merge pending statement is superseded by the merged increment below.
+
+### 2026-10-02 — real 390-wide 200% Studio navigation
+
+Actual native Chrome 200% exposed More outside the 195-pixel CSS viewport despite no document overflow. W2-only CSS repair personally operated on exact `fc92a031`: all five 57×44 links fit in Light and Night; Night keyboard reached all five and the twentieth stored example’s 44-pixel label. Baseline 390×1300 gutter 16 and 1280×900 sidebar 248 retained in both themes. Native zoom reset to 100%; matching GUI lease released. [Sanitized receipt](../20261002-studio-200-navigation/README.md). Local web typecheck and formatting passed; exact-head CI and normal merge pending. Screen readers, native iOS, other artboards, provider paths and named p95 remain open. No persisted state or provider writes.
+
+
 ### 2026-10-02 — merged narrow Studio repair; held genuine retrieval
 
 PR143 normal merge `1048f2f4` (exact head `e28cc951`, four fast checks PASS, six macOS QUEUED; main unprotected/rulesets[] rechecked). Personally reloaded actual main Studio at1280×900 and CSS195×650; all57×44 links fit and More takes keyboard focus. Earlier actual native200% Light/Night AX/DOM checks retained. Screenshot audit found195×128 cropped native200% captures; whole-window capture remains open, not full R12 acceptance. [Navigation receipt](../20261002-studio-200-navigation/README.md).

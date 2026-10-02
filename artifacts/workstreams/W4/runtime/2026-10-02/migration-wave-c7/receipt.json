@@ -29,5 +29,42 @@
   ],
   "merge": "5ec5cb07a5f5185e4dd68732f2562f32aec753a7",
   "reminderMerge": "b96e77ef50ac24b8676b2b83f6fcde48cfc7a6d4",
-  "appDatabase": "original creator_w4 remains40; upgrade clone remains traffic closed"
+  "appDatabase": "Original creator_w4 now57; no live-data restore; protected40 backup retained",
+  "sourceActivation": {
+    "exact57": true,
+    "originalLedgerPreserved": true,
+    "schemaMatchesRehearsal": true,
+    "securityMatchesRehearsal": true,
+    "originalDataPreserved": true,
+    "originalSequencePreserved": true,
+    "originalRolesPreserved": true,
+    "sourceLedgerRows": 57,
+    "originalRows": 22,
+    "originalTables": 145,
+    "sourceNoRestore": true,
+    "activationAppliedToOriginal": true,
+    "developmentAcceptanceOnly": true,
+    "releaseReady": false
+  },
+  "domainReconciliation": {
+    "ownedDevelopment": true,
+    "externalMoneyAndStoreRowsAbsent": true,
+    "privacyJobsAndTransportGenerationRowsAbsent": true,
+    "onlySpendPreferenceRowsRetained": 1,
+    "sourceNoRestore": true,
+    "privateOriginalBackupSeparatelyRestored": true,
+    "releaseReady": false
+  },
+  "personalWebAcceptance": {
+    "normalDevelopmentActorTwoSignIn": true,
+    "currentCap7USD": true,
+    "originalPendingNoneDeadlineRetained": true,
+    "remindersOff": true,
+    "financialTotalsZero": true,
+    "providerRestoreDisabled": true
+  },
+  "operatorCorrections": [
+    "Private helper cleanup ended an already-ended pool after successful closure; corrected and repeated",
+    "Initial full57 comparison refused independently applied new-row timestamps; corrected to exact57 versions/checksums plus all original40 complete ledger rows, matching official wave custody"
+  ]
 }

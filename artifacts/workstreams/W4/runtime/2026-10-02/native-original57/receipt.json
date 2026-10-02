@@ -1,0 +1,78 @@
+{
+  "operator": "primary W4; real Android CUA taps and system-keyboard typing",
+  "runtime": {
+    "canonicalMigrations": 57,
+    "identityMode": "clearly labeled development actor two",
+    "android": "CreatorPlatform_W4; emulator-5564; shipping debug app",
+    "ios": "Creator Platform W4; BC8F4A5B-6F9E-4A89-813B-FF4DD8572271; normal signed shipping build installed and launched"
+  },
+  "personallyVerified": [
+    "Immediate lower from7USD to6USD; prior pending increase cleared.",
+    "Explicit No limit retains6USD and creates a new24-hour pending deadline.",
+    "Android cold emulator return preserves account, current6USD and pending No limit.",
+    "Real owned API outage preserves current facts and draft; offline Save refuses without a success claim.",
+    "Actual API restart and user Refresh clear the error and preserve current6USD/pending No limit.",
+    "Night and Light cold app returns preserve facts.",
+    "Requests Delivered/Closed empty states and Manage membership unavailable purchase/restore are reached by real taps."
+  ],
+  "observedState": {
+    "cap": "6USD",
+    "pending": "No limit; Oct3,2026 05:42 as displayed on the Android device",
+    "reminders": "off",
+    "financialTotals": "zero"
+  },
+  "defectsAndLimits": [
+    "Amount field opens the default alphabetic keyboard; real numeric typing used the system keyboard number page. Decimal keyboard repair is pending.",
+    "Initial official Android mirror process exited134; cold restart and persisted return passed.",
+    "iOS CUA binding to the observed DeviceHub bundle and application path timed out even after owned boot/install/launch. No personal iOS taps are claimed.",
+    "No actual24-hour elapsed activation, payment/store transaction, positive system subscription-management sheet or creator signing was fabricated.",
+    "Native shipping builds precede the latest main LiveKit integration; fresh integrated builds/operation remain pending."
+  ],
+  "resources": "Owned Android/iOS devices stopped and exact-owner device/GUI leases released.",
+  "evidence": [
+    {
+      "file": "android-cold-return-current6-pending-none-night.png",
+      "sha256": "d9f9fbd9a1437f343a7279eef9e7303237c0140de03e402abd76be9e945cc5cb"
+    },
+    {
+      "file": "android-cold-return-spending-light.png",
+      "sha256": "367b7a3ee3af4e23106659737c1ac4803489d8b213d63d639bf79d328ac4ce96"
+    },
+    {
+      "file": "android-immediate-lower6-night.png",
+      "sha256": "28c56ed110104232218e465eb527475eab59a08f27a8b65bfb8e570581260b5b"
+    },
+    {
+      "file": "android-membership-unavailable-night.png",
+      "sha256": "d8272dd2580a1372ea760b8a781fc8776e3f458e135f42a09f98bdfd0b1e1a97"
+    },
+    {
+      "file": "android-offline-save-refused-night.png",
+      "sha256": "275018e2199c00ad55295bb2b0d8efa103d270bf963f45e9c6fe04c604e15eae"
+    },
+    {
+      "file": "android-pending-none-current6-night.png",
+      "sha256": "17129b8c785eeaf4d77a852b064b2741924af9d84af5564ac12a670206c8c847"
+    },
+    {
+      "file": "android-requests-closed-empty-night.png",
+      "sha256": "9f876d7e52e4743d0f800de86f4ed3304a6eece28f71adb16eb3b0273b9793ad"
+    },
+    {
+      "file": "android-requests-delivered-empty-night.png",
+      "sha256": "4209c8d483376cc72b7634997abb3531e5a100f5f71428abf8aca22669e57d87"
+    },
+    {
+      "file": "android-spending-outage-retained-night.png",
+      "sha256": "6d7022a67b14618321154b0f07d5588aa390728035130b82f21224c70e189d4a"
+    },
+    {
+      "file": "android-spending-reconnected-night.png",
+      "sha256": "e76cdf04c38bc53d4e0177b06a995289af8efaff92623475bfd2f23dd9bbcf8a"
+    }
+  ],
+  "releaseReady": false,
+  "documentationBase": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7",
+  "apiSource": "321918fa959cf76a814247d7eb8fe67f9bb87699",
+  "nativeBuildSource": "Earlier personally built shipping source; latest main LiveKit native integration remains pending."
+}
