@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "applicationRevision": "cac6be9cfd2351044ae6690dd25b0dab57a358b3",
+  "baseMain": "8d4a71525af0b881ecb23a80fd74c235837f81b6",
+  "environment": "Mac Studio; Node24.13.0/pnpm12.5.1/Next16.3.7; labelled synthetic-development separate canonical57 restore",
+  "api": "127.0.0.1:4112",
+  "web": "127.0.0.1:3012",
+  "provider": "actual explicit loopback development identity, seven listed actors; production identity unavailable",
+  "browser": "personally operated Chrome through supported computer-use",
+  "viewport": {
+    "cssWidth": 1325,
+    "cssHeight": 873,
+    "dpr": 2,
+    "theme": "Light"
+  },
+  "performed": [
+    "Ops Continue with Pantopus -> seven-actor chooser -> actual actor four -> /ops without Handle",
+    "Actual queue and supervisor metrics refuse without Ops membership",
+    "Current session restore -> /ops/audits",
+    "Owner expired only the genuine newly issued actor-four access session on the labelled development copy; browser restore -> /ops/metrics; repeat at final source -> /ops/audits",
+    "Same actual session ID, changed credential hash, advanced expiry; no fan profile and no current Ops membership",
+    "Account shows actual absent public-profile state with Choose your handle and no invented @handle",
+    "Fan Home restore still opens Handle",
+    "Status restore reaches public Service status without Handle",
+    "Explicit resumeHandle=1 still opens Handle with saved Ops return",
+    "Malformed external return opens local canonical Welcome with invalid-return notice",
+    "Actual Sign out reaches Welcome; fresh Ops sign-in repeated at final committed source"
+  ],
+  "savedOutcome": {
+    "sameActualSession": true,
+    "credentialRotated": true,
+    "expiryAdvanced": true,
+    "noFanProfile": true,
+    "noCurrentOpsMembership": true,
+    "original57StillClosed": true
+  },
+  "checks": [
+    "canonical12 resources/99 native operations verified",
+    "backend and web types pass",
+    "scoped ESLint/Prettier pass",
+    "production Next build passes:3.1s compilation/4.8s TypeScript"
+  ],
+  "failures": [
+    "New private session key initially encoded hex; constructor refused before traffic; corrected32-byte base64",
+    "Development API refused nonimmutable release label; pinned actual committed revision",
+    "Next child rejected inherited --env-file NODE_OPTIONS; explicit private env loader starts child without inherited CLI flags",
+    "Trust proxy initially missing W8_API_URL, then explicit W8_LOCAL_DEVELOPMENT; refused both incomplete configurations; configured real same API without weakening transport guard",
+    "Observed preexisting @Choose your handle Account label and misleading Edit public profile; fixed by consuming actual W1 account/canonical copy behavior"
+  ],
+  "limitations": [
+    "Bounded local development acceptance; not original retained-database recovery or release",
+    "Access expiry was deliberately imposed by owner on the genuine issued development session, not natural15-minute elapsed expiry",
+    "No new unit tests",
+    "Native generated destinations/copy only; native builds and personal acceptance of this focused increment remain pending",
+    "No Ops grant, proof approval, provider call, helpful/intro policy or higher-purpose activation",
+    "Readiness remains503",
+    "Light desktop viewport is not assigned phone-artboard or200% acceptance"
+  ],
+  "cleanup": {
+    "ownedApi4112Stopped": true,
+    "ownedWeb3012Stopped": true,
+    "boundedCopyNowClosed": true,
+    "originalNeverOpened": true
+  }
+}

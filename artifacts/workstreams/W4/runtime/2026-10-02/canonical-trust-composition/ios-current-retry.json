@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-10-02T19:08Z",
+  "iosShippingSource": "142f7208d2ea1e099a0662b25698c31018abfab6",
+  "apiSource": "09288da65feee510b5f83408e76af7a544ead076",
+  "exactOwnedSimulator": "BC8F4A5B-6F9E-4A89-813B-FF4DD8572271",
+  "normalBootAndLaunchPassed": true,
+  "supportedController": "com.apple.dt.Devices",
+  "cuaResult": "timeout -10005 before any UI state",
+  "simulatorNameLauncherResult": "no application registered as Simulator",
+  "normalOwnedShutdownPassed": true,
+  "exactGuiAndSlotLeasesReleased": true,
+  "peerResourcesChanged": false,
+  "personallyOperatedIos": false,
+  "alternativeDriverExecuted": false,
+  "releaseReady": false
+}

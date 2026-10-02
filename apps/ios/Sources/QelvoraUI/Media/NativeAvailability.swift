@@ -59,8 +59,8 @@ private struct NativeAvailability: View {
     @State private var mutation: Task<Void, Never>?
     @FocusState private var editedField: String?
     private var client: NativeMediaClient? {
-        baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: {
-            guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }
+        baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: {
+            guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }
             return value
         }) }
     }

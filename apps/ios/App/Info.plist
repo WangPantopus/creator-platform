@@ -29,6 +29,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CreatorAPIURL</key>
+	<string>$(CREATOR_API_URL)</string>
+	<key>CreatorLinkHost</key>
+	<string>$(CREATOR_LINK_HOST)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

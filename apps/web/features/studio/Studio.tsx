@@ -899,7 +899,10 @@ function Notes({ creator }: { creator: Creator }) {
                     : "AI-source review required"}
                 </p>
                 {["draft", "scheduled", "media_pending"].includes(n.state) && (
-                  <Link href={`/studio/${creator.id}/compose/${n.id}`}>
+                  <Link
+                    href={`/studio/${creator.id}/compose/${n.id}`}
+                    className="qv-link-btn w5-note-edit"
+                  >
                     Edit draft
                   </Link>
                 )}
