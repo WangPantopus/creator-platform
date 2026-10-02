@@ -61,6 +61,18 @@ export function createTrustRouter(options: TrustRouterOptions) {
     .max(100)
     .parse(options.crisisResources);
   const router = express.Router();
+  // This router is mounted at the host root. Keep Trust body/origin guards
+  // inside its namespace so other producers retain their own ingress custody.
+  router.use((req, _res, next) => {
+    if (
+      req.path === "/v1/trust" ||
+      req.path.startsWith("/v1/trust/") ||
+      req.path === "/health/live" ||
+      req.path === "/health/ready"
+    )
+      return next();
+    next("router");
+  });
   router.use(options.telemetry.middleware());
   router.use((req, res, next) => {
     const origin = req.header("origin");
