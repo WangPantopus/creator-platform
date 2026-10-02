@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
 import { recognizedAdoptionVersions } from "./migration-custody.js";
+import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -66,6 +67,23 @@ try {
   const historical = localLegacy
     ? new Set<string>()
     : await recognizedAdoptionVersions(applied);
+  const continuation = files.some(
+    (f) => f.version === "0103_w8_domain_privacy_task_fence",
+  );
+  const installedRoles = (rows: readonly { version: string }[]) => ({
+    trust: rows.some((r) => r.version === "0053_w8_runtime_denial_projection"),
+    media: rows.some((r) => r.version === "0062_w6_creator_media_worker"),
+    content: rows.some((r) => r.version === "0074_w8_content_runtime_denial"),
+    interactive: rows.some(
+      (r) => r.version === "0082_w8_interactive_denial_try_fence",
+    ),
+  });
+  const installedPrivacy = (rows: readonly { version: string }[]) => ({
+    privacy: rows.some(
+      (r) => r.version === "0087_w8_privacy_task_commit_fence",
+    ),
+    domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
+  });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
   );
@@ -84,14 +102,9 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      await assertWaveRoleSafety(client, {
-        trust: applied.some(
-          (r) => r.version === "0053_w8_runtime_denial_projection",
-        ),
-        media: applied.some(
-          (r) => r.version === "0062_w6_creator_media_worker",
-        ),
-      });
+      await assertWaveRoleSafety(client, installedRoles(applied));
+      if (continuation)
+        await assertPrivacyWaveRoleSafety(client, installedPrivacy(applied));
       await client.query("COMMIT");
     } catch (error) {
       await client.query("ROLLBACK");
@@ -174,7 +187,9 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      await assertWaveRoleSafety(client, { trust: true, media: true });
+      await assertWaveRoleSafety(client, installedRoles(files));
+      if (continuation)
+        await assertPrivacyWaveRoleSafety(client, installedPrivacy(files));
       await client.query("COMMIT");
     } catch (error) {
       await client.query("ROLLBACK");

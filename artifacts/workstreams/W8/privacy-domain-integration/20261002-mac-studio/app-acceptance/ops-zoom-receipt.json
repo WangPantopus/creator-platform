@@ -1,0 +1,171 @@
+{
+  "label": "Personally operated synthetic Ops with actual Chrome tab zoom; no screen-reader or complete design acceptance",
+  "newUnitTests": false,
+  "errors": [],
+  "observations": [
+    {
+      "surface": "queue",
+      "theme": "light",
+      "zoom": 1,
+      "innerWidth": 1280,
+      "innerHeight": 900,
+      "scrollWidth": 1280,
+      "devicePixelRatio": 1,
+      "visualWidth": 1280,
+      "sidebar": 220,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "queue",
+      "theme": "light",
+      "zoom": 2,
+      "innerWidth": 640,
+      "innerHeight": 450,
+      "scrollWidth": 640,
+      "devicePixelRatio": 2,
+      "visualWidth": 640,
+      "sidebar": 640,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "queue",
+      "theme": "light",
+      "zoom": 1,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "devicePixelRatio": 1,
+      "visualWidth": 390,
+      "sidebar": 390,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "queue",
+      "theme": "night",
+      "zoom": 1,
+      "innerWidth": 1280,
+      "innerHeight": 900,
+      "scrollWidth": 1280,
+      "devicePixelRatio": 1,
+      "visualWidth": 1280,
+      "sidebar": 220,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "queue",
+      "theme": "night",
+      "zoom": 2,
+      "innerWidth": 640,
+      "innerHeight": 450,
+      "scrollWidth": 640,
+      "devicePixelRatio": 2,
+      "visualWidth": 640,
+      "sidebar": 640,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "queue",
+      "theme": "night",
+      "zoom": 1,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "devicePixelRatio": 1,
+      "visualWidth": 390,
+      "sidebar": 390,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "light",
+      "zoom": 1,
+      "innerWidth": 1280,
+      "innerHeight": 900,
+      "scrollWidth": 1280,
+      "devicePixelRatio": 1,
+      "visualWidth": 1280,
+      "sidebar": null,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "light",
+      "zoom": 2,
+      "innerWidth": 640,
+      "innerHeight": 450,
+      "scrollWidth": 640,
+      "devicePixelRatio": 2,
+      "visualWidth": 640,
+      "sidebar": null,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "light",
+      "zoom": 2,
+      "keyboard": {
+        "tag": "A",
+        "visible": true
+      }
+    },
+    {
+      "surface": "case",
+      "theme": "light",
+      "zoom": 1,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "devicePixelRatio": 1,
+      "visualWidth": 390,
+      "sidebar": null,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "night",
+      "zoom": 1,
+      "innerWidth": 1280,
+      "innerHeight": 900,
+      "scrollWidth": 1280,
+      "devicePixelRatio": 1,
+      "visualWidth": 1280,
+      "sidebar": null,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "night",
+      "zoom": 2,
+      "innerWidth": 640,
+      "innerHeight": 450,
+      "scrollWidth": 640,
+      "devicePixelRatio": 2,
+      "visualWidth": 640,
+      "sidebar": null,
+      "headingFont": "34px"
+    },
+    {
+      "surface": "case",
+      "theme": "night",
+      "zoom": 2,
+      "keyboard": {
+        "tag": "A",
+        "visible": true
+      }
+    },
+    {
+      "surface": "case",
+      "theme": "night",
+      "zoom": 1,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "devicePixelRatio": 1,
+      "visualWidth": 390,
+      "sidebar": null,
+      "headingFont": "34px"
+    }
+  ],
+  "accessStatus": 200,
+  "actualCaseOpened": true
+}
