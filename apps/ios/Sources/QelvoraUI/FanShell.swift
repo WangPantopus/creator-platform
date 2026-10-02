@@ -214,7 +214,10 @@ public final class FanSession: ObservableObject {
             let previous = try await storage.read()
             guard current == generation, !Task.isCancelled else { return }
             guard let previous else { await purge(); return }
-            let result = try await api.refreshSession()
+            // An unstructured task survives cancellation of the foreground
+            // caller. A one-use exchange must finish and persist its response.
+            let rotation = Task { try await api.refreshSession() }
+            let result = try await rotation.value
             // Persist a completed rotation even if its foreground read was cancelled.
             guard current == generation else { return }
             do { try await storage.save(result.token, replacing: previous) }
