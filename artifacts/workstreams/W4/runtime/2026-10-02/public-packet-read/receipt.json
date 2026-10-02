@@ -8,7 +8,8 @@
     "Unscoped mode function returned NULL and unscoped evidence returned no rows",
     "Runtime has no membership in metadata role",
     "Full inner evidence query plans under creator_commerce_public_read with column-only grants and exact published-tuple policies",
-    "Final backend typecheck, changed-file lint and formatting pass including six trigger readiness checks and separate bounded-page positive preparation"
+    "Final backend typecheck, changed-file lint and formatting pass including six trigger readiness checks and separate bounded-page positive preparation",
+    "Actual PG17 non-owner mode/packet advisory metadata probe: try-shared refuses both held exclusive keys and acquires both after release; no business rows touched"
   ],
   "authoritiesRequired": [
     "W8 0076 exact original-participant negative authority before content locks",
@@ -25,7 +26,8 @@
     "Actual group service requires durable SYSTEM message and exact published group evidence; no publication inference from a draft",
     "Shared mode then packet fence; no packet FOR SHARE row locks underneath; final source lease last",
     "No private packet disclosure, fan identity, credential bytes, assertion or payment reference returned",
-    "Separate preparePositive holds every mode/packet fence before final read; final read takes no session/domain/advisory lock, and further preparation in that transaction is rejected"
+    "Separate preparePositive holds every mode/packet fence before final read; final read takes no session/domain/advisory lock, and further preparation in that transaction is rejected",
+    "All-page mode/packet contention throws retryable503 without waiting below earlier content/domain locks or returning a successful empty page"
   ],
   "notVerified": [
     "Positive original creator/fan/viewer journeys",

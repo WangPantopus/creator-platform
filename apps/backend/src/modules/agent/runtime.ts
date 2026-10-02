@@ -279,7 +279,7 @@ export class LiveAgentRuntime {
     return {
       creatorId: scope.creatorId,
       accountId: scope.creatorAccountId,
-      development: false,
+      development: this.service.syntheticDevelopmentLicensing,
     };
   }
   private async current(scope: CreatorScope): Promise<{
@@ -304,6 +304,7 @@ export class LiveAgentRuntime {
           await this.service.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_expired",
           "This AI’s license is unavailable or expired.",
