@@ -9,16 +9,53 @@ private struct ContentReply: Decodable, Identifiable, Sendable { let safetyState
 private struct ContentReplyPage: Decodable, Sendable { let items: [ContentReply]; let nextCursor: String? }
 private struct ContentThanks: Decodable, Sendable { let version: Int; let text: String; let shareWithCreatorDigest: Bool; let showIdentity: Bool; let withdrawn: Bool }
 private struct ContentPreference: Decodable, Sendable {let accountId:String;let muted:Bool}
+private struct ContentReplyPolicy: Decodable, Sendable {
+    let accountId: String; let creatorId: String; let limit: Int
+    let confirmedDays: Int?; let milestone: Int?; let basis: String?
+    let historyComplete: Bool; let longerRepliesActive: Bool; let checkedAt: String
+    func validate(accountId: String, creatorId: String) throws {
+        guard self.accountId == accountId, self.creatorId == creatorId else {
+            throw ContentFailure(status: 403, code: "content_account_changed")
+        }
+        let milestone = confirmedDays.map { $0 >= 365 ? 365 : $0 >= 100 ? 100 : $0 >= 50 ? 50 : 0 }.flatMap { $0 == 0 ? nil : $0 }
+        let expectedLimit = !longerRepliesActive || milestone == nil ? 4000 : milestone == 365 ? 12000 : milestone == 100 ? 8000 : 6000
+        let formatter = ISO8601DateFormatter(); formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard !historyComplete, confirmedDays == nil || confirmedDays! >= 0,
+              self.milestone == milestone, limit == expectedLimit,
+              basis == nil || ["confirmed_stripe_paid_periods", "confirmed_paid_periods"].contains(basis!),
+              confirmedDays == nil || basis != nil, formatter.date(from: checkedAt) != nil else {
+            throw ContentFailure(status: 503, code: "reply_policy_unconfigured")
+        }
+    }
+}
 private struct ContentReceipt: Decodable, Sendable { let version: Int? }
-private struct ContentFailure: Error { let message: String; var status: Int = 0 }
-private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
+private struct ContentFailure: Error { var status: Int = 0; var code: String? = nil
+    var accountChanged: Bool { ["content_account_changed", "session_account_changed", "session_changed"].contains(code ?? "") }
+    var authorityDenied: Bool { status == 401 || status == 403 || accountChanged }
+}
+private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let code: String? }; let error: Failure }
+
+private func contentFailureCopy(_ error: Error, action: Bool = false) -> String {
+    let failure = error as? ContentFailure
+    let key: String
+    if failure?.accountChanged == true { key = "w5ContentAccountChanged" }
+    else if failure?.status == 401 { key = "w5ContentSessionEnded" }
+    else if ["reply_changed", "consent_changed", "thanks_changed"].contains(failure?.code ?? "") { key = "w5ContentChanged" }
+    else if failure?.code == "idempotency_conflict" { key = "w5ContentDuplicateChanged" }
+    else if failure?.code == "reply_withdrawn" { key = "w5ContentReplyWithdrawn" }
+    else if failure?.code == "fan_profile_required" { key = "w5ContentFanProfileRequired" }
+    else if [403, 404].contains(failure?.status ?? 0) || failure?.code?.hasSuffix("_unconfigured") == true { key = "w5ContentAccessUnavailable" }
+    else if action && failure?.code == "invalid_request" { key = "w5ContentInvalidRequest" }
+    else { key = action ? "w5ContentActionUnconfirmed" : "w5ContentRefreshUnavailable" }
+    return QelvoraCopy.text(key)
+}
 
 private actor ContentClient {
     let baseURL: URL
     private let storage = SecureSessionStorage()
     init(baseURL: URL) { self.baseURL = baseURL }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, expectedAccountId:String? = nil) async throws -> T {
-        guard let token = try await storage.read() else { throw ContentFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
+        guard let token = try await storage.read() else { throw ContentFailure(status: 401) }
         guard let url = URL(string: "v1/content/" + path, relativeTo: baseURL) else { throw URLError(.badURL) }
         var request = URLRequest(url: url); request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body
         request.cachePolicy = .reloadIgnoringLocalCacheData; request.timeoutInterval = 15
@@ -26,7 +63,8 @@ private actor ContentClient {
         request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization"); request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
-            throw ContentFailure(message: (try? JSONDecoder().decode(ContentErrorEnvelope.self, from: data).error.message) ?? "Content is unavailable. Reconnect to refresh current access.", status: (response as? HTTPURLResponse)?.statusCode ?? 0)
+            let failure = try? JSONDecoder().decode(ContentErrorEnvelope.self, from: data).error
+            throw ContentFailure(status: (response as? HTTPURLResponse)?.statusCode ?? 0, code: failure?.code)
         }
         return try JSONDecoder().decode(T.self, from: data)
     }
@@ -50,6 +88,7 @@ private struct ContentFanScreen: View {
     @State private var nextCursor: String?
     @State private var replyDepth = 1
     @State private var replyText = ""
+    @State private var replyPolicy: ContentReplyPolicy?
     @State private var thanks: ContentThanks?
     @State private var thanksText = ""
     @State private var shareDigest = false
@@ -61,6 +100,9 @@ private struct ContentFanScreen: View {
     @State private var viewerAccountId:String?
     @State private var loadGeneration=0
     @State private var currentAccess = false
+    @State private var muted: Bool?
+    @State private var replyAccess = false
+    @State private var thanksAccess = false
     @State private var loading = false
     @State private var checkedAt: TimeInterval = 0
     @State private var retryKeys: [String: String] = [:]
@@ -68,13 +110,14 @@ private struct ContentFanScreen: View {
     @Environment(\.scenePhase) private var scene
     private var creatorId: String { String(session.destination.split(separator: "/")[1]) }
     private var contentId: String { String(session.destination.split(separator: "/")[2]) }
+    private var replyLimit: Int { replyPolicy?.limit ?? 4000 }
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if !error.isEmpty { Notice(tone: .error, title: "Content status", children: error) }
+                if !error.isEmpty { Notice(tone: .error, title: QelvoraCopy.text("w5ContentStatus"), children: error) }
                 if !currentAccess {
-                    Text("Checking current access. Your input is kept during a connection interruption.").qText("body")
-                    Button("Check current access", variant: .secondary, disabled: busy) { Task { await load(refreshThanks: false) } }
+                    Text(QelvoraCopy.text("w5ContentCheckingAccess")).qText("body")
+                    Button(QelvoraCopy.text("w5ContentCheckCurrentAccess"), variant: .secondary, disabled: busy) { Task { await load(refreshThanks: false) } }
                 } else {
                 if let content {
                     if content.document.kind == "note" {
@@ -91,8 +134,16 @@ private struct ContentFanScreen: View {
                     if content.document.kind == "note" {
                         Text("Your private replies").qText("display-md").accessibilityAddTraits(.isHeader)
                         Text("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.").qText("caption")
-                        TextField("Reply privately", text: $replyText, axis: .vertical).qText("body").lineLimit(3...8).accessibilityLabel("Private reply")
-                        Button("Send private reply", variant: .secondary, block: true, disabled: busy || replyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await sendReply() } }
+                        if replyPolicy?.milestone != nil, let days = replyPolicy?.confirmedDays {
+                            Text(QelvoraCopy.text("contentConfirmedTenure", values: ["days": String(days)])).qText("caption")
+                        }
+                        if replyPolicy == nil { Text(QelvoraCopy.text("contentReplyPolicyUnavailable")).qText("caption") }
+                        TextField("Reply privately", text: Binding(get: { replyText }, set: { value in
+                            if value.utf16.count <= replyLimit || value.utf16.count < replyText.utf16.count { replyText = value }
+                        }), axis: .vertical).qText("body").lineLimit(3...8).accessibilityLabel("Private reply")
+                        Text(QelvoraCopy.text("contentReplyLimit", values: ["used": String(replyText.utf16.count), "limit": String(replyLimit)])).qText("caption")
+                        if replyText.utf16.count > replyLimit { Text(QelvoraCopy.text("contentReplyOverLimit")).qText("caption") }
+                        Button("Send private reply", variant: .secondary, block: true, disabled: busy || !replyAccess || replyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count > replyLimit) { Task { await sendReply() } }
                         ForEach(replies.filter { $0.contentId == contentId }) { reply in
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(reply.text).qText("body")
@@ -105,14 +156,14 @@ private struct ContentFanScreen: View {
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16))
                         }
                         if nextCursor != nil { Button("Older replies", variant: .secondary, disabled: busy || replyDepth >= 5) { Task { await older() } } }
-                        Button("Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": true]) { await load(refreshThanks:false) } } }
+                        if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": !muted]) { await load(refreshThanks:false) } } } }
                     }
                     Text("This helped").qText("display-md").accessibilityAddTraits(.isHeader)
                     TextField("Thanks · optional", text: $thanksText, axis: .vertical).qText("body").lineLimit(2...6)
-                    Toggle("Share this text with the creator’s digest", isOn: $shareDigest).onChange(of: shareDigest) { _, value in if !value { showIdentity = false } }
-                    Toggle("Include my handle", isOn: $showIdentity).disabled(!shareDigest)
-                    Button(thanks != nil && thanks?.withdrawn == false ? "Update Thanks" : "This helped", variant: .secondary, block: true, disabled: busy) { Task { await saveThanks(withdraw: false) } }
-                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks", variant: .quiet, disabled: busy) { Task { await saveThanks(withdraw: true) } } }
+                    Toggle("Share this text with the creator’s digest", isOn: $shareDigest).disabled(busy || !thanksAccess).onChange(of: shareDigest) { _, value in if !value { showIdentity = false } }
+                    Toggle("Include my handle", isOn: $showIdentity).disabled(busy || !thanksAccess || !shareDigest)
+                    Button(thanks != nil && thanks?.withdrawn == false ? "Update Thanks" : "This helped", variant: .secondary, block: true, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: false) } }
+                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks", variant: .quiet, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: true) } } }
                 } else {
                     Text("Content unavailable").qText("display-md"); Button("Refresh", variant: .secondary, disabled: busy) { Task { await load() } }
                     ForEach(replies.filter { $0.contentId == contentId }) { reply in
@@ -123,8 +174,8 @@ private struct ContentFanScreen: View {
                         }.padding(16).background(qColor("surface",scheme))
                     }
                     if nextCursor != nil { Button("Older replies",variant:.secondary,disabled:busy || replyDepth >= 5) { Task { await older() } } }
-                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy) { Task { await saveThanks(withdraw:true) } } }
-                    Button("Unmute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted":false]) { await load() } } }
+                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy || !thanksAccess) { Task { await saveThanks(withdraw:true) } } }
+                    if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted": !muted]) { await load(refreshThanks:false) } } } }
                 }
                 }
             }.padding(16)
@@ -155,58 +206,85 @@ private struct ContentFanScreen: View {
         }
     }
     @ViewBuilder private func attachments(for content: ContentViewValue) -> some View {
-        if let baseURL, let viewerAccountId, content.version > 0, content.document.media.count <= 6 {
-            ForEach(content.document.media) { attachment in
-                NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
-                    .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
+        if let baseURL, let viewerAccountId, content.version > 0 {
+            if content.document.media.count <= 10 {
+                ForEach(content.document.media) { attachment in
+                    NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
+                        .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
+                }
+            } else {
+                Text("Attachment information is unavailable. Refresh current access.").qText("caption")
             }
         }
     }
     private func contentReset() { content = nil }
     @MainActor private func suspendAccess() {
-        currentAccess = false; signature = nil; signatureStatus = ""
+        currentAccess = false; replyAccess = false; thanksAccess = false; replyPolicy = nil; signature = nil; signatureStatus = ""
     }
     @MainActor private func clearAuthority() {
         suspendAccess(); content = nil; replies = []; thanks = nil; nextCursor = nil
-        viewerAccountId = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
+        viewerAccountId = nil; muted = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
     }
     @MainActor private func load(refreshThanks: Bool = true) async {
         guard !loading else { return }; loading = true; defer { loading = false }
-        guard let baseURL else { suspendAccess(); error = "The content service is not connected."; return }
+        guard let baseURL else { suspendAccess(); error = QelvoraCopy.text("w5ContentRefreshUnavailable"); return }
         let creatorId = self.creatorId, contentId = self.contentId
         let cycleStartedAt = ProcessInfo.processInfo.systemUptime
         loadGeneration+=1;let generation=loadGeneration
         let client=ContentClient(baseURL:baseURL)
         do {
             let before:ContentPreference=try await client.request(creatorId+"/mute")
-            var view:ContentViewValue?;var status=""
-            do {view=try await client.request(creatorId+"/"+contentId, expectedAccountId: before.accountId)} catch {status=(error as? ContentFailure)?.message ?? "Reconnect to refresh content. Your input is kept."}
-            let depth = before.accountId == viewerAccountId ? replyDepth : 1
-            var page:ContentReplyPage=try await client.request(creatorId+"/replies", expectedAccountId: before.accountId)
-            var currentReplies = page.items
-            if depth > 1 {
-                for _ in 1..<depth {
-                    guard let cursor = page.nextCursor else { break }
-                    page = try await client.request(creatorId + "/replies?cursor=" + cursor, expectedAccountId: before.accountId)
-                    currentReplies += page.items
-                }
+            var view:ContentViewValue?;var statuses:[String]=[]
+            do {view=try await client.request(creatorId+"/"+contentId, expectedAccountId: before.accountId)} catch {
+                if let failure=error as? ContentFailure, failure.status==401 || failure.accountChanged {throw error}
+                statuses.append(contentFailureCopy(error))
             }
-            let mine:ContentThanks?=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId, expectedAccountId: before.accountId)
+            let depth = before.accountId == viewerAccountId ? replyDepth : 1
+            var page:ContentReplyPage?;var currentReplies:[ContentReply]=[];var repliesAvailable=false
+            do {
+                var fresh:ContentReplyPage=try await client.request(creatorId+"/replies", expectedAccountId: before.accountId)
+                var items=fresh.items
+                if depth > 1 {
+                    for _ in 1..<depth {
+                        guard let cursor = fresh.nextCursor else { break }
+                        fresh = try await client.request(creatorId + "/replies?cursor=" + cursor, expectedAccountId: before.accountId)
+                        items += fresh.items
+                    }
+                }
+                page=fresh;currentReplies=items;repliesAvailable=true
+            } catch {
+                if (error as? ContentFailure)?.authorityDenied == true {throw error}
+                statuses.append("Private replies are unavailable. Refresh to try again.")
+            }
+            var mine:ContentThanks?;var thanksAvailable=false
+            do {mine=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId, expectedAccountId: before.accountId);thanksAvailable=true} catch {
+                if (error as? ContentFailure)?.authorityDenied == true {throw error}
+                statuses.append("Thanks is unavailable. Your input is kept; refresh before saving.")
+            }
+            var policy: ContentReplyPolicy?
+            do {
+                let current: ContentReplyPolicy = try await client.request(creatorId + "/reply-policy", expectedAccountId: before.accountId)
+                try current.validate(accountId: before.accountId, creatorId: creatorId)
+                policy = current
+            } catch {
+                if (error as? ContentFailure)?.authorityDenied == true { throw error }
+                statuses.append(QelvoraCopy.text("contentReplyPolicyUnavailable"))
+            }
             let after:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: before.accountId)
             guard generation==loadGeneration else{return}
-            guard before.accountId==after.accountId else {clearAuthority();self.error="The signed-in account changed. Refresh before continuing.";return}
+            guard before.accountId==after.accountId else {clearAuthority();self.error=QelvoraCopy.text("w5ContentAccountChanged");return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
-            viewerAccountId=before.accountId;content=view;replies=currentReplies;nextCursor=page.nextCursor;thanks=mine
-            if refreshThanks || changed {thanksText=mine?.text ?? "";shareDigest=mine?.shareWithCreatorDigest ?? false;showIdentity=mine?.showIdentity ?? false}
-            self.error=status
+            viewerAccountId=before.accountId;muted=after.muted;content=view;replies=currentReplies;nextCursor=page?.nextCursor;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable;replyPolicy=policy
+            if thanksAvailable && (refreshThanks || changed) {thanksText=mine?.text ?? "";shareDigest=mine?.shareWithCreatorDigest ?? false;showIdentity=mine?.showIdentity ?? false}
+            self.error=statuses.joined(separator: "\n")
             checkedAt = cycleStartedAt; currentAccess = scene == .active && ProcessInfo.processInfo.systemUptime - cycleStartedAt < 5
         } catch {
             guard generation==loadGeneration else{return}
             suspendAccess()
             content=nil;replies=[];thanks=nil;nextCursor=nil
-            if (error as? ContentFailure)?.status==401 || (error as? ContentFailure)?.status==403 {clearAuthority()}
-            self.error=(error as? ContentFailure)?.message ?? "Reconnect to refresh current access. Your input is kept."
+            if (error as? ContentFailure)?.authorityDenied == true {clearAuthority()}
+            self.error=contentFailureCopy(error)
         }
     }
     @MainActor private func mutate(_ path: String, _ body: [String: Any]) async -> Bool {
@@ -218,12 +296,13 @@ private struct ContentFanScreen: View {
             if let data=try? JSONSerialization.data(withJSONObject:command,options:.sortedKeys),let json=String(data:data,encoding:.utf8) { fingerprint=path+json;command["idempotencyKey"]=retryKeys[fingerprint!] ?? UUID().uuidString;retryKeys[fingerprint!]=command["idempotencyKey"] as? String }
         }
         do { let _: ContentReceipt = try await ContentClient(baseURL: baseURL).request(creatorId + "/" + path, body: JSONSerialization.data(withJSONObject: command), expectedAccountId:viewerAccountId); if let fingerprint { retryKeys.removeValue(forKey:fingerprint) }; error = ""; return true }
-        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if let failure = error as? ContentFailure, [401, 403].contains(failure.status) { clearAuthority() }; self.error = (error as? ContentFailure)?.message ?? "This action could not complete. Your input is kept."; return false }
+        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if (error as? ContentFailure)?.authorityDenied == true { clearAuthority() }; self.error = contentFailureCopy(error, action: true); return false }
     }
-    @MainActor private func sendReply() async { if await mutate(contentId + "/replies", ["text": replyText, "idempotencyKey": UUID().uuidString]) { replyText = ""; await load(refreshThanks: false) } }
+    @MainActor private func sendReply() async { guard replyAccess, replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count <= replyLimit else {return}; if await mutate(contentId + "/replies", ["text": replyText, "idempotencyKey": UUID().uuidString]) { replyText = ""; await load(refreshThanks: false) } }
     @MainActor private func withdraw(_ reply:ContentReply) async { if await mutate("replies/"+reply.id+"/withdraw",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } }
     @MainActor private func consent(_ reply: ContentReply, text: Bool, handle: Bool) async { if await mutate("replies/" + reply.id + "/consent", ["version": reply.consent.version, "shareText": text, "showHandle": handle, "idempotencyKey": UUID().uuidString]) { await load(refreshThanks: false) } }
     @MainActor private func saveThanks(withdraw: Bool) async {
+        guard thanksAccess else {return}
         if await mutate("thanks", ["targetKind": "content", "targetId": contentId, "text": withdraw ? "" : thanksText, "shareWithCreatorDigest": !withdraw && shareDigest, "showIdentity": !withdraw && showIdentity, "withdrawn": withdraw, "expectedVersion": thanks?.version ?? 0, "idempotencyKey": UUID().uuidString]) { await load() }
     }
     @MainActor private func older() async {

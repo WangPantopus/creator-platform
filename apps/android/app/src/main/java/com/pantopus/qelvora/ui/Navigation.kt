@@ -10,6 +10,8 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -25,19 +27,7 @@ import com.pantopus.qelvora.generated.QelvoraTokens as T
 @Composable
 fun TabBar(active: String = QelvoraCopy.text("navHome"), onSelect: (String) -> Unit = {}) {
     val tabs = listOf("navHome" to "home", "navDiscover" to "compass", "navRequests" to "inbox", "navYou" to "user")
-    Column(Modifier.fillMaxWidth().background(qColor("surface"))) {
-        Box(Modifier.fillMaxWidth().height(T.hairline).background(qColor("line")))
-        Row(Modifier.padding(start = T.space2, end = T.space2, top = T.authorGap, bottom = T.space6)) {
-            tabs.forEach { (key, glyph) ->
-                val title = QelvoraCopy.text(key)
-                val ink = qColor(if (title == active) "ink" else "ink-muted")
-                Column(Modifier.weight(1f).heightIn(min = T.space12).selectable(title == active, role = Role.Tab) { onSelect(title) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(T.space1, Alignment.CenterVertically)) {
-                    Glyph(glyph, T.glyphSize, ink)
-                    BasicText(title, style = qText("tab-label").copy(color = ink))
-                }
-            }
-        }
-    }
+    NavigationTabs(tabs, active, onSelect = onSelect)
 }
 
 @Composable
@@ -66,18 +56,42 @@ internal fun NavigationCount(count: Int, halo: Boolean = false) {
 @Composable
 fun StudioTabBar(active: String = QelvoraCopy.text("navRequests"), requests: Int = 0, onSelect: (String) -> Unit = {}) {
     val tabs = listOf("navNotes" to "broadcast", "navRequests" to "inbox", "navThreads" to "threads", "navMyAI" to "ring", "navMore" to "more")
+    NavigationTabs(tabs, active, requests, studio = true, onSelect = onSelect)
+}
+
+/** Give scaled labels more room without shrinking them or changing the reference-size row. */
+@Composable
+private fun NavigationTabs(tabs: List<Pair<String, String>>, active: String, requests: Int = 0, studio: Boolean = false, onSelect: (String) -> Unit) {
+    val scale = LocalDensity.current.fontScale
+    val columns = if (scale >= 2.4f) 1 else if (scale >= 1.6f) 2 else tabs.size
     Column(Modifier.fillMaxWidth().background(qColor("surface"))) {
         Box(Modifier.fillMaxWidth().height(T.hairline).background(qColor("line")))
-        Row(Modifier.padding(start = T.space2, end = T.space2, top = T.authorGap, bottom = T.space6)) {
-            tabs.forEach { (key, glyph) ->
-                val title = QelvoraCopy.text(key)
-                val ink = qColor(if (title == active) "ink" else "ink-muted")
-                Column(Modifier.weight(1f).heightIn(min = T.space12).selectable(title == active, role = Role.Tab) { onSelect(title) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(T.space1, Alignment.CenterVertically)) {
-                    Box(Modifier.height(T.glyphSize), contentAlignment = Alignment.Center) {
-                        Glyph(glyph, if (key == "navNotes") (T.space4 + T.hairline) else T.glyphSize, ink)
-                        if (key == "navRequests" && requests > 0) Box(Modifier.align(Alignment.TopStart).offset(x = T.messagePadding, y = -T.authorGap)) { NavigationCount(requests, halo = true) }
+        Column(Modifier.padding(start = T.space2, end = T.space2, top = T.authorGap, bottom = T.space6), verticalArrangement = Arrangement.spacedBy(T.space2)) {
+            tabs.chunked(columns).forEach { row ->
+                Row {
+                    row.forEach { (key, glyph) ->
+                        val title = QelvoraCopy.text(key)
+                        val ink = qColor(if (title == active) "ink" else "ink-muted")
+                        val modifier = Modifier.weight(1f).heightIn(min = T.space12).selectable(title == active, role = Role.Tab) { onSelect(title) }
+                        val icon: @Composable () -> Unit = {
+                            Box(Modifier.height(T.glyphSize), contentAlignment = Alignment.Center) {
+                                Glyph(glyph, if (studio && key == "navNotes") (T.space4 + T.hairline) else T.glyphSize, ink)
+                                if (studio && key == "navRequests" && requests > 0) Box(Modifier.align(Alignment.TopStart).offset(x = T.messagePadding, y = -T.authorGap)) { NavigationCount(requests, halo = true) }
+                            }
+                        }
+                        if (columns == 1) {
+                            Row(modifier, horizontalArrangement = Arrangement.spacedBy(T.space3, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+                                icon()
+                                BasicText(title, style = qText("tab-label").copy(color = ink, textAlign = TextAlign.Center))
+                            }
+                        } else {
+                            Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(T.space1, Alignment.CenterVertically)) {
+                                icon()
+                                BasicText(title, style = qText("tab-label").copy(color = ink, textAlign = TextAlign.Center))
+                            }
+                        }
                     }
-                    BasicText(title, style = qText("tab-label").copy(color = ink))
+                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
         }

@@ -1,0 +1,64 @@
+{
+  "qualification": "Guarded SDK implementation, actual iOS app gate and real developer transport; no human voice, canonical call, complete history, production trust or native transport acceptance",
+  "baseRevision": "0186a6de",
+  "sourceSha256": {
+    "apps/backend/src/modules/session/livekit.ts": "236106d9fd11624198b862b839004a6c801d44ea3944720115b7c4de12b014fa",
+    "apps/backend/src/modules/session/livekit-journal.ts": "f0f79980cf26dc1d149fba4bc62f9f07234766568fe9376e9944985a70f6d482",
+    "apps/backend/src/modules/session/livekit-schema.sql": "b43115fd1c104c8f5ea517b2f2e74278067e04062e1688c58747c705a4a68faf",
+    "apps/web/features/calls/livekit.ts": "830134606d8412c9b762a97259cf26bc5d61e5e6668d31ddbbd32766dba2f28b",
+    "apps/ios/Sources/QelvoraUI/Media/LiveKitNativeCallTransport.swift": "b57d7d164e6a543949da40db43c838349c6d9188941c1ade6ed1075604db7a7e",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/LiveKitNativeCallTransport.kt": "58df5ea9d8b79559729478ab4339911da4a813e87fbc7ef8df3a61cb806562d3",
+    "apps/ios/Sources/QelvoraUI/Navigation.swift": "f9bea3fbc66934b1722ca844b52495c8e2f9b89e3b82496e33799de65a850b7e",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Navigation.kt": "e841b936a94958c43b6c00525468e37963224be2e58a1e348d7fa68b51f0c774"
+  },
+  "ios": {
+    "signedShippingBinarySha256": "61d53c0f73926c4cdf02661ff90bd8a6c5ca5db065e84128cd84d64ec65771e2",
+    "sdk": "2.17.0",
+    "actualFanAccountSeconds": 12.72,
+    "actualFanAndOwnerGateSeconds": 39.457,
+    "gatePassed": true,
+    "appearance": "Night",
+    "contentSize": "accessibility-extra-large (AX3), not an exact200% claim",
+    "recordingOrCallAccepted": false
+  },
+  "android": {
+    "sdk": "2.29.0",
+    "sdkShippingBuildPassed": true,
+    "elapsedSeconds": 54,
+    "apkBytes": 70240115,
+    "actualLatestSdkInstallJourney": "pending; W8 and W3 own both emulator leases",
+    "navigationCurrentSourceRebuild": {
+      "passed": true,
+      "elapsedSeconds": 36,
+      "apkBytes": 70240115,
+      "apkSha256": "7ec6ad88c5e0b56dd775ee4680a29dfd553a34c383abd0c8c2acc25c1df9f1c2",
+      "actualInstalledJourney": "pending"
+    }
+  },
+  "failures": [
+    "Initial developer operator JavaScript was incorrectly served as JSON/octet-stream; corrected Buffer and MIME, actual repeat passed.",
+    "First iOS gate expected creator handle from an older fan-only profile renderer; failed and xcodebuild result finalization hung. Only the owned process was stopped. Corrected actual actor driver, repeat passed.",
+    "Attempted corrected iOS run while own finalization held the heavy guard was refused75 and started no child.",
+    "One Android emulator launch was incorrectly started after a failed slot claim; exact own AVD/process was immediately verified/stopped, peer lease/device untouched. Subsequent launches require successful claim."
+  ],
+  "future0092": {
+    "registered": false,
+    "applied": false,
+    "positiveCanonicalCallbackAccepted": false,
+    "retentionDefault": null,
+    "activationDependencies": [
+      "W8 source/role/commit-fence review",
+      "Approved privacy policy reference and expiry",
+      "Genuine current CallCustody and C10 PrivacyJob/fence adapters",
+      "Real provider project and production qualification"
+    ]
+  },
+  "ownedCleanup": {
+    "livekitContainer": "stopped",
+    "operator3106": "stopped",
+    "iosSimulator": "stopped; exact slot2 token/inode released",
+    "heavyBuild": "released",
+    "api4106AndWeb3006": "still running on first57, all media/calls unavailable without0082",
+    "ingestionWorker": "not running"
+  }
+}
