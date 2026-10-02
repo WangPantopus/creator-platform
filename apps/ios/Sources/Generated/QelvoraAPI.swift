@@ -5625,6 +5625,15 @@ public enum APIConversationConversationAuthorship: String, Codable, Sendable {
   case `system` = "system"
 }
 
+public struct APIConversationConversationCallControl: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public let `expectedEpoch`: Int
+  public init(idempotencyKey: String, expectedEpoch: Int) {
+    self.idempotencyKey = idempotencyKey
+    self.expectedEpoch = expectedEpoch
+  }
+}
+
 public struct APIConversationConversationCorrectionCommand: Codable, Sendable {
   public let `actType`: APIConversationConversationCorrectionCommandActType
   public let `subjectId`: String
