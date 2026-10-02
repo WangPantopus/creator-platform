@@ -14,8 +14,9 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        NSMicrophoneUsageDescription: Record a voice note you choose to send.
+        NSMicrophoneUsageDescription: Use your microphone for voice notes and calls you choose.
         NSCameraUsageDescription: Share your camera in a video call you choose to join.
+        UIBackgroundModes: [audio]
         CFBundleURLTypes:
           - CFBundleURLName: local-development-entry
             CFBundleURLSchemes: [qelvora]

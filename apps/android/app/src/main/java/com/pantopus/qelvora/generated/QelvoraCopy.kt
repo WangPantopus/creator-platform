@@ -724,6 +724,7 @@ object QelvoraCopy {
     "w6SummaryQueuedAvailableWhenItsProviderCompletes" to "Summary queued · available when its provider completes.",
     "w6DeleteThisSummary" to "Delete this summary",
     "w6CallReceipt" to "Call receipt",
+    "w6CallInProgress" to "Human call",
     "w6RecordingOccurredCheckTheConsentHistory" to "Recording occurred · check the consent history",
     "w6NoRecordingWasConfirmed" to "No recording was confirmed",
     "w6ViewTheReconciledReceipt" to "View the reconciled receipt",

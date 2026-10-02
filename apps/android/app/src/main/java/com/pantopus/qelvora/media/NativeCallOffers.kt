@@ -81,14 +81,13 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
     var notice by remember(route) { mutableStateOf<String?>(null) }
     var submission by remember(route) { mutableStateOf<Triple<String, Int, String>?>(null) }
     val scope = rememberCoroutineScope()
-    val root = route?.let { "/v1/w6/threads/${it.creator}/${it.fan}/call-offers" }
-    val canSelect = model.session?.fan?.id?.lowercase() == route?.fan?.toString()
+        val canSelect = model.session?.fan?.id?.lowercase() == route?.fan?.toString()
     fun display(timestamp: String, zone: String) = runCatching { DateTimeFormatter.ofPattern("EEEE, MMMM d, HH:mm XXX").withZone(ZoneId.of(zone)).format(Instant.parse(timestamp)) }.getOrDefault(timestamp)
     suspend fun refresh() {
-        val api = NativeCallRequest.capture(baseURL, model) ?: return; val path = root ?: return; val current = route ?: return
+        val api = NativeCallRequest.capture(baseURL, model) ?: return; val current = route ?: return
         if (busy) return; busy = true
         try {
-            val values = JSONArray(api.request(path).toString(Charsets.UTF_8))
+            val values = api.offers(current)
             val next = (0 until values.length()).map { values.getJSONObject(it) }.firstOrNull { it.getString("id").lowercase() == current.session.toString() }
             if (next?.optInt("version") != offer?.optInt("version")) chosen = null
             offer = next; loaded = true; stale = false; notice = null
@@ -97,20 +96,20 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
         finally { busy = false }
     }
     suspend fun select() {
-        val api = NativeCallRequest.capture(baseURL, model) ?: return; val path = root ?: return; val current = route ?: return; val value = offer ?: return; val slot = chosen ?: return
+        val api = NativeCallRequest.capture(baseURL, model) ?: return; val current = route ?: return; val value = offer ?: return; val slot = chosen ?: return
         if (busy || stale || !canSelect) return; busy = true; notice = null
         try {
             val version = value.getInt("version")
             if (submission?.first != slot || submission?.second != version) submission = Triple(slot, version, UUID.randomUUID().toString())
             val command = JSONObject().put("slotId", slot).put("expectedVersion", version).put("idempotencyKey", submission!!.third)
-            val selected = JSONObject(api.request("$path/${value.getString("id")}/select", "POST", command.toString().toByteArray()).toString(Charsets.UTF_8))
+            val selected = api.select(current, value.getString("id"), command)
             val sessionId = UUID.fromString(selected.getString("id"))
             if (api.current()) model.open("/calls/${current.creator}/${current.fan}/$sessionId")
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { if (api.current()) notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") }
         finally { busy = false }
     }
-    LaunchedEffect(route, baseURL) { while (true) { refresh(); delay(30_000) } }
+    LaunchedEffect(route, baseURL) { while (true) { refresh(); delay(if (loaded) 30_000 else 1_000) } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         BasicText(QelvoraCopy.text("w6CALLREQUEST"), style = qText("label").copy(color = qColor("ink-muted")))
         BasicText(QelvoraCopy.text("w6ChooseATime"), style = qText("display-md").copy(color = qColor("ink")))

@@ -724,6 +724,7 @@
   <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
   <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
   <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_call_in_progress" formatted="false">Human call</string>
   <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
   <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
   <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>

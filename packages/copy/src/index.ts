@@ -722,6 +722,7 @@ export const copy = {
   "w6SummaryQueuedAvailableWhenItsProviderCompletes": "Summary queued · available when its provider completes.",
   "w6DeleteThisSummary": "Delete this summary",
   "w6CallReceipt": "Call receipt",
+  "w6CallInProgress": "Human call",
   "w6RecordingOccurredCheckTheConsentHistory": "Recording occurred · check the consent history",
   "w6NoRecordingWasConfirmed": "No recording was confirmed",
   "w6ViewTheReconciledReceipt": "View the reconciled receipt",

@@ -1,43 +1,66 @@
 package com.pantopus.qelvora.media
 
+import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.identity.FanSessionRequestCapture
 import kotlinx.coroutines.CancellationException
-import java.net.URL
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.UUID
 
-/** Client lifetime protection only. The backend authorizes the real held request.
- * Never read a replacement credential for an operation opened by another session.
- */
-internal class NativeCallRequest private constructor(
-    private val model: FanSession,
-    private val credential: String,
-    val accountId: String,
-    private val sessionId: String,
-    private val destination: String,
-    private val client: NativeMediaClient,
-) {
-    fun current(): Boolean = model.destination == destination &&
-        model.session?.accountId == accountId && model.session?.sessionId == sessionId &&
-        runCatching { model.currentToken() == credential }.getOrDefault(false)
-
-    private fun requireCurrent() {
-        if (!current()) throw CancellationException("The call request's session or destination changed")
+/** Only the actual issuer-bound capture owns a client. UI projections and OS
+ * state grant no authority and may not read replacement credentials. */
+internal class NativeCallRequest private constructor(private val capture: FanSessionRequestCapture) {
+    val accountId get() = capture.expectedAccountId
+    val destination get() = capture.destination
+    suspend fun current(): Boolean = capture.isCurrent()
+    private suspend fun requireCurrent() { if (!current()) throw CancellationException("Call request changed") }
+    private fun document(value: APICallCallSession, route: CallRoute, selected: Boolean = false): JSONObject {
+        require(UUID.fromString(value.creatorId) == route.creator && UUID.fromString(value.fanId) == route.fan)
+        if (!selected) require(UUID.fromString(value.id) == route.session)
+        return JSONObject(Json.encodeToString(value))
     }
-
-    suspend fun request(path: String, method: String = "GET", bytes: ByteArray? = null): ByteArray {
+    suspend fun read(route: CallRoute): JSONObject {
         requireCurrent()
-        val result = client.request(path, method, bytes, expectedAccountId = accountId)
-        requireCurrent()
-        return result
+        val value = capture.client.readCallSession(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId)
+        requireCurrent(); return document(value, route)
     }
-
+    suspend fun action(route: CallRoute, name: String, body: JSONObject): JSONObject {
+        requireCurrent()
+        val value = when (name) {
+            "consent" -> capture.client.setCallConsent(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId, Json.decodeFromString<APICallConsentCommand>(body.toString()))
+            "end" -> capture.client.endCallSession(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId, Json.decodeFromString<APICallEndCall>(body.toString()))
+            "delete-summary" -> capture.client.deleteCallSummary(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId, Json.decodeFromString<APICallCallRevision>(body.toString()))
+            else -> error("Unsupported call action")
+        }
+        requireCurrent(); return document(value, route)
+    }
+    suspend fun join(route: CallRoute): JSONObject {
+        requireCurrent()
+        val value = capture.client.joinCallSession(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId)
+        requireCurrent(); return JSONObject(Json.encodeToString(value))
+    }
+    suspend fun redeem(route: CallRoute, nonce: String): Boolean {
+        requireCurrent()
+        val value = capture.client.redeemCallAdmission(route.creator.toString(), route.fan.toString(), route.session.toString(), accountId, APICallAdmissionRedemption(nonce))
+        requireCurrent(); return value.admitted.value
+    }
+    suspend fun offers(route: CallRoute): JSONArray {
+        requireCurrent()
+        val value = capture.client.readCallOffers(route.creator.toString(), route.fan.toString(), accountId)
+        requireCurrent(); return JSONArray(Json.encodeToString(value))
+    }
+    suspend fun select(route: CallRoute, offerId: String, body: JSONObject): JSONObject {
+        requireCurrent()
+        val value = capture.client.selectCallOffer(route.creator.toString(), route.fan.toString(), offerId, accountId, Json.decodeFromString<APICallSelectTime>(body.toString()))
+        requireCurrent(); return document(value, route, selected = true)
+    }
     companion object {
-        fun capture(baseURL: String?, model: FanSession): NativeCallRequest? {
-            val origin = baseURL ?: return null
-            val session = model.session ?: return null
-            val credential = runCatching { model.currentToken() }.getOrNull() ?: return null
-            val destination = model.destination
-            return NativeCallRequest(model, credential, session.accountId, session.sessionId,
-                destination, NativeMediaClient(URL(origin)) { credential }).takeIf { it.current() }
+        suspend fun capture(baseURL: String?, model: FanSession): NativeCallRequest? {
+            if (baseURL == null) return null
+            return model.captureRequest(model.destination)?.let(::NativeCallRequest)
         }
     }
 }
