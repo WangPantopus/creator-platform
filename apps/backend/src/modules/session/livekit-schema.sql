@@ -68,6 +68,12 @@ END $$;
 -- Read-only minimum projections stay behind the non-login definer. Worker has
 -- no direct table access. Participant APIs must redact provider IDs/history.
 GRANT SELECT ON creator.call_provider_room,creator.call_provider_identity TO creator_call_callback_authority;
+-- SHARE locks fence actual C10 deletion against callback commit. UPDATE is
+-- column-limited and its check is always false, so it permits locks, not edits.
+GRANT UPDATE(session_id) ON creator.call_provider_room TO creator_call_callback_authority;
+GRANT UPDATE(identity) ON creator.call_provider_identity TO creator_call_callback_authority;
+CREATE POLICY callback_room_lock ON creator.call_provider_room FOR UPDATE TO creator_call_callback_authority USING(true) WITH CHECK(false);
+CREATE POLICY callback_identity_lock ON creator.call_provider_identity FOR UPDATE TO creator_call_callback_authority USING(true) WITH CHECK(false);
 GRANT SELECT,INSERT ON creator.call_provider_callback TO creator_call_callback_authority;
 CREATE POLICY callback_metadata_insert ON creator.call_provider_callback FOR INSERT TO creator_call_callback_authority WITH CHECK(true);
 CREATE POLICY participant_insert ON creator.call_provider_room FOR INSERT TO creator_runtime WITH CHECK(
@@ -133,13 +139,17 @@ BEGIN
    OR sid IS NULL OR sid!~'^RM_[a-zA-Z0-9]{1,64}$' OR e IS NULL OR length(e) NOT BETWEEN 1 AND 128
    OR h IS NULL OR h!~'^[a-f0-9]{64}$' OR provider_time IS NULL OR provider_time<=to_timestamp(0) OR provider_time>clock_timestamp()+interval '2 minutes'
    OR kind IS NULL OR kind NOT IN('room_started','room_finished','participant_joined','participant_left','participant_connection_aborted','track_published','track_unpublished') THEN RETURN NULL; END IF;
- SELECT * INTO r FROM creator.call_provider_room WHERE provider=p AND project_key_sha256=project_hash AND provider_room_sid=sid AND expires_at>clock_timestamp();
+ SELECT * INTO r FROM creator.call_provider_room WHERE provider=p AND project_key_sha256=project_hash AND provider_room_sid=sid AND expires_at>clock_timestamp() FOR SHARE;
  IF NOT FOUND THEN RETURN NULL; END IF;
  IF kind IN('room_started','room_finished') THEN
   IF identity_id IS NOT NULL OR admission IS NOT NULL THEN RETURN NULL; END IF;
- ELSIF identity_id IS NULL OR admission IS NULL OR NOT EXISTS(SELECT FROM creator.call_provider_identity
+ ELSE
+  IF identity_id IS NULL OR admission IS NULL THEN RETURN NULL; END IF;
+  PERFORM 1 FROM creator.call_provider_identity
    WHERE identity=identity_id AND admission_id=admission AND session_id=r.session_id AND provider=p AND project_key_sha256=project_hash
-     AND creator_id=r.creator_id AND fan_id=r.fan_id) THEN RETURN NULL; END IF;
+     AND creator_id=r.creator_id AND fan_id=r.fan_id FOR SHARE;
+  IF NOT FOUND THEN RETURN NULL; END IF;
+ END IF;
  INSERT INTO creator.call_callback_scope(claim_token,transaction_id,backend_pid,login_name,provider,project_key_sha256,session_id,creator_id,fan_id,
   provider_room_sid,event_id,body_sha256,event_type,provider_created_at,identity,admission_id,expires_at,lease_until)
  VALUES(claim,pg_current_xact_id(),pg_backend_pid(),session_user,p,project_hash,r.session_id,r.creator_id,r.fan_id,
