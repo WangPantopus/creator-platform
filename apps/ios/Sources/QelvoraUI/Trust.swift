@@ -189,7 +189,20 @@ public struct TrustFanFeature: View {
         var failure: Error?
         do { help = try await client.request("help") } catch { failure = error }
         if route.contains("privacy") { do { capability = try await client.request("capabilities") } catch { capability = nil; failure = failure ?? error } }
-        do { if route.hasPrefix("/trust") || route.contains("feedback") { } else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items } else if route.contains("privacy") { let page: TrustItems<TrustJob> = try await client.request("privacy/jobs"); jobs = page.items } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items } } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
+        do {
+            if route.hasPrefix("/trust") || route.contains("feedback") { }
+            else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items }
+            else if route.contains("privacy") {
+                exportPayload = nil
+                let page: TrustItems<TrustJob> = try await client.request("privacy/jobs")
+                jobs = page.items
+                if let selectedId = selectedJob?.id, jobs.contains(where: { $0.id == selectedId }) {
+                    let detail: TrustJob = try await client.request("privacy/jobs/" + selectedId)
+                    selectedJob = detail
+                    jobs = jobs.map { $0.id == selectedId ? detail : $0 }
+                } else { selectedJob = nil }
+            } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items }
+        } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         error = failure?.localizedDescription ?? ""
     }
     private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? { guard let client, !busy else { return nil }; busy = true; defer { busy = false }; do { let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); error = ""; commandKey = UUID().uuidString; return ack } catch { self.error = error.localizedDescription; return nil } }

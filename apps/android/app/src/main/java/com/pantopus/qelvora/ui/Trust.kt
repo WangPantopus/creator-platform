@@ -146,7 +146,16 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             try {
                 if (route.startsWith("/trust") || route.contains("feedback")) { }
                 else if (route.contains("access")) history = client.request("access-history").items()
-                else if (route.contains("privacy")) jobs = client.request("privacy/jobs").items()
+                else if (route.contains("privacy")) {
+                    pendingExport = null
+                    jobs = client.request("privacy/jobs").items()
+                    val selectedId = selectedJob?.text("id")
+                    if (selectedId != null && jobs.any { it.text("id") == selectedId }) {
+                        val detail = client.request("privacy/jobs/$selectedId")
+                        selectedJob = detail
+                        jobs = jobs.map { if (it.text("id") == selectedId) detail else it }
+                    } else selectedJob = null
+                }
                 else { cases = client.request("my-cases").items(); notices = client.request("inbox").items() }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (current: Exception) { cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
