@@ -15,6 +15,10 @@ import {
   assertCommercePublicPacketHost,
   type CommercePublicPacketHost,
 } from "./public-packet-host.js";
+import {
+  assertCommercePublicationSource,
+  type CommercePublicationSource,
+} from "./publication-source.js";
 
 /** Explicit W1/W8 composition after canonical schema custody. Default hosts
  * remain unavailable; schema presence cannot substitute for current authority.
@@ -26,6 +30,7 @@ export async function createCommerceStudio(input: {
     Required<Pick<ContentDependencies, "assertAllowed">>;
   assertScopeAllowedInTransaction: ScopeRestrictionInTransaction;
   publicPacketRead?: CommercePublicPacketHost;
+  publicationSource?: CommercePublicationSource;
   approvals?: {
     database: Database;
     access: AccessService;
@@ -72,11 +77,20 @@ export async function createCommerceStudio(input: {
     );
   if (input.publicPacketRead)
     assertCommercePublicPacketHost(input.publicPacketRead, input.pool);
+  if (input.publicationSource)
+    assertCommercePublicationSource(input.publicationSource, input.pool);
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
+    );
   const content = createContentStudio({
     pool: input.pool,
     owners: input.owners,
     dependencies: {
       ...input.dependencies,
+      publicationSource:
+        input.publicationSource ?? input.dependencies.publicationSource,
       ...(input.publicPacketRead
         ? {
             preparePublicPacketRead: input.publicPacketRead.prepare,

@@ -132,6 +132,21 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+      - name: Install and verify Android emulator
+        run: |
+          w3_sdk_manager="${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager"
+          w3_install_log="${RUNNER_TEMP:?}/android-emulator-install.log"
+          if ! "$w3_sdk_manager" --install emulator --channel=0 > "$w3_install_log" 2>&1; then
+            cat "$w3_install_log"
+            # Retry this observed SDK archive failure once; other failures stay fatal.
+            if ! grep -Fq 'Error on ZipFile unknown archive' "$w3_install_log"; then
+              exit 1
+            fi
+            "$w3_sdk_manager" --install emulator --channel=0
+          else
+            cat "$w3_install_log"
+          fi
+          "${ANDROID_HOME}/emulator/emulator" -no-window -noaudio -version
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
