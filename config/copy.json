@@ -68,6 +68,7 @@
   "noteReplies": "Only {name} and her team see replies to Notes.",
   "sponsorDisclosure": "Paid partnership: {name} is paid by {brand}.",
   "processorConsent": "Before your first message, {name}'s AI is powered by {providers}. They don't keep or train on your messages.",
+  "conversationReplyUnavailable": "Reply unavailable",
   "conversationDevelopmentPolicyTitle": "Unreviewed development policy",
   "conversationDevelopmentPolicyNotice": "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.",
   "sensitiveMemory": "Want me to remember this? Only if you say yes.",

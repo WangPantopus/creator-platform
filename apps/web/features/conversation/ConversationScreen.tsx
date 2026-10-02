@@ -24,7 +24,7 @@ import type {
   ConversationPage,
 } from "../../../../packages/api/src/conversation/contracts";
 import { useConversationRequest, ConversationError } from "./api";
-import { formatCopy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import { useIdentityRequest } from "../identity/session-boundary";
 import { ConversationOfflineStorage } from "./offline-storage";
 import { VoicePlayer } from "../media/VoicePlayer";
@@ -880,7 +880,7 @@ export function ConversationScreen({
                 )}
                 {message.deliveryState === "failed" && (
                   <span className="qv-tag">
-                    Reply unavailable · your allowance was released
+                    {copy.conversationReplyUnavailable}
                   </span>
                 )}
               </Message>

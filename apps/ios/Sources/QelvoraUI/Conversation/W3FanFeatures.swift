@@ -139,7 +139,7 @@ private struct W3ThreadScreen: View {
                 Text(QelvoraCopy.text("correctionAuthor", values: ["name": page.creatorName])).qText("label")
                 Button("Original AI reply · version \(correction.originalVersion)", variant: .quiet) { Task { do { let original: W3Message = try await model.client.request(model.root + "/messages/" + correction.originalMessageId); guard original.id == correction.originalMessageId, original.version == correction.originalVersion, original.authorKind == .ai else { sourceFailure = "The original reply changed."; return }; originalReply = original } catch { sourceFailure = "No longer accessible to you" } } }
             }
-            if message.deliveryState == .failed { Text("Reply unavailable · your allowance was released").qText("caption") }
+            if message.deliveryState == .failed { Text(QelvoraCopy.text("conversationReplyUnavailable")).qText("caption") }
             if message.authorKind != .fan { Button("Report", variant: .quiet) { session.open(reportDestination(message)) } }
             if message.authorKind == .ai, message.agentVersion != nil, message.deliveryState == .delivered || message.deliveryState == .interrupted, let policy = page.feedbackPolicy {
                 DisclosureGroup(QelvoraCopy.text("thisHelped")) {
