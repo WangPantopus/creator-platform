@@ -288,22 +288,20 @@ export class Database {
           })
         : client;
       const request = requestAuthority.getStore();
-      if (!request || request.accountId !== scope.actorAccountId)
-        throw new DomainError(
-          "held_thread_required",
-          "Use the current authorized conversation transaction.",
-          503,
-        );
-      this.held.set(scopedClient, {
-        scope,
-        sessionId: request.sessionId,
-        lockMode,
-        pending: 0,
-      });
+      // Preserve separately scoped host/job callbacks. They have no interactive
+      // session binding and cannot use assertHeldThread or the intro-offer port.
+      // assertCurrentSession already validated and held any actual request above.
+      if (request)
+        this.held.set(scopedClient, {
+          scope,
+          sessionId: request.sessionId,
+          lockMode,
+          pending: 0,
+        });
       let value: T;
       try {
         value = await work(scopedClient);
-        if (this.held.get(scopedClient)!.pending !== 0)
+        if ((this.held.get(scopedClient)?.pending ?? 0) !== 0)
           throw new DomainError(
             "held_work_pending",
             "Finish the authorized conversation work before commit.",
