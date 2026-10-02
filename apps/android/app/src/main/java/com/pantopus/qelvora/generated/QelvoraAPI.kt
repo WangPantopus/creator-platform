@@ -1068,6 +1068,13 @@ data class APICallCallRevision(
 )
 
 @Serializable
+data class APICallCallRoute(
+  val `sessionId`: String,
+  val `creatorId`: String,
+  val `fanId`: String
+)
+
+@Serializable
 data class APICallCallSummaryNote(
   val `note`: String,
   val `expectedVersion`: Long,
@@ -4737,6 +4744,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

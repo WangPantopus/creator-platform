@@ -18,6 +18,7 @@ import { createDevelopmentTrust } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { DomainError } from "./core/errors.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -48,6 +49,7 @@ const configured =
           ? { trust: createDevelopmentTrust }
           : {}),
         registerFeatures: async (runtime) => {
+          const accountCalls = await AccountCallMetadata.prepare(runtime);
           const mediaEnvironment = readMediaEnvironment();
           const mediaDenials = runtimeMediaDenials(runtime);
           // The development host consumes W8's 0082 held try-fence. A code
@@ -172,7 +174,7 @@ const configured =
               pool: runtime.pool,
               development: config.identityAdapter === "development",
             }),
-            mediaHost?.feature() ?? mediaFeature({}),
+            mediaHost?.feature(accountCalls) ?? mediaFeature({ accountCalls }),
             ...(commerce ? [commerce.feature] : []),
             ...(content ? content.features : []),
             ...(features.growth ? [features.growth.feature] : []),
