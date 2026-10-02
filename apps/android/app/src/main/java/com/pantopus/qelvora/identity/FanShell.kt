@@ -53,9 +53,11 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private var removedArrivalFor: String? = null
     suspend fun purge(): Boolean = withContext(NonCancellable) {
         if (purgingPrivateState) return@withContext false
+        val pushCredential = runCatching { currentToken() }.getOrNull()
         purgingPrivateState = true; localPurgeFailed = true
         try {
             generation++; session = null; actors = emptyList(); choosingActor = false; error = ""
+            GrowthPush.clearSession(context, pushCredential)
             var cleared = true
             try { storage.save(null) } catch (_: Exception) { cleared = false }
             try { com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) } catch (_: Exception) { cleared = false }
@@ -154,7 +156,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
 class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
 
 @Composable
-fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList()) {
+fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
@@ -163,9 +165,20 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(returnTo) { model.open(returnTo) }
+    LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (model.currentToken() != null && !model.choosingActor && !model.busy) model.refresh() } } }
+    LaunchedEffect(model.session?.accountId, model.currentToken()) { GrowthPush.refresh(context) }
+    LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
+        val id = notificationID ?: return@LaunchedEffect
+        if (model.session == null) return@LaunchedEffect
+        val captured = model.currentToken() ?: return@LaunchedEffect
+        val origin = baseURL ?: return@LaunchedEffect
+        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (model.currentToken() == captured) model.open(target) }
+        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: Exception) { if (model.currentToken() == captured) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
+        finally { if (model.currentToken() == captured) onNotificationConsumed() }
+    }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
@@ -175,7 +188,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 model.actors.forEach { actor -> Button(actor.label, ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.selectActor(actor.id) } } }
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
-            model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
+            model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             model.session?.fan == null || model.destination == "/onboarding/handle" -> HandleForm(model)
@@ -194,7 +207,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button("Your data", ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
                         Button("Notification settings", ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
-                    } else if (feature != null) key(model.session?.accountId, model.destination) { feature.screen(model) }
+                    } else if (feature != null) key(model.session?.accountId, model.destination, destinationDelivery) { feature.screen(model) }
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")

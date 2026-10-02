@@ -7,7 +7,6 @@ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { createCommerceRuntime } from "./modules/commerce/runtime.js";
 import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
-import { canonicalConversationHome } from "./modules/growth/home.js";
 import { createConversationRuntime } from "./modules/conversation/runtime.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
@@ -18,6 +17,11 @@ import {
   createDevelopmentTrust,
   developmentTrustActors,
 } from "./modules/trust/development.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
+import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { canonicalPassAccess } from "./modules/growth/integration.js";
+import { DomainError } from "./core/errors.js";
+import { copy } from "@qelvora/copy";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -60,6 +64,39 @@ const configured =
           const conversation = createConversationRuntime(runtime);
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
           const agent = createAgentDomain({ pool: runtime.pool, model: null });
+          const contentDependencies = {
+            assertAllowed: runtime.assertCreatorAllowed,
+            follows: async (
+              ...args: Parameters<
+                NonNullable<
+                  import("./modules/content/service.js").ContentDependencies["follows"]
+                >
+              >
+            ) => {
+              if (!features.growth)
+                throw new DomainError(
+                  "content_delivery_unconfigured",
+                  copy.growthErrorContentEffectUnconfigured,
+                  503,
+                );
+              return features.growth.contentFollows(...args);
+            },
+            effect: async (
+              ...args: Parameters<ReturnType<typeof contentPublicProjection>>
+            ): Promise<{ reference: string }> => {
+              if (!features.growth || !runtime.identity)
+                throw new DomainError(
+                  "content_delivery_unconfigured",
+                  copy.growthErrorContentEffectUnconfigured,
+                  503,
+                );
+              return contentPublicProjection(
+                features.growth.service,
+                content.content,
+                runtime.identity.signing,
+              )(...args);
+            },
+          };
           const content = runtime.assertScopeAllowedInTransaction
             ? await createCommerceStudio({
                 assertScopeAllowedInTransaction:
@@ -71,7 +108,7 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: contentDependencies,
               })
             : createContentStudio({
                 pool: runtime.pool,
@@ -81,7 +118,7 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: contentDependencies,
               });
           runtime.configureSignedSubjects(
             Array.isArray(content.signedSubjects)
@@ -94,18 +131,28 @@ const configured =
               creatorId
                 ? runtime.assertCreatorAllowed(actor, creatorId)
                 : runtime.assertActorAllowed(actor),
-            ...(runtime.identity
+            owners: runtime.identity
               ? {
-                  owners: {
-                    home: canonicalConversationHome(
-                      conversation.feature,
-                      runtime.access,
-                      runtime.database,
-                      runtime.identity.signing,
-                    ),
-                  },
+                  homePage: canonicalConversationHomePage(
+                    conversation.feature,
+                    runtime.access,
+                    runtime.database,
+                    runtime.identity.signing,
+                    async (creatorId) => {
+                      const row = (
+                        await runtime.pool.query(
+                          "SELECT handle FROM creator.creator_profile WHERE id=$1",
+                          [creatorId],
+                        )
+                      ).rows[0];
+                      return row?.handle ?? null;
+                    },
+                  ),
+                  ...(commerce
+                    ? { discoveryAccess: canonicalPassAccess(commerce.service) }
+                    : {}),
                 }
-              : {}),
+              : undefined,
           });
           return [
             conversation.registration,

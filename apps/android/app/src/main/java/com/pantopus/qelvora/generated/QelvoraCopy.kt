@@ -338,6 +338,17 @@ object QelvoraCopy {
     "growthPreferencesWereNotSaved" to "Preferences were not saved.",
     "growthYourInAppNotificationRecordCannotBeTurnedOffPush" to "Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.",
     "growthPushNotifications" to "Push notifications",
+    "growthDevicePushHeading" to "Notifications on this device",
+    "growthDevicePushAllow" to "Allow notifications on this device",
+    "growthDevicePushOpenSettings" to "Open notification settings",
+    "growthDevicePushUnavailable" to "Push delivery is not enabled for this app. Your in-app notifications remain available.",
+    "growthDevicePushUnknown" to "Device permission is unavailable. Check notification settings.",
+    "growthDevicePushNotRequested" to "Choose whether this device may show notifications. Your account preferences apply separately.",
+    "growthDevicePushDenied" to "Notifications are blocked in device settings. Your in-app record remains available.",
+    "growthDevicePushGranted" to "This device allows notifications. Your account preferences and quiet hours still apply.",
+    "growthDevicePushQuiet" to "This device allows quiet notifications. You can change their presentation in device settings.",
+    "growthDevicePushPermissionFailed" to "Device permission could not be read. Try again in notification settings.",
+    "growthDevicePushRegistrationFailed" to "Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.",
     "growthEmailDigest" to "Email digest",
     "growthHideSensitivePreviews" to "Hide sensitive previews",
     "growthQuietHours" to "Quiet hours",
@@ -411,6 +422,8 @@ object QelvoraCopy {
     "growthDiscoverCreators" to "Discover creators",
     "growthNewFromPeopleYouFollow" to "New from people you follow",
     "growthLatestFirst" to "Latest first.",
+    "growthMoreCreators" to "More creators",
+    "growthFirstPage" to "First page",
     "growthAnInvitationFrom" to "AN INVITATION FROM {value1}",
     "growthSAiCanHelpYouKeepGoing" to "{value1}'s AI can help you keep going.",
     "growthAcceptInvitation" to "Accept invitation",
@@ -939,7 +952,9 @@ object QelvoraCopy {
     "growthRetainedFanAggregates" to "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair" to "Both quiet-hour boundaries are required",
     "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
-    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59."
+    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59.",
+    "growthDownloadCompleteReply" to "Download complete reply",
+    "growthShareCompleteReply" to "Share complete reply"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

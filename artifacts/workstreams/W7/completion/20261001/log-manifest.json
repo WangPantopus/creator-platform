@@ -1,0 +1,489 @@
+{
+  "backend-existing-checks.log": {
+    "sha256": "85ecfac649661c880b0fa877d8f53a50988c3d674e2ba3a4a81f7b12570b97d8",
+    "gzip": "backend-existing-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "9d050a027383756ea0ea28f39e9ecbd1ac9b1a455d5a39c54f391deb84ad633e"
+  },
+  "backend-existing-checks-isolated.log": {
+    "sha256": "51f5c4fbdfd4fbdaa15f713c92bc79e218209d5bde91eae596c912aaec2df6a0",
+    "gzip": "backend-existing-checks-isolated.log.gz",
+    "sanitized": true,
+    "contentSha256": "11695397686ff26eaab4adccdb229f79bbd2d902d332ac97f54e973842ecbb14"
+  },
+  "backend-existing-checks-idle-retry.log": {
+    "sha256": "c930076d879426a81693e261e738bda45dc85364eeceba328335f28eb420ca3b",
+    "gzip": "backend-existing-checks-idle-retry.log.gz",
+    "sanitized": true,
+    "contentSha256": "5500a053ac7888af7f07d9221dcaadab9eb5ecb1bcec590e8082756a436eef7e"
+  },
+  "workspace-combined-check.log": {
+    "sha256": "6ff26612e16312384c0131a5eda158443de2874657531785283e21f9d7ca0c08",
+    "gzip": "workspace-combined-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "ef129fb5746ff1b402e5194f53509a70cf0086140498f6eee731a0596e6ea0f0"
+  },
+  "swift-combined-checks.log": {
+    "sha256": "cc6334e26800e5fbc98b1d66e91565748ec680dd9bdd2d59ef76de923b79d59e",
+    "gzip": "swift-combined-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "addecebd285d5fe64818470116ca9f83132d1b42d4ba3c9cb1bf9bebac27c56a"
+  },
+  "ios-combined-build.log": {
+    "sha256": "285ba6924bba603dc4b3c0cb269621312622240f7ca5a3bbbf4861f8f9738d0a",
+    "gzip": "ios-combined-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "530f1eae3e7b43600b9bfebb56a22e9314496ab4d77279bc9af0fe44b87dfef0"
+  },
+  "android-combined-checks.log": {
+    "sha256": "2702d1ebc0fb3301bf6fd9e02ad272cffce408c59dc98880df597699e90c2d13",
+    "gzip": "android-combined-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "ba7a5018cc17e185364464c0aef4e87fe678b6e984fc52d51df1b783ab0dd648"
+  },
+  "android-boot-events.log": {
+    "sha256": "a705c7ccfa2fe75dd22711552991a0c6be8ff4057bdeb0d34d15be618f04365c",
+    "gzip": "android-boot-events.log.gz",
+    "sanitized": true,
+    "contentSha256": "60737efd05a21a131943c9aa11a19e840beab4170e803409bfbe33226435a40f"
+  },
+  "ios-combined-boot.log": {
+    "sha256": "c5220205e757829da1104aa3c27b5d66926d4291d5f45e6f5697d045a5eb9d61",
+    "gzip": "ios-combined-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "68a25a0f6ca555fc772dbb0859ce387601f0cf3b37355375f7d5778bc469b257"
+  },
+  "android-combined-events.log": {
+    "sha256": "23660b61be44ece9239e9b6fb272fd1267f305767f6128e0e74a27c645c794be",
+    "gzip": "android-combined-events.log.gz",
+    "sanitized": true,
+    "contentSha256": "8cf8ca50199cc54e6dc60707144e8072695e3529a3235daa55de9f498c7f28d1"
+  },
+  "workspace-owner-integration-check.log": {
+    "sha256": "02e76ef723ccb8a3676461cce241781a59611523aeb1b15adffa4c6f8314866a",
+    "gzip": "workspace-owner-integration-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "26e82ba6b163f9524ceb99cb0ae8a61212011cf239290c35ac83e5229d3c085d"
+  },
+  "swift-navigation-checks.log": {
+    "sha256": "4651e51de650840e59d3db08deb7e71ff8b2f48450d48584e3ddf3cb318c397f",
+    "gzip": "swift-navigation-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "9e8263ddd8b75f958ce8d0930cf978bc3c72ed4288d845fc1be1add29ba8419b"
+  },
+  "ios-navigation-build.log": {
+    "sha256": "8ba8329a2d15aab9427eb4a8343a5d5ca657e005f74484a4b3423d4fbe82eb26",
+    "gzip": "ios-navigation-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "a11d46373c6dfaaaf3522f2a1dbb145fd3fc27fda915d7af411cdeb5247c5de6"
+  },
+  "ios-navigation-boot.log": {
+    "sha256": "b4664e9fb6e08df4c2b195764bd469f83296a2dc92e3599210ad0fe7ff650254",
+    "gzip": "ios-navigation-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "6ce4afa9c8bda29f62e20499989fa8efe287d1692d505a3758c0aa1790879730"
+  },
+  "ios-navigation-boot-retry.log": {
+    "sha256": "c3d9dcf89030ce188b23d5aaed6c782ed6c7c8caa4c71c75900e4e6f19fcd4f5",
+    "gzip": "ios-navigation-boot-retry.log.gz",
+    "sanitized": true,
+    "contentSha256": "b538cc59a7a405446eb4fd4bf974089c7be98d86f9b4c934b4aac542feca5a95"
+  },
+  "android-repeat-link-checks.log": {
+    "sha256": "e96e100dd51d9140e622da619dcffec39b3978d6b98425a813e1eb766fe90440",
+    "gzip": "android-repeat-link-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "9e8792ab6015d5485c9b019515e166f5361ed475ad03d9448d730f409ff4143a"
+  },
+  "android-navigation-checks.log": {
+    "sha256": "c7e73e66dd860d9e68d8d83049c5e3c40b3d0f517d3181559ccbf267bbbe5f24",
+    "gzip": "android-navigation-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "f49b8606deeac692c35b56cd32b7a6c3abdfbf8697d78dadc4898e99e48ffced"
+  },
+  "android-repeat-link-final-checks.log": {
+    "sha256": "6747258b4f73942044d281e70e84c1875f759a08111f73f5c63e6cd2c0788bf5",
+    "gzip": "android-repeat-link-final-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "8ef77055d6fd63b0e528bb80db13b68fd7907260dc409b3515ae8199d0ae50bb"
+  },
+  "android-navigation-events.log": {
+    "sha256": "268824c3dfad7a4a9d5532d181b5172603a770c16815fa3baf4cc855644bfd16",
+    "gzip": "android-navigation-events.log.gz",
+    "sanitized": true,
+    "contentSha256": "c1b1049219f2c76299145d0235afa8c4e0facac972177b1571f1377680ff499b"
+  },
+  "android-navigation-boot.log": {
+    "sha256": "ac6493819701323c1a0839a6f89c1ce524e092714bb8f43caccb11e90c3fde3d",
+    "gzip": "android-navigation-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "c773f019fd5a42530c3e93db1c84e50fef9a90651f3d61be545e4632c87af278"
+  },
+  "android-repeat-link-boot.log": {
+    "sha256": "58dc929371a9f437e1d9a118c61af84797e5b601ea6cc57d5cc524062c347666",
+    "gzip": "android-repeat-link-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "11437bea07c385d8feb7f4128c1c4c5b089be913a0752e1c479f66cb316e12d1"
+  },
+  "workspace-activity-directory-check.log": {
+    "sha256": "f9c724b53d19ebc0d9ff531aabbaa59f9d3b3f7d4536c5b7d724b5fe14217940",
+    "gzip": "workspace-activity-directory-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "1938e6cc404b98d6a9ffb950375056e6fe14624b4ae52a189e0458bab7082391"
+  },
+  "workspace-thanks-collector-check.log": {
+    "sha256": "979bef6193a450b5ad000e6201f37d15cbdcdded059d2e6210b75896b9a9281d",
+    "gzip": "workspace-thanks-collector-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "3110d9a558d249177ab1a61d66fcf6d1025a96540405fab04ac1355a4be1ae5e"
+  },
+  "thanks-collector-typecheck-initial.log": {
+    "sha256": "687294b7a779091f39c6fbc2e0f25ee592f3bde819f5922bca514dbbd8c97247",
+    "gzip": "thanks-collector-typecheck-initial.log.gz",
+    "sanitized": true,
+    "contentSha256": "6b04001d67ad9ffaa47942db070d4914d8b4f3a67b7cf1f665c66f5be6d172a3"
+  },
+  "thanks-collector-typecheck.log": {
+    "sha256": "48a7429244207d660fd9089d8481ec3cbc9c491aac93b801256ceab700c17237",
+    "gzip": "thanks-collector-typecheck.log.gz",
+    "sanitized": true,
+    "contentSha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+  },
+  "discover-generation.log": {
+    "sha256": "9bc0fa11a6fae22ae73a42565b74bfe79ebd427c6205295b85d8158db0b44c63",
+    "gzip": "discover-generation.log.gz",
+    "sanitized": true,
+    "contentSha256": "bbbf8a98a101212d4499692ee9474df3b3c1a5a0886deeeef6c0bc932d4aba14"
+  },
+  "workspace-discover-check.log": {
+    "sha256": "8051f079e2197d887d8b981ea7b3c41da3a1cf6de9293c3fc7c055bd81da13d8",
+    "gzip": "workspace-discover-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "8639cf294cf5876c92760ee86833f144ce8b25ab75d7de1709c1294025abdcff"
+  },
+  "backend-discover-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-discover-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "ios-discover-build.log": {
+    "sha256": "242e09fdcaa040a9b01858109b7e1b8c4c8e2c51bd7919e9ef081943d053f13b",
+    "gzip": "ios-discover-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "9e2fd9b5795fd1ebe98b90974e9eac767c7148bb3195d586ab3c01af029e4b92"
+  },
+  "swift-discover-checks.log": {
+    "sha256": "8a018812cbd3bcd29dc912b12a6b3bb01fffd63893ca818d8ce3ca1d02b7a123",
+    "gzip": "swift-discover-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "dc6d02448cfe48dcc827d80385cdee1a19de09401bd1fa85e040e5eed4d1b800"
+  },
+  "ci-ios-51e8be6-push.log": {
+    "sha256": "a700cc82d0e66b487a949e87c6806a5796dfcb8249100751f1c00552cc0dd2ae",
+    "gzip": "ci-ios-51e8be6-push.log.gz",
+    "sanitized": true,
+    "contentSha256": "4d54c08da4b8eeedfd6ab0e0b46c3065e670f6470936190fa854b3ff448f4110"
+  },
+  "ci-android-c6bbdce-pr.log": {
+    "sha256": "9ac7bbc67c73391b0259ecb6293adf8f12ea6697be9a08e48baf8851436cb92b",
+    "gzip": "ci-android-c6bbdce-pr.log.gz",
+    "sanitized": true,
+    "contentSha256": "bf82b90f3712a311ea286a09160f99c0075800d9a105fc1b750a63bf2f16e01a"
+  },
+  "dependencies-document-restore.log": {
+    "sha256": "976d827792ad9ba51952a75edcb34b3329179ab67f809555a1492c58d5778db6",
+    "gzip": "dependencies-document-restore.log.gz",
+    "sanitized": true,
+    "contentSha256": "f9e495d35b14c8e497bf865d95a95e55d0acc726c14faad42139cc36385894c0"
+  },
+  "ios-document-build.log": {
+    "sha256": "a935fa53f33d8e7f31d732d7ebff5cc7aa4f66e328c0893e4970eb1cfcbad7d9",
+    "gzip": "ios-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "e7ab5da3f0967d63a43cef128cfeadd99b41853c3b086b625170bc539a9ed5fd"
+  },
+  "swift-document-checks.log": {
+    "sha256": "0541ab7bed0002c5f9e14b0e59fa1e1ce90eb360036628c5f9a70be7177f22c5",
+    "gzip": "swift-document-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "226bae073134b3ee6c0616dd57f0f7bf74483875c8b76ee119710b73345b8270"
+  },
+  "ios-document-boot.log": {
+    "sha256": "c7f3c876ece0fad2a1e84bd1ba5ecf7dbdb0b6d324f406c5df0e311cd1b68cb6",
+    "gzip": "ios-document-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "b1b43bc2f9f0e8192b35d9e59f158a96c0be9df445e6438765c63debdd5ed145"
+  },
+  "backend-document-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-leased-privacy-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-leased-privacy-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-readiness-build.log": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "gzip": "backend-readiness-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-readiness-contracts.log": {
+    "sha256": "7c2f16f1a2aeb9f4cdfe50ab1aa676c9870dca431332f11f918e21e544570ec5",
+    "gzip": "backend-readiness-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "c3b5a4a9067c69d576156358f482a47cdbc7da65fd34f6ef500ea25ed3a04139"
+  },
+  "backend-document-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-document-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "backend-leased-privacy-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-leased-privacy-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "backend-readiness-runtime.log": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "gzip": "backend-readiness-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "web-document-build.log": {
+    "sha256": "6313999a54607858c6263207932ccc7def506b2bf00f4a486bf8fb01d494c43f",
+    "gzip": "web-document-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "e20cd51a70a1522baeb7b56aa2420592e9380a41f013c2513a868c0b5a8edff0"
+  },
+  "web-document-runtime.log": {
+    "sha256": "3028b4b06cd8544947e9b5dfe17baf5a327d5e3e1f2e45c7880b9e60e1e7ba4c",
+    "gzip": "web-document-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "18cff962ff711d83a70f2d7313728e1a470dc87bade9902c50cff465db442c7e"
+  },
+  "web-document-loopback-runtime.log": {
+    "sha256": "870b5d793cf88cdc2fcb1fb854dde0e541d99e62ce49b667a856e15ce803fd21",
+    "gzip": "web-document-loopback-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "2dfa23063b248671ad8f34406e675640e9e979495356b42449f51d847e1fcc5f"
+  },
+  "backend-signed-preview-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-signed-preview-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-signed-preview-contracts.log": {
+    "sha256": "3fc193301539c3ce55fb265b55ef1596b3199979eccb2ffbc7912dbf76cbf9af",
+    "gzip": "backend-signed-preview-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "efe9683c0e05825d982c7ee6733796ae8eff91bd450008dccd78a629b9346998"
+  },
+  "backend-provider-outcome-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-provider-outcome-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-provider-device-lint-failed.log": {
+    "sha256": "2824be20c57d9d1610dde34ad0ec270eb6d492eb33ae3e53e231ac86ff554fbe",
+    "gzip": "backend-provider-device-lint-failed.log.gz",
+    "sanitized": true,
+    "contentSha256": "2aed30f52461e38b87f123da10ca22ed3a2106a09e659e9a8ad14aa5828ec8fe"
+  },
+  "backend-provider-device-format.log": {
+    "sha256": "d64010ae55eaddf0a918163db8e4a6821b3d87a770c6df0154973888c7113c59",
+    "gzip": "backend-provider-device-format.log.gz",
+    "sanitized": true,
+    "contentSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "backend-provider-device-lint.log": {
+    "sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+    "gzip": "backend-provider-device-lint.log.gz",
+    "sanitized": true,
+    "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "backend-provider-device-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-provider-device-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-provider-device-contracts.log": {
+    "sha256": "d006311457f4185e59e38851255f108153b3b961bdb7da87849cc0b5e074725e",
+    "gzip": "backend-provider-device-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "ce9c2b4fd1621918509f7aeff8e3325ab1dfd29f8570cc66f6d7b51061af1790"
+  },
+  "backend-device-session-format.log": {
+    "sha256": "6a41f34c880d23be64d1432ea5c817e0978ffa254ba6e0490e21cfc7f1fc4ec9",
+    "gzip": "backend-device-session-format.log.gz",
+    "sanitized": true,
+    "contentSha256": "036ccceeb57f23b5bcbc7e1b58da4cd6ac03f3a4923a0dfa39a16ed0d5325440"
+  },
+  "backend-device-session-lint.log": {
+    "sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+    "gzip": "backend-device-session-lint.log.gz",
+    "sanitized": true,
+    "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "backend-device-session-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-device-session-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-device-session-contracts.log": {
+    "sha256": "9b62880b8b2c2f8ba2ba7f274a71b8756c28559d6378496259ceaaf38dbd8361",
+    "gzip": "backend-device-session-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "f9d92bb095200a036b5202d01d683a360dc8b367e093f31326e1151df2efb16a"
+  },
+  "native-push-copy-generation.log": {
+    "sha256": "9fbb03070ea4a15014d5cc226e1221deb6ce67261143d7b0d5e0bf8ada7826ec",
+    "gzip": "native-push-copy-generation.log.gz",
+    "sanitized": true,
+    "contentSha256": "42d18732f547b82d8a0d42b1bd59593f060996c7215de2478a861075bf4c8984"
+  },
+  "native-push-copy-check.log": {
+    "sha256": "0377900be4a64aa8c89081bac7206d0ba732ad48259e8e95b6092031491ae450",
+    "gzip": "native-push-copy-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317"
+  },
+  "backend-native-push-format.log": {
+    "sha256": "cea46f0f202c59e81b730677955856de3776059b625d066bb49c0bee88aa4616",
+    "gzip": "backend-native-push-format.log.gz",
+    "sanitized": true,
+    "contentSha256": "65e28765798ddb5a4c1f826e724b554d6da0793de52912b9d22ab4d71eda4d0e"
+  },
+  "backend-native-push-lint.log": {
+    "sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+    "gzip": "backend-native-push-lint.log.gz",
+    "sanitized": true,
+    "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "backend-native-push-build.log": {
+    "sha256": "37914dfa181d9745991f81b06a66dfe953fbbf752a854063175098658c8f4497",
+    "gzip": "backend-native-push-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "backend-native-push-contracts.log": {
+    "sha256": "53739e9440b4f36922eed2c1339ddad814f91597cf0846116882d0c380bbf8a6",
+    "gzip": "backend-native-push-contracts.log.gz",
+    "sanitized": true,
+    "contentSha256": "cc3ad088d8a7b7c6e7daa70a62e7065e59c198d19dd697853b526308dd528eec"
+  },
+  "handoff-source-format-check.log": {
+    "sha256": "d64010ae55eaddf0a918163db8e4a6821b3d87a770c6df0154973888c7113c59",
+    "gzip": "handoff-source-format-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "handoff-shared-generation-check.log": {
+    "sha256": "0377900be4a64aa8c89081bac7206d0ba732ad48259e8e95b6092031491ae450",
+    "gzip": "handoff-shared-generation-check.log.gz",
+    "sanitized": true,
+    "contentSha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317"
+  },
+  "ios-push-build.log": {
+    "sha256": "422f87c9d7579bfc6c72eacbbed587e9f2cf6e88aab41aefd5d0b04df7be9026",
+    "gzip": "ios-push-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "23a616e5adf22e7bb333be471638c4fd1a401fd4f37e3357d02fb22c4ab11f9d"
+  },
+  "ios-push-build-repair.log": {
+    "sha256": "88c3c2f664e1da65a8e7b4c34a3cb437a53076c503f2e20e20f4ee48233196e0",
+    "gzip": "ios-push-build-repair.log.gz",
+    "sanitized": true,
+    "contentSha256": "c3b0d4d54242610f256db0407da9b91885374b6a819245c0429190a0f5f0645a"
+  },
+  "ios-push-build-final.log": {
+    "sha256": "dcfbaf667c631b4930014acf3f703d50d0940a145b3b229ad62a7775ab0419a5",
+    "gzip": "ios-push-build-final.log.gz",
+    "sanitized": true,
+    "contentSha256": "83d343571ab0b1135fbadaff94c1c1d972e29a9730fb96c63da4b8adcbf7bc5a"
+  },
+  "ios-push-build-reviewed.log": {
+    "sha256": "e4b85f197e53192d292e0bad299c76e0b8bbffa458571a0b5f33b1a73fdafa46",
+    "gzip": "ios-push-build-reviewed.log.gz",
+    "sanitized": true,
+    "contentSha256": "215eba2859750d77179012cdb81a695776b396df27bc44de440d827312700d4a"
+  },
+  "ios-push-signature.log": {
+    "sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+    "gzip": "ios-push-signature.log.gz",
+    "sanitized": true,
+    "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "swift-push-checks.log": {
+    "sha256": "d7f67a73f120f12d460fcccd7d619f8423887f222b1871687a7e2d34624b71e8",
+    "gzip": "swift-push-checks.log.gz",
+    "sanitized": true,
+    "contentSha256": "2d3722d40b1e7f3b11391318dee7c29a05c4d78dd1f3afa9863aba13956486f8"
+  },
+  "web-push-build.log": {
+    "sha256": "1c3a1b02e52a68e660bb9a2d9593fedbc69f7b14e7ba2818207775a93baecf10",
+    "gzip": "web-push-build.log.gz",
+    "sanitized": true,
+    "contentSha256": "ce701db88bbf84150c2063b2ab1b86e02fc582fd6c6c8537fb65e4ed5df7a79e"
+  },
+  "backend-push-runtime.log": {
+    "sha256": "8370d59e5961bbfb48aa81fd7dbd68fd939e22fd03b44db538568292bd2b06fd",
+    "gzip": "backend-push-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "web-push-runtime.log": {
+    "sha256": "4ef3499d99ac2835470f1e5b2e89d00c3f11c60fb0bf83eb034e882509902c4d",
+    "gzip": "web-push-runtime.log.gz",
+    "sanitized": true,
+    "contentSha256": "74320453610d488ce7b5b08b83c197b6452dbe7a5aa0ab2ef908b9ef9eb5cd12"
+  },
+  "web-push-runtime-corrected.log": {
+    "sha256": "39a74814b0ad119f6348356b729dce4f7d1d308a40572cf429008576c274de80",
+    "gzip": "web-push-runtime-corrected.log.gz",
+    "sanitized": true,
+    "contentSha256": "3b0eb760d2303a67ac03aae8668dbd72d0aa787e88fad6500cca19696fb73e5a"
+  },
+  "ios-push-boot.log": {
+    "sha256": "feb71dc4dff33289e11fab69d9f9bf83cf897bb816e84ca5a0f9077fb895359e",
+    "gzip": "ios-push-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "8aa4ef054881c5ea91b1b17242ecce44e97fb3dc281d0d945f782c6e80e389d1"
+  },
+  "ios-push-launch.log": {
+    "sha256": "6c357f7b04aa08240661a232b8bbeacab7511e9bfc66abc95d5632659c3af7bf",
+    "gzip": "ios-push-launch.log.gz",
+    "sanitized": true,
+    "contentSha256": "34fc0ca85c42295e4eb24f198803c322c05501d852e9cf3677861a2294f18f34"
+  },
+  "ios-push-reobserve-boot.log": {
+    "sha256": "5bbbb8f1aeb0c35d53facb3b3d5f722b1c3136119504882b574a6812ff4d26f6",
+    "gzip": "ios-push-reobserve-boot.log.gz",
+    "sanitized": true,
+    "contentSha256": "3e365649676f5906e922cc4b2e2b66f38c423cb40d50e4493c157a5bfa139e86"
+  },
+  "ios-push-reobserve-launch.log": {
+    "sha256": "75c6f5052276d544cf1615c4f9dee44b9d84641ae58f645ece71383374d4d51e",
+    "gzip": "ios-push-reobserve-launch.log.gz",
+    "sanitized": true,
+    "contentSha256": "7f423c3950a81d45835683883b5995c9d72779156f710be17203f1574ccd8c66"
+  },
+  "ci-ios-7f71-failed.log": {
+    "gzip": "ci-ios-7f71-failed.log.gz",
+    "sha256": "c16042235f52457d82ae3975cbffa1fd3c41bfc190532c0c9c07f9528ee979af",
+    "contentSha256": "9cedfd6fde76b33537167ed3fd347a1fe6e40b5473c884266a49f6b40df93d7a",
+    "sanitized": true,
+    "sanitization": "terminal escapes removed; masked GitHub credentials retained as masked"
+  }
+}

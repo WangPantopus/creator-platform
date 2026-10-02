@@ -336,6 +336,17 @@ export const copy = {
   "growthPreferencesWereNotSaved": "Preferences were not saved.",
   "growthYourInAppNotificationRecordCannotBeTurnedOffPush": "Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.",
   "growthPushNotifications": "Push notifications",
+  "growthDevicePushHeading": "Notifications on this device",
+  "growthDevicePushAllow": "Allow notifications on this device",
+  "growthDevicePushOpenSettings": "Open notification settings",
+  "growthDevicePushUnavailable": "Push delivery is not enabled for this app. Your in-app notifications remain available.",
+  "growthDevicePushUnknown": "Device permission is unavailable. Check notification settings.",
+  "growthDevicePushNotRequested": "Choose whether this device may show notifications. Your account preferences apply separately.",
+  "growthDevicePushDenied": "Notifications are blocked in device settings. Your in-app record remains available.",
+  "growthDevicePushGranted": "This device allows notifications. Your account preferences and quiet hours still apply.",
+  "growthDevicePushQuiet": "This device allows quiet notifications. You can change their presentation in device settings.",
+  "growthDevicePushPermissionFailed": "Device permission could not be read. Try again in notification settings.",
+  "growthDevicePushRegistrationFailed": "Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.",
   "growthEmailDigest": "Email digest",
   "growthHideSensitivePreviews": "Hide sensitive previews",
   "growthQuietHours": "Quiet hours",
@@ -409,6 +420,8 @@ export const copy = {
   "growthDiscoverCreators": "Discover creators",
   "growthNewFromPeopleYouFollow": "New from people you follow",
   "growthLatestFirst": "Latest first.",
+  "growthMoreCreators": "More creators",
+  "growthFirstPage": "First page",
   "growthAnInvitationFrom": "AN INVITATION FROM {value1}",
   "growthSAiCanHelpYouKeepGoing": "{value1}'s AI can help you keep going.",
   "growthAcceptInvitation": "Accept invitation",
@@ -937,7 +950,9 @@ export const copy = {
   "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
   "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
   "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
-  "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
+  "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
+  "growthDownloadCompleteReply": "Download complete reply",
+  "growthShareCompleteReply": "Share complete reply"
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

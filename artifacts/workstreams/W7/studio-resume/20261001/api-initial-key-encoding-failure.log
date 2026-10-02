@@ -1,0 +1,11 @@
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/src/modules/identity/sessions.ts:26
+      throw new Error("IDENTITY_SESSION_KEY must decode to 32 bytes.");
+            ^
+
+Error: IDENTITY_SESSION_KEY must decode to 32 bytes.
+    at new SessionService (/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/src/modules/identity/sessions.ts:26:13)
+    at createConfiguredBackend (/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/src/integration.ts:178:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async <anonymous> (/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/src/server.ts:34:7)
+
+Node.js v24.13.0

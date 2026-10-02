@@ -54,6 +54,9 @@ public final class FanSession: ObservableObject {
             guard current == generation, !Task.isCancelled else { return }
             if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
+            #if os(iOS)
+            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL)
+            #endif
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
             if failure.status == 401 {
@@ -128,6 +131,9 @@ public final class FanSession: ObservableObject {
         defer { purgingPrivateState = false }
         generation += 1; session = nil; actors = []; choosingDevelopmentActor = false; error = ""
         URLCache.shared.removeAllCachedResponses()
+        #if os(iOS)
+        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
+        #endif
         var cleared = true
         do { try await storage.save(nil) } catch { cleared = false }
         do { try await W3FanFeatures.clearPrivateState() } catch { cleared = false }
@@ -135,6 +141,27 @@ public final class FanSession: ObservableObject {
         if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
         return cleared
     }
+    #if os(iOS)
+    func openNotification(_ id: UUID) async -> Bool {
+        guard let baseURL, let active = session else { open("/notifications"); return false }
+        let snapshot = generation
+        do {
+            guard let credential = try await storage.read() else { return false }
+            let target = try await GrowthClient(baseURL: baseURL).notificationDestination(id: id, expectedSession: credential)
+            guard !Task.isCancelled, snapshot == generation, session?.sessionId == active.sessionId else { return false }
+            open(target)
+            return true
+        } catch let failure as GrowthRequestFailure {
+            guard !Task.isCancelled, snapshot == generation else { return false }
+            open("/notifications"); error = failure.message
+            return [403, 404, 410].contains(failure.status)
+        } catch {
+            guard !Task.isCancelled, snapshot == generation else { return false }
+            open("/notifications"); self.error = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")
+            return false
+        }
+    }
+    #endif
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
@@ -150,9 +177,14 @@ public struct FanFeatureRegistration {
 
 public struct FanAppShell: View {
     @StateObject private var model: FanSession
+    @State private var destinationDelivery = UUID()
     private let features: [FanFeatureRegistration]
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
+    #if os(iOS)
+    @ObservedObject private var push = GrowthPushCoordinator.shared
+    @State private var notificationArrivalRevision = 0
+    #endif
     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
     public var body: some View {
         VStack(spacing: 0) {
@@ -169,7 +201,7 @@ public struct FanAppShell: View {
                     Button("Cancel", variant: .quiet) { model.choosingDevelopmentActor = false }
                 }.padding(16)
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
-                feature.screen(model)
+                feature.screen(model).id(model.destination + destinationDelivery.uuidString)
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
@@ -196,7 +228,7 @@ public struct FanAppShell: View {
                             #endif
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }
@@ -211,13 +243,23 @@ public struct FanAppShell: View {
                     if model.session != nil { await model.refresh() }
                 }
             }
-            .task(id: model.destination) { await model.loadArrival() }
+            .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
+            #if os(iOS)
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { push.refreshPermission(); notificationArrivalRevision += 1 }
+            }
+            .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision)) {
+                guard let tap = push.pendingTap else { return }
+                if await model.openNotification(tap.notificationID) { push.consumed(tap); destinationDelivery = UUID() }
+            }
+            #endif
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
                 guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
                 model.open(target)
+                if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
     private var tab: FanTab { FanTab.allCases.first(where: { model.destination.components(separatedBy: "?")[0] == "/" + $0.rawValue.lowercased() }) ?? .home }

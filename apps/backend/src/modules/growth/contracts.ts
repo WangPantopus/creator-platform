@@ -214,7 +214,18 @@ export interface GrowthOwners {
     recipient: GrowthEvent["recipients"][number],
   ): Promise<NotificationState>;
   home(actor: Actor): Promise<HomeEntry[]>;
-  discoveryAccess(actor: Actor): Promise<PassDiscoveryView>;
+  homePage?(
+    actor: Actor,
+    cursor?: string,
+  ): Promise<{
+    entries: HomeEntry[];
+    nextCursor: string | null;
+    order?: "activity" | "directory";
+  }>;
+  discoveryAccess(
+    actor: Actor,
+    creatorIds: readonly string[],
+  ): Promise<PassDiscoveryView>;
   creatorFor(actor: Actor): Promise<string | null>;
   shareSource(actor: Actor, grantId: string): Promise<ShareSource | null>;
   shareStatus(

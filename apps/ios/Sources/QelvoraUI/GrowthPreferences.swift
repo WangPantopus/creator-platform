@@ -26,6 +26,9 @@ struct GrowthNotificationSettings: View {
             Text(QelvoraCopy.text("growthNotificationSettings")).qText("display-md")
             Text(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd")).qText("body")
             if value != nil {
+                #if os(iOS)
+                GrowthDevicePushSettings()
+                #endif
                 Toggle(QelvoraCopy.text("growthPushNotifications"), isOn: field(\.push))
                 Toggle(QelvoraCopy.text("growthEmailDigest"), isOn: field(\.email))
                 Toggle(QelvoraCopy.text("growthHideSensitivePreviews"), isOn: field(\.hideSensitive))

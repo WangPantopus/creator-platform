@@ -35,6 +35,7 @@ export function growthAccountExport(
   accountId: string,
   ownedCreators: readonly string[],
   signal: AbortSignal,
+  assertAuthority: () => Promise<void>,
 ): GrowthPrivacyExportStream {
   const snapshotRef = randomUUID();
   const sources: Source[] = [
@@ -156,6 +157,7 @@ export function growthAccountExport(
       }
     };
     try {
+      await assertAuthority();
       client = await service.db.worker.connect();
       signal.addEventListener("abort", destroy, { once: true });
       signal.throwIfAborted();
@@ -166,6 +168,7 @@ export function growthAccountExport(
         accountId,
         ownedCreators,
       );
+      await assertAuthority();
       signal.throwIfAborted();
       await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
       if (!(await service.erasure.subjects(client, [accountId], ownedCreators)))
@@ -213,6 +216,7 @@ export function growthAccountExport(
         await client.query(`CLOSE ${cursor}`);
       }
       signal.throwIfAborted();
+      await assertAuthority();
       await client.query("COMMIT");
       signal.throwIfAborted();
       sha256 = hash.digest("hex");
@@ -234,6 +238,7 @@ export function growthAccountExport(
     },
     async finish() {
       signal.throwIfAborted();
+      await assertAuthority();
       if (!complete) throw new Error("growth_export_incomplete");
       return {
         complete: true,

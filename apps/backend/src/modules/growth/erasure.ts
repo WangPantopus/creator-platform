@@ -77,6 +77,22 @@ export class GrowthErasure {
       )
     ).rowCount;
   }
+  /** Negative fences only. Device transfer may remove an erased account's
+   * old registration, but must never recreate any of its data. */
+  async lockSubjects(client: PoolClient, accountIds: readonly string[]) {
+    await this.lock(
+      client,
+      accountIds.map((id) => this.key("account", id)),
+    );
+  }
+  /** Routing collisions only acquire negative fences. An erased former
+   * handle holder must not grant or deny a different creator's authority. */
+  async lockCreatorSubjects(client: PoolClient, creatorIds: readonly string[]) {
+    await this.lock(
+      client,
+      creatorIds.map((id) => this.key("creator", id)),
+    );
+  }
   async event(
     client: PoolClient,
     event: GrowthEvent,

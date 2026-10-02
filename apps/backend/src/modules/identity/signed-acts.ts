@@ -8,7 +8,11 @@ import { HumanReplySchema, type SignedActCommand } from "@qelvora/api";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import {
+  assertThreadScope,
+  type AccessService,
+  type ThreadScope,
+} from "../access/scope.js";
 import { identityTransaction } from "./transaction.js";
 import {
   prepareSignedSubject,
@@ -346,6 +350,47 @@ export class SignedActService {
       explanation:
         "A signature proves an authorized key approved this exact act. It does not prove that every factual statement is true.",
     };
+  }
+  /** Current metadata on the caller's held, genuinely issued thread read.
+   * The domain supplies its complete canonical command; no private command or
+   * signer account is copied into the public verification response. */
+  async matchesThreadAct(
+    client: PoolClient,
+    scope: ThreadScope,
+    signedActId: string,
+    command: SignedActCommand,
+  ): Promise<boolean> {
+    assertThreadScope(scope);
+    if (command.subjectId !== scope.threadId) {
+      const body = command.content;
+      if (
+        command.actType !== "correction" ||
+        !body ||
+        typeof body !== "object" ||
+        Array.isArray(body) ||
+        body.kind !== "conversation_correction" ||
+        body.threadId !== scope.threadId ||
+        body.creatorId !== scope.creatorId ||
+        body.fanId !== scope.fanId
+      )
+        return false;
+    }
+    const result = await client.query<{ valid: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM creator.signed_verification v
+       JOIN creator.creator_profile cp ON cp.id=v.creator_id AND cp.account_id=v.account_id
+       WHERE v.id=$1 AND v.creator_id=$2 AND v.account_id=$3
+       AND v.act_type=$4 AND v.content_hash=$5
+       AND NOT v.withdrawn AND NOT v.key_revoked AND NOT v.creator_revoked
+       AND cp.verification='verified' AND NOT cp.recovery_required) AS valid`,
+      [
+        signedActId,
+        scope.creatorId,
+        scope.creatorAccountId,
+        command.actType,
+        contentHash(command),
+      ],
+    );
+    return result.rows[0]?.valid === true;
   }
 }
 
