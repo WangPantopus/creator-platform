@@ -396,6 +396,7 @@ function ConversationPrivacy({
     | null
   >(null);
   const [policy, setPolicy] = useState<ProviderPolicy | null>(null);
+  const [consentAvailable, setConsentAvailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
@@ -410,6 +411,7 @@ function ConversationPrivacy({
     setAudit(null);
     setUsage(null);
     setPolicy(null);
+    setConsentAvailable(false);
     setBusy(false);
   }, []);
   const refresh = useCallback(async () => {
@@ -432,11 +434,10 @@ function ConversationPrivacy({
           requestController.signal,
         ),
         request<Audit[]>(`${root}/audit`, undefined, requestController.signal),
-        request<{ providers: ProviderPolicy | null }>(
-          "capabilities",
-          undefined,
-          requestController.signal,
-        ),
+        request<{
+          providers: ProviderPolicy | null;
+          consentAvailable: boolean;
+        }>("capabilities", undefined, requestController.signal),
         request<
           import("../../../../packages/api/src/conversation/contracts").ConversationUsage
         >(`${root}/usage`, undefined, requestController.signal),
@@ -446,6 +447,7 @@ function ConversationPrivacy({
       setMemory(memories);
       setAudit(entries);
       setPolicy(caps.providers);
+      setConsentAvailable(caps.consentAvailable);
       setUsage(time);
       setError(null);
     } catch (error) {
@@ -757,6 +759,11 @@ function ConversationPrivacy({
       </section>
       <section>
         <h2>AI providers</h2>
+        {policy?.verified === false && (
+          <Notice title={copy.conversationDevelopmentPolicyTitle}>
+            {copy.conversationDevelopmentPolicyNotice}
+          </Notice>
+        )}
         {policy?.providers.map((provider) => (
           <a key={provider.name} href={provider.termsUrl}>
             {provider.name} · processing terms
@@ -783,7 +790,8 @@ function ConversationPrivacy({
             Withdraw AI provider consent
           </button>
         ) : (
-          policy?.verified && (
+          policy &&
+          consentAvailable && (
             <button
               disabled={busy}
               className="qv-btn qv-btn--secondary"

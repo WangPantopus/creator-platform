@@ -480,12 +480,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button(if (memory?.offTheRecord == true) "Turn off off-the-record" else "Turn on off-the-record", variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
             Button(if (memory?.introShared == true) "Stop sharing my intro" else "Share my intro with this creator's AI", variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
             BasicText("AI providers", style = qText("display-md").copy(color = qColor("ink")))
+            if (policy?.providers?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
             policy?.providers?.providers?.forEach { provider ->
                 Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
                 BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
             }
             if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
-            Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || policy?.providers?.verified != true) { scope.launch { consent() } }
+            Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
         item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
         item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
@@ -533,6 +534,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
                     val policy = capabilities?.providers
+                    if (policy?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
                     if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
                     else BasicText("This AI is powered by ${policy.providers.joinToString(", ") { it.name }}.", style = qText("body").copy(color = qColor("ink")))
                     policy?.providers?.forEach { provider ->

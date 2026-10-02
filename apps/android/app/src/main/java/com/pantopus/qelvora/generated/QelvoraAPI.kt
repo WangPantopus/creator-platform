@@ -3675,6 +3675,7 @@ enum class APIConversationMemoryProposalKind {
 @Serializable
 data class APIConversationProviderPolicy(
   val `version`: String,
+  val `reference`: String? = null,
   val `providers`: List<APIConversationProviderPolicyProvidersItem>,
   val `verified`: Boolean
 )

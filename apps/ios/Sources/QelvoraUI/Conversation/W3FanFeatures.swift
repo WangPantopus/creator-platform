@@ -213,6 +213,7 @@ private struct W3FirstConversation: View {
                     VStack(alignment: .leading, spacing: 0) {
                         disclosureSection("WHO RUNS IT") {
                             if let policy = caps?.providers {
+                                if !policy.verified { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
                                 Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
                                 ForEach(policy.providers, id: \.name) { provider in
                                     if let url = URL(string: provider.termsUrl) {
@@ -313,9 +314,10 @@ private struct W3PrivacyScreen: View {
                 if !usage.modeAvailable { Text("Companion mode time signals await the verified AI mode configuration.").qText("caption") }
             }
             Text("AI providers").qText("display-md")
+            if caps?.providers?.verified == false { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
             if caps?.providers == nil { Text("AI provider consent is unavailable or has been withdrawn.").qText("body") }
             ForEach(caps?.providers?.providers ?? [], id: \.name) { provider in if let url = URL(string: provider.termsUrl) { Link(provider.name + " processing terms", destination: url) } }
-            if let policy = caps?.providers { Button(page?.consentCurrent == true ? "Withdraw AI provider consent" : "Agree to these AI providers", variant: .secondary, disabled: busy || !policy.verified) { Task { await consent(policy) } } }
+            if let policy = caps?.providers { Button(page?.consentCurrent == true ? "Withdraw AI provider consent" : "Agree to these AI providers", variant: .secondary, disabled: busy || (page?.consentCurrent != true && caps?.consentAvailable != true)) { Task { await consent(policy) } } }
             Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
             Button("Help and safety", variant: .quiet) { session.open("/support") }
         }.padding(16) }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))

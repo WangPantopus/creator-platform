@@ -7,7 +7,11 @@ import type { FeatureRegistration } from "../../app.js";
 import type { Database } from "../../db/database.js";
 import type { Actor } from "../identity/adapter.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import {
+  assertThreadScope,
+  type AccessService,
+  type ThreadScope,
+} from "../access/scope.js";
 import { invariant, DomainError } from "../../core/errors.js";
 import type { ConversationService } from "./service.js";
 import type { MemoryService } from "./memory.js";
@@ -34,6 +38,7 @@ import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
+import { DevelopmentConversationPolicy } from "./development-policy.js";
 import {
   conversationHomeCursor,
   readConversationHomeCursor,
@@ -73,21 +78,57 @@ export class ConversationFeature {
     ) => Promise<void>,
     readonly recordings?: ConversationRecordings,
     readonly offlineIssuer?: ConversationOfflineIssuer,
+    private readonly developmentPolicy?: DevelopmentConversationPolicy,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
+    invariant(
+      !developmentPolicy ||
+        (developmentPolicy instanceof DevelopmentConversationPolicy &&
+          this.policy &&
+          developmentPolicy.isFor(db.pool, this.policy)),
+      "synthetic_policy_authority_required",
+      "The development policy requires its actual configured conversation host.",
+    );
+  }
+  policyAvailable(subject?: Actor | ThreadScope): boolean {
+    if (this.policy?.verified) return true;
+    if (
+      !this.policy ||
+      !this.developmentPolicy?.isFor(this.db.pool, this.policy)
+    )
+      return false;
+    if (!subject) return true;
+    if ("threadId" in subject) {
+      assertThreadScope(subject);
+      return this.developmentPolicy.allowsAccounts(
+        subject.actorAccountId,
+        subject.fanAccountId,
+        subject.creatorAccountId,
+      );
+    }
+    return (
+      subject.adultEligible &&
+      this.developmentPolicy.allowsAccounts(subject.accountId)
+    );
   }
   capabilities() {
     return {
       providers: this.policy,
-      consentAvailable: Boolean(this.policy?.verified),
+      developmentSynthetic: Boolean(
+        this.developmentPolicy && this.policyAvailable(),
+      ),
+      consentAvailable:
+        this.policyAvailable() &&
+        (!this.developmentPolicy ||
+          Boolean(this.generationAvailable && this.assertReady)),
       generationAvailable:
         this.generationAvailable &&
-        Boolean(this.policy?.verified && this.assertReady) &&
+        Boolean(this.policyAvailable() && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       firstConversationAvailable:
         Boolean(this.firstConversation?.firstConversationAvailable) &&
         this.generationAvailable &&
-        Boolean(this.policy?.verified && this.assertReady) &&
+        Boolean(this.policyAvailable() && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       correctionsAvailable: Boolean(this.corrections),
       recordingDeliveryAvailable: Boolean(this.recordings),
@@ -108,9 +149,11 @@ export class ConversationFeature {
       "Adult eligibility is required.",
     );
     invariant(
-      this.policy?.verified && body.policyVersion === this.policy.version,
+      this.policy &&
+        this.policyAvailable(actor) &&
+        body.policyVersion === this.policy.version,
       "providers_unconfigured",
-      "AI providers and their verified terms are not configured yet.",
+      "AI provider policy is unavailable for this account.",
     );
     invariant(
       this.capabilities().generationAvailable,
@@ -186,6 +229,11 @@ export class ConversationFeature {
         current.authority === "fan",
         "fan_required",
         "Only the fan can begin this conversation.",
+      );
+      invariant(
+        this.policyAvailable(current),
+        "synthetic_accounts_required",
+        "Development conversations are available only to the configured fictional accounts.",
       );
       // This exact transaction retains current license/source/budget locks.
       // Failure rolls back the thread, consent and any one-time trial together.
@@ -274,7 +322,8 @@ export class ConversationFeature {
       )
     ).rows;
     const currentConsent = Boolean(
-      this.policy?.verified &&
+      this.policy &&
+        this.policyAvailable(scope) &&
         t.processor_consent_version === this.policy.version,
     );
     const capabilities = await capabilitySnapshot(client, scope);
@@ -401,13 +450,23 @@ export class ConversationFeature {
     const body = ConsentInputSchema.parse(raw);
     if (body.accepted)
       invariant(
-        this.policy?.verified && body.version === this.policy.version,
+        this.policy &&
+          this.policyAvailable(scope) &&
+          body.version === this.policy.version,
         "providers_changed",
         "Review the currently configured providers.",
       );
     await this.db.withThread(
       scope,
       async (client) => {
+        if (body.accepted && this.developmentPolicy) {
+          invariant(
+            this.assertReady,
+            "synthetic_license_unavailable",
+            "Development consent requires the current stored development license.",
+          );
+          await this.assertReady(scope, client);
+        }
         await client.query(
           "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
           [scope.threadId, scope.creatorId, scope.fanId],
@@ -869,7 +928,7 @@ export function conversationFeature(
               body,
               expected,
             );
-          } else if (feature.routeSafety && feature.policy?.verified) {
+          } else if (feature.routeSafety && feature.policyAvailable(scope)) {
             const abort = new AbortController();
             res.on("close", () => {
               if (!res.writableEnded) abort.abort();
@@ -900,7 +959,7 @@ export function conversationFeature(
         }
         if (
           !prior &&
-          (!feature.generationAvailable || !feature.policy?.verified)
+          (!feature.generationAvailable || !feature.policyAvailable(scope))
         )
           throw new DomainError(
             "model_unconfigured",

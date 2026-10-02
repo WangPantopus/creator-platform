@@ -33,8 +33,8 @@ struct W3FeedbackInput: Encodable { let messageVersion: Int; let agentVersion: W
 }
 struct W3FeedbackResult: Decodable, Sendable { let rating: String? }
 struct W3Provider: Decodable, Sendable { let name: String; let termsUrl: String; let noTraining: Bool; let noRetention: Bool }
-struct W3Policy: Decodable, Sendable { let version: String; let providers: [W3Provider]; let verified: Bool }
-struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String }
+struct W3Policy: Decodable, Sendable { let version: String; let reference: String?; let providers: [W3Provider]; let verified: Bool }
+struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String; let developmentSynthetic: Bool? }
 struct W3Memory: Decodable, Identifiable, Sendable {
     let id: String; let kind: String; let text: String; let provenanceMessageId: String
     let sensitiveCategory: String?; let state: String; let editedByFan: Bool; let createdAt: String

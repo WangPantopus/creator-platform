@@ -71,6 +71,8 @@ object QelvoraCopy {
     "noteReplies" to "Only {name} and her team see replies to Notes.",
     "sponsorDisclosure" to "Paid partnership: {name} is paid by {brand}.",
     "processorConsent" to "Before your first message, {name}'s AI is powered by {providers}. They don't keep or train on your messages.",
+    "conversationDevelopmentPolicyTitle" to "Unreviewed development policy",
+    "conversationDevelopmentPolicyNotice" to "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.",
     "sensitiveMemory" to "Want me to remember this? Only if you say yes.",
     "spendLimit" to "Set a monthly limit. You can change it any time; raising it takes 24 hours.",
     "stepIn" to "Ask {name} to step in",

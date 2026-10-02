@@ -72,6 +72,8 @@
   <string name="note_replies" formatted="false">Only {name} and her team see replies to Notes.</string>
   <string name="sponsor_disclosure" formatted="false">Paid partnership: {name} is paid by {brand}.</string>
   <string name="processor_consent" formatted="false">Before your first message, {name}\'s AI is powered by {providers}. They don\'t keep or train on your messages.</string>
+  <string name="conversation_development_policy_title" formatted="false">Unreviewed development policy</string>
+  <string name="conversation_development_policy_notice" formatted="false">Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.</string>
   <string name="sensitive_memory" formatted="false">Want me to remember this? Only if you say yes.</string>
   <string name="spend_limit" formatted="false">Set a monthly limit. You can change it any time; raising it takes 24 hours.</string>
   <string name="step_in" formatted="false">Ask {name} to step in</string>
