@@ -11,8 +11,41 @@ import { ProviderResponseError } from "./response-usage.js";
 export interface ProviderExecution {
   readonly generationId: string;
   readonly attemptId: string;
+  readonly purpose?: "reply" | "translation";
+  /** Actual W3 producer locks/checks its accepted durable job's purpose and
+   * immutable source/target binding. Required for translation admissions. */
+  assertPurposeInTransaction?(
+    client: PoolClient,
+    expected: "reply" | "translation",
+    binding?: TranslationJobBinding,
+  ): Promise<void>;
   admit<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
   sealAdmission<T>(journal: (client: PoolClient) => Promise<T>): Promise<T>;
+}
+export type TranslationJobBinding = {
+  sourceMessageId: string;
+  targetLanguage: string;
+  sourceVersion?: number;
+  sourceHash?: string;
+};
+export function providerUsagePurpose(
+  category: string,
+  execution?: ProviderExecution,
+) {
+  invariant(
+    execution?.purpose === undefined ||
+      execution.purpose === "reply" ||
+      execution.purpose === "translation",
+    "execution_purpose_invalid",
+    "This provider execution purpose is unavailable.",
+  );
+  if (execution?.purpose !== "translation") return category;
+  invariant(
+    category === "reply" || category === "guardrail",
+    "execution_purpose_invalid",
+    "Translation admits only translation and meaning-preservation calls.",
+  );
+  return category === "reply" ? "translation" : "translation_guardrail";
 }
 
 async function openProviderUsage(
@@ -28,6 +61,7 @@ async function openProviderUsage(
   const started = performance.now();
   const admittedScope = Object.freeze({ ...scope });
   const fingerprint = model.fingerprint;
+  const purpose = providerUsagePurpose(category, execution);
   const journal = repository.usageJournal;
   const pool = repository.pool;
   const lineage = execution && {
@@ -39,7 +73,7 @@ async function openProviderUsage(
       return journal.open(
         client,
         admittedScope,
-        { versionHash, model: fingerprint, category },
+        { versionHash, model: fingerprint, category, purpose },
         execution,
       );
     const row = await client.query<{ id: string }>(
@@ -99,7 +133,7 @@ async function openProviderUsage(
             id,
             lineage?.generationId ?? null,
             lineage?.attemptId ?? null,
-            category,
+            purpose,
           ],
         );
         invariant(
