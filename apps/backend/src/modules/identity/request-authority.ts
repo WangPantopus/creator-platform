@@ -114,7 +114,9 @@ export async function holdCurrentRequestSession(
 
 /** Recheck the opaque issuer result at every metadata bookend, on the exact
  * original client/transaction/request. Retention, serialization, another
- * request, another pool client and COMMIT/ROLLBACK cannot carry authority. */
+ * request, another pool client and COMMIT/ROLLBACK cannot carry authority.
+ * The original issuer already holds the session row. Bookends read current
+ * metadata/clock only: they acquire no row locks and change no GUCs. */
 export async function assertHeldCurrentRequestSession(
   held: HeldCurrentRequestSession,
   client: PoolClient,
@@ -137,7 +139,10 @@ export async function assertHeldCurrentRequestSession(
        AND session_user=current_user
        AND current_setting('transaction_isolation')='read committed'
        AND nullif(current_setting('app.account_id',true),'')=$3
-       AND nullif(current_setting('app.identity_session_id',true),'')=$4 AS current`,
+       AND nullif(current_setting('app.identity_session_id',true),'')=$4
+       AND EXISTS(SELECT FROM creator.identity_session s
+        WHERE s.id=$4::uuid AND s.account_id=$3::uuid AND s.revoked_at IS NULL
+         AND s.expires_at>clock_timestamp()) AS current`,
       [binding.transaction, binding.pid, held.accountId, held.sessionId],
     )
   ).rows[0];
@@ -147,7 +152,6 @@ export async function assertHeldCurrentRequestSession(
       "This account action ended or changed. Reopen it and try again.",
       401,
     );
-  await assertCurrentSession(client, held.accountId);
 }
 
 /** Lock the session for the duration of the domain transaction. Revocation waits for
