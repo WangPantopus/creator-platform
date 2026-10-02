@@ -1,3 +1,7 @@
+### Current terminal issuer and separate registry — October 2, 2026
+
+Personally consumed W1 current same-client issuer bookends and separate fixed terminal registry. The core183 compatibility matcher remains required exactly as its unchanged SQL grants it;188/189 leaf roles must lack the original matcher. Actual worker metadata and two rolled-back permission mutations verify that distinction; unregistered189 remains refused with ledger57/zero generation/journal rows. Source types and scoped lint/format pass. Positive prepared authority, real combined terminal/last-write/COMMIT and provider/race acceptance remain open. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/generation-terminal-settlement/terminal-registry.json).
+
 ### Actual System-link consumer integration — October 2, 2026
 
 Personally integrated exact W3 delivery/history and only W5 optional/no-default C08 reference delta, preserving current conversation features. Backend/web types, scoped lint and current99-operation generated consistency pass. Empty non-owner historical-link planning preserves ledger57/zero deliveries/messages. Android build exposed three missing Compose imports; corrected source awaits the shared build slot and personal native operation. Current viewer0199/W8 denial0200, W5 publication composition and finite C10 detachment remain open; no positive activation is claimed. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/system-link-integration/README.md).

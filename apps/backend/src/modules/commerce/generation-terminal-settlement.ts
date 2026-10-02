@@ -6,7 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import type { AccessService } from "../access/scope.js";
 import {
   GenerationIdentityAuthority,
-  type GenerationPurposeConsumer,
+  type GenerationTerminalPurposeConsumer,
 } from "../identity/generation-scope.js";
 import {
   GenerationTerminalAuthority,
@@ -65,7 +65,7 @@ export class CommerceGenerationTerminalSettlement {
       access: AccessService;
       allowance: CommerceGenerationAllowance;
       journal: PreparedGenerationTerminalJournal;
-      consumers: readonly GenerationPurposeConsumer[];
+      consumers: readonly GenerationTerminalPurposeConsumer[];
       catalogueChecksum: string;
     },
   ) {}
@@ -77,7 +77,7 @@ export class CommerceGenerationTerminalSettlement {
     access: AccessService;
     allowance: CommerceGenerationAllowance;
     journal: PreparedGenerationTerminalJournal;
-    consumers: readonly GenerationPurposeConsumer[];
+    consumers: readonly GenerationTerminalPurposeConsumer[];
     catalogueChecksum: string;
   }) {
     invariant(
@@ -127,7 +127,8 @@ export class CommerceGenerationTerminalSettlement {
       "generation_terminal_allowance_unconfigured",
       "Both independently reviewed original financial executables and catalogue are required.",
     );
-    for (const r of consumers) input.identity.assertConsumerRegistered(r);
+    for (const r of consumers)
+      input.identity.assertTerminalConsumerRegistered(r);
     const settlement = new CommerceGenerationTerminalSettlement({
       ...input,
       consumers: Object.freeze(consumers),
