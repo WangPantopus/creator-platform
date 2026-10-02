@@ -24,7 +24,8 @@ import {
   createCommercePrivacyAuthority,
   type CommercePrivacyConfiguration,
 } from "../commerce/privacy-purpose.js";
-import { DomainError } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
+import { PreparedConversationPrivacyCursor } from "../conversation/privacy-export-cursor.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
@@ -35,7 +36,14 @@ import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-author
 export type ConversationPrivacyOwnerPorts = Omit<
   ConversationPrivacyInput,
   "pool" | "authority" | "retention"
->;
+> & {
+  /** Real prepared W2 owners and independently reviewed0206 custody. The
+   * coordinator supplies its own actual authority, never a caller substitute. */
+  cursorPreparation?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "lineage" | "recordings"
+  >;
+};
 
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
@@ -98,8 +106,28 @@ export function createPrivacyConsumers(input: {
             "Conversation privacy owners are not composed yet.",
             503,
           );
+        let exportCursor = owners?.exportCursor;
+        if (
+          job.kind === "export" &&
+          !exportCursor &&
+          owners?.cursorPreparation
+        ) {
+          invariant(
+            owners.lineage && owners.recordings,
+            "conversation_export_unconfigured",
+            "Complete export requires its actual prepared source owners.",
+          );
+          exportCursor = await PreparedConversationPrivacyCursor.prepare({
+            ...owners.cursorPreparation,
+            pool: input.runtimePool,
+            authority: conversationAuthority,
+            lineage: owners.lineage,
+            recordings: owners.recordings,
+          });
+        }
         return conversationPrivacyHook({
           ...owners,
+          ...(exportCursor ? { exportCursor } : {}),
           pool: input.runtimePool,
           authority: conversationAuthority,
           retention: input.conversationRetention,

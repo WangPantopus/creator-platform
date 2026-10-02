@@ -13,6 +13,7 @@ import type {
 } from "../commerce/generation-privacy.js";
 import { z } from "zod";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
+import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 function financialJob(job: Job): GenerationPrivacyJob {
@@ -134,6 +135,9 @@ export type ConversationPrivacyInput = {
   lineage?: ConversationLineage;
   recordings?: ConversationRecordings;
   accounting?: ConversationAccountingLifecycle;
+  /** Distinct reviewed0206 source. Per-family readers cannot substitute for
+   * the one READ COMMITTED cursor snapshot required by the real0087 fence. */
+  exportCursor?: PreparedConversationPrivacyCursor;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
@@ -194,7 +198,13 @@ export function conversationPrivacyHook(
         "conversation_retention_unavailable",
         "Conversation deletion needs the verified dispute-retention and allowance adapters.",
       );
-      if (job.kind === "export")
+      if (job.kind === "export") {
+        invariant(
+          input.exportCursor instanceof PreparedConversationPrivacyCursor,
+          "conversation_export_unconfigured",
+          "This complete export needs its actual prepared source cursor.",
+        );
+        input.exportCursor.assertRuntime(input);
         return {
           receipt: {
             schemaVersion: 2,
@@ -205,6 +215,7 @@ export function conversationPrivacyHook(
           },
           stream: conversationPrivacyExportStream(input, job, families, signal),
         };
+      }
       const client = await input.pool.connect();
       let released = false;
       const abort = () => {

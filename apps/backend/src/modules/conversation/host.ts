@@ -33,6 +33,7 @@ import {
   type IntroOfferPolicy,
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { createConversationRuntime } from "./runtime.js";
 import {
   DevelopmentConversationPolicy,
@@ -73,6 +74,12 @@ export type ConversationHostProducers = {
     retentionPolicyVersion: string;
     assertPrivacyRegistered: () => Promise<void>;
   };
+  /** W2's actual prepared expiry producer plus W8's independently reviewed
+   *0206 custody. W8 fixes its real held-task authority when preparing exports. */
+  privacyCursor?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "journal" | "lineage" | "recordings"
+  >;
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -447,6 +454,14 @@ export async function composeConversationHost(
     privacy: {
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),
+      ...(journal && producers.privacyCursor
+        ? {
+            cursorPreparation: {
+              ...producers.privacyCursor,
+              journal,
+            },
+          }
+        : {}),
     },
     fanGeneration: { available, missing },
     close() {
