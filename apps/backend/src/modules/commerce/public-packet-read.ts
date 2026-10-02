@@ -80,9 +80,14 @@ export async function createCommercePublicPacketReader(input: {
   );
   const leases = new WeakMap<
     PoolClient,
-    Map<string, { transactionId: string; accountId: string }>
+    Map<string, { transactionId: string; accountId: string; heldMode?: string }>
   >();
-  async function context(client: PoolClient, actor: Actor) {
+  const finalizing = new WeakMap<PoolClient, string>();
+  async function context(
+    client: PoolClient,
+    actor: Actor,
+    holdSession: boolean,
+  ) {
     if (!actor.adultEligible) return null;
     const value = (
       await client.query<{
@@ -93,6 +98,12 @@ export async function createCommercePublicPacketReader(input: {
       )
     ).rows[0];
     if (value?.account !== actor.accountId) return null;
+    if (!holdSession) return value.transaction;
+    invariant(
+      !value.transaction || finalizing.get(client) !== value.transaction,
+      "public_packet_read_order_invalid",
+      "Prepare every public request before checking its source signatures.",
+    );
     await assertCurrentSession(client, actor.accountId);
     // Assigning an xid is not an authorization. It prevents an old weak-map
     // entry from being reused by a later transaction on this pooled client.
@@ -108,7 +119,7 @@ export async function createCommercePublicPacketReader(input: {
     raw: PublicPacketReadTuple,
   ): Promise<boolean> {
     const tuple = Tuple.parse(raw);
-    const transactionId = await context(client, actor);
+    const transactionId = await context(client, actor, true);
     if (!transactionId) return false;
     const key = contentHash(tuple);
     const bindings = leases.get(client) ?? new Map();
@@ -128,7 +139,7 @@ export async function createCommercePublicPacketReader(input: {
     );
     if (!(await input.holdNegativeAuthority(client, actor, tuple)))
       return false;
-    if ((await context(client, actor)) !== transactionId) return false;
+    if ((await context(client, actor, true)) !== transactionId) return false;
     bindings.set(key, { transactionId, accountId: actor.accountId });
     return true;
   }
@@ -143,7 +154,7 @@ export async function createCommercePublicPacketReader(input: {
     const pointer = z
       .strictObject({ creatorId: z.uuid(), contentId: z.uuid() })
       .parse(raw);
-    if (!(await context(client, actor))) return;
+    if (!(await context(client, actor, true))) return;
     const row = (
       await client.query<{
         creator_id: string;
@@ -169,14 +180,17 @@ export async function createCommercePublicPacketReader(input: {
       }),
     );
   }
-  async function read(
+  /** W5 calls this for EVERY candidate after all page content/quote/audience
+   * checks and BEFORE its first final reader. It holds only mode/packet fences;
+   * no source signature is acquired here. */
+  async function preparePositive(
     client: PoolClient,
     actor: Actor,
     raw: PublicPacketReadTuple,
   ): Promise<boolean> {
     const tuple = Tuple.parse(raw);
     const binding = leases.get(client)?.get(contentHash(tuple));
-    const transactionId = await context(client, actor);
+    const transactionId = await context(client, actor, true);
     if (
       !transactionId ||
       binding?.transactionId !== transactionId ||
@@ -212,6 +226,41 @@ export async function createCommercePublicPacketReader(input: {
       )
     ).rows[0]?.mode;
     if (heldMode !== mode) return false;
+    if ((await context(client, actor, true)) !== transactionId) return false;
+    binding.heldMode = mode;
+    return true;
+  }
+  async function read(
+    client: PoolClient,
+    actor: Actor,
+    raw: PublicPacketReadTuple,
+  ): Promise<boolean> {
+    const tuple = Tuple.parse(raw);
+    const binding = leases.get(client)?.get(contentHash(tuple));
+    // No session row or domain/advisory lock may be acquired after another
+    // candidate's source lease. The early preparation already held the session.
+    const transactionId = await context(client, actor, false);
+    if (
+      !transactionId ||
+      binding?.transactionId !== transactionId ||
+      binding.accountId !== actor.accountId ||
+      !binding.heldMode
+    )
+      return false;
+    const parameters = [
+      tuple.creatorId,
+      tuple.packetId,
+      tuple.contentId,
+      tuple.contentVersion,
+      JSON.stringify(tuple.audience),
+    ];
+    const mode = (
+      await client.query<{ mode: string | null }>(
+        "SELECT creator.commerce_public_packet_mode($1,$2,$3,$4,$5::jsonb) AS mode",
+        parameters,
+      )
+    ).rows[0]?.mode;
+    if (mode !== binding.heldMode) return false;
     async function evidence() {
       return (
         await client.query<{ eligible: boolean; signed_act_ids: string[] }>(
@@ -223,6 +272,7 @@ export async function createCommercePublicPacketReader(input: {
     const before = await evidence();
     if (!before?.eligible || !before.signed_act_ids.length) return false;
     const signedActIds = [...new Set(before.signed_act_ids)].sort();
+    finalizing.set(client, transactionId);
     if (
       !(await input.holdSignatureAuthority(client, actor, {
         ...tuple,
@@ -247,5 +297,5 @@ export async function createCommercePublicPacketReader(input: {
           contentHash(signedActIds),
     );
   }
-  return { prepare, prepareTuple, read };
+  return { prepare, prepareTuple, preparePositive, read };
 }
