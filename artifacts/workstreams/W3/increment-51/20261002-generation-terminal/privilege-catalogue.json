@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-10-02T14:38:14.059Z",
+  "source": "7aa8e129b0c4ddc37ed8a68709905eb7efa7e097",
+  "unsafeNonsequenceQueryCode": "42809",
+  "guarded": {
+    "database": "creator_w3_dev57_1790946508212",
+    "role": "creator_runtime",
+    "postgres17": true,
+    "relations": 504,
+    "sequences": 1,
+    "otherrelations": 503,
+    "tableprivilegerelations": 115,
+    "sequenceprivilegerelations": 0
+  },
+  "columns": {
+    "permittedcolumns": 3108
+  },
+  "actualSourceCatalogueQuery": {
+    "sha256": "03fff22cb3ee09374d9a90c4b397108f6728d715952ea2d70b225413022cb42f",
+    "rows": 0,
+    "installedConsumerQualified": false
+  },
+  "state": {
+    "registered": 57,
+    "installed": false,
+    "originalclosed": true
+  },
+  "sqlApplied": false,
+  "roleChanges": false,
+  "businessWrites": false,
+  "generationFinalized": false
+}
