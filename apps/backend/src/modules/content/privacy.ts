@@ -72,7 +72,7 @@ export function contentPrivacyHook(
         ).rows;
         const revisions = (
           await client.query(
-            "SELECT r.content_id,r.creator_id,r.version,r.document,r.created_at,i.state,i.version AS current_version,NOT EXISTS(SELECT 1 FROM creator.content_revision other WHERE other.content_id=r.content_id AND other.author_account_id<>$1) AS solely_authored FROM creator.content_revision r JOIN creator.content_index i ON i.id=r.content_id WHERE $4::uuid IS NULL AND ($2::uuid IS NULL OR r.creator_id=$2) AND (r.author_account_id=$1 OR r.creator_id=ANY($3::uuid[])) ORDER BY r.content_id,r.version LIMIT 1001",
+            "SELECT r.content_id,r.creator_id,r.version,r.document,r.created_at,jsonb_build_object('publicOwnText',to_jsonb(r)->'ai_reuse_public_text','sourceHash',to_jsonb(r)->'ai_reuse_source_hash','commandHash',to_jsonb(r)->'ai_reuse_command_hash') AS ai_reuse_metadata,i.state,i.version AS current_version,NOT EXISTS(SELECT 1 FROM creator.content_revision other WHERE other.content_id=r.content_id AND other.author_account_id<>$1) AS solely_authored FROM creator.content_revision r JOIN creator.content_index i ON i.id=r.content_id WHERE $4::uuid IS NULL AND ($2::uuid IS NULL OR r.creator_id=$2) AND (r.author_account_id=$1 OR r.creator_id=ANY($3::uuid[])) ORDER BY r.content_id,r.version LIMIT 1001",
             scope,
           )
         ).rows;

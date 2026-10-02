@@ -5,6 +5,12 @@ import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
 import { assertCommercePublicationSource } from "../commerce/publication-source.js";
+export {
+  PreparedContentGenerationOrigins,
+  GENERATION_CONTENT_ORIGIN_MIGRATION,
+  GENERATION_CONTENT_ORIGIN_SIGNATURE,
+  type GenerationContentOriginSource,
+} from "./generation-origin.js";
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
