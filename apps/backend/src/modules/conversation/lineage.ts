@@ -6,6 +6,7 @@ import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineageProjection } from "./lineage-projection.js";
+import { writeConversationExportRows } from "./privacy-export-rows.js";
 import { IdSchema } from "@qelvora/api";
 import {
   ConversationMessageSchema,
@@ -148,6 +149,41 @@ export class ConversationLineage {
       "bounded_subjob_required",
       "This export needs a paginated lineage subjob.",
     );
+    return { messages, feedback };
+  }
+  /** Complete source for W3's held-snapshot export. The real leased family is
+   * rechecked before every page and again before source exhaustion. */
+  async exportMetadataTo(
+    client: PoolClient,
+    family: ConversationPrivacyFamily,
+    write: (part: string) => Promise<void>,
+    assertCurrent: () => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    await write('{"messages":');
+    const messages = await writeConversationExportRows({
+      client,
+      family,
+      write,
+      assertCurrent,
+      signal,
+      table: "message",
+      key: "lpad(sequence::text,10,'0')||':'||id::text",
+      projection:
+        "id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version,signed_command",
+    });
+    await write(',"feedback":');
+    const feedback = await writeConversationExportRows({
+      client,
+      family,
+      write,
+      assertCurrent,
+      signal,
+      table: "conversation_feedback",
+      key: "message_id::text||':'||account_id::text",
+      projection: `message_id,message_version,account_id,rating,agent_version_id,agent_version_hash,created_at,updated_at${this.feedbackConsentReady ? ",consent_policy_version,consented_at,expires_at" : ""}`,
+    });
+    await write("}");
     return { messages, feedback };
   }
   async prepareDeletion(
