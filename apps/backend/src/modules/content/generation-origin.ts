@@ -109,6 +109,18 @@ export class PreparedContentGenerationOrigins {
            AND (SELECT count(*)=1 FROM pg_proc WHERE proowner=r.oid)
            AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
             WHERE a.grantee=0 AND a.privilege_type='EXECUTE')
+           AND NOT EXISTS(SELECT FROM aclexplode(p.proacl) a LEFT JOIN pg_roles recipient ON recipient.oid=a.grantee
+            WHERE a.privilege_type<>'EXECUTE' OR recipient.rolname IS NULL
+             OR recipient.rolname NOT IN('creator_w5_generation_origin','creator_generation_worker',
+              'creator_w2_generation_input','creator_w2_generation_retrieval')
+             OR (a.grantee<>p.proowner AND a.is_grantable))
+           AND NOT EXISTS(SELECT FROM pg_roles recipient WHERE recipient.rolname='creator_w2_generation_retrieval'
+            AND (recipient.rolcanlogin OR recipient.rolsuper OR recipient.rolbypassrls OR recipient.rolinherit
+             OR recipient.rolcreatedb OR recipient.rolcreaterole OR recipient.rolreplication
+             OR (recipient.rolconfig IS NOT NULL AND cardinality(recipient.rolconfig)<>0)
+             OR EXISTS(SELECT FROM pg_auth_members WHERE member=recipient.oid OR roleid=recipient.oid)
+             OR EXISTS(SELECT FROM pg_namespace WHERE nspowner=recipient.oid)
+             OR EXISTS(SELECT FROM pg_class WHERE relowner=recipient.oid)))
            AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
             WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
            AND has_function_privilege(current_user,p.oid,'EXECUTE')

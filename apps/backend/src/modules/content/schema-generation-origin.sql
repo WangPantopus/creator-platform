@@ -195,5 +195,8 @@ ALTER FUNCTION creator.generation_content_origins(uuid,uuid,jsonb) OWNER TO crea
 REVOKE ALL ON FUNCTION creator.generation_content_origins(uuid,uuid,jsonb) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION creator.generation_content_origins(uuid,uuid,jsonb)
  TO creator_generation_worker,creator_w2_generation_input;
+-- W2's later reviewed retrieval migration may grant this same exact entrypoint
+-- to its dedicated creator_w2_generation_retrieval NOLOGIN owner after creating
+-- that role. There is no generic recipient registry or runtime grant operation.
 -- W8 owns reviewed source/function receipts and activation. No ledger write.
 COMMIT;
