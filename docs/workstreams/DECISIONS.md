@@ -277,3 +277,10 @@ Proof projection returns the actual saved post URL, including explicit null, so 
 ### W1 October 2 — operated responsive Studio and canonical exits
 
 The required responsive Studio uses the current creator family for Team/Publish/daily work and its existing Commerce routes for Offers/Earnings. Phone My AI More must expose the actual complete creator menu; sending More only to License hides required Team/account/support destinations. Preserve W2's existing dirty-draft guard on every affected desktop and phone exit. Route repair grants no authority: personally operated Team Retry retains its current-verification/recovery refusal and disabled invitation. Actual locally authored source candidate persists through cold read but remains unapproved while identity is pending. O19/Q15 daily native Studio implementation remains active and distinct from this responsive-web acceptance.
+
+
+### W1 October2 — coherent takeover and focused evidence
+
+The founder authorizes a seamless handoff at a coherent boundary and clarifies that optional screenshot PNGs/JSON verification receipts need not be committed. Finish the qualified native producer and actual navigation/held-authority increments, preserve unfinished implementation outside executable source, publish precise source/runtime/acceptance dependencies and retain all data/private configuration. Use concise sanitized notes for meaningful actual checks/operation; preserve necessary canonical config, application assets, original comparison references and peer/history. This spends effort on user-visible correctness instead of redundant artifact production. The handed-off workstream remains incomplete, with personal iOS/current native and real authority/provider journeys explicitly open.
+
+The untracked translation acceptance algorithm is preserved as `.ts.txt` under workstream drafts because its issuer SQL, finalizer, source checksum and acceptance-specific finite consent are missing. A placeholder must never masquerade as a prepared runtime authority. The next implementer receives the actual draft and exact missing owner contracts without accidentally wiring or shipping it.
