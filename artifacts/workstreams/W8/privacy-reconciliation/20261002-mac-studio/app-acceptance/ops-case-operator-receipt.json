@@ -1,0 +1,41 @@
+{
+  "label": "real labelled synthetic canonical web privacy and Ops, no full C10/activation/release claim",
+  "errors": [],
+  "ops": {
+    "desktop": {
+      "width": 1280,
+      "scroll": 1280,
+      "nav": 220,
+      "theme": "light"
+    },
+    "cases": 3,
+    "night": {
+      "width": 1280,
+      "scroll": 1280,
+      "nav": 220,
+      "theme": "night"
+    },
+    "keyboard": {
+      "tag": "A",
+      "label": "Skip to case content"
+    },
+    "phone": {
+      "width": 390,
+      "scroll": 390,
+      "nav": 390,
+      "theme": "night"
+    },
+    "caseAccessPrompt": true,
+    "reusedCurrentCaseAccess": true,
+    "actualCaseOpened": true,
+    "casePhone": {
+      "width": 390,
+      "scroll": 390,
+      "nav": null,
+      "theme": "night"
+    },
+    "decisionStatus": 200,
+    "decisionState": "resolved",
+    "coldResolved": true
+  }
+}

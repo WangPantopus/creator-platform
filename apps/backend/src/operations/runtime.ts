@@ -374,25 +374,19 @@ export async function createTrustRuntime(options: {
     assertScopeAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictInTransaction>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[4]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[4]);
       await restrictInTransaction(...scope);
     },
     assertAudienceAllowed: async (
       ...scope: Parameters<typeof restrictAudience>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[3]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[3]);
       await restrictAudience(...scope);
     },
     assertCreatorAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictCreator>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[2]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[2]);
       await restrictCreator(...scope);
     },
     privacyOwnershipScope: privacyOwnershipScope(options.workerPool),
