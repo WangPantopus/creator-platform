@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-02T16:41:39.010191+00:00",
+  "apiPID": 46894,
+  "ownerSource": "a7ce54d172633647b2854708c9365fd4911f2249",
+  "signals": [
+    "SIGINT",
+    "SIGTERM"
+  ],
+  "SQLActivated": false,
+  "exit": 0,
+  "observed": "Actual compiled API supervised exit0 after two OS signals; no duplicate Pool.end or shutdown failure. Both handler overlap is not independently established."
+}

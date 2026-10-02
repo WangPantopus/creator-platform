@@ -924,5 +924,18 @@
   "w6AvailabilitySaveIsUnconfirmed": "Saving is unconfirmed. Retry this same change before editing your windows.",
   "w6RetryAvailabilitySave": "Retry this availability save",
   "w6RefreshWillReplaceAvailabilityChanges": "Replace your unsaved changes with the saved availability?",
-  "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue."
+  "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue.",
+  "w5ContentStatus": "Content status",
+  "w5ContentCheckingAccess": "Checking current access. Your input is kept during a connection interruption.",
+  "w5ContentCheckCurrentAccess": "Check current access",
+  "w5ContentAccessUnavailable": "This content is unavailable. Check current access to try again.",
+  "w5ContentRefreshUnavailable": "Content could not be refreshed. Reconnect and check current access. Your input is kept.",
+  "w5ContentActionUnconfirmed": "We could not confirm this action. Check current access before retrying. Your input is kept.",
+  "w5ContentSessionEnded": "Your session ended. Continue with Pantopus again.",
+  "w5ContentAccountChanged": "The signed-in account changed. Refresh before continuing.",
+  "w5ContentChanged": "This changed while you were viewing it. Refresh before trying again.",
+  "w5ContentDuplicateChanged": "This retry differs from the earlier action. Refresh before trying again.",
+  "w5ContentReplyWithdrawn": "This reply was withdrawn. It cannot be shared again.",
+  "w5ContentFanProfileRequired": "Set up your fan profile before continuing.",
+  "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept."
 }

@@ -928,4 +928,17 @@
   <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
   <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
+  <string name="w5_content_status" formatted="false">Content status</string>
+  <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
+  <string name="w5_content_check_current_access" formatted="false">Check current access</string>
+  <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
+  <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
+  <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
+  <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
+  <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
+  <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
+  <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
+  <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
 </resources>

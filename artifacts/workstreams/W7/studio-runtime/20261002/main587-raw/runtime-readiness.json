@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-02T16:34:22.835038+00:00",
+  "endpoint": "/health/ready",
+  "status": 503,
+  "body": {
+    "ready": false,
+    "capabilities": [
+      {
+        "name": "trust_runtime",
+        "required": true,
+        "state": "unavailable",
+        "code": "trust_unconfigured",
+        "checkedAt": "2026-10-02T16:34:22.833Z"
+      }
+    ]
+  },
+  "SQLActivated": false,
+  "providerOperated": false
+}

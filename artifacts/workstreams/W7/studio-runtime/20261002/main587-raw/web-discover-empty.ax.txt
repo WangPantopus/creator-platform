@@ -1,0 +1,23 @@
+Browser tab: 5, Title: "Qelvora", URL: "http://127.0.0.1:3007/discover".
+1 AXWebArea Qelvora, URL: 127.0.0.1:3007/discover
+	2 container
+		3 heading Discover, Value: 1
+			4 text Discover
+		5 text Search creators
+		6 text field (settable) Search creators, ID: q
+		7 button Search
+		8 container Categories
+			9 link Description: For you, Value: 127.0.0.1:3007/discover?q=&category=
+			10 link Description: Crafts, Value: 127.0.0.1:3007/discover?q=&category=Crafts
+			11 link Description: Music, Value: 127.0.0.1:3007/discover?q=&category=Music
+			12 link Description: Food, Value: 127.0.0.1:3007/discover?q=&category=Food
+		13 heading No creators found, Value: 3
+			14 text No creators found
+		15 text Try a different need or browse a category. Public creator information · alphabetical order. Official means the creator authorized this AI.
+		16 container Main
+			17 link Description: Home, Value: 127.0.0.1:3007/home
+			18 link Description: Discover, Value: 127.0.0.1:3007/discover
+			19 link Description: Requests, Value: 127.0.0.1:3007/requests
+			20 link Description: You, Value: 127.0.0.1:3007/you
+
+The focused UI element is 1 AXWebArea Qelvora, URL: 127.0.0.1:3007/discover

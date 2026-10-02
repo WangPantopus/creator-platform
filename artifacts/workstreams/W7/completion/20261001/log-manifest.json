@@ -855,5 +855,310 @@
   "../../studio-runtime/20261002/held-map-raw/receipt.json": {
     "sha256": "0351de85082c42f348290b9c488f59d376f9670ca54c109f2111e379fdfb787f",
     "bytes": 3284
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-workspace.log.gz": {
+    "sha256": "e24586bc9d5b02e6132aebc22f478510a66f223414d30120818d82c6bf49fd53",
+    "bytes": 2599,
+    "contentSha256": "dce85d5030b920a10049a2b06160b901ecefb7e063de34d5e5072f14d551f208"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-workspace-final.log.gz": {
+    "sha256": "59eb267f2124f6ca9e72f990cc2671d4bfe278768c14eb4c9a60e345653d07bd",
+    "bytes": 2537,
+    "contentSha256": "80d9ac5d789c6457b30ac64b131ce2e6ea2944c146381595971a05ffd4d8b99e"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-android-build.log.gz": {
+    "sha256": "12b6bda2850cdcbb1283e095ba43bcd7e60c98134bcc50895c9aa7752ccb7356",
+    "bytes": 958,
+    "contentSha256": "31f73bcad5e33e9d0559a8a0bc79404e39f9c3203380f0f66084e5bfec0d2305"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-ios-build.log.gz": {
+    "sha256": "924dcb65b7fb2db0785922c946eb9157761e134cd93cb5b0f2484151de066ef7",
+    "bytes": 8597,
+    "contentSha256": "a1a09cc622b0a326f13df5b28c3e693563d8b37544e94b3723046ab9272ebd84"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-ios-signature.log.gz": {
+    "sha256": "3cd232bffdf3166f7740ecc34bf7b8fd541d2ac87acaa8f7547d12e22f9de1a1",
+    "bytes": 160,
+    "contentSha256": "a297f79478a24a9a860a6e827fa2f619d8cccd326fc370aa6bf081633a2b2cc2"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-swift-original.log.gz": {
+    "sha256": "0150341a8256f8f8b0f9f74138f106fb1c8629021747bb7018bc161e1fe53072",
+    "bytes": 5333,
+    "contentSha256": "5cab7082fd0454281e137e9446e66a504bd8f828bdd96c9c62c79fcd8d23215f"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-close-backend.log.gz": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "bytes": 61,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-final-backend.log.gz": {
+    "sha256": "807f8edd8dd994b8d6910f5618dcdada3e582e9efa03c1630dec82ffa416bf71",
+    "bytes": 61,
+    "contentSha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-web-visual.log.gz": {
+    "sha256": "d946bf867b67cc567abe2a47ea7f4046a8801b33ee401656ae7c71a0b71e92ed",
+    "bytes": 1583,
+    "contentSha256": "55446e4fe3fb1abf2825ffe2927a5d806bda3a3e5b4da5e72fa8c18ee4432e0b"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-final-api.private.log.gz": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "bytes": 81,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-recovery-api.private.log.gz": {
+    "sha256": "f7e6270d212592ce584c67b40922c1d7e6eae7c1df96299ccc91467472a1c634",
+    "bytes": 81,
+    "contentSha256": "fb6a169df252d19c2dc063841d26f2bef1bbce5e6c4942fde40279a38214edda"
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-web-visual-configured.log.gz": {
+    "sha256": "e6b4aebf44e6ad7e732346226ce92124d2341171dae177bf5ac3b2f53d4af555",
+    "bytes": 2302,
+    "contentSha256": "01c2672d6940b6568974d457bc6d5c22eacdad8d223193404010ffbe538fbb42"
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-reloaded.xml": {
+    "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+    "bytes": 20048
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-reloaded.png": {
+    "sha256": "6fb414a9bc652541e727b9f79d4f95d5796b898edd9a6f95b50dd9f5a696d56d",
+    "bytes": 172339
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-scrolled.ax.json": {
+    "sha256": "e1b61cb08894891c502f021827aaf295a980efa96a81ae3fbed7703a5b3afd0c",
+    "bytes": 32440
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-cold-settled.ax.json": {
+    "sha256": "c63404342e6cdbbd2d56fad000a17613d42ec8db79f2cc618bb64057d92401de",
+    "bytes": 3237
+  },
+  "../../studio-runtime/20261002/main587-raw/main587-web-visual-origin.log.gz": {
+    "sha256": "a4926a4e91071b84b9a393331469d44972dc5fde93effeebe243d4883bbaba93",
+    "bytes": 1818,
+    "contentSha256": "7e317b65f3b5be347959932ae9aa6ae052c343597d12adc0e045e56c660c0393"
+  },
+  "../../studio-runtime/20261002/main587-raw/shutdown-source.json": {
+    "sha256": "75bc2154e2ab240a017460e60fa437e92b6977dc62e3c71ccb446504e14126cf",
+    "bytes": 464
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-notifications.ax.json": {
+    "sha256": "4c1fe776c3511282fc603b1471e1b0c96b98fcdf5515b60b45c5ee6914f7d931",
+    "bytes": 4104
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-reloaded.ax.json": {
+    "sha256": "2f6aeb1f47e5e02f48141799183b4ed945d5c98cf7ac674dad02d7eca3200e10",
+    "bytes": 32436
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-recovered.ax.txt": {
+    "sha256": "d50f788bfdfa93a09fbfde3e78f74fb8c5969b4f48aabcbd4438cd59a7b9bbd9",
+    "bytes": 1265
+  },
+  "../../studio-runtime/20261002/main587-raw/readiness-wrong-endpoint-404.json": {
+    "sha256": "af23e103c0a0f2e6cafc901b8238263268bcdd7e09d75714887816c6167a36ce",
+    "bytes": 328
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-retry.ax.json": {
+    "sha256": "16d036d720450cdde501637b61b8d74efb2f7ca6a65f4ee079f85af0e22ef1ef",
+    "bytes": 3237
+  },
+  "../../studio-runtime/20261002/main587-raw/android-notifications.xml": {
+    "sha256": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+    "bytes": 11370
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-cold-settled.png": {
+    "sha256": "39e6ff9996d8d51ee17805757a65ca77929b549f36fb5e709b9a305cd902760f",
+    "bytes": 135702
+  },
+  "../../studio-runtime/20261002/main587-raw/device-cleanup.json": {
+    "sha256": "eae3d70013da2c9b68ffdd0f3bb2eb892f52f9bd803e7a3396bcd06ddd91fe04",
+    "bytes": 351
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-outage.ax.txt": {
+    "sha256": "4601fae90c57babebd432de54410201d023ec75fa81f2c861f4acaafe88d7748",
+    "bytes": 694
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-cold-first.ax.json": {
+    "sha256": "fa0426f9f6e25331b242a689792acdfbae1ef963878146e1fd87a9e392ac9d39",
+    "bytes": 3276
+  },
+  "../../studio-runtime/20261002/main587-raw/shutdown-first.json": {
+    "sha256": "f7a596f02369b672ae32176ac7fc76f60192c941aae06965c579ba2296253b88",
+    "bytes": 802
+  },
+  "../../studio-runtime/20261002/main587-raw/web-continue-back.ax.txt": {
+    "sha256": "67435b6ec3c212c223cce1b641b2ade11a5cd7c1be652f9c8efc8bc13de4d430",
+    "bytes": 855
+  },
+  "../../studio-runtime/20261002/main587-raw/web-share-unavailable.ax.txt": {
+    "sha256": "5c3e4810ea96a2ecbefb07f6c350f26b835a31455f0f2943d26267edb4111d73",
+    "bytes": 704
+  },
+  "../../studio-runtime/20261002/main587-raw/web-continue-unavailable.ax.txt": {
+    "sha256": "db0c2c586b7b4594a2eb02dd3f049e6c3ca88d27ea4a26e72fd9da5784e71488",
+    "bytes": 1130
+  },
+  "../../studio-runtime/20261002/main587-raw/installed-binary-sha256.json": {
+    "sha256": "9dd0e5f6f1e97fc056e75d78ca3e12ecfe058ff658328648e64901414c617803",
+    "bytes": 407
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-outage.png": {
+    "sha256": "9f211dccb73812204d208849b31a6fdbbce1b6bb1a08cf7423e1047c1279cd0e",
+    "bytes": 15710
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-saved.ax.json": {
+    "sha256": "ed0717555e9b4f9bd8784a885b9b75133d0fad18a41d4f22f99f8f1620cdb1d9",
+    "bytes": 32953
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-rejected-wrong-host.ax.json": {
+    "sha256": "2ed252fc082f832f31264b072c2ec958a13501fa343f72ac14c2612af74cc37e",
+    "bytes": 32883
+  },
+  "../../studio-runtime/20261002/main587-raw/android-actor-home.xml": {
+    "sha256": "542db4ba546ae2de41432ea71aacb462ea5e7b36f9302fdcd35e444e24986b49",
+    "bytes": 12370
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-reloaded.png": {
+    "sha256": "015afad4ed40a09d85736310aa85661239dcf9784675ae7f3af2b7430651663d",
+    "bytes": 197062
+  },
+  "../../studio-runtime/20261002/main587-raw/android-startup.png": {
+    "sha256": "ff13e2bc5755470bc035d22fda5058fc76caff2fac1a744267623f5f9b3efe20",
+    "bytes": 198831
+  },
+  "../../studio-runtime/20261002/main587-raw/runtime-readiness.json": {
+    "sha256": "55bbc1c3f127b8d3ba5eb056e7a97b957f903507ad37e4a7bbcdd0c337771bb5",
+    "bytes": 407
+  },
+  "../../studio-runtime/20261002/main587-raw/android-share-cold.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-valid-warm.ax.json": {
+    "sha256": "fb51134e053faa5a4dd38a6748280143749a15775fdba7a87fb8144fca0b84f6",
+    "bytes": 3237
+  },
+  "../../studio-runtime/20261002/main587-raw/personal-review-ledger.json": {
+    "sha256": "77e29f8e8e4c752b32f2a1e1f81051b382b151928f40e8096c522f3fc3b02a3e",
+    "bytes": 1654
+  },
+  "../../studio-runtime/20261002/main587-raw/android-share-cold.png": {
+    "sha256": "2a7da0ac281fabbfe0eba1cfcd37f307b2c46f3f0108c1d13827c830551e0dff",
+    "bytes": 83050
+  },
+  "../../studio-runtime/20261002/main587-raw/android-share-retry.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674
+  },
+  "../../studio-runtime/20261002/main587-raw/shutdown-final.json": {
+    "sha256": "63c1ab55361e6ee48b52330ef41378c3f33e7fb2e15923d8c1337c8c16e59862",
+    "bytes": 387
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-saved.png": {
+    "sha256": "fcc83517e18b2d97b725db328a1bb62fef2f52c4a9d60ae3edf77872c3f02509",
+    "bytes": 179974
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-saved.xml": {
+    "sha256": "2a2233e43c34201d2fa189b4a5bd9affde6238650486a38b4d565083d81fa5e5",
+    "bytes": 20102
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings.xml": {
+    "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77",
+    "bytes": 15955
+  },
+  "../../studio-runtime/20261002/main587-raw/web-share-unavailable.png": {
+    "sha256": "2958af5a110b1c7405118e9fb37740a6446a0ea976001e5116d115a9eaadcde0",
+    "bytes": 14757
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-recovered.png": {
+    "sha256": "cc4b221c28bc09d51a698479761560580cfe2e83039a8638f66f9fd64d4ef91e",
+    "bytes": 23318
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-empty.ax.txt": {
+    "sha256": "4d678e2ce72527bd8434003c49068741e592957cb05895fa9c65344ae9f1d2dc",
+    "bytes": 1177
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-empty.png": {
+    "sha256": "5c64c677bd676ea4b5bb2a36f3c795f043f87cb94605290680b6712fabea3689",
+    "bytes": 25139
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings.ax.json": {
+    "sha256": "5f0c9964794b69e02b5d7f6afecb118ef1ae0b1b88d2fd814d6cd7a86e520780",
+    "bytes": 32158
+  },
+  "../../studio-runtime/20261002/main587-raw/built-binary-sha256.json": {
+    "sha256": "e7680b4598839f41c08e5663b9e0b3bf1dfb298939179c6e1bd437f54d5eae76",
+    "bytes": 537
+  },
+  "../../studio-runtime/20261002/main587-raw/android-home.xml": {
+    "sha256": "5502a8a1f05b40f6fe90d21fd2d8b464bc5f81f1c1ee5b04a0b6651d195fa489",
+    "bytes": 6738
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-lower.xml": {
+    "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+    "bytes": 20048
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-reload-position.ax.json": {
+    "sha256": "58b9faa5a966824cbb2c76b09d7c1eac3ecdb1d368804f194652f57aa4634a14",
+    "bytes": 32921
+  },
+  "../../studio-runtime/20261002/main587-raw/web-continue-unavailable.png": {
+    "sha256": "614f6ac59699246b85d41915d6fe55d3d29fc79149ce740586046e01de991c6f",
+    "bytes": 43984
+  },
+  "../../studio-runtime/20261002/main587-raw/android-home-after-continue.xml": {
+    "sha256": "23bed57a0d0a683793e09077b4336f583fe703c24921e48b7761faf40a6d74bf",
+    "bytes": 13181
+  },
+  "../../studio-runtime/20261002/main587-raw/web-discover-search-empty.ax.txt": {
+    "sha256": "d50f788bfdfa93a09fbfde3e78f74fb8c5969b4f48aabcbd4438cd59a7b9bbd9",
+    "bytes": 1265
+  },
+  "../../studio-runtime/20261002/main587-raw/android-share-warm.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-home.ax.json": {
+    "sha256": "d726553582baf0ae2e80b1178c6817cdb6a378541243ea4f23377469c553cfbf",
+    "bytes": 4600
+  },
+  "../../studio-runtime/20261002/main587-raw/android-settings-reload-position.xml": {
+    "sha256": "09ba07f460e5ebb7afd331f0f76c016673fce890cf2ec655aacd0f3b0e9754fa",
+    "bytes": 19418
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-settings-saved.png": {
+    "sha256": "f2453f3aaa0545bd8070e34db929d811da2a1b275b1766cdab5f9ad498a320e5",
+    "bytes": 204220
+  },
+  "../../studio-runtime/20261002/main587-raw/receipt.json": {
+    "sha256": "df34f8ce1fa1d145b8babcd110ccecbaf29b102122b8dd88ed977c9f3769621a",
+    "bytes": 8199
+  },
+  "../../studio-runtime/20261002/main587-raw/ios-share-valid-warm.png": {
+    "sha256": "291169fb1065d8509207ca5a09cb61cd62838ebe21533316047ab9254f53463b",
+    "bytes": 135202
+  },
+  "../../studio-runtime/20261002/main587-raw/configured-visual-loopback-alias.error-context.md.gz": {
+    "sha256": "54ca785a352bcb9d00d07f0b92f1296b4354653eeffd19d486434308640254eb",
+    "contentSha256": "5f477f0b9e04464401486430c614329b4310f4e6f1e715fb860c419f2bf43ba2",
+    "bytes": 1258,
+    "kind": "Exact generated failure context bytes compressed, no normalization"
+  },
+  "../../studio-runtime/20261002/main587-raw/production-visual-auth-contract-welcome-and--9d9f7--registered-creator-arrival.error-context.md.gz": {
+    "sha256": "9dcb5c45bfcf17712675b79fe2337ae1451d77a4cc19d4910e069997a71eb213",
+    "contentSha256": "e702a6cd9a49cfd0091871a6282ea47ae1ff39c23ec3ec596ce098a02226ef61",
+    "bytes": 1540,
+    "kind": "Exact generated failure context bytes compressed, no normalization"
+  },
+  "../../studio-runtime/20261002/main587-raw/production-visual-foundation-unconfigured-Pa-bcb56-ntity-and-preserves-arrival.error-context.md.gz": {
+    "sha256": "f7731305233d85c87d3e1dee6af36a7f09f27636ae07683a96bd5e538372d3e5",
+    "contentSha256": "8d172c0720124d67746ff788ffaad9c119c5939355e00182f9af39e4bc17a689",
+    "bytes": 2420,
+    "kind": "Exact generated failure context bytes compressed, no normalization"
+  },
+  "../../studio-runtime/20261002/main587-raw/production-visual-auth-contract-auth-seam-re-c181a--control-character-contexts.error-context.md.gz": {
+    "sha256": "ac96b08f652d02029b46d053c8a1f57d2f3ff7fa9254f01dc48a9949688fd821",
+    "contentSha256": "20080c7188011927a22886d2a73e89c739466ddd04451588ff0bc0dc2cfac7a8",
+    "bytes": 1249,
+    "kind": "Exact generated failure context bytes compressed, no normalization"
   }
 }
