@@ -159,6 +159,7 @@ export class PreparedGenerationAgentInputs {
       "The canonical host and distinct worker must use the same database endpoint.",
     );
     const receipt = input.consumer;
+    input.identity.assertConsumerRegistered(receipt);
     invariant(
       receipt.signature === GENERATION_INPUT_SIGNATURE &&
         receipt.owner === owner &&

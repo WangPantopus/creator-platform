@@ -1,0 +1,442 @@
+{
+  "source": "fc92a031fd72f09771f2abc373bbd3d2250bd073",
+  "night200": {
+    "clientWidth": 195,
+    "dpr": 2,
+    "height": 650,
+    "nav": [
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 8,
+        "name": "Notes",
+        "right": 65,
+        "top": 548,
+        "width": 57,
+        "x": 8,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 69,
+        "name": "Requests",
+        "right": 126,
+        "top": 548,
+        "width": 57,
+        "x": 69,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 130,
+        "name": "Threads",
+        "right": 187,
+        "top": 548,
+        "width": 57,
+        "x": 130,
+        "y": 548
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 8,
+        "name": "My AI",
+        "right": 65,
+        "top": 596,
+        "width": 57,
+        "x": 8,
+        "y": 596
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 69,
+        "name": "More",
+        "right": 126,
+        "top": 596,
+        "width": 57,
+        "x": 69,
+        "y": 596
+      }
+    ],
+    "navRect": {
+      "bottom": 650,
+      "height": 113,
+      "left": 0,
+      "right": 195,
+      "top": 537,
+      "width": 195,
+      "x": 0,
+      "y": 537
+    },
+    "scrollWidth": 195,
+    "width": 195,
+    "example20": {
+      "focusLabel": " Creator-owned and approved",
+      "navTop": 537,
+      "rect": {
+        "bottom": 292,
+        "height": 44,
+        "left": 33,
+        "right": 162,
+        "top": 248,
+        "width": 129,
+        "x": 33,
+        "y": 248
+      }
+    },
+    "keyboard": [
+      {
+        "name": "Notes",
+        "rect": {
+          "bottom": 592,
+          "height": 44,
+          "left": 8,
+          "right": 65,
+          "top": 548,
+          "width": 57,
+          "x": 8,
+          "y": 548
+        }
+      },
+      {
+        "name": "Requests",
+        "rect": {
+          "bottom": 592,
+          "height": 44,
+          "left": 69,
+          "right": 126,
+          "top": 548,
+          "width": 57,
+          "x": 69,
+          "y": 548
+        }
+      },
+      {
+        "name": "Threads",
+        "rect": {
+          "bottom": 592,
+          "height": 44,
+          "left": 130,
+          "right": 187,
+          "top": 548,
+          "width": 57,
+          "x": 130,
+          "y": 548
+        }
+      },
+      {
+        "name": "My AI",
+        "rect": {
+          "bottom": 640,
+          "height": 44,
+          "left": 8,
+          "right": 65,
+          "top": 596,
+          "width": 57,
+          "x": 8,
+          "y": 596
+        }
+      },
+      {
+        "name": "More",
+        "rect": {
+          "bottom": 640,
+          "height": 44,
+          "left": 69,
+          "right": 126,
+          "top": 596,
+          "width": 57,
+          "x": 69,
+          "y": 596
+        }
+      }
+    ]
+  },
+  "light200": {
+    "clientWidth": 195,
+    "dpr": 2,
+    "focus": "Notes",
+    "height": 650,
+    "nav": [
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 8,
+        "name": "Notes",
+        "right": 65,
+        "top": 548,
+        "width": 57,
+        "x": 8,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 69,
+        "name": "Requests",
+        "right": 126,
+        "top": 548,
+        "width": 57,
+        "x": 69,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 130,
+        "name": "Threads",
+        "right": 187,
+        "top": 548,
+        "width": 57,
+        "x": 130,
+        "y": 548
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 8,
+        "name": "My AI",
+        "right": 65,
+        "top": 596,
+        "width": 57,
+        "x": 8,
+        "y": 596
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 69,
+        "name": "More",
+        "right": 126,
+        "top": 596,
+        "width": 57,
+        "x": 69,
+        "y": 596
+      }
+    ],
+    "navRect": {
+      "bottom": 650,
+      "height": 113,
+      "left": 0,
+      "right": 195,
+      "top": 537,
+      "width": 195,
+      "x": 0,
+      "y": 537
+    },
+    "scrollWidth": 195,
+    "theme": "light",
+    "width": 195
+  },
+  "baselineLight390": {
+    "clientWidth": 390,
+    "dpr": 1,
+    "height": 1300,
+    "nav": [
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 21.3359375,
+        "name": "Notes",
+        "right": 65.3359375,
+        "top": 1246,
+        "width": 44,
+        "x": 21.3359375,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 96.0078125,
+        "name": "Requests",
+        "right": 144.640625,
+        "top": 1246,
+        "width": 48.6328125,
+        "x": 96.0078125,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 175.3125,
+        "name": "Threads",
+        "right": 219.3125,
+        "top": 1246,
+        "width": 44,
+        "x": 175.3125,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 249.9921875,
+        "name": "My AI",
+        "right": 293.9921875,
+        "top": 1246,
+        "width": 44,
+        "x": 249.9921875,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 324.6640625,
+        "name": "More",
+        "right": 368.6640625,
+        "top": 1246,
+        "width": 44,
+        "x": 324.6640625,
+        "y": 1246
+      }
+    ],
+    "scrollWidth": 390,
+    "theme": "light",
+    "width": 390
+  },
+  "baselineLight1280": {
+    "clientWidth": 1280,
+    "dpr": 1,
+    "height": 900,
+    "phoneNavDisplay": "none",
+    "scrollWidth": 1280,
+    "sidebarWidth": 248,
+    "theme": "light",
+    "width": 1280
+  },
+  "baselineNight1280": {
+    "clientWidth": 1280,
+    "dpr": 1,
+    "height": 900,
+    "scrollWidth": 1280,
+    "sidebarWidth": 248,
+    "theme": "night",
+    "width": 1280
+  },
+  "baselineNight390": {
+    "clientWidth": 390,
+    "dpr": 1,
+    "gutter": "16px",
+    "height": 1300,
+    "nav": [
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 21.3359375,
+        "name": "Notes",
+        "right": 65.3359375,
+        "top": 1246,
+        "width": 44,
+        "x": 21.3359375,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 96.0078125,
+        "name": "Requests",
+        "right": 144.640625,
+        "top": 1246,
+        "width": 48.6328125,
+        "x": 96.0078125,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 175.3125,
+        "name": "Threads",
+        "right": 219.3125,
+        "top": 1246,
+        "width": 44,
+        "x": 175.3125,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 249.9921875,
+        "name": "My AI",
+        "right": 293.9921875,
+        "top": 1246,
+        "width": 44,
+        "x": 249.9921875,
+        "y": 1246
+      },
+      {
+        "bottom": 1290,
+        "height": 44,
+        "left": 324.6640625,
+        "name": "More",
+        "right": 368.6640625,
+        "top": 1246,
+        "width": 44,
+        "x": 324.6640625,
+        "y": 1246
+      }
+    ],
+    "scrollWidth": 390,
+    "theme": "night",
+    "width": 390
+  },
+  "time": "2026-10-02T13:42:42.936244+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "apiSource": "5ec5cb07",
+  "database": "creator_w2 canonical57",
+  "actor": "fictional Maya/kilnfire_w2; documented synthetic admin verification",
+  "provider": {
+    "configured": false,
+    "calls": 0
+  },
+  "before": {
+    "source": "7bf3a0ad0b878350bd181f34df5aa4ba290f2522",
+    "nativeZoom": "200%",
+    "requestedViewport": [390, 1300],
+    "cssViewport": [195, 650],
+    "moreRect": {
+      "x": 200,
+      "width": 44
+    },
+    "documentWidth": 195,
+    "defect": "fixed bottom nav overflow is invisible to document scrollWidth check"
+  },
+  "actions": [
+    "Actual nativeChrome100\u2192110\u2192125\u2192150\u2192175\u2192200, AXZoom200 andDOMDPR2",
+    "Night Stylecard\u2192TabPlainer;summaryEnteropens20persistedexamples;20thtextboxTabapprovedlabel",
+    "RunboundaryevaluationsTabNotes thenTabRequests/Threads/MyAI/More",
+    "SupportedthemeLight actual195CSS; keyboardNotes/More visible",
+    "NativeReset100 AX andDOMDPR1; normal390\u00d71300 and1280\u00d7900 Light/Night baseline",
+    "Actual ownweb3002 restarted from exactfc92 branch; API remained actual5ec/canonical57"
+  ],
+  "limits": [
+    "Browser reflow and keyboard proof only; VoiceOver/TalkBack/nativeiOS remain open",
+    "No saved config, source, consent, license, provider or money writes",
+    "No namedp95 or other artboard/fullR12 acceptance",
+    "Light middle links measured visible; all five sequential keyboard traversal was Night",
+    "Inspection found four native200%-tab screenshot files unexpectedly cropped to195\u00d7128. Their DOM/AX zoom and bounds are actual, but those images do not prove a full650-high viewport. Added full195\u00d7650 CSS-at100%-zoom main screenshot; native whole-window200% capture waits for free GUI. Some1280 snapshots cropped57pixels. All images retained, not relabeled complete."
+  ],
+  "cssSha256": "a5936a69c09935ff6c8a41a964566c2ca432e9734643fe64c1d9285c69612f37",
+  "screenshots": {
+    "after-light-390-200-more-focus.png": "70716d7e439e8e71b7241d72319461d0acce085266e53d993731404d917bd794",
+    "after-night-390-200-example20.png": "9482e6e002d51aa5ad3ed922d86977938a13f2807e3fdd9b2b9d8843909885e8",
+    "after-night-390-200-more-focus.png": "cd074183082f51afa001a9b57231de4b1fc282d254824fa3f915235d9ab104ae",
+    "after-night-390-200-tone.png": "8048c5d9ce93e7fc1c805eb2a5e8e1663867f2c8c729421e6d546532222cd017",
+    "baseline-light-1280.png": "488f6bad2673096de65aa826c305cf043d9df0b06ad8a3ecfb9436f54e970788",
+    "baseline-light-390.png": "46f7b7ed898bb368e9a77b8c0d2c7e62f3f775a3a9237bc49c118ae5ce9b053a",
+    "baseline-night-1280.png": "7cd26643d561f05db4958c0202b2786cd50d0a47e5d6804fd79e8b4fd19092e8",
+    "baseline-night-390.png": "7098083f3986692803aac91f25bbf6646ae6de952c64cfffb75ac242ca6128d0",
+    "before-night-390-200.png": "91d01dc4835cd9b0f1751b98ac1560500b87f15db2aca9e8d0391e1fdeaf8465"
+  },
+  "merge": {
+    "pr": 143,
+    "head": "e28cc9514534f3feeda4462c11890ed186f3ddd3",
+    "commit": "1048f2f43050444acb918925eea6d0b9db404877",
+    "at": "2026-10-02T13:59:24Z",
+    "method": "normal merge, no admin override",
+    "rulesets": [],
+    "mainProtected": false,
+    "ci": "four exact-head fast checks PASS; six macOS QUEUED"
+  }
+}

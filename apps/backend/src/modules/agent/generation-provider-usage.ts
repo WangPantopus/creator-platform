@@ -77,6 +77,24 @@ export class PreparedGenerationProviderAccounting {
     private readonly journal: PreparedGenerationJournal,
   ) {}
 
+  assertComposition(input: {
+    identity: GenerationIdentityAuthority;
+    service: AgentService;
+    inputs: PreparedGenerationAgentInputs;
+    context: PreparedGenerationConversationContext;
+  }): void {
+    invariant(
+      input.identity === this.identity &&
+        input.service.pipeline.model === this.model &&
+        input.inputs === this.inputs &&
+        input.context === this.context &&
+        input.service.repository.usageJournal === this.journal,
+      "generation_provider_composition_mismatch",
+      "Use the actual accounting consumer's current model, inputs, conversation and journal.",
+    );
+    this.inputs.assertHostPool(input.service.repository.pool);
+  }
+
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
     workerPool: Pool;
@@ -125,6 +143,7 @@ export class PreparedGenerationProviderAccounting {
     );
     try {
       for (const consumer of consumers) {
+        input.identity.assertConsumerRegistered(consumer);
         const row = (
           await input.workerPool.query<{
             ready: boolean;

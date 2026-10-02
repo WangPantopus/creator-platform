@@ -1,0 +1,88 @@
+{
+  "source": "1048f2f43050444acb918925eea6d0b9db404877",
+  "nativeZoom": "previously restored100%; no new native action",
+  "baseline": {
+    "client": 1280,
+    "dpr": 1,
+    "height": 900,
+    "scroll": 1280,
+    "sidebar": 248,
+    "theme": "night",
+    "width": 1280
+  },
+  "night195": {
+    "client": 195,
+    "dpr": 1,
+    "focus": "More",
+    "height": 650,
+    "nav": [
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 8,
+        "name": "Notes",
+        "right": 65,
+        "top": 548,
+        "width": 57,
+        "x": 8,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 69,
+        "name": "Requests",
+        "right": 126,
+        "top": 548,
+        "width": 57,
+        "x": 69,
+        "y": 548
+      },
+      {
+        "bottom": 592,
+        "height": 44,
+        "left": 130,
+        "name": "Threads",
+        "right": 187,
+        "top": 548,
+        "width": 57,
+        "x": 130,
+        "y": 548
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 8,
+        "name": "My AI",
+        "right": 65,
+        "top": 596,
+        "width": 57,
+        "x": 8,
+        "y": 596
+      },
+      {
+        "bottom": 640,
+        "height": 44,
+        "left": 69,
+        "name": "More",
+        "right": 126,
+        "top": 596,
+        "width": 57,
+        "x": 69,
+        "y": 596
+      }
+    ],
+    "rect": {
+      "bottom": 640,
+      "height": 44,
+      "left": 69,
+      "right": 126,
+      "top": 596,
+      "width": 57,
+      "x": 69,
+      "y": 596
+    },
+    "scroll": 195,
+    "width": 195
+  }
+}
