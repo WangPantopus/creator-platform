@@ -156,17 +156,19 @@ export class PreparedGenerationConversationTerminal {
            AND (SELECT count(*)=1 FROM pg_proc WHERE proowner=r.oid)
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND c.relkind IN('r','p','v','m','f')
-             AND has_table_privilege($3,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
+             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+              has_table_privilege($3,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END)
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
             CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) AS privilege
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND c.relkind IN('r','p','v','m','f')
-             AND has_column_privilege($3,c.oid,a.attnum,privilege)
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+              has_column_privilege($3,c.oid,a.attnum,privilege) ELSE false END
              AND NOT coalesce(($5::jsonb->(n.nspname||'.'||c.relname)->privilege) ? a.attname,false))
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND c.relkind='S'
-             AND has_sequence_privilege($3,c.oid,'USAGE,SELECT,UPDATE'))
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind='S' THEN
+              has_sequence_privilege($3,c.oid,'USAGE,SELECT,UPDATE') ELSE false END)
            AND NOT EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
             AND has_schema_privilege($3,n.oid,'CREATE'))
            AND NOT EXISTS(SELECT FROM pg_proc f JOIN pg_namespace n ON n.oid=f.pronamespace
