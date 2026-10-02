@@ -1,9 +1,106 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
-import { invariant } from "../../core/errors.js";
-import type { PrivacyHook } from "./contracts.js";
+import { DomainError, invariant } from "../../core/errors.js";
+import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
+import { requestAuthority } from "../identity/request-authority.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
+/** Same held-client lifecycle capability. The exact real task and its signal
+ * come from the coordinator claim, never an interactive request or UUID alone.
+ * 0087 locks current job/task metadata before domain locks and checks its actual
+ * wall-clock lease at the separate COMMIT, erasing all transient scope metadata.
+ */
+export async function privacyTaskAuthorityInTransaction(
+  client: PoolClient,
+  input: PrivacyTaskInput,
+): Promise<readonly string[]> {
+  if (!input.signal || requestAuthority.getStore())
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "The actual cancellable lifecycle task is required.",
+      503,
+    );
+  input.signal.throwIfAborted();
+  const parsed = z
+    .strictObject({
+      jobId: z.uuid(),
+      accountId: z.uuid(),
+      kind: z.enum(["export", "delete"]),
+      scope: z.enum(["account", "creator", "thread"]),
+      creatorId: z.uuid().nullable(),
+      threadId: z.uuid().nullable(),
+      leaseToken: z.uuid(),
+      idempotencyKey: z.string(),
+    })
+    .safeParse({
+      jobId: input.jobId,
+      accountId: input.accountId,
+      kind: input.kind,
+      scope: input.scope,
+      creatorId: input.creatorId,
+      threadId: input.threadId,
+      leaseToken: input.leaseToken,
+      idempotencyKey: input.idempotencyKey,
+    });
+  if (!parsed.success)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "The exact leased data request is required.",
+      503,
+    );
+  const domain = PrivacyDomains.find(
+    (value) => input.idempotencyKey === `${input.jobId}:${value}`,
+  );
+  if (!domain)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "The exact leased data domain is required.",
+      503,
+    );
+  await client.query("SAVEPOINT w8_privacy_task_fence");
+  try {
+    const row = (
+      await client.query<{ owned: string[] }>(
+        "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+        [
+          input.jobId,
+          input.accountId,
+          input.kind,
+          input.scope,
+          input.creatorId,
+          input.threadId,
+          domain,
+          input.leaseToken,
+        ],
+      )
+    ).rows[0];
+    input.signal.throwIfAborted();
+    if (!row)
+      throw new DomainError(
+        "privacy_commit_fence_unavailable",
+        "The current lifecycle task is unavailable.",
+        503,
+      );
+    return z.array(z.uuid()).max(100).parse(row.owned);
+  } catch (error) {
+    await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      ["42883", "42501", "55P03", "40001"].includes(String(error.code))
+    )
+      throw new DomainError(
+        "privacy_commit_fence_unavailable",
+        "Current lifecycle authority is unavailable. Try again.",
+        503,
+      );
+    throw error;
+  } finally {
+    await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
+  }
+}
+
 /** Worker-only negative/ownership metadata. A client UUID never grants a lifecycle scope. */
 export function privacyTaskAuthority(pool: Pool) {
   return async (input: PrivacyTaskInput) => {
