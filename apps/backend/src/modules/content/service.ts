@@ -767,6 +767,12 @@ export class ContentService {
     ).rows[0];
     invariant(revision, "content_unavailable", "This revision is unavailable.");
     const document = ContentDocument.parse(revision.document);
+    if (document.planRef)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current access to this answer is unavailable.",
+        503,
+      );
     const creator = (
       await client.query(
         "SELECT display_name,handle FROM creator.creator_profile WHERE id=$1",
@@ -865,6 +871,12 @@ export class ContentService {
   }
   async save(actor: Actor, creatorId: string, raw: unknown) {
     const input = SaveContent.parse(raw);
+    if (input.document.planRef)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current fulfillment is unavailable. Your draft is kept.",
+        503,
+      );
     return this.transaction(actor, creatorId, async (client) => {
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, [
@@ -1008,6 +1020,12 @@ export class ContentService {
     row: Index,
     document: ContentBody,
   ) {
+    if (document.planRef)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current fulfillment is unavailable. Your draft is kept.",
+        503,
+      );
     invariant(
       document.text.length > 0 || document.media.length > 0,
       "content_empty",
