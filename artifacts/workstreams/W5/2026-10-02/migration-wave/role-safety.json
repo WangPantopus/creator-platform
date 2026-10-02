@@ -1,0 +1,37 @@
+{
+  "guardSource": "a71994f58eb2d5f8a097a3ceed4b117064ef040c",
+  "metadataOnly": true,
+  "sqlReplayed": false,
+  "receipts": [
+    {
+      "database": "creator_w5",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82
+      }
+    },
+    {
+      "database": "creator_w5_wave_20261002",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82
+      }
+    },
+    {
+      "database": "creator_w5_fresh57_20261002",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82
+      }
+    }
+  ],
+  "consumerSource": "93f5c9ebef3fed4d2518aff787af4ea7d2bb264b",
+  "checkedConsumerSource": "e84c7df15b264505e46dec949e3ceb951960434e",
+  "typescriptCorrection": "Boolean wrapper keeps missing optional capability checks false; no SQL or grant change"
+}
