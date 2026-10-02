@@ -145,3 +145,8 @@ A late real provider result belongs to the original pre-admission W2 completion 
 ### W1 — explicit usefulness and a durable intro opportunity (October 2, 2026)
 
 DI09 uses only the fan's actual consented helpful response to the exact delivered/interrupted AI lineage. A stable pending offer is account-wide and survives response loss; the UI's actual Save/Skip gets a separate durable acknowledgement. Existing outbox publication is not evidence a prompt was seen. A pre-existing intro suppresses the first opportunity, and saving an intro grants no per-creator provider consent. The current held session/client and approved account metadata policy are mandatory; absent policy leaves the feature unconfigured. W1 retains all-client implementation and acceptance.
+
+
+### October 2 — original terminal construction custody
+
+W1 pins the actual immutable99/100 SQL and seven installed PostgreSQL definitions in a frozen construction packet. This is a review receipt, not activation or positive work permission; genuine generation registry, held W8 recovery and actual W2/W4 settlement remain required. The factory requires the exact delivered100 name and uses CASE relation-kind guards before PostgreSQL type-specific privilege helpers. Personally installed only on empty closed proposal57, actual worker-login denials/unknown refusal/catalogue execution pass; no app/private data or applied canonical migration is changed.
