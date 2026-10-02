@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "recordedAt": "2026-10-02T11:43:59.676628+00:00",
   "workstream": "W4",
-  "state": "prepared actual owner source and consumer integration; retry fix pending, authority unactivated",
+  "state": "implemented prepared owner and real consumer integration; authority and positive acceptance unactivated",
   "changes": [
     "Actual stored creator/content/version/document/audience/packet/original commitment/mode/acceptance are retained on exact client/xid/pid/Actor/ALS request",
     "Original participant negatives precede Content/media/creator positives; separate staged permission takes TRY mode/packet and NOWAIT packet/commitment/share locks",
@@ -16,22 +16,30 @@
     "W1": "0e494f937b9c0e29b13ac6c047f343799056172f",
     "W5OwnerProof": "5b95b8904e76ec7d8ec9f8388092eaf1a5c82aaf",
     "W5PhasedContent": "9adf2e88481984ac9bf56d14c9998596368faba5",
-    "integration": "Personally resolved Content import/composition conflicts, preserving current baseline and independent exact W1 finalization; unrelated inherited tenure/identity changes excluded"
+    "integration": "Personally resolved Content import/composition conflicts, preserving current baseline and independent exact W1 finalization; unrelated inherited tenure/identity changes excluded",
+    "W5Replay": "6adea1cd26d514d5751d31838c730f4e8353e1e1"
   },
   "validation": {
     "backendTypecheck": "PASS",
-    "backendBuild": "PASS",
+    "backendBuild": "PASS including consumed W5 replay fix",
     "ownedLint": "PASS",
     "format": "PASS",
     "generatedConsistency": "PASS:12 resources,98 operations",
     "sqlPlanning": {
       "role": "creator_runtime",
       "target": "owned fresh57",
-      "statements": 16,
+      "statements": 19,
       "analyze": false,
       "businessWrites": 0,
       "result": "PASS",
-      "diagnosticCorrection": "Initial diagnostic JavaScript quote syntax failed before any database connection; corrected and repeated successfully"
+      "diagnosticCorrection": "Initial diagnostic JavaScript quote syntax failed before any database connection; corrected and repeated successfully",
+      "byFile": {
+        "commerce/publication-source.ts": 9,
+        "commerce/publication.ts": 6,
+        "content/publication-source.ts": 2,
+        "content/service.ts replay": 1,
+        "actualContext": 1
+      }
     },
     "inactiveFactory": {
       "result": "PASS",
@@ -61,9 +69,6 @@
       ]
     }
   },
-  "openDefects": [
-    "A genuine publish idempotency replay skips positive callback in W5 consumer; independently identified and compiled local fix, then preserved private reference and restored source to consume W5 immutable owner fix. No successful replay acceptance claimed."
-  ],
   "limits": [
     "Exact0070/0081 migrations and genuine composed held authority remain unavailable in source40; no activation or SQL registry changes",
     "No genuine creator passkey/signature, payment/capture/consent, group service or public owner acceptance manufactured",
@@ -91,7 +96,7 @@
     },
     {
       "path": "apps/backend/src/modules/content/service.ts",
-      "sha256": "d94f19776e0ef75b9bb27dbb56c3cd592aaf249a0235f5ddf6d206cf7388b1ae"
+      "sha256": "6cc4a6f45e94a54bee899b3752ed62a3d79f4143018d8f203f0d564c6c6533a0"
     },
     {
       "path": "apps/backend/src/modules/content/registration.ts",
@@ -117,5 +122,8 @@
       "path": "artifacts/workstreams/W4/runtime/2026-10-02/owner-publication-source/fan-return-night.png",
       "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
     }
+  ],
+  "resolvedDefects": [
+    "A genuine publish idempotency replay skips positive callback in W5 consumer; independently identified and compiled local fix, then preserved private reference and restored source to consume W5 immutable owner fix. No successful replay acceptance claimed. Subsequently consumed exact W5 published6adea1cd; replay validates original receipt/current content/actual author/processed evidence and stages positive permission before final source, without signature reconsume or domain writes."
   ]
 }
