@@ -1,11 +1,11 @@
 import type { PoolClient } from "pg";
 import { z } from "zod";
-import { DomainError } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import {
-  requestAuthority,
   assertCurrentSession,
+  requestAuthority,
 } from "../identity/request-authority.js";
+import { DomainError } from "../../core/errors.js";
 import type { FeatureRegistration } from "../../app.js";
 import type { IdentityProfiles } from "../identity/profiles.js";
 import type { Actor } from "../identity/adapter.js";
