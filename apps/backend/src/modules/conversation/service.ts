@@ -26,6 +26,7 @@ import { consumeSignedAct } from "../identity/signed-acts.js";
 import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
+import { ThreadFrameNotifications } from "../../realtime/frame-notifications.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import {
@@ -90,6 +91,14 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private frameNotifications?: ThreadFrameNotifications;
+  watchFrames(threadId: string, wake: () => void): () => void {
+    this.frameNotifications ??= new ThreadFrameNotifications(this.db.pool);
+    return this.frameNotifications.subscribe(threadId, wake);
+  }
+  closeFrameNotifications(): void {
+    this.frameNotifications?.close();
+  }
   private approvals?: Pick<
     CommerceApprovals,
     "prepareDelivery" | "recordDelivery"
