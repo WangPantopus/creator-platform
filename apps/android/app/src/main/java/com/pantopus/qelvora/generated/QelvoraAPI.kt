@@ -3598,6 +3598,7 @@ data class APIConversationConversationOfflineSnapshotPageMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3628,6 +3629,25 @@ enum class APIConversationConversationOfflineSnapshotPageMessagesItemDeliverySta
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink(
+  val `kind`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable

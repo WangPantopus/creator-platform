@@ -6617,6 +6617,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
   public let `signedActId`: String?
   public let `member`: String?
   public let `authorAccountId`: String?
+  public let `systemLink`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink?
   public let `citations`: [String]
   public let `createdAt`: String
   public let `offTheRecord`: Bool
@@ -6625,7 +6626,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
   public let `feedback`: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback?
   public let `recording`: APIJSONValue?
   public let `correction`: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection?
-  public init(id: String, threadId: String, authorKind: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection? = nil) {
+  public init(id: String, threadId: String, authorKind: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection? = nil) {
     self.id = id
     self.threadId = threadId
     self.authorKind = authorKind
@@ -6636,6 +6637,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
     self.signedActId = signedActId
     self.member = member
     self.authorAccountId = authorAccountId
+    self.systemLink = systemLink
     self.citations = citations
     self.createdAt = createdAt
     self.offTheRecord = offTheRecord
@@ -6656,6 +6658,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
     case `signedActId`
     case `member`
     case `authorAccountId`
+    case `systemLink`
     case `citations`
     case `createdAt`
     case `offTheRecord`
@@ -6677,6 +6680,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
     self.signedActId = try container.decode(String?.self, forKey: .signedActId)
     self.member = try container.decode(String?.self, forKey: .member)
     self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.systemLink = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink.self, forKey: .systemLink)
     self.citations = try container.decode([String].self, forKey: .citations)
     self.createdAt = try container.decode(String.self, forKey: .createdAt)
     self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
@@ -6698,6 +6702,7 @@ public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codabl
     try container.encode(signedActId, forKey: .signedActId)
     try container.encode(member, forKey: .member)
     try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encodeIfPresent(systemLink, forKey: .systemLink)
     try container.encode(citations, forKey: .citations)
     try container.encode(createdAt, forKey: .createdAt)
     try container.encode(offTheRecord, forKey: .offTheRecord)
@@ -6727,6 +6732,29 @@ public enum APIConversationConversationOfflineSnapshotPageMessagesItemDeliverySt
   case `delivered` = "delivered"
   case `failed` = "failed"
   case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink: Codable, Sendable {
+  public let `kind`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `contentVersion`: Int
+  public let `label`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel
+  public init(kind: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel) {
+    self.kind = kind
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.contentVersion = contentVersion
+    self.label = label
+  }
+}
+
+public enum APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind: String, Codable, Sendable {
+  case `published_answer` = "published_answer"
+}
+
+public enum APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel: String, Codable, Sendable {
+  case `Answered_publicly_` = "Answered publicly."
 }
 
 public struct APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion: Codable, Sendable {
