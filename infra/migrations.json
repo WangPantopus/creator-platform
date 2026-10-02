@@ -206,6 +206,121 @@
       "version": "0043_w8_relationship_backfill",
       "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
       "owner": "W8"
+    },
+    {
+      "owner": "W4",
+      "version": "0044_w4_personal_approval",
+      "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "sourceCommit": "2dd53adcbaaa0789b9b0a4a0352404bd872ca42f",
+      "sourceSha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+    },
+    {
+      "owner": "W5",
+      "version": "0045_w5_reply_review",
+      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "sourceCommit": "15730d79c0c3da7076b7ac517a82d3e8ec2873cc",
+      "sourceSha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+    },
+    {
+      "owner": "W6",
+      "version": "0046_w6_call_availability",
+      "path": "apps/backend/src/modules/session/availability.sql",
+      "sourceCommit": "d52e449cd4690cb8509283fb47a19dbbf40fb077",
+      "sourceSha256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097"
+    },
+    {
+      "owner": "W6",
+      "version": "0047_w6_creator_media",
+      "path": "apps/backend/src/modules/media/creator-scope.sql",
+      "sourceCommit": "682766cdec3318a70aa949eda93a9834845f5f05",
+      "sourceSha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db"
+    },
+    {
+      "owner": "W4",
+      "version": "0049_w4_generation_cost_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
+      "sourceCommit": "d1cf2af5dc9245ba49d580fe124ab3146c152410",
+      "sourceSha256": "00f4c2cc2962a0e9f14b0ba0ad57f23823fcc811042e8d6b8b9c6dc5394daffc"
+    },
+    {
+      "owner": "W3",
+      "version": "0050_w3_account_relationship_index",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_account_index.sql",
+      "sourceSha256": "189e19e001182efe6b28f4eed8c1633abf0945a9592b2209c950ac8de01e86e1"
+    },
+    {
+      "owner": "W5",
+      "version": "0051_w5_media_publication",
+      "path": "apps/backend/src/modules/content/schema-media-publication.sql",
+      "sourceCommit": "074290033b3d3041cec23910a40ef04564e20d10",
+      "sourceSha256": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e"
+    },
+    {
+      "owner": "W8",
+      "version": "0053_w8_runtime_denial_projection",
+      "path": "apps/backend/migrations/0053_w8_runtime_denial_projection.sql",
+      "sourceSha256": "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185"
+    },
+    {
+      "owner": "W4",
+      "version": "0054_w4_pass_purchase_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-purchase-effects.sql",
+      "sourceCommit": "d1cf2af5dc9245ba49d580fe124ab3146c152410",
+      "sourceSha256": "d6ead22cd6115df960dbe612b1de4a9473d2717a040cb66c6ba473da580827ca"
+    },
+    {
+      "owner": "W4",
+      "version": "0055_w4_pass_pool_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql",
+      "sourceSha256": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca"
+    },
+    {
+      "owner": "W3",
+      "version": "0056_w3_correction_feedback_lineage",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "sourceCommit": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
+      "sourceSha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    },
+    {
+      "owner": "W3",
+      "version": "0057_w3_feedback_consent",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
+      "sourceCommit": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
+      "sourceSha256": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11"
+    },
+    {
+      "owner": "W3",
+      "version": "0058_w3_correction_signature",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "sourceCommit": "b804a5e1b2fe56b85e376d8ffd207e1ecec2cdb8",
+      "sourceSha256": "5c94b94a7287a5c4a149da454117c30be40367034b9930ac11e168e5b6a4b3e0"
+    },
+    {
+      "owner": "W3",
+      "version": "0059_w3_recording_association",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "sourceCommit": "b804a5e1b2fe56b85e376d8ffd207e1ecec2cdb8",
+      "sourceSha256": "b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e"
+    },
+    {
+      "owner": "W8",
+      "version": "0060_w8_composed_signed_message",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
+    },
+    {
+      "version": "0061_w4_payout_custody",
+      "path": "apps/backend/src/modules/commerce/schema-payout-custody.sql",
+      "owner": "W4",
+      "sourceCommit": "d1cf2af5dc9245ba49d580fe124ab3146c152410",
+      "sourceSha256": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd"
+    },
+    {
+      "version": "0062_w6_creator_media_worker",
+      "path": "apps/backend/src/modules/media/worker-scope.sql",
+      "owner": "W6",
+      "sourceCommit": "4e4e6aed7dd47600d4c19e9ddf3fd0b28c3b62a3",
+      "sourceSha256": "abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a"
     }
   ],
   "reserved": [
@@ -220,148 +335,145 @@
       "state": "producer_allocated_at_0041"
     },
     {
-      "id": "0044",
+      "id": "0063",
+      "owner": "W7",
+      "version": "0063_w7_relationship_activity",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0064",
+      "owner": "W7",
+      "version": "0064_w7_source_scan_checkpoint",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0065",
+      "owner": "W7",
+      "version": "0065_w7_home_page_index",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0066",
+      "owner": "W7",
+      "version": "0066_w7_thanks_window_index",
+      "path": "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0068",
       "owner": "W4",
-      "version": "0044_w4_personal_approval",
-      "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "version": "0068_w4_paid_coverage",
+      "path": "apps/backend/src/modules/commerce/schema-paid-coverage.sql",
       "state": "reserved_unapplied",
-      "sourceCommit": "2dd53adcbaaa0789b9b0a4a0352404bd872ca42f",
-      "sourceSha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
     },
     {
-      "id": "0045",
-      "owner": "W5",
-      "version": "0045_w5_reply_review",
-      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "id": "0069",
+      "owner": "W8",
+      "version": "0069_w8_reply_review",
+      "path": "apps/backend/migrations/0069_w8_reply_review.sql",
       "state": "reserved_unapplied",
-      "sourceCommit": "15730d79c0c3da7076b7ac517a82d3e8ec2873cc",
-      "sourceSha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
     },
     {
-      "id": "0046",
+      "id": "0070",
+      "owner": "W4",
+      "version": "0070_w4_public_packet_read",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0071",
+      "owner": "W1",
+      "version": "0071_w1_publication_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-publication-scope.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0072",
+      "owner": "W1",
+      "version": "0072_w1_generation_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0073",
+      "owner": "W8",
+      "version": "0073_w8_publication_worker_denial",
+      "path": "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0074",
+      "owner": "W8",
+      "version": "0074_w8_content_runtime_denial",
+      "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
+      "state": "reserved_unapplied",
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
+    },
+    {
+      "id": "0075",
       "owner": "W6",
-      "version": "0046_w6_call_availability",
-      "path": "apps/backend/src/modules/session/availability.sql",
+      "version": "0075_w6_publication_media_scope",
+      "path": "apps/backend/src/modules/media/publication-scope.sql",
       "state": "reserved_unapplied",
-      "sourceCommit": "d52e449cd4690cb8509283fb47a19dbbf40fb077",
-      "sourceSha256": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097"
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
     },
     {
-      "id": "0047",
-      "owner": "W6",
-      "version": "0047_w6_creator_media",
-      "path": "apps/backend/src/modules/media/creator-scope.sql",
+      "id": "0076",
+      "owner": "W8",
+      "version": "0076_w8_public_packet_denial",
+      "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql",
       "state": "reserved_unapplied",
-      "sourceCommit": "682766cdec3318a70aa949eda93a9834845f5f05",
-      "sourceSha256": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db"
+      "reason": "Above initial reviewed wave; exact source and integration review pending in this activation PR."
     },
     {
-      "id": "0048",
+      "id": "0077",
       "owner": "W2",
-      "version": "0048_w2_usage_lineage",
+      "version": "0077_w2_usage_lineage",
       "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
       "state": "reserved_unapplied",
       "sourceCommit": "a010a030378a0c62a44d6c14e714cc397722e702",
-      "sourceSha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
+      "sourceSha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+      "previousVersion": "0048_w2_usage_lineage",
+      "reason": "Held above this wave: actual C10 accounting/export/delete/expiry registration and approved policy."
     },
     {
-      "id": "0049",
-      "owner": "W4",
-      "version": "0049_w4_generation_cost_settlement",
-      "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "cff4ef456351c357bb8438c1379eda186bf21a9d",
-      "sourceSha256": "60ab295d660d4dc6192d811bd8a97c657433dea25d6a0f0759e03cf751505155"
-    },
-    {
-      "id": "0050",
-      "owner": "W3",
-      "version": "0050_w3_account_relationship_index",
-      "path": "apps/backend/src/modules/conversation/migrations/0050_w3_account_relationship_index.sql",
-      "state": "reserved_unapplied"
-    },
-    {
-      "id": "0051",
-      "owner": "W5",
-      "version": "0051_w5_media_publication",
-      "path": "apps/backend/src/modules/content/schema-media-publication.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "074290033b3d3041cec23910a40ef04564e20d10",
-      "sourceSha256": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e"
-    },
-    {
-      "id": "0052",
+      "id": "0078",
       "owner": "W8",
-      "version": "0052_w8_privacy_export_chunks",
+      "version": "0078_w8_privacy_export_chunks",
       "path": "apps/backend/migrations/0052_w8_privacy_export_chunks.sql",
-      "state": "reserved_unapplied"
+      "state": "reserved_unapplied",
+      "previousVersion": "0052_w8_privacy_export_chunks",
+      "reason": "Held above this wave: source and durable chunk/checkpoint design not implemented."
     },
     {
-      "id": "0053",
-      "owner": "W8",
-      "version": "0053_w8_runtime_denial_projection",
-      "path": "apps/backend/migrations/0053_w8_runtime_denial_projection.sql",
-      "state": "reserved_unapplied"
+      "id": "0079",
+      "owner": "W2",
+      "version": "0079_w2_usage_retention_expiry",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
+      "state": "reserved_unapplied",
+      "reason": "Depends on held0077 usage lineage and actual policy/expiry/task authority; source bytes retain0067 filename.",
+      "previousVersion": "0067_w2_usage_retention_expiry"
     },
     {
-      "id": "0054",
+      "id": "0080",
       "owner": "W4",
-      "version": "0054_w4_pass_purchase_effects",
-      "path": "apps/backend/src/modules/commerce/schema-pass-purchase-effects.sql",
+      "version": "0080_w4_fan_request_page_index",
+      "path": "apps/backend/src/modules/commerce/schema-fan-request-page-index.sql",
       "state": "reserved_unapplied",
-      "sourceCommit": "d0d843b3c16b2d9bbc5b5aac3a19baab95c9bb59",
-      "sourceSha256": "8ca4b8c73d1828dbf53fb71926f0b822e79db0616e6aec53aa595ddaace5206e"
-    },
-    {
-      "id": "0055",
-      "owner": "W4",
-      "version": "0055_w4_pass_pool_effects",
-      "path": "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql",
-      "state": "reserved_unapplied"
-    },
-    {
-      "id": "0056",
-      "owner": "W3",
-      "version": "0056_w3_correction_feedback_lineage",
-      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "f44e2a5a105e7642bd2f190abf1f855cb2ac5a23",
-      "sourceSha256": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
-    },
-    {
-      "id": "0057",
-      "owner": "W3",
-      "version": "0057_w3_feedback_consent",
-      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "6b5ca6e2ed3ffbc96d5f68bab6496858cb8013ce",
-      "sourceSha256": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11"
-    },
-    {
-      "id": "0058",
-      "owner": "W3",
-      "version": "0058_w3_correction_signature",
-      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "3cda401692fab65fe1af36eb4a8c41ac81b01f8c",
-      "sourceSha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911"
-    },
-    {
-      "id": "0059",
-      "owner": "W3",
-      "version": "0059_w3_recording_association",
-      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
-      "state": "reserved_unapplied",
-      "sourceCommit": "c9c1f43bd6311d5595d4f40a433f17b425e4df02",
-      "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2"
-    },
-    {
-      "id": "0060",
-      "owner": "W8",
-      "version": "0060_w8_composed_signed_message",
-      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
-      "state": "reserved_unapplied",
-      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
+      "reason": "Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending."
     }
   ]
 }

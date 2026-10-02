@@ -1,4 +1,4 @@
--- W3 additive unallocated/unapplied recording-association proposal.
+-- W3 additive reserved0059/unapplied recording-association proposal.
 -- Depends on W8 canonical 0041 and exact final 0056/0057/0058 plus W6 media.
 -- W1 reviews private signing/read authority; W8 allocates and deploys the bytes.
 -- No edits to applied SQL. Existing correction/original/legacy predicates remain.
@@ -25,6 +25,8 @@ DECLARE
  owner_account uuid;
  original creator.message;
  exact_command jsonb;
+ approval creator.commerce_approval;
+ exact_content jsonb;
  recording creator.media_asset;
  exact_evidence jsonb;
  current_key uuid;
@@ -40,6 +42,7 @@ BEGIN
   NEW.control_epoch IS DISTINCT FROM OLD.control_epoch OR NEW.citations IS DISTINCT FROM OLD.citations OR
   NEW.signed_act_id IS DISTINCT FROM OLD.signed_act_id OR NEW.signed_content_hash IS DISTINCT FROM OLD.signed_content_hash OR
   NEW.signed_command IS DISTINCT FROM OLD.signed_command OR
+  NEW.approval_id IS DISTINCT FROM OLD.approval_id OR
   NEW.recording_asset_id IS DISTINCT FROM OLD.recording_asset_id OR
   NEW.recording_evidence IS DISTINCT FROM OLD.recording_evidence OR
   NEW.text IS DISTINCT FROM OLD.text OR NEW.version IS DISTINCT FROM OLD.version OR
@@ -57,6 +60,7 @@ BEGIN
   NEW.corrects_message_id IS DISTINCT FROM OLD.corrects_message_id OR NEW.corrects_message_version IS DISTINCT FROM OLD.corrects_message_version OR
   NEW.signed_act_id IS DISTINCT FROM OLD.signed_act_id OR NEW.signed_content_hash IS DISTINCT FROM OLD.signed_content_hash OR
   NEW.signed_command IS DISTINCT FROM OLD.signed_command OR
+  NEW.approval_id IS DISTINCT FROM OLD.approval_id OR
   NEW.recording_asset_id IS DISTINCT FROM OLD.recording_asset_id OR
   NEW.recording_evidence IS DISTINCT FROM OLD.recording_evidence
  ) THEN
@@ -74,9 +78,42 @@ BEGIN
   NEW.corrects_message_id IS DISTINCT FROM OLD.corrects_message_id OR NEW.corrects_message_version IS DISTINCT FROM OLD.corrects_message_version OR
   NEW.signed_act_id IS DISTINCT FROM OLD.signed_act_id OR NEW.signed_content_hash IS DISTINCT FROM OLD.signed_content_hash OR
   NEW.signed_command IS DISTINCT FROM OLD.signed_command OR
+  NEW.approval_id IS DISTINCT FROM OLD.approval_id OR
   NEW.recording_asset_id IS DISTINCT FROM OLD.recording_asset_id OR NEW.recording_evidence IS DISTINCT FROM OLD.recording_evidence
  ) THEN
   RAISE EXCEPTION 'A signed recording association is immutable' USING ERRCODE='23514';
+ END IF;
+
+ -- Consume every approved_draft through0044's exact personal Approval.
+ -- The correction/recording signed_command column is not a generic named-act
+ -- fallback: retain its existing rejection for an approved draft attachment.
+ IF NEW.author_kind='approved_draft' THEN
+  IF NEW.corrects_message_id IS NOT NULL OR NEW.corrects_message_version IS NOT NULL OR
+   NEW.signed_command IS NOT NULL OR NEW.recording_asset_id IS NOT NULL OR NEW.recording_evidence IS NOT NULL THEN
+   RAISE EXCEPTION 'A personal Approval cannot be a correction or recording association' USING ERRCODE='23514';
+  END IF;
+  SELECT account_id INTO owner_account FROM creator.creator_profile WHERE id=NEW.creator_id;
+  SELECT * INTO signing FROM creator.signed_act WHERE id=NEW.signed_act_id;
+   SELECT a.* INTO approval FROM creator.commerce_approval a JOIN creator.commerce_reply_draft d ON d.id=a.draft_id AND d.version=a.draft_version
+    JOIN creator.creator_profile cp ON cp.id=a.creator_id AND cp.account_id=a.approver_account_id
+    JOIN creator.passkey_credential pc ON pc.id=signing.credential_id AND pc.account_id=owner_account
+    WHERE a.id=NEW.approval_id AND a.thread_id=NEW.thread_id AND a.creator_id=NEW.creator_id AND a.fan_id=NEW.fan_id
+    AND a.invalidated_at IS NULL AND a.approver_account_id=owner_account AND a.signed_act_id=NEW.signed_act_id
+    AND a.text=NEW.text AND d.text=NEW.text AND a.command->'content'->>'text'=NEW.text
+    AND a.creator_epoch=cp.commerce_approval_epoch AND a.key_epoch=pc.commerce_approval_epoch
+    AND a.content_hash=NEW.signed_content_hash AND cp.verification='verified' AND NOT cp.recovery_required AND pc.revoked_at IS NULL;
+   IF approval.id IS NULL OR NEW.version<>1 OR (approval.delivered_message_id IS NOT NULL AND approval.delivered_message_id<>NEW.id) THEN
+    RAISE EXCEPTION 'Approved draft requires a current exact-version personal Approval' USING ERRCODE='23514';
+   END IF;
+   exact_content=approval.command->'content';
+  IF signing.id IS NULL OR signing.account_id IS DISTINCT FROM owner_account OR NEW.author_account_id IS DISTINCT FROM owner_account
+   OR signing.creator_id IS DISTINCT FROM NEW.creator_id OR signing.subject_id IS DISTINCT FROM NEW.thread_id
+   OR signing.content_hash IS DISTINCT FROM NEW.signed_content_hash
+   OR signing.content_hash IS DISTINCT FROM encode(public.digest(creator.canonical_json(jsonb_build_object('actType',signing.act_type,'subjectId',NEW.thread_id::text,'content',exact_content)), 'sha256'), 'hex')
+   OR signing.act_type IS DISTINCT FROM (CASE NEW.author_kind WHEN 'human_creator' THEN 'reply' WHEN 'human_broadcast' THEN 'broadcast' WHEN 'human_reaction' THEN 'reaction' ELSE 'approved_draft' END) THEN
+   RAISE EXCEPTION 'A named act requires an exact creator-signed assertion' USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
  END IF;
 
  -- Only a new row may acquire the association. Immutable recording updates

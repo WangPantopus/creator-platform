@@ -1,5 +1,14 @@
 # Trust operation and recovery
 
+## Initial wave operator — 2026-10-02 (draft)
+
+Use `apps/backend/scripts/activate-wave.ts` only after review of the exact packet in `infra/migrations/waves/20261002.json`. Set `W8_MIGRATION_WAVE=20261002` and separate `DATABASE_MIGRATION_URL` in a private0600 env file. Set private `W8_MIGRATION_BACKUP_PATH` and `W8_MIGRATION_BACKUP_MANIFEST`; neither belongs in Git. The manifest must record the actual target, fresh backup SHA256, original ledger/catalog/business-data hashes and matching hashes from a real separate restore. Never generate restore receipts from assumed values.
+
+Stop the target's applications/workers, owner-close its database marker, set `CONNECTION LIMIT 0`, and stop its other clients. This requires migration administrator authority; runtime roles must remain non-owner/non-bypass. From `apps/backend`, run `node --env-file=<private-file> --import tsx scripts/activate-wave.ts`. It holds the migration advisory lock, verifies exact historical/source custody, applies the whole wave in one transaction, and rolls back changed original rows/history/old roles. Success leaves traffic closed. Reopening requires domain reconciliation and real application acceptance, not the migration receipt alone. The exact adopted-W5 path remains pending rehearsal; do not use this operator for other historical profiles.
+
+[Current synthetic rehearsal](../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/README.md) is SQL verification only. It is not original preserved-data recovery. Existing default fresh runner remains `scripts/migrate-trust.ts`; it continues to refuse out-of-order preserved histories.
+
+
 **Mac Studio host, 2026-10-01 (current):** this host does not have the iMac's private W8 archives, env files or Docker volumes. Read [the re-verification record](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) before reusing any older instruction below.
 
 - **W8 resources on this host** (all stopped at handoff; volumes retained):
