@@ -424,7 +424,7 @@ private struct W3AccountScreen: View {
     private func accountMetric(_ title: String, value: String, detail: String) -> some View {
         accountPanel {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title).qText("meta").foregroundStyle(qColor("ink-muted", scheme))
+                Text(title).qText("caption", weight: .semibold).foregroundStyle(qColor("ink-muted", scheme))
                 Text(value).font(QelvoraFonts.font("mono", size: metricSize)).minimumScaleFactor(0.8)
                 Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
             }.padding(14).frame(maxWidth: .infinity, alignment: .leading)
