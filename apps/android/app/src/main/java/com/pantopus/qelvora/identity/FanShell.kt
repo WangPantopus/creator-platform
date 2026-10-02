@@ -33,6 +33,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
     var session by mutableStateOf<APISession?>(null); private set
+    var hasSavedCredential by mutableStateOf(false); private set
+    var checkingSession by mutableStateOf(baseURL != null); private set
     var destination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
@@ -41,16 +43,32 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
     private var rotatingCredential = false
+    private var refreshingSession = false
     private var removedArrivalFor: String? = null
-    private suspend fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
+    private suspend fun purge() { generation++; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
     suspend fun refresh() {
-        if (rotatingCredential) return
-        val client = api ?: return; val current = generation
-        if (currentToken() == null) { session = null; return }
-        try { val value = client.identitySession(); if (current != generation) return; if (session?.accountId != null && session?.accountId != value.accountId) { purge(); error = "The account changed. Continue with Pantopus again."; return }; session = value; error = "" }
-        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { if (!busy) refreshCredentials() else { purge(); error = "Your session ended. Continue with Pantopus again." } } else error = message(failure) }
-        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        if (rotatingCredential || refreshingSession) return
+        val client = api ?: run { checkingSession = false; return }
+        val current = generation
+        refreshingSession = true; checkingSession = true
+        try {
+            val token = currentToken()
+            if (current != generation) return
+            hasSavedCredential = token != null
+            if (token == null) { if (session != null) purge(); return }
+            val value = client.identitySession()
+            if (current != generation) return
+            if (session?.accountId != null && session?.accountId != value.accountId) { purge(); error = "The account changed. Continue with Pantopus again."; return }
+            session = value; error = ""
+        } catch (failure: CreatorAPIError) {
+            if (current != generation) return
+            if (failure.status == 401) {
+                if (!busy) { refreshingSession = false; refreshCredentials() }
+                else { purge(); error = "Your session ended. Continue with Pantopus again." }
+            } else error = message(failure)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        finally { refreshingSession = false; checkingSession = false }
     }
     suspend fun loadArrival() {
         val snapshot = destination; arrival = null; val origin = baseURL ?: return
@@ -110,7 +128,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     LaunchedEffect(returnTo) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (model.session != null) model.refresh() } }
+    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (!model.busy && !model.choosingActor && (model.session != null || model.hasSavedCredential)) model.refresh() } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         when {
@@ -120,6 +138,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
+            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                BasicText(QelvoraCopy.text(if (model.checkingSession && model.error.isEmpty()) "growthLoading" else "accountUnavailableTitle"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+                BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
+                Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
+            }
+            model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null || model.destination == "/onboarding/handle" -> HandleForm(model)
             else -> {
