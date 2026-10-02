@@ -15,7 +15,7 @@ import {
 } from "../identity/generation-scope.js";
 import { AgentService } from "./service.js";
 
-export const GENERATION_INPUT_MIGRATION = "0096_w2_generation_input_consumers";
+export const GENERATION_INPUT_MIGRATION = "0180_w2_generation_input_consumers";
 export const GENERATION_INPUT_SIGNATURE =
   "creator.generation_agent_inputs(uuid,uuid)";
 const owner = "creator_w2_generation_input";

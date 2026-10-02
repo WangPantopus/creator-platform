@@ -9,6 +9,7 @@ import type { AgentLifecycle } from "./lifecycle.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import { agentExportStream } from "./privacy-stream.js";
+import type { PreparedAgentPrivacyExport } from "./privacy-export-snapshot.js";
 
 /** W1/W8 supply authoritative job and case projections; HTTP fields cannot mint these scopes. */
 export interface AgentTrustAuthority {
@@ -170,6 +171,7 @@ export function agentPrivacyHook(
   authority: AgentTrustAuthority,
   artifacts?: AgentExportArtifactSink,
   coordinatorStream = false,
+  exportSnapshot?: PreparedAgentPrivacyExport,
 ): PrivacyHook {
   const boundary = authority.accountingBoundary?.bind(authority);
   return {
@@ -306,6 +308,9 @@ export function agentPrivacyHook(
                     assertCustody: (client) =>
                       lifecycle.assertAccountingClient(client),
                   }
+                : undefined,
+              exportSnapshot
+                ? { prepared: exportSnapshot, job: input }
                 : undefined,
             ),
           };

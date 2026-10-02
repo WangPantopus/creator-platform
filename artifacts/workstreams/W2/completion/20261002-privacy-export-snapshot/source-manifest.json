@@ -1,0 +1,64 @@
+{
+  "reviewBase": "30c0939b8d9b2abc24a6f54b148b4c1bdb603a8b",
+  "heldMapSource": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "heldMapSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "reviewMode": "source/closed copy/generic engine, not live activation",
+  "files": [
+    {
+      "path": "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+      "sha256": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/privacy-export-snapshot.ts",
+      "sha256": "c87b2776dd9b42089eee36904d406e911b48b01db44fefe8f533c98a7e1af34b"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/privacy-stream.ts",
+      "sha256": "e7e54c9e1be3acc6a9da854ae6bf86642be90618bc49192e4b77c8491c461aec"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/trust-adapter.ts",
+      "sha256": "92609224786e8b45b34dc77adb5ead83b01218b7b2f7b646ecaf02a465fa9c58"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/integration.ts",
+      "sha256": "e950412b2b69cbd891d73b6befe74308cc80aee883d39d48c77c3748a9e1ae68"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "sha256": "7c79743a53fab3c7ebc798b9e44a571976487cc5f0bf7d9c6047416d6a0870d8"
+    },
+    {
+      "path": "apps/backend/src/core/purpose-catalogue.ts",
+      "sha256": "57aec2e0a9d0b9ff31b428bee7b9652f88438fa929bd9bd33fd72f5bac3adc09"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-consumer-catalogue.ts",
+      "sha256": "cb76da8bed67c568f6dee73b05f06e196628b774945931f3e745c160051df2eb"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-inputs.ts",
+      "sha256": "5aa8067f583f0c15e2e1d4643ec3b4db2c6e169236141ee750fa6a81c006cd46"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-provider-usage.ts",
+      "sha256": "b0565d1e46c166fc47294b20e97e6b9c765cc210925d1faf2978286dc4b86f3c"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-runtime-context.ts",
+      "sha256": "fae1562353a6401ac7566cfe3be824ee99fe02a80688c30e4cb23674cddf4433"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-terminal-journal.ts",
+      "sha256": "09c0798899db95d01b136f3ccd87e49c87c857f301807547f9e9684a43a0ac6a"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-journal.ts",
+      "sha256": "4aa5f96866b61713428162640648456cff24a397735456465fa873fb3430e1d8"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/usage-retention.ts",
+      "sha256": "5ebb85f9772745b820bad6858439505bb4ed4514f33834161e81ba1cf579f1ff"
+    }
+  ]
+}

@@ -12,10 +12,10 @@ import {
   type GenerationTerminalScope,
 } from "../identity/generation-terminal.js";
 import { PreparedGenerationJournal } from "./generation-journal.js";
-import { generationConsumerCatalogue } from "./generation-runtime-context.js";
+import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
 
 export const GENERATION_TERMINAL_JOURNAL_MIGRATION =
-  "0105_w2_generation_terminal_journal";
+  "0188_w2_generation_terminal_journal";
 export const GENERATION_TERMINAL_JOURNAL_SIGNATURES = [
   "creator.generation_agent_journal_receipt(uuid,uuid)",
   "creator.generation_seal_agent_journal(uuid,uuid)",

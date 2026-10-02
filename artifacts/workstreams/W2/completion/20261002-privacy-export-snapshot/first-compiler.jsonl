@@ -1,0 +1,4 @@
+SET
+{"issue": {"hint": "When you fix this issue, please, recheck other functions that uses this function.", "level": "warning", "query": null, "detail": "there is a risk of unwanted behave", "lineno": 3, "context": null, "message": "routine is marked as STABLE, but expression is VOLATILE", "position": null, "sqlstate": "00000", "statement": "IF", "functionid": "creator.agent_privacy_export_rows"}, "signature": "creator.agent_privacy_export_rows(uuid)"}
+{"issue": {"hint": "When you fix this issue, please, recheck other functions that uses this function.", "level": "warning", "query": null, "detail": "there is a risk of unwanted behave", "lineno": 4, "context": null, "message": "routine is marked as STABLE, but expression is VOLATILE", "position": null, "sqlstate": "00000", "statement": "RETURN QUERY", "functionid": "creator.agent_privacy_export_rows"}, "signature": "creator.agent_privacy_export_rows(uuid)"}
+RESET

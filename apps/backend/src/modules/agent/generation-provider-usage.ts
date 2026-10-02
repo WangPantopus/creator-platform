@@ -18,7 +18,7 @@ import { ProviderResponseError } from "./response-usage.js";
 import type { StreamProposal } from "./streaming.js";
 
 export const GENERATION_PROVIDER_MIGRATION =
-  "0097_w2_generation_attempt_admission";
+  "0181_w2_generation_attempt_admission";
 export const GENERATION_PROVIDER_SIGNATURES = Object.freeze([
   "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
   "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
