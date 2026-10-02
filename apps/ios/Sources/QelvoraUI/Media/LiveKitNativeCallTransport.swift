@@ -15,6 +15,7 @@ import LiveKit
     public var mediaView: AnyView { AnyView(LiveKitCallMedia(transport: self)) }
 
     public func connect(admission: NativeCallAdmission, camera: Bool, onState: @escaping @MainActor (String) -> Void) async throws {
+        guard NativeMediaDevicePermissions.granted(camera: camera) else { throw URLError(.noPermissionsToReadFile) }
         guard room == nil, UUID(uuidString: admission.sessionId) == sessionID,
               let url = URLComponents(string: admission.url), url.user == nil, url.password == nil,
               url.query == nil, url.fragment == nil, !admission.token.isEmpty, admission.token.count <= 16384 else { throw URLError(.badServerResponse) }
