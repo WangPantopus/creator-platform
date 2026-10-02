@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "sourceSHA": "b81aa45ba5f12a784b0038a60780263bd6822342",
+  "validatedAt": "2026-10-02T11:40:27.616483+00:00",
+  "privateBackupName": "creator_w2-20261002T114025Z.pgdump",
+  "privateMode": "0600",
+  "bytes": 541344,
+  "sha256": "67c67ca0116bc774c3f3598f1a058722317f32f82eb91eb584eb6c9f950ff5da",
+  "dump": "passed",
+  "list": "passed",
+  "TOCentries": 1277,
+  "actualSeparateRestore": "creator_w2_rehearsal_recovery_20261002t114025z",
+  "exitOnRestoreError": true,
+  "restore": "passed",
+  "readback": {
+    "migrations": 40,
+    "draftRevision": 15,
+    "examples": 20,
+    "sources": 1,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0,
+    "allFanProfiles": 2,
+    "sessions": 3
+  },
+  "sourceReadbackMatches": true,
+  "limits": [
+    "Raw dump and TOC remain private.",
+    "Live canonical ledger40, held generations/migrations not activated.",
+    "No original iMac archive, key or release readiness inferred."
+  ]
+}
