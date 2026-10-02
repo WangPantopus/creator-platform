@@ -930,7 +930,9 @@ public enum QelvoraCopy {
     "identityPrivateClearRetry": "Retry clearing saved private data",
     "w1CallLookupTitle": "Your call",
     "w1CallLookupChecking": "Checking the booking and your current access…",
-    "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status."
+    "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status.",
+    "identityProofReviewSupport": "Request verification review",
+    "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

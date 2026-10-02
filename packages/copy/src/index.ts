@@ -928,7 +928,9 @@ export const copy = {
   "identityPrivateClearRetry": "Retry clearing saved private data",
   "w1CallLookupTitle": "Your call",
   "w1CallLookupChecking": "Checking the booking and your current access…",
-  "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status."
+  "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status.",
+  "identityProofReviewSupport": "Request verification review",
+  "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

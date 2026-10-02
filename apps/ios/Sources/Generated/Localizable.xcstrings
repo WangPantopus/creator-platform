@@ -10098,6 +10098,28 @@
           }
         }
       }
+    },
+    "Request verification review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request verification review"
+          }
+        }
+      }
+    },
+    "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
