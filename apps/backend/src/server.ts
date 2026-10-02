@@ -50,19 +50,15 @@ const configured =
           : {}),
         registerFeatures: async (runtime) => {
           const accountCalls = await AccountCallMetadata.prepare(runtime);
+          const callControl = await InteractiveCallControl.prepare(runtime);
           const mediaEnvironment = readMediaEnvironment();
-          const mediaDenials = runtimeMediaDenials(runtime);
+          const mediaDenials = callControl
+            ? runtimeMediaDenials(runtime, callControl)
+            : null;
           // The development host consumes W8's 0082 held try-fence. A code
           // callback alone cannot advertise media while its real producer is
           // absent. Registry activation and custody remain with W8.
-          const mediaAuthorityReady =
-            mediaEnvironment && mediaDenials
-              ? (
-                  await runtime.pool.query<{ ready: boolean }>(
-                    "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
-                  )
-                ).rows[0]?.ready === true
-              : false;
+          const mediaAuthorityReady = Boolean(callControl);
           const mediaHost =
             mediaEnvironment && mediaDenials && mediaAuthorityReady
               ? composeMediaHost({
@@ -96,7 +92,6 @@ const configured =
           // Preparing the genuine graph does not configure a provider, worker
           // purpose or arrival policy. The calls feature remains unmounted
           // until those separate producers exist; no request Actor is invented.
-          const callControl = await InteractiveCallControl.prepare(runtime);
           process.stdout.write(
             callControl
               ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
