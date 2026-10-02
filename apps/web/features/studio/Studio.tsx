@@ -430,11 +430,14 @@ export function Studio({
   useEffect(() => {
     if (suspended) {
       if (!document.hidden) reconnectButton.current?.focus();
-    } else if (previousFocus.current?.isConnected) {
+    }
+  }, [loading, suspended]);
+  useEffect(() => {
+    if (!suspended && previousFocus.current?.isConnected) {
       previousFocus.current.focus();
       previousFocus.current = null;
     }
-  }, [loading, suspended]);
+  }, [suspended]);
   useEffect(() => {
     void refresh();
     return () => {
@@ -592,6 +595,11 @@ export function Studio({
         className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
         hidden={suspended}
         inert={suspended}
+        onFocusCapture={(event) => {
+          // Capture before a parent/current-role outage can remove browser
+          // focus. Only a validated return may restore this private control.
+          if (!suspended) previousFocus.current = event.target;
+        }}
       >
         <aside className="w5-sidebar">
           {navigationTree(
