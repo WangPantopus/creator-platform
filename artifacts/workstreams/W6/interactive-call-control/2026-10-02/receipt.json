@@ -1,0 +1,107 @@
+{
+  "at": "2026-10-02T15:34:46.680013+00:00",
+  "reviewSource": "d097b68b6ed4582d783503da36ddf977d6516f6e",
+  "nativeOperatedSource": "b5164a81115abd8673594261f41f5608bed9029a",
+  "compiledApiOperatedSource": "e4a1b9781418c8267ec4958c71d8196324a95750",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt": "f31e657548fab6529d2fc675c8330115550d49dcdc543cabf4d3af743832f2c2",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "499a71a2b48ebed9423a8e31ae4722a8ce8968763fef4e6bf662911207cf4695",
+    "apps/backend/scripts/build.mjs": "00a85a7bc7ba4784a7f3837511f93237fa02bd9de379924fa3690b54c746f014",
+    "apps/backend/src/modules/conversation/host.ts": "92075a0d70a1caac238bd2b037517ea6d995cf456cdf0db219e5a81b600a6b79",
+    "apps/backend/src/modules/conversation/service.ts": "dd49ca24139ef2adfd5248b2ac0cd44921c61738b276096bbe7a2326f524e6ba",
+    "apps/backend/src/modules/media/registration.ts": "4038598502f39fc201b9d04760677a0630cd38a26f5570585e0020f56f690079",
+    "apps/backend/src/modules/media/router.ts": "c8a2c752ff2381f4ef17841675107814d08e1159b122bf2457ad75e1a5a2db45",
+    "apps/backend/src/modules/session/commerce.ts": "8ff6ce1fcaedab6b9aff90795adfe5994e1e1c4b7083e95583ea2ee574a958ea",
+    "apps/backend/src/modules/session/interactive-control.ts": "4ddb91411484cf635d9fab114783a78d54bbe51769cb1a073fc1685cadf17166",
+    "apps/backend/src/modules/session/service.ts": "3cf74b46b8496ffc351579bc84e9e6e58cb9ebb37834e93be78a625cf2b63018",
+    "apps/backend/src/server.ts": "4111c03fa29c6e8c3f9208263dcb2a362fff9132a326037e672b8147af9ab1a9",
+    "apps/ios/Sources/Generated/QelvoraAPI.swift": "d50ef2becaae20ffe67f674d1f974fec378d96cbb54f9a24576a2d0fba743821",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift": "164b65c6a593ee514c225eab537f77d682b19d1475d7f9442627e16acc17e4ee",
+    "apps/web/features/calls/CallView.tsx": "c2191b34d622a31e0fa98c1701248fcc328cec2c787aadfb4a1b884e20badd94",
+    "infra/local/w6/ios-runtime/RuntimeJourney.swift": "a792e3add3b3ce8294e720b9055e4b36f3f13c381485363455aefa72fcec8606",
+    "packages/api/generated/openapi.json": "775ecc77de5b77f647793b525f741d8a361b8840f06c4e7b5656899a229d22a4",
+    "packages/api/src/conversation/contracts.ts": "b25b587ca4fee71e865b562185bb48e3345cb34bda689cad686a5b76e56ca148",
+    "packages/api/src/session.ts": "dc537573f6bd285f55e403ad5cf648072c1e2cd9a924c6735b6f239331121192"
+  },
+  "privateLogSha256": {
+    "interactive-call-postgres-contracts.log": "c6af64dc4990843d819daac5283bf270a4ce0c58ad62fb65b7c7a560d9e0e7f4",
+    "interactive-call-bundled-repair-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "web-interactive-control-production-build.log": "6ec1c5a5264de76b4729eae53c577df265d4c6a8d6116e95a2fd2db1d9a17710",
+    "android-call-display-repair-build-repeat.log": "89d23bab0a1ee6450540406fe110609f05229b73b86146aefc33dd537d50612d",
+    "ios-call-display-repair-build-repeat.log": "348c83ec0d9b49f7e04d0b069150529235ecd35ff71b007509ec3be185decf27",
+    "ios-display-repaired-freshboot-actual.log": "7100d7512668c90fb3ce5e8cbd17de68e0f31163de32eae31ec44662f9225b82",
+    "ios-call-ui-cleanup-repeat.log": "8296f34aa7a00b57d8d8429e22484d15e430b35bd46aae7f3c4b08ef445c9761",
+    "ios-interactive-final-polling.log": "0bbe8de1a96fd8a3a42e01d95e3e5a593eb98dc3641ac7e797f8243d5543fb22",
+    "android-interactive-final-emulator.log": "686b558ff9195c0b0f4ae6f7ad841a767981983cb58da11e23e74dde68456a02",
+    "android-interactive-control-emulator.log": "c149c726fb0c4d1bd53d257f6dc6700c54a580202e9c13ef3d5e6d6e54ba442f",
+    "host-reportcrash-readonly-sample.log": "76cbdf59bf035d7d43aab932d6d3a4afee5dd37b1f68f47001c1dcde4aac8902",
+    "interactive-control-main-repeat-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "interactive-control-main-repeat-generation.log": "e560fad1c2e2ee85534237bdbccec490a319b3fab038610b14d9a73a409d9bd1",
+    "interactive-control-main-repeat-web-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "interactive-control-main-repeat-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "checks": {
+    "originalPostgresAndContractChecks": {
+      "passed": 18,
+      "newUnitTests": 0,
+      "durationSeconds": 105.03
+    },
+    "mainMergedBackendBuild": "passed",
+    "mainMergedWebTypes": "passed",
+    "mainMergedGeneration": "passed",
+    "mainMergedScopedLint": "passed",
+    "webProductionBuild": "passed",
+    "webProductionLaunched": "passed",
+    "productionIdentityOverHttp": "honestly unavailable; Retry and Back personally operated",
+    "androidRebuiltInstallAndActualJourneys": "completed",
+    "iosNormallySignedBuildAndStrictCodesign": "passed",
+    "iosActualUiObservations": "real fan, repaired unavailable call, manual Refresh, no admission, no OS media prompt, explicit owned app termination",
+    "iosUiDriverSuite": "failed exit65 in crash-reporter synchronization; not a pass"
+  },
+  "android": {
+    "ownedSerial": "emulator-5582",
+    "apkSha256": "6d71e799cdf950fb3937a4ca8b6916615df9009a7f807651e49df3c5b5981a6c",
+    "actualFontScale": 2.0,
+    "actualThemes": ["Light", "Night"],
+    "normalFinalEmulatorExit": 0,
+    "earlierEmulatorExit": 134,
+    "earlierCause": "unresolved; preserve actual error log",
+    "lightCaptureDuringConfiguration": "loading only; not denial acceptance",
+    "repeatedLightCapture": "actual unavailable state; same fan cold return"
+  },
+  "ios": {
+    "ownedDevice": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+    "appExecutableSha256": "000fc368fae8a43e73a9610ed43fc10badb79ad0547a95f2328ecce94b1ae9bb",
+    "appDylibSha256": "ad1723fe16f4e2a0f2dc05e2a5a59cd623fa1c4f4caafdda4af8b5a090cb8f33",
+    "lastBodyAndTerminationCompletedSeconds": 22.03,
+    "lastWholeDriverExit": 65,
+    "failure": "XCTest synchronizing with crash reporter waits300seconds;60second allowance fails in framework finalization",
+    "attemptedFixes": [
+      "explicit owned app termination",
+      "normal owned simulator shutdown and fresh boot"
+    ],
+    "neitherFixResolvedDriver": true,
+    "crashTrackingSuppressed": false,
+    "deviceHubRead": "actual timeoutReached after5.163seconds; no UI acceptance",
+    "actualNewOwnedAppCrashReportFound": false,
+    "rootCauseStillUnresolved": true
+  },
+  "qualifications": [
+    "No real human voice recording/publication/fan playback accepted",
+    "No provider admission, complete history, financial settlement, revocation or incoming/background call accepted",
+    "No actual VoiceOver/TalkBack or full200% iOS accessibility accepted",
+    "The screenshot named web-real-api-outage-backoff raced shutdown and is not actual outage acceptance",
+    "The screenshot web-real-offline-backoff-actual records the prior incorrect recording copy; corrected copy is separately verified against the real stopped API",
+    "Expected-role Retry driver initially timed out, corrected using the actual observed link role",
+    "Current57 keeps0082 unregistered/unapplied; runtime haszero memberships andzero call/admission/media/effect/event rows",
+    "W8 proposed61 and held0150 are future dependencies, not activation"
+  ],
+  "nextDependencies": [
+    "W8 reviewed sole purpose-wave activation plus independent fresh/preserved backup+restore verification",
+    "W1 genuine request/client/XID/session-bound bootstrap for held0150 metadata",
+    "W4 reviewed original capture/current booking custody",
+    "Actual CallCustody, noninteractive call worker/handback purpose and provider single-use/history/revocation",
+    "Approved arrival grace, both-absent/cancel/reschedule financial decisions and ordinary-media/call retention",
+    "Production KMS/C2PA trust-list signer, real human microphone/provider account and physical-device calling"
+  ]
+}

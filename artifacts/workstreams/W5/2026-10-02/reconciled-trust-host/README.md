@@ -1,0 +1,3 @@
+W5 now mounts the exact current-main W8 Trust composition, with canonical creator_runtime core and separate Growth API/worker pools. The same Agent core pool is shared between the actual Trust consumer and the Studio agent owner. Content receives the actual caller-held denial callback; no callback result or composite core privilege is fabricated.
+
+Implemented and runnable at8eee65ee: backend types/lint/format and actual API startup pass. Integrated: branch, merge pending. Verified: actual non-owner RLS/restoration readiness and 390 Night Notes concealment with scope_denial_unconfigured503 while canonical57 lacks the continuation authority. Release-ready:false; privacy/provider gates remain unavailable. No signing, review or fan-reply acceptance. No new tests.

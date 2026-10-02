@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
 import { identityPrivacyHook } from "./identity-privacy-hook.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
@@ -15,7 +15,10 @@ import type { AgentService } from "../agent/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { CommerceService } from "../commerce/service.js";
 import { commercePrivacyHook } from "../commerce/operations.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 import {
   createCommercePrivacyAuthority,
   type CommercePrivacyConfiguration,
@@ -23,9 +26,13 @@ import {
 import { DomainError } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
-import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
+
+export type ConversationPrivacyOwnerPorts = Omit<
+  Parameters<typeof conversationPrivacyHook>[0],
+  "pool" | "authority" | "retention"
+>;
 
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
@@ -33,7 +40,14 @@ import { contentPrivacyHook } from "../content/privacy.js";
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
+  /** Real current restoration on the owner's held client, never a pool check. */
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
+  /** Prepared owner instances; the coordinator fixes the pool, actual task
+   * authority and reviewed retention after spreading these owner ports. */
+  conversation?:
+    | ConversationPrivacyOwnerPorts
+    | (() => ConversationPrivacyOwnerPorts | undefined);
   agent?: {
     service: AgentService;
     lifecycle: AgentLifecycle;
@@ -51,26 +65,49 @@ export function createPrivacyConsumers(input: {
   };
   media?: Omit<
     Parameters<typeof mediaPrivacyHook>[0],
-    "runtime" | "coordinator"
+    "runtime" | "coordinator" | "assertRestoredInTransaction"
   >;
   additional?: PrivacyHook[];
 }) {
   const verify = privacyTaskAuthority(input.coordinatorPool);
+  const conversationAuthority = conversationPrivacyAuthority(
+    input.runtimePool,
+    input.coordinatorPool,
+    input.assertRestoredInTransaction,
+  );
   const hooks: PrivacyHook[] = [
-    trustPrivacyHook(input.coordinatorPool),
-    identityPrivacyHook(input.runtimePool, input.coordinatorPool),
-    conversationPrivacyHook({
-      pool: input.runtimePool,
-      authority: conversationPrivacyAuthority(
-        input.runtimePool,
-        input.coordinatorPool,
-      ),
-      retention: input.conversationRetention,
-    }),
+    trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
+    identityPrivacyHook(
+      input.runtimePool,
+      input.coordinatorPool,
+      input.assertRestoredInTransaction,
+    ),
+    {
+      domain: "conversation",
+      async run(job) {
+        const owners =
+          typeof input.conversation === "function"
+            ? input.conversation()
+            : input.conversation;
+        if (typeof input.conversation === "function" && !owners)
+          throw new DomainError(
+            "conversation_privacy_unavailable",
+            "Conversation privacy owners are not composed yet.",
+            503,
+          );
+        return conversationPrivacyHook({
+          ...owners,
+          pool: input.runtimePool,
+          authority: conversationAuthority,
+          retention: input.conversationRetention,
+        }).run(job);
+      },
+    },
     mediaPrivacyHook({
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,
       ...input.media,
+      assertRestoredInTransaction: input.assertRestoredInTransaction,
     }),
   ];
   if (input.agent)
@@ -78,13 +115,28 @@ export function createPrivacyConsumers(input: {
       agentPrivacyHook(
         input.agent.service,
         input.agent.lifecycle,
-        createAgentTrustAuthority(input.coordinatorPool, async () => {
-          throw new DomainError(
-            "notice_authority_required",
-            "Privacy consumers cannot issue operations action scopes.",
-            503,
-          );
-        }),
+        createAgentTrustAuthority(
+          input.coordinatorPool,
+          async () => {
+            throw new DomainError(
+              "notice_authority_required",
+              "Privacy consumers cannot issue operations action scopes.",
+              503,
+            );
+          },
+          async (client, job) => {
+            if (!input.assertRestoredInTransaction)
+              throw new DomainError(
+                "privacy_restoration_unconfigured",
+                "Current restoration on the held Agent lifecycle client is required.",
+                503,
+              );
+            await input.assertRestoredInTransaction(client);
+            const owned = await privacyTaskAuthorityInTransaction(client, job);
+            await input.assertRestoredInTransaction(client);
+            return owned;
+          },
+        ),
         input.agent.artifacts,
       ),
     );
@@ -109,16 +161,15 @@ export function createPrivacyConsumers(input: {
     );
   }
   if (input.growth) {
-    const owner = growthPrivacyHook(input.growth, undefined, verify);
     hooks.push({
       domain: "growth",
       async run(job) {
         await verify(job);
-        // The owner receives the complete current task, including its lease,
-        // cancellation signal and immutable pre-deletion ownership binding.
-        const result = await owner.run(job);
-        await verify(job);
-        return result;
+        throw new DomainError(
+          "growth_held_authority_unavailable",
+          "Growth privacy requires its reviewed same-client task and COMMIT integration.",
+          503,
+        );
       },
     });
   }

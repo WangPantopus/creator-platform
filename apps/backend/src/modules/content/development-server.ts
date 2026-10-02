@@ -2,7 +2,11 @@
 import { randomBytes } from "node:crypto";
 import { readFile, writeFile, stat } from "node:fs/promises";
 import pg from "pg";
-import { createConfiguredBackend } from "../../integration.js";
+import { createGrowthAPIPool } from "../../db/growth-api-pool.js";
+import {
+  createConfiguredBackend,
+  type BackendRuntime,
+} from "../../integration.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { ContentService } from "./service.js";
 import { contentFeature, contentSignedSubjects } from "./registration.js";
@@ -22,7 +26,11 @@ import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
-import { canonicalContentFollows } from "../growth/integration.js";
+import { canonicalCoreContentFollows } from "../growth/core-follows.js";
+import { contentPublicProjection } from "../growth/content.js";
+import { createTrustReplyReviewer } from "../trust/reply-review.js";
+import { createDevelopmentTrust } from "../trust/development.js";
+import { createAgentDomain } from "../agent/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -89,6 +97,7 @@ let studio: StudioService;
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   agentPool?: pg.Pool;
+  growthPool?: pg.Pool;
 } = { growth: null };
 const agentDatabaseUrl = process.env.W5_AGENT_DATABASE_URL;
 if (agentDatabaseUrl) {
@@ -106,6 +115,17 @@ if (agentDatabaseUrl) {
 } else if (process.env.GROWTH_ENABLED === "true")
   throw new Error("W5 Growth composition requires W5_AGENT_DATABASE_URL.");
 const model = modelFromEnvironment();
+const agentPoolFor = (runtime: BackendRuntime) => {
+  if (features.agentPool) return features.agentPool;
+  if (!agentDatabaseUrl) return runtime.pool;
+  features.agentPool = new pg.Pool({
+    connectionString: agentDatabaseUrl,
+    max: 2,
+    connectionTimeoutMillis: 5000,
+    statement_timeout: 5000,
+  });
+  return features.agentPool;
+};
 const backend = await createConfiguredBackend({
   config: {
     port: apiPort,
@@ -118,6 +138,10 @@ const backend = await createConfiguredBackend({
     passkeyOrigins: [webOrigin],
   },
   identity,
+  trust: (runtime) =>
+    createDevelopmentTrust(runtime, {
+      agent: createAgentDomain({ pool: agentPoolFor(runtime), model }),
+    }),
   guardrails: {
     checkSentence: async () => {
       throw new DomainError(
@@ -138,17 +162,11 @@ const backend = await createConfiguredBackend({
     },
   ],
   registerFeatures: async (runtime) => {
+    const growthPool = await createGrowthAPIPool(url);
+    if (growthPool) features.growthPool = growthPool;
     const conversation = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-    const agentPool = agentDatabaseUrl
-      ? new pg.Pool({
-          connectionString: agentDatabaseUrl,
-          max: 2,
-          connectionTimeoutMillis: 5000,
-          statement_timeout: 5000,
-        })
-      : runtime.pool;
-    if (agentPool !== runtime.pool) features.agentPool = agentPool;
+    const agentPool = agentPoolFor(runtime);
     const repository = new AgentRepository(agentPool),
       agent = new AgentService(
         repository,
@@ -163,6 +181,7 @@ const backend = await createConfiguredBackend({
     );
     const growth = await configureGrowthForBackend({
       ...runtime,
+      pool: growthPool ?? runtime.pool,
       assertAllowed: (actor, creatorId) =>
         creatorId
           ? runtime.assertCreatorAllowed(actor, creatorId)
@@ -175,7 +194,9 @@ const backend = await createConfiguredBackend({
               runtime.database,
               runtime.identity.signing,
               async (creatorId) => {
-                const current = await runtime.pool.query<{ handle: string }>(
+                const current = await (growthPool ?? runtime.pool).query<{
+                  handle: string;
+                }>(
                   "SELECT handle FROM growth.creator_public WHERE id=$1 AND verified AND state='published'",
                   [creatorId],
                 );
@@ -186,6 +207,12 @@ const backend = await createConfiguredBackend({
         : {},
     });
     features.growth = growth;
+    if (!runtime.assertContentAllowedInTransaction)
+      throw new DomainError(
+        "content_denial_unconfigured",
+        "Configure the current caller-held content denial authority.",
+        503,
+      );
     const composition = composeContentHost({
       pool: runtime.pool,
       owners: {
@@ -195,15 +222,37 @@ const backend = await createConfiguredBackend({
         agent,
         profiles: runtime.identity?.profiles,
       },
-      dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+      dependencies: {
+        assertAllowed: runtime.assertCreatorAllowed,
+        assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
+        reviewReply: createTrustReplyReviewer(),
+      },
       sources: { service: sources, repository },
+      ...(runtime.audienceIdentity
+        ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
+        : {}),
+      ...(runtime.holdCreatorFanNegativeAuthority
+        ? {
+            creatorTenure: {
+              holdCreatorFanNegativeAuthority:
+                runtime.holdCreatorFanNegativeAuthority,
+            },
+          }
+        : {}),
       ...(growth && runtime.identity
         ? {
-            growth: {
-              service: growth.service,
-              signing: runtime.identity.signing,
-              follows: { follows: canonicalContentFollows() },
+            followReaders: {
+              // No W8 activation receipt exists on the fresh canonical57 DB.
+              // The actual producer stays unavailable; never read Growth from
+              // a different transaction and treat its Boolean as held access.
+              follows: canonicalCoreContentFollows(),
             },
+            publicProjection: (actor, effect) =>
+              contentPublicProjection(
+                growth.service,
+                content,
+                runtime.identity!.signing,
+              )(actor, effect),
           }
         : {}),
       ...(runtime.assertScopeAllowedInTransaction
@@ -252,6 +301,7 @@ backend.server.listen(apiPort, "127.0.0.1", () =>
 const stop = () => {
   void (async () => {
     await features.growth?.close();
+    await features.growthPool?.end();
     await features.agentPool?.end();
     await backend.close();
     process.exit(0);

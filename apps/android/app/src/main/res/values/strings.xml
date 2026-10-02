@@ -19,6 +19,10 @@
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>
   <string name="note_replies" formatted="false">Only {name} and her team see replies to Notes.</string>
+  <string name="content_confirmed_tenure" formatted="false">Membership · at least {days} continuous days</string>
+  <string name="content_reply_limit" formatted="false">{used} / {limit} characters</string>
+  <string name="content_reply_over_limit" formatted="false">This draft is over your current limit. Shorten it to send; your words are kept.</string>
+  <string name="content_reply_policy_unavailable" formatted="false">Current membership recognition is unavailable. The reply limit stays at 4,000 characters.</string>
   <string name="sponsor_disclosure" formatted="false">Paid partnership: {name} is paid by {brand}.</string>
   <string name="processor_consent" formatted="false">Before your first message, {name}\'s AI is powered by {providers}. They don\'t keep or train on your messages.</string>
   <string name="sensitive_memory" formatted="false">Want me to remember this? Only if you say yes.</string>
@@ -903,6 +907,19 @@
   <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="w5_content_status" formatted="false">Content status</string>
+  <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
+  <string name="w5_content_check_current_access" formatted="false">Check current access</string>
+  <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
+  <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
+  <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
+  <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
+  <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
+  <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
+  <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
+  <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
   <string name="identity_choose_handle" formatted="false">Choose your handle</string>
   <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
 </resources>

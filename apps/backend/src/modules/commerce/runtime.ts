@@ -45,6 +45,7 @@ import {
 } from "./audience.js";
 import { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 import type { CommerceCallTransport } from "./call-transport.js";
+import type { CommerceFulfillmentPlans } from "./fulfillment-plans.js";
 import { createCommerceTenureReader, type TenureAuthority } from "./tenure.js";
 import {
   createCommercePublicPacketHost,
@@ -83,6 +84,7 @@ export async function createCommerceRuntime(input: {
   >;
   /** W3's actual prepared exact association and W6 recording reader. */
   voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
+  fulfillmentPlans?: CommerceFulfillmentPlans;
   qualifiedReads?: QualifiedReadAuthority;
   /** Genuine W6 same-graph transport evidence; never enables paid calls. */
   callTransport?: (service: CommerceService) => Promise<CommerceCallTransport>;
@@ -173,6 +175,7 @@ export async function createCommerceRuntime(input: {
           recordings: input.voiceRecordings,
         })
       : undefined,
+    input.fulfillmentPlans,
   );
   const billing = new MembershipBilling(service, input.billing);
   if (input.callTransport)
@@ -251,6 +254,9 @@ export async function createCommerceRuntime(input: {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
     ...(generationAllowance ? { allowance: generationAllowance } : {}),
     service,
+    signedSubjects: input.fulfillmentPlans
+      ? [input.fulfillmentPlans.signedSubjects]
+      : [],
     billing,
     extended,
     paidAudienceCount,

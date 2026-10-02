@@ -47,6 +47,8 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** W4: genuinely prepared original group fulfillment on this exact graph. */
+  fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
   licenseVerifier?: LicenseVerifier;
   /** W2: the reviewed thread-accounting retention for the usage journal. */
@@ -64,10 +66,19 @@ export type ConversationHostProducers = {
 
 type Registry = { migrations: { version: string; path: string }[] };
 const repositoryRoot = new URL("../../../../../", import.meta.url);
+declare const __QELVORA_REGISTERED_MIGRATIONS__:
+  | Readonly<Record<string, string>>
+  | undefined;
 
 /** Only an executable registry entry counts. The expected checksum is the
  * reviewed file's own bytes, never a value read back from the database. */
 async function registeredChecksum(version: string) {
+  // Shipping bundles carry the exact executable registry's SQL hashes from
+  // their build. Source execution retains the same checked-out byte custody.
+  if (typeof __QELVORA_REGISTERED_MIGRATIONS__ !== "undefined")
+    return Object.hasOwn(__QELVORA_REGISTERED_MIGRATIONS__, version)
+      ? __QELVORA_REGISTERED_MIGRATIONS__[version]
+      : undefined;
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as Registry;
@@ -278,6 +289,9 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(producers.fulfillmentPlans
+      ? { fulfillmentPlans: producers.fulfillmentPlans }
+      : {}),
   });
   // Studio drafting, evaluation and ingestion use the same configured model.
   agent ??= createAgentDomain({
