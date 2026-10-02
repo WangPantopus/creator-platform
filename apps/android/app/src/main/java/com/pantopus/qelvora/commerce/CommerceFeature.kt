@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.ui.*
@@ -131,8 +132,10 @@ object CommerceFanFeature {
         if (current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
         else when (screen) {
             "spending" -> {
-                CommerceText("Spending and time", "display-md"); CommerceText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), "spend-total"); CommerceText("Charged this UTC calendar month", "caption")
-                current.exposure?.month?.let { CommerceText("$it · UTC", "meta") }
+                CommerceText("Spending and time", "display-md")
+                BasicText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), style = qText("data-lg").copy(fontSize = 44.sp, lineHeight = 48.sp, color = qColor("ink")))
+                CommerceText("Charged this UTC calendar month", "caption")
+                current.exposure?.month?.let { CommerceText("$it · UTC", "data-sm") }
                 val limit = current.limits.firstOrNull { it.currency == current.policy.currency }
                 CommercePanel {
                     CommerceRow("Current limit", limit?.let { if (it.explicit_none) "No limit" else commerceMoney(it.amount?.toLongOrNull() ?: 0, it.currency) } ?: "Choose before your first paid action")
@@ -140,7 +143,7 @@ object CommerceFanFeature {
                     current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, onSelect = { choice = it })
+                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it })
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
@@ -200,7 +203,10 @@ object CommerceFanFeature {
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
                 val accountId=session.session?.accountId
                 if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
-                else Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                else {
+                    Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                    if(current.memberships.any {it.provider=="google"}) key(accountId) {StoreSubscriptionManagement(context)}
+                }
                 CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
             }
             "pass" -> {

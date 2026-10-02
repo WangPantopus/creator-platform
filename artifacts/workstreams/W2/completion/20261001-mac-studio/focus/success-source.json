@@ -1,0 +1,15 @@
+{
+  "sourceBase": "b63f49d9cfb8eaa841f0d195e01604e70dbb4975",
+  "host": "Yingpengs-Mac-Studio.local",
+  "provider": "absent; no calls",
+  "files": {
+    "apps/web/features/creator-ai/CreatorAI.tsx": "1692dd18d26e3356373eb8db76ec195d872f8b17a5df5fc1ae40283445c2fe75",
+    "apps/web/features/creator-ai/creator-ai.css": "4eff03636b091dc48da14825a1708a2dc0cfb3501568b6df4baceca51925fdee"
+  },
+  "captures": {
+    "success-night-phone.png": "53f3ab292434cf56d07f99878a73cba38e74555a9f2b76e53a41927b30517953",
+    "success-night-desktop.png": "c1a90d4e077be4437b1c510f1b2f48defe35ee3ab0797e7bcc83009205f8853d",
+    "success-light-desktop.png": "14d84cc85aa37a7fd353787857d34cba5518b5396ea2b3c343fd9e1d1e64dda4",
+    "success-light-phone.png": "bc15509337877341a0a570865a48de31b621a4eac924bc5dbe61d41ce832ddfd"
+  }
+}

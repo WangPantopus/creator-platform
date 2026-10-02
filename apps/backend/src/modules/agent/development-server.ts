@@ -7,6 +7,7 @@ import { createConversationRuntime } from "../conversation/runtime.js";
 import { modelFromEnvironment } from "./model.js";
 import { createAgentDomain } from "./integration.js";
 import { agentFeature } from "./feature.js";
+import { DevelopmentLicenseVerifier } from "./development-license.js";
 
 if (
   process.env.NODE_ENV !== "development" ||
@@ -49,7 +50,21 @@ const backend = await createConfiguredBackend({
     },
   },
   registerFeatures: async (runtime) => {
-    domain = createAgentDomain({ pool: runtime.pool, model });
+    // Opt-in labeled licensing for fictional development creators only.
+    const licenseVerifier =
+      process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
+        ? DevelopmentLicenseVerifier.create(runtime.pool, {
+            environment: process.env.NODE_ENV,
+            enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+            identityMode: identity.mode,
+            webOrigin,
+          })
+        : undefined;
+    domain = createAgentDomain({
+      pool: runtime.pool,
+      model,
+      ...(licenseVerifier ? { licenseVerifier } : {}),
+    });
     await domain.service.repository.assertRuntimeRole();
     conversations = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversations.signedSubjectPolicies);
