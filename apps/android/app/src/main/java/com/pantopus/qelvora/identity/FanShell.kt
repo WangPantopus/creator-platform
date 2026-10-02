@@ -167,7 +167,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     }
     LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (model.currentToken() != null && !model.choosingActor && !model.busy) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy) model.refresh() } } }
     LaunchedEffect(model.session) { GrowthPush.refresh(context) }
     LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
         val id = notificationID ?: return@LaunchedEffect

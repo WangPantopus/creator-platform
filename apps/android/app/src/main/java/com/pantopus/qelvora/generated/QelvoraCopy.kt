@@ -248,6 +248,8 @@ object QelvoraCopy {
     "writtenBy" to "Written by {name}",
     "monthlyLimitLegend" to "Monthly limit for requests and memberships",
     "limitReminders" to "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
+    "limitRemindersOff" to "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+    "limitRemindersUnknown" to "Lowering a limit is immediate.",
     "noLimit" to "No limit",
     "navChat" to "Chat",
     "navPosts" to "Posts",

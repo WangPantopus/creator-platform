@@ -261,7 +261,7 @@ public struct GrowthFanFeature: View {
             onSignIn: { target in
               session.open(target)
               Task { await session.beginSignIn() }
-            }, onNavigate: session.open
+            }
           ).id(session.destination))
       })
   }
