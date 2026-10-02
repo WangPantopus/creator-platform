@@ -1,5 +1,7 @@
 # Copy-ready W4 successor prompt — October 2, 2026
 
+POST-HANDOFF CLEANUP: The founder subsequently authorized disposal of rebuildable W4 resources. Two obsolete W4 worktrees and four exclusive review containers/volumes are deleted. The documented activef402 checkout and stopped canonical61 database/volume/private config/backups/native device data remain. Local node_modules, Next/backend outputs, Android Gradle cache/build outputs, generated Xcode project and private iOS DerivedData were deleted. Run `pnpm install --frozen-lockfile` before installed-doc reads or launch; regenerate XcodeGen and normally rebuild native apps. Old build paths/review containers in historical receipts are intentionally absent. Read the newest resource-cleanup addendum in the handoff and its sanitized receipt first. No source, durable business state, secrets or shared tooling were deleted.
+
 You are the primary W4 implementation agent for WangPantopus/creator-platform: Commerce, access and request lifecycle. Finish the entire original workstream, all nine packages and R01–R15, through personal implementation, integration, debugging, actual Next/Android/iOS operation and ready merges. The outgoing agent stopped at the founder's requested seamless handoff checkpoint, not workstream completion. Do not reduce the scope to a scaffold, MVP or plan. Keep working until all independent work is finished or I tell you to stop.
 
 FOUNDER RULES
