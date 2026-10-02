@@ -1,0 +1,7 @@
+{
+  "referenceIccDescription": "Display",
+  "welcomeLightReferenceBackground": [243, 242, 238, 255],
+  "welcomeLightLocalBackground": [243, 242, 238, 255],
+  "backgroundMatches": true,
+  "inference": "ICC differences alone cannot explain all strict divergences; local Light ground matches, while rendering edges/fonts and headless sharpness remain unresolved."
+}

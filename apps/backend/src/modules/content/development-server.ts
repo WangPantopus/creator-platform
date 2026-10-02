@@ -1,6 +1,7 @@
 /** Explicit loopback W5 host. Synthetic actors cannot be enabled in production. */
 import { randomBytes } from "node:crypto";
 import { readFile, writeFile, stat } from "node:fs/promises";
+import pg from "pg";
 import { createConfiguredBackend } from "../../integration.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { ContentService } from "./service.js";
@@ -19,7 +20,9 @@ import { modelFromEnvironment } from "../agent/model.js";
 import { SourceService } from "../sources/service.js";
 import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
-import { ContentSources } from "./sources.js";
+import { composeContentHost } from "./integration.js";
+import { configureGrowthForBackend } from "../growth/configured.js";
+import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3005",
@@ -82,7 +85,25 @@ if (!currency)
   throw new Error("Explicit development commerce currency is required.");
 let content: ContentService;
 let studio: StudioService;
-let contentSources: ContentSources;
+const features: {
+  growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
+  agentPool?: pg.Pool;
+} = { growth: null };
+const agentDatabaseUrl = process.env.W5_AGENT_DATABASE_URL;
+if (agentDatabaseUrl) {
+  const configured = new URL(agentDatabaseUrl),
+    database = new URL(url);
+  if (
+    configured.hostname !== database.hostname ||
+    configured.port !== database.port ||
+    configured.pathname !== database.pathname ||
+    configured.username !== "creator_runtime"
+  )
+    throw new Error(
+      "W5 AI requires its canonical runtime on the same database.",
+    );
+} else if (process.env.GROWTH_ENABLED === "true")
+  throw new Error("W5 Growth composition requires W5_AGENT_DATABASE_URL.");
 const model = modelFromEnvironment();
 const backend = await createConfiguredBackend({
   config: {
@@ -115,93 +136,87 @@ const backend = await createConfiguredBackend({
   registerFeatures: async (runtime) => {
     const conversation = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-    const repository = new AgentRepository(runtime.pool),
+    const agentPool = agentDatabaseUrl
+      ? new pg.Pool({
+          connectionString: agentDatabaseUrl,
+          max: 2,
+          connectionTimeoutMillis: 5000,
+          statement_timeout: 5000,
+        })
+      : runtime.pool;
+    if (agentPool !== runtime.pool) features.agentPool = agentPool;
+    const repository = new AgentRepository(agentPool),
       agent = new AgentService(
         repository,
         new AgentPipeline(repository, model),
       ),
       sources = new SourceService(repository);
-    content = new ContentService(runtime.pool, {
-      assertAllowed: runtime.assertCreatorAllowed,
-      follows: async (client, accountId, creatorId) =>
-        Boolean(
-          (
-            await client.query(
-              "SELECT 1 FROM growth.follow WHERE account_id=$1 AND creator_id=$2",
-              [accountId, creatorId],
-            )
-          ).rowCount,
-        ),
-      revokeSource: (...args) => contentSources.revoke(...args),
-      effect: async (actor, effect) => {
-        if (effect.type === "source_candidate")
-          return contentSources.candidate(actor, effect);
-        if (effect.type === "source_revoke") {
-          await contentSources.revoke(
-            actor,
-            effect.creatorId,
-            effect.contentId,
-            effect.version,
-          );
-          return { reference: `revoked:${effect.contentId}:${effect.version}` };
-        }
-        throw new DomainError(
-          "content_distribution_unconfigured",
-          "The current-state distribution producer is not connected.",
-          503,
-        );
-      },
-      thanksMessage: async (client, actor, creatorId, messageId) => {
-        const fan = (
-          await client.query(
-            "SELECT id FROM creator.fan_profile WHERE account_id=$1",
-            [actor.accountId],
-          )
-        ).rows[0];
-        if (!fan) return null;
-        await client.query("SELECT set_config('app.fan_id',$1,true)", [fan.id]);
-        return (
-          (
-            await client.query(
-              "SELECT thread_id FROM creator.message WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind IN('ai','human_creator','approved_draft','human_call','human_broadcast') AND delivery_state='delivered'",
-              [messageId, creatorId, fan.id],
-            )
-          ).rows[0]?.thread_id ?? null
-        );
-      },
-      publicPacket: async (client, _actor, creatorId, packetId) =>
-        Boolean(
-          (
-            await client.query(
-              "SELECT 1 FROM creator.commerce_packet p JOIN creator.commerce_commitment c ON c.packet_id=p.id JOIN creator.commerce_share_grant s ON s.packet_id=p.id JOIN creator.commerce_mode m ON m.id=p.mode_id WHERE p.id=$1 AND p.creator_id=$2 AND p.state='accepted' AND p.payment_state='captured' AND c.state='delivered' AND s.fan_choice AND s.creator_permission AND s.revoked_at IS NULL AND m.shareable AND m.state='offered'",
-              [packetId, creatorId],
-            )
-          ).rowCount,
-        ),
-    });
-    contentSources = new ContentSources(content, sources, repository);
     const commerce = new CommerceService(
       runtime.pool,
       runtime.database,
       runtime.access,
-      {
-        currency,
-        limitOptions: [],
-        passEnabled: false,
-      },
+      { currency, limitOptions: [], passEnabled: false },
     );
-    studio = new StudioService(content, {
-      commerce,
-      conversation: runtime.conversation,
-      access: runtime.access,
-      agent,
-      profiles: runtime.identity?.profiles,
+    const growth = await configureGrowthForBackend({
+      ...runtime,
+      assertAllowed: (actor, creatorId) =>
+        creatorId
+          ? runtime.assertCreatorAllowed(actor, creatorId)
+          : runtime.assertActorAllowed(actor),
+      owners: runtime.identity
+        ? {
+            home: canonicalConversationHome(
+              conversation.feature,
+              runtime.access,
+              runtime.database,
+              runtime.identity.signing,
+              async (creatorId) => {
+                const current = await runtime.pool.query<{ handle: string }>(
+                  "SELECT handle FROM growth.creator_public WHERE id=$1 AND verified AND state='published'",
+                  [creatorId],
+                );
+                return current.rows[0]?.handle ?? null;
+              },
+            ),
+          }
+        : {},
     });
+    features.growth = growth;
+    const composition = composeContentHost({
+      pool: runtime.pool,
+      owners: {
+        commerce,
+        conversation: runtime.conversation,
+        access: runtime.access,
+        agent,
+        profiles: runtime.identity?.profiles,
+      },
+      dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+      sources: { service: sources, repository },
+      ...(growth && runtime.identity
+        ? {
+            growth: {
+              service: growth.service,
+              signing: runtime.identity.signing,
+            },
+          }
+        : {}),
+      ...(runtime.assertScopeAllowedInTransaction
+        ? {
+            assertScopeAllowedInTransaction:
+              runtime.assertScopeAllowedInTransaction,
+          }
+        : {}),
+    });
+    content = new ContentService(runtime.pool, composition.dependencies);
+    composition.bindContent(content);
+    studio = new StudioService(content, composition.owners);
     return [
       conversation.registration,
       contentFeature(content),
       studioFeature(studio),
       commerceFeature(commerce),
+      ...(growth ? [growth.feature] : []),
       {
         name: "agent",
         path: "/v1/agent",
@@ -216,6 +231,7 @@ const backend = await createConfiguredBackend({
     ];
   },
 });
+features.growth?.start();
 let sweeping = false;
 const worker =
   process.env.W5_CONTENT_WORKER === "1"
@@ -252,7 +268,12 @@ backend.server.listen(apiPort, "127.0.0.1", () =>
 );
 const stop = () => {
   if (worker) clearInterval(worker);
-  void backend.close().then(() => process.exit(0));
+  void (async () => {
+    await features.growth?.close();
+    await features.agentPool?.end();
+    await backend.close();
+    process.exit(0);
+  })();
 };
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);

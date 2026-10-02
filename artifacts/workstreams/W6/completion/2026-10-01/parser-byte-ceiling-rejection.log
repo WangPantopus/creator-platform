@@ -1,0 +1,1 @@
+{"operation":"bounded read of actual FFmpeg byte-ceiling output","capBytes":12000,"actualBytes":13653,"actualSha256":"5dc87f2ac7fb6f6ada8e4ac104af42fc46bc56d1e91ac7d06977f0aff1b38612","result":"media_integrity_invalid","qualification":"direct decoder/read diagnostic; scanner timeouts prevent complete additional pipeline acceptance"}

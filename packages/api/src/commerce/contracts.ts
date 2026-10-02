@@ -8,6 +8,26 @@ export const MinorUnits = z
   .max(Number.MAX_SAFE_INTEGER);
 export const Currency = z.string().regex(/^[A-Z]{3}$/u);
 export const Money = z.strictObject({ amount: MinorUnits, currency: Currency });
+/** Participant System metadata only; transport closure does not settle money
+ * or fulfill a service. Provider history, room references and identities stay
+ * inside the genuine owner evidence adapter. */
+export const CallTransportStatus = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("unavailable"),
+    authorKind: z.literal("system"),
+  }),
+  z.strictObject({
+    state: z.literal("closed_unresolved"),
+    authorKind: z.literal("system"),
+    reason: z.literal("both_missed_arrival_grace"),
+    scheduledAt: z.iso.datetime({ offset: true }),
+    arrivalGraceEndedAt: z.iso.datetime({ offset: true }),
+    recordedAt: z.iso.datetime({ offset: true }),
+    outcome: z.null(),
+    settlementResolved: z.literal(false),
+  }),
+]);
+export type CallTransportStatus = z.infer<typeof CallTransportStatus>;
 const IntegerText = z.string().regex(/^\d+$/u).max(32);
 /** Creator-only projection of canonical slots and posted pool cash. It contains
  * no fan identities, private invoices, provider keys or estimated money. */

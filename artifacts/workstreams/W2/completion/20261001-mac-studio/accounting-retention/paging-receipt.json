@@ -1,0 +1,45 @@
+{
+  "observedAt": "2026-10-02T06:39:00Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "baseSource": "e5a81bbe",
+  "producerSha256": "0f665559b7d28f1c2737e374c927a59379b6732dc96b091165be54de2967edb4",
+  "method": "purgeFamilyPaged(client, job, family, signal)",
+  "receiptSchemaVersion": 2,
+  "pageSize": 100,
+  "hashMetadata": "canonical JSON {id,costMicros:string|null} followed by newline, ordered by UUID",
+  "disposableSqlRehearsal": {
+    "container": "creator-platform-w2-check-20261001",
+    "database": "creator_w2_rehearsal_native_20261002",
+    "role": "creator_runtime",
+    "forceRls": true,
+    "rows": 3001,
+    "holdOnlyRows": 1000,
+    "pages": 31,
+    "knownRows": 1500,
+    "unknownRows": 1501,
+    "preservedKnownCostMicros": 150000,
+    "residualLinks": 0,
+    "otherCreatorVisibleRows": 0,
+    "finalResidualQuery": "prepared and executed on the owning creator scope: zero rows",
+    "rollback": "complete",
+    "durableRetentionColumns": 0,
+    "durableUsageRows": 0
+  },
+  "checks": {
+    "backendTypecheck": "pass",
+    "scopedEslint": "pass",
+    "prettier": "pass",
+    "newTests": 0,
+    "existingBackend": "18/18 pass",
+    "t11Pairs": 10000,
+    "t11Queries": 30000,
+    "t11LimitMs": 300000,
+    "t11ObservedMs": 44936
+  },
+  "limits": [
+    "The SQL rehearsal verifies paging, selection, constraints and RLS; it does not invoke a genuine W8 privacy job or prepared producer.",
+    "The caller must roll back its held transaction on cancellation, lost lease or changed policy and persist completion only with a successful commit.",
+    "Actual registration, original financial disposition, approved retention policy and consumer integration remain required.",
+    "Unknown costs remain reconciliation-required with no reported expiry."
+  ]
+}

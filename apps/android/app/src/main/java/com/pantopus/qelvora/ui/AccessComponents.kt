@@ -137,12 +137,17 @@ fun Receipt(name: String = "Maya", reqId: String = "REQ-0412", title: String = c
 
 @Composable
 fun SpendLimit(options: List<String> = listOf("$30", "$60", "$120", copy("noLimit")), selected: String? = null, onSelect: (String) -> Unit = {}) {
+    SpendLimit(options, selected, remindersOn = null, onSelect = onSelect)
+}
+
+@Composable
+fun SpendLimit(options: List<String> = listOf("$30", "$60", "$120", copy("noLimit")), selected: String? = null, remindersOn: Boolean?, onSelect: (String) -> Unit = {}) {
     var current by remember(selected) { mutableStateOf(selected) }
     Column(verticalArrangement = Arrangement.spacedBy(T.space3)) {
         TextLine(copy("spendLimit"), "body-strong")
         Column(Modifier.selectableGroup().semantics { contentDescription = copy("monthlyLimitLegend") }, verticalArrangement = Arrangement.spacedBy(T.space2)) {
             options.chunked(2).forEach { pair -> Row(horizontalArrangement = Arrangement.spacedBy(T.space2)) { pair.forEach { option -> Row(Modifier.weight(1f).border(T.hairline, qColor(if (current == option) "ink" else "control-line"), RoundedCornerShape(T.radiusMd)).selectable(current == option, role = Role.RadioButton) { current = option; onSelect(option) }.padding(T.space3), horizontalArrangement = Arrangement.spacedBy(T.composerGap), verticalAlignment = Alignment.CenterVertically) { SelectionDot(current == option); TextLine(option, "data-md") } }; if (pair.size == 1) Spacer(Modifier.weight(1f)) } }
         }
-        TextLine(copy("limitReminders"), "caption", "ink-muted")
+        TextLine(copy(when (remindersOn) { true -> "limitReminders"; false -> "limitRemindersOff"; null -> "limitRemindersUnknown" }), "caption", "ink-muted")
     }
 }
