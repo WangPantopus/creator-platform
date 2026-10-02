@@ -1,3 +1,9 @@
+### Original terminal settlement source — October 2, 2026
+
+Held0106 is implemented against genuine W1 terminal/W2 journal/W4 allowance owners on the exact held client. It captures approved original cost rules at admission, refuses historical backfill, preserves unknown-cost ceilings, and derives immutable settlement from real accounting and persisted output. Exact source/role/function/column/RLS checks, three PostgreSQL compiler reviews, six restricted-role plans and worker denials pass on an isolated empty canonical57 catalogue. Ledger57 and zero generations/messages/reservations/journal receipts are preserved. Backend build and scoped lint/format pass; no new tests or fabricated business records. [Implementation and evidence](W4-generation-terminal-settlement-2026-10-02.md). Actual composed producers, positive/race acceptance,0107 late financial authority and C10 policy remain open.
+
+PR146 personally operated Android input repair and PR158 original call-capture eligibility are merged (`e120435929c22d53a80ac0a035379936b9f828ea`, `3ef708f7af218505a9c147ebefaed1e6e85e9d01`). Passing web/backend/Android runtime checks do not establish queued native/visual or iOS personal acceptance. W8's exact PR1596771bfed privacy wave now awaits independent fresh61 and original57 preserved-data qualification; live55444 is still canonical57. All nine packages and R01–R15 remain assigned.
+
 ### Current integrated native input checkpoint — October 2, 2026
 
 ## 2026-10-02 — repaired Android decimal input personally verified
