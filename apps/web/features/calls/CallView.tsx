@@ -78,7 +78,9 @@ export function CallView({
       if (fetching) return;
       fetching = true;
       try {
-        const value = await mediaRequest<CallSession>(root);
+        const value = await mediaRequest<CallSession>(root, {
+          expectedAccountId: actorAccountId ?? undefined,
+        });
         if (active) {
           setSession((prior) =>
             prior && prior.id === value.id && prior.version > value.version
@@ -92,7 +94,7 @@ export function CallView({
         if (active) {
           if (
             e instanceof MediaRequestError &&
-            [401, 403, 404].includes(e.status)
+            [401, 403, 404, 409].includes(e.status)
           ) {
             disconnectMedia();
             setSession(null);
@@ -115,7 +117,7 @@ export function CallView({
       clearInterval(timer);
       disconnectMedia();
     };
-  }, [root]);
+  }, [root, actorAccountId]);
   useEffect(() => {
     if (session && ["ending", "ended", "cancelled"].includes(session.state)) {
       disconnectMedia();
@@ -168,11 +170,45 @@ export function CallView({
     setBusy(true);
     const epoch = ++mediaEpoch.current;
     try {
-      const token = await mediaRequest<{ token: string; url: string }>(
-        `${root}/join`,
-        { method: "POST", body: "{}" },
+      const token = await mediaRequest<{
+        token: string;
+        url: string;
+        nonce: string;
+        sessionId: string;
+        accountId: string;
+        expiresAt: string;
+        role: "creator" | "fan";
+      }>(`${root}/join`, {
+        method: "POST",
+        body: "{}",
+        expectedAccountId: actorAccountId ?? undefined,
+      });
+      if (epoch !== mediaEpoch.current) return;
+      const nonce =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+      if (
+        token.sessionId !== sessionId ||
+        token.accountId !== actorAccountId ||
+        token.role !== role ||
+        !nonce.test(token.nonce) ||
+        !Number.isFinite(Date.parse(token.expiresAt)) ||
+        Date.parse(token.expiresAt) <= Date.now()
+      )
+        throw new Error(copy.w6ConnectionFailedRejoinTheSameCall);
+      const admission = await mediaRequest<{ admitted: boolean }>(
+        `${root}/redeem`,
+        {
+          method: "POST",
+          body: JSON.stringify({ nonce: token.nonce }),
+          expectedAccountId: actorAccountId ?? undefined,
+        },
       );
       if (epoch !== mediaEpoch.current) return;
+      if (
+        admission.admitted !== true ||
+        Date.parse(token.expiresAt) <= Date.now()
+      )
+        throw new Error(copy.w6ConnectionFailedRejoinTheSameCall);
       transport.current = adapter;
       await adapter.connect({
         ...token,

@@ -1,0 +1,20 @@
+{
+  "qualification": "Future0092 proposal only; W8 sole registry review and activation, no applied grants/positive canonical probes",
+  "sqlSha256": "d3b16596e2dee78df13705414077cc0993f0612022ddf8d05b76ab8c01045a8c",
+  "projectBinding": "sha256 of exact verified SDK apiKey; no raw project credential stored",
+  "proofBinding": "SDK-verified exact frozen event + raw-body SHA + original API key + fresh claim; one consumption within30seconds",
+  "transactionBinding": [
+    "actual provider/project/room SID and captured admission UUID",
+    "private fresh PID/xid/session_user/claim scope",
+    "real parent room and identity SHARE locks held through commit",
+    "COMMIT-only deferred wall-clock/binding fence; early SET CONSTRAINTS refused; transient scope deleted before commit"
+  ],
+  "privacyDependencies": [
+    "Approved policy reference/retention expiry; no default",
+    "Genuine actual CallCustody producer mapping",
+    "Actual W8 PrivacyJob0087 fenced C10 export/delete/expiry and archive; no callback borrowed privacy scope"
+  ],
+  "canonicalAcceptance": false,
+  "sqlExecutionVerified": false,
+  "callbackHistoryComplete": false
+}
