@@ -14,6 +14,8 @@ import {
   waveDataTables,
   waveDataDigest,
   waveRoleCustody,
+  waveSecurityCustody,
+  waveSequenceCustody,
 } from "./migration-wave-custody.js";
 import {
   assertWaveRoleSafety,
@@ -126,10 +128,14 @@ async function activate() {
     schemaSha256: string;
     createdAt: string;
     dataSha256: string;
+    securitySha256: string;
+    sequenceSha256: string;
     restored: {
       ledgerSha256: string;
       schemaSha256: string;
       dataSha256: string;
+      securitySha256: string;
+      sequenceSha256: string;
     };
   };
   check(
@@ -186,11 +192,17 @@ async function activate() {
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
     const beforeRoles = await waveRoleCustody(client);
+    const beforeSecurity = await waveSecurityCustody(client);
+    const beforeSequences = await waveSequenceCustody(client);
     check(
       beforeData.sha256 === manifest.dataSha256 &&
         manifest.restored?.dataSha256 === manifest.dataSha256 &&
         manifest.restored?.ledgerSha256 === manifest.ledgerSha256 &&
-        manifest.restored?.schemaSha256 === manifest.schemaSha256,
+        manifest.restored?.schemaSha256 === manifest.schemaSha256 &&
+        beforeSecurity.sha256 === manifest.securitySha256 &&
+        manifest.restored?.securitySha256 === manifest.securitySha256 &&
+        beforeSequences.sha256 === manifest.sequenceSha256 &&
+        manifest.restored?.sequenceSha256 === manifest.sequenceSha256,
       "A verified separate restore and matching live data digest are required.",
     );
     const historical = await recognizedAdoptionVersions(before);
@@ -243,6 +255,14 @@ async function activate() {
     const after = await readLedger(client);
     const afterData = await waveDataDigest(client, tables);
     const afterRoles = await waveRoleCustody(client);
+    const afterSequences = await waveSequenceCustody(
+      client,
+      beforeSequences.values,
+    );
+    check(
+      afterSequences.sha256 === beforeSequences.sha256,
+      "Original sequence values changed; rolling back the wave.",
+    );
     const roleSafety = await assertWaveRoleSafety(client, {
       trust: true,
       media: true,
@@ -276,6 +296,7 @@ async function activate() {
       "Wave ledger is incomplete; rolling back.",
     );
     const afterSchemaSha256 = sha256(canonical(await schemaCustody(client)));
+    const afterSecurity = await waveSecurityCustody(client);
     await client.query("COMMIT");
     process.stdout.write(
       JSON.stringify({
@@ -288,6 +309,11 @@ async function activate() {
         originalRows: beforeData.rows,
         originalTables: beforeData.tables,
         oldRolesPreserved: true,
+        originalSequencesPreserved: true,
+        originalSequences: beforeSequences.sequences,
+        verifiedBackupSecurity: true,
+        securityRecords: afterSecurity.records,
+        afterSecuritySha256: afterSecurity.sha256,
         roleSafety,
         afterSchemaSha256,
         trafficClosed: true,

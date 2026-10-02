@@ -83,6 +83,7 @@ export function composeContentHost(input: {
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   tenure?: Parameters<typeof createContentTenureHost>[0];
   creatorTenure?: Parameters<typeof createContentCreatorTenureHost>[0];
+  publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
@@ -91,7 +92,6 @@ export function composeContentHost(input: {
     >;
     read: NonNullable<ContentDependencies["publicPacketRead"]>;
   };
-  publication?: ContentPublicationDependencies;
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
   if (input.publicationSource)

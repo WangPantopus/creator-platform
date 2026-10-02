@@ -221,6 +221,8 @@ data class APIAgentStatusWrite(
   val `expiresAt`: String
 )
 
+typealias APICommerceCallTransportStatus = JsonElement
+
 @Serializable
 enum class APICommerceCommitmentState {
   @SerialName("due") DUE,

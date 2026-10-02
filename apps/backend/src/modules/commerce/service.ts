@@ -28,6 +28,8 @@ import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
 import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
+import { CommerceCallTransport } from "./call-transport.js";
+import type { CallTransportStatus } from "../../../../../packages/api/src/commerce/contracts.js";
 
 export type CommercePolicy = {
   currency: string;
@@ -149,6 +151,16 @@ const ModeCommand = z
   );
 
 export class CommerceService {
+  private callTransport?: CommerceCallTransport;
+  configureCallTransport(value: CommerceCallTransport) {
+    CommerceCallTransport.assertRuntime(value, this.db, this.access);
+    invariant(
+      !this.callTransport || this.callTransport === value,
+      "call_transport_graph_mismatch",
+      "The call status graph is already configured.",
+    );
+    this.callTransport = value;
+  }
   constructor(
     readonly pool: Pool,
     private readonly db: Database,
@@ -1168,6 +1180,49 @@ export class CommerceService {
     return this.packet(actor, result.packetId);
   }
   async packet(actor: Actor, id: string) {
+    const before = await this.packetRecord(actor, id);
+    let callTransport: CallTransportStatus | null = null;
+    const c = before.commitment;
+    if (
+      !c ||
+      !["audio_call", "video_call"].includes(c.mode) ||
+      !["due", "in_progress"].includes(c.state)
+    )
+      return { ...before, callTransport };
+    callTransport = { state: "unavailable", authorKind: "system" };
+    if (this.callTransport) {
+      try {
+        const scope = await this.access.openThread(
+          actor,
+          before.packet.creator_id,
+          before.packet.fan_id,
+          false,
+        );
+        callTransport = await this.callTransport.forCommitment(scope, c.id);
+      } catch (error) {
+        // A denied/unavailable current family never opens call metadata. Keep
+        // the separately authorized retained financial receipt available.
+        if (
+          !(error instanceof DomainError) ||
+          ![403, 404, 503].includes(error.status)
+        )
+          throw error;
+      }
+    }
+    // The owner port uses its own held family transaction. Re-read original
+    // financial state afterward so an intervening resolution cannot carry a
+    // stale unresolved transport label into a completed/refunded receipt.
+    const current = await this.packetRecord(actor, id);
+    if (
+      current.packet.version !== before.packet.version ||
+      current.commitment?.id !== c.id ||
+      current.commitment?.version !== c.version ||
+      !["due", "in_progress"].includes(current.commitment?.state ?? "")
+    )
+      callTransport = null;
+    return { ...current, callTransport };
+  }
+  private async packetRecord(actor: Actor, id: string) {
     return this.account(actor, async (client) => {
       const p = (
         await client.query<PacketRow>(
@@ -1179,7 +1234,7 @@ export class CommerceService {
       const commitment =
         (
           await client.query(
-            "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1",
+            "SELECT c.*,p.accepted_act_id AS accept_act_id FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id WHERE p.id=$1",
             [id],
           )
         ).rows[0] ?? null;
