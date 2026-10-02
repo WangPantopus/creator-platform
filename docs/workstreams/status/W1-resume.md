@@ -1,5 +1,7 @@
 # W1 continuation — September 30, 2026
 
+October 2 current integration: normal main1048f2f4 merge3110bd39 preserves W1 issuer storage, held Database callback, separate Growth API pool and canonical Home/Pass owner ports while composing current conversation/content/media hosts and native call permission/lifecycle changes. W8 exactd12 worker-held restoration export is consumed; its three legacy pool-only fallbacks are removed. Canonical12/99, web/backend types/scoped checks/backend production build/original9 contracts pass. Shipping rebuilds and current native/personal acceptance follow; no higher-purpose activation or original57 reopening.
+
 October 2 current terminal review: W1 personally consumes exact W8d12db34c0100, pins actualSQL/seven function-definition hashes and guards catalogue helper relation kinds. Real worker-password private/direct denials pass in a separate empty closed57 proposal database; unknown work mints no scope. No activation/positive/provider/financial/recovery acceptance. [Exact receipt](../../../artifacts/workstreams/W1/resume/2026-10-01-codex-completion/generation-terminal100-review.json).
 
 October 2 current DI09 correction: interactive held bindings preserve existing separately scoped host/job callbacks while DI09 still requires its actual current session/client. Original9 contracts plus all9 PostgreSQL foundation cases pass on an owned disposable PostgreSQL17 database, 18 checks/58.56s; no new tests or fake sessions. No positive helpful policy/offer or all-client acceptance is inferred.
