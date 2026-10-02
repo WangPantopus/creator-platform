@@ -899,7 +899,11 @@ object QelvoraCopy {
     "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
     "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59.",
     "growthDownloadCompleteReply" to "Download complete reply",
-    "growthShareCompleteReply" to "Share complete reply"
+    "growthShareCompleteReply" to "Share complete reply",
+    "accountUnavailableTitle" to "We can't reach your account right now",
+    "accountUnavailableBody" to "Your session is kept on this device. Try again in a moment.",
+    "pageUnavailableTitle" to "This page didn't load",
+    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

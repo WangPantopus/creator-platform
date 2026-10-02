@@ -897,7 +897,11 @@ export const copy = {
   "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
   "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
   "growthDownloadCompleteReply": "Download complete reply",
-  "growthShareCompleteReply": "Share complete reply"
+  "growthShareCompleteReply": "Share complete reply",
+  "accountUnavailableTitle": "We can't reach your account right now",
+  "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
+  "pageUnavailableTitle": "This page didn't load",
+  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;
