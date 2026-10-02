@@ -423,5 +423,95 @@
         "bytes": 66
       }
     ]
+  },
+  "coreFollowLiveCustody": {
+    "baseHead": "6354480b2b408ea361b2a4762fd7ca4bc6a1056b",
+    "files": [
+      {
+        "path": "core-follow-live-raw/core-follow-custody-baseline.log",
+        "sha256": "59d1d596271960f3248b45ea2153bf250ff9e45e35735acf294d5197f7effc4e",
+        "bytes": 1277
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-custody-baseline-catalogue.log",
+        "sha256": "2963b7a299361539d33698593e0ae73eb4eb0ff26e413cb4cc1a9aa36c7ff22e",
+        "bytes": 414
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-custody-proposal-install.log",
+        "sha256": "65b40583776589f2422ca5b15bfb6c22f1a9205d5f5c5413663fb75222439403",
+        "bytes": 3237
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-custody-proposal-install-retry.log",
+        "sha256": "9b4a03fa5a2004a0ba55d23bb4c8ea4790b812277646e372f3903dc603723d15",
+        "bytes": 166
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-custody-final-baseline.log",
+        "sha256": "59d1d596271960f3248b45ea2153bf250ff9e45e35735acf294d5197f7effc4e",
+        "bytes": 1277
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-custody-final-proposal-install.log",
+        "sha256": "9b4a03fa5a2004a0ba55d23bb4c8ea4790b812277646e372f3903dc603723d15",
+        "bytes": 166
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-pg17-function.sql",
+        "sha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+        "bytes": 1333
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-pg17-catalogue.json",
+        "sha256": "527e58fe2f7211cbedc62ab75281a80009cf4e576dde0a56c380e07e5a115d5f",
+        "bytes": 561
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-pg17-final-function.sql",
+        "sha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+        "bytes": 1333
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-pg17-final-catalogue.json",
+        "sha256": "eca979d7421d92ba52b758661d04eafcc4bf450c65464e327838316d721f5db3",
+        "bytes": 639
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-build.log",
+        "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+        "bytes": 41
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-final-build.log",
+        "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+        "bytes": 41
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-final-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-existing-contracts.log",
+        "sha256": "2b9e4dbc004b58c7f95052c95510b3124e048ef5f83841c7f53e60dbd1c08624",
+        "bytes": 331
+      },
+      {
+        "path": "core-follow-live-raw/core-follow-live-format.log",
+        "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+        "bytes": 66
+      },
+      {
+        "path": "core-follow-live-raw/preserved-tool-outcomes.txt",
+        "sha256": "1f41f91da20e41f2f9e470b9ffcb699d66120490c17bf04601267ba40d3520fb",
+        "bytes": 536
+      }
+    ]
   }
 }

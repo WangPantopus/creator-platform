@@ -14,6 +14,9 @@ DO $$ BEGIN
     AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls)
     OR EXISTS(SELECT FROM pg_roles r WHERE r.rolname='creator_growth_follow_metadata'
       AND r.rolconfig IS NOT NULL AND cardinality(r.rolconfig)>0)
+    OR EXISTS(SELECT FROM pg_db_role_setting setting JOIN pg_roles r ON r.oid=setting.setrole
+      WHERE r.rolname='creator_growth_follow_metadata'
+      AND setting.setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
     OR EXISTS(SELECT FROM pg_auth_members m JOIN pg_roles r
       ON r.oid=m.member OR r.oid=m.roleid WHERE r.rolname='creator_growth_follow_metadata')
     OR EXISTS(SELECT FROM pg_class c JOIN pg_roles r ON r.oid=c.relowner
@@ -95,15 +98,30 @@ BEGIN
    OR EXISTS(SELECT FROM pg_namespace n WHERE has_schema_privilege(owner_id,n.oid,'CREATE'))
    OR EXISTS(SELECT FROM pg_namespace n WHERE n.nspowner=owner_id)
    OR EXISTS(SELECT FROM pg_class c WHERE c.relowner=owner_id)
+   OR EXISTS(SELECT FROM pg_type t WHERE t.typowner=owner_id)
+   OR EXISTS(SELECT FROM pg_language l WHERE l.lanowner=owner_id)
+   OR EXISTS(SELECT FROM pg_foreign_server s WHERE s.srvowner=owner_id)
+   OR EXISTS(SELECT FROM pg_foreign_data_wrapper w WHERE w.fdwowner=owner_id)
+   OR EXISTS(SELECT FROM pg_database d WHERE d.datdba=owner_id OR has_database_privilege(owner_id,d.oid,'CREATE'))
+   OR EXISTS(SELECT FROM pg_largeobject_metadata o WHERE o.lomowner=owner_id)
    OR EXISTS(SELECT FROM pg_proc p WHERE p.proowner=owner_id AND p.oid<>function_id)
+   OR EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND n.nspname NOT IN('public','creator','growth','creator_growth_metadata') AND has_schema_privilege(owner_id,n.oid,'USAGE'))
+   OR EXISTS(SELECT FROM pg_class rel JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE rel.relkind='S' AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND CASE WHEN rel.relkind='S' THEN has_sequence_privilege(owner_id,rel.oid,'USAGE,SELECT,UPDATE') ELSE false END)
+   OR EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+     WHERE p.oid<>function_id AND p.prosecdef AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND has_schema_privilege(owner_id,n.oid,'USAGE') AND has_function_privilege(owner_id,p.oid,'EXECUTE'))
    OR EXISTS(SELECT FROM pg_proc p,
      LATERAL aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
      WHERE p.oid=function_id AND a.privilege_type='EXECUTE'
-       AND a.grantee NOT IN(owner_id,'creator_runtime'::regrole::oid))
+       AND (a.grantee NOT IN(owner_id,'creator_runtime'::regrole::oid)
+         OR (a.grantee='creator_runtime'::regrole::oid AND a.is_grantable)))
    OR EXISTS(SELECT FROM pg_attribute col JOIN pg_class rel ON rel.oid=col.attrelid
      JOIN pg_namespace n ON n.oid=rel.relnamespace
      WHERE col.attnum>0 AND NOT col.attisdropped AND rel.relkind IN('r','p','v','m','f')
-       AND n.nspname IN('creator','growth') AND (
+       AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND (
        (has_column_privilege(owner_id,rel.oid,col.attnum,'SELECT') AND NOT (
          (n.nspname='creator' AND rel.relname='identity_session' AND col.attname IN('id','account_id','revoked_at','expires_at'))
          OR(n.nspname='growth' AND rel.relname='follow' AND col.attname IN('account_id','creator_id'))))
@@ -111,7 +129,7 @@ BEGIN
        OR(has_column_privilege(owner_id,rel.oid,col.attnum,'UPDATE') AND NOT (
          n.nspname='growth' AND rel.relname='follow' AND col.attname='created_at'))))
    OR EXISTS(SELECT FROM pg_class rel JOIN pg_namespace n ON n.oid=rel.relnamespace
-     WHERE n.nspname IN('creator','growth') AND rel.relkind IN('r','p','v','m','f')
+     WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND rel.relkind IN('r','p','v','m','f')
        AND has_table_privilege(owner_id,rel.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
  THEN RAISE EXCEPTION 'Unsafe final core Follow metadata custody'; END IF;
 END $$;

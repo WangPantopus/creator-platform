@@ -115,5 +115,19 @@
         "sha256": "75dcbd3833cd44a99695a494d060c9f22cae792a75a986f019b66b30166bd549"
       }
     ]
+  },
+  "coreFollowLiveCustody": {
+    "baseHead": "6354480b2b408ea361b2a4762fd7ca4bc6a1056b",
+    "files": [
+      {
+        "path": "apps/backend/src/modules/growth/core-follows.ts",
+        "sha256": "e31c673af82a391c2aabd6fdad30a51a1880c2ac0e7723049cb625e13480337b"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+        "sha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796"
+      }
+    ],
+    "functionDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78"
   }
 }

@@ -257,6 +257,20 @@
         "browser": "own w7ImpactTab closed",
         "peerResourcesTouched": false
       }
+    },
+    "coreFollowQualification": {
+      "container": "creator-platform-w7-core-follow-custody-20261002",
+      "database": "creator_w7_core_follow_custody",
+      "port": 55448,
+      "volume": "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85",
+      "state": "stopped,exit0,traffic-closed,connection-limit0",
+      "mainW7RuntimeDatabase": "untouched,stopped,40 active migrations,no metadata function/namespace",
+      "privateInputNames": [
+        "DATABASE_MIGRATION_URL",
+        "POSTGRES_USER",
+        "POSTGRES_DB",
+        "POSTGRES_PASSWORD"
+      ]
     }
   }
 }
