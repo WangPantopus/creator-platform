@@ -24,6 +24,7 @@ export class Database {
     {
       scope: ThreadScope;
       sessionId: string;
+      request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
       lockMode: ThreadLockMode;
       pending: number;
     }
@@ -54,6 +55,8 @@ export class Database {
     if (
       binding?.scope !== scope ||
       !request ||
+      request !== binding.request ||
+      request.actor !== threadScopeActor(scope) ||
       request.sessionId !== binding.sessionId ||
       request.accountId !== scope.actorAccountId ||
       (lockMode !== undefined && binding.lockMode !== lockMode)
@@ -307,6 +310,7 @@ export class Database {
         this.held.set(scopedClient, {
           scope,
           sessionId: request.sessionId,
+          request,
           lockMode,
           pending: 0,
         });
