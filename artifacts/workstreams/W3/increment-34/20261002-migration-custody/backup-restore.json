@@ -1,0 +1,20 @@
+{
+  "operation": "actual W3 private baseline40 backup and independent restore; no wave applied",
+  "source": "58b59fa0e5b8937af7cd0cb7272ae5b5662d7ee7",
+  "database": "creator_w3",
+  "restoredDatabase": "creator_w3_restore95_1790928374123",
+  "ledgerRows": 40,
+  "originalRows": 12,
+  "originalTables": 145,
+  "backupBytes": 536145,
+  "backupSha256": "ec5f63f40875a5af86930f38501d4b56f2435a7a00934644efbaa57f58b5ef04",
+  "ledgerSha256": "fa22f8bc074e7131efe93d4f2d03fb07b10c9af3ef68caa6b1d97c24392a102b",
+  "schemaSha256": "c644f2e880991f1478bf372060ff42a95e2cb919fa8ef976d7a9fe37853cd1f9",
+  "dataSha256": "0d9dfd0ff728e55ef21cc76ffcf1979a39a0ea51990a6afeb3025792d5b16cff",
+  "roleSha256": "e8097346607bd048643b6fc395981cc8477e89d3de131158f6aaabbd04f19861",
+  "matchingIndependentRestore": true,
+  "liveDatabaseUnchanged": true,
+  "otherClients": 0,
+  "restoreTrafficClosed": true,
+  "reservedMigrationsApplied": false
+}
