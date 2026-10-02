@@ -149,7 +149,18 @@ export function TrustSession() {
     const destination = IdentityContinueSchema.safeParse({
       returnTo: window.location.pathname + window.location.search,
     });
-    setReturnTo(destination.success ? destination.data.returnTo : "/home");
+    // Appearance parameters are not identity navigation authority. Preserve
+    // the registered Trust page when its optional query is not a return target.
+    const page = IdentityContinueSchema.safeParse({
+      returnTo: window.location.pathname,
+    });
+    setReturnTo(
+      destination.success
+        ? destination.data.returnTo
+        : page.success
+          ? page.data.returnTo
+          : "/home",
+    );
   }, []);
   useEffect(() => {
     const refresh = () => void session.refresh();
