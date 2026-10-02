@@ -267,14 +267,16 @@
       "database": "creator_w7_core_follow_custody",
       "port": 55448,
       "volume": "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85",
-      "state": "stopped,exit0,traffic-closed,connection-limit0",
+      "state": "Permanently removed during user-authorized cleanup; stopped qualification container and its exclusively owned anonymous volume deleted. No product data; historical source/function-definition custody proof retained.",
       "mainW7RuntimeDatabase": "untouched,stopped,40 active migrations,no metadata function/namespace",
       "privateInputNames": [
         "DATABASE_MIGRATION_URL",
         "POSTGRES_USER",
         "POSTGRES_DB",
         "POSTGRES_PASSWORD"
-      ]
+      ],
+      "containerExists": false,
+      "volumeExists": false
     },
     "mainIntegrationRuntime": {
       "stoppedAt": "2026-10-02T14:31:41.202148+00:00",
@@ -365,9 +367,11 @@
       "volume": "creator-platform-w7-wave-restore-20261002",
       "port": 55457,
       "database": "creator_w7_restore_20261002",
-      "state": "Stopped normally; separate restore of actual40 matches ledger/schema/data/security/sequence/role digests; volume/private backups retained; connectionlimit0/commenttrafficclosed; noSQLactivation",
+      "state": "Permanently removed during user-authorized cleanup; both stopped container and exclusively owned stale duplicate volume deleted. Historical restore proof retained; future activation needs a newly created separate restore.",
       "privateDirectory": "/Users/yingpengwang/.config/creator-platform/w7-macstudio-20261001/wave-backup-20261002",
-      "runtimeClients": false
+      "runtimeClients": false,
+      "containerExists": false,
+      "volumeExists": false
     },
     "wavePreparation": {
       "packet": "infra/migrations/waves/20261002.json",
@@ -656,6 +660,31 @@
         "firstTrustDispatch": "unchanged d5 parent; does not qualify changed source",
         "newHeadParentGuardRequired": true
       }
+    },
+    "cleanup20261002": {
+      "userAuthorized": true,
+      "removedRebuildableNativeAllocatedGiB": 2.8,
+      "removedPrivateBuildDirectories": [
+        "/private/tmp/creator-platform-w7-active-20261001/ios-derived",
+        "/private/tmp/creator-platform-w7-active-20261001/swift-checks"
+      ],
+      "removedOldInstalledAPKCopies": 5,
+      "removedDisposableContainers": [
+        "creator-platform-w7-wave-restore-20261002",
+        "creator-platform-w7-core-follow-custody-20261002"
+      ],
+      "removedDisposableVolumes": [
+        "creator-platform-w7-wave-restore-20261002",
+        "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85"
+      ],
+      "canonicalPostgres": "Retained stopped, original40 unchanged",
+      "configuredNativeDevices": "Retained shutdown/absent; state preserved",
+      "privateInputsAndSmallEvidence": "Retained; checkout diagnostics copied into scratch",
+      "sharedResourcesAndPeersTouched": false,
+      "checkout": "Scheduled permanent removal only after clean commit/push and exact remote-head verification; successor recreates managed worktree if absent",
+      "finalLocalReceipt": "~/.config/creator-platform/w7-macstudio-20261001/cleanup-20261002/final-status.md",
+      "futureActivation": "Fresh closed backup and newly created separate real restore required; no SQL activated",
+      "swiftBuildScratch": "Native DerivedData/Swift check product directories removed; retained scratch logs and evidence remain"
     }
   }
 }
