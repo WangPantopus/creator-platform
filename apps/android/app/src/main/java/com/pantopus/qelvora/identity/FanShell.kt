@@ -89,7 +89,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         val credential = runCatching { storage.read() }.getOrNull() ?: return null
         fun matches(): Boolean = snapshot == generation && navigation == destinationGeneration &&
             destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
-            !busy && !purgingPrivateState && !localPurgeFailed && !checkingSession && !rotatingCredential
+            !purgingPrivateState && !localPurgeFailed && !rotatingCredential
         val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
             CreatorAPIClient(origin) { credential }, active.accountId, active.sessionId, from) {
             currentCoroutineContext().ensureActive()
@@ -232,7 +232,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (_: Exception) { return false }
     }
     suspend fun logout(all: Boolean = false) {
-        if (busy) return; val client = api ?: run { purge(); return }; busy = true
+        if (busy) return; val client = api ?: run { purge(); return }; busy = true; generation++
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }

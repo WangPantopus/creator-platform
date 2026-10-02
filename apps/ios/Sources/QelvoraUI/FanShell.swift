@@ -78,8 +78,7 @@ public final class FanSession: ObservableObject {
             capture.owner === self && capture.generation == generation &&
             capture.destinationGeneration == destinationGeneration && destination == capture.destination &&
             session?.accountId == capture.expectedAccountId && session?.sessionId == capture.sessionId &&
-            !busy && !purgingPrivateState && !localPurgeFailed && !checkingSession &&
-            !rotatingCredential && !Task.isCancelled
+            !purgingPrivateState && !localPurgeFailed && !rotatingCredential && !Task.isCancelled
         }
         guard matches(), let credential = try? await storage.read() else { return false }
         return matches() && credential == capture.credential
@@ -203,7 +202,7 @@ public final class FanSession: ObservableObject {
         } catch { return false }
     }
     public func logout(all: Bool = false) async {
-        guard !busy else { return }; busy = true; defer { busy = false }
+        guard !busy else { return }; busy = true; generation &+= 1; defer { busy = false }
         guard let api else { await purge(); return }
         do { if all { _ = try await api.revokeSessions() } else { _ = try await api.logout() }; await purge() }
         catch let error as CreatorAPIError { if error.status == 401 { await purge() } else { self.error = Self.message(error) } }
