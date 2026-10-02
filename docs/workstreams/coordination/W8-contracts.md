@@ -1,5 +1,12 @@
 # W8 contract, migration and runtime register
 
+## Corrected held dependency ordering and actual owner integration — 2026-10-02
+
+Focused draftPR159 publishes the closed four-source continuation; its original6771bfed future held map is superseded. W1 caught that moving only63–102 left dependent translation/terminal/Agent consumers before their producers. All47 held slots are now0151–0197, metadata only: original83→0168,111→0194,112→0195,113→0196;99→0183,100→0184,105→0188,106→0189; late subject108→0190 thennegative109→0191 thenfinancial107→0192. Actual map `infra/migrations/waves/20261002-privacy-held.json` SHA256 **2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a** is authoritative. SQL files/bytes, canonical57 and selected74/82/87/103 are unchanged; unknown further DDL dependencies require review before any future wave. No fabricated ledger aliases.
+
+Combined integration source2423dd12 contains actual mergedW2 Agent166d9ee6 and personally reviewedW7 Growthb7d21b0c. [Exact source review](../../../artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/README.md) verifies actual same-client restoration/task bookends, one fixed-source cursor and separate COMMIT; types/scopedlint pass. W1 server.ts remains untouched. W8 managed Growth key/worker URL are absent; no peer credentials or synthetic provider receipts were borrowed. Real composed61 web/Android/iOS/task/expiry/physical effects and fullC10/recovery/release remain pending. All own resources are stopped with private checkpoints retained. Continue actual Trust/owner acceptance and collect independent owner fresh/preserved-upgrade reviews.
+
+
 ## Closed privacy continuation — 2026-10-02
 
 [Personally executed four-purpose SQL continuation](../../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) is on `codex/w8-migration-continuation-20261002`, normal main merge2c9aa8ca. Actual private backup/separate restore and atomic57→61 preserve57 history/131 rows/roles/sequence; fresh61 schema/security/roles match. Eight functions have zero compiler diagnostics;20 actual drift mutations refuse and roll back. All four targets remain closed. Draft packet selects only0074/0082/0087/0103; no main/peer/app/task/C10/original recovery/release activation is claimed.
