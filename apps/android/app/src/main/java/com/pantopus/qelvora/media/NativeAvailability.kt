@@ -61,6 +61,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
     var fresh by remember { mutableStateOf(false) }
     var freshUntil by remember { mutableLongStateOf(0L) }
     var busy by remember { mutableStateOf(false) }
+    var replacingSavedWindows by remember { mutableStateOf(false) }
     var active by remember { mutableStateOf(true) }
     var notice by remember { mutableStateOf<String?>(null) }
     var confirmRefresh by remember { mutableStateOf(false) }
@@ -83,7 +84,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
     fun clear() { loaded = false; fresh = false; current = null; command = null; windows = emptyList(); zone = "" }
     suspend fun read(replace: Boolean) {
         val api = client ?: return
-        if (busy || !active) return; busy = true
+        if (busy || !active) return; busy = true; replacingSavedWindows = replace
         val started = android.os.SystemClock.elapsedRealtime()
         try {
             val value = decode(api.request(root, expectedAccountId = account, timeoutMs = 4000))
@@ -93,7 +94,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: NativeMediaRequestError) { fresh = false; if (authorityLost(failure)) clear(); notice = QelvoraCopy.text(if (failure.code == "session_account_changed") "w6AvailabilityAccountChanged" else "w6AvailabilityCouldNotBeLoaded") }
         catch (_: Exception) { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") }
-        finally { busy = false }
+        finally { busy = false; replacingSavedWindows = false }
     }
     suspend fun save() {
         val api = client ?: return
@@ -133,7 +134,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
     @Composable fun field(label: String, value: String, change: (String) -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             BasicText(label, style = qText("caption").copy(color = qColor("ink-muted")))
-            BasicTextField(value, { change(it.take(80)) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, enabled = !busy && command == null, textStyle = qText("body").copy(color = qColor("ink")))
+            BasicTextField(value, { change(it.take(80)) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, enabled = !replacingSavedWindows && command == null, textStyle = qText("body").copy(color = qColor("ink")))
         }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {

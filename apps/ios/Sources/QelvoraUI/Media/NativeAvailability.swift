@@ -52,6 +52,7 @@ private struct NativeAvailability: View {
     @State private var fresh = false
     @State private var freshUntil = Date.distantPast
     @State private var busy = false
+    @State private var replacingSavedWindows = false
     @State private var notice: String?
     @State private var command: AvailabilitySave?
     @State private var confirmRefresh = false
@@ -78,7 +79,8 @@ private struct NativeAvailability: View {
     }
     private func read(replace: Bool) async {
         guard !busy, scene == .active, let client, let actor = UUID(uuidString: account) else { return }
-        busy = true; defer { busy = false }
+        busy = true; replacingSavedWindows = replace
+        defer { busy = false; replacingSavedWindows = false }
         let started = Date()
         do {
             let value = try JSONDecoder().decode(SavedAvailability?.self, from: await client.request(path: root, expectedAccountId: actor, timeoutSeconds: 4))
@@ -132,14 +134,14 @@ private struct NativeAvailability: View {
                 Text(QelvoraCopy.text("w6UseDatedWindowsEachOfferedCallAndItsReconnectAllowance")).qText("caption")
                 if fresh && scene == .active {
                     Text(QelvoraCopy.text("w6YourTimeZone")).qText("caption")
-                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(busy || command != nil).accessibilityIdentifier("availability-zone")
+                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-zone")
                     ForEach(windows.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(QelvoraCopy.text("w6Window", values: ["value1": String(index + 1)])).qText("label")
                             Text(QelvoraCopy.text("w6Starts")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(busy || command != nil).accessibilityIdentifier("availability-start-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-start-\(index)")
                             Text(QelvoraCopy.text("w6Ends")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(busy || command != nil).accessibilityIdentifier("availability-end-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-end-\(index)")
                             Button(QelvoraCopy.text("w6RemoveWindow", values: ["value1": String(index + 1)]), variant: .quiet, disabled: busy || command != nil) { windows.remove(at: index) }
                         }
                     }
