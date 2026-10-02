@@ -6,6 +6,7 @@ import type { CommerceService } from "../commerce/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { TrustDependencies } from "./service.js";
 import type { EffectHook, Evidence } from "./contracts.js";
+import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 
@@ -17,7 +18,7 @@ export function scopedTrustEvidence(options: {
   identity: IdentityProfiles;
   commerce?: CommerceService;
   assertAllowed: (
-    accountId: string,
+    actor: Actor,
     creatorId: string,
     threadId?: string,
   ) => Promise<void>;
@@ -25,7 +26,7 @@ export function scopedTrustEvidence(options: {
   return async (actor, input) => {
     if (!input.creatorId && !input.requestId) return { items: [] };
     if (input.kind === "verification" && input.creatorId) {
-      await options.assertAllowed(actor.accountId, input.creatorId);
+      await options.assertAllowed(actor, input.creatorId);
       const proof = await options.identity.proof(actor, input.creatorId);
       return {
         creatorId: input.creatorId,
@@ -55,11 +56,7 @@ export function scopedTrustEvidence(options: {
           "This request is unavailable.",
           404,
         );
-      await options.assertAllowed(
-        actor.accountId,
-        packet.creator_id,
-        packet.thread_id,
-      );
+      await options.assertAllowed(actor, packet.creator_id, packet.thread_id);
       const identity = (
         await options.pool.query(
           "SELECT account_id,display_name FROM creator.creator_profile WHERE id=$1",
@@ -166,11 +163,7 @@ export function scopedTrustEvidence(options: {
         "fan_scope_required",
         "Report only your own conversation.",
       );
-    await options.assertAllowed(
-      actor.accountId,
-      scope.creatorId,
-      scope.threadId,
-    );
+    await options.assertAllowed(actor, scope.creatorId, scope.threadId);
     const items = input.messageId
       ? await options.database.withThread(scope, async (client) => {
           const message = (

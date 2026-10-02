@@ -1,5 +1,7 @@
 # Trust operation and recovery
 
+Preserved targets follow [the R6 reconciliation procedure](W8-preserved-reconciliation.md). `scripts/reconcile-restored-trust.ts` inventories an actual named/owner-closed target read-only and always returns trafficReady false. It does not clear closure, issue provider effects or certify all eight domains.
+
 ## Simulator credential custody
 
 Build a launched iOS simulator app normally under the shared heavy-build guard, with `CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. Disabling signing can compile but omit Xcode's actual simulated `application-identifier` entitlement, causing canonical complete200 followed by Keychain failure and no authenticated session. Merely ad-hoc resigning that binary does not restore the omitted simulated entitlement. Verify the normally built shipping app through actual sign-in/cold return and saved backend state. No production signing key is fabricated by this simulator build.
