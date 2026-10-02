@@ -474,7 +474,7 @@
       "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql",
       "state": "reserved_unapplied",
       "reason": "Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending.",
-      "sourceCommit": "3fc7040a",
+      "sourceCommit": "3fc7040ab03a6ea760e2f2852a0a98d3a89a56a8",
       "sourceSha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e"
     },
     {
