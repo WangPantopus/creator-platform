@@ -940,6 +940,21 @@ enum class APIMediaProcessedMediaEvidenceMimeType {
 }
 
 @Serializable
+data class APIMediaThreadRecordingPolicy(
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `threadId`: String,
+  val `purpose`: APIMediaThreadRecordingPolicyPurpose,
+  val `maxBytes`: Long,
+  val `maxDurationMs`: Long
+)
+
+@Serializable
+enum class APIMediaThreadRecordingPolicyPurpose {
+  @SerialName("human_reply") HUMAN_REPLY
+}
+
+@Serializable
 data class APIMediaUploadRequest(
   val `purpose`: APIMediaUploadRequestPurpose,
   val `mimeType`: APIMediaUploadRequestMimeType,

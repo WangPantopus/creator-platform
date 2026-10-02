@@ -1723,6 +1723,27 @@ public enum APIMediaProcessedMediaEvidenceMimeType: String, Codable, Sendable {
   case `image_png` = "image/png"
 }
 
+public struct APIMediaThreadRecordingPolicy: Codable, Sendable {
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `threadId`: String
+  public let `purpose`: APIMediaThreadRecordingPolicyPurpose
+  public let `maxBytes`: Int
+  public let `maxDurationMs`: Int
+  public init(creatorId: String, fanId: String, threadId: String, purpose: APIMediaThreadRecordingPolicyPurpose, maxBytes: Int, maxDurationMs: Int) {
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.threadId = threadId
+    self.purpose = purpose
+    self.maxBytes = maxBytes
+    self.maxDurationMs = maxDurationMs
+  }
+}
+
+public enum APIMediaThreadRecordingPolicyPurpose: String, Codable, Sendable {
+  case `human_reply` = "human_reply"
+}
+
 public struct APIMediaUploadRequest: Codable, Sendable {
   public let `purpose`: APIMediaUploadRequestPurpose
   public let `mimeType`: APIMediaUploadRequestMimeType
