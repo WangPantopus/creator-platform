@@ -1,5 +1,8 @@
 # W8 contract, migration and runtime register
 
+Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, actualJob, domain, assertRestoredInTransaction)`; [exact dedicated owner/caller/currentness contract](../../operations/W8-domain-privacy-fence.md). Actual Trust/Growth worker roles are domain-bound, metadata/scope are private, the real signal and held restoration are mandatory and COMMIT is separately fenced.0087 is unchanged. W7 owns the one-cursor/read-committed consistent export and delete seam; outer pool verification does not satisfy this port. Actual activation and leased task/COMMIT/app/purge acceptance remain open.
+
+
 Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
 
 Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.

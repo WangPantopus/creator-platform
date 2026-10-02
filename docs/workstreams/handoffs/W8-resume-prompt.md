@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Private privacy worker COMMIT fence — 2026-10-02
+
+Reserved0103 now separates actual Trust/Growth worker lifecycle custody from0087. [Personally executed closed SQL/compiler/catalogue review](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/README.md) preserves canonical57, absent activation and zero scopes. All three functions have zero diagnostics; six permission refusals and eight rolled-back drift refusals are recorded. Both full guards refuse unregistered0103. Trust's real hook requires the current job/signal and held restoration before domain reads/deletes and COMMIT. [Owner contract](../../operations/W8-domain-privacy-fence.md) exports the actual same-client port; W7 is integrating a single-cursor consistent snapshot under read committed. No full privacy/COMMIT, original recovery or release acceptance is claimed.
+
+Terminal denial is published as draft [PR145](https://github.com/WangPantopus/creator-platform/pull/145), exact source d12db34c/pin8714bc0c. The current privacy-fence branch remains separate from this terminal stack. Actual worker/job/app acceptance follows source verification; canonical SQL/history and0087 remain unchanged.
+
+
 ## Actual current privacy and scoped Ops — 2026-10-02
 
 [Real web/Android/iOS operation and independent saved-state evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/app-acceptance/README.md) at backend/webc3c0a6d1 verifies the same synthetic export in both appearances, explicit blocked core0087/configuration dependencies and no download. Actual Ops purpose-limited access and recorded Close cold-reload resolved; DB verifies reviewer/access/one decision/version2/zero external effects. Queue1280×900/220sidebar and390/no overflow plus keyboard skip-link observed. No all-eight C10/owner COMMIT, accessibility200%/screen reader, provider, original recovery or release completion.

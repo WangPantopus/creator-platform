@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
 import { identityPrivacyHook } from "./identity-privacy-hook.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
@@ -38,6 +38,8 @@ export type ConversationPrivacyOwnerPorts = Omit<
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
+  /** Real current restoration on the owner's held client, never a pool check. */
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
   /** Prepared owner instances; the coordinator fixes the pool, actual task
    * authority and reviewed retention after spreading these owner ports. */
@@ -71,7 +73,7 @@ export function createPrivacyConsumers(input: {
     input.coordinatorPool,
   );
   const hooks: PrivacyHook[] = [
-    trustPrivacyHook(input.coordinatorPool),
+    trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
     identityPrivacyHook(input.runtimePool, input.coordinatorPool),
     {
       domain: "conversation",

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "environment": "labelled-synthetic-closed-proposal",
+  "database": "creator_w8_generation_denial_20261002",
+  "canonicalMigrations": 57,
+  "registrationRows0103": 0,
+  "privateScopes": 0,
+  "sqlSha256": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d",
+  "functionDefinitions": {
+    "domain_privacy_migration_registered": "8795a31e4bcec9e6b592b460842cf20f4897409fddf65e5ec8e3e806d05f3af3",
+    "fence_domain_privacy_task": "292a246c3cdb988a6fa4ed60b0a1cd4bf785d15ce485f934ff38dc779ec265e2",
+    "finish_domain_privacy_task_scope": "ddfab6cb18e029edc18ed0d16bc8a00c3ce4e98972c3e55472c845ec8b3ad368"
+  },
+  "compiler": {
+    "postgresql": "17.11",
+    "package": "postgresql-17-plpgsql-check 2.10.11-1.pgdg12+1",
+    "functionsChecked": 3,
+    "diagnostics": 0
+  },
+  "fullCatalogues": {
+    "creator_trust_worker": false,
+    "growth_worker": false,
+    "reason": "0103 not registered"
+  },
+  "partialCatalogueWithoutRegistration": {
+    "creator_trust_worker": true,
+    "growth_worker": true,
+    "activation": false
+  },
+  "rolledBackDriftRefusals": [
+    {
+      "fault": "extra_private_column",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "broader_function_execute",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "raw_scope_exposed",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "forced_rls_disabled",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "commit_trigger_disabled",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "owner_setting",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "owner_membership",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    },
+    {
+      "fault": "extra_schema_create",
+      "exitCode": 0,
+      "catalogueRefused": true,
+      "rolledBack": true
+    }
+  ],
+  "permissionProbes": [
+    {
+      "probe": "growth_raw_job",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    },
+    {
+      "probe": "growth_raw_scope",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    },
+    {
+      "probe": "trust_raw_scope",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    },
+    {
+      "probe": "core_direct_fence",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    },
+    {
+      "probe": "wrong_domain",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    },
+    {
+      "probe": "unregistered_growth_fence",
+      "sqlState": "42501",
+      "refused": true,
+      "adminSelectedSessionRole": true,
+      "actualWorkerLoginAcceptance": false
+    }
+  ],
+  "cursorSnapshot": {
+    "syntheticScratchOnly": true,
+    "readCommittedReadWrite": true,
+    "oneUnionCursorBeforeChange": true,
+    "secondCollectionRetainsOriginal": true,
+    "separateBookendSeesBothChanges": true,
+    "explicitSecondFetchEOF": true,
+    "businessRowsUsed": 0,
+    "applicationAcceptance": false
+  },
+  "failedAttempts": [
+    "Initial SQL-language registry helper creation refused creator schema access for creator_trust_owner. Entire transaction rolled back; changed helper to PL/pgSQL, retaining narrow final owner grants.",
+    "The scratch EOF assertion initially expected a psql FETCH command tag that psql does not print. Corrected operator to observe a separate empty FETCH response; all actual snapshot/EOF observations then passed."
+  ],
+  "actualWorkerLoginOrTaskCommit": false,
+  "appAcceptance": "pending",
+  "allEightC10": false,
+  "originalRecovery": false,
+  "releaseReady": false
+}
