@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import type { PoolClient } from "pg";
-import type { Actor } from "../identity/adapter.js";
+import {
+  assertCommercePrivacyScope,
+  withCommercePrivacyExport,
+  type CommercePrivacyScope,
+} from "./privacy-purpose.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { CommerceService } from "./service.js";
 import { invariant } from "../../core/errors.js";
@@ -29,35 +33,39 @@ export interface FinancialExportSink {
  * domain projection, forced RLS remains active, and no page is silently dropped. */
 export async function exportCommerceFinancial(
   service: CommerceService,
-  actor: Actor,
+  scope: CommercePrivacyScope,
   input: ExportInput,
   sink: FinancialExportSink,
 ) {
   invariant(
     input.kind === "export" &&
-      actor.accountId === input.accountId &&
+      scope.accountId === input.accountId &&
       ["account", "creator", "thread"].includes(input.scope) &&
       (input.scope === "account" || input.creatorId) &&
       (input.scope !== "thread" || input.threadId),
     "privacy_scope_invalid",
     "A complete current financial export authority is required.",
   );
-  const writer = await sink.begin(input);
+  assertCommercePrivacyScope(scope, service.pool, input);
+  let writer: FinancialExportWriter | undefined;
   const counts: Record<string, number> = {};
   const hash = createHash("sha256");
   try {
-    await service.account(
-      actor,
+    await withCommercePrivacyExport(
+      scope,
+      service.pool,
+      input,
       async (client) => {
         const restricted = await client.query(
           "SELECT 1 FROM creator.creator_profile WHERE account_id=$1 AND verification<>'verified' LIMIT 1",
-          [actor.accountId],
+          [scope.accountId],
         );
         invariant(
           !restricted.rowCount,
           "privacy_authority_required",
           "Restricted financial records require the configured purpose-scoped privacy authority.",
         );
+        const activeWriter = (writer = await sink.begin(input));
         const page = async (
           name: string,
           select: string,
@@ -68,7 +76,8 @@ export async function exportCommerceFinancial(
           counts[name] ??= 0;
           let cursor: unknown[] | undefined;
           while (true) {
-            await writer.assertCurrent();
+            assertCommercePrivacyScope(scope, service.pool, input);
+            await activeWriter.assertCurrent();
             const after = cursor
               ? ` AND (${keys.join(",")})>(${keys.map((_, index) => `$${parameters.length + index + 1}`).join(",")})`
               : "";
@@ -79,7 +88,7 @@ export async function exportCommerceFinancial(
               )
             ).rows;
             if (!rows.length) break;
-            await writer.write(name, rows);
+            await activeWriter.write(name, rows);
             hash.update(JSON.stringify({ collection: name, rows }) + "\n");
             counts[name]! += rows.length;
             invariant(
@@ -389,10 +398,15 @@ export async function exportCommerceFinancial(
           ] as const)
             await page(name, select, "true", keys);
         }
-        await writer.assertCurrent();
+        await activeWriter.assertCurrent();
       },
-      { isolation: "repeatable read" },
     );
+    invariant(
+      writer,
+      "privacy_export_incomplete",
+      "No financial export was staged.",
+    );
+    assertCommercePrivacyScope(scope, service.pool, input);
     await writer.assertCurrent();
     const artifact = await writer.complete({
       recordCounts: counts,
@@ -408,7 +422,7 @@ export async function exportCommerceFinancial(
       data: { artifactReference: artifact.artifactReference },
     };
   } catch (error) {
-    await writer.abort().catch(() => undefined);
+    await writer?.abort().catch(() => undefined);
     throw error;
   }
 }

@@ -10,6 +10,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.CancellationException
@@ -26,11 +29,12 @@ internal data class CallRoute(val creator: UUID, val fan: UUID, val session: UUI
     val path get() = "/v1/w6/threads/$creator/$fan/calls/$session"
     companion object { fun from(destination: String): CallRoute? = runCatching { val parts = destination.substringBefore('?').trim('/').split('/'); require(parts.size == 4 && parts[0] == "calls"); CallRoute(UUID.fromString(parts[1]), UUID.fromString(parts[2]), UUID.fromString(parts[3])) }.getOrNull() }
 }
-data class CallAdmission(val token: String, val url: String, val sessionId: String, val accountId: String, val expiresAt: String)
-/** Genuine transport owns camera/audio, rendering, Telecom and foreground lifetime. No transport is registered by default. */
+data class CallAdmission(val token: String, val url: String, val nonce: String, val sessionId: String, val accountId: String, val expiresAt: String, val role: String)
+/** Genuine SDK transport owns camera/audio and rendering. OS call lifetime is
+ * separately composed; no transport is registered by default. */
 interface NativeCallScreenTransport {
     @Composable fun Media()
-    suspend fun connect(admission: CallAdmission, onState: (String) -> Unit)
+    suspend fun connect(admission: CallAdmission, camera: Boolean, onState: (String) -> Unit)
     suspend fun microphone(enabled: Boolean)
     suspend fun camera(enabled: Boolean)
     fun disconnect()
@@ -56,6 +60,8 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     var mediaEpoch by remember(route) { mutableStateOf(0) }
     var active by remember(route) { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
+    val devicePermissions = rememberNativeMediaDevicePermissions()
+    val lifecycle = LocalLifecycleOwner.current
     fun disconnectMedia() { mediaEpoch++; val current = transport; transport = null; localState = "disconnected"; current?.disconnect() }
     fun role(value: JSONObject): String? = when (model.session?.accountId) { value.getString("creatorAccountId") -> "creator"; value.getString("fanAccountId") -> "fan"; else -> null }
     suspend fun refresh() {
@@ -93,18 +99,43 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         if (adapter == null) { notice = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return }
         busy = true; notice = null
         mediaEpoch++; val epoch = mediaEpoch
+        val account = model.session?.accountId
+        val wantsCamera = value.getString("mediaMode") == "video"
         try {
+            if (!devicePermissions.request(wantsCamera)) {
+                if (active && epoch == mediaEpoch) notice = QelvoraCopy.text(if (wantsCamera) "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour" else "w6MicrophoneAccessIsOffAllowItInSettingsThenTry")
+                return
+            }
+            if (!active || epoch != mediaEpoch || account != model.session?.accountId) return
             val response = JSONObject(api.request(currentRoute.path + "/join", "POST", "{}".toByteArray()).toString(Charsets.UTF_8))
             if (!active || epoch != mediaEpoch) return
-            transport = adapter; camera = value.getString("mediaMode") == "video"
-            adapter.connect(CallAdmission(response.getString("token"), response.getString("url"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"))) { if (active && epoch == mediaEpoch) localState = it }
+            val admission = CallAdmission(response.getString("token"), response.getString("url"), response.getString("nonce"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"), response.getString("role"))
+            require(UUID.fromString(admission.sessionId) == currentRoute.session && admission.accountId == model.session?.accountId && admission.role == role(value))
+            UUID.fromString(admission.nonce)
+            val expires = Instant.parse(admission.expiresAt)
+            require(expires.isAfter(Instant.now()))
+            val receipt = JSONObject(api.request(currentRoute.path + "/redeem", "POST", JSONObject().put("nonce", admission.nonce).toString().toByteArray()).toString(Charsets.UTF_8))
+            if (!active || epoch != mediaEpoch) return
+            require(receipt.get("admitted") == true && expires.isAfter(Instant.now()) && admission.accountId == model.session?.accountId)
+            transport = adapter; camera = wantsCamera
+            adapter.connect(admission, camera) { if (active && epoch == mediaEpoch) localState = it }
             if (!active || epoch != mediaEpoch) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
         catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
         finally { busy = false }
     }
     LaunchedEffect(route, client) { while (true) { refresh(); delay(1000) } }
-    DisposableEffect(route) { active = true; onDispose { active = false; disconnectMedia() } }
+    DisposableEffect(route) { active = true; onDispose { active = false; devicePermissions.cancel(); disconnectMedia() } }
+    DisposableEffect(route, lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP && transport == null) {
+                mediaEpoch++; devicePermissions.cancel()
+            }
+        }
+        lifecycle.lifecycle.addObserver(observer)
+        onDispose { lifecycle.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(model.session?.accountId) { devicePermissions.cancel(); disconnectMedia(); call = null; stale = true }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {

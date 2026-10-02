@@ -1,0 +1,26 @@
+{
+  "base": "c532f30b8cd7c0ebe35c732507db5a634c808c7a",
+  "files": [
+    {
+      "path": "apps/backend/src/modules/agent/trust-adapter.ts",
+      "sha256": "d1eab9336d3c835f1473063e1caff9ec0a74e772897f6b6546afffd90178ac89"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/lifecycle.ts",
+      "sha256": "4c9c4bbdc62a8134877e44c5d5e55e20fa64b4fb42d303431b53dfe2f66229fa"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/privacy-stream.ts",
+      "sha256": "6a11053b86cc6aab34458460f61311e11b71a0dabd8e6e7ca58a7d0d824c0243"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "sha256": "f01964d1b111c8c9585a91635c21790c13d01c57b5c34dae5b247272c179bdc7"
+    },
+    {
+      "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
+      "sha256": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef"
+    }
+  ],
+  "extractedBase": "36f9505eca1315486928694a097b3168097fb345"
+}
