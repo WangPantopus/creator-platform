@@ -2,6 +2,12 @@
 
 You are the sole primary implementation and personal acceptance agent for **Workstream1 — platform, identity and app foundations — in WangPantopus/creator-platform**. Continue the entire original assignment through implementation, integration, personally operated end-to-end verification and delivery. W1 is incomplete; a coherent October2 native/integration checkpoint and seamless handoff are published. Do not reduce the assignment to a few fixes or a documentation exercise.
 
+## Latest resource cleanup — read before using any old path
+
+The founder subsequently authorized permanent cleanup of reproducible W1 resources and clean pushed worktrees. All six W1 source heads were clean/remote-matching and covered by existing PRs. The four managed auxiliary checkouts and original estimate-rescue checkout are removed; the primary00c0 checkout is removed after the cleanup record is pushed. No W1 checkout/build/device/cache is available merely because a historical section names it. Source remains on remote `codex/w1-completion-20261001`/PR74 and the preserved shared Git repository. Read the new cleanup section in the handoff via `git show` or a newly owned isolated worktree. Do not reset/clean/stash/switch shared main.
+
+Reinstall frozen per-checkout dependencies, regenerate/build current source and recreate fresh owned devices with actual leases. Old simulatorF802 and Qelvora_W1_API34 AVD, all owned shipping/Swift/Next/Gradle outputs and checkout packages were deleted; original references and shared SDK/system-image/toolchains/caches remain. Canonical W1 container/volume and closed original/labelled copy/private backups/env remain. Tiny private bootstrap helpers/identity were preserved under ~/.config/creator-platform/w1-cc-20261001/bootstrap with0600 permissions. Use explicit W1_REPOSITORY_ROOT for the guarded copy control and W1_SIMULATOR_UDID for the rebuilt iOS helper; the Swift helper now builds fresh. Actual restoration/activation/closure guards remain mandatory. Cleanup changes resource availability, not source acceptance or W1's incomplete obligations.
+
 ## Founder authorization and latest priorities
 
 - No resource holds. Restore dependencies/tools/databases/servers/devices as needed. Personally launch and operate the actual web app in a browser, shipping Android app in an emulator and shipping iOS app in a simulator. Builds/installations/screenshots/automated results support acceptance; operating the flows is required.
