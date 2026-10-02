@@ -1,5 +1,10 @@
 # W8 contract, migration and runtime register
 
+## Original-fan packet denial source — 2026-10-02
+
+W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.
+
+
 ## Held restoration/content integration — 2026-10-02
 
 W8 now exports canonical `assertRestoredInTransaction(client)` and `assertContentAllowedInTransaction(client, actualActor, creatorId)`, plus loopback-only `trustLocalRestorationInTransaction(env)`. The development helper supplies the actual held callback; missing ports deny503. [Personally operated web and held transaction evidence](../../../artifacts/workstreams/W8/held-restoration/20261002-mac-studio/README.md) verifies current closure, saved block/case and retained canonical40 ledger; no publication/proof/provider recovery is inferred. W1/W6 can compose these ports without owner substitution or a true/no-op callback. Native authenticated interaction, original recovery/C10 and packet-fan negatives remain open. No R1–R10 or release gate is declared complete.
