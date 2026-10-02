@@ -16,7 +16,7 @@ const consumerSchema = z.strictObject({
   signature: z
     .string()
     .regex(/^(creator|creator_trust)\.[a-z][a-z0-9_]+\([^()]*\)$/u),
-  owner: z.string().regex(/^creator_generation_[a-z][a-z0-9_]+$/u),
+  owner: z.string().regex(/^creator_[a-z][a-z0-9_]+$/u),
   /** SHA-256 of PostgreSQL's actual pg_get_functiondef, after reviewed install. */
   definitionChecksum: Hash,
 });
@@ -200,17 +200,17 @@ export class GenerationIdentityAuthority {
             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema'
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
              AND c.relkind IN('r','p','v','m','f')
              AND NOT(n.nspname='creator' AND c.relname='schema_migration')
              AND (has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
               OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
            AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=current_user))
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema'
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
              AND c.relkind='S' AND has_sequence_privilege(current_user,c.oid,'USAGE,SELECT,UPDATE'))
            AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-            WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema' AND p.prosecdef
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prosecdef
              AND has_function_privilege(current_user,p.oid,'EXECUTE')
              AND NOT(p.oid=ANY(ARRAY[
               to_regprocedure('creator.pending_generation_tasks(integer)'),

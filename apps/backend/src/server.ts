@@ -79,20 +79,15 @@ try {
                       runtime.assertContentAllowedInTransaction,
                   }
                 : {}),
-              follows: async (
-                ...args: Parameters<
-                  NonNullable<
-                    import("./modules/content/service.js").ContentDependencies["follows"]
-                  >
-                >
-              ) => {
-                if (!features.growth)
-                  throw new DomainError(
-                    "content_delivery_unconfigured",
-                    copy.growthErrorContentEffectUnconfigured,
-                    503,
-                  );
-                return features.growth.contentFollows(...args);
+              follows: async () => {
+                // Content and Commerce use the canonical core pool. A Growth
+                // callback bound to another pool cannot supply this held read.
+                // W7/W8's reviewed core Follow projection is still required.
+                throw new DomainError(
+                  "content_delivery_unconfigured",
+                  copy.growthErrorContentEffectUnconfigured,
+                  503,
+                );
               },
               effect: async (
                 ...args: Parameters<ReturnType<typeof contentPublicProjection>>
@@ -114,7 +109,10 @@ try {
               ? await createCommerceStudio({
                   assertScopeAllowedInTransaction:
                     runtime.assertScopeAllowedInTransaction,
-                  pool: growthAPIPool ?? runtime.pool,
+                  ...(commerce?.publicPacketRead
+                    ? { publicPacketRead: commerce.publicPacketRead }
+                    : {}),
+                  pool: runtime.pool,
                   owners: {
                     commerce: commerce?.service,
                     conversation: runtime.conversation,
@@ -124,7 +122,7 @@ try {
                   dependencies: contentDependencies,
                 })
               : createContentStudio({
-                  pool: growthAPIPool ?? runtime.pool,
+                  pool: runtime.pool,
                   owners: {
                     commerce: commerce?.service,
                     conversation: runtime.conversation,

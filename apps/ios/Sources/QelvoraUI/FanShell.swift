@@ -72,7 +72,8 @@ public final class FanSession: ObservableObject {
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
-        } catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        } catch is CancellationError { return }
+        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }

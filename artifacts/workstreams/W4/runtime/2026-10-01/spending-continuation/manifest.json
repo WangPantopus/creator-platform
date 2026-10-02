@@ -94,5 +94,10 @@
   ],
   "additionalScreenshotHashes": {
     "spending-night-390x844.jpg": "b729aeb10134df78a14443b4f6d361957753e81a29516e5faa2d303397961ec7"
+  },
+  "additionalInvalidInputEvidence": {
+    "file": "invalid-cap-night-390x844.jpg",
+    "sha256": "eb0fb2324c0ceef9d490f80606ca3422edb2646cef201f8053ecd5593f42098e",
+    "result": "Actual earlier Night390x844 frame: draft1.001 is rejected with Enter a valid amount; current/pending values are retained. Frame preserved and indexed October2; no new successful save or clock passage claimed."
   }
 }
