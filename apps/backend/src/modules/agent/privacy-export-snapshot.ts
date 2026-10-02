@@ -3,6 +3,7 @@ import { Client, type Pool, type PoolClient, type QueryResult } from "pg";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
 import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
@@ -18,7 +19,7 @@ export const AGENT_PRIVACY_EXPORT_SIGNATURES = [
   "creator.finish_agent_privacy_export_scope()",
 ] as const;
 type Signature = (typeof AGENT_PRIVACY_EXPORT_SIGNATURES)[number];
-type ExportReview = Readonly<{
+export type AgentPrivacyExportReview = Readonly<{
   migration: Readonly<{ version: string; checksum: string }>;
   definitions: Readonly<Record<Signature, string>>;
   catalogueChecksum: string;
@@ -74,7 +75,37 @@ export type AgentPrivacyExportSource = Readonly<{
  * startup readiness alone cannot authorize a later export. */
 async function assertReviewedExport(
   database: Pick<Pool, "query">,
-  review: ExportReview,
+  review: AgentPrivacyExportReview,
+) {
+  try {
+    const active = await registeredMigration({
+      name: "w2_privacy_export_snapshot",
+      path: "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+      owner: "W2",
+      checksum:
+        "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+    });
+    if (
+      !active ||
+      active.version !== review.migration.version ||
+      active.checksum !== review.migration.checksum
+    )
+      throw new Error("Inactive export executable source");
+    await assertAgentPrivacyExportPurposeCatalogue(database, review);
+  } catch {
+    throw new DomainError(
+      "privacy_export_unconfigured",
+      "Reviewed current all-source export custody is unavailable.",
+      503,
+    );
+  }
+}
+
+/** Closed operator source review only. No source or task authority is issued;
+ * applications additionally require the active executable registry gate above. */
+export async function assertAgentPrivacyExportPurposeCatalogue(
+  database: Pick<Pool, "query">,
+  review: AgentPrivacyExportReview,
 ) {
   try {
     const ready = (
@@ -120,9 +151,26 @@ async function assertReviewedExport(
          AND NOT has_table_privilege($3,'creator.access_grant','SELECT,INSERT,UPDATE,DELETE')
          AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid=to_regclass('creator.agent_privacy_export_scope')
           AND tgname='w2_privacy_export_commit' AND tgenabled='O' AND tgdeferrable AND tginitdeferred
-          AND tgfoid=to_regprocedure('creator.finish_agent_privacy_export_scope()'))
+          AND tgfoid=to_regprocedure('creator.finish_agent_privacy_export_scope()')
+          AND tgtype=5 AND NOT tgisinternal AND tgnargs=0 AND octet_length(tgargs)=0
+          AND tgqual IS NULL AND tgattr=''::int2vector AND tgconstrrelid=0 AND tgconstrindid=0
+          AND pg_get_triggerdef(oid,false)='CREATE CONSTRAINT TRIGGER w2_privacy_export_commit AFTER INSERT ON creator.agent_privacy_export_scope DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION creator.finish_agent_privacy_export_scope()')
          AND (SELECT count(*)=1 FROM pg_trigger WHERE tgrelid=to_regclass('creator.agent_privacy_export_scope') AND NOT tgisinternal)
-         AND (SELECT count(*)=9 FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attnum>0 AND NOT attisdropped)
+         AND (SELECT count(*)=9 FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attnum>0)
+         AND NOT EXISTS(SELECT FROM (VALUES
+          (1,'pid','integer',NULL::text),(2,'xid','xid8',NULL),(3,'login','name',NULL),
+          (4,'nonce','uuid',NULL),(5,'job_id','uuid',NULL),(6,'lease_token','uuid',NULL),
+          (7,'binding','jsonb',NULL),(8,'exhausted','boolean','false'),
+          (9,'created_at','timestamp with time zone','clock_timestamp()')
+         ) AS expected(position,name,type,default_expression)
+          LEFT JOIN pg_attribute a ON a.attrelid=to_regclass('creator.agent_privacy_export_scope') AND a.attnum=expected.position
+          LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
+          WHERE a.attname IS DISTINCT FROM expected.name OR a.atttypid IS DISTINCT FROM to_regtype(expected.type)
+           OR a.attisdropped OR NOT a.attnotnull OR a.atttypmod<>-1 OR a.attndims<>0
+           OR a.attidentity<>'' OR a.attgenerated<>'' OR NOT a.attislocal OR a.attinhcount<>0
+           OR a.attcollation IS DISTINCT FROM (SELECT typcollation FROM pg_type WHERE oid=to_regtype(expected.type))
+           OR a.atthasdef IS DISTINCT FROM (expected.default_expression IS NOT NULL)
+           OR pg_get_expr(d.adbin,d.adrelid) IS DISTINCT FROM expected.default_expression)
          AND (SELECT count(*)=1 FROM pg_constraint WHERE conrelid=to_regclass('creator.agent_privacy_export_scope') AND contype='p'
           AND conkey=ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attname='pid'),
            (SELECT attnum FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attname='xid')]::smallint[])
@@ -195,7 +243,7 @@ export class PreparedAgentPrivacyExport {
       client: PoolClient,
       job: PrivacyTaskInput,
     ) => Promise<readonly string[]>,
-    private readonly review: ExportReview,
+    private readonly review: AgentPrivacyExportReview,
   ) {}
   assertHostPool(pool: Pool) {
     invariant(
