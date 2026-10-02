@@ -1,6 +1,7 @@
 /** Explicit loopback W5 host. Synthetic actors cannot be enabled in production. */
 import { randomBytes } from "node:crypto";
 import { readFile, writeFile, stat } from "node:fs/promises";
+import pg from "pg";
 import { createConfiguredBackend } from "../../integration.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { ContentService } from "./service.js";
@@ -86,7 +87,23 @@ let content: ContentService;
 let studio: StudioService;
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
+  agentPool?: pg.Pool;
 } = { growth: null };
+const agentDatabaseUrl = process.env.W5_AGENT_DATABASE_URL;
+if (agentDatabaseUrl) {
+  const configured = new URL(agentDatabaseUrl),
+    database = new URL(url);
+  if (
+    configured.hostname !== database.hostname ||
+    configured.port !== database.port ||
+    configured.pathname !== database.pathname ||
+    configured.username !== "creator_runtime"
+  )
+    throw new Error(
+      "W5 AI requires its canonical runtime on the same database.",
+    );
+} else if (process.env.GROWTH_ENABLED === "true")
+  throw new Error("W5 Growth composition requires W5_AGENT_DATABASE_URL.");
 const model = modelFromEnvironment();
 const backend = await createConfiguredBackend({
   config: {
@@ -119,7 +136,16 @@ const backend = await createConfiguredBackend({
   registerFeatures: async (runtime) => {
     const conversation = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-    const repository = new AgentRepository(runtime.pool),
+    const agentPool = agentDatabaseUrl
+      ? new pg.Pool({
+          connectionString: agentDatabaseUrl,
+          max: 2,
+          connectionTimeoutMillis: 5000,
+          statement_timeout: 5000,
+        })
+      : runtime.pool;
+    if (agentPool !== runtime.pool) features.agentPool = agentPool;
+    const repository = new AgentRepository(agentPool),
       agent = new AgentService(
         repository,
         new AgentPipeline(repository, model),
@@ -244,6 +270,7 @@ const stop = () => {
   if (worker) clearInterval(worker);
   void (async () => {
     await features.growth?.close();
+    await features.agentPool?.end();
     await backend.close();
     process.exit(0);
   })();

@@ -68,12 +68,9 @@ export function composeContentHost(input: {
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
-  if (
-    (input.sources && input.sources.repository.pool !== input.pool) ||
-    (input.growth && input.growth.service.db.runtime !== input.pool)
-  )
+  if (input.growth && input.growth.service.db.runtime !== input.pool)
     throw new Error(
-      "Content producers must share the configured runtime pool.",
+      "Content and Growth must share the configured runtime pool.",
     );
   let content: ContentService | null = null;
   let sources: ContentSources | null = null;
