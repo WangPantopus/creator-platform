@@ -1,0 +1,20 @@
+{
+  "nativeSource": "6784efd4c7d20557e2f5e1294190a80c5a889335",
+  "apiSource": "ea463d162ccf1be5e68b9dc9f40abefa6768c277",
+  "udid": "78C3590E-6D36-4A73-9E46-D23563EF0134",
+  "installedIOSDebugDylib_SHA256": "51da298b682c39bf31f9d717dfae0a17f8fb6029f56c1e3686c46d263b0ba664",
+  "launchPID": 76777,
+  "at": "2026-10-02T14:43:56.269670+00:00",
+  "supportedOperationAttempt": "Actual CUA inventory identified Device Hub com.apple.dt.Devices. Exact display-name cua.getApp(\"Device Hub\") returned server -10005 timeoutReached after5.099s.",
+  "personalIOSUI": "not verified",
+  "proven": [
+    "Shipping iOS build passed and strict code signature verified.",
+    "Exact matching build installed in own simulator and launched Light declared content destination against actual local API.",
+    "Owned app terminated, own simulator normally shut down and exact simulator/GUI leases released."
+  ],
+  "limits": [
+    "No actual iOS screenshot/input/private-content/consent/reply/signature acceptance.",
+    "No alternative UI input tool or permission bypass.",
+    "Creator verification DEVELOPMENT-ONLY SEEDED, no proof or passkey."
+  ]
+}
