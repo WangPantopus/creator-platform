@@ -1,3 +1,19 @@
+### Corrected held source custody — October 2, 2026
+
+Actual corrected W8 assignments now pin W4 factories and their narrow consumed owners. Original proposals/SQL/ledger remain exact. The audience's embedded registration defect is repaired in a distinct complete successor source, using182/159/177 plus original0049; actual function compilation and unregistered denial pass inside rollback, original definition/ledger57/zero business state restored. [Source/hash/failure evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/held-purpose-renumbering/README.md). Future owner activation and positive generation/fulfillment/C10 acceptance remain open.
+
+The actual W2 terminal-journal source now retains current custody descriptors and checks them before/after same-client read/seal. Three real metadata drifts deny and roll back to exact original catalogue/definitions without business rows or prepared-scope fabrication. W1's actual current183 issuer bookend remains to be consumed. [Journal evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/generation-terminal-settlement/journal-drift.json).
+
+### Independent privacy-wave qualification — October 2, 2026
+
+Exact W8 fb1cbca PR159 passes personal fresh61 and independently restored original57→61 qualification. Schema/grants/RLS/ownership/roles/security match;57 prior ledger records,26 current development rows across161 tables, old roles/memberships and original sequence are preserved. Live55444 remains57 with identical before/after custody. The first shared-cluster fresh install changed global role metadata and the upgrade refused; repeating on a separate cluster passes unchanged SQL. All review copies are closed/stopped. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/privacy-wave-review/README.md). Actual task/app/native/privacy/C10 release acceptance and future held producers remain open; corrected held mapping alone does not repair embedded audience registration guards.
+
+### Original terminal settlement source — October 2, 2026
+
+Held0106 is implemented against genuine W1 terminal/W2 journal/W4 allowance owners on the exact held client. It captures approved original cost rules at admission, refuses historical backfill, preserves unknown-cost ceilings, and derives immutable settlement from real accounting and persisted output. Exact source/role/function/column/RLS checks, three PostgreSQL compiler reviews, six restricted-role plans and worker denials pass on an isolated empty canonical57 catalogue. Ledger57 and zero generations/messages/reservations/journal receipts are preserved. Backend build and scoped lint/format pass; no new tests or fabricated business records. [Implementation and evidence](W4-generation-terminal-settlement-2026-10-02.md). Actual composed producers, positive/race acceptance,0107 late financial authority and C10 policy remain open.
+
+PR146 personally operated Android input repair and PR158 original call-capture eligibility are merged (`e120435929c22d53a80ac0a035379936b9f828ea`, `3ef708f7af218505a9c147ebefaed1e6e85e9d01`). Passing web/backend/Android runtime checks do not establish queued native/visual or iOS personal acceptance. W8's exact PR1596771bfed privacy wave now awaits independent fresh61 and original57 preserved-data qualification; live55444 is still canonical57. All nine packages and R01–R15 remain assigned.
+
 ### Current integrated native input checkpoint — October 2, 2026
 
 ## 2026-10-02 — repaired Android decimal input personally verified
