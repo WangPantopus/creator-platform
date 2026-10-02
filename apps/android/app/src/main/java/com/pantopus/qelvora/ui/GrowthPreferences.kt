@@ -89,7 +89,14 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
             GrowthPreferenceField(zone, {zone = it; clearError("zone")}, QelvoraCopy.text("growthTimeZone"), errors["zone"], zoneFocus, zoneView, !busy)
             BasicText(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours"), style = qText("caption").copy(color = ink))
             creators.forEach {(id, name) -> Button(QelvoraCopy.text("growthCreatorWithState", mapOf("name" to name, "state" to if (contains("mutedCreators", id)) QelvoraCopy.text("growthMuted") else QelvoraCopy.text("growthPushAndEmailAllowed"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {toggle("mutedCreators", id)} }
-            growthKinds.forEach {kind -> BasicText(QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }), style = qText("label").copy(color = ink));listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)} } }
+            growthKinds.forEach {kind ->
+                val typeLabel = QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } })
+                BasicText(typeLabel, style = qText("label").copy(color = ink))
+                listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, channel) ->
+                    val label = QelvoraCopy.text("growthNotificationChannel", mapOf("kind" to typeLabel, "channel" to channel))
+                    Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)}
+                }
+            }
             Button(if (busy) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {
                 if (!busy) {
                     message = ""

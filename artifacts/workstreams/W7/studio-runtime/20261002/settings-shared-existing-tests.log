@@ -1,0 +1,10 @@
+✔ one rename updates native identifiers, package scopes and UI names while preserving Pantopus and binary assets (195.382334ms)
+✔ all fixed copy and both themes exist in generated web, Swift and Kotlin resources (120.244917ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 402.690125

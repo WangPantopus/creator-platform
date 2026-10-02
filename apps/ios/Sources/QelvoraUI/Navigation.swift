@@ -52,10 +52,11 @@ public struct Segmented: View {
                         .background(active == item ? qColor("selected-surface", scheme) : .clear, in: RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")))
                         .overlay { if active == item { RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")).stroke(qColor("line", scheme), lineWidth: QelvoraTokens.token("hairline")) } }
                         .contentShape(Rectangle().inset(by: -QelvoraTokens.token("space-1") / 2))
-                }.buttonStyle(.plain).accessibilityAddTraits(active == item ? .isSelected : [])
+                }.buttonStyle(.plain).accessibilityAddTraits(active == item ? .isSelected : []).accessibilityLabel(item)
             }
         }.padding(QelvoraTokens.token("space-1"))
             .background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.token("radius-lg")))
+            .accessibilityElement(children: .contain)
             .accessibilityLabel(label)
     }
 }

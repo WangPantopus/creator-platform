@@ -1,0 +1,67 @@
+{
+  "ios-combined-23945-retry.log": {
+    "sha256": "28b608de3f37083919567984edefba065fb497dc0973e5a892913dd72b1c4b79",
+    "bytes": 42543,
+    "preserved": true
+  },
+  "ios-combined-23945-signed.log": {
+    "sha256": "c5eb1c518b98f0a6425af45e7472f43a943411f5f442312b937f4a924e318df0",
+    "bytes": 31200,
+    "preserved": true
+  },
+  "ios-discover-focus-target-build.log": {
+    "sha256": "acf71da64cf923bbc391832974c63e93ce991ea5f99d4c30bac8f55266fa0bd4",
+    "bytes": 58584,
+    "preserved": true
+  },
+  "android-settings-accessibility-build.log": {
+    "sha256": "9837c3b74de57c93e1f808dee5ffaea15c52e933cf95de22313b3c2771680aec",
+    "bytes": 2324,
+    "preserved": true
+  },
+  "swift-final-settings-existing-checks.log": {
+    "sha256": "0f274ecfcab8b1bdda0d1341658c19df9a5688f65d39451596989ea81a782e9f",
+    "bytes": 43283,
+    "preserved": true
+  },
+  "settings-shared-generate-check.log": {
+    "sha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317",
+    "bytes": 52,
+    "preserved": true
+  },
+  "settings-shared-existing-tests.log": {
+    "sha256": "8ab76e88784daea3fde255c7f1884a8cc2a13cfb455944f52a1da2dda649119c",
+    "bytes": 346,
+    "preserved": true
+  },
+  "settings-backend-build.log": {
+    "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "bytes": 41,
+    "preserved": true
+  },
+  "settings-backend-existing-contracts.log": {
+    "sha256": "e838466e9effae24cd9029f8939db9e9ed5c1507f731bcbb1c5250d0a3aec65e",
+    "bytes": 456,
+    "preserved": true
+  },
+  "settings-backend-lint.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "preserved": true
+  },
+  "web-production-combined-23945.log": {
+    "sha256": "c79a52ebc2dd4b5b857b2719498d96e36d1d8d85c1c91c471c650719dadb08ab",
+    "bytes": 10546,
+    "preserved": true
+  },
+  "web-production-combined-23945-correct-env.log": {
+    "sha256": "d9fdd3b8cf39d9845d48bcff3d7d5409e677721f270ce6df71f92e496a602146",
+    "bytes": 2666,
+    "preserved": true
+  },
+  "ios-keychain-diagnosis.private.log": {
+    "sha256": "80533a4f26222354ac3a1023126ddc51beaa13b8709c7edaa065d59855d9248b",
+    "preserved": false,
+    "reason": "Private authentication log retained locally only; observed Keychain OSStatus -34018."
+  }
+}

@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T06:27:11.832751+00:00",
+    "recordedAt": "2026-10-02T08:21:14.452763+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -142,20 +142,20 @@
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "API loopback4107 PID92298/session28521; web3007 PID74906/session4318 Next development. API current at last restart; latest handle reuse repair compiled afterward. Verify listeners before reuse."
+      "note": "Owned API loopback4107 PID93807/session3007 after actual Android API outage/recovery; production web3007 PID1941/session71511. Verify listeners before reuse."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Earlier8c shipping app installed/launched but CUA timeouts; terminated/shutdown. New ordered-revocation source built successfully; not installed yet. No W7 simulator lease held."
+      "state": "Shipping app final source dylib75d0063483027f60d861fdc332d6fb3604ec35678716dbb0f1299fca51737153 normally signed, installed and personally operated. Actual fan settings save/cold Night restore, full toggle actions, Discover input/category/outage/recovery, unavailable share. Terminated/shutdown; exact slot3 released07:56Z, data retained. Owned idb companion91671 stopped07:58Z."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Qelvora_W7_API34/emulator5580 installed and launched earlier shipping draft; no personal taps yet. Stopped and emulator-slot-2 released. Final current-source APK compiled successfully after release; not installed yet."
+      "state": "Shipping APK15978e25cb27ae0ce85d4d767e63460c62fdca44a84d37a85181025e86de10c2 installed and personally operated: real sign-in, settings save/cold Night restore22:00\u201307:00/America/Los_Angeles, Home/Notifications/Settings, Discover search/category/API failure/recovery, missing-share warm and cold custom-scheme arrival. Own emulator-5580 normally stopped; exact slot1 UUIDa1b64a6c-a416-49a8-ab49-e649fe35b47a/inode released; data retained. No W7 native device, heavy slot or GUI held."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -183,18 +183,18 @@
       ],
       "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed"
     },
-    "nativeBuild": "Final Android FCM build11s exit0 and final iOS build exit0 under reviewed W1 atomic UUID+inode helper94258f0e. Heavy slot released after each. No W7 heavy native build remains.",
+    "nativeBuild": "Final signed shipping iOS build and Android shipping build pass under reviewed atomic UUID/inode heavy wrapper; final original18 Swift checks/110 comparisons pass. No heavy slot held. No new test/ref/tolerance.",
     "api": {
-      "pid": 92298,
-      "session": 28521,
-      "source": "Canonical public AI/held follows current at restart; latest handle collision repair compiled afterward, not yet restarted.",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/api-current-source-3.log"
+      "pid": 93807,
+      "session": 3007,
+      "source": "23945c32 plus recorded W7 contracts route repair; current at restart. No uncommitted native source is executed in API.",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/api-android-recovery.log"
     },
     "web": {
-      "pid": 74906,
-      "session": 4318,
-      "mode": "Next development; actual local fan settings/feedback operated",
-      "productionBuild": "completed earlier; production signed-out settings/discovery recovery/share refusal observed only"
+      "pid": 1941,
+      "session": 71511,
+      "mode": "Next production, source23945c32, custom .next-w7-production-23945; NODE_ENVproduction in this child only",
+      "productionBuild": "Passed after correcting inherited development NODE_ENV; original prerender failure preserved. Actual signed-out settings and Discover search/API outage/recovery operated. Authenticated production identity remains blocked on approved HTTPS."
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,

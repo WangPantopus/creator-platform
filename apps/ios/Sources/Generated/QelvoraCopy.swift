@@ -571,6 +571,7 @@ public enum QelvoraCopy {
     "growthMusic": "Music",
     "growthFood": "Food",
     "growthLabelWithState": "{label} · {state}",
+    "growthNotificationChannel": "{kind} · {channel}",
     "growthCreatorWithState": "{name} · {state}",
     "growthDecisionAccept": "Accept",
     "growthDecisionDefer": "Defer",

@@ -1,0 +1,10 @@
+{
+  "owner": "W7 a1b64a6c-a416-49a8-ab49-e649fe35b47a Qelvora_W7_API34 emulator-5580 2026-10-02T07:56:16.724119+00:00",
+  "inode": 240225658,
+  "device": 16777232,
+  "slot": 1,
+  "avd": "Qelvora_W7_API34",
+  "serial": "emulator-5580",
+  "releasedAt": "2026-10-02T08:20:36.052902+00:00",
+  "state": "Own emulator stopped using explicit adb emulator-5580 emu kill; data retained"
+}

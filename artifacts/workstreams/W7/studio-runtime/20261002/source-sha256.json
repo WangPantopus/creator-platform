@@ -1,0 +1,16 @@
+{
+  "parent": "23945c32b9867bb0e8ad8a959168c13dbee1920d",
+  "files": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "7d714166c448d2d36ded58cf4a2a000d5f6206afabf29c80cfa099530257acb3",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt": "77dbdbeafab3d531c3787dd2d57e0689d1bf4fcade5961cc9a794dfa0e2ad191",
+    "apps/android/app/src/main/res/values/strings.xml": "abdcc67c79f099b00d60c2148d908afadf46fd8f3733b4801c4d8bf5e18ecad5",
+    "apps/backend/src/modules/growth/contracts.ts": "6f315291a357ddb0f0a3a99da3c7fdaf051bfba06a870ffa7916a94a1d675820",
+    "apps/ios/Sources/Generated/Localizable.xcstrings": "2621b8c1fa4c92043b7e582b3423d52178be9e911260e8d3912b9b72391756e7",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "0c5a0514ff1f774fca5d2e3465a8cba5484048a06929f0ec31c000d1cbba1a7e",
+    "apps/ios/Sources/QelvoraUI/Growth.swift": "9d84078840f28ba4436518ef6ed9904a28fbca3eed37cf8f54adb37f76d60949",
+    "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift": "174d27709545dc8da7174bf769240b662e879a90afb6a110afec8c0a0129746f",
+    "apps/ios/Sources/QelvoraUI/Navigation.swift": "43347965738bdecf78869c050773dd20569bf7c9ff1c92b18d85e666a92e2b2c",
+    "config/copy.json": "653e4c640a007b10e2c23d748e6a924dd50dad8cf82e298ad7504c75b99586fd",
+    "packages/copy/src/index.ts": "9766a7105d8ec26af8abf91eb75c3ee801e2097549371b9390653fbeee963d01"
+  }
+}

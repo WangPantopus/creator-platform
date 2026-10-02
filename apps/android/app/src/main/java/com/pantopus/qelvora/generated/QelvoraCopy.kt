@@ -571,6 +571,7 @@ object QelvoraCopy {
     "growthMusic" to "Music",
     "growthFood" to "Food",
     "growthLabelWithState" to "{label} · {state}",
+    "growthNotificationChannel" to "{kind} · {channel}",
     "growthCreatorWithState" to "{name} · {state}",
     "growthDecisionAccept" to "Accept",
     "growthDecisionDefer" to "Defer",
