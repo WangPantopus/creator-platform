@@ -1175,6 +1175,7 @@ data class APIContentDocument(
   val `quote`: APIContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentDocumentPlanRef? = null,
   val `live`: APIContentDocumentLive? = null
 )
 
@@ -1208,6 +1209,13 @@ enum class APIContentDocumentMediaItemKind {
 data class APIContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1285,6 +1293,7 @@ data class APIContentListItemsItemDocument(
   val `quote`: APIContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentListItemsItemDocumentLive? = null
 )
 
@@ -1318,6 +1327,13 @@ enum class APIContentListItemsItemDocumentMediaItemKind {
 data class APIContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1672,6 +1688,7 @@ data class APIContentViewDocument(
   val `quote`: APIContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentViewDocumentPlanRef? = null,
   val `live`: APIContentViewDocumentLive? = null
 )
 
@@ -1705,6 +1722,13 @@ enum class APIContentViewDocumentMediaItemKind {
 data class APIContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1900,6 +1924,7 @@ data class APISaveContentDocument(
   val `quote`: APISaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APISaveContentDocumentPlanRef? = null,
   val `live`: APISaveContentDocumentLive? = null
 )
 
@@ -1933,6 +1958,13 @@ enum class APISaveContentDocumentMediaItemKind {
 data class APISaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APISaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -2268,6 +2300,7 @@ data class APIContentReviewViewDocument(
   val `quote`: APIContentReviewViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentReviewViewDocumentPlanRef? = null,
   val `live`: APIContentReviewViewDocumentLive? = null
 )
 
@@ -2301,6 +2334,13 @@ enum class APIContentReviewViewDocumentMediaItemKind {
 data class APIContentReviewViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentReviewViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -2941,7 +2981,8 @@ data class APIMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIMessageSystemLink? = null
 )
 
 @Serializable
@@ -2967,6 +3008,25 @@ enum class APIMessageDeliveryState {
 }
 
 @Serializable
+data class APIMessageSystemLink(
+  val `kind`: APIMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
   @Required
@@ -2985,7 +3045,8 @@ data class APIAcceptedMessageMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIAcceptedMessageMessageSystemLink? = null
 )
 
 @Serializable
@@ -3011,6 +3072,25 @@ enum class APIAcceptedMessageMessageDeliveryState {
 }
 
 @Serializable
+data class APIAcceptedMessageMessageSystemLink(
+  val `kind`: APIAcceptedMessageMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIAcceptedMessageMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIFrame(
   val `threadId`: String,
   val `cursor`: Long,
@@ -3022,7 +3102,8 @@ data class APIFrame(
   @Required
   val `generationId`: String? = null,
   val `sequence`: Long,
-  val `control`: APIFrameControl? = null
+  val `control`: APIFrameControl? = null,
+  val `systemLink`: APIFrameSystemLink? = null
 )
 
 @Serializable
@@ -3054,6 +3135,25 @@ enum class APIFrameControl {
   @SerialName("ai_paused") AI_PAUSED,
   @SerialName("closed") CLOSED,
   @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIFrameSystemLink(
+  val `kind`: APIFrameSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIFrameSystemLinkLabel
+)
+
+@Serializable
+enum class APIFrameSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIFrameSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3102,7 +3202,8 @@ data class APIThreadTimelineMessagesItem(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIThreadTimelineMessagesItemSystemLink? = null
 )
 
 @Serializable
@@ -3125,6 +3226,25 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIThreadTimelineMessagesItemSystemLink(
+  val `kind`: APIThreadTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIThreadTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3297,6 +3417,7 @@ data class APIConversationConversationMessage(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationMessageSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3327,6 +3448,25 @@ enum class APIConversationConversationMessageDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationMessageSystemLink(
+  val `kind`: APIConversationConversationMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3394,6 +3534,7 @@ data class APIConversationConversationPageMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationPageMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3424,6 +3565,25 @@ enum class APIConversationConversationPageMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemSystemLink(
+  val `kind`: APIConversationConversationPageMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationPageMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3543,6 +3703,7 @@ data class APIConversationConversationTimelineMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationTimelineMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3573,6 +3734,25 @@ enum class APIConversationConversationTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemSystemLink(
+  val `kind`: APIConversationConversationTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3805,6 +3985,7 @@ data class APIContentContentDocument(
   val `quote`: APIContentContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentDocumentPlanRef? = null,
   val `live`: APIContentContentDocumentLive? = null
 )
 
@@ -3838,6 +4019,13 @@ enum class APIContentContentDocumentMediaItemKind {
 data class APIContentContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -3915,6 +4103,7 @@ data class APIContentContentListItemsItemDocument(
   val `quote`: APIContentContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentContentListItemsItemDocumentLive? = null
 )
 
@@ -3948,6 +4137,13 @@ enum class APIContentContentListItemsItemDocumentMediaItemKind {
 data class APIContentContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4302,6 +4498,7 @@ data class APIContentContentViewDocument(
   val `quote`: APIContentContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentViewDocumentPlanRef? = null,
   val `live`: APIContentContentViewDocumentLive? = null
 )
 
@@ -4335,6 +4532,13 @@ enum class APIContentContentViewDocumentMediaItemKind {
 data class APIContentContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4530,6 +4734,7 @@ data class APIContentSaveContentDocument(
   val `quote`: APIContentSaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentSaveContentDocumentPlanRef? = null,
   val `live`: APIContentSaveContentDocumentLive? = null
 )
 
@@ -4563,6 +4768,13 @@ enum class APIContentSaveContentDocumentMediaItemKind {
 data class APIContentSaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentSaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable

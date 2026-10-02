@@ -9,6 +9,16 @@ struct W3Message: Decodable, Identifiable, Sendable {
     let agentVersion: W3AgentVersion?; let feedback: String?
     let correction: W3Correction?
     let recording: W3Recording?
+    let authorAccountId: String?
+    let systemLink: W3SystemLink?
+    func publicAnswerDestination(creatorId: String) -> String? {
+        guard authorKind == .system, deliveryState == .delivered,
+              signedActId == nil, authorAccountId == nil, text == "Answered publicly.",
+              let link = systemLink, link.kind == "published_answer",
+              link.label == text, link.creatorId == creatorId, link.contentVersion > 0,
+              UUID(uuidString: link.creatorId) != nil, UUID(uuidString: link.contentId) != nil else { return nil }
+        return "/content/" + link.creatorId + "/" + link.contentId
+    }
     func authorLabel(name: String) -> String {
         if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
         if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
@@ -25,6 +35,10 @@ struct W3Page: Decodable, Sendable {
     let feedbackPolicy: W3FeedbackPolicy?
 }
 struct W3AgentVersion: Codable, Sendable { let id: String; let hash: String }
+struct W3SystemLink: Decodable, Sendable {
+    let kind: String; let creatorId: String; let contentId: String
+    let contentVersion: Int; let label: String
+}
 struct W3Correction: Decodable, Sendable { let originalMessageId: String; let originalVersion: Int }
 struct W3FeedbackPolicy: Decodable, Sendable { let version: String; let notice: String }
 struct W3FeedbackInput: Encodable { let messageVersion: Int; let agentVersion: W3AgentVersion; let rating: String?; let consent: Bool?; let policyVersion: String?
