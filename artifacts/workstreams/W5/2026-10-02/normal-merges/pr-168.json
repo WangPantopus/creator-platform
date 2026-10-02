@@ -1,0 +1,115 @@
+{
+  "headRefOid": "04606f7ead825445be90a74b35e7ca0390be4a52",
+  "mergeCommit": {
+    "oid": "0d958dfd44a69c92c4fad44e550e658d0418a42e"
+  },
+  "mergedAt": "2026-10-02T18:51:45Z",
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:46:01Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049365749/job/110978602101",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T18:43:33Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:45:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049360021/job/110978578013",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T18:43:29Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049365749/job/110978601744",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T18:43:31Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049360021/job/110978578004",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T18:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049365749/job/110978602147",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T18:43:31Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049360021/job/110978578006",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T18:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049365749/job/110978602088",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T18:43:31Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049360021/job/110978578091",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T18:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:47:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049365749/job/110978601997",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T18:43:33Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:48:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37049360021/job/110978577742",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T18:43:29Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "checkedBase": "0f7a86da1751e93d4de4ebe43f8224aab31086fd",
+  "checkedCombinedTree": "2aff577c1b6e5ddca77af9adbafd269f2c9a942b",
+  "locallyCheckedCombinedCommit": "833a7e8649245bf08297d3b5643a92158123fc31",
+  "postMergeTreeMatched": true,
+  "limits": "Actual closed61 rollback compiler/catalogue/EXPLAIN and canonical57 preparation refusal; no0198 activation, actual leased body export, positive COMMIT/cancellation/lease recovery, C10 deletion, native operation or release readiness."
+}
