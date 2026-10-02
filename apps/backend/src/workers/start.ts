@@ -1,4 +1,5 @@
 import { startMediaWorker } from "./media.js";
+import { trustMediaWorkerDenial } from "../modules/trust/scope-restriction.js";
 
 const pool = process.argv[2];
 if (!["generation", "ingestion"].includes(pool ?? ""))
@@ -11,7 +12,7 @@ if (pool === "generation") {
   process.exitCode = 1;
 } else {
   // The ingestion pool currently hosts W6 media processing only.
-  const worker = await startMediaWorker();
+  const worker = await startMediaWorker(process.env, trustMediaWorkerDenial());
   const shutdown = () => {
     void worker.close().then(() => process.exit(0));
   };

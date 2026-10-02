@@ -11,6 +11,9 @@ import { createConversationRuntime } from "./modules/conversation/runtime.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
+import { readMediaEnvironment } from "./modules/media/environment.js";
+import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
+import { createDevelopmentTrust } from "./modules/trust/development.js";
 import { createAgentDomain } from "./modules/agent/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
 
@@ -38,7 +41,21 @@ const configured =
           },
         },
         signedSubjectPolicies: [commerceSignedSubjects],
+        ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+          ? { trust: createDevelopmentTrust }
+          : {}),
         registerFeatures: async (runtime) => {
+          const mediaEnvironment = readMediaEnvironment();
+          const mediaDenials = runtimeMediaDenials(runtime);
+          const mediaHost =
+            mediaEnvironment && mediaDenials
+              ? composeMediaHost({
+                  runtime,
+                  environment: mediaEnvironment,
+                  denials: mediaDenials,
+                  development: true,
+                })
+              : undefined;
           features.growth = await configureGrowthForBackend({
             ...runtime,
             assertAllowed: async (actor, creatorId) =>
@@ -67,7 +84,10 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: {
+                  assertAllowed: runtime.assertCreatorAllowed,
+                  mediaPublication: mediaHost?.contentPublication,
+                },
               })
             : createContentStudio({
                 pool: runtime.pool,
@@ -77,8 +97,12 @@ const configured =
                   access: runtime.access,
                   profiles: runtime.identity?.profiles,
                 },
-                dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+                dependencies: {
+                  assertAllowed: runtime.assertCreatorAllowed,
+                  mediaPublication: mediaHost?.contentPublication,
+                },
               });
+          mediaHost?.bindContent(content.content);
           runtime.configureSignedSubjects(
             Array.isArray(content.signedSubjects)
               ? content.signedSubjects
@@ -91,7 +115,7 @@ const configured =
               pool: runtime.pool,
               development: config.identityAdapter === "development",
             }),
-            mediaFeature({}),
+            mediaHost?.feature() ?? mediaFeature({}),
             ...(commerce ? [commerce.feature] : []),
             ...(content ? content.features : []),
             ...(features.growth ? [features.growth.feature] : []),

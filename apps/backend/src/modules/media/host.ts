@@ -11,7 +11,7 @@ import {
 import { invariant } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
 import { CreatorIdentityAuthority } from "../identity/creator-scope.js";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { contentMediaAuthority } from "../content/media.js";
 import { contentPublicationMedia } from "../content/w6-publication.js";
 import type {
@@ -51,6 +51,45 @@ export type MediaDenials = Readonly<{
     client: PoolClient,
   ) => Promise<boolean>;
 }>;
+
+/** Only the canonical host's real W8 held-client checks can enable media.
+ * Issued interactive scopes supply identity; no worker Actor is constructed. */
+export function runtimeMediaDenials(
+  runtime: BackendRuntime,
+): MediaDenials | null {
+  const thread = runtime.assertScopeAllowedInTransaction;
+  const creator = runtime.assertCreatorAllowedInTransaction;
+  const audience = runtime.audienceIdentity;
+  if (!thread || !creator || !audience) return null;
+  const checkThread = async (scope: ThreadScope, client: PoolClient) => {
+    assertThreadScope(scope);
+    await thread(
+      { accountId: scope.actorAccountId, adultEligible: true },
+      scope.creatorId,
+      scope.threadId,
+      {
+        creatorAccountId: scope.creatorAccountId,
+        fanAccountId: scope.fanAccountId,
+      },
+      client,
+    );
+    return false;
+  };
+  return {
+    thread: checkThread,
+    creator: async (scope, client) => {
+      if ("accountId" in scope)
+        await creator(
+          { accountId: scope.accountId, adultEligible: true },
+          scope.creatorId,
+          client,
+        );
+      else if ("threadId" in scope) return checkThread(scope, client);
+      else await audience.authorizeInTransaction(scope, client);
+      return false;
+    },
+  };
+}
 
 export type MediaHost = Readonly<{
   media: MediaService;
