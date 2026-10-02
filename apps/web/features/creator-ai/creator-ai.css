@@ -15,7 +15,12 @@
   position: sticky;
   top: 0;
   height: 100dvh;
+  min-height: 0;
+  overflow-y: auto;
   box-sizing: border-box;
+}
+.w2-sidebar .qv-side__item {
+  min-height: 44px;
 }
 .w2-main {
   padding: 36px 48px;
