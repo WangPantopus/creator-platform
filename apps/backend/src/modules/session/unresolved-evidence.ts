@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { ThreadScope } from "../access/scope.js";
 import { DomainError } from "../../core/errors.js";
 import type { SessionService } from "./service.js";
+import { requestAuthority } from "../identity/request-authority.js";
 
 const timestamp = z.iso.datetime({ offset: true });
 const schema = z.strictObject({
@@ -42,6 +43,13 @@ export function createUnresolvedCallEvidenceReader(sessions: SessionService) {
     scope: ThreadScope,
     sessionId: string,
   ): Promise<UnresolvedCallTransportEvidence | null> => {
+    const request = requestAuthority.getStore();
+    if (!request || request.accountId !== scope.actorAccountId)
+      throw new DomainError(
+        "call_evidence_session_required",
+        "Reopen this call with your current account.",
+        401,
+      );
     if (!z.uuid().safeParse(sessionId).success)
       throw new DomainError(
         "call_evidence_invalid",
