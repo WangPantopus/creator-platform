@@ -170,6 +170,13 @@ export interface ContentDependencies {
     reference: string;
     textHash: string;
   }>;
+  /** Hold current W1 session and W8 creator/fan denial on the domain client,
+   * before object locks. This callback cannot substitute a worker Actor. */
+  assertAllowedInTransaction?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<void>;
   assertAllowed?: (actor: Actor, creatorId: string) => Promise<void>;
   effect?: (
     actor: Actor,
@@ -322,7 +329,14 @@ export class ContentService {
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
-    await this.dependencies.assertAllowed?.(actor, creatorId);
+    await assertCurrentSession(client, actor.accountId);
+    if (this.dependencies.assertAllowedInTransaction)
+      await this.dependencies.assertAllowedInTransaction(
+        client,
+        actor,
+        creatorId,
+      );
+    else await this.dependencies.assertAllowed?.(actor, creatorId);
     const denied = await client.query(
       "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
       [actor.accountId],
