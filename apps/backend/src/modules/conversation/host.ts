@@ -73,10 +73,19 @@ export type ConversationHostProducers = {
 
 type Registry = { migrations: { version: string; path: string }[] };
 const repositoryRoot = new URL("../../../../../", import.meta.url);
+declare const __QELVORA_REGISTERED_MIGRATIONS__:
+  | Readonly<Record<string, string>>
+  | undefined;
 
 /** Only an executable registry entry counts. The expected checksum is the
  * reviewed file's own bytes, never a value read back from the database. */
 async function registeredChecksum(version: string) {
+  // Shipping bundles carry the exact executable registry's SQL hashes from
+  // their build. Source execution retains the same checked-out byte custody.
+  if (typeof __QELVORA_REGISTERED_MIGRATIONS__ !== "undefined")
+    return Object.hasOwn(__QELVORA_REGISTERED_MIGRATIONS__, version)
+      ? __QELVORA_REGISTERED_MIGRATIONS__[version]
+      : undefined;
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as Registry;
