@@ -103,6 +103,14 @@ export type ContentPacketRead = {
   contentVersion: number;
   audience: Audience;
 };
+/** Current publisher result from one held transaction. This is a stored
+ * publication proof, never a fan grant or post-commit recipient authority. */
+export type ContentPublicationProof = {
+  view: ContentView;
+  command: SignedActCommand;
+  signedActId: string | null;
+  mediaReady: boolean;
+};
 export interface ContentDependencies {
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
@@ -1432,46 +1440,82 @@ export class ContentService {
       return this.view(client, actor, row, studio);
     });
   }
-  /** Internal W7 proof port. Read the actual stored evidence, never reconstruct
-   * a media signature from a document-only projection or return a stale command.
+  /** Internal W7 owner proof port. A publisher does not become its own fan.
+   * All current domain/media checks use the same actual request/client/version;
+   * Growth separately verifies the public signature and recipient authority.
    */
-  async publicationProof(actor: Actor, creatorId: string, id: string) {
+  async publicationProof(
+    actor: Actor,
+    creatorId: string,
+    id: string,
+  ): Promise<ContentPublicationProof | null> {
     return this.transaction(actor, creatorId, async (client) => {
-      await this.prepareReadInTransaction(client, actor, creatorId, id);
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, ["publisher"]);
       const row = await this.index(client, creatorId, id);
-      await this.authorizeRead(client, actor, row);
-      if (row.state !== "published") return null;
+      if (row.state !== "published" || !row.published_at) return null;
+      await client.query("SELECT set_config('app.content_id',$1,true)", [id]);
       const current = await this.view(client, actor, row, false);
+      invariant(
+        current.document.kind === row.kind &&
+          contentHash(current.document.audience) ===
+            contentHash(row.audience) &&
+          current.document.packetId === row.packet_id &&
+          (current.document.quote?.replyId ?? null) === row.quote_reply_id &&
+          (current.document.quote?.consentVersion ?? null) ===
+            row.quote_consent_version,
+        "publication_evidence_changed",
+        "The current publication and its stored source binding must agree.",
+      );
+      // The viewer's delivered-packet/signature graph cannot authorize the
+      // publisher's original acceptance or an indirect fan source. W4/W1's
+      // real phased owner fence and each source's retraction producer must be
+      // composed before these proofs are available. Do not take late negative
+      // leases below the creator/content positives or call a viewer as owner.
+      if (current.document.packetId || current.document.quote)
+        throw new DomainError(
+          "publication_source_authority_unconfigured",
+          "Current publication source authority is not connected.",
+          503,
+        );
       const publication = (
         await client.query(
           "SELECT * FROM creator.content_publication WHERE content_id=$1 AND version=$2",
           [id, row.version],
         )
       ).rows[0];
-      if (!publication) return null;
+      if (!publication?.published_at) return null;
+      invariant(
+        publication.signed_act_id === current.signedActId &&
+          publication.author_kind === current.authorKind &&
+          (publication.author_kind === "team"
+            ? current.document.kind === "post" &&
+              current.document.media.length === 0 &&
+              publication.signed_act_id === null
+            : publication.author_account_id === role.account_id &&
+              typeof publication.signed_act_id === "string"),
+        "publication_evidence_changed",
+        "The exact current publisher and stored publication are required.",
+      );
       const evidence = z
         .array(ProcessedMediaEvidenceSchema)
         .max(10)
         .parse(publication.media_evidence ?? []);
+      const processed = await this.validatePublication(
+        client,
+        actor,
+        row,
+        current.document,
+      );
       const command = publicationCommand(row, current.document, evidence);
       let mediaReady =
-        current.document.media.length === 0 && evidence.length === 0;
+        contentHash(processed.mediaEvidence) === contentHash(evidence);
       if (
         role.creator &&
         current.document.media.length > 0 &&
         this.dependencies.mediaPublication &&
         publication.signed_act_id
       ) {
-        const processed = await this.validatePublication(
-          client,
-          actor,
-          row,
-          current.document,
-        );
-        mediaReady =
-          contentHash(processed.mediaEvidence) === contentHash(evidence);
         for (const item of evidence)
           if (
             !(await this.dependencies.mediaPublication.ready(
@@ -1486,6 +1530,7 @@ export class ContentService {
             mediaReady = false;
       }
       return {
+        view: current,
         command,
         signedActId: publication.signed_act_id as string | null,
         mediaReady,
