@@ -256,6 +256,8 @@ export class GenerationTerminalAuthority {
             AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreatedb
             AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
             AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+            AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid
+             AND setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
            AND (SELECT count(*)=6 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))

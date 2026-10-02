@@ -3,7 +3,7 @@
   "recordedAt": "2026-10-02T13:05:28.082013+00:00",
   "sourceParent": "61db88ebba0ddcd420fa4e49144b77033dfc7dbd",
   "sourceFiles": {
-    "apps/backend/src/modules/identity/generation-terminal.ts": "8c8ca6c9eb4413f6e014015400a468045bfa8af75959bdb6098ff2558ff974ad",
+    "apps/backend/src/modules/identity/generation-terminal.ts": "ce0cf0af5eb29ab87dcb319fa345586025cc82d29468df9ab39472dfc87add1f",
     "apps/backend/src/modules/identity/schema-generation-terminal.sql": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
     "apps/backend/src/modules/identity/generation-scope.ts": "eebec15d06b7e611c7c8b1ebb2bf76fa7de09c09ab0c8dfb16b8be3a3c751f7e"
   },
@@ -62,7 +62,8 @@
   "checks": {
     "backendTypes": "passed",
     "scopedESLint": "passed",
-    "scopedPrettier": "passed"
+    "scopedPrettier": "passed",
+    "databaseSpecificRoleConfiguration": "factory rejects global/current-database role settings; catalogue query replanned"
   },
   "failures": [
     "Initial return flow after mapping retryable database errors failed TS2366; explicit never return corrected, subsequent types pass.",
