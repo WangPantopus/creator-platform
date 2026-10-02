@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Closed privacy continuation — 2026-10-02
+
+[Personally executed four-purpose SQL continuation](../../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) is on `codex/w8-migration-continuation-20261002`, normal main merge2c9aa8ca. Actual private backup/separate restore and atomic57→61 preserve57 history/131 rows/roles/sequence; fresh61 schema/security/roles match. Eight functions have zero compiler diagnostics;20 actual drift mutations refuse and roll back. All four targets remain closed. Draft packet selects only0074/0082/0087/0103; no main/peer/app/task/C10/original recovery/release activation is claimed.
+
+Draft metadata-only held map moves36 lower unready reservations to0114–0149, preserves SQL paths/bytes/history and leaves0111–0113 unchanged.0150 is W6 distinct current-account single-call metadata discovery, source/issuance/current booking/negative custody pending. Next: consume actual merged W2 Agent correction and W7 Growth owner; operate a separate labelled development copy through all three clients and independently inspect genuine task/COMMIT/refusals; obtain owner fresh/preserved-upgrade reviews before finalizing. No new unit tests or paid calls. Own API/web/devices/build slots and database container are stopped; private closed61 checkpoint/volumes retained.
+
+
 Actual0103 increment acceptance now includes [web plus normally shipped Android/iOS and independent saved-state readback](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/app-acceptance/README.md) at ccc4474b. Same new synthetic account-export hash across clients, Light/Night Trust blocked with no receipt/data/download. Missing activation never becomes an empty success. Existing Agent receipt is a separately identified unqualified lifecycle gap; W2 is correcting it. All own devices/services/slots are stopped/released, next-env restored and private0600 checkpoint retained. Actual activated task/COMMIT/expiry/owner/purge and full C10/recovery/release remain open. Additional held allocations:0111 W1 translation issuer,0112 W8 original translation negatives,0113 W2 distinct all-owned export snapshot;0087 scope ACL/owner stay isolated.
 
 

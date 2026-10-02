@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "wave": "20261002-privacy",
+  "state": "proposed_unapplied",
+  "mappings": [
+    {
+      "owner": "W7",
+      "old": "0063_w7_relationship_activity",
+      "new": "0114_w7_relationship_activity",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql"
+    },
+    {
+      "owner": "W7",
+      "old": "0064_w7_source_scan_checkpoint",
+      "new": "0115_w7_source_scan_checkpoint",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql"
+    },
+    {
+      "owner": "W7",
+      "old": "0065_w7_home_page_index",
+      "new": "0116_w7_home_page_index",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql"
+    },
+    {
+      "owner": "W7",
+      "old": "0066_w7_thanks_window_index",
+      "new": "0117_w7_thanks_window_index",
+      "path": "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql"
+    },
+    {
+      "owner": "W4",
+      "old": "0068_w4_paid_coverage",
+      "new": "0118_w4_paid_coverage",
+      "path": "apps/backend/src/modules/commerce/schema-paid-coverage.sql"
+    },
+    {
+      "owner": "W8",
+      "old": "0069_w8_reply_review",
+      "new": "0119_w8_reply_review",
+      "path": "apps/backend/migrations/0069_w8_reply_review.sql"
+    },
+    {
+      "owner": "W4",
+      "old": "0070_w4_public_packet_read",
+      "new": "0120_w4_public_packet_read",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql"
+    },
+    {
+      "owner": "W1",
+      "old": "0071_w1_publication_worker_scope",
+      "new": "0121_w1_publication_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-publication-scope.sql"
+    },
+    {
+      "owner": "W1",
+      "old": "0072_w1_generation_worker_scope",
+      "new": "0122_w1_generation_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql"
+    },
+    {
+      "owner": "W8",
+      "old": "0073_w8_publication_worker_denial",
+      "new": "0123_w8_publication_worker_denial",
+      "path": "apps/backend/migrations/0073_w8_publication_worker_denial.sql"
+    },
+    {
+      "owner": "W6",
+      "old": "0075_w6_publication_media_scope",
+      "new": "0124_w6_publication_media_scope",
+      "path": "apps/backend/src/modules/media/publication-scope.sql"
+    },
+    {
+      "owner": "W8",
+      "old": "0076_w8_public_packet_denial",
+      "new": "0125_w8_public_packet_denial",
+      "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql"
+    },
+    {
+      "owner": "W2",
+      "old": "0077_w2_usage_lineage",
+      "new": "0126_w2_usage_lineage",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql"
+    },
+    {
+      "owner": "W8",
+      "old": "0078_w8_privacy_export_chunks",
+      "new": "0127_w8_privacy_export_chunks",
+      "path": "apps/backend/migrations/0052_w8_privacy_export_chunks.sql"
+    },
+    {
+      "owner": "W2",
+      "old": "0079_w2_usage_retention_expiry",
+      "new": "0128_w2_usage_retention_expiry",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql"
+    },
+    {
+      "owner": "W4",
+      "old": "0080_w4_fan_request_page_index",
+      "new": "0129_w4_fan_request_page_index",
+      "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql"
+    },
+    {
+      "owner": "W1",
+      "old": "0081_w1_signature_read_fence",
+      "new": "0130_w1_signature_read_fence",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql"
+    },
+    {
+      "owner": "W3",
+      "old": "0083_w3_translation_worker_scope",
+      "new": "0131_w3_translation_worker_scope",
+      "path": null
+    },
+    {
+      "owner": "W8",
+      "old": "0084_w8_team_thread_denial",
+      "new": "0132_w8_team_thread_denial",
+      "path": "apps/backend/migrations/0084_w8_team_thread_denial.sql"
+    },
+    {
+      "owner": "W1",
+      "old": "0085_w1_public_ai_metadata_scope",
+      "new": "0133_w1_public_ai_metadata_scope",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql"
+    },
+    {
+      "owner": "W8",
+      "old": "0086_w8_public_creator_denial",
+      "new": "0134_w8_public_creator_denial",
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql"
+    },
+    {
+      "owner": "W5",
+      "old": "0088_w5_reply_tenure_cap",
+      "new": "0135_w5_reply_tenure_cap",
+      "path": null
+    },
+    {
+      "owner": "W8",
+      "old": "0089_w8_creator_fan_denial",
+      "new": "0136_w8_creator_fan_denial",
+      "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql"
+    },
+    {
+      "owner": "W4",
+      "old": "0090_w4_spending_notice_custody",
+      "new": "0137_w4_spending_notice_custody",
+      "path": null
+    },
+    {
+      "owner": "W8",
+      "old": "0091_w8_account_denial",
+      "new": "0138_w8_account_denial",
+      "path": null
+    },
+    {
+      "owner": "W6",
+      "old": "0092_w6_provider_callback_ingress",
+      "new": "0139_w6_provider_callback_ingress",
+      "path": null
+    },
+    {
+      "owner": "W8",
+      "old": "0093_w8_generation_worker_denial",
+      "new": "0140_w8_generation_worker_denial",
+      "path": null
+    },
+    {
+      "owner": "W4",
+      "old": "0094_w4_fulfillment_plan_custody",
+      "new": "0141_w4_fulfillment_plan_custody",
+      "path": null
+    },
+    {
+      "owner": "W3",
+      "old": "0095_w3_generation_purpose_consumers",
+      "new": "0142_w3_generation_purpose_consumers",
+      "path": null
+    },
+    {
+      "owner": "W2",
+      "old": "0096_w2_generation_input_consumers",
+      "new": "0143_w2_generation_input_consumers",
+      "path": null
+    },
+    {
+      "owner": "W2",
+      "old": "0097_w2_generation_attempt_admission",
+      "new": "0144_w2_generation_attempt_admission",
+      "path": null
+    },
+    {
+      "owner": "W4",
+      "old": "0098_w4_generation_allowance_audience",
+      "new": "0145_w4_generation_allowance_audience",
+      "path": null
+    },
+    {
+      "owner": "W1",
+      "old": "0099_w1_generation_terminal_scope",
+      "new": "0146_w1_generation_terminal_scope",
+      "path": null
+    },
+    {
+      "owner": "W8",
+      "old": "0100_w8_generation_terminal_denial",
+      "new": "0147_w8_generation_terminal_denial",
+      "path": null
+    },
+    {
+      "owner": "W7",
+      "old": "0101_w7_core_follow_metadata",
+      "new": "0148_w7_core_follow_metadata",
+      "path": null
+    },
+    {
+      "owner": "W5",
+      "old": "0102_w5_generation_content_origin",
+      "new": "0149_w5_generation_content_origin",
+      "path": null
+    }
+  ]
+}

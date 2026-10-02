@@ -1,5 +1,12 @@
 # W8 contract, migration and runtime register
 
+## Closed privacy continuation — 2026-10-02
+
+[Personally executed four-purpose SQL continuation](../../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) is on `codex/w8-migration-continuation-20261002`, normal main merge2c9aa8ca. Actual private backup/separate restore and atomic57→61 preserve57 history/131 rows/roles/sequence; fresh61 schema/security/roles match. Eight functions have zero compiler diagnostics;20 actual drift mutations refuse and roll back. All four targets remain closed. Draft packet selects only0074/0082/0087/0103; no main/peer/app/task/C10/original recovery/release activation is claimed.
+
+Draft metadata-only held map moves36 lower unready reservations to0114–0149, preserves SQL paths/bytes/history and leaves0111–0113 unchanged.0150 is W6 distinct current-account single-call metadata discovery, source/issuance/current booking/negative custody pending. Next: consume actual merged W2 Agent correction and W7 Growth owner; operate a separate labelled development copy through all three clients and independently inspect genuine task/COMMIT/refusals; obtain owner fresh/preserved-upgrade reviews before finalizing. No new unit tests or paid calls. Own API/web/devices/build slots and database container are stopped; private closed61 checkpoint/volumes retained.
+
+
 Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
 
 
