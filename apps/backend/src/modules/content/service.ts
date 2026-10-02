@@ -621,7 +621,20 @@ export class ContentService {
     contentId: string,
     version?: number,
   ) {
-    if (await this.hasFulfillmentPlan(client, creatorId, contentId, version))
+    const candidate = (
+      await client.query<{ planned_answer: boolean }>(
+        `SELECT kind='public_answer' AND packet_id IS NULL AS planned_answer
+         FROM creator.content_index WHERE creator_id=$1 AND id=$2
+         AND ($3::integer IS NULL OR version=$3)`,
+        [creatorId, contentId, version ?? null],
+      )
+    ).rows[0];
+    // A fan cannot inspect revision metadata before eligibility. The public,
+    // body-free index tuple also closes planned answers hidden by revision RLS.
+    if (
+      candidate?.planned_answer ||
+      (await this.hasFulfillmentPlan(client, creatorId, contentId, version))
+    )
       throw new DomainError(
         "fulfillment_view_unconfigured",
         "Current access to this answer is unavailable.",
@@ -1658,9 +1671,13 @@ export class ContentService {
       await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const planned =
-        studio && (await this.hasFulfillmentPlan(client, creatorId, id));
-      if (planned)
-        await this.publicationSources.prepare(client, actor, creatorId, id);
+        studio &&
+        (await this.publicationSources.prepareReadBatch(
+          client,
+          actor,
+          creatorId,
+          [id],
+        ));
       const row = await this.index(
         client,
         creatorId,
@@ -1669,14 +1686,11 @@ export class ContentService {
         studio ? undefined : actor,
       );
       await this.authorizeRead(client, actor, row, studio);
+      if (planned)
+        await this.publicationSources.positiveReadBatch(client, actor);
       const view = await this.view(client, actor, row, studio);
-      if (planned) {
-        await this.publicationSources.groupPositive(client, actor);
-        await this.publicationSources.finalize(client, actor, {
-          stage: "review",
-          publicationSignedActId: view.signedActId,
-        });
-      }
+      if (planned)
+        await this.publicationSources.finalizeReadBatch(client, actor);
       return view;
     });
   }
@@ -1801,11 +1815,23 @@ export class ContentService {
           ],
         )
       ).rows;
-      // The owner publication preparation holds one actual plan. A bounded
-      // mixed Studio page requires its own multi-plan owner preparation; never
-      // clone that scope or silently omit a current answer from this feed.
-      for (const row of rows.slice(0, page.limit))
-        await this.requireOrdinaryRead(client, creatorId, row.id, row.version);
+      const selected = rows.slice(0, page.limit);
+      const planned =
+        studio &&
+        (await this.publicationSources.prepareReadBatch(
+          client,
+          actor,
+          creatorId,
+          selected.map((row) => row.id),
+        ));
+      if (!studio)
+        for (const row of selected)
+          await this.requireOrdinaryRead(
+            client,
+            creatorId,
+            row.id,
+            row.version,
+          );
       if (studio)
         await this.role(client, actor, creatorId, [
           "triage",
@@ -1855,6 +1881,8 @@ export class ContentService {
           (await this.preparePacketPositive(client, actor, current))
         )
           packetPrepared.push(current);
+      if (planned)
+        await this.publicationSources.positiveReadBatch(client, actor);
       // Every content/quote/audience/mode/packet positive lock is now held. Final W4
       // source gates and plain view reads cannot introduce a later identity or
       // domain lock from another candidate after the first source fence.
@@ -1873,11 +1901,14 @@ export class ContentService {
         )
           items.push(view);
       }
-      return {
+      const result = {
         items,
         nextCursor: rows.length > page.limit ? rows[page.limit - 1]!.id : null,
         serverTime: new Date().toISOString(),
       };
+      if (planned)
+        await this.publicationSources.finalizeReadBatch(client, actor);
+      return result;
     });
   }
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {

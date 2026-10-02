@@ -12,6 +12,7 @@ import type { AccessService } from "../access/scope.js";
 import {
   CommerceFulfillmentPlans,
   type CommerceGroupRecipient,
+  type CommerceFulfillmentDraftReadBatch,
 } from "../commerce/fulfillment-plans.js";
 import { ConversationService } from "../conversation/service.js";
 import type { Actor } from "../identity/adapter.js";
@@ -25,6 +26,23 @@ export type ContentGroupPublicationOwners = {
   conversations: ConversationService;
 };
 type Ref = z.infer<typeof CommerceFulfillmentPlanRef>;
+const ReadTuple = z.strictObject({
+  contentId: z.uuid(),
+  version: z.int().positive(),
+  state: z.enum(["draft", "published"]),
+  planRef: CommerceFulfillmentPlanRef,
+});
+type ReadHeld = {
+  actor: Actor;
+  request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
+  pid: number;
+  transaction: string;
+  creatorId: string;
+  tuples: readonly z.infer<typeof ReadTuple>[];
+  proof: CommerceFulfillmentDraftReadBatch;
+  positive: boolean;
+  finalized: boolean;
+};
 type Held = {
   actor: Actor;
   request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
@@ -55,6 +73,7 @@ function unavailable(): never {
  * W3 records delivery once; all W5 writes precede the last W4 finalizer. */
 export class ContentGroupPublication {
   private readonly held = new WeakMap<PoolClient, Held>();
+  private readonly reads = new WeakMap<PoolClient, ReadHeld>();
   constructor(
     pool: Pool,
     private readonly owners: ContentGroupPublicationOwners,
@@ -114,6 +133,7 @@ export class ContentGroupPublication {
     const context = await this.context(client, actor);
     if (
       this.held.get(client)?.transaction === context.transaction ||
+      this.reads.get(client)?.transaction === context.transaction ||
       !["draft", "published"].includes(tuple.state)
     )
       unavailable();
@@ -141,6 +161,67 @@ export class ContentGroupPublication {
     });
   }
 
+  async prepareReadBatch(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    raw: unknown,
+  ) {
+    const context = await this.context(client, actor);
+    if (
+      this.held.get(client)?.transaction === context.transaction ||
+      this.reads.get(client)?.transaction === context.transaction
+    )
+      unavailable();
+    const tuples = z.array(ReadTuple).min(1).max(100).parse(raw);
+    const proof = await this.owners.plans.prepareDraftReadBatch(client, actor, {
+      creatorId,
+      answers: tuples.map(({ contentId, planRef }) => ({ contentId, planRef })),
+    });
+    this.reads.set(client, {
+      ...context,
+      actor,
+      creatorId,
+      tuples,
+      proof,
+      positive: false,
+      finalized: false,
+    });
+  }
+
+  private async currentRead(client: PoolClient, actor: Actor) {
+    const context = await this.context(client, actor),
+      held = this.reads.get(client);
+    if (
+      !held ||
+      held.finalized ||
+      held.actor !== actor ||
+      held.request !== context.request ||
+      held.pid !== context.pid ||
+      held.transaction !== context.transaction
+    )
+      unavailable();
+    return held;
+  }
+
+  async positiveReadBatch(client: PoolClient, actor: Actor) {
+    const held = await this.currentRead(client, actor);
+    if (held.positive) unavailable();
+    await this.owners.plans.prepareDraftReadBatchPositive(
+      client,
+      actor,
+      held.proof,
+    );
+    held.positive = true;
+  }
+
+  async finalizeReadBatch(client: PoolClient, actor: Actor) {
+    const held = await this.currentRead(client, actor);
+    if (!held.positive) unavailable();
+    held.finalized = true;
+    await this.owners.plans.finalizeDraftReadBatch(client, actor, held.proof);
+  }
+
   async prepareSave(
     client: PoolClient,
     actor: Actor,
@@ -155,7 +236,10 @@ export class ContentGroupPublication {
     const document = ContentDocument.parse(input.document);
     if (!document.planRef) unavailable();
     const context = await this.context(client, actor);
-    if (this.held.get(client)?.transaction === context.transaction)
+    if (
+      this.held.get(client)?.transaction === context.transaction ||
+      this.reads.get(client)?.transaction === context.transaction
+    )
       unavailable();
     const current = (
       await client.query<{ version: number; state: string }>(
@@ -255,6 +339,24 @@ export class ContentGroupPublication {
       state: string;
     },
   ) {
+    const context = await this.context(client, actor);
+    if (this.reads.get(client)?.transaction === context.transaction) {
+      const held = await this.currentRead(client, actor);
+      const tuple = held.tuples.find(
+        (value) => value.contentId === input.contentId,
+      );
+      if (
+        held.creatorId !== input.creatorId ||
+        !held.positive ||
+        !tuple ||
+        tuple.version !== input.version ||
+        tuple.state !== input.state ||
+        contentHash(tuple.planRef) !==
+          contentHash(CommerceFulfillmentPlanRef.parse(input.planRef))
+      )
+        unavailable();
+      return;
+    }
     const held = await this.current(client, actor);
     if (
       held.creatorId !== input.creatorId ||

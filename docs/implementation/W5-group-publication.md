@@ -9,9 +9,11 @@ The minimum recipient count remains W4's explicit founder configuration.
 
 W4 owner dependencies were taken byte for byte from
 `a632cd7ad5af0e4dffc2385cc3b8497961fb23dc`, including W3's personally confirmed
-main-compatible system-link implementation. `fulfillment-plans.ts` and `fulfillment-view-authority.ts` are updated
-byte for byte to W4 `84a035328150746e6a94cbce8e511de87b469109` for the genuine
-empty saved-draft retry and actual W1 held request-session consumer. These dependencies retain their held SQL and catalogue
+main-compatible system-link implementation. `fulfillment-plans.ts` is updated byte for byte to W4
+`5a7925ef91fee53386136708a28eb1818b5ae8c4` for genuine empty saved-draft
+retries and bounded creator draft reads. `fulfillment-view-authority.ts` retains
+W4 `84a035328150746e6a94cbce8e511de87b469109` and its actual W1 held
+request-session consumer. These dependencies retain their held SQL and catalogue
 pins; this change registers and activates no migrations.
 
 ## Actual transaction order
@@ -36,9 +38,11 @@ body or supplied URL, and it does not alter takeover control or its epoch.
 
 Fan reads of planned answers are refused using tuple metadata before ordinary
 audience preparation; a fulfillment plan ID never enters tier-group permission.
-A Studio page containing plans also remains unavailable until W4 supplies a
-bounded multi-plan draft reader. An empty draft's single saved return needs a
-draft-read owner rather than publication's nonempty-body preparation. Genuine
+Single saved return and mixed Studio pages consume the actual bounded W4 read
+batch (including empty drafts) without a recipient proof or mutation authority.
+A page change or over-bound original set refuses the whole read rather than
+omitting an answer. The immutable public index tuple also closes fan planned
+answers before revision RLS could hide their plan metadata. Genuine
 0199 view issuance, W8 0200 all-original negatives, W4 0202 descriptor matching,
 the final capture/refund/dispute and signature/source-retraction checks remain
 necessary before fan body access. Group public projection remains pending its

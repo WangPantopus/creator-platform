@@ -201,6 +201,59 @@ export class ContentPublicationSources {
     await this.groups.prepareSave(client, actor, input);
   }
 
+  async prepareReadBatch(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    contentIds: readonly string[],
+  ) {
+    const rows = (
+      await client.query<{
+        content_id: string;
+        version: number;
+        state: string;
+        plan_ref: unknown;
+      }>(
+        `SELECT i.id AS content_id,i.version,i.state,r.document->'planRef' AS plan_ref
+         FROM creator.content_index i JOIN creator.content_revision r
+         ON r.content_id=i.id AND r.creator_id=i.creator_id AND r.version=i.version
+         WHERE i.creator_id=$1 AND i.id=ANY($2::uuid[])
+         AND r.document->'planRef' IS NOT NULL AND r.document->'planRef'<>'null'::jsonb
+         ORDER BY i.id`,
+        [creatorId, contentIds],
+      )
+    ).rows;
+    if (!rows.length) return false;
+    if (!this.groups)
+      throw new DomainError(
+        "fulfillment_plan_unconfigured",
+        "Current access to this answer is unavailable.",
+        503,
+      );
+    await this.groups.prepareReadBatch(
+      client,
+      actor,
+      creatorId,
+      rows.map((row) => ({
+        contentId: row.content_id,
+        version: row.version,
+        state: row.state,
+        planRef: row.plan_ref,
+      })),
+    );
+    return true;
+  }
+
+  async positiveReadBatch(client: PoolClient, actor: Actor) {
+    if (!this.groups) throw new Error("Actual group read owner required.");
+    await this.groups.positiveReadBatch(client, actor);
+  }
+
+  async finalizeReadBatch(client: PoolClient, actor: Actor) {
+    if (!this.groups) throw new Error("Actual group read owner required.");
+    await this.groups.finalizeReadBatch(client, actor);
+  }
+
   async groupPositive(client: PoolClient, actor: Actor) {
     if (!this.groups)
       throw new DomainError(
