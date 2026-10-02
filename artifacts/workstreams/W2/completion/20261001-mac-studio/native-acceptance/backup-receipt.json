@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-02T06:25:00Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "source": "c83da8c9",
+  "privateArchive": "creator_w2-20261002T062500Z.pgdump",
+  "bytes": 541338,
+  "sha256": "b08b38c30978e74f586041538b584dd43b1abea248c2f14f8e7863d34daac8b8",
+  "tocEntries": 1277,
+  "restoration": {
+    "container": "creator-platform-w2-check-20261001",
+    "database": "creator_w2_rehearsal_native_20261002",
+    "exitOnError": true,
+    "result": "success",
+    "registeredMigrations": 40,
+    "draftRevision": 15,
+    "examples": 20,
+    "sources": 1,
+    "developmentLicenses": 1,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0,
+    "fictionalFan": "w2_native_fan",
+    "activeFanSessions": 1
+  },
+  "limits": [
+    "The raw dump and owner export remain private and are not committed.",
+    "This fresh Mac Studio database does not recover the missing iMac archive.",
+    "No provider or publication acceptance is implied."
+  ]
+}
