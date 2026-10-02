@@ -1,0 +1,41 @@
+{
+  "base": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "branch": "codex/w6-completion-20261001",
+  "ownedSource": [
+    {
+      "file": "apps/backend/src/modules/media/credentials.ts",
+      "bytes": 9486,
+      "sha256": "ba63da353d743830ff46936ad667952aabb38dcc0a21387ab4982d9da44ff4b9"
+    },
+    {
+      "file": "apps/backend/src/modules/media/files.ts",
+      "bytes": 2470,
+      "sha256": "657ad7c498eb6c74eea73734b77b134b8aaef9fd9fa453871de96003e78a0bd9"
+    },
+    {
+      "file": "apps/backend/src/modules/media/processor.ts",
+      "bytes": 12431,
+      "sha256": "e85ba5479ceb390b4f370b0bdce928c201aef7af53bf77d372a6b490ca8e3af2"
+    },
+    {
+      "file": "apps/backend/src/modules/media/storage.ts",
+      "bytes": 11147,
+      "sha256": "c92f47ef7c5e6fabf04062f18b869f4b67e368b488e2ebe4ef1d93db75f6177c"
+    },
+    {
+      "file": "apps/backend/src/modules/media/worker.ts",
+      "bytes": 10580,
+      "sha256": "07b1083077a3b816194a8f5f1967951339b54ccf1186b6e094f879edc9d3776c"
+    },
+    {
+      "file": "apps/backend/src/modules/media/creator-worker.ts",
+      "bytes": 9282,
+      "sha256": "2a5f607030abe70d1d2fcc4e44aeb3047f17410098bcc79cec8d254f3a8b3e9d"
+    }
+  ],
+  "personallyImplemented": true,
+  "delegated": false,
+  "newTestCode": false,
+  "configured": false,
+  "fullWorkstreamComplete": false
+}
