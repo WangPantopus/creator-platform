@@ -24,6 +24,7 @@ export function mediaPrivacyHook(input: {
   const authority = conversationPrivacyAuthority(
     input.runtime,
     input.coordinator,
+    input.assertRestoredInTransaction,
   );
   return {
     domain: "media",

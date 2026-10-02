@@ -75,6 +75,7 @@ export function createPrivacyConsumers(input: {
   const conversationAuthority = conversationPrivacyAuthority(
     input.runtimePool,
     input.coordinatorPool,
+    input.assertRestoredInTransaction,
   );
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
