@@ -183,11 +183,15 @@ export class SessionService implements PantopusIdentityAdapter {
         401,
       );
     let actor: Actor;
+    let adultVerifiedAt: string;
     try {
       actor = await resolveActor(
         this.upstream,
         this.decrypt(row.upstream_cipher),
       );
+      // This is the time of this actual current upstream confirmation, not
+      // session creation, refresh time or caller-supplied adult provenance.
+      adultVerifiedAt = new Date().toISOString();
     } catch (error) {
       if (
         !(error instanceof DomainError) ||
@@ -224,6 +228,7 @@ export class SessionService implements PantopusIdentityAdapter {
       sessionId: row.id,
       expiresAt: row.expires_at.toISOString(),
       authenticatedAt: row.created_at,
+      adultVerifiedAt,
     };
   }
   async refresh(token: string) {

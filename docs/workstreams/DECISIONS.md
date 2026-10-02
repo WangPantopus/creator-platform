@@ -168,3 +168,7 @@ Personally launching the actual shipping Android build without command-line over
 ## W1 canonical error envelope matches the actual API — October2
 
 The personally operated shipping Android under18 flow displayed a generic reconnect failure. The actual API error middleware includes optional correlationId, while the canonical strict Error model omitted it; Android strict decoding therefore discarded the actionable message. Added the existing optional correlation field to the canonical schema and regenerated every consumer. This preserves strict authority payload validation while allowing the actual sanctioned diagnostic field. The under18 journey will be repeated after the shipping rebuild; the initial generic message remains a recorded UX failure.
+
+## W1 strict held request before family discovery — October2
+
+One-ID metadata bootstrap requires a current genuine request before its family is known. The new issuer refuses absent ALS, mismatched/stale current adult evidence, wrong/non-owner role, implicit transactions and another session binding. Its opaque result retains exact request/client/PID/full transaction custody; bookends reject cross-request/client or ended-transaction reuse and recheck actual session expiry. It cannot grant a family, Access, Trust or provider permission. Call metadata must stay internal until genuine same-client restoration, participant negatives, Access and current booking pass. See [the actual contract](../implementation/W1-current-request-session.md). Existing scoped host/job absence behavior is preserved separately.
