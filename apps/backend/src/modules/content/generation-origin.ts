@@ -12,7 +12,7 @@ import {
 import { SIGNATURE_READ_FENCE_MIGRATION } from "../identity/signature-read-fence.js";
 
 export const GENERATION_CONTENT_ORIGIN_MIGRATION =
-  "0102_w5_generation_content_origin";
+  "0186_w5_generation_content_origin";
 export const GENERATION_CONTENT_ORIGIN_SIGNATURE =
   "creator.generation_content_origins(uuid,uuid,jsonb)";
 const owner = "creator_w5_generation_origin";

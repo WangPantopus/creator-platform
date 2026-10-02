@@ -1,5 +1,7 @@
 # Current generation content origins
 
+W8's corrected held order at `fb1cbcaab7926e96a361bfd7840ecf192efafefd` allocates `0186_w5_generation_content_origin` and `0172_w5_reply_tenure_cap`. W5's two factories now require these exact future versions. Both SQL byte streams, paths and historical comments remain unchanged; no registry or database activation is performed. The earlier version references below describe historical observations. See `held-order-update.json` for the reviewed map and immutable SQL checksums.
+
 Implementation: `307448af24c69f67dba2e4258cba92040eea0230`, branch `codex/w5-generation-content-origin-20261002`, based on PR133's current-main integration `833593b3aa5fe07f77c7abcafda83e4abd3e6c18`.
 
 Implemented: `PreparedContentGenerationOrigins` consumes W1's actual `GenerationIdentityAuthority` from immutable `dcb77f23833f8a79761ee072b018e7aa78d765b7`, unchanged SHA256 `590d381f72b66262f7c77bd8010332fe9249395e9aac8c0b4851db92a6decfd1`. Both bookends require that exact issuer's genuine scope/client/private transaction binding. Copied scopes, interactive Actors and a job ID cannot supply permission. W5 exports the factory from its canonical integration seam.
