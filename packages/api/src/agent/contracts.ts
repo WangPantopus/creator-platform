@@ -91,6 +91,11 @@ export const PreviewRequest = z.strictObject({
   expectedRevision: Revision,
   message: z.string().trim().min(1).max(2000),
 });
+/** Labeled terms for fictional creators on a loopback development host. Never
+ * counsel-reviewed, signed or applicable to real fans. */
+export const DEVELOPMENT_LICENSE_TERMS = "development-synthetic-unreviewed";
+export const developmentProofReference = (creatorId: string) =>
+  `development-synthetic:${creatorId}`;
 export const LicenseRequest = z.strictObject({
   proofReference: z.string().min(1).max(200),
   counselVersion: z.string().min(1).max(100),
@@ -238,6 +243,8 @@ export type StudioState = {
     model: boolean;
     embeddings: boolean;
     licensing: boolean;
+    /** Loopback development creators may record a labeled, unreviewed license. */
+    syntheticLicensing: boolean;
     audioInterview: boolean;
     aiVoice: boolean;
   };
