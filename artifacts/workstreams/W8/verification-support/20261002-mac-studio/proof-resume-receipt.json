@@ -1,0 +1,18 @@
+{
+  "source": "f558ca04915f24115c132460322c398246bc5c2a",
+  "labelledSynthetic": true,
+  "externalOwnershipVerified": false,
+  "providerReceipt": false,
+  "renewedAccessForActualResolvedVersion": false,
+  "preApprovalComparisonGuardPresent": true,
+  "initialDecisionRunReceiptMissing": true,
+  "errors": [],
+  "coldInitialReadStatus": 200,
+  "reusedActualUnexpiredResolvedVersionAccess": true,
+  "explicitColdCodeComparison": true,
+  "mockAccountUrlMatches": true,
+  "mockPostUrlMatches": true,
+  "coldCaseResolved": true,
+  "coldCreatorProofApproved": true,
+  "normalSignout": true
+}

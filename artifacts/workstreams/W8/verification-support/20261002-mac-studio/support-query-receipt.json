@@ -1,0 +1,32 @@
+{
+  "webSource": "87578f8c7e40767decd07fe44c134b91071faf5a",
+  "labelledSynthetic": true,
+  "readOnlyQueryVerification": true,
+  "newUnitTests": false,
+  "errors": [],
+  "valid": {
+    "expectedKind": "verification",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  },
+  "invalid-id": {
+    "expectedKind": "support",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  },
+  "unknown-kind": {
+    "expectedKind": "support",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  },
+  "mixed-message": {
+    "expectedKind": "ai_report",
+    "actualCreatorMatches": true,
+    "overflow": false,
+    "noAutomaticReport": true
+  },
+  "normalSignout": true
+}
