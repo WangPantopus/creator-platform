@@ -38,5 +38,17 @@
       "path": "artifacts/workstreams/W4/runtime/2026-10-02/reminder-opt-in-default/fan-reload-night.png",
       "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
     }
-  ]
+  ],
+  "hostedInitialHead": {
+    "head": "66d3e9613b7e6c005f2cc86a1ee4ce6d45341393",
+    "webBackend": "bothPASS",
+    "androidRuntime": [
+      "PASS",
+      "FAIL before app/test execution: Android34 system-image download unknown ZIP archive; emulator never launched, cleanup5554 refused"
+    ],
+    "run": 37003004977,
+    "job": 110824766618,
+    "retry": "Actual gh per-job rerun refused while workflow queued; preserved original failure and updating evidence on new head, without source/expected-result changes",
+    "visualAndNativeFoundation": "QUEUED, notPASS"
+  }
 }

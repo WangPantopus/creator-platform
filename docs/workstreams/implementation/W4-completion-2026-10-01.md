@@ -1,5 +1,7 @@
 ### Reminder omission remains opt-in — October 2, 2026
 
+PR127 initial head66d3e961 passed both web/backend jobs and one Android runtime job. The other Android job failed before app/test execution: SDK34 system-image download reported an unknown ZIP archive and its unbooted emulator cleanup refused5554. GitHub rejected the actual per-job retry while the workflow remained queued. This evidence-only update requests fresh-head CI without changing source or expected outcomes; queued visual/native jobs remain unverified.
+
 Found and corrected a contract-level consent defect: omitted `remindersOn` previously defaulted true even though R10 and all app choices require deliberate opt-in. It now defaults false; explicit choices remain authoritative and generated OpenAPI agrees. This changes no stored preference or migration. Backend compilation, generated consistency and scoped lint/format pass. The primary restarted the owned API and personally reloaded actual web: reminders off, current7USD and the original pending No limit deadline persist. [Sanitized receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/reminder-opt-in-default/receipt.json) distinguishes this retained regression from an omitted-field transaction or notification delivery. Actual owner-publication source integration continues independently; original nine packages/R01–R15 remain assigned.
 
 ### Closed call transport and financial separation — October 2, 2026
