@@ -513,6 +513,7 @@
   <string name="growth_music" formatted="false">Music</string>
   <string name="growth_food" formatted="false">Food</string>
   <string name="growth_label_with_state" formatted="false">{label} · {state}</string>
+  <string name="growth_notification_channel" formatted="false">{kind} · {channel}</string>
   <string name="growth_creator_with_state" formatted="false">{name} · {state}</string>
   <string name="growth_decision_accept" formatted="false">Accept</string>
   <string name="growth_decision_defer" formatted="false">Defer</string>

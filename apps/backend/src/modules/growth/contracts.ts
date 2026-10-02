@@ -29,7 +29,7 @@ export const Destination = z
   .string()
   .max(512)
   .regex(
-    /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|requests\/[a-f0-9-]+|calls\/[a-f0-9-]+|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
+    /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]+|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
   );
 export const EventEnvelope = z.strictObject({
   id: z.uuid(),

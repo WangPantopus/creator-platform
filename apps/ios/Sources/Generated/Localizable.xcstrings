@@ -5622,6 +5622,17 @@
         }
       }
     },
+    "{kind} · {channel}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{kind} · {channel}"
+          }
+        }
+      }
+    },
     "{name} · {state}": {
       "extractionState": "manual",
       "localizations": {

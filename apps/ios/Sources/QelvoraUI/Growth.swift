@@ -201,6 +201,7 @@ public struct GrowthFanFeature: View {
   private let signIn: (String) -> Void
   private let navigate: ((String) -> Void)?
   @State private var route: String
+  @FocusState private var discoverSearchFocused: Bool
   @State private var query = ""
   @State private var category = "For you"
   @State private var section = "Chat"
@@ -279,10 +280,15 @@ public struct GrowthFanFeature: View {
             Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
-              .foregroundStyle(qColor("ink", scheme)).padding(12)
+              .textFieldStyle(.plain)
+              .qText("body").foregroundStyle(qColor("ink", scheme)).padding(12).frame(minHeight: 48)
+              .accessibilityLabel(QelvoraCopy.text("growthSearchCreators"))
               .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
               .overlay { RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1) }
-              .submitLabel(.search).onSubmit { Task { await load() } }
+              .focused($discoverSearchFocused)
+              .contentShape(Rectangle())
+              .onTapGesture { discoverSearchFocused = true }
+              .submitLabel(.search).onSubmit { discoverSearchFocused = false; Task { await load() } }
             Segmented(items: growthCategories.map(growthLabel), active: growthLabel(category)) { value in
               category = growthCategories.first(where: { growthLabel($0) == value }) ?? category
               Task { await load() }
