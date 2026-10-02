@@ -22,10 +22,10 @@ DO $$ DECLARE r oid; BEGIN
   OR EXISTS(SELECT FROM pg_proc WHERE proowner=r)
   OR EXISTS(SELECT FROM pg_class t JOIN pg_namespace n ON n.oid=t.relnamespace
    WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-    AND ((t.relkind IN('r','p','v','m','f') AND
+    AND (CASE WHEN t.relkind IN('r','p','v','m','f') THEN
       (has_table_privilege(r,t.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
-       OR has_any_column_privilege(r,t.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
-     OR (t.relkind='S' AND has_sequence_privilege(r,t.oid,'USAGE,SELECT,UPDATE')))) THEN
+       OR has_any_column_privilege(r,t.oid,'SELECT,INSERT,UPDATE,REFERENCES')) ELSE false END
+     OR CASE WHEN t.relkind='S' THEN has_sequence_privilege(r,t.oid,'USAGE,SELECT,UPDATE') ELSE false END)) THEN
   RAISE EXCEPTION 'Unsafe generation content origin custody';
  END IF;
 END $$;
