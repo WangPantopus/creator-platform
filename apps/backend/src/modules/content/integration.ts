@@ -70,6 +70,7 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
