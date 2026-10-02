@@ -5,6 +5,8 @@ public struct ArrivalContext: Sendable { let source: String; let title: String; 
 @MainActor
 public final class FanSession: ObservableObject {
     @Published public private(set) var session: APISession?
+    @Published public private(set) var hasSavedCredential = false
+    @Published public private(set) var checkingSession: Bool
     @Published public var destination: String
     @Published public var error = ""
     @Published public var busy = false
@@ -18,10 +20,12 @@ public final class FanSession: ObservableObject {
     private let baseURL: URL?
     private var generation = 0
     private var rotatingCredential = false
+    private var refreshingSession = false
     private var removedArrivalFor: String?
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
         self.baseURL = baseURL
+        checkingSession = baseURL != nil
         storage = SecureSessionStorage(issuer: baseURL)
         if let baseURL { let credentials = storage; api = CreatorAPIClient(baseURL: baseURL, token: { try await credentials.read() }) } else { api = nil }
     }
@@ -38,7 +42,10 @@ public final class FanSession: ObservableObject {
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
-        guard let api, !rotatingCredential, !purgingPrivateState, !Task.isCancelled else { return }
+        guard !rotatingCredential, !refreshingSession, !purgingPrivateState, !Task.isCancelled else { return }
+        guard let api else { checkingSession = false; return }
+        refreshingSession = true; checkingSession = true
+        defer { refreshingSession = false; checkingSession = false }
         let current = generation
         let token: String?
         do { token = try await storage.read() }
@@ -48,6 +55,7 @@ public final class FanSession: ObservableObject {
             return
         }
         guard current == generation, !Task.isCancelled else { return }
+        hasSavedCredential = token != nil
         guard token != nil else { if session != nil { await purge() }; return }
         do {
             let value = try await api.identitySession()
@@ -60,7 +68,7 @@ public final class FanSession: ObservableObject {
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
             if failure.status == 401 {
-                if !busy { await refreshCredentials() }
+                if !busy { refreshingSession = false; await refreshCredentials() }
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
@@ -129,7 +137,7 @@ public final class FanSession: ObservableObject {
         guard !purgingPrivateState else { return false }
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
-        generation += 1; session = nil; actors = []; choosingDevelopmentActor = false; error = ""
+        generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
         URLCache.shared.removeAllCachedResponses()
         #if os(iOS)
         GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
@@ -202,6 +210,14 @@ public struct FanAppShell: View {
                 }.padding(16)
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id(model.destination + destinationDelivery.uuidString)
+            } else if model.session == nil, model.hasSavedCredential {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(QelvoraCopy.text(model.checkingSession && model.error.isEmpty ? "growthLoading" : "accountUnavailableTitle")).qText("display-md").accessibilityAddTraits(.isHeader)
+                    Text(QelvoraCopy.text("accountUnavailableBody")).qText("body").foregroundStyle(qColor("ink-muted", scheme))
+                    Button(QelvoraCopy.text("retry"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession) { Task { await model.refresh() } }
+                }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+            } else if model.session == nil, model.checkingSession {
+                ProgressView(QelvoraCopy.text("growthLoading")).padding(16)
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
