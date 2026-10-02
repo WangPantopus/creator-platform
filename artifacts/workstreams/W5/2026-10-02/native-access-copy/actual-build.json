@@ -1,0 +1,23 @@
+{
+  "source": "6784efd4c7d20557e2f5e1294190a80c5a889335",
+  "at": "2026-10-02T14:19:55.261023+00:00",
+  "shippingIOSBuild": "passed",
+  "strictIOSCodeSignature": "passed",
+  "shippingAndroidBuild": "passed",
+  "sourceArtifacts": {
+    "androidAPK": {
+      "path": "/private/tmp/creator-w5-android-build/outputs/apk/debug/app-debug.apk",
+      "sha256": "0d958b4ef0a0443822fecdf1846350ce58c5a2c406080607281e46514d0a69d5"
+    },
+    "iosDebugDylib": {
+      "path": "/private/tmp/creator-w5-ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+      "sha256": "51da298b682c39bf31f9d717dfae0a17f8fb6029f56c1e3686c46d263b0ba664"
+    }
+  },
+  "generatedCopyAndAPIModels": "verified",
+  "copyTypeScript": "passed",
+  "copyFormatting": "passed",
+  "personalOperationOfThisSource": "pending",
+  "qualification": "No genuine publication/signature/proof/passkey/private-reply/Thanks isolation acceptance.",
+  "generatedIOSPlist": "xcodegen rendered NSCameraUsageDescription from committed project.yml; generated tracked Info.plist restored before commit. No W5 camera-permission change."
+}
