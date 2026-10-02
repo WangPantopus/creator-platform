@@ -1,0 +1,112 @@
+{
+  "workstream": "W5",
+  "increment": "continuation-b",
+  "recordedAt": "2026-10-01T21:05:00Z",
+  "host": "Mac Studio (different machine from earlier W5/W2/W4/W8 handoffs)",
+  "baseRevision": "d6ea70e4 (fetched); handoff branch on db1252df",
+  "applicationCodeChanged": false,
+  "recoveryArchives": {
+    "path": "~/.config/creator-platform/cleanup-20261001/",
+    "present": false,
+    "confirmedBy": ["W5", "W8"]
+  },
+  "database": {
+    "container": "creator-platform-w5-local",
+    "image": "pgvector/pgvector:pg17",
+    "volume": "creator-platform-w5-pg-20261001",
+    "address": "127.0.0.1:55435/creator_w5",
+    "ledgerRows": 40,
+    "range": "0001_foundation..0043_w8_relationship_backfill",
+    "reservedApplied": [],
+    "runtimeRole": "creator_runtime (non-owner, NOBYPASSRLS)",
+    "stateAtHandoff": "stopped"
+  },
+  "actorsCreatedThroughUI": [
+    {
+      "account": "10000000-0000-4000-8000-000000000001",
+      "handle": "maya_w5",
+      "role": "creator account"
+    },
+    {
+      "account": "10000000-0000-4000-8000-000000000002",
+      "handle": "kilnfire",
+      "role": "fan one"
+    },
+    {
+      "account": "10000000-0000-4000-8000-000000000003",
+      "handle": "wheelhouse",
+      "role": "fan two"
+    },
+    {
+      "account": "10000000-0000-4000-8000-000000000004",
+      "handle": "priya_team",
+      "role": "intended triage team (not yet invited)"
+    }
+  ],
+  "creator": {
+    "id": "46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e",
+    "handle": "maya",
+    "createdVia": "/studio/setup (pending)",
+    "verification": "verified by development-only SQL seed at 2026-10-01T20:44:26Z; no creator_proof; no passkey; NOT acceptance"
+  },
+  "operated": [
+    {
+      "surface": "web 390 Light (headless operator)",
+      "journey": "dev sign-in + handle onboarding x4",
+      "result": "pass: fan_profile rows created through /onboarding/handle"
+    },
+    {
+      "surface": "web 390 Light",
+      "journey": "creator setup step 1",
+      "result": "pass: pending creator profile; step 2 external proof requires ops review (unavailable in development identity)"
+    },
+    {
+      "surface": "web 390 Light",
+      "journey": "Studio Notes as pending creator",
+      "result": "honest denial: 403 creator verification and recovery are required"
+    },
+    {
+      "surface": "web 390 Light",
+      "journey": "Studio Notes after dev-seeded verification",
+      "result": "honest unavailable: private reply review schema (0045) not installed"
+    },
+    {
+      "surface": "web 390 Light",
+      "journey": "Compose",
+      "result": "renders; defect: audience-size notice lacks 16px gutter; design segment/primary-action differences"
+    },
+    {
+      "surface": "web fan /home",
+      "journey": "fan Home",
+      "result": "Temporarily unavailable (Growth not mounted on W5 host)"
+    },
+    {
+      "surface": "in-app Browser pane",
+      "journey": "Studio load while pane hidden",
+      "result": "document.hidden=true; Studio stays concealed (correct behavior, tool limitation)"
+    },
+    {
+      "surface": "iOS 27.0 simulator 78C3590E",
+      "journey": "shipping app launch + Continue with Pantopus",
+      "result": "pass: W5 development actor picker shown"
+    },
+    {
+      "surface": "Android",
+      "journey": "assembleDebug",
+      "result": "build succeeded 12m9s; not installed/operated"
+    }
+  ],
+  "blockers": {
+    "genuineSigning": "ops-approved creator_proof path unmounted (W1 composing W8 trust review) + human Touch ID ceremony",
+    "creatorThreadReplies": "W8 in-transaction denial (0053 missing)",
+    "privateNoteReplies": "0045 activation order from W8 + W8 reviewReply producer",
+    "threads": "W3 generation host + verified provider terms + model key (human) + W8 0053/0048/0049 + W2 license verifier",
+    "paidPackets": "Stripe sandbox does not exist (founder); threads",
+    "approvals": "0044 + W4 mount (/v1/commerce-approvals not in createApp allow-list)",
+    "followersAudience": "no canonical W7 creator projection producer",
+    "impact": "W7 weekly Impact job unbuilt; W5 to export CurrentThanksTarget",
+    "tenure": "W4 currentTenure reader not built; no memberships without Stripe/stores",
+    "media": "W6 runtime + C2PA signer (interface only) + 0047/0051",
+    "generation": "no model provider keys on host"
+  }
+}

@@ -123,23 +123,35 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             finally { pendingExport = null; busy = false }
         } else pendingExport = null
     }
+    // Public crisis help never waits on capability or account data: a restored or
+    // degraded host can refuse those while help stays available. A failed capability
+    // read clears the old value so data requests cannot submit on stale verification.
     suspend fun load() {
         if (client == null) { error = "The trust service is not configured."; return }
         busy = true
+        var failure: Exception? = null
         try {
-            val capability = client.request("capabilities")
-            local = capability["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
-            verificationConfigured = capability.text("actorVerification") == "configured"
-            verificationMethod = capability.text("verificationMethod")
-            help = client.request("help")
-            if (route.startsWith("/trust") || route.contains("feedback")) { }
-            else if (route.contains("access")) history = client.request("access-history").items()
-            else if (route.contains("privacy")) jobs = client.request("privacy/jobs").items()
-            else { cases = client.request("my-cases").items(); notices = client.request("inbox").items() }
-            error = ""
-        } catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; error = failure.message ?: "Reconnect and try again." }
-        finally { busy = false }
+            try { help = client.request("help") }
+            catch (cancelled: CancellationException) { throw cancelled }
+            catch (current: Exception) { failure = current }
+            if (route.contains("privacy")) {
+                try {
+                    val capability = client.request("capabilities")
+                    local = capability["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
+                    verificationConfigured = capability.text("actorVerification") == "configured"
+                    verificationMethod = capability.text("verificationMethod")
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (current: Exception) { local = false; verificationConfigured = false; verificationMethod = ""; failure = failure ?: current }
+            }
+            try {
+                if (route.startsWith("/trust") || route.contains("feedback")) { }
+                else if (route.contains("access")) history = client.request("access-history").items()
+                else if (route.contains("privacy")) jobs = client.request("privacy/jobs").items()
+                else { cases = client.request("my-cases").items(); notices = client.request("inbox").items() }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (current: Exception) { cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
+            error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
+        } finally { busy = false }
     }
     suspend fun perform(path: String, input: JsonObject): JsonObject? {
         if (client == null || busy) return null

@@ -1,5 +1,60 @@
 # W8 contract, migration and runtime register
 
+## Original-fan packet denial source — 2026-10-02
+
+W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.
+
+
+## Held restoration/content integration — 2026-10-02
+
+W8 now exports canonical `assertRestoredInTransaction(client)` and `assertContentAllowedInTransaction(client, actualActor, creatorId)`, plus loopback-only `trustLocalRestorationInTransaction(env)`. The development helper supplies the actual held callback; missing ports deny503. [Personally operated web and held transaction evidence](../../../artifacts/workstreams/W8/held-restoration/20261002-mac-studio/README.md) verifies current closure, saved block/case and retained canonical40 ledger; no publication/proof/provider recovery is inferred. W1/W6 can compose these ports without owner substitution or a true/no-op callback. Native authenticated interaction, original recovery/C10 and packet-fan negatives remain open. No R1–R10 or release gate is declared complete.
+
+
+**Held content/publication denial — 2026-10-02:** reserved0073/0074 and `trustContentRestrictionInTransaction()` / `trustPublicationWorkerDenial()` are implemented on `codex/w8-purpose-denial-authority`, consuming W5's exactc56fe342 held-client seam. [Actual receipt](../../../artifacts/workstreams/W8/purpose-denial/20261002-mac-studio/README.md) has canonical real web block save and current content200→403, saved block/case, non-owner session/snapshot/role and unissued-worker refusals. Registry remains40. W1's0071 PUBLIC-only/wallclock correction is reviewed, final-wave installation/positive proof/publication/Team/native/provider/C10 acceptance remains open. W8 services stopped; data retained.
+
+**Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
+
+## Canonical development trust increment — 2026-10-01
+
+Current source branch: `codex/w8-development-trust-runtime`. [Actual partial acceptance](../../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) separates implemented source, experimental DDL, real app operation and release gates. PR17 is merged. W8 remains the sole registry activation owner;0053 is not active yet.
+
+W1 owns `server.ts`. Its existing development `createConfiguredBackend` input can add these seven lines after consuming the reviewed branch and provisioning the actual0053 schema:
+
+```ts
+import { createDevelopmentTrust } from "./modules/trust/development.js";
+// In the existing createConfiguredBackend input:
+...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+  ? {
+      trust: (runtime) => createDevelopmentTrust(runtime),
+    }
+  : {}),
+```
+
+Require `NODE_ENV=development`, canonical development identity/session custody, exact loopback web origin and core database, plus separate `TRUST_API_DATABASE_URL` (`creator_trust_runtime`) and `TRUST_WORKER_DATABASE_URL` (`creator_trust_worker`) on that same database. Supply an immutable `RELEASE_REVISION`. Defaults register real available privacy consumers; they do not imply all eight domains, protected storage, retention or provider readiness. Optional consumers and shared agent/settlement ports must come from their actual owners. The helper closes its own pools after worker drain.
+
+`developmentTrustActors` is a readonly `{id,label}[]`: accounts ending004/005/006, labelled Development Ops supervisor/support reviewer/verification reviewer respectively. W1 relabels matching canonical development actors through its adapter; these labels do not create sessions, Ops membership or production identities. Canonical Trust capability uses `localActorSelection:false`, keeping the legacy harness selector out of this host.
+
+Held-client exports from `modules/trust/scope-restriction.ts`: `trustScopeRestrictionInTransaction()`, `trustAudienceRestrictionInTransaction()`, `trustCreatorRestrictionInTransaction()`, `trustMediaWorkerDenial()`. Thread projection answers only when `app.account_id` is an actual participant. Audience and creator-owner checks have separate purposes. Core receives schema USAGE and only the three bounded projection EXECUTEs; private Trust SELECT and media-worker EXECUTE remain denied.0053's negative-metadata function owner is NOLOGIN/non-owner/NOBYPASSRLS with column-limited reads. All projections require READ COMMITTED; a retained REPEATABLE READ snapshot returns unavailable. Shared caller locks and exclusive negative-authority change locks last to transaction end; never hold a database transaction over a provider call.
+
+W6's worker uses its existing `media.*` family fence and the caller-held dedicated worker client. SQL `creator_trust.media_worker_denial(text,uuid,uuid,uuid)` takes kind, creator, nullable fan and actual asset owner; returns allowed/denied/unavailable.0062 grants only schema USAGE plus that EXECUTE to `creator_media_worker`; runtime cannot execute it. Missing ownership/authority fails closed. Fully revoked byte cleanup remains W6's separate negative-only path.
+
+Allocations beyond the original wave:0061 W4 payout custody;0062 W6 worker (final proposal hash `abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a`);0063–0066 W7 proposals, pending revised relationship/checkpoint security custody;0067 W2 retained-counter expiry;0068 W4 paid coverage. These allocations are not application authorization. W3 published revised0058/0059 preserving0044 at each step; review those exact bytes before activation.0048 remains blocked on real accounting/export/delete/expiry composition and durable conversation-before-agent privacy receipts.
+
+**Mac Studio coordination, 2026-10-01 (current):**
+- **Registry:** W8 owns the single activation PR for reserved migrations. W3, W4, W5 and W6 agreed not to edit `infra/migrations.json` and to verify on their own DBs once the branch is pushed. Activation runs in ascending waves; IDs that aren't ready are renumbered above the wave (metadata only).
+- **0058/0059:** both replace 0044's `require_signed_message` without the approved_draft exact-version personal-Approval branch. 0060 recomposes that branch, but applying 0058→0060 as separate runner transactions leaves a weakened window. Before activating 0058–0060, choose one: revised 0058/0059 bytes that keep the 0044 branch, a single-transaction wave, or a traffic-closed rollout.
+- **0048:** needs C10 accounting registration first.
+- **0049/0054:** bytes change in W4 PR61 (new hashes `00f4c2cc…`, `d6ead22c…`).
+- **0050:** is W3's existing `pending_w3_account_index.sql` (`189e19e0…`). W4 payout custody is proposed as 0061.
+- **W8 build commitments:**
+  - 0053 `runtime_denial_projection`: a SECURITY DEFINER participant-bounded deny check executable by `creator_runtime` on the held client, plus `trustScopeRestrictionInTransaction()`.
+  - A loopback-only local-development trust mode and a `createDevelopmentTrust(runtime)` helper. It includes `scopedTrustEvidence`, verification and agent-pause effects, privacy consumers, development Ops actors and the actor/scope/in-transaction denials. W1 wires `server.ts` after W8 publishes export names.
+  - W5's `reviewReply` producer.
+- **W1 handoff:** W1's successor continues from `codex/w1-session-truth-20261001` (PR66), and its `docs/workstreams/handoffs/W1-continuation-2026-10-01-claude.md` records W8's trust plan as binding. W1 will not relax the `createTrustRuntime`/`integration.ts` guards; it will only compose W8's `createDevelopmentTrust(runtime)` exports into `server.ts`. When the W8 trust-composition PR is ready, publish its exact export names and the 6–8 `server.ts` lines in that PR's description and in this file, and message the new W1 session once it appears in ListAgents.
+- **Open W6 questions:** audience/creator in-transaction denial and an ingestion-worker authority ID. Exact inputs are in the [snapshot](../../../artifacts/workstreams/W8/handoff/20261001-mac-studio/snapshot.json).
+
+**Fresh post-cleanup W8 recovery lease, 2026-10-01:** source branch `codex/w8-post-cleanup-recovery` begins at merged `2f0319d`. New container `creator-platform-w8-recovery-20261001`, durable volume `creator-platform-w8-recovery-20261001-data`, loopback database 55438 and temporary web/API 3008/4108 are W8-owned. API/web/container stop after verification; durable data and private checkpoints remain. No deleted device/volume/PID or peer resource is reused. The W8-owned local host and privacy form receive only restoration closure and unavailable-capability fixes; no shared authority, test, golden, applied SQL or canonical registry changes. [Actual custody/verification](../../../artifacts/workstreams/W8/recovery/20261001/README.md) supersedes old resource availability. Restored traffic remains closed until actual domain/policy/adapter gates pass.
+
 **Preserved W5 upgrade operator:** [Exact adoption procedure](../../operations/W8-migration-adoption.md) and [actual closed-restore evidence](../../../artifacts/workstreams/W8/takeover/20260930/w5-adoption-operator.json) supersede the former missing-runner claim. W8's owned operator appends seven canonical identities while preserving all35 original ledger rows and executes only six pinned missing active migrations. Actual277 original rows/136 tables survive, with exact fresh/upgrade catalog equality; normal canonical runner then reports40 already applied. Canonical0045 records historical installed bytes and satisfies the existing non-owner lookup with actual FORCE RLS; it is not a global activation or SQL replay. The original W5 database remains35 and W8 remains40. No peer application stop/upgrade, original domain-data/ledger write, applied-SQL/test/golden change or broad rollout bypass. The new helper/scripts/profile are W8 migration-orchestration scope; no producer service or authority is edited.
 
 **Published W2 custody:** [Actual PR1 source audit](../../../artifacts/workstreams/W8/takeover/20260930/post-pr1-source-audit.json) verifies merge0a9a9a7 preserves W8's compared authority/privacy/runtime objects and all40 active SQL bytes. Its opt-in stream and prepared journal/retention interfaces are now immutable main source. They still require actual host/privacy/financial-policy registration; W8 did not enable them, apply0048 or use the model key.

@@ -8,10 +8,14 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type RefObject,
+  type ReactElement,
+  type AnchorHTMLAttributes,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { copy } from "@qelvora/copy";
 import {
   AuthorLabel,
   AuditBanner,
@@ -35,8 +39,15 @@ import type {
 } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
 import { CreatorVoiceRecording } from "../media/VoiceRecorder";
+import { VoicePlayer } from "../media/VoicePlayer";
+import {
+  ConversationMessageSchema,
+  type ConversationMessage,
+} from "../../../../packages/api/src/conversation/contracts";
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
+import { ConversationVoiceReply } from "./ConversationVoiceReply";
+import { AvailabilityEditor } from "../calls/AvailabilityEditor";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
@@ -92,6 +103,7 @@ type Queue = Page<QueueItem> & {
     reserved: number;
   }[];
   serverTime: string;
+  requests: number;
 };
 type Packet = {
   groupModes: {
@@ -120,7 +132,50 @@ type Packet = {
 };
 const key = () => crypto.randomUUID();
 const contentStateLabel = (state: string) =>
-  state === "media_pending" ? "Media processing" : state;
+  ({
+    draft: "Draft",
+    scheduled: "Scheduled",
+    published: "Published",
+    media_pending: "Media processing",
+    unpublished: "Unpublished",
+    archived: "Archived",
+    withdrawn: "Withdrawn",
+  })[state] ?? "Status unavailable";
+const packetStateLabel = (state: string) =>
+  ({
+    draft: "Draft",
+    submitting: "Submitting",
+    submitted: "Waiting for your decision",
+    more_info: "Waiting for more information",
+    offer_pending: "Waiting for the fan’s decision",
+    accepting: "Confirming acceptance",
+    accepted: "Accepted",
+    releasing: "Closing request",
+    declined: "Passed on this one",
+    expired: "Decision time passed",
+    withdrawn: "Withdrawn",
+  })[state] ?? "Request status unavailable";
+const paymentStateLabel = (state: string) =>
+  ({
+    authorization_pending: "Checking payment hold",
+    requires_action: "Fan payment confirmation needed",
+    requires_capture: "Payment held · not charged",
+    unknown: "Checking payment status",
+    capturing: "Confirming charge",
+    captured: "Charged",
+    releasing: "Releasing payment hold",
+    released: "Payment hold released",
+    refund_pending: "Refund in progress",
+    refunded: "Refunded",
+    failed: "Payment could not complete",
+  })[state] ?? "Payment status unavailable";
+const speakerLabel = (control: string, name: string) =>
+  ({
+    ai_active: `${name}’s AI`,
+    human_active: name,
+    ai_paused: `${name}’s AI is paused`,
+    closed: "Conversation closed",
+  })[control] ?? "Current speaker unavailable";
 const time = (value: string | null) =>
   value
     ? new Intl.DateTimeFormat(undefined, {
@@ -149,12 +204,118 @@ function navigationTree(
   href: (label: string) => string,
 ): ReactNode {
   return Children.map(node, (n) => {
-    if (!isValidElement<{ children?: ReactNode; href?: string }>(n)) return n;
-    return cloneElement(n, {
-      ...(n.type === "a" ? { href: href(words(n.props.children)) } : {}),
-      children: navigationTree(n.props.children, href),
-    });
+    if (!isValidElement<AnchorHTMLAttributes<HTMLAnchorElement>>(n)) return n;
+    const children = navigationTree(n.props.children, href);
+    if (n.type === "a")
+      return (
+        <Link
+          {...n.props}
+          key={n.key}
+          href={href(words(n.props.children))}
+          prefetch={false}
+        >
+          {children}
+        </Link>
+      );
+    return cloneElement(n, { children });
   });
+}
+function studioSidebar(
+  props: Parameters<typeof Sidebar>[0],
+  moreHref: string,
+  active: boolean,
+) {
+  const sidebar = Sidebar(props) as ReactElement<{ children?: ReactNode }>;
+  const children = Children.toArray(sidebar.props.children);
+  children.splice(
+    children.length - 1,
+    0,
+    <div key="w5-more" className="qv-side__group">
+      <Link
+        href={moreHref}
+        prefetch={false}
+        className={`qv-side__item${active ? " is-active" : ""}`}
+        aria-current={active ? "page" : undefined}
+      >
+        <span className="qv-side__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+            <circle cx="5.5" cy="11" r="1.4" fill="currentColor" />
+            <circle cx="11" cy="11" r="1.4" fill="currentColor" />
+            <circle cx="16.5" cy="11" r="1.4" fill="currentColor" />
+          </svg>
+        </span>
+        <span className="qv-side__label">More</span>
+      </Link>
+    </div>,
+  );
+  return cloneElement(sidebar, { children });
+}
+function useRequestsCount(creator: Creator | null, suspended: boolean) {
+  const [count, setCount] = useState<number>();
+  useEffect(() => {
+    setCount(undefined);
+    if (
+      !creator ||
+      suspended ||
+      (!creator.owned && !creator.roles.includes("triage"))
+    )
+      return;
+    let closed = false;
+    let controller: AbortController | null = null;
+    const load = async () => {
+      if (closed || document.hidden || controller) return;
+      const current = new AbortController();
+      controller = current;
+      try {
+        const result = await studioRequest<Queue>(
+          "studio",
+          `${creator.id}/queue?filter=all&limit=1`,
+          undefined,
+          creator.viewerAccountId,
+          {
+            signal: AbortSignal.any([
+              current.signal,
+              AbortSignal.timeout(4000),
+            ]),
+          },
+        );
+        if (!closed && !document.hidden)
+          setCount(
+            Number.isSafeInteger(result.requests) && result.requests >= 0
+              ? result.requests
+              : undefined,
+          );
+      } catch {
+        if (!closed) setCount(undefined);
+      } finally {
+        if (controller === current) controller = null;
+      }
+    };
+    const visibility = () => {
+      if (document.hidden) {
+        controller?.abort();
+        setCount(undefined);
+      } else void load();
+    };
+    void load();
+    const timer = setInterval(() => void load(), 15000);
+    window.addEventListener("focus", load);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      closed = true;
+      controller?.abort();
+      clearInterval(timer);
+      window.removeEventListener("focus", load);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, [
+    creator?.id,
+    creator?.viewerAccountId,
+    creator?.owned,
+    creator?.roles,
+    suspended,
+  ]);
+  return count;
 }
 export function Studio({
   creatorId,
@@ -194,6 +355,7 @@ export function Studio({
     [suspended, setSuspended] = useState(false),
     [freshUntil, setFreshUntil] = useState(0),
     [loading, setLoading] = useState(true);
+  const requests = useRequestsCount(creator, suspended);
   const generation = useRef(0),
     roleRequest = useRef<AbortController | null>(null),
     reconnectButton = useRef<HTMLButtonElement>(null),
@@ -277,11 +439,14 @@ export function Studio({
   useEffect(() => {
     if (suspended) {
       if (!document.hidden) reconnectButton.current?.focus();
-    } else if (previousFocus.current?.isConnected) {
+    }
+  }, [loading, suspended]);
+  useEffect(() => {
+    if (!suspended && previousFocus.current?.isConnected) {
       previousFocus.current.focus();
       previousFocus.current = null;
     }
-  }, [loading, suspended]);
+  }, [suspended]);
   useEffect(() => {
     void refresh();
     return () => {
@@ -439,16 +604,26 @@ export function Studio({
         className={`qv w5-studio${current === "compose" ? " w5-studio--compose" : ""}`}
         hidden={suspended}
         inert={suspended}
+        onFocusCapture={(event) => {
+          // Capture before a parent/current-role outage can remove browser
+          // focus. Only a validated return may restore this private control.
+          if (!suspended) previousFocus.current = event.target;
+        }}
       >
         <aside className="w5-sidebar">
           {navigationTree(
-            Sidebar({
-              name: creator.display_name,
-              active,
-              status: creator.owned
-                ? "Creator workspace"
-                : `Team · ${creator.roles.join(", ")}`,
-            }),
+            studioSidebar(
+              {
+                name: creator.display_name,
+                active,
+                requests,
+                status: creator.owned
+                  ? "Creator workspace"
+                  : `Team · ${creator.roles.join(", ")}`,
+              },
+              `${root}/more`,
+              ["more", "thanks"].includes(current),
+            ),
             href,
           )}
         </aside>
@@ -501,6 +676,7 @@ export function Studio({
         <div className="w5-tabs">
           {navigationTree(
             StudioTabBar({
+              requests,
               active: [
                 "Notes",
                 "Requests",
@@ -634,9 +810,11 @@ function Notes({ creator }: { creator: Creator }) {
                   ? "Separate from AI sources"
                   : "AI-source review required"}
               </p>
-              <Link href={`/studio/${creator.id}/compose/${n.id}`}>
-                Edit draft
-              </Link>
+              {["draft", "scheduled", "media_pending"].includes(n.state) && (
+                <Link href={`/studio/${creator.id}/compose/${n.id}`}>
+                  Edit draft
+                </Link>
+              )}
               {n.state === "media_pending" && (
                 <p className="qv-help">
                   Signed. Delivery waits for verified media credentials. You can
@@ -821,15 +999,20 @@ function Modal({
   onClose,
   children,
   closeDisabled = false,
+  restoreFocusTo,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   closeDisabled?: boolean;
+  restoreFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    const restore = document.activeElement as HTMLElement | null;
+    // An async save may disable the trigger before this modal mounts, moving
+    // focus to body. Preserve the explicit media trigger in that case.
+    const restore =
+      restoreFocusTo?.current ?? (document.activeElement as HTMLElement | null);
     const dialog = ref.current;
     if (!dialog) return;
     let resumeFocus: HTMLElement | null = null;
@@ -863,7 +1046,7 @@ function Modal({
       dialog.close();
       restore?.focus();
     };
-  }, []);
+  }, [restoreFocusTo]);
   return (
     <dialog
       ref={ref}
@@ -944,6 +1127,7 @@ function Compose({
     } | null>(null),
     [schedule, setSchedule] = useState(""),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
+    voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
@@ -1309,6 +1493,7 @@ function Compose({
             Photo
           </button>
           <button
+            ref={voiceTrigger}
             className="qv-btn qv-btn--quiet"
             type="button"
             disabled={
@@ -1357,7 +1542,9 @@ function Compose({
         />
       </label>
       {!catalog?.audienceCountsAvailable && (
-        <p className="qv-help">Current audience size is unavailable.</p>
+        <p className="w5-gutter qv-help">
+          Current audience size is unavailable.
+        </p>
       )}
       {!post && (
         <label className="w5-toggle">
@@ -1582,7 +1769,11 @@ function Compose({
         </Modal>
       )}
       {voiceObjectId && canDraft && (
-        <Modal title="Your own voice" onClose={() => setVoiceObjectId(null)}>
+        <Modal
+          title="Your own voice"
+          onClose={() => setVoiceObjectId(null)}
+          restoreFocusTo={voiceTrigger}
+        >
           {(() => {
             const Recorder =
               document.kind === "post"
@@ -1590,6 +1781,7 @@ function Compose({
                 : CreatorVoiceRecording;
             return (
               <Recorder
+                embedded
                 creatorId={creator.id}
                 expectedAccountId={creator.viewerAccountId}
                 creatorName={creator.display_name}
@@ -1911,10 +2103,7 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
     [command, setCommand] = useState<SignedActCommand | null>(null),
     [proposedMode, setProposedMode] = useState(""),
     [approveDraft, setApproveDraft] = useState(false),
-    [deliveries, setDeliveries] = useState<
-      | { id: string; text: string; authorKind: string; signedActId?: string }[]
-      | null
-    >(null),
+    [deliveries, setDeliveries] = useState<ConversationMessage[] | null>(null),
     action = useAction();
   const router = useRouter(),
     edited = useRef(false);
@@ -2011,7 +2200,8 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                 detail.packet.snapshot.amount,
                 detail.packet.snapshot.currency,
               )}{" "}
-              · {detail.packet.state} · {detail.packet.payment_state}
+              · {packetStateLabel(detail.packet.state)} ·{" "}
+              {paymentStateLabel(detail.packet.payment_state)}
             </p>
             <p>
               Decide by {time(detail.packet.decision_at)} · hold expires{" "}
@@ -2202,12 +2392,19 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
             </details>
             <div className="w5-card">
               {detail.commitment &&
+                ["written_reply", "voice_note"].includes(
+                  detail.packet.snapshot.mode,
+                ) &&
                 ["due", "in_progress"].includes(detail.commitment.state) && (
                   <>
-                    <h2>Fulfill with a delivered reply</h2>
+                    <h2>
+                      {detail.packet.snapshot.mode === "voice_note"
+                        ? "Fulfill with a delivered recording"
+                        : "Fulfill with a delivered reply"}
+                    </h2>
                     <p>
-                      W4 checks the exact signed message, promised mode and
-                      current commitment before recording delivery.
+                      Choose your signed reply or recording for this request. It
+                      must match the promised service.
                     </p>
                     <button
                       className="qv-btn qv-btn--secondary"
@@ -2215,12 +2412,16 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                       onClick={() =>
                         void action.run(async () => {
                           const result = await studioRequest<{
-                            items: typeof deliveries;
+                            items: unknown;
                           }>(
                             "studio",
                             `${creator.id}/packets/${id}/deliveries`,
                           );
-                          setDeliveries(result.items);
+                          setDeliveries(
+                            ConversationMessageSchema.array()
+                              .max(100)
+                              .parse(result.items),
+                          );
                         })
                       }
                     >
@@ -2237,7 +2438,18 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                           }
                           name={creator.display_name}
                         />
-                        <p>{message.text}</p>
+                        {message.recording?.state === "available" ? (
+                          <VoicePlayer
+                            asset={message.recording.asset}
+                            creatorId={creator.id}
+                            fanId={detail.packet.fan_id}
+                            creatorName={creator.display_name}
+                            time={message.createdAt}
+                            expectedAccountId={creator.viewerAccountId}
+                          />
+                        ) : (
+                          <p>{message.text}</p>
+                        )}
                         <button
                           className="qv-btn qv-btn--secondary"
                           disabled={action.busy}
@@ -2258,14 +2470,17 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                             })
                           }
                         >
-                          Use this delivered reply
+                          {detail.packet.snapshot.mode === "voice_note"
+                            ? "Use this delivered recording"
+                            : "Use this delivered reply"}
                         </button>
                       </article>
                     ))}
                     {deliveries?.length === 0 && (
                       <p>
-                        No signed delivered reply is available. Send your
-                        personal reply in the audited thread first.
+                        {detail.packet.snapshot.mode === "voice_note"
+                          ? "No current signed recording is available. Deliver your personal recording in the audited thread first."
+                          : "No signed delivered reply is available. Send your personal reply in the audited thread first."}
                       </p>
                     )}
                   </>
@@ -2698,6 +2913,12 @@ function Team({ creator }: { creator: Creator }) {
   );
 }
 function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
+  const voiceTrigger = useRef<HTMLButtonElement | null>(null);
+  const [voiceReply, setVoiceReply] = useState<{
+    fanId: string;
+    threadId: string;
+  } | null>(null);
+  const [voicePending, setVoicePending] = useState(false);
   const [entries, setEntries] = useState<{
       items: {
         fanId: string;
@@ -3061,8 +3282,8 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
             data && (
               <>
                 <p className="qv-meta">
-                  CURRENT SPEAKER · {data.timeline.control} · EPOCH{" "}
-                  {data.timeline.epoch}
+                  Current speaker ·{" "}
+                  {speakerLabel(data.timeline.control, creator.display_name)}
                 </p>
                 <div className="w5-thread-messages">
                   {data.timeline.messages.map((m) => {
@@ -3254,6 +3475,20 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                 >
                   Review signed reply
                 </button>
+                {creator.owned && fanId && (
+                  <button
+                    ref={voiceTrigger}
+                    className="qv-btn qv-btn--secondary"
+                    disabled={
+                      action.busy || data.timeline.control !== "human_active"
+                    }
+                    onClick={() =>
+                      setVoiceReply({ fanId, threadId: data.timeline.threadId })
+                    }
+                  >
+                    {copy.w6RecordAVoiceReply}
+                  </button>
+                )}
                 {!creator.owned && (
                   <>
                     <p className="qv-help">
@@ -3330,6 +3565,37 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         </div>
       </div>
       <div hidden={!threadCurrent} inert={!threadCurrent}>
+        {creator.owned &&
+          fanId &&
+          data &&
+          voiceReply?.fanId === fanId &&
+          voiceReply.threadId === data.timeline.threadId && (
+            <Modal
+              title={copy.w6RecordAVoiceReply}
+              closeDisabled={voicePending}
+              restoreFocusTo={voiceTrigger}
+              onClose={() => setVoiceReply(null)}
+            >
+              <ConversationVoiceReply
+                key={`${creator.viewerAccountId}:${creator.id}:${fanId}:${data.timeline.threadId}`}
+                creatorId={creator.id}
+                fanId={fanId}
+                threadId={data.timeline.threadId}
+                creatorName={creator.display_name}
+                expectedAccountId={creator.viewerAccountId}
+                current={
+                  threadCurrent && data.timeline.control === "human_active"
+                }
+                onPendingChange={setVoicePending}
+                onDelivered={() => {
+                  setVoiceReply(null);
+                  void action
+                    .run(load)
+                    .then(() => action.setNotice(copy.w6RecordingDelivered));
+                }}
+              />
+            </Modal>
+          )}
         {attachedCorrection && fanId && data && (
           <Modal
             title="Correct this answer"
@@ -3573,6 +3839,17 @@ function ThanksFeed({ creator }: { creator: Creator }) {
       <p className="qv-help">
         Only notes fans consented to share with your digest appear here.
       </p>
+      {!error && freshUntil > 0 && rows.length === 0 && (
+        <EmptyState
+          title="No shared thanks yet"
+          body="When a fan chooses to share a thanks with your digest, it appears here. Their private thanks stay private."
+        />
+      )}
+      {!error && !freshUntil && (
+        <p role="status" className="qv-help">
+          Checking current sharing permission…
+        </p>
+      )}
       {rows.map((r) => (
         <article className="w5-card" key={r.id}>
           {r.handle && <strong>@{r.handle}</strong>}
@@ -3584,6 +3861,7 @@ function ThanksFeed({ creator }: { creator: Creator }) {
   );
 }
 function More({ creator }: { creator: Creator }) {
+  const { signal } = useIdentityRequest();
   return (
     <section className="w5-more">
       <header className="w5-heading">
@@ -3597,6 +3875,7 @@ function More({ creator }: { creator: Creator }) {
           ["Earnings", "/commerce/earnings"],
           ["Team", `/studio/${creator.id}/team`],
           ["Thanks", `/studio/${creator.id}/thanks`],
+          ["Impact", "/studio/impact"],
           ["Verification and account", "/identity/account"],
           ["License", "/studio/ai/license"],
           ["Support", "/support"],
@@ -3611,6 +3890,13 @@ function More({ creator }: { creator: Creator }) {
         Personal signing and commitments stay with the creator. Support access
         is scoped and audited.
       </p>
+      {creator.owned && creator.verification === "verified" && (
+        <AvailabilityEditor
+          creatorId={creator.id}
+          accountId={creator.viewerAccountId}
+          signal={signal}
+        />
+      )}
     </section>
   );
 }

@@ -1,0 +1,316 @@
+{
+  "observedAt": "2026-10-01T12:35:30.337942-07:00",
+  "scope": "Documentation-only W8 handoff requested directly by the human; no implementation/runtime resumption in this turn.",
+  "latestHumanDirection": {
+    "scope": "Finish the entire workstream without artificial restrictions or holdbacks.",
+    "tests": "Do not write new unit tests; coverage may be restricted. Prior blanket no-test-code and narrow-fixture-only procedures superseded.",
+    "acceptance": "Launch and personally verify web, Android emulator and iOS simulator end to end.",
+    "delivery": "Create PRs when ready and merge normally when ready, not just drafts."
+  },
+  "baseMain": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "historicalW8": {
+    "branch": "codex/w8-trust-handoff",
+    "head": "b77ad263ac5fd63ab48766c9659363328d57fdcb",
+    "checkout": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform",
+    "untouchedByHandoff": true
+  },
+  "currentW8Continuation": {
+    "headRefName": "codex/w8-post-cleanup-recovery",
+    "headRefOid": "bc809085e22d997cf868071c5cedab2992187005",
+    "isDraft": true,
+    "number": 17,
+    "title": "Keep post-cleanup W8 recovery traffic closed",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/17",
+    "checkout": "/Users/yingpengwang/.codex/worktrees/f25f/creator-platform",
+    "action": "Finish existing PR17 against current main, preserving this latest handoff authority during any documentation conflict; no duplicate implementation PR.",
+    "evidenceAttribution": "Published PR17 recovery/operator/browser evidence read; not rerun by this handoff author."
+  },
+  "openPRSnapshot": [
+    {
+      "headRefName": "codex/w1-native-uri-20261001",
+      "headRefOid": "c74c95166675d96221e2e9551bda827dfd79cd32",
+      "isDraft": true,
+      "number": 49,
+      "title": "Validate native API origins and supply iOS host configuration",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/49"
+    },
+    {
+      "headRefName": "codex/w1-native-storage-20261001",
+      "headRefOid": "84968320a2fd5609b8d9b02589baeb80de02f6f4",
+      "isDraft": true,
+      "number": 48,
+      "title": "Handle native storage failures and foreground session refresh",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/48"
+    },
+    {
+      "headRefName": "codex/w4-signed-voice-fulfillment-20261001",
+      "headRefOid": "87ec1b192cac82ea4823703c0fcab38e6babdb19",
+      "isDraft": false,
+      "number": 47,
+      "title": "Fulfill voice promises from current signed recordings",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/47"
+    },
+    {
+      "headRefName": "codex/w4-qualified-read-custody-20261001",
+      "headRefOid": "b6c70ec14aead8a36dc554bde8c70a3af557633e",
+      "isDraft": false,
+      "number": 46,
+      "title": "Require canonical durable read receipts before noncash credit issuance",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/46"
+    },
+    {
+      "headRefName": "codex/w3-emulator-sdk-recovery",
+      "headRefOid": "a4917db65767dd16534f38a7b257010d213257d9",
+      "isDraft": false,
+      "number": 45,
+      "title": "Retry only the observed Android emulator SDK archive failure",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/45"
+    },
+    {
+      "headRefName": "codex/w4-store-management-recovery-20261001",
+      "headRefOid": "5c262f91f06e2fc8062cb6b6555184a7954c3ce9",
+      "isDraft": false,
+      "number": 44,
+      "title": "Keep native subscription management available during verification outages",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/44"
+    },
+    {
+      "headRefName": "codex/w1-native-verification-20261001",
+      "headRefOid": "fa68e0dd9c82c55bd927e1191862dfe0c6c4ccfe",
+      "isDraft": true,
+      "number": 42,
+      "title": "Connect Signed links to public verification across clients",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/42"
+    },
+    {
+      "headRefName": "codex/w4-call-refund-custody-20261001",
+      "headRefOid": "fd19bc448636c5c0622b5d7e53fdd3caac0802d1",
+      "isDraft": false,
+      "number": 41,
+      "title": "Commit original call refunds atomically with resolved outcomes",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/41"
+    },
+    {
+      "headRefName": "codex/w2-pool-recovery",
+      "headRefOid": "3a76192e5a129dc0c0bb327ff53d46106dd048cd",
+      "isDraft": true,
+      "number": 40,
+      "title": "Handle idle database connection failures without leaking client internals",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/40"
+    },
+    {
+      "headRefName": "codex/w3-privacy-revalidation",
+      "headRefOid": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "isDraft": true,
+      "number": 36,
+      "title": "Revalidate privacy snapshots and recover retained Android sessions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/36"
+    },
+    {
+      "headRefName": "codex/w1-signing-authority-20261001",
+      "headRefOid": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "isDraft": true,
+      "number": 35,
+      "title": "Hold current creator authority through assertion verification",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/35"
+    },
+    {
+      "headRefName": "codex/w7-completion-20261001",
+      "headRefOid": "7f71c2faeed3143b7a38abc23acc57324312964d",
+      "isDraft": false,
+      "number": 31,
+      "title": "Connect bounded W7 journeys and preserve current delivery authority",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/31"
+    },
+    {
+      "headRefName": "codex/w1-home-host-20261001",
+      "headRefOid": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "isDraft": true,
+      "number": 29,
+      "title": "Connect canonical Home and preserve native saved-thread navigation",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/29"
+    },
+    {
+      "headRefName": "codex/w1-team-state-20261001",
+      "headRefOid": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "isDraft": true,
+      "number": 28,
+      "title": "Gate Team actions on current access reads",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/28"
+    },
+    {
+      "headRefName": "codex/w1-generation-efficiency-20261001",
+      "headRefOid": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "isDraft": true,
+      "number": 26,
+      "title": "Preserve unchanged generated resources and verify portable rename",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/26"
+    },
+    {
+      "headRefName": "codex/w3-conversations",
+      "headRefOid": "a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1",
+      "isDraft": false,
+      "number": 24,
+      "title": "Refresh account snapshots on return and preserve Android launcher destination",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/24"
+    },
+    {
+      "headRefName": "codex/w1-comprehension-focus-20261001",
+      "headRefOid": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "isDraft": true,
+      "number": 22,
+      "title": "Restore Restart focus after authorship practice completion",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/22"
+    },
+    {
+      "headRefName": "codex/w1-onboarding-timing-20261001",
+      "headRefOid": "75267e07852603a7947e5125f3d1ddb665876921",
+      "isDraft": true,
+      "number": 21,
+      "title": "Defer intro collection beyond initial onboarding",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/21"
+    },
+    {
+      "headRefName": "codex/w6-completion-20261001",
+      "headRefOid": "588f834f8634e91131cca45087089e6bde0cde3e",
+      "isDraft": true,
+      "number": 20,
+      "title": "Bound media ingestion and verify external C2PA credentials",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/20"
+    },
+    {
+      "headRefName": "codex/w6-isolated-recovery-20261001",
+      "headRefOid": "2831c07faeb1b868d43e56e078e3785093f9034c",
+      "isDraft": true,
+      "number": 19,
+      "title": "Guard native call cleanup and account-bound media uploads",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/19"
+    },
+    {
+      "headRefName": "codex/w8-post-cleanup-recovery",
+      "headRefOid": "bc809085e22d997cf868071c5cedab2992187005",
+      "isDraft": true,
+      "number": 17,
+      "title": "Keep post-cleanup W8 recovery traffic closed",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/17"
+    },
+    {
+      "headRefName": "codex/w1-resume-20261001",
+      "headRefOid": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "isDraft": false,
+      "number": 16,
+      "title": "Keep creator verification setup bound to saved proof state",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/16"
+    }
+  ],
+  "canonicalRegistry": {
+    "activeCount": 40,
+    "reservedIds": [
+      "0005",
+      "0009",
+      "0044",
+      "0045",
+      "0046",
+      "0047",
+      "0048",
+      "0049",
+      "0050",
+      "0051",
+      "0052",
+      "0053",
+      "0054",
+      "0055",
+      "0056",
+      "0057",
+      "0058",
+      "0059",
+      "0060"
+    ],
+    "reserved0048": {
+      "id": "0048",
+      "owner": "W2",
+      "version": "0048_w2_usage_lineage",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "state": "reserved_unapplied",
+      "sourceCommit": "a010a030378a0c62a44d6c14e714cc397722e702",
+      "sourceSha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
+    },
+    "actual0048Sha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+    "changedByHandoff": false
+  },
+  "originalBackups": [
+    {
+      "path": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001/creator-platform-w8-resume-20260930.sql.gz",
+      "bytes": 533459,
+      "sha256": "fe09be665339e7333ee7afec6fbe7f2c48e9e96a53ad99ffc3cb4ab4c2581f71",
+      "matchesPrivateManifest": true,
+      "gzipReadable": true,
+      "format": "gzip-compressed plain pg_dumpall cluster SQL; format corroborated by published PR17 procedure",
+      "restoredInThisHandoff": false
+    },
+    {
+      "path": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001/creator-platform-w8-foundation-20260930-takeover.sql.gz",
+      "bytes": 212725,
+      "sha256": "037c1b4d22be29fb7919b7e311e3c4ec029051c591bc81731a784551eb3d0ef4",
+      "matchesPrivateManifest": true,
+      "gzipReadable": true,
+      "format": "gzip-compressed plain pg_dumpall cluster SQL; format corroborated by published PR17 procedure",
+      "restoredInThisHandoff": false
+    }
+  ],
+  "newerPrivateCheckpoint": {
+    "path": "/Users/yingpengwang/.config/creator-platform/recovery-20261001-active/post-recovery-runtime.dump",
+    "bytes": 553088,
+    "sha256": "1bf9de3d3c65d7b49032a904bd2e724892e7bc1eb6e52901e973dadb9d62efd4",
+    "customArchiveHeaderVerified": true,
+    "independentRestoration": "Reported in the immutable PR17 recovery receipt; not rerun for this handoff."
+  },
+  "privateStateDirectories": [
+    {
+      "path": "/Users/yingpengwang/.config/creator-platform/w8-local",
+      "exists": true
+    },
+    {
+      "path": "/Users/yingpengwang/.config/creator-platform/recovery-20261001-active",
+      "exists": true
+    },
+    {
+      "path": "/Users/yingpengwang/.config/creator-platform/recovery-20261001-active/preserved",
+      "exists": true
+    }
+  ],
+  "resources": {
+    "recordedW8Ports": [
+      3008,
+      4108,
+      55438
+    ],
+    "listenersObserved": false,
+    "volumeSurvivalAfterSecondCleanup": "Not established; do not equate historical names with existing resources.",
+    "startedOrStoppedAnyRuntime": false
+  },
+  "remainingIntegration": {
+    "W3": "Specific adoption of schema already installed without0041/0042 ledger custody; PR36 catalog and exact historical provenance required; W5 profile inapplicable.",
+    "W2": "0048 reserved; actual notice/settlement/protected-store/account/thread privacy and expiry registration remains required.",
+    "signing": "0044/0056\u20130060 ordered composition and actual acceptance unfinished.",
+    "recoveryAndOffline": "Purpose-authorized restart discovery and offline-content authority/expiry producer unfinished.",
+    "scope": "Every unfinished R1\u2013R10 requirement remains assigned."
+  },
+  "ownerReportedW2DataLoss": {
+    "attribution": "W2 owner message; not independent inspection of deleted volume",
+    "retainedArchiveCounts": {
+      "sources": 123,
+      "versions": 105,
+      "evaluations": 20,
+      "usage": 658
+    },
+    "laterStateWithoutCompleteBackup": {
+      "sources": 125,
+      "versions": 105,
+      "evaluations": 25,
+      "usage": 939
+    },
+    "implication": "Do not claim recovery of later state from older retained archive."
+  },
+  "acceptanceLimit": "Only handoff/source/metadata/archive integrity checks performed. No current-main browser/native/provider/security/release acceptance inferred."
+}
