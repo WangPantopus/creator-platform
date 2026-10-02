@@ -1,0 +1,7 @@
+# Actual native grant-free Report and saved-state readback
+
+The real iOS app on W8's explicit simulator and the installed shipping Android debug APK on W8's explicit two-core/2GB emulator completed ordinary canonical development sign-in as actor one. Both opened the actual Report arrival for the existing labelled synthetic AI message, submitted a reason, and retained their own case after a cold Night restart. iOS saved CASE-2; Android saved CASE-3. Independent database readback verifies both open cases, exact reporter/creator and one evidence snapshot each referencing the expected existing message. Both clients then display both cases for the same account. No paid access grant, fabricated message, verification proof or provider action was created.
+
+[Receipt](receipt.json) records actual build hashes, devices,33.776s iOS E2E run, retained states and a new private checkpoint. Screenshots were personally inspected. Operators, raw UI trees/cookies/logs, XCTest results and the database checkpoint stay outside Git. No new unit tests or coverage work. The initially failed scratch-project build and Android offscreen success-label correction are preserved in the receipt, without duplicating a report.
+
+This target has40 canonical ledger entries plus labelled purpose proposals; these journeys do not establish the57-migration wave, creator verification, Signed publication, provider generation, complete privacy, all accessibility/design states, original recovery or release acceptance. Those remain separate work.

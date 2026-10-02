@@ -27,6 +27,7 @@ import {
   trustCreatorRestrictionInTransaction,
   trustContentRestrictionInTransaction,
   trustPublicPacketDenial,
+  trustPublicCreatorDenial,
   type TrustPublicPacketTuple,
 } from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
@@ -286,6 +287,7 @@ export async function createTrustRuntime(options: {
   const restrictCreator = trustCreatorRestrictionInTransaction();
   const restrictContent = trustContentRestrictionInTransaction();
   const restrictPacket = trustPublicPacketDenial();
+  const restrictPublicCreator = trustPublicCreatorDenial();
   const assertRestored = async () => {
     if (!(await restored()))
       throw new DomainError(
@@ -351,6 +353,13 @@ export async function createTrustRuntime(options: {
     ) => {
       await assertRestoredInTransaction(client);
       return restrictPacket(client, actor, tuple);
+    },
+    holdPublicCreatorNegativeAuthority: async (
+      client: PoolClient,
+      creatorId: string,
+    ) => {
+      await assertRestoredInTransaction(client);
+      return restrictPublicCreator(client, creatorId);
     },
     assertScopeAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictInTransaction>
