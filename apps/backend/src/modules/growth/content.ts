@@ -22,6 +22,8 @@ interface ContentPublicationView {
     audience: { kind: string };
     quote: { replyId: string; consentVersion: number } | null;
     packetId: string | null;
+    /** Original-plan consent/retraction remains a separate current owner. */
+    planRef?: unknown;
     media?: readonly unknown[];
   };
 }
@@ -96,9 +98,14 @@ export function contentPublicProjection(
       current.state === "published" &&
       current.document.audience.kind === "public" &&
       Boolean(current.publishedAt);
-    // Quote/packet retractions originate in separate fan/commerce outboxes.
+    // Quote/packet/plan retractions originate in separate owner outboxes.
     // Keep these effects pending until their current owner adapters are bound.
-    if (publicState && (current.document.quote || current.document.packetId)) {
+    if (
+      publicState &&
+      (current.document.quote ||
+        current.document.packetId ||
+        current.document.planRef != null)
+    ) {
       await growth.withdrawContent(
         current.creatorId,
         current.id,
@@ -163,7 +170,11 @@ export function contentPublicProjection(
       }
       // A correction between the initial Studio read and owner proof may have
       // changed its source. Never project it without current retraction hooks.
-      if (current.document.quote || current.document.packetId) {
+      if (
+        current.document.quote ||
+        current.document.packetId ||
+        current.document.planRef != null
+      ) {
         await growth.withdrawContent(
           current.creatorId,
           current.id,
