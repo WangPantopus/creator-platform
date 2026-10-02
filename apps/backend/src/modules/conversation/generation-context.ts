@@ -172,7 +172,16 @@ export class PreparedGenerationConversationContext {
         [scope.generationId, scope.workerToken],
       )
     ).rows[0]?.context;
-    const value = Context.parse(raw);
+    let value: z.infer<typeof Context>;
+    try {
+      value = Context.parse(raw);
+    } catch {
+      throw new DomainError(
+        "generation_context_unavailable",
+        "The current accepted conversation context is unavailable.",
+        503,
+      );
+    }
     invariant(
       value.generationId === scope.generationId &&
         value.threadId === scope.threadId &&
