@@ -1,0 +1,14 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend
+
+No test files found, exiting with code 1
+
+filter: tests/growth.contract.test.ts
+include: tests/**/*.test.ts
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in /Users/yingpengwang/estimate-rescue/
+  │ creator-platform/w7-completion-840545/apps/backend
+
