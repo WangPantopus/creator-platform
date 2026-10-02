@@ -1,0 +1,69 @@
+{
+  "isolatedOnly": true,
+  "schemaSha256": "534f5c36b3d58eb2099f9a9a12452a60b287e4f1f3040c4ebeba99a3c8e96684",
+  "compiler": [
+    {
+      "signature": "creator.begin_commerce_fulfillment_view(uuid,uuid,integer,uuid,integer,text,jsonb)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_view_originals(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.end_commerce_fulfillment_view(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.require_fulfillment_view_cleanup()",
+      "diagnosticCount": 0
+    }
+  ],
+  "definitions": {
+    "creator.begin_commerce_fulfillment_view(uuid,uuid,integer,uuid,integer,text,jsonb)": "90b1bc70d66c2f3b716640f6492a9c45cb46ea6e0197608d72d75f7805052d4b",
+    "creator.commerce_fulfillment_view_matches(uuid)": "88b41c43b673f2e41aeadf60252e1579aec6ef4e2cdaccc82c9b04a294350380",
+    "creator.commerce_fulfillment_view_originals(uuid)": "7f2296ce4f132165d3852ad52b32de253e0e7b990cfe1d083f179ab325eb258a",
+    "creator.end_commerce_fulfillment_view(uuid)": "92bb6999329cb5b862a61e284a4bba95171c9e929d6e907dc0fef20566ba72e3",
+    "creator.require_fulfillment_view_cleanup()": "7be123b8176d77f2b519a5256d3f67df92739e73b6c3d70fbce74e54717d9a22"
+  },
+  "catalogueChecksum": "f870ee07b5d12f65ac3abe45864a55ce9011af6967fc63cac91fff78f8a88d8e",
+  "scopeCatalogueChecksum": "b7a9cbb52541e90dad02bad4c3e04d140649f2cca1647e7dafdc5e3ddd64161a",
+  "originalPlanCatalogueChecksum": "12cda15c2b2078940e44cc667dfb0cac85284a34d846f6d0e0cb6a2defc763e7",
+  "mutations": [
+    {
+      "name": "cleanupTriggerDropped",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "name": "privateQuestionGrant",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "name": "metadataHelperSearchPath",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    }
+  ],
+  "administratorSelectedRuntime": true,
+  "unregisteredRefusal": true,
+  "counts": {
+    "migrations": 57,
+    "plans": 0,
+    "deliveries": 0,
+    "rolled_back": true
+  },
+  "positiveViewerVerified": false,
+  "reviewedBy": "primary W4",
+  "registrationOwner": "W8",
+  "registered": false,
+  "mounted": false,
+  "releaseReady": false
+}

@@ -1,0 +1,7 @@
+# Actual fulfillment viewer issuer review — 2026-10-02
+
+The primary implemented and reviewed the actual held0199 metadata issuer against the isolated canonical57 PostgreSQL review database. The SQL and new role were created only within a rolled-back operator transaction. No future migration ledger entry or business row was inserted. The exact source and consumer contract are in [W4-fulfillment-view.md](../../../../../../docs/implementation/W4-fulfillment-view.md).
+
+The receipt contains only source/catalogue hashes, diagnostic counts, deliberate metadata-mutation outcomes and aggregate counts. Private connection data and operator logs remain outside Git. Four PL/pgSQL compiler checks have zero diagnostics; the SQL matcher was created and its compiled definition was pinned. Cleanup-trigger removal, a private question grant and a changed helper search path all changed the actual guarded metadata, were detected, and were rolled back to the original catalogue.
+
+Unregistered entry-point refusal is a negative metadata check under an administrator-selected runtime role, not a genuine interactive invocation. No actual positive viewer or new session/Actor/plan/capture was fabricated. Earlier compiler-argument, SQL declaration and aggregate-privilege errors are preserved in the private operator history and described in the contract. Real W8 all-original negatives, bounded original private-input hash, W5 source/retraction/signature gates and populated C10 detachment remain unverified. This source is not release-ready.
