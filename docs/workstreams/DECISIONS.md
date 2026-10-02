@@ -251,3 +251,10 @@ A genuine iOS largest-text screenshot exposed Notice title/body truncation. Pres
 ### W1 October 2 — current main53133967 reconciliation
 
 Normal main integration preserves W1 strict request/session custody, terminal catalogue checks, canonical61 and all corrected0151–0201 held allocations. Resolve the older main privacy adapter in favor of actual same-client task/restoration/cancellation bookends; keep both dated W8 reports and exact closed0201 qualification. W5 current Note tenure/mute UI is personally source-reviewed, uses genuine current account/creator tuple and validated paid-history metadata, defaults to4000 while higher policy is unavailable, and preserves over-limit input for shortening. Its owner personal receipts do not become W1 acceptance. Canonical12/102 generation, web/backend types, scoped lint and original backend contracts qualify this integration; new native personal acceptance remains open.
+
+
+### W1 October2 — original Actor custody and ninth terminal executable
+
+Remove remaining Database scope-derived adult Actors by retaining AccessService's actual original caller object privately. Requests must also match the actual current session Actor and held client through restriction and COMMIT bookends. Preserve separately scoped host callbacks without granting request bootstrap to them. A copied account tuple is metadata, not an Actor. Actual18 existing checks pass on separate disposable PostgreSQL17/71.03s including startup and normal cleanup; no retained data/role credentials are touched.
+
+Extend the finite terminal registry by exactly one reviewed W3 terminal-only owner/signature/source contract (0203, SQL8de1897f, originalScopeBridge=false, max9). The original immutable0193/0110 source and input authority stay intact. W3's missingBEGIN factory bug is recorded and will be consumed only after its actual owner correction. No current terminal/provider/financial success or activation follows from types or existing tests.
