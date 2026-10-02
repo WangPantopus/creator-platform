@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { TrustStore, command, priorCommand } from "./store.js";
+import { assertAllScopeOwnershipCatalog } from "./privacy-ownership-catalog.js";
 import {
   PrivacyDomains,
   type CaseSummary,
@@ -776,6 +777,8 @@ export class TrustService {
         input.idempotencyKey,
         immutable,
         async () => {
+          if (input.scope !== "account")
+            await assertAllScopeOwnershipCatalog(client);
           if (input.kind === "export" || input.scope === "account")
             await this.assertAllowedInTransaction(
               client,
