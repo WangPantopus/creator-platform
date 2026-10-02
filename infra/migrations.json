@@ -873,6 +873,39 @@
       "state": "reserved_unapplied",
       "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Distinct genuine authenticated current-account/session-bound single-call metadata discovery; exact participant/booking/currentness, held restoration/Trust negatives and narrow NoLogin source/C10 review pending. No provider/document/token or worker authority, no fabricated family/scopes.",
       "heldVersionHistory": ["0150_w6_account_call_metadata"]
+    },
+    {
+      "id": "0198",
+      "owner": "W5",
+      "version": "0198_w5_content_privacy_export",
+      "path": "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct fixed Content export metadata/data purpose under the genuine0087 cancellable task, immutable verified ownership and current held restoration. Exact isolated NoLogin role/function/column/RLS/source/compiler and real-row export review pending. No raw0087 scope ACL, fabricated Actor/ownership, retention or source revocation. Deletion remains unavailable until approved Q16, actual W2 revocation and original W4 group-plan FK handling."
+    },
+    {
+      "id": "0199",
+      "owner": "W4",
+      "version": "0199_w4_fulfillment_plan_read",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-plan-read.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct bounded original fulfillment-plan recipient metadata purpose. Actual current viewer/session, every original family/capture/share/signature, W8 negatives, W5 positive mode/packet fences and W1 signatures last remain required. Exact source/isolated role/ACL/column/RLS/compiler/currentness review pending. No private body/question, scalar plan or tier-group permission fallback. Original immutable group-plan family/message FKs and genuine finite retained-family detachment remain C10 dependencies; positive activation stays closed."
+    },
+    {
+      "id": "0200",
+      "owner": "W8",
+      "version": "0200_w8_fulfillment_view_denial",
+      "path": "apps/backend/migrations/0200_w8_fulfillment_view_denial.sql",
+      "state": "reserved_unapplied",
+      "reason": "Original-recipient Trust negatives; depends on actual0178 fulfillment plan and0199 genuine viewer metadata issuer. Exact concrete viewer/session/client/XID/plan/revision/original-recipient binding is pending owner source review. No fabricated family/Actor/nonce, NULL-packet permission, raw question/body or successful callback. Allocation only; current restoration and all-original negative custody remain required before positive viewing."
+    },
+    {
+      "id": "0201",
+      "owner": "W8",
+      "version": "0201_w8_worker_migration_metadata",
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+      "state": "reserved_unapplied",
+      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Exact rolled-back SQL/ACL/refusal qualification pending; not activation or positive ingress acceptance."
     }
   ]
 }

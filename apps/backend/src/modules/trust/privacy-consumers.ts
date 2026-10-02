@@ -67,7 +67,7 @@ export function createPrivacyConsumers(input: {
   };
   media?: Omit<
     Parameters<typeof mediaPrivacyHook>[0],
-    "runtime" | "coordinator"
+    "runtime" | "coordinator" | "assertRestoredInTransaction"
   >;
   additional?: PrivacyHook[];
 }) {
@@ -75,10 +75,15 @@ export function createPrivacyConsumers(input: {
   const conversationAuthority = conversationPrivacyAuthority(
     input.runtimePool,
     input.coordinatorPool,
+    input.assertRestoredInTransaction,
   );
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
-    identityPrivacyHook(input.runtimePool, input.coordinatorPool),
+    identityPrivacyHook(
+      input.runtimePool,
+      input.coordinatorPool,
+      input.assertRestoredInTransaction,
+    ),
     {
       domain: "conversation",
       async run(job) {
@@ -104,6 +109,7 @@ export function createPrivacyConsumers(input: {
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,
       ...input.media,
+      assertRestoredInTransaction: input.assertRestoredInTransaction,
     }),
   ];
   if (input.agent)
