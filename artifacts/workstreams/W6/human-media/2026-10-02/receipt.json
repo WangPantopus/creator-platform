@@ -1,0 +1,84 @@
+{
+  "sourceBase": "89e561a9",
+  "database": "creator_w6_human_media_20261001",
+  "canonicalRegistryAcceptance": false,
+  "identity": "synthetic development creator/fan; explicitly seeded approved proof",
+  "passkey": "CDP virtual CTAP2 authenticator, actual WebAuthn backend verification; no physical Touch ID claim",
+  "credentialTrust": "generated development root only; not system trust or public C2PA trust list",
+  "photo": {
+    "assetId": "9c71dbcb-b97f-47e0-a623-50a6ecc957be",
+    "contentId": "c5def6a5-4a43-4cce-9d72-bd114e7dc895",
+    "signedActId": "ea5ec1ed-1fd1-4b7c-91f7-e8f915a9778e",
+    "inputBytes": 218730,
+    "processedBytes": 171049,
+    "processedSha256": "cbfb020394d608912743d81b78d117b9c215477f3c94853a2ec50f61800e7e1f",
+    "servedOwnerBytes": 183734,
+    "servedOwnerSha256": "5880ae416aac904e189ce081bba51d98bfad8148c3f330e18898eeda88d8afb1",
+    "state": "ready",
+    "manifestPending": false,
+    "contentState": "media_pending",
+    "fanPlaybackAccepted": false
+  },
+  "failureCases": [
+    {
+      "case": "oversize",
+      "declaredActualBytes": 17825792,
+      "result": "real UI rejected; no ticket allocated; discard/reselect operated"
+    },
+    {
+      "case": "corrupt PNG",
+      "assetId": "521bff72-638d-4d58-96ef-b3e98e3eba77",
+      "inputBytes": 53,
+      "result": "media_parse_rejected; actual UI discard then worker deleted"
+    },
+    {
+      "case": "EICAR",
+      "assetId": "9396f9d9-afc8-48a6-9d35-beb0c2ad244e",
+      "inputBytes": 68,
+      "result": "media_scan_rejected; actual UI discard then worker deleted; owned storage directory absent"
+    },
+    {
+      "case": "transport outage after ticket creation",
+      "assetId": "806d1e8a-e965-4661-bb5a-223e45b7b144",
+      "result": "actual PUT aborted while browser went offline; same mounted editor/file/ticket restored after current-role checks; Retry upload advanced the same asset from uploading/0 bytes to ready/218730 uploaded bytes; UI discard and worker deletion confirmed",
+      "inputBytes": 218730,
+      "processedBytes": 171049,
+      "processedSha256": "cbfb020394d608912743d81b78d117b9c215477f3c94853a2ec50f61800e7e1f"
+    },
+    {
+      "case": "owner playback link expiry",
+      "result": "genuine creator browser session and old BFF link returned 403/media_ticket_expired; renewed real ticket returned 200 and identical 183734 bytes/SHA5880ae416aac904e189ce081bba51d98bfad8148c3f330e18898eeda88d8afb1",
+      "qualification": "backend recovery through genuine browser cookie; no UI playback-expiry claim"
+    },
+    {
+      "case": "voice reply microphone absent",
+      "result": "real policy returned ten-minute human_reply limit for actual seeded thread; actual Record request found no audioinput; revised UI states microphone unavailable, delivery disabled, Record focused; Close restores Record a voice reply focus",
+      "acceptedDelivery": false
+    }
+  ],
+  "native": {
+    "ios": {
+      "device": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+      "runtime": "iOS 27",
+      "normalSimulatorSigning": true,
+      "journey": "shipping app actual development actor two selected via opt-in XCUI UI driver; real backend session at05:39:13 UTC, app relaunched and persisted fan account observed; pending Note denied",
+      "cuaDeviceHub": "selection timed out; no CUA tap claim",
+      "stopped": true
+    },
+    "android": {
+      "device": "emulator-5582",
+      "avd": "Qelvora_W6_API34",
+      "runtime": "Android 14/API34 arm64",
+      "journey": "shipping APK installed/launched, fresh UI hierarchy bounds used to tap Continue/actor two, real backend session at05:48:31 UTC; force-stop/relaunch restored fan; pending Note denied and Refresh tapped",
+      "stopped": true
+    }
+  },
+  "remaining": [
+    "real microphone absent after prior disconnection",
+    "W1 issued background publication authority and W5 consumer",
+    "canonical W8 registry activation/recreated database checks",
+    "full human voice fan play/seek on all clients",
+    "production proof, physical passkey, C2PA trust-list signer, reviewed retention/provider/hardware"
+  ],
+  "sourceQualification": "89e561a9 plus the W6 composer, recording-policy and recovery changes committed with this receipt; API was restarted for recording-policy operation."
+}

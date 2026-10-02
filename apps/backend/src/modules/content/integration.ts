@@ -7,6 +7,10 @@ import { createCommercePublicationPermission } from "../commerce/publication.js"
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
+import {
+  ContentPublicationWorker,
+  type ContentPublicationDependencies,
+} from "./publication.js";
 
 /** W1 host seam: one service instance for HTTP and exact W1 signed subjects.
  * Production hosts supply W8's current scope denial callback. Each downstream
@@ -66,6 +70,7 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
@@ -170,6 +175,9 @@ export function composeContentHost(input: {
   return {
     owners: input.owners,
     dependencies,
+    publicationWorker: input.publication
+      ? new ContentPublicationWorker(input.publication)
+      : null,
     bindContent(service: ContentService) {
       if (service.pool !== input.pool || (content && content !== service))
         throw new Error(
