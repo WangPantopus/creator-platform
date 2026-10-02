@@ -5215,211 +5215,211 @@
         }
       }
     },
-    "ai reply": {
+    "AI replies": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "ai reply"
+            "value": "AI replies"
           }
         }
       }
     },
-    "approved draft": {
+    "Approved AI drafts": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "approved draft"
+            "value": "Approved AI drafts"
           }
         }
       }
     },
-    "personal reply": {
+    "Personal replies and voice notes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "personal reply"
+            "value": "Personal replies and voice notes"
           }
         }
       }
     },
-    "request status": {
+    "Request status updates": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "request status"
+            "value": "Request status updates"
           }
         }
       }
     },
-    "call reminder": {
+    "Call reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "call reminder"
+            "value": "Call reminders"
           }
         }
       }
     },
-    "answered publicly": {
+    "Your question answered publicly": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "answered publicly"
+            "value": "Your question answered publicly"
           }
         }
       }
     },
-    "content match": {
+    "Posts about what you asked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "content match"
+            "value": "Posts about what you asked"
           }
         }
       }
     },
-    "announcement": {
+    "Creator announcements": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "announcement"
+            "value": "Creator announcements"
           }
         }
       }
     },
-    "creator offer": {
+    "Offers from creators": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "creator offer"
+            "value": "Offers from creators"
           }
         }
       }
     },
-    "slot change": {
+    "Pass slot changes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "slot change"
+            "value": "Pass slot changes"
           }
         }
       }
     },
-    "new packet": {
+    "New requests": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "new packet"
+            "value": "New requests"
           }
         }
       }
     },
-    "commitment due": {
+    "Commitment reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "commitment due"
+            "value": "Commitment reminders"
           }
         }
       }
     },
-    "guardrail": {
+    "Safety events and reports": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "guardrail"
+            "value": "Safety events and reports"
           }
         }
       }
     },
-    "pool share": {
+    "Pass pool updates": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "pool share"
+            "value": "Pass pool updates"
           }
         }
       }
     },
-    "note": {
+    "New Notes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "note"
+            "value": "New Notes"
           }
         }
       }
     },
-    "reaction": {
+    "Reactions to your replies": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "reaction"
+            "value": "Reactions to your replies"
           }
         }
       }
     },
-    "public answer": {
+    "New public answers": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "public answer"
+            "value": "New public answers"
           }
         }
       }
     },
-    "spending reminder": {
+    "Spending reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "spending reminder"
+            "value": "Spending reminders"
           }
         }
       }
     },
-    "weekly impact": {
+    "Weekly impact digests": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "weekly impact"
+            "value": "Weekly impact digests"
           }
         }
       }
@@ -10799,6 +10799,116 @@
           "stringUnit": {
             "state": "translated",
             "value": "Check your reply and sharing choices before trying again. Your input is kept."
+          }
+        }
+      }
+    },
+    "Back to reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to reply"
+          }
+        }
+      }
+    },
+    "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy."
+          }
+        }
+      }
+    },
+    "Preparing images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing images…"
+          }
+        }
+      }
+    },
+    "Prepared {page} images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepared {page} images…"
+          }
+        }
+      }
+    },
+    "Page {page}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page {page}"
+          }
+        }
+      }
+    },
+    "Your download is ready. Check your browser’s downloads.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your download is ready. Check your browser’s downloads."
+          }
+        }
+      }
+    },
+    "The complete image export could not be prepared. Retry, or download the complete text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete image export could not be prepared. Retry, or download the complete text."
+          }
+        }
+      }
+    },
+    "{kind} · {channel}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{kind} · {channel}"
+          }
+        }
+      }
+    },
+    "This week: {people} people helped and {thanks} thanks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week: {people} people helped and {thanks} thanks."
+          }
+        }
+      }
+    },
+    "You've reached {percent}% of your monthly limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've reached {percent}% of your monthly limit."
           }
         }
       }

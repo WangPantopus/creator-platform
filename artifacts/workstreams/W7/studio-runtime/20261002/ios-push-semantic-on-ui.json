@@ -1,0 +1,1 @@
+[{"subrole":null,"content_required":false,"pid":22807,"type":"Button","frame":{"x":16,"width":358,"height":44,"y":342},"AXFrame":"{{16, 342}, {358, 44}}","traits":["Scrollable","Button"],"title":null,"role":"AXButton","custom_actions":[],"AXLabel":"Push notifications","AXValue":"on","enabled":true,"help":null,"AXUniqueId":null,"role_description":"button"}]

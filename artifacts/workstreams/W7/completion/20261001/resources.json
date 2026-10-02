@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-01T20:59:59.084917+00:00",
+  "updatedAt": "2026-10-02T15:01:28.379946+00:00",
   "owner": "W7 primary",
   "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
   "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T06:27:11.832751+00:00",
+    "recordedAt": "2026-10-02T14:31:41.202148+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,26 +136,26 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Running;40 active migrations through0043, separated nonowner roles; actual UI created one fan w7_studio_fan and one optional usefulness feedback row.0 creator/verified public rows. No pending migration activated.",
+      "state": "Stopped normally after share-export recovery;40 active migrations through0043; no new schema applied.",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "API loopback4107 PID92298/session28521; web3007 PID74906/session4318 Next development. API current at last restart; latest handle reuse repair compiled afterward. Verify listeners before reuse."
+      "note": "W7 API/web normally stopped after actual acceptance; owned devices and exact leases stopped/released. Verify ports and current compiled source before reusing."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Earlier8c shipping app installed/launched but CUA timeouts; terminated/shutdown. New ordered-revocation source built successfully; not installed yet. No W7 simulator lease held."
+      "state": "Stopped normally; signed account-copy shipping dylib fdd1fe5d installed and actual saved Settings/Home\u2192Notifications observed. Exact slot1 released. Populated/provider/privacy acceptance remains open."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Qelvora_W7_API34/emulator5580 installed and launched earlier shipping draft; no personal taps yet. Stopped and emulator-slot-2 released. Final current-source APK compiled successfully after release; not installed yet."
+      "state": "Stopped normally; shipping APK01754237 installed and actual Home action200% Light/Night, Notifications and saved Settings observed. Own font scale restored1.0; exact slot2 released. Shared Requests wrap preserved pending reviewed W1 source integration."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -179,22 +179,26 @@
         "GROWTH_ENCRYPTION_KEY",
         "GROWTH_WORKER_DATABASE_URL",
         "QELVORA_API_URL",
-        "QELVORA_GROWTH_API_URL"
+        "QELVORA_GROWTH_API_URL",
+        "GROWTH_API_DATABASE_URL"
       ],
-      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed"
+      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed",
+      "runtime-before-pool-split.env": "Private0600 recovery copy only; never print/commit/upload values"
     },
-    "nativeBuild": "Final Android FCM build11s exit0 and final iOS build exit0 under reviewed W1 atomic UUID+inode helper94258f0e. Heavy slot released after each. No W7 heavy native build remains.",
+    "nativeBuild": "Signed shipping iOS and Android shipping/original checks pass; actual clients Settings and navigation observed, Android Home action200% Light/Night. Original18 Swift/110 comparisons pass. Both own devices normally stopped, exact UUID/inode leases released; companion stopped. No new tests/references/tolerances.",
     "api": {
-      "pid": 92298,
-      "session": 28521,
-      "source": "Canonical public AI/held follows current at restart; latest handle collision repair compiled afterward, not yet restarted.",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/api-current-source-3.log"
+      "source": "5fc1a8ac811779cb13dae7ef485cb675cfeaccaa compiled backend with newly generated copy",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/share-images-api.log",
+      "lastPid": 44338,
+      "lastSession": 37554,
+      "state": "Stopped normally after actual readiness and share-unavailable operation; no provider/purpose fabricated."
     },
     "web": {
-      "pid": 74906,
-      "session": 4318,
-      "mode": "Next development; actual local fan settings/feedback operated",
-      "productionBuild": "completed earlier; production signed-out settings/discovery recovery/share refusal observed only"
+      "mode": "Shipping production .next-w7-images-20261002, loopback3007",
+      "acceptance": "Actual unavailable-share export and recovery,410 no artifact; successful full-image download requires genuine approved share/origin and remains unobserved.",
+      "lastPid": 42433,
+      "lastParentSession": 64965,
+      "state": "Stopped normally after actual share export/recovery Light/Night; browser closed; fresh build retained."
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,
@@ -203,6 +207,109 @@
       "APNsProviderSupplied": false,
       "emailProviderSupplied": false,
       "publicHTTPSOriginSupplied": false
+    },
+    "databaseRoles": {
+      "core": "creator_runtime direct LOGIN, NOINHERIT, no Growth or worker membership",
+      "growthAPI": "w7_api direct LOGIN, INHERIT, only creator_runtime+growth_runtime, no worker",
+      "growthWorker": "growth_worker direct LOGIN, NOINHERIT",
+      "realCoreAndGrowthReadiness": "passed; protected trust/purpose authorities remain unconfigured"
+    },
+    "accountNotifications": "Unregistered pending SQL and owner port; actual40-migration catalogue refuses503. No allowed W7 slot free, no migration above0060 activated, no purpose/Actor/provider fabricated.",
+    "shareImages": "Browser-local complete-image source compiled; genuine permitted rendering/download and revocation-during-render acceptance remain open.",
+    "coreFollowMetadata": "Corrected genuine fan/session context and strict all-schema custody; W8 held0101 descriptor recognized but SQL unnumbered/unregistered/unapplied, actual40 migrations/absent function; human0044-0060 activation ceiling preserved, no fabricated scope.",
+    "publisherProof": {
+      "state": "Implemented/compiled, genuine permitted projection/signature/runtime acceptance absent",
+      "ownerSource": "5b95b8904e76ec7d8ec9f8388092eaf1a5c82aaf",
+      "sourceCherryPick": "f73793f3",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/owner-proof.md",
+      "services": "All own services/devices/leases stopped"
+    },
+    "weeklyImpactRuntime": {
+      "state": "Normally stopped; retained own data/binaries/private configuration",
+      "apiPid": null,
+      "apiLastPid": 85637,
+      "apiExit": 0,
+      "apiPort": 4107,
+      "webPid": null,
+      "webLastPid": 55079,
+      "webExit": 143,
+      "webPort": 3007,
+      "webBuild": ".next-w7-impact-20261002",
+      "devices": "Both W7 apps terminated; own simulator shut down, emulator-5580 explicitly killed, exact owned slots released; no peer touched",
+      "collection": "Actual source/counts/Thanks/current-purpose/notice readers unbound; no fabricated aggregate",
+      "readiness": "503 trust_unconfigured observed",
+      "webAuth": "Production HTTP continuation503 identity_unconfigured, destination preserved, no policy weakening",
+      "source": "Final scheduler directory-failure isolation compiled after native/API observations; repaired positive collection branch unoperated",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/weekly-impact.md",
+      "cleanup": {
+        "stoppedAt": "2026-10-02T12:47:21.298437+00:00",
+        "apiExit": 0,
+        "webExit": 143,
+        "softwareEmulatorExit": 0,
+        "idbCompanionExit": 0,
+        "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shut down",
+        "emulator": "emulator-5580 killed explicitly",
+        "released": [
+          "creator-platform-simulator-slot-1",
+          "creator-platform-emulator-slot-1"
+        ],
+        "postgres": "creator-platform-w7-macstudio-20261001 normally stopped",
+        "browser": "own w7ImpactTab closed",
+        "peerResourcesTouched": false
+      }
+    },
+    "coreFollowQualification": {
+      "container": "creator-platform-w7-core-follow-custody-20261002",
+      "database": "creator_w7_core_follow_custody",
+      "port": 55448,
+      "volume": "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85",
+      "state": "stopped,exit0,traffic-closed,connection-limit0",
+      "mainW7RuntimeDatabase": "untouched,stopped,40 active migrations,no metadata function/namespace",
+      "privateInputNames": [
+        "DATABASE_MIGRATION_URL",
+        "POSTGRES_USER",
+        "POSTGRES_DB",
+        "POSTGRES_PASSWORD"
+      ]
+    },
+    "mainIntegrationRuntime": {
+      "stoppedAt": "2026-10-02T14:31:41.202148+00:00",
+      "apiLastPid": 51804,
+      "apiExit": 0,
+      "webLastPid": 66458,
+      "webExit": 1,
+      "webExitNote": "Owned next process terminated with TERM; pnpm wrapper returned1; no product failure inferred from shutdown wrapper",
+      "iosUDID": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "ios": "App terminated/simulator shutdown",
+      "android": "emulator-5580 explicitly killed,exit0",
+      "companionLastPid": 80720,
+      "companionExit": 0,
+      "released": [
+        "simulator-slot1",
+        "emulator-slot1"
+      ],
+      "leaseCustody": "Actual owner UUID+inode checked before owner-file unlink and empty directory removal",
+      "database": "creator-platform-w7-macstudio-20261001 normally stopped,exit0",
+      "browser": "own w7MainTab closed",
+      "peerResourcesTouched": false,
+      "state": "All W7 resources stopped; current source/acceptance limits in main-integration.md",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/main-integration.md",
+      "environmentValues": "Not recorded; existing private0600 runtime input names unchanged",
+      "SQLActivated": false
+    },
+    "privacyHeldConsumer": {
+      "parent": "9841372c38f1afe17d27a35e06e92c550b246bae",
+      "implemented": true,
+      "checks": "workspace/production pass",
+      "runtimeObserved": false,
+      "resourcesStarted": false,
+      "newSQLActivated": false,
+      "dependencies": [
+        "current0053 on retained40 database",
+        "registered0103",
+        "real protected export storage/current owner protocols"
+      ],
+      "sourceEvidence": "artifacts/workstreams/W7/studio-runtime/20261002/privacy-held.md"
     }
   }
 }

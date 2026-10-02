@@ -5,6 +5,8 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { EventEnvelope, type GrowthEvent } from "./contracts.js";
 import type { GrowthService } from "./service.js";
+import { requireAccountNotificationSchema } from "./account-notifications.js";
+import { leasedNotificationCustody } from "./notification-custody.js";
 
 export const Producer = z.enum([
   "agent",
@@ -93,16 +95,31 @@ export class GrowthRelay {
   async enqueue(producer: GrowthProducer, input: unknown) {
     const owner = Producer.parse(producer),
       event = EventEnvelope.parse(input);
+    if (event.creatorId === null) {
+      if (owner !== "commerce")
+        throw new DomainError(
+          "producer_event_conflict",
+          copy.growthErrorProducerEventConflict,
+          409,
+        );
+      await requireAccountNotificationSchema(this.service.db.worker);
+    }
     const hash = contentHash({ producer: owner, event });
     return this.service.db.transaction(
       this.service.db.worker,
       async (client) => {
         const retained = await this.service.erasure.event(client, event);
         if (!retained) return { queued: false };
-        await client.query(
-          "INSERT INTO growth.producer_relay(id,producer,creator_id,envelope,envelope_hash) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
-          [event.id, owner, event.creatorId, retained, hash],
-        );
+        const inserted =
+          event.creatorId === null
+            ? await client.query(
+                "INSERT INTO growth.producer_relay(id,producer,creator_id,account_id,envelope,envelope_hash) VALUES($1,$2,NULL,$3,$4,$5) ON CONFLICT DO NOTHING",
+                [event.id, owner, event.accountId, retained, hash],
+              )
+            : await client.query(
+                "INSERT INTO growth.producer_relay(id,producer,creator_id,envelope,envelope_hash) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
+                [event.id, owner, event.creatorId, retained, hash],
+              );
         const prior = (
           await client.query(
             "SELECT envelope_hash FROM growth.producer_relay WHERE id=$1",
@@ -115,7 +132,7 @@ export class GrowthRelay {
             copy.growthErrorProducerEventConflict3,
             409,
           );
-        return { queued: true };
+        return { queued: true, inserted: Boolean(inserted.rowCount) };
       },
     );
   }
@@ -142,7 +159,12 @@ export class GrowthRelay {
       async (client) =>
         (
           await client.query(
-            `WITH due AS (SELECT id FROM growth.producer_relay WHERE (state='queued' AND available_at<=now()) OR (state='leased' AND lease_until<now()) ORDER BY available_at,id LIMIT $1 FOR UPDATE SKIP LOCKED)
+            `WITH due AS (SELECT r.id FROM growth.producer_relay r
+              WHERE ((r.state='queued' AND r.available_at<=now()) OR (r.state='leased' AND r.lease_until<now()))
+              AND NOT (r.producer='retention' AND r.envelope->>'type'='weekly_impact'
+                AND NOT EXISTS(SELECT FROM growth.impact i WHERE i.creator_id=r.creator_id
+                  AND r.envelope->>'occurredAt'=to_char(i.window_start+7,'YYYY-MM-DD')||'T00:00:00.000Z'))
+              ORDER BY r.available_at,r.id LIMIT $1 FOR UPDATE SKIP LOCKED)
          UPDATE growth.producer_relay r SET state='leased',lease_id=$2,lease_until=now()+interval '60 seconds',attempts=attempts+1 FROM due WHERE r.id=due.id RETURNING r.*`,
             [bound, lease],
           )
@@ -150,7 +172,21 @@ export class GrowthRelay {
     );
     for (const row of rows) {
       try {
-        await this.service.notifications.consume(row.envelope);
+        const event = EventEnvelope.parse(row.envelope);
+        await this.service.notifications.consume(
+          row.envelope,
+          event.creatorId === null || event.type === "weekly_impact"
+            ? leasedNotificationCustody(
+                this.service.db,
+                this.service.erasure,
+                event,
+                event.creatorId === null
+                  ? event.accountId
+                  : event.recipients[0]!.accountId,
+                { kind: "relay", id: row.id, leaseId: lease },
+              )
+            : undefined,
+        );
         await this.service.db.worker.query(
           "UPDATE growth.producer_relay SET state='consumed',consumed_at=now(),lease_until=NULL,error_code=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
           [row.id, lease],
@@ -190,6 +226,19 @@ export class GrowthRelay {
         await this.service.db.worker.query(
           "UPDATE growth.producer_relay SET state='queued',attempts=0,available_at=now(),lease_until=NULL,lease_id=NULL,error_code=NULL WHERE producer=$1 AND creator_id=$2 AND state='blocked' RETURNING id",
           [Producer.parse(producer), z.uuid().parse(creatorId)],
+        )
+      ).rowCount ?? 0
+    );
+  }
+  /** Current host recovery for genuine portfolio notices; no creator scope is fabricated. */
+  async resumeAccount(accountId: string) {
+    const account = z.uuid().parse(accountId);
+    await requireAccountNotificationSchema(this.service.db.worker);
+    return (
+      (
+        await this.service.db.worker.query(
+          "UPDATE growth.producer_relay SET state='queued',attempts=0,available_at=now(),lease_until=NULL,lease_id=NULL,error_code=NULL WHERE producer='commerce' AND creator_id IS NULL AND account_id=$1 AND state='blocked' RETURNING id",
+          [account],
         )
       ).rowCount ?? 0
     );

@@ -12,7 +12,7 @@ export interface PublicCreatorAIProjection {
   current(id: string): Promise<{
     state: PublicCreator["state"];
     mode: PublicCreator["mode"];
-    topics: string[];
+    topics: readonly string[];
     sourceSummary: string;
   } | null>;
 }
@@ -101,7 +101,9 @@ export function canonicalCreatorProjections(
               : ai.state,
         mode: ai?.mode ?? "expert",
         topics:
-          ai && ["published", "paused"].includes(ai.state) ? ai.topics : [],
+          ai && ["published", "paused"].includes(ai.state)
+            ? [...ai.topics]
+            : [],
         sourceSummary:
           ai && ["published", "paused"].includes(ai.state)
             ? ai.sourceSummary

@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-10-02T08:47:41.028437+00:00",
+  "sourceParent": "52fbab1931813ad32ff0440e4107075db436985d",
+  "sourceFiles": {
+    "apps/backend/src/db/growth-api-pool.ts": "0f0eca08b17ab9637700f5ea8b9c33cc56e0a6ef8877299edbb8219630a9c4a8",
+    "apps/backend/src/modules/growth/home-composition.ts": "f6fc9a477a883a49d6dffc7a599c69499ad3a50cb33bcbfb47c4b36ba430825b",
+    "apps/backend/src/modules/growth/contracts.ts": "5b64f41b6840f7f66f9be0030cbf02e9fc5778993d7e30fc26893895e3519bb8",
+    "apps/backend/src/modules/growth/home.ts": "47aaa63893bf384c86022e28ed62d5bca99574468059089ab6917de0e255e7f5",
+    "apps/backend/src/modules/growth/service.ts": "43b2d0cc2078991c9c2b729e01331a8e11710d901f2d3a55809def4726c71181",
+    "apps/backend/src/server.ts": "67f0694d86e4b82e8077599f86d9b5eb41d9877c15a5ba23deb0c75a4ee2efa1"
+  },
+  "reviewedPoolProducer": "0302b0f00ebb172b6a28cc28c38dd87782449040",
+  "runtimeFiles": {
+    "pool-split-readiness.json": "2dac189a59684e6434986126ebcf5cfb89fb4bb97a1e9c7d1d0761d3ed160293",
+    "pool-split-health-ready.json": "d07af88d3a7c7eda54f4a8742e5efa6f4278c8440c321920e00e0db23b9f9bab",
+    "android-pool-split-slot-2-custody.json": "756fd731c11b2afd1692b4e588fdb8b4f6f3dd3f9edab705f9bbf491fdbf5bca",
+    "android-pool-home-ui.xml": "658be343d78cf38b752997e7947b872592451c70fdb9d7fecf2170f3c64e78f2",
+    "android-pool-home.png": "c2c34729262da6e9fb8523d84fc3c85219e194cf43fd62468c1213a17e9c6459",
+    "android-pool-notifications-ui.xml": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+    "android-pool-settings-ui.xml": "6a5a826d01500c2a5dae3ed93088047187c9c11f4431cd0fee8053a029ab4246",
+    "android-pool-settings.png": "d8376e383c7f357aa0c1d435d9127f23959f5ace230f943cc1a8fe1317729494",
+    "home-pools-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "home-pools-backend-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "home-composition-existing-contracts.log": "311179afb5c79037c2d7d76d9062737621da8c9a765de2e9ec7353f7fe6d89d8"
+  },
+  "personallyImplementedAndOperated": true,
+  "newTestCode": false,
+  "populatedGlobalHomeAcceptance": false,
+  "pendingMigrationsActivated": false,
+  "corePurposeAuthorityConfigured": false,
+  "state": "Partial backend-host runtime observation, all original W7 acceptance remains binding"
+}

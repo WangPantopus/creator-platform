@@ -18,11 +18,14 @@ import {
   createDevelopmentTrust,
   developmentTrustActors,
 } from "./modules/trust/development.js";
-import { createGrowthAPIPool } from "./db/growth-api-pool.js";
-import { canonicalConversationHomePage } from "./modules/growth/home.js";
-import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
+import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { canonicalHomePage } from "./modules/growth/home-composition.js";
+import { canonicalPassAccess } from "./modules/growth/integration.js";
+import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -56,7 +59,34 @@ try {
           },
           signedSubjectPolicies: [commerceSignedSubjects],
           ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-            ? { trust: createDevelopmentTrust }
+            ? {
+                trust: (
+                  runtime: Parameters<typeof createDevelopmentTrust>[0],
+                ) =>
+                  createDevelopmentTrust(runtime, {
+                    consumers: {
+                      additional:
+                        process.env.GROWTH_ENABLED === "true"
+                          ? [
+                              {
+                                domain: "growth",
+                                async run(job) {
+                                  // Trust is composed first; resolve the actual
+                                  // owner only after feature composition completes.
+                                  if (!features.growth)
+                                    throw new DomainError(
+                                      "privacy_commit_fence_unavailable",
+                                      "The actual Growth privacy owner is unavailable.",
+                                      503,
+                                    );
+                                  return features.growth.privacyHook.run(job);
+                                },
+                              },
+                            ]
+                          : [],
+                    },
+                  }),
+              }
             : {}),
           registerFeatures: async (runtime) => {
             const mediaEnvironment = readMediaEnvironment();
@@ -100,27 +130,43 @@ try {
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              privacyTaskAuthority: async (client, job) => {
+                if (!runtime.assertRestoredInTransaction)
+                  throw new DomainError(
+                    "privacy_commit_fence_unavailable",
+                    "Current held restoration authority is required.",
+                    503,
+                  );
+                return domainPrivacyTaskAuthorityInTransaction(
+                  client,
+                  job,
+                  "growth",
+                  runtime.assertRestoredInTransaction,
+                );
+              },
               assertAllowed: async (actor, creatorId) =>
                 creatorId
                   ? runtime.assertCreatorAllowed(actor, creatorId)
                   : runtime.assertActorAllowed(actor),
               owners: runtime.identity
                 ? {
-                    homePage: canonicalConversationHomePage(
-                      conversation.feature,
-                      runtime.access,
-                      runtime.database,
-                      runtime.identity.signing,
-                      async (creatorId) => {
-                        const row = (
-                          await runtime.pool.query(
-                            "SELECT handle FROM creator.creator_profile WHERE id=$1",
-                            [creatorId],
-                          )
-                        ).rows[0];
-                        return row?.handle ?? null;
-                      },
-                    ),
+                    homePage: canonicalHomePage({
+                      thread: canonicalConversationHomePage(
+                        conversation.feature,
+                        runtime.access,
+                        runtime.database,
+                        runtime.identity.signing,
+                        async (creatorId) => {
+                          const row = (
+                            await runtime.pool.query<{ handle: string }>(
+                              "SELECT handle FROM creator.creator_profile WHERE id=$1",
+                              [creatorId],
+                            )
+                          ).rows[0];
+                          return row?.handle ?? null;
+                        },
+                      ),
+                    }),
                     ...(commerce
                       ? {
                           discoveryAccess: canonicalPassAccess(
@@ -163,14 +209,20 @@ try {
                   );
                 },
                 mediaPublication: mediaHost?.contentPublication,
+                // Canonical content retains creator_runtime and actual held
+                // scopes. Missing 0101 custody fails closed without Growth grants.
+                ...(features.growth
+                  ? { follows: features.growth.coreContentFollows }
+                  : {}),
               },
               ...(features.growth && runtime.identity
                 ? {
-                    growth: {
-                      service: features.growth.service,
-                      signing: runtime.identity.signing,
-                      follows: { follows: features.growth.contentFollows },
-                    },
+                    publicProjection: async (actor, effect) =>
+                      contentPublicProjection(
+                        features.growth!.service,
+                        content.content,
+                        runtime.identity!.signing,
+                      )(actor, effect),
                   }
                 : {}),
               assertScopeAllowedInTransaction:
@@ -215,7 +267,11 @@ try {
         })
       : undefined;
 } catch (error) {
-  await growthAPIPool?.end();
+  await Promise.allSettled([
+    features.growth?.close(),
+    ...features.close.map((close) => Promise.resolve().then(close)),
+    growthAPIPool?.end(),
+  ]);
   throw error;
 }
 features.growth?.start();
@@ -233,7 +289,7 @@ server.listen(
 const shutdown = () => {
   void (async () => {
     await features.growth?.close();
-    for (const close of features.close) close();
+    for (const close of features.close) await close();
     if (configured) await configured.close();
     else await new Promise<void>((resolve) => server.close(() => resolve()));
     await growthAPIPool?.end();

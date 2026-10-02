@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "parent": "9841372c38f1afe17d27a35e06e92c550b246bae",
+  "personalImplementationAndReview": true,
+  "ownerSource": "ccc4474b57b1dd4e0d1b1d1157c6ef4a77e7e07d",
+  "exactConsumedFiles": {
+    "apps/backend/src/modules/trust/domain-privacy-authority.ts": "19a6a60fce2f390a1522374d959a495b425fc526d9bbb30796102696a0f5ee23",
+    "apps/backend/src/modules/trust/domain-privacy-catalog.ts": "f36bfa5b69cfc2343a5fc65d44ae4d41509b04b97bbf0b96ebaad3bb449a2848",
+    "apps/backend/src/modules/trust/own-privacy-hook.ts": "c2b85854cb6321c0fad53e3caebe4af4ff759f5bf629996fb4227402cea227ae"
+  },
+  "files": {
+    "apps/backend/src/server.ts": "310435ebe2d27c952c7c77c4e6804c37e802c9686d0d829b55dfce27df6a8b96",
+    "apps/backend/src/modules/growth/lifecycle.ts": "c9978810b443e3523c1e525fb6a340d6226f6ebab7e7c4a94a5e9bc967a6203d",
+    "apps/backend/src/modules/growth/service.ts": "6eb8abbe1999fde5e061fbc8985882bb8515475c2ad09c046768a68c25225ed1",
+    "apps/backend/src/modules/growth/erasure.ts": "9503d34cd4ae3bffb51e7759da9d06f8c49d529f3543ae94dfc816530ce1fe23",
+    "apps/backend/src/modules/growth/privacy-export.ts": "4c537faed97f6a1a6a27905c26102e8a36e2080b350eb423669cdd7f834abe28",
+    "apps/backend/src/modules/trust/domain-privacy-authority.ts": "19a6a60fce2f390a1522374d959a495b425fc526d9bbb30796102696a0f5ee23",
+    "apps/backend/src/modules/trust/domain-privacy-catalog.ts": "f36bfa5b69cfc2343a5fc65d44ae4d41509b04b97bbf0b96ebaad3bb449a2848",
+    "apps/backend/src/modules/trust/own-privacy-hook.ts": "c2b85854cb6321c0fad53e3caebe4af4ff759f5bf629996fb4227402cea227ae",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "cb751fd41e5c9dfb853b19361d9b5f6dfbad20099495620711790252d1bd11b1",
+    "apps/backend/src/modules/trust/development.ts": "669517061e2b3eb57a376de635a4eb92c0600daaed97792439e4c542a7daf914"
+  },
+  "sourceContract": {
+    "heldWorkerClient": true,
+    "authorityBeforeDomainLocks": true,
+    "oneFixedSourceUnionCursor": true,
+    "readCommittedReadWrite": true,
+    "boundedSources": 23,
+    "sourceRowBytes": 262144,
+    "fetchRows": 16,
+    "encodedRecordBytes": 524288,
+    "maxOwnedCreators": 100,
+    "explicitEmptyFetchEOF": true,
+    "sameClientPageAndCommitBookends": true,
+    "deferredWallClockCommitFenceRequired": true,
+    "noPoolAuthorityFallback": true,
+    "completionAfterSeparateCommit": true,
+    "abortDestroysOnlyOwnClient": true
+  },
+  "checks": {
+    "workspaceFirst": "pass after missing type import repair",
+    "workspaceFinal": "pass",
+    "newTests": 0,
+    "nativeChanges": 0,
+    "newSQL": 0,
+    "referenceOrToleranceChanges": 0
+  },
+  "runtime": {
+    "newPrivacyJobOperated": false,
+    "newNativePrivacyAcceptance": false,
+    "retainedDatabaseMigrations": 40,
+    "neededCurrentTrustMigration": "0053_w8_runtime_denial_projection",
+    "domainPrivacyFenceRegistered": false,
+    "protectedArtifactStoreConfigured": false,
+    "noResourceStarted": true,
+    "positivePrivacyReceipt": false,
+    "recoveryOrReleaseAcceptance": false
+  },
+  "merge": {
+    "pr": 31,
+    "merged": false,
+    "parentTrust": "pass",
+    "parentFoundation": "web-and-backend/android-runtime pass; web-visual/android-foundation/ios-foundation queued",
+    "changedHeadNeedsAllExactChecks": true,
+    "finalCombinedReviewPending": true
+  },
+  "scopeComplete": false
+}

@@ -1,16 +1,16 @@
-import type { PoolClient } from "pg";
-import { z } from "zod";
-import { copy } from "@qelvora/copy";
-import {
-  assertCurrentSession,
-  requestAuthority,
-} from "../identity/request-authority.js";
-import { DomainError } from "../../core/errors.js";
 import type { FeatureRegistration } from "../../app.js";
 import type { IdentityProfiles } from "../identity/profiles.js";
 import type { Actor } from "../identity/adapter.js";
 import type { GrowthOwners } from "./contracts.js";
 import type { GrowthService } from "./service.js";
+import type { PoolClient } from "pg";
+import { z } from "zod";
+import { DomainError } from "../../core/errors.js";
+import { copy } from "@qelvora/copy";
+import {
+  requestAuthority,
+  assertCurrentSession,
+} from "../identity/request-authority.js";
 import { createGrowthRouter } from "./router.js";
 
 /** W1's configured host mounts this before its terminal 404 and resolves each session. */

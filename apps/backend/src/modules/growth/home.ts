@@ -6,7 +6,10 @@ import type { Database } from "../../db/database.js";
 import type { SignedActService } from "../identity/signed-acts.js";
 import { DomainError } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
-import { readConversationHomeCursor } from "../conversation/home-cursor.js";
+import {
+  conversationHomeCursor,
+  readConversationHomeCursor,
+} from "../conversation/home-cursor.js";
 import { deliveredTextCommand } from "../conversation/signed-preview.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
@@ -187,6 +190,13 @@ export function canonicalConversationHomePage(
               message?.created_at ?? row.thread.privacy_notice_at,
             ).toISOString(),
           kind: "thread",
+          cursor:
+            directory.order === "activity" && entry.activityAt
+              ? conversationHomeCursor({
+                  threadId: entry.id,
+                  activityAt: entry.activityAt,
+                })
+              : undefined,
         });
       } catch (error) {
         // A deleted/denied family can remain briefly in W3's directory. Skip

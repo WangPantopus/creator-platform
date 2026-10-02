@@ -158,12 +158,12 @@ export function Inbox({
             <a
               className={`qv qv-notif growth-notification ${item.readAt ? "" : "is-unread"}`}
               key={item.id}
-              href={item.destination}
+              href={`/notifications/${item.id}`}
               onClick={async (event) => {
                 event.preventDefault();
                 try {
                   await mutate(`notifications/${item.id}/read`, {}, "PUT");
-                  window.location.assign(item.destination);
+                  window.location.assign(`/notifications/${item.id}`);
                 } catch (e) {
                   setError(
                     e instanceof Error

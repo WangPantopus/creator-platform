@@ -187,9 +187,12 @@ public struct GrowthClient: Sendable {
     let _: Ack = try await request("devices/" + installationID.uuidString.lowercased(), method: "DELETE", body: body, expectedSession: expectedSession)
   }
   func notificationDestination(id: UUID, expectedSession: String) async throws -> String {
-    struct Current: Decodable { let destination: String }
+    struct Current: Decodable { let id: String; let available: Bool; let destination: String }
     let current: Current = try await request("notifications/" + id.uuidString.lowercased(), expectedSession: expectedSession)
+    guard UUID(uuidString: current.id) == id, current.available else { throw GrowthRequestFailure(status: 404) }
     guard ApplicationDestination.isPermitted(current.destination) else { throw URLError(.badServerResponse) }
+    struct Ack: Decodable { let read: Bool }
+    let _: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
     return current.destination
   }
 }
@@ -201,6 +204,7 @@ public struct GrowthFanFeature: View {
   private let signIn: (String) -> Void
   private let navigate: ((String) -> Void)?
   @State private var route: String
+  @FocusState private var discoverSearchFocused: Bool
   @State private var query = ""
   @State private var category = "For you"
   @State private var section = "Chat"
@@ -280,10 +284,15 @@ public struct GrowthFanFeature: View {
             Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
-              .foregroundStyle(qColor("ink", scheme)).padding(12)
+              .textFieldStyle(.plain)
+              .qText("body").foregroundStyle(qColor("ink", scheme)).padding(12).frame(minHeight: 48)
+              .accessibilityLabel(QelvoraCopy.text("growthSearchCreators"))
               .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
               .overlay { RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1) }
-              .submitLabel(.search).onSubmit { Task { await load() } }
+              .focused($discoverSearchFocused)
+              .contentShape(Rectangle())
+              .onTapGesture { discoverSearchFocused = true }
+              .submitLabel(.search).onSubmit { discoverSearchFocused = false; Task { await load() } }
             Segmented(items: growthCategories.map(growthLabel), active: growthLabel(category)) { value in
               category = growthCategories.first(where: { growthLabel($0) == value }) ?? category
               Task { await load() }
@@ -309,15 +318,15 @@ public struct GrowthFanFeature: View {
             if creators.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoCreatorsFound"), body: QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
             }
-          } else if route == "/notifications" {
+          } else if route.hasPrefix("/notifications") {
             Text(QelvoraCopy.text("growthNotifications")).qText("display-lg")
             Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { open("/notifications/settings") }
-            if notifications.isEmpty && !loading && error.isEmpty {
+            if route == "/notifications" && notifications.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoUpdatesYet"), body: QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
             }
-            ForEach(notifications) { item in
+            ForEach(route == "/notifications" ? notifications : []) { item in
               SwiftUI.Button {
-                Task { await openNotification(item) }
+                openNotification(item)
               } label: {
                 VStack(alignment: .leading, spacing: 6) {
                   Text(item.sender).qText("label")
@@ -610,6 +619,12 @@ public struct GrowthFanFeature: View {
       } else if route == "/notifications" {
         let data: NotificationPage = try await client.request("notifications")
         notifications = data.notifications
+      } else if route.hasPrefix("/notifications/"), route != "/notifications/settings" {
+        guard let id = UUID(uuidString: String(route.dropFirst(15))) else { throw GrowthRequestFailure(status: 404) }
+        guard let captured = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+        let target = try await client.notificationDestination(id: id, expectedSession: captured)
+        guard !Task.isCancelled, route == loadedRoute, discoverRequestID == loadID, try await client.token() == captured else { return }
+        open(target)
       } else if route.hasPrefix("/creators/") {
         let parts = route.split(separator: "/")
         guard parts.count >= 2 else { return }
@@ -761,14 +776,9 @@ public struct GrowthFanFeature: View {
       error = ""
     } catch { if !Task.isCancelled { record(error) } }
   }
-  private func openNotification(_ item: GrowthNotification) async {
-    guard let client else { return }
-    do {
-      struct Ack: Decodable { let read: Bool }
-      let _: Ack = try await client.request(
-        "notifications/" + item.id + "/read", method: "PUT", body: Data("{}".utf8))
-      open(item.destination)
-    } catch { if !Task.isCancelled { record(error) } }
+  private func openNotification(_ item: GrowthNotification) {
+    guard let id = UUID(uuidString: item.id) else { record(GrowthRequestFailure(status: 404)); return }
+    open("/notifications/" + id.uuidString.lowercased())
   }
   private func openDestination(_ target: String) {
     if let navigate { navigate(target) }

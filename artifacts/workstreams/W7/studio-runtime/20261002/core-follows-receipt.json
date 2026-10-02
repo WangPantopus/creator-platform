@@ -1,0 +1,65 @@
+{
+  "recordedAt": "2026-10-02T11:50:06.218525+00:00",
+  "baseHead": "e1668430b2fac3c2102b798ec9f63c374bb6580d",
+  "primary": "W7 personally implemented/reviewed; no agents/test code",
+  "state": "Compiled; unbound canonical core adapter; SQL unregistered/unapplied; positive product acceptance absent",
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/core-follows.ts",
+      "sha256": "e32a4636afc928162867945a90255dabf3072ff736952c29bee80d0c08f11017"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "43790809803e51e2518be0c997b1c6b4ca344b1b490c177b1035e1693bfa9db4"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "sha256": "8bb25bc703c2fda3ab9fc211d4a800fe4c6ffaa473acc6dc055c9bd8cb8b9b1b"
+    }
+  ],
+  "custody": {
+    "migration": "No slot assigned; no application; actual W8 receipt required within0044-0060",
+    "identity": "Actual W1 ALS/session on held real core client, no fabricated Actor/GUC/scope",
+    "negative": "Caller retains genuine W1/W8 family/negative gates before Follow lock",
+    "result": "Boolean exact real Follow pair; null/unavailable is503, verified no-row only isfalse",
+    "function": "creator_growth_metadata.core_follow(uuid,uuid,uuid), no raw Growth privilege to core",
+    "role": "Dedicated NOLOGIN/NOINHERIT/non-owner/no-membership; lock-only UPDATE with WITH CHECKfalse",
+    "privateSession": "Only id/account/expiry/revocation column grant, fixed actual predicate; preserve existing bearer-resolution table RLS; W8 actual schema review remains required",
+    "graph": "W1 must personally compose core Content+W4 opaque exact-pool host with this held metadata; no current server switch"
+  },
+  "checks": {
+    "backendBuild": "exit0",
+    "lint": "exit0",
+    "existingContracts": "exit0,9 original",
+    "catalogue": "Actual own creator_runtime/40 active migrations, readyfalse, function/namespace absent; null receipt parameters not authority",
+    "runtime": "No positive/current-session/other-account/busy/followed-content acceptance; no SQL applied",
+    "cleanup": "Own PostgreSQL started solely for catalogue and normally stopped; API/web/native devices and leases remain stopped"
+  },
+  "raw": [
+    {
+      "path": "core-follows-raw/core-follows-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "core-follows-raw/core-follows-catalogue.json",
+      "sha256": "2e0febc21aa8791ba9b6c9afea249b45fd49b966ec20caadeaa8cfc7292c3244",
+      "bytes": 376
+    },
+    {
+      "path": "core-follows-raw/core-follows-existing-contracts.log",
+      "sha256": "90ba4fffecb5dd3afe85be8ec5e526ef344fd3cb3cc509920b667385edba7342",
+      "bytes": 328
+    },
+    {
+      "path": "core-follows-raw/core-follows-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "core-follows-raw/first-startup-tool-transcript.txt",
+      "sha256": "1d77fcc4c70455bbfc3626b0caa8a269deacdeb47c059707fe937c820a605b1c",
+      "bytes": 775
+    }
+  ]
+}

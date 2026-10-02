@@ -476,25 +476,25 @@
   <string name="growth_your_entry_context_is_kept_no_message_has_been_sent" formatted="false">Your entry context is kept. No message has been sent.</string>
   <string name="growth_getstring" formatted="false">).getString(</string>
   <string name="growth_loading2" formatted="false">Loading…</string>
-  <string name="growth_kind_ai_reply" formatted="false">ai reply</string>
-  <string name="growth_kind_approved_draft" formatted="false">approved draft</string>
-  <string name="growth_kind_personal_reply" formatted="false">personal reply</string>
-  <string name="growth_kind_request_status" formatted="false">request status</string>
-  <string name="growth_kind_call_reminder" formatted="false">call reminder</string>
-  <string name="growth_kind_answered_publicly" formatted="false">answered publicly</string>
-  <string name="growth_kind_content_match" formatted="false">content match</string>
-  <string name="growth_kind_announcement" formatted="false">announcement</string>
-  <string name="growth_kind_creator_offer" formatted="false">creator offer</string>
-  <string name="growth_kind_slot_change" formatted="false">slot change</string>
-  <string name="growth_kind_new_packet" formatted="false">new packet</string>
-  <string name="growth_kind_commitment_due" formatted="false">commitment due</string>
-  <string name="growth_kind_guardrail" formatted="false">guardrail</string>
-  <string name="growth_kind_pool_share" formatted="false">pool share</string>
-  <string name="growth_kind_note" formatted="false">note</string>
-  <string name="growth_kind_reaction" formatted="false">reaction</string>
-  <string name="growth_kind_public_answer" formatted="false">public answer</string>
-  <string name="growth_kind_spending_reminder" formatted="false">spending reminder</string>
-  <string name="growth_kind_weekly_impact" formatted="false">weekly impact</string>
+  <string name="growth_kind_ai_reply" formatted="false">AI replies</string>
+  <string name="growth_kind_approved_draft" formatted="false">Approved AI drafts</string>
+  <string name="growth_kind_personal_reply" formatted="false">Personal replies and voice notes</string>
+  <string name="growth_kind_request_status" formatted="false">Request status updates</string>
+  <string name="growth_kind_call_reminder" formatted="false">Call reminders</string>
+  <string name="growth_kind_answered_publicly" formatted="false">Your question answered publicly</string>
+  <string name="growth_kind_content_match" formatted="false">Posts about what you asked</string>
+  <string name="growth_kind_announcement" formatted="false">Creator announcements</string>
+  <string name="growth_kind_creator_offer" formatted="false">Offers from creators</string>
+  <string name="growth_kind_slot_change" formatted="false">Pass slot changes</string>
+  <string name="growth_kind_new_packet" formatted="false">New requests</string>
+  <string name="growth_kind_commitment_due" formatted="false">Commitment reminders</string>
+  <string name="growth_kind_guardrail" formatted="false">Safety events and reports</string>
+  <string name="growth_kind_pool_share" formatted="false">Pass pool updates</string>
+  <string name="growth_kind_note" formatted="false">New Notes</string>
+  <string name="growth_kind_reaction" formatted="false">Reactions to your replies</string>
+  <string name="growth_kind_public_answer" formatted="false">New public answers</string>
+  <string name="growth_kind_spending_reminder" formatted="false">Spending reminders</string>
+  <string name="growth_kind_weekly_impact" formatted="false">Weekly impact digests</string>
   <string name="growth_for_you" formatted="false">For you</string>
   <string name="growth_crafts" formatted="false">Crafts</string>
   <string name="growth_music" formatted="false">Music</string>
@@ -999,4 +999,14 @@
   <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
   <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
   <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
+  <string name="growth_back_to_reply" formatted="false">Back to reply</string>
+  <string name="growth_reply_image_export_help" formatted="false">The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.</string>
+  <string name="growth_preparing_reply_images" formatted="false">Preparing images…</string>
+  <string name="growth_reply_image_progress" formatted="false">Prepared {page} images…</string>
+  <string name="growth_reply_image_page" formatted="false">Page {page}</string>
+  <string name="growth_reply_images_ready" formatted="false">Your download is ready. Check your browser’s downloads.</string>
+  <string name="growth_reply_image_export_failed" formatted="false">The complete image export could not be prepared. Retry, or download the complete text.</string>
+  <string name="growth_notification_channel" formatted="false">{kind} · {channel}</string>
+  <string name="growth_weekly_impact_summary" formatted="false">This week: {people} people helped and {thanks} thanks.</string>
+  <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
 </resources>

@@ -176,3 +176,10 @@ One-ID metadata bootstrap requires a current genuine request before its family i
 ## W1 canonical enrollment exceptions and verification heading — October2
 
 The personally operated native public verification displayed a technical route identifier, and source inspection found Status/Ops still behind a fan-handle gate despite web's corrected guard. Canonical navigation now generates the same narrow Account/Status/Ops exemption for web, Swift and Kotlin; invalid destinations never qualify and explicit Handle enrollment stays explicit. This removes a persona dependency without granting any Ops membership. Public verification uses a clear shared heading and accessible page title, while exact act hashes remain available where they help inspect an actual signature. Earlier screenshots retain the original finding. Shipping rebuild/current personal acceptance are separately required.
+
+
+## W1 core Content, separate Growth projection and held privacy — October 2
+
+Canonical Content must retain its actual creator_runtime pool and service. The root host now consumes W7's reviewed separate publicProjection port rather than passing a Growth service from another pool into the strict Content composition seam. Follower metadata comes from the actual held core reader and stays unavailable while its migration is unregistered; a separate-pool Boolean or role inheritance cannot substitute for held authority. The projection still rechecks the original publisher, exact current Content version, signing and media proof.
+
+Growth privacy uses W8's genuine leased domain-task/restoration authority on the actual Growth worker client before domain locks and at export/delete bookends. An ownership snapshot, coordinator pool check or unknown job grants nothing. The cursor completes only after exhaustion and an accepted commit; cancellation destroys only its dedicated client. The existing prepared conversation/Agent consumers and W1 actor/adult/session capability are preserved. Normal source integration is distinct from actual migration activation, provider outcomes and W1's personal all-client acceptance.

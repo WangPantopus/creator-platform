@@ -280,7 +280,7 @@ public struct FanAppShell: View {
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .seconds(4)) } catch { return }
                     guard !Task.isCancelled else { return }
-                    if !model.busy && !model.choosingDevelopmentActor { await model.refresh() }
+                    if !model.busy && !model.choosingDevelopmentActor && (model.session != nil || model.hasSavedCredential) { await model.refresh() }
                 }
             }
             .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
