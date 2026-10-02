@@ -195,33 +195,69 @@ private struct W3FirstConversation: View {
     @State private var key = UUID().uuidString.lowercased()
     @Environment(\.colorScheme) private var scheme
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Button("Back", variant: .quiet) { session.open("/creators/" + handle) }
-            AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
-            Text("Before your first message").qText("display-lg")
-            VStack(alignment: .leading, spacing: 16) {
-                Text("WHO RUNS IT").qText("data-sm")
-                if let policy = caps?.providers {
-                    Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
-                    ForEach(policy.providers, id: \.name) { provider in
-                        if let url = URL(string: provider.termsUrl) { Link(provider.name + " processing terms", destination: url) }
-                        Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    HStack {
+                        SwiftUI.Button { session.open("/creators/" + handle) } label: {
+                            QelvoraGlyph(name: "back", size: 22, color: qColor("ink", scheme))
+                                .frame(width: 44, height: 44)
+                        }.buttonStyle(.plain).accessibilityLabel("Back")
+                        Spacer()
+                        Text("1 OF 1").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
                     }
-                } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
-                Text("WHO CAN READ IT").qText("data-sm"); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
-                Text("WHAT IT REMEMBERS").qText("data-sm"); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
-            }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
-            if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
-            if session.destination.contains("context=") { Notice(title: "Post context unavailable", children: "This post context is not connected to the conversation service yet. Your destination is kept.") }
-            Spacer(minLength: 0)
-            Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || creator == nil || session.destination.contains("context=") || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
-            Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
-        }.padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 36).frame(maxWidth: 390).background(qColor("ground", scheme))
-            .task {
-                struct Page: Decodable { let creator: GrowthCreator }
-                do { let page: Page = try await GrowthClient(baseURL: baseURL, token: { nil }).request("public/creators/" + handle); creator = page.creator; caps = try await W3ConversationClient(baseURL: baseURL).request("capabilities", publicRead: true) }
-                catch { failure = "This creator or the conversation service is unavailable." }
-            }
+                    VStack(alignment: .leading, spacing: 10) {
+                        AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
+                        Text("Before your first message").qText("display-lg")
+                    }
+                    VStack(alignment: .leading, spacing: 0) {
+                        disclosureSection("WHO RUNS IT") {
+                            if let policy = caps?.providers {
+                                Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
+                                ForEach(policy.providers, id: \.name) { provider in
+                                    if let url = URL(string: provider.termsUrl) {
+                                        Link(provider.name + " processing terms", destination: url)
+                                            .qText("body").frame(minHeight: 44, alignment: .leading)
+                                    }
+                                    Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+                                }
+                            } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
+                        }
+                        qColor("line", scheme).frame(height: QelvoraTokens.token("hairline"))
+                        disclosureSection("WHO CAN READ IT") {
+                            Text(caps?.accessDisclosure ?? "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("body")
+                        }
+                        qColor("line", scheme).frame(height: QelvoraTokens.token("hairline"))
+                        disclosureSection("WHAT IT REMEMBERS") {
+                            Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
+                        }
+                    }.background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+                        .clipShape(RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+                        .overlay(RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg).stroke(qColor("line", scheme), lineWidth: QelvoraTokens.token("hairline")))
+                    if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
+                    if session.destination.contains("context=") { Notice(title: "Post context unavailable", children: "This post context is not connected to the conversation service yet. Your destination is kept.") }
+                    Spacer(minLength: 0)
+                    VStack(spacing: 10) {
+                        Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || creator == nil || session.destination.contains("context=") || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
+                        Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
+                    }
+                }.frame(maxWidth: .infinity, minHeight: max(0, geometry.size.height - 52), alignment: .topLeading)
+                    .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 36)
+                    .frame(maxWidth: 390)
+            }.frame(maxWidth: .infinity).background(qColor("ground", scheme))
+        }.task {
+            struct Page: Decodable { let creator: GrowthCreator }
+            do { let page: Page = try await GrowthClient(baseURL: baseURL, token: { nil }).request("public/creators/" + handle); creator = page.creator }
+            catch { failure = "This creator or the conversation service is unavailable." }
+            do { caps = try await W3ConversationClient(baseURL: baseURL).request("capabilities", publicRead: true) }
+            catch { failure = "This creator or the conversation service is unavailable." }
+        }
+    }
+    private func disclosureSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
+            content()
+        }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
     }
     private func begin() async {
         guard let creator, let policy = caps?.providers else { return }; busy = true; defer { busy = false }

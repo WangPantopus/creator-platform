@@ -2,6 +2,9 @@ package com.pantopus.qelvora.conversation
 
 import android.net.Uri
 import android.os.SystemClock
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -505,28 +508,55 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
             creator = growth.request("public/creators/$handle").getJSONObject("creator")
-            capabilities = client.json.decodeFromJsonElement(client.request("capabilities",publicRead = true))
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        try {
+            capabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
     }
     val name = creator?.optString("name").orEmpty().ifBlank { "the creator" }
-    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
+    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
-            BasicText("WHO RUNS IT",style=qText("data-sm").copy(color = qColor("ink")))
-            val policy = capabilities?.providers
-            if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
-            policy?.providers?.forEach { provider ->
-                BasicText("This AI is powered by ${provider.name}.",style=qText("body").copy(color = qColor("ink")))
-                Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                IconButton("back", "Back", qColor("ink")) { session.open("/creators/$handle") }
+                BasicText("1 OF 1", style = qText("data-sm").copy(color = qColor("ink-muted")))
             }
-            BasicText("WHO CAN READ IT",style=qText("data-sm").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
-            BasicText("WHAT IT REMEMBERS",style=qText("data-sm").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                AuthorLabel(kind = AuthorKind.AI, name = name)
+                BasicText("Before your first message", style = qText("display-lg").copy(color = qColor("ink")))
+            }
+        }
+        item {
+            val shape = RoundedCornerShape(QelvoraTokens.radiusLg)
+            Column(Modifier.fillMaxWidth().background(qColor("surface"), shape).clip(shape).border(QelvoraTokens.hairline, qColor("line"), shape)) {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    val policy = capabilities?.providers
+                    if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
+                    else BasicText("This AI is powered by ${policy.providers.joinToString(", ") { it.name }}.", style = qText("body").copy(color = qColor("ink")))
+                    policy?.providers?.forEach { provider ->
+                        Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
+                        BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                    }
+                }
+                Hairline()
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHO CAN READ IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(capabilities?.accessDisclosure ?: "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("body").copy(color = qColor("ink")))
+                }
+                Hairline()
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHAT IT REMEMBERS", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.", style = qText("body").copy(color = qColor("ink")))
+                }
+            }
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
         if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
         item {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Button("Start with $name's AI",variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
                 val policy=capabilities?.providers ?: return@launch; busy=true
                 try {
                     val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))
@@ -534,6 +564,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 } catch(failure: Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "Reconnect to try again. No message was sent." } finally {busy=false}
             } }
             Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
+            }
         }
     }
 }
