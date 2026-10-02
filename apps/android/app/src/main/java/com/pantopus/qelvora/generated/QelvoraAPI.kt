@@ -1068,6 +1068,13 @@ data class APICallCallRevision(
 )
 
 @Serializable
+data class APICallCallRoute(
+  val `sessionId`: String,
+  val `creatorId`: String,
+  val `fanId`: String
+)
+
+@Serializable
 data class APICallCallSummaryNote(
   val `note`: String,
   val `expectedVersion`: Long,
@@ -1418,6 +1425,7 @@ data class APIContentReplyListItemsItem(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentReplyListItemsItemTenure? = null,
   val `consent`: APIContentReplyListItemsItemConsent,
   @Required
   val `reaction`: APIContentReplyListItemsItemReaction? = null
@@ -1428,6 +1436,33 @@ enum class APIContentReplyListItemsItemSafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentReplyListItemsItemTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentReplyListItemsItemTenureBasis,
+  val `historyComplete`: APIContentReplyListItemsItemTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentReplyListItemsItemTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentReplyListItemsItemTenureHistoryCompleteSerializer::class)
+object APIContentReplyListItemsItemTenureHistoryComplete { const val value: Boolean = false }
+object APIContentReplyListItemsItemTenureHistoryCompleteSerializer : KSerializer<APIContentReplyListItemsItemTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentReplyListItemsItemTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentReplyListItemsItemTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentReplyListItemsItemTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentReplyListItemsItemTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -1508,6 +1543,33 @@ data class APIContentRevisionResult(
 data class APIContentScheduledResult(
   val `published`: Long
 )
+
+@Serializable
+data class APIContentTenureRecognition(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentTenureRecognitionBasis,
+  val `historyComplete`: APIContentTenureRecognitionHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentTenureRecognitionBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentTenureRecognitionHistoryCompleteSerializer::class)
+object APIContentTenureRecognitionHistoryComplete { const val value: Boolean = false }
+object APIContentTenureRecognitionHistoryCompleteSerializer : KSerializer<APIContentTenureRecognitionHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentTenureRecognitionHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentTenureRecognitionHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentTenureRecognitionHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentTenureRecognitionHistoryComplete) { encoder.encodeBoolean(false) }
+}
 
 typealias APIContentThanksFeed = List<APIContentThanksFeedValueItem>
 
@@ -1725,6 +1787,7 @@ data class APIPrivateNoteReply(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIPrivateNoteReplyTenure? = null,
   val `consent`: APIPrivateNoteReplyConsent,
   @Required
   val `reaction`: APIPrivateNoteReplyReaction? = null
@@ -1735,6 +1798,33 @@ enum class APIPrivateNoteReplySafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIPrivateNoteReplyTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIPrivateNoteReplyTenureBasis,
+  val `historyComplete`: APIPrivateNoteReplyTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIPrivateNoteReplyTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIPrivateNoteReplyTenureHistoryCompleteSerializer::class)
+object APIPrivateNoteReplyTenureHistoryComplete { const val value: Boolean = false }
+object APIPrivateNoteReplyTenureHistoryCompleteSerializer : KSerializer<APIPrivateNoteReplyTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIPrivateNoteReplyTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIPrivateNoteReplyTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIPrivateNoteReplyTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIPrivateNoteReplyTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -3930,6 +4020,7 @@ data class APIContentContentReplyListItemsItem(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentContentReplyListItemsItemTenure? = null,
   val `consent`: APIContentContentReplyListItemsItemConsent,
   @Required
   val `reaction`: APIContentContentReplyListItemsItemReaction? = null
@@ -3940,6 +4031,33 @@ enum class APIContentContentReplyListItemsItemSafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentContentReplyListItemsItemTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentContentReplyListItemsItemTenureBasis,
+  val `historyComplete`: APIContentContentReplyListItemsItemTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentContentReplyListItemsItemTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentContentReplyListItemsItemTenureHistoryCompleteSerializer::class)
+object APIContentContentReplyListItemsItemTenureHistoryComplete { const val value: Boolean = false }
+object APIContentContentReplyListItemsItemTenureHistoryCompleteSerializer : KSerializer<APIContentContentReplyListItemsItemTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentReplyListItemsItemTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentReplyListItemsItemTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentContentReplyListItemsItemTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentReplyListItemsItemTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -4020,6 +4138,33 @@ data class APIContentContentRevisionResult(
 data class APIContentContentScheduledResult(
   val `published`: Long
 )
+
+@Serializable
+data class APIContentContentTenureRecognition(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentContentTenureRecognitionBasis,
+  val `historyComplete`: APIContentContentTenureRecognitionHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentContentTenureRecognitionBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentContentTenureRecognitionHistoryCompleteSerializer::class)
+object APIContentContentTenureRecognitionHistoryComplete { const val value: Boolean = false }
+object APIContentContentTenureRecognitionHistoryCompleteSerializer : KSerializer<APIContentContentTenureRecognitionHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentTenureRecognitionHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentTenureRecognitionHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentContentTenureRecognitionHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentTenureRecognitionHistoryComplete) { encoder.encodeBoolean(false) }
+}
 
 typealias APIContentContentThanksFeed = List<APIContentContentThanksFeedValueItem>
 
@@ -4237,6 +4382,7 @@ data class APIContentPrivateNoteReply(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentPrivateNoteReplyTenure? = null,
   val `consent`: APIContentPrivateNoteReplyConsent,
   @Required
   val `reaction`: APIContentPrivateNoteReplyReaction? = null
@@ -4247,6 +4393,33 @@ enum class APIContentPrivateNoteReplySafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentPrivateNoteReplyTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentPrivateNoteReplyTenureBasis,
+  val `historyComplete`: APIContentPrivateNoteReplyTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentPrivateNoteReplyTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentPrivateNoteReplyTenureHistoryCompleteSerializer::class)
+object APIContentPrivateNoteReplyTenureHistoryComplete { const val value: Boolean = false }
+object APIContentPrivateNoteReplyTenureHistoryCompleteSerializer : KSerializer<APIContentPrivateNoteReplyTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentPrivateNoteReplyTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentPrivateNoteReplyTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentPrivateNoteReplyTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentPrivateNoteReplyTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -4737,6 +4910,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

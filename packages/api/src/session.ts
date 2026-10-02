@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/** Navigation only after the current account's held booking is authorized.
+ * It grants no admission, provider token, worker or financial authority. */
+export const CallRouteSchema = z.strictObject({
+  sessionId: z.uuid(),
+  creatorId: z.uuid(),
+  fanId: z.uuid(),
+});
+
 export const AvailabilityCommandSchema = z.strictObject({
   timeZone: z.string().min(1).max(80),
   windows: z

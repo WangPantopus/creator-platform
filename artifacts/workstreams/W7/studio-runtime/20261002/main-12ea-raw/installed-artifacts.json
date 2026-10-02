@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-02T19:39:02.965390+00:00",
+  "sourceBase": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+  "incomingMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+  "localFollowSessionProof": true,
+  "ios": {
+    "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+    "files": [
+      {
+        "file": "QelvoraApp",
+        "builtSHA256": "3f0c5a6fa3f42e677a7dbe2188c58ed40135e1f0699dd4118e52de7bbf0ec1ec",
+        "installedSHA256": "3f0c5a6fa3f42e677a7dbe2188c58ed40135e1f0699dd4118e52de7bbf0ec1ec",
+        "match": true
+      },
+      {
+        "file": "QelvoraApp.debug.dylib",
+        "builtSHA256": "5e623c7a54a92cfd8555fdf701fd9a942cb825c074afdef0cd1de285c05881dc",
+        "installedSHA256": "5e623c7a54a92cfd8555fdf701fd9a942cb825c074afdef0cd1de285c05881dc",
+        "match": true
+      }
+    ]
+  },
+  "android": {
+    "serial": "emulator-5580",
+    "builtSHA256": "2e9b01960d6f66ac6a367e09c23b8fb8a267bd15aba4bc70074e628a7144bb7a",
+    "installedSHA256": "2e9b01960d6f66ac6a367e09c23b8fb8a267bd15aba4bc70074e628a7144bb7a",
+    "match": true
+  },
+  "acceptanceLimit": "Actual shipping development builds using explicit synthetic identity against the local original-40 API; no production authority or populated public acceptance."
+}

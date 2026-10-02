@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { copy, formatCopy } from "@qelvora/copy";
 import {
   AuthorLabel,
   EmptyState,
@@ -11,7 +12,9 @@ import {
 import type {
   ContentView,
   PrivateNoteReply,
+  NoteReplyPolicy,
 } from "../../../../packages/api/src/content";
+import { NoteReplyPolicy as NoteReplyPolicySchema } from "../../../../packages/api/src/content";
 import {
   configureStudioRequests,
   studioRequest,
@@ -56,6 +59,7 @@ export function FanContent({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [muted, setMuted] = useState(false);
+  const [replyPolicy, setReplyPolicy] = useState<NoteReplyPolicy | null>(null);
   const [thanks, setThanks] = useState<Thanks | null>(null),
     [thanksText, setThanksText] = useState(""),
     [share, setShare] = useState(false),
@@ -68,6 +72,7 @@ export function FanContent({
     busyRef = useRef(false),
     depth = useRef(1);
   const resetInputs = useCallback(() => {
+    setReplyPolicy(null);
     setText("");
     setThanksText("");
     setShare(false);
@@ -139,6 +144,15 @@ export function FanContent({
           return { ...page, items };
         })(),
         Promise.resolve(before),
+        (async () =>
+          NoteReplyPolicySchema.parse(
+            await studioRequest(
+              "content",
+              `${creatorId}/reply-policy`,
+              undefined,
+              before.accountId,
+            ),
+          ))(),
       ]);
       try {
         results[3] = {
@@ -229,6 +243,14 @@ export function FanContent({
         setCursor(null);
       }
       if (pref.status === "fulfilled") setMuted(pref.value.muted);
+      const policy = results[4];
+      if (
+        policy.status === "fulfilled" &&
+        policy.value.accountId === before.accountId &&
+        policy.value.creatorId === creatorId
+      )
+        setReplyPolicy(policy.value);
+      else setReplyPolicy(null);
       const failure = results.find((r) => r.status === "rejected");
       setError(failure?.status === "rejected" ? failure.reason.message : "");
       checkedAt.current = cycleStartedAt;
@@ -318,6 +340,7 @@ export function FanContent({
       dirtyThanks.current = false;
     });
   const ownReplies = replies.filter((r) => r.contentId === contentId);
+  const replyLimit = replyPolicy?.limit ?? 4000;
   return (
     <main className="w5-fan" aria-busy={busy}>
       <nav>
@@ -444,14 +467,41 @@ export function FanContent({
                 }}
               >
                 <label htmlFor="private-reply">Reply privately</label>
+                {replyPolicy?.milestone !== null &&
+                  replyPolicy?.confirmedDays != null && (
+                    <p className="qv-help">
+                      {formatCopy("contentConfirmedTenure", {
+                        days: replyPolicy.confirmedDays,
+                      })}
+                    </p>
+                  )}
+                {!replyPolicy && (
+                  <p className="qv-help">
+                    {copy.contentReplyPolicyUnavailable}
+                  </p>
+                )}
                 <textarea
                   id="private-reply"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  maxLength={4000}
+                  maxLength={replyLimit}
+                  aria-describedby="private-reply-limit"
                   required
                 />
-                <button disabled={busy || !text.trim()}>
+                <p id="private-reply-limit" className="qv-help">
+                  {formatCopy("contentReplyLimit", {
+                    used: text.length,
+                    limit: replyLimit,
+                  })}
+                </p>
+                {text.length > replyLimit && (
+                  <p role="status">{copy.contentReplyOverLimit}</p>
+                )}
+                <button
+                  disabled={
+                    busy || !text.trim() || text.trim().length > replyLimit
+                  }
+                >
                   Send private reply
                 </button>
               </form>

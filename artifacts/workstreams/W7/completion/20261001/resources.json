@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-02T18:54:10.931203+00:00",
+  "updatedAt": "2026-10-02T19:47:42.548761+00:00",
   "owner": "W7 primary",
   "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
   "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T18:54:10.931203+00:00",
+    "recordedAt": "2026-10-02T19:47:42.548761+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,7 +136,7 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "stopped, canonical40 unchanged, connectionLimit0, other_clients0; no wave activation",
+      "state": "Stopped exit0; canonical40 unchanged/no otherclients; connectionlimit0; actual traffic-closed comment; no SQL activation",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
@@ -149,13 +149,13 @@
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Current account-bound shipping app personally operated Save/Reload and actual development account switch; normally shut down; exact slot2 lease released after physical verification"
+      "state": "Shutdown after rebuilt actual Home/Notifications/Settings Save/Reload; exact owned slot1 token/device/dev/inode lease released; installed executable/dylib hashes match"
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "matching APK Save/Reload and ordinary account isolation personally observed; initial emulator host134 preserved; identical retained AVD retry exit0, exact slot2 released after absence"
+      "state": "5580 absent, normal emulator exit0; exact owned slot2 lease released; retained AVD unchanged; current lowram run actual2026148KiB/2 online cores; first invalid link refusal preserved"
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -187,22 +187,22 @@
     },
     "nativeBuild": "Signed shipping iOS and Android shipping/original checks pass; actual clients Settings and navigation observed, Android Home action200% Light/Night. Original18 Swift/110 comparisons pass. Both own devices normally stopped, exact UUID/inode leases released; companion stopped. No new tests/references/tolerances.",
     "api": {
-      "source": "6079ba3d with six uncommitted account-bound settings files; backend rebuilt by workspace check",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/settings-custody-android-api-repaired.log",
-      "lastPid": 86496,
-      "lastSession": 51569,
-      "state": "Normally stopped repaired API exit0; PID86496 verified own cwd before SIGTERM; initial53300 refusal preserved",
+      "source": "d5bf845 + personally reviewed main12ea + original held Core Follow session proof; compiled by final workspace check",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/main-12ea-api-recovery.log",
+      "lastPid": 37895,
+      "lastSession": 60870,
+      "state": "Stopped normally exit0; first correct API40152 exit0; initial wrong server.js exit1 preserved",
       "session": null
     },
     "web": {
       "mode": "Shipping production Next 16.3.7, apps/web cwd, loopback 3007",
       "acceptance": "Actual unavailable-share export and recovery,410 no artifact; successful full-image download requires genuine approved share/origin and remains unobserved.",
-      "lastPid": 42433,
-      "lastParentSession": 64965,
-      "state": "Final shipping web personally operated signed-out settings/Continue/Retry/Back; normally stopped exit143",
+      "lastPid": 41185,
+      "lastParentSession": 52778,
+      "state": "Stopped SIGTERM exit143; actual production settings destination and Discover outage/retry/recovery observed; authenticated/populated acceptance open",
       "session": null,
-      "log": "/private/tmp/creator-platform-w7-active-20261001/settings-custody-web-final.log",
-      "lastSession": 15882
+      "log": "/private/tmp/creator-platform-w7-active-20261001/main-12ea-web.log",
+      "lastSession": 52778
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,
@@ -417,7 +417,245 @@
       "retryAndroidExit": 0,
       "repairedApiExit": 0,
       "newTests": false,
-      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/settings-custody.md"
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/settings-custody.md",
+      "resourceBudgetCorrection": "Preserved emulator logs show requested2048 was silently raised to2560; prior actual cap compliance unproven. Current main12ea uses official -lowram and actual2026148KiB/2cores."
+    },
+    "currentRun": "main-12ea source/checks/personal bounded shipping observations preserved; own runtime stopped, no completion/PR merge",
+    "main12eaRuntime": {
+      "at": "2026-10-02T19:47:42.548761+00:00",
+      "parent": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+      "reviewedMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+      "incomingSourcePathsPersonallyReviewed": 93,
+      "resolvedAndFollowSourceSHA256": {
+        "apps/backend/src/server.ts": "f622e0cfe62e6cb953b5559cd77ec7eac2fc321e4f213c34f69b40379c817033",
+        "apps/backend/src/modules/trust/privacy-consumers.ts": "849f2a1c0e4abed3808c1a380f7c2ff407a158fb2d72727d90ab4646e4789d0b",
+        "apps/backend/src/modules/trust/worker.ts": "c028eafe73778c609edefa467d3eef004a18c5ead4b830bacfeca2ca3cc429b5",
+        "apps/backend/src/modules/growth/core-follows.ts": "ee1712b5babc563817d8ccf52b586158982b161ea1fbd3a3a6c2cb00e94b9cf7"
+      },
+      "checks": {
+        "finalWorkspace": {
+          "session": 49199,
+          "exit": 0,
+          "tasks": 6,
+          "existingContractsPass": 9,
+          "PostgreSQLCasesSkipped": 9
+        },
+        "signedIOS": {
+          "session": 23162,
+          "exit": 0,
+          "strictSignature": "pass"
+        },
+        "androidShippingOriginalChecks": {
+          "firstExit": 75,
+          "retrySession": 32021,
+          "retryExit": 0,
+          "tasks": 47
+        },
+        "originalSwift": {
+          "session": 82811,
+          "exit": 0,
+          "checks": 18,
+          "originalVisualComparisons": 110
+        }
+      },
+      "actualShipping": {
+        "web": "Production signed-out Settings/Continue/Retry/Back retained destination; actual Discover API outage/retry/restart/retry recovered to empty directory",
+        "ios": "Built and installed executable/dylib match; actual Home/Notifications/Settings Save acknowledgement then Reload restored quiet values",
+        "android": "Built and installed APK match; actual Home/Notifications/Settings Save acknowledgement then Reload restored quiet values; corrected first invalid entry host refusal preserved"
+      },
+      "nativeResourceCorrection": {
+        "actualCurrentAndroidRAMKiB": 2026148,
+        "onlineCores": "0-1",
+        "lowram": true,
+        "priorSettingsCustodyBudgetUnproven": true
+      },
+      "cleanup": {
+        "APIInitialExit": 0,
+        "APIRecoveryExit": 0,
+        "webExit": 143,
+        "companionExit": 0,
+        "emulatorExit": 0,
+        "devices": "own FAB Shutdown and5580 absent; exact leases released",
+        "ports": "4107/3007 free",
+        "postgres": "40 migrations,no otherclients,connectionlimit0,stopped exit0",
+        "peerResourcesTouched": false
+      },
+      "failedAttemptsPreserved": [
+        "first Android heavy guard exit75 before retry",
+        "absent guessed Docker path corrected to inventoried /usr/local/bin/docker",
+        "first pg_isready no response; proceeded only after ready",
+        "first server.js startup MODULE_NOT_FOUND corrected to actual server.mjs",
+        "first Android entry-host refusal corrected with actual app host/existing debug local-api option",
+        "browser first Back operation timed out; fresh separate Back succeeded",
+        "initial database comment null; earlier closure-comment claim corrected",
+        "prior settings-custody emulator silently raised requested2048MB to2560; current supported -lowram verifiedactualcap"
+      ],
+      "currentMainUnreviewed": "79e3b0c7d57fcfc6828618fe5b712ff48909e731",
+      "exactParentCI": {
+        "Foundation": "two pass,three queued",
+        "Trust": "success"
+      },
+      "newHeadChecksRequired": true,
+      "finalCombinedPRReviewComplete": false,
+      "newSQLActivated": false,
+      "newTests": false,
+      "harnessAdded": false,
+      "populatedAcceptance": false,
+      "providerAccepted": false,
+      "protectedPrivacyAccepted": false,
+      "releaseAccepted": false,
+      "workstreamComplete": false,
+      "losslessLogOrigins": [
+        {
+          "file": "main-12ea-android-bottom-dump.log.gz",
+          "uncompressedSHA256": "e902cc18417d20019f58647a0c42a867d1d6a2ccc36e38ce39b57e12d8635423",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-footer-dump.log.gz",
+          "uncompressedSHA256": "30008857f11120e3a107e8a8d0f1e227f36513e335b2a49c89ecd78a28005dfa",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-home-dump.log.gz",
+          "uncompressedSHA256": "581ba35e618ae0433ac468387a6e19b81d6db7adff48be35a52d8ceb992c85e4",
+          "uncompressedBytes": 54
+        },
+        {
+          "file": "main-12ea-android-home-repaired-dump.log.gz",
+          "uncompressedSHA256": "5da80ad6cd40f25cbfa7f3c4f479d2a9a0d4f494faa78cf488c6a8b9654ddcdf",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-notifications-dump.log.gz",
+          "uncompressedSHA256": "2a11baaf12358717fe43b3789839bcd66294d903a456595a1c8fcd9a17c71a51",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-reload-dump.log.gz",
+          "uncompressedSHA256": "fb9d5f3309bbbb47ae2d46ab649cb30ef43ef3d4313be203d0f2445822ed78c0",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-reload-top-dump.log.gz",
+          "uncompressedSHA256": "38a27fbb7785e4d40b1170cba83bb34af0692d83f1dde047c4b1c72669635a51",
+          "uncompressedBytes": 69
+        },
+        {
+          "file": "main-12ea-android-reload-visible-dump.log.gz",
+          "uncompressedSHA256": "c9912973389dd19e7e8ba6afd6479a6dd59912e2b73b3471e4c3574431eec095",
+          "uncompressedBytes": 73
+        },
+        {
+          "file": "main-12ea-android-retry.log.gz",
+          "uncompressedSHA256": "82b4c075da826667c681f07149eb7a22b3fd66031b3f10400b0ab437e9c7d14a",
+          "uncompressedBytes": 3105
+        },
+        {
+          "file": "main-12ea-android-save-dump.log.gz",
+          "uncompressedSHA256": "623546d94a04d42c83bd8fce682450c2e854bd010b13401a73e7fa5a15f67a5b",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-settings-dump.log.gz",
+          "uncompressedSHA256": "19b7b1304cbcbca074bb32dc5ffde5183617c0956e1c0c86f173597c62742573",
+          "uncompressedBytes": 58
+        },
+        {
+          "file": "main-12ea-android.log.gz",
+          "uncompressedSHA256": "579fab07d2ce6340b2133ab3db7a1f5f9fcf6dfa70155a8592c653937bd12886",
+          "uncompressedBytes": 66
+        },
+        {
+          "file": "main-12ea-api-recovery.log.gz",
+          "uncompressedSHA256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+          "uncompressedBytes": 140
+        },
+        {
+          "file": "main-12ea-api-repaired.log.gz",
+          "uncompressedSHA256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+          "uncompressedBytes": 140
+        },
+        {
+          "file": "main-12ea-api.log.gz",
+          "uncompressedSHA256": "5befb705ba409a1bff77911815f1a2cd58597301ce869678f05f2bf1d2c06929",
+          "uncompressedBytes": 800
+        },
+        {
+          "file": "main-12ea-emulator-lease.json.gz",
+          "uncompressedSHA256": "8192b4cc066ac1eed0d9c3513d9a88ebf56c370176f3b395548dbba78f7a6775",
+          "uncompressedBytes": 499
+        },
+        {
+          "file": "main-12ea-emulator.log.gz",
+          "uncompressedSHA256": "c63fabbf39e79db34d553e7e7c9775adc0e90577d394f64a9f715a8f3aa2b183",
+          "uncompressedBytes": 8055
+        },
+        {
+          "file": "main-12ea-idb.log.gz",
+          "uncompressedSHA256": "da414764c2ded7f3eb81b006f299798f8d99d7afe1ba18547b1dd2d5727261ca",
+          "uncompressedBytes": 81163
+        },
+        {
+          "file": "main-12ea-ios.log.gz",
+          "uncompressedSHA256": "af13acbc0e5811e059e0a5e7a2a38ea6dc1a1841917c907d4799786167d3087f",
+          "uncompressedBytes": 97810
+        },
+        {
+          "file": "main-12ea-prior-foundation.json.gz",
+          "uncompressedSHA256": "1ca63b91f1dd6a5279b11e80c1646cf7a83e5f26d395750acdc54ed728f8fb5a",
+          "uncompressedBytes": 5575
+        },
+        {
+          "file": "main-12ea-prior-trust.json.gz",
+          "uncompressedSHA256": "d2b6fa8c52008cbf5177f18b51264e259c77313b06b3e86091f06eca6ec9d82f",
+          "uncompressedBytes": 3216
+        },
+        {
+          "file": "main-12ea-simulator-lease.json.gz",
+          "uncompressedSHA256": "f0626522b81fda12dba70969fbb21097c191226755e6213ee2d003fac4fef0ed",
+          "uncompressedBytes": 394
+        },
+        {
+          "file": "main-12ea-swift.log.gz",
+          "uncompressedSHA256": "69c04167f5d76924df796b45e2c812dd608794e5ee77cef9ee7e7afa6f89cebc",
+          "uncompressedBytes": 65341
+        },
+        {
+          "file": "main-12ea-web.log.gz",
+          "uncompressedSHA256": "a6a113636c84c4e24d566d300be347fb6b76872c147d6134d5733cbdcd1f57bc",
+          "uncompressedBytes": 153
+        },
+        {
+          "file": "main-12ea-workspace-final.log.gz",
+          "uncompressedSHA256": "445743fca87f5fe57513fc32fe256ccd23c20cebd398908548fb2729903a2e9d",
+          "uncompressedBytes": 10028
+        },
+        {
+          "file": "main-12ea-workspace.log.gz",
+          "uncompressedSHA256": "7186dda880da2eacb0a5c26a58fce8c402cd41c785c151078d2b5e307fa3b585",
+          "uncompressedBytes": 10223
+        },
+        {
+          "file": "readiness.headers.gz",
+          "uncompressedSHA256": "a487b49f5f3da4f8d17de1b98de6241bc48afa9ba927731e4ca36057b2ab5eb2",
+          "uncompressedBytes": 330
+        },
+        {
+          "file": "main-12ea-publication-first-diffcheck.log.gz",
+          "uncompressedSHA256": "16c6a2aca6e9235c5aa2f1ce5068607f53003ede74627a60b22d56aa91fbad67",
+          "uncompressedBytes": 1606
+        }
+      ],
+      "publicationCorrection": {
+        "firstCommitCheckExit": 2,
+        "cause": "Raw HTTP headers contain original CRLF line endings; lossless gzip preserves original bytes without introducing trailing-whitespace source",
+        "headersUncompressedSHA256": "a487b49f5f3da4f8d17de1b98de6241bc48afa9ba927731e4ca36057b2ab5eb2",
+        "firstCommitCreated": false,
+        "firstPush": "unchanged parent, Everything up-to-date",
+        "firstTrustDispatch": "unchanged d5 parent; does not qualify changed source",
+        "newHeadParentGuardRequired": true
+      }
     }
   }
 }

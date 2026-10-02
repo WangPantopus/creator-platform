@@ -32,6 +32,13 @@ import {
 import { mediaFeature } from "./registration.js";
 import { AvailabilityService } from "../session/availability.js";
 import type { MediaInteractiveEnvironment } from "./environment.js";
+import type { AccountCallMetadata } from "../session/account-call-metadata.js";
+import { isConfiguredBackendRuntime } from "../../integration.js";
+import type { InteractiveCallControl } from "../session/interactive-control.js";
+import {
+  holdCurrentRequestSession,
+  assertHeldCurrentRequestSession,
+} from "../identity/request-authority.js";
 
 /** W3 proves a fan's read against its own delivered message on the held client. */
 export type RecordingPublicationPort = (
@@ -46,26 +53,46 @@ export type RecordingPublicationPort = (
 
 /** W8's held denials on the caller's non-owner transaction. `true` denies. */
 export type MediaDenials = Readonly<{
+  creatorActor: (
+    actor: Actor,
+    creatorId: string,
+    client: PoolClient,
+  ) => Promise<void>;
   thread: (scope: ThreadScope, client: PoolClient) => Promise<boolean>;
   creator: (
     scope: CreatorMediaReadScope,
     client: PoolClient,
   ) => Promise<boolean>;
 }>;
+const issuedDenials = new WeakMap<MediaDenials, BackendRuntime>();
 
 /** Only the canonical host's real W8 held-client checks can enable media.
  * Issued interactive scopes supply identity; no worker Actor is constructed. */
 export function runtimeMediaDenials(
   runtime: BackendRuntime,
+  authority: InteractiveCallControl,
 ): MediaDenials | null {
   const thread = runtime.assertScopeAllowedInTransaction;
   const creator = runtime.assertCreatorAllowedInTransaction;
   const audience = runtime.audienceIdentity;
-  if (!thread || !creator || !audience) return null;
+  if (
+    !thread ||
+    !creator ||
+    !audience ||
+    !isConfiguredBackendRuntime(runtime) ||
+    !authority.isFor(runtime.database)
+  )
+    return null;
+  const bookend = async (client: PoolClient) => {
+    await authority.assertDenialAuthority(client);
+    await runtime.assertRestoredInTransaction!(client);
+  };
   const checkThread = async (scope: ThreadScope, client: PoolClient) => {
     assertThreadScope(scope);
+    const held = await holdCurrentRequestSession(client, scope.actorAccountId);
+    await bookend(client);
     await thread(
-      { accountId: scope.actorAccountId, adultEligible: true },
+      held.actor,
       scope.creatorId,
       scope.threadId,
       {
@@ -74,22 +101,41 @@ export function runtimeMediaDenials(
       },
       client,
     );
+    await bookend(client);
+    await assertHeldCurrentRequestSession(held, client);
     return false;
   };
-  return {
+  const denials: MediaDenials = Object.freeze({
+    creatorActor: async (actor, creatorId, client) => {
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "media_current_actor_required",
+        "Media requires the Actor from this current request.",
+      );
+      await bookend(client);
+      await creator(held.actor, creatorId, client);
+      await bookend(client);
+      await assertHeldCurrentRequestSession(held, client);
+    },
     thread: checkThread,
     creator: async (scope, client) => {
+      const held = await holdCurrentRequestSession(
+        client,
+        "accountId" in scope ? scope.accountId : scope.actorAccountId,
+      );
+      await bookend(client);
       if ("accountId" in scope)
-        await creator(
-          { accountId: scope.accountId, adultEligible: true },
-          scope.creatorId,
-          client,
-        );
+        await creator(held.actor, scope.creatorId, client);
       else if ("threadId" in scope) return checkThread(scope, client);
       else await audience.authorizeInTransaction(scope, client);
+      await bookend(client);
+      await assertHeldCurrentRequestSession(held, client);
       return false;
     },
-  };
+  });
+  issuedDenials.set(denials, runtime);
+  return denials;
 }
 
 export type MediaHost = Readonly<{
@@ -105,14 +151,19 @@ export type MediaHost = Readonly<{
   bindRecordingPublication(port: RecordingPublicationPort): void;
   /** Call after binding. A surface is mounted only when its consumer is real:
    * thread recordings need W3's association, creator media needs W5 content. */
-  feature(): FeatureRegistration;
+  feature(accountCalls?: AccountCallMetadata): FeatureRegistration;
 }>;
 
-function actorOf(scope: CreatorMediaReadScope): Actor {
-  return {
-    accountId: "accountId" in scope ? scope.accountId : scope.actorAccountId,
-    adultEligible: true,
-  };
+async function actorOf(
+  scope: CreatorMediaReadScope,
+  client: PoolClient,
+): Promise<Actor> {
+  return (
+    await holdCurrentRequestSession(
+      client,
+      "accountId" in scope ? scope.accountId : scope.actorAccountId,
+    )
+  ).actor;
 }
 
 /** Interactive composition of W6 human media. Parsing, scanning and content
@@ -125,6 +176,12 @@ export function composeMediaHost(input: {
   development: boolean;
 }): MediaHost {
   const { runtime, environment, denials } = input;
+  invariant(
+    issuedDenials.get(denials) === runtime &&
+      isConfiguredBackendRuntime(runtime),
+    "media_denial_unconfigured",
+    "Media requires its original current denial producer.",
+  );
   const storage = new PrivateMediaStorage(environment.storageRoot);
   let recordingPublication: RecordingPublicationPort | undefined;
   let content: ReturnType<typeof contentMediaAuthority> | undefined;
@@ -159,8 +216,7 @@ export function composeMediaHost(input: {
   );
   const creatorIdentity = new CreatorIdentityAuthority(runtime.pool, {
     mode: input.development ? "development" : "pantopus",
-    assertAllowed: (actor, creatorId, client) =>
-      creatorRestriction(actor, creatorId, client),
+    assertAllowed: denials.creatorActor,
   });
   const availability = new AvailabilityService(
     runtime.database,
@@ -189,7 +245,7 @@ export function composeMediaHost(input: {
       scopes.set(client, scope);
       return objectAuthority().policy(
         client,
-        actorOf(scope),
+        await actorOf(scope, client),
         scope.creatorId,
         objectId,
         purpose,
@@ -201,7 +257,7 @@ export function composeMediaHost(input: {
       scopes.set(client, scope);
       return objectAuthority().currentAssetRead(
         client,
-        actorOf(scope),
+        await actorOf(scope, client),
         scope.creatorId,
         objectId,
         asset,
@@ -211,7 +267,7 @@ export function composeMediaHost(input: {
       scopes.set(client, scope);
       return objectAuthority().currentPublication(
         client,
-        actorOf(scope),
+        await actorOf(scope, client),
         scope.creatorId,
         objectId,
         asset,
@@ -279,9 +335,10 @@ export function composeMediaHost(input: {
       );
       recordingPublication = port;
     },
-    feature: () =>
+    feature: (accountCalls) =>
       mediaFeature({
         availability,
+        ...(accountCalls ? { accountCalls } : {}),
         ...(recordingPublication ? { media } : {}),
         ...(content ? { creatorMedia } : {}),
       }),

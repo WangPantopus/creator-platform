@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-02T19:40:27.907137+00:00",
+  "processes": [
+    {
+      "port": 4107,
+      "pid": 40152,
+      "cwd": "p40152\nfcwd\nn/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
+      "command": "node --env-file=/Users/yingpengwang/.config/creator-platform/w7-macstudio-20261001/runtime.env apps/backend/dist/server.mjs"
+    },
+    {
+      "port": 3007,
+      "pid": 41185,
+      "cwd": "p41185\nfcwd\nn/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/web",
+      "command": "next-server (v16.3.7)"
+    },
+    {
+      "purpose": "owned companion",
+      "pid": 54018,
+      "command": "/opt/homebrew/bin/idb_companion --udid FAB31883-2F36-4E50-83B3-D9654B60FF00 --grpc-domain-sock /private/tmp/creator-platform-w7-active-20261001/main-12ea-idb.sock"
+    }
+  ]
+}

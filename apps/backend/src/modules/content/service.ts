@@ -118,6 +118,23 @@ export type ContentPublicationProof = {
   mediaReady: boolean;
 };
 export interface ContentDependencies {
+  /** Prepare every bounded creator-visible candidate's real negative pair
+   * before creator/content/membership positives. Never issue a fan scope. */
+  prepareCreatorTenure?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanIds: readonly string[],
+  ) => Promise<void>;
+  creatorTenure?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+  ) => Promise<
+    | import("../../../../../packages/api/src/content.js").ContentTenureRecognition
+    | null
+  >;
   /** Issue the genuine request scope before leasing the content pool client. */
   prepareAudienceRequest?: (actor: Actor, creatorId: string) => Promise<void>;
   /** Actual own-fan identity prepared after all packet negatives and before
@@ -2012,6 +2029,36 @@ export class ContentService {
     const page = ContentReplyPage.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
+      if (studio && this.dependencies.prepareCreatorTenure) {
+        // Metadata only: the actual owner producer must finish every candidate
+        // pair's negatives before the role and any tenure positives below.
+        const candidates = (
+          await client.query<{ fan_id: string }>(
+            `SELECT m.fan_id FROM creator.content_reply_review m
+             LEFT JOIN creator.content_reaction re ON re.reply_id=m.reply_id
+             LEFT JOIN creator.content_reply_read rd ON rd.reply_id=m.reply_id AND rd.account_id=$4
+             WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL
+             AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1))
+             AND (($5='flagged' AND m.state='flagged') OR ($5<>'flagged' AND m.state='allowed'
+               AND ($5<>'unread' OR rd.reply_version IS NULL OR rd.reply_version<m.reply_version)
+               AND ($5<>'reacted' OR re.reply_id IS NOT NULL)))
+             ORDER BY m.created_at DESC,m.reply_id DESC LIMIT $3`,
+            [
+              creatorId,
+              page.cursor ?? null,
+              page.limit + 1,
+              actor.accountId,
+              page.filter,
+            ],
+          )
+        ).rows;
+        await this.dependencies.prepareCreatorTenure(
+          client,
+          actor,
+          creatorId,
+          candidates.map((candidate) => candidate.fan_id),
+        );
+      }
       if (studio) await this.role(client, actor, creatorId, ["triage"]);
       else
         invariant(
@@ -2038,6 +2085,24 @@ export class ContentService {
           ],
         )
       ).rows;
+      const tenure = new Map<
+        string,
+        | import("../../../../../packages/api/src/content.js").ContentTenureRecognition
+        | null
+      >();
+      if (studio && this.dependencies.creatorTenure)
+        for (const fanId of [
+          ...new Set<string>(rows.slice(0, page.limit).map((r) => r.fan_id)),
+        ].sort())
+          tenure.set(
+            fanId,
+            await this.dependencies.creatorTenure(
+              client,
+              actor,
+              creatorId,
+              fanId,
+            ),
+          );
       const items: PrivateNoteReply[] = rows.slice(0, page.limit).map((r) => ({
         id: r.id,
         contentId: r.content_id,
@@ -2049,6 +2114,7 @@ export class ContentService {
             : (r.text ?? "Reply withheld and routed for safety review."),
         version: r.version,
         createdAt: r.created_at.toISOString(),
+        ...(studio ? { tenure: tenure.get(r.fan_id) ?? null } : {}),
         safetyState: r.state,
         safetyReviewAvailable: Boolean(this.dependencies.reviewReply),
         read: Boolean(r.read),

@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-02T19:41:25.246284+00:00",
+  "iosPhysicalState": "Shutdown",
+  "androidPhysicalState": "absent",
+  "released": [
+    {
+      "slot": "/private/tmp/creator-platform-simulator-slot-1",
+      "device": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "exactTokenMatched": true,
+      "dev": 16777232,
+      "ino": 241647733
+    },
+    {
+      "slot": "/private/tmp/creator-platform-emulator-slot-2",
+      "device": "emulator-5580",
+      "exactTokenMatched": true,
+      "dev": 16777232,
+      "ino": 241661372
+    }
+  ],
+  "peerDevicesUntouched": true
+}

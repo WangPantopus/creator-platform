@@ -24,6 +24,7 @@ import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -84,19 +85,15 @@ try {
               }
             : {}),
           registerFeatures: async (runtime) => {
+            const accountCalls = await AccountCallMetadata.prepare(runtime);
+            const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
-            const mediaDenials = runtimeMediaDenials(runtime);
-            // The development host consumes W8's 0082 held try-fence. A code
-            // callback alone cannot advertise media while its real producer is
-            // absent. Registry activation and custody remain with W8.
-            const mediaAuthorityReady =
-              mediaEnvironment && mediaDenials
-                ? (
-                    await runtime.pool.query<{ ready: boolean }>(
-                      "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
-                    )
-                  ).rows[0]?.ready === true
-                : false;
+            const mediaDenials = callControl
+              ? runtimeMediaDenials(runtime, callControl)
+              : null;
+            // A genuine prepared graph attests its actual held request and
+            // negative gates. It does not configure calling or a provider.
+            const mediaAuthorityReady = Boolean(callControl);
             const mediaHost =
               mediaEnvironment && mediaDenials && mediaAuthorityReady
                 ? composeMediaHost({
@@ -124,7 +121,6 @@ try {
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. The calls feature remains unmounted
             // until those separate producers exist; no request Actor is invented.
-            const callControl = await InteractiveCallControl.prepare(runtime);
             process.stdout.write(
               callControl
                 ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
@@ -262,7 +258,8 @@ try {
                 pool: runtime.pool,
                 development: config.identityAdapter === "development",
               }),
-              mediaHost?.feature() ?? mediaFeature({}),
+              mediaHost?.feature(accountCalls) ??
+                mediaFeature({ accountCalls }),
               ...(commerce ? [commerce.feature] : []),
               ...(content ? content.features : []),
               ...(features.growth ? [features.growth.feature] : []),

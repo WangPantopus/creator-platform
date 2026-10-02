@@ -249,5 +249,19 @@
     "nativeAccountIsolation": "ordinary development account switching observed; mid-flight race unobserved",
     "webAuthenticatedBranchesObserved": false,
     "evidence": "../../studio-runtime/20261002/settings-custody.md"
+  },
+  "currentStudioMain12ea": {
+    "parent": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+    "reviewedMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+    "93IncomingPathsPersonallyReviewed": true,
+    "finalResolvedAndFollowSourceSHA256": {
+      "apps/backend/src/server.ts": "f622e0cfe62e6cb953b5559cd77ec7eac2fc321e4f213c34f69b40379c817033",
+      "apps/backend/src/modules/trust/privacy-consumers.ts": "849f2a1c0e4abed3808c1a380f7c2ff407a158fb2d72727d90ab4646e4789d0b",
+      "apps/backend/src/modules/trust/worker.ts": "c028eafe73778c609edefa467d3eef004a18c5ead4b830bacfeca2ca3cc429b5",
+      "apps/backend/src/modules/growth/core-follows.ts": "ee1712b5babc563817d8ccf52b586158982b161ea1fbd3a3a6c2cb00e94b9cf7"
+    },
+    "finalCombinedPRReviewComplete": false,
+    "SQLActivated": false,
+    "evidence": "../../studio-runtime/20261002/main-12ea.md"
   }
 }

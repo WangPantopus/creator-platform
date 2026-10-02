@@ -1,0 +1,10 @@
+{
+  "database": "creator_w7",
+  "migrations": 40,
+  "connectionLimit": -1,
+  "otherClients": 0,
+  "at": "2026-10-02T19:19:59.164252+00:00",
+  "firstPgIsReady": "no response immediately after start; proceeded only after accepting connections",
+  "firstDockerPath": "absent /opt/homebrew/bin/docker; corrected to discovered /usr/local/bin/docker",
+  "initialDatabaseComment": null
+}
