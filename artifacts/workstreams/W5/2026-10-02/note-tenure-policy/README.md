@@ -11,3 +11,6 @@ Runnable: the actual W5 host and web proxy were launched at source `659038439b47
 Personally verified at `2026-10-02T10:43:59.938Z`: normal kilnfire session 200, current policy 503 `scope_denial_unconfigured`, and a wrong expected wheelhouse account 403 `content_account_changed`. The same source revision appears in the actual API route log. The database contains zero memberships, confirmed Stripe paid periods, private replies and published content. No positive badge, long reply, paid eligibility, publication, review decision or delivery was manufactured. Creator feed recognition awaits W8's separate real creator/fan negative authority.
 
 Release-ready: no. W8's next migration activation packet, genuine signing and actual paid-history operation remain prerequisites. The creator is DEVELOPMENT-ONLY SEEDED VERIFIED (2026-10-01T20:44:26Z), with no genuine proof or passkey.
+# Corrected future version
+
+The factory now requires `0172_w5_reply_tenure_cap` from W8's corrected held map at `fb1cbcaab7926e96a361bfd7840ecf192efafefd` (map SHA256 `2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a`). The original SQL path, bytes and checksum `b1ec7e9684e5f916253202cf8d6b484376fe3c74dbec63221500e68ecf7fe0ba` remain unchanged. This is held factory metadata; it does not activate a migration or establish paid tenure.

@@ -50,7 +50,7 @@ export async function createCommercePublicPacketHost(
 ): Promise<CommercePublicPacketHost> {
   const migrations = [
     [input.migrations.packet, PUBLIC_PACKET_READ_MIGRATION],
-    [input.migrations.denial, "0076_w8_public_packet_denial"],
+    [input.migrations.denial, "0162_w8_public_packet_denial"],
     [input.migrations.signature, SIGNATURE_READ_FENCE_MIGRATION],
   ] as const;
   if (

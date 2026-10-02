@@ -1,0 +1,75 @@
+{
+  "revision": "126f86103d8e94c275aa8dcea48e7a5a42544e6e",
+  "mainMerged": "3cfdde0561b22784515ca75eb54097a6baf623d1",
+  "w1AdmissionContract": "3742a165 (only additive admission hunks; current destination/W4 DTOs retained)",
+  "backendRelease": "126f86103d8e94c275aa8dcea48e7a5a42544e6e",
+  "database": "creator_w6_wave_fresh_20261002",
+  "qualification": "Real shipping application unavailable gates/account navigation; no successful human voice publication, canonical call, transport audio or production provider acceptance",
+  "android": {
+    "sdk": "2.29.0",
+    "packagingSeconds": 36,
+    "normallySignedInstalledApkBytes": 70240115,
+    "apkSha256": "dd102f2fad6acb1173b9e38e8e58f0ed13d0e6d7cb7a26da45880f54d8462f09",
+    "fontScale": 2.0,
+    "appearance": "Night",
+    "operated": [
+      "retained fan account from actual Keystore at cold launch",
+      "Home/Discover/Requests/You tabs all personally tapped with two-column readable labels; Home/Discover unavailable and Commerce unconfigured were preserved",
+      "fan media gate: availability error, no EditText private fields, actual Save button enabled=false",
+      "real product sign-out, Continue, development actor one sign-in: actual @w6_dev_owner",
+      "owner media gate after current backend restart: no private fields, Save false; tapped disabled Save",
+      "creator cold return preserves actual account",
+      "product sign-out/actor two fan sign-in restores @w6_local_fan",
+      "fan cold media gate remains unavailable after account switch"
+    ],
+    "firstDumpFailure": "Initial launch UiAutomator dump returned null root; repeated after actual screen readiness, no substitute response",
+    "talkBackAccepted": false
+  },
+  "ios": {
+    "sdk": "2.17.0",
+    "normallySignedBinarySha256": "b6d26234467ac96b1b410ee0399e534518c4ec8041e5e2cd4042ccec51dfa274",
+    "shippingGenericBuild": "passed",
+    "actualGateSeconds": 45.095,
+    "passed": true,
+    "operated": [
+      "normalize current account through product sign-out",
+      "actual fan sign-in and unavailable gate: no private fields, disabled Save",
+      "actual creator sign-in after product sign-out and same unavailable gate"
+    ],
+    "appearance": "Night",
+    "contentSize": "accessibility-extra-large (AX3), not exact200%",
+    "firstCurrentMainAttempt": "Guard refused75 while W1 owned heavy slot; no child started, own simulator/lease released; later repeat passed",
+    "cleanup": "Xcode already shut down own selected simulator; verified Shutdown before exact lease release",
+    "voiceOverAccepted": false
+  },
+  "backendAfterJourneys": {
+    "availabilityVersion": 4,
+    "canonicalCallRows": 0,
+    "callbackTablePresent": false,
+    "missingInteractiveDenial": "0082",
+    "mediaAndCallsAvailable": false
+  },
+  "checks": {
+    "canonicalSharedResources": 12,
+    "canonicalOperations": 99,
+    "generationReadOnly": "passed after narrowing unrelated destination hunk",
+    "backendTypes": "passed",
+    "webTypes": "passed",
+    "scopedLintFormat": "passed",
+    "newUnitTests": 0,
+    "candidateCI126f8610": {
+      "bothWebBackend": "SUCCESS",
+      "bothAndroidRuntime": "SUCCESS",
+      "compile": "SUCCESS",
+      "webVisualIosFoundationAndroidFoundation": "QUEUED, not passes"
+    }
+  },
+  "ownedCleanup": {
+    "android5582": "stopped; adb confirms absent; exact slot2 token/inode released",
+    "ios3E02": "Shutdown confirmed; exact slot2 token/inode released",
+    "heavyBuild": "released",
+    "operator3106AndLivekitServer": "stopped",
+    "api4106AndWeb3006": "running; backend current126f8610",
+    "ingestionPublicationWorkers": "none"
+  }
+}
