@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import type { Router } from "express";
+import express, { type Router } from "express";
 import pg from "pg";
 import { createApp, type FeatureRegistration } from "./app.js";
 import type { BackendConfig } from "./config.js";
@@ -35,6 +35,22 @@ export type BackendRuntime = {
   identity: import("./modules/identity/router.js").IdentityRuntime | undefined;
   audienceIdentity?: AudienceIdentityAuthority;
   assertScopeAllowedInTransaction?: ScopeRestrictionInTransaction;
+  assertCreatorAllowedInTransaction?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+    client: pg.PoolClient,
+  ) => Promise<void>;
+  assertRestoredInTransaction?: (client: pg.PoolClient) => Promise<void>;
+  assertContentAllowedInTransaction?: (
+    client: pg.PoolClient,
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
+  holdPublicPacketNegativeAuthority?: (
+    client: pg.PoolClient,
+    actor: import("./modules/identity/adapter.js").Actor,
+    tuple: import("./modules/trust/scope-restriction.js").TrustPublicPacketTuple,
+  ) => Promise<boolean>;
   assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -83,7 +99,15 @@ export async function createConfiguredBackend(input: {
     throw new Error(
       "Enable the feature and provide a non-owner runtime DATABASE_URL.",
     );
-  if (input.trust && input.identity.mode === "development")
+  if (
+    input.trust &&
+    input.identity.mode === "development" &&
+    (process.env.NODE_ENV !== "development" ||
+      process.env.TRUST_LOCAL_DEVELOPMENT !== "true" ||
+      !["localhost", "127.0.0.1", "[::1]"].includes(
+        new URL(input.config.allowedOrigin).hostname,
+      ))
+  )
     throw new Error(
       "Deployed trust requires the configured Pantopus identity adapter.",
     );
@@ -98,7 +122,8 @@ export async function createConfiguredBackend(input: {
   if (
     input.identity.mode !== "development" &&
     (!input.config.identitySessionKey ||
-      typeof input.assertScopeAllowedInTransaction !== "function")
+      (!input.trust &&
+        typeof input.assertScopeAllowedInTransaction !== "function"))
   )
     throw new Error(
       "Configured identity requires canonical session custody and current caller-held trust denials.",
@@ -115,6 +140,34 @@ export async function createConfiguredBackend(input: {
     console.error("An idle database connection failed and was discarded.");
   });
   let trust: Awaited<ReturnType<typeof createTrustRuntime>> | undefined;
+  const assertScopeAllowedInTransaction:
+    | ScopeRestrictionInTransaction
+    | undefined =
+    input.trust || input.assertScopeAllowedInTransaction
+      ? async (...scope) => {
+          if (input.trust && !trust)
+            throw new DomainError(
+              "trust_unconfigured",
+              "Current transaction denial authority is unavailable.",
+              503,
+            );
+          await input.assertScopeAllowedInTransaction?.(...scope);
+          await trust?.assertScopeAllowedInTransaction(...scope);
+        }
+      : undefined;
+  const assertAudienceAllowed: AudienceRestriction | undefined =
+    input.trust || input.assertAudienceAllowed
+      ? async (...scope) => {
+          if (input.trust && !trust)
+            throw new DomainError(
+              "trust_unconfigured",
+              "Current audience denial authority is unavailable.",
+              503,
+            );
+          await input.assertAudienceAllowed?.(...scope);
+          await trust?.assertAudienceAllowed(...scope);
+        }
+      : undefined;
   const assertScopeAllowed: ScopeRestriction = async (...scope) => {
     if (
       !input.assertScopeAllowed &&
@@ -156,7 +209,7 @@ export async function createConfiguredBackend(input: {
     pool,
     undefined,
     assertScopeAllowed,
-    input.assertScopeAllowedInTransaction,
+    assertScopeAllowedInTransaction,
   );
   const conversation = new ConversationService(
     database,
@@ -199,20 +252,83 @@ export async function createConfiguredBackend(input: {
     access,
     conversation,
     identity: platformIdentity,
-    ...(input.assertAudienceAllowed && platformIdentity
+    ...(assertAudienceAllowed && platformIdentity
       ? {
           audienceIdentity: new AudienceIdentityAuthority(pool, {
             mode: platformIdentity.sessions.mode,
-            assertAllowed: input.assertAudienceAllowed,
+            assertAllowed: assertAudienceAllowed,
           }),
         }
       : {}),
     assertActorAllowed,
     assertScopeAllowed,
-    ...(input.assertScopeAllowedInTransaction
+    ...(assertScopeAllowedInTransaction
       ? {
-          assertScopeAllowedInTransaction:
-            input.assertScopeAllowedInTransaction,
+          assertScopeAllowedInTransaction: assertScopeAllowedInTransaction,
+        }
+      : {}),
+    ...(input.trust
+      ? {
+          assertRestoredInTransaction: async (client: pg.PoolClient) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current recovery authority is unavailable.",
+                503,
+              );
+            await trust.assertRestoredInTransaction(client);
+          },
+          assertContentAllowedInTransaction: async (
+            client: pg.PoolClient,
+            actor: import("./modules/identity/adapter.js").Actor,
+            creatorId: string,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current content denial authority is unavailable.",
+                503,
+              );
+            await trust.assertContentAllowedInTransaction(
+              client,
+              actor,
+              creatorId,
+            );
+          },
+          holdPublicPacketNegativeAuthority: async (
+            client: pg.PoolClient,
+            actor: import("./modules/identity/adapter.js").Actor,
+            tuple: import("./modules/trust/scope-restriction.js").TrustPublicPacketTuple,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current public request authority is unavailable.",
+                503,
+              );
+            return trust.holdPublicPacketNegativeAuthority(
+              client,
+              actor,
+              tuple,
+            );
+          },
+          assertCreatorAllowedInTransaction: async (
+            actor: import("./modules/identity/adapter.js").Actor,
+            creatorId: string,
+            client: pg.PoolClient,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current creator denial authority is unavailable.",
+                503,
+              );
+            await trust.assertCreatorAllowedInTransaction(
+              actor,
+              creatorId,
+              client,
+            );
+          },
         }
       : {}),
     assertCreatorAllowed: async (actor, creatorId) => {
@@ -245,6 +361,15 @@ export async function createConfiguredBackend(input: {
         typeof input.trust === "function"
           ? await input.trust(backendRuntime)
           : input.trust;
+      if (
+        (input.identity.mode === "development") !==
+          (configuration.environment === "local-development") ||
+        (configuration.environment === "local-development" &&
+          configuration.identityMode !== "development")
+      )
+        throw new Error(
+          "Trust environment must agree with the canonical identity mode.",
+        );
       const privacyAuthority = platformIdentity
         ? trustIdentityAuthority(pool, platformIdentity, access, database)
         : {};
@@ -280,27 +405,59 @@ export async function createConfiguredBackend(input: {
     await pool.end();
     throw error;
   }
-  const server = createServer(
-    createApp(input.config, {
-      identity: sessions ?? input.identity,
-      ...(platformIdentity ? { platformIdentity } : {}),
-      access,
-      conversation,
-      signing,
-      generationAvailable: false,
-      features,
-      ...(trust
-        ? { trustRouter: trust.router, telemetry: trust.telemetry }
-        : {}),
-      assertActorAllowed,
-      ...(input.stripeNotifications
-        ? { stripeNotifications: input.stripeNotifications }
-        : {}),
-      ...(input.storeNotifications
-        ? { storeNotifications: input.storeNotifications }
-        : {}),
-    }),
-  );
+  const application = createApp(input.config, {
+    identity: sessions ?? input.identity,
+    ...(platformIdentity ? { platformIdentity } : {}),
+    access,
+    conversation,
+    signing,
+    generationAvailable: false,
+    features,
+    ...(trust ? { trustRouter: trust.router, telemetry: trust.telemetry } : {}),
+    assertActorAllowed,
+    ...(input.stripeNotifications
+      ? { stripeNotifications: input.stripeNotifications }
+      : {}),
+    ...(input.storeNotifications
+      ? { storeNotifications: input.storeNotifications }
+      : {}),
+  });
+  // Fence the complete host before provider ingress, session issuance or any
+  // domain router. Public help/readiness remain usable while recovery is closed.
+  const host = express();
+  if (trust)
+    host.use(async (req, res, next) => {
+      if (await trust!.trafficReady()) return next();
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      if (["GET", "HEAD"].includes(req.method)) {
+        if (req.path === "/v1/identity/capabilities")
+          return res.json({
+            signInAvailable: false,
+            localAccountsAllowed: false,
+            mode: input.identity.mode ?? "pantopus",
+            developmentActors: [],
+          });
+        if (
+          [
+            "/health/live",
+            "/health/ready",
+            "/v1/trust/help",
+            "/v1/trust/status",
+          ].includes(req.path)
+        )
+          return next();
+      }
+      return res.status(503).json({
+        error: {
+          code: "restoration_pending",
+          message:
+            "This restored environment is unavailable while recovery is verified.",
+        },
+      });
+    });
+  host.use(application);
+  const server = createServer(host);
   const sockets = attachRealtime(
     server,
     sessions ?? input.identity,
