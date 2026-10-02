@@ -1,0 +1,483 @@
+{
+  "recordedDate": "2026-10-01",
+  "baseSource": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "backendSourceCommit": "dcce0a752c8982cab07a007e5530b14980173a93",
+  "webSourceCommit": "e5c315d8e190d85191a090999cfc8aeb736683cb",
+  "archives": [
+    {
+      "name": "creator-platform-w8-resume-20260930.sql.gz",
+      "bytes": 533459,
+      "sha256": "fe09be665339e7333ee7afec6fbe7f2c48e9e96a53ad99ffc3cb4ab4c2581f71",
+      "format": "gzip plain pg_dumpall SQL"
+    },
+    {
+      "name": "creator-platform-w8-foundation-20260930-takeover.sql.gz",
+      "sha256": "037c1b4d22be29fb7919b7e311e3c4ec029051c591bc81731a784551eb3d0ef4",
+      "format": "gzip plain pg_dumpall SQL"
+    }
+  ],
+  "preservation": {
+    "separatePrivateSnapshotVerified": true,
+    "originalFilesUnchanged": true,
+    "originalEnvAndEncryptionKeysUnchanged": true,
+    "isolatedLoginPasswordsGenerated": true
+  },
+  "resources": {
+    "container": "creator-platform-w8-recovery-20261001",
+    "volume": "creator-platform-w8-recovery-20261001-data",
+    "database": "creator_w8",
+    "loopbackPort": 55438,
+    "image": "pgvector/pgvector@sha256:cf134a767f474095eeba57e0117be8e568e011a63f33fbf252f14c9b760f8e6f",
+    "restoredTrafficDisabled": true,
+    "globalRolesSha256": "099b2c67f52ac9249d57cfc6335f996e8127e08939ad5e7e21349cf8e4494510",
+    "databaseSqlSha256": "c41d57c30ffbe138ea06cfeed4f5f007b470f267eaba13bb8b4a085f4062b20f",
+    "state": "stopped",
+    "durableVolumeRetained": true,
+    "apiAndWebPortsClosed": true
+  },
+  "runtime": {
+    "canonicalMigrationCount": 40,
+    "canonicalChecksumsVerified": true,
+    "ledgerSha256": "27a19679861294d4b221c65a32f27edbff11cb28f7aad056af506eb4b200b5fc",
+    "cases": [
+      {
+        "state": "open",
+        "count": 1
+      },
+      {
+        "state": "resolved",
+        "count": 3
+      }
+    ],
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "blocked",
+        "count": 1
+      },
+      {
+        "kind": "export",
+        "state": "blocked",
+        "count": 2
+      }
+    ],
+    "privacyTasks": [
+      {
+        "state": "blocked",
+        "count": 11
+      },
+      {
+        "state": "complete",
+        "count": 13
+      }
+    ],
+    "denials": {
+      "blocks": 1,
+      "tombstones": 1
+    },
+    "ownership": {
+      "account_jobs": 3,
+      "unproved": 0,
+      "verified_empty": 2,
+      "verified_nonempty": 1,
+      "invalid": 0
+    },
+    "journal": {
+      "schemaVersion": 2,
+      "createdAt": "2026-09-30T23:24:02.528Z",
+      "sha256": "330ad99fcd0c806681bdfbc0dffd866c8a7383a7267cf18215c89524ed2da6d3",
+      "tombstones": 1,
+      "allRetainedScopeAndOwnershipMatch": true
+    },
+    "roles": [
+      {
+        "role": "creator_trust_runtime",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "owns": false,
+        "owner_membership": false,
+        "unscopedCases": 0,
+        "unscopedEvidence": 0
+      },
+      {
+        "role": "creator_trust_worker",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "owns": false,
+        "owner_membership": false
+      },
+      {
+        "role": "creator_runtime",
+        "rolsuper": false,
+        "rolbypassrls": false,
+        "owns": false,
+        "owner_membership": false,
+        "unscopedMessages": 0
+      }
+    ],
+    "trafficClosed": true
+  },
+  "restoredData": [
+    {
+      "database": "creator_w8",
+      "tables": 146,
+      "rows": 210,
+      "allOriginalDataMatches": true
+    },
+    {
+      "database": "creator_w8_alias_final_20261001",
+      "tables": 148,
+      "rows": 325,
+      "allOriginalDataMatches": true
+    }
+  ],
+  "security": [
+    {
+      "database": "creator_w8",
+      "security": {
+        "rowSecurity": {
+          "archiveStatements": 258,
+          "restoredStatements": 258,
+          "exactMatch": true,
+          "sha256": "0cf9b45c593d5906123c8db78895a264bfa71f1a0a13153eaf5cab1f14efb5ed"
+        },
+        "policies": {
+          "archiveStatements": 250,
+          "restoredStatements": 250,
+          "exactMatch": true,
+          "sha256": "03790635216b8d8f41f514d2565c850548ada91aa1f8a5e9b26d3eeef9f2ca87"
+        },
+        "grantsAndRevokes": {
+          "archiveStatements": 195,
+          "restoredStatements": 195,
+          "exactMatch": true,
+          "sha256": "0d630ffb3ac3ba89a7dcf2cfa689e9489b6da10083bd25f1aa191353f006cacf"
+        },
+        "owners": {
+          "archiveStatements": 158,
+          "restoredStatements": 158,
+          "exactMatch": true,
+          "sha256": "a2646528b96f425a96b3ef9c4be0f42ef50bf3efa0efb81bc7e90845ad146ab6"
+        }
+      },
+      "trafficClosed": true
+    },
+    {
+      "database": "creator_w8_alias_final_20261001",
+      "security": {
+        "rowSecurity": {
+          "archiveStatements": 262,
+          "restoredStatements": 262,
+          "exactMatch": true,
+          "sha256": "8c1a81dd84b607c4a0492b689934ace80917e0c8930fe615877bf68e93cfcdbe"
+        },
+        "policies": {
+          "archiveStatements": 254,
+          "restoredStatements": 254,
+          "exactMatch": true,
+          "sha256": "1038e7fa402419480c649d200a021d46b736d7b4554b7ba6762230c8db08733e"
+        },
+        "grantsAndRevokes": {
+          "archiveStatements": 197,
+          "restoredStatements": 197,
+          "exactMatch": true,
+          "sha256": "4561b35d248a0d3d6647b355e1748e42a2f73759aad1393289a2ee43ec7924b6"
+        },
+        "owners": {
+          "archiveStatements": 160,
+          "restoredStatements": 160,
+          "exactMatch": true,
+          "sha256": "ac22cc639bd887d9bbac6fd42bab077bc60dc88778db8eaf4d74904bedfea840"
+        }
+      },
+      "trafficClosed": true
+    }
+  ],
+  "foundationCanonicalRunner": {
+    "exitCode": 0,
+    "canonicalEntriesRecognized": 40,
+    "newEntriesApplied": 0,
+    "originalLedgerRows": 48
+  },
+  "journalReplay": {
+    "first": {
+      "operation": "restore",
+      "rows": 1,
+      "sha256": "330ad99fcd0c806681bdfbc0dffd866c8a7383a7267cf18215c89524ed2da6d3",
+      "replayMs": 16,
+      "trafficReady": false,
+      "requiredNext": "Run every domain's denial/purge and verify acknowledgments before reopening traffic."
+    },
+    "second": {
+      "operation": "restore",
+      "rows": 1,
+      "sha256": "330ad99fcd0c806681bdfbc0dffd866c8a7383a7267cf18215c89524ed2da6d3",
+      "replayMs": 16,
+      "trafficReady": false,
+      "requiredNext": "Run every domain's denial/purge and verify acknowledgments before reopening traffic."
+    },
+    "after": {
+      "tombstones": 1,
+      "deletionJobs": 1,
+      "pendingDeletionDomains": 8,
+      "nullOwnership": 0,
+      "ownedCreatorCount": 1,
+      "canonicalMigrations": 40,
+      "trafficReady": false
+    },
+    "recoveryCredential": "dedicated operator; no runtime/worker grant widening",
+    "firstWorkerReplay": "refused 42501 on tombstone row lock; transaction rolled back"
+  },
+  "olderBackupNewerJournal": {
+    "backupFormat": "CUSTOM",
+    "backupCreatedAt": "2026-09-30T23:18:12Z",
+    "backupSha256": "1495ab8ee0d59a7fdd335d47f49dbc6fba09fe42e5f789b0979b8173609d4e4c",
+    "journalCreatedAt": "2026-09-30T23:24:02.528Z",
+    "journalIsNewerThanBackup": true,
+    "databaseRestoreMs": 3763,
+    "journalReplay": {
+      "operation": "restore",
+      "rows": 1,
+      "sha256": "330ad99fcd0c806681bdfbc0dffd866c8a7383a7267cf18215c89524ed2da6d3",
+      "replayMs": 61,
+      "trafficReady": false,
+      "requiredNext": "Run every domain's denial/purge and verify acknowledgments before reopening traffic."
+    },
+    "trafficReady": false
+  },
+  "closedHttp": [
+    {
+      "method": "GET",
+      "path": "/health/live",
+      "status": 200,
+      "alive": true
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 503,
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "database",
+          "required": true,
+          "state": "available",
+          "code": "non_owner_rls_verified",
+          "checkedAt": "2026-10-01T09:29:40.457Z"
+        },
+        {
+          "name": "identity",
+          "required": true,
+          "state": "development",
+          "code": "synthetic_local_accounts",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "restoration_denial",
+          "required": true,
+          "state": "unavailable",
+          "code": "restored_traffic_closed",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "model",
+          "required": true,
+          "state": "unavailable",
+          "code": "adapter_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "payments",
+          "required": true,
+          "state": "unavailable",
+          "code": "adapter_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "calls",
+          "required": true,
+          "state": "unavailable",
+          "code": "adapter_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "voice",
+          "required": true,
+          "state": "unavailable",
+          "code": "adapter_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "push",
+          "required": true,
+          "state": "unavailable",
+          "code": "adapter_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_identity",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_conversation",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_agent",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_commerce",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_content",
+          "required": true,
+          "state": "unavailable",
+          "code": "owner_hook_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_media",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_growth",
+          "required": true,
+          "state": "unavailable",
+          "code": "owner_hook_unconfigured",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        },
+        {
+          "name": "privacy_trust",
+          "required": true,
+          "state": "unavailable",
+          "code": "export_hook_registered_retention_gated",
+          "checkedAt": "2026-10-01T09:29:40.446Z"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v1/identity/capabilities",
+      "status": 200,
+      "signInAvailable": false,
+      "actorCount": 0
+    },
+    {
+      "method": "POST",
+      "path": "/v1/identity/continue",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "2f7ec1bb-41cc-4c52-8928-1f4943aa0bcc"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/trust/dev/session",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "c2e456bb-66bd-4fec-8e13-0161bb947e5a"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trust/privacy/jobs",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "d50b1475-4b13-4ac4-85fd-232016c89d04"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/trust/privacy/jobs",
+      "status": 503,
+      "errorCode": "restoration_pending",
+      "correlationId": "78b9b4a2-20e1-496d-8e85-e4f7072f0887"
+    }
+  ],
+  "browser": {
+    "personallyOperated": true,
+    "injectedTokensOrCookies": false,
+    "status": "required restoration capability unavailable; ready false",
+    "phone": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "privacyForm": "recovery unavailable; Request export disabled; no private progress or Download",
+      "ordinarySignIn": "identity_unconfigured; /support/privacy return destination preserved"
+    },
+    "native": "No new device required for a closed recovery host; current authenticated native acceptance unverified.",
+    "desktop": {
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "temporary1280x900OverrideAlsoInspected": true,
+      "viewportResetAfterAcceptance": true,
+      "statusRelease": "dcce0a752c8982cab07a007e5530b14980173a93"
+    }
+  },
+  "checks": {
+    "packageManager": "pnpm 12.5.1",
+    "node": "24.19.0",
+    "frozenLockfile": true,
+    "lifecycleScripts": "ignored",
+    "generatedResources": "passed",
+    "workspaceTypecheck": "7/7 passed, concurrency 1",
+    "lint": "full workspace and final changed-source checks passed",
+    "backendBuild": "passed",
+    "webProductionBuild": "passed, default Turbopack; bounded Node heap and low scheduling priority",
+    "existingBackendContracts": "9/9 passed",
+    "newTests": "none",
+    "testsGoldensMigrationsModified": false
+  },
+  "limits": [
+    "No source data reseeded or replaced",
+    "No domain purge or completed C10",
+    "Retained growth encryption key unavailable; no replacement applied",
+    "No paid calls or OpenAI secret opened",
+    "No remote staging/provider/signing/hardware/pilot acceptance",
+    "Logical recovery only; no WAL/RPO/full-incident-RTO claim"
+  ],
+  "backendInitialGateCommit": "72fcad30981441ba069899f7573bcbc93c869811",
+  "workerRoleCheckedWhilePaused": true,
+  "postRecoveryBackup": {
+    "format": "CUSTOM",
+    "bytes": 553088,
+    "sha256": "1bf9de3d3c65d7b49032a904bd2e724892e7bc1eb6e52901e973dadb9d62efd4",
+    "tocReadable": true,
+    "restoredTrafficDisabled": true,
+    "note": "Fresh isolated checkpoint restore matches all original archive rows. Local logical mechanics only; traffic remains closed.",
+    "independentlyRestored": true,
+    "originalRowCount": 210,
+    "tableCount": 146,
+    "allOriginalDataMatches": true
+  },
+  "screenshots": [
+    {
+      "path": "privacy-closed-phone.jpg",
+      "bytes": 69413,
+      "sha256": "3963d9fea98889146dcaa5a82d651c4c2ce3be97fb74fb9477e7a3e169c86e39"
+    },
+    {
+      "path": "status-closed-desktop.jpg",
+      "bytes": 45732,
+      "sha256": "c4c858092790c0f61c2342be6d07d2bf9935d4818e71a371e4833ed3202c18fd"
+    }
+  ]
+}
