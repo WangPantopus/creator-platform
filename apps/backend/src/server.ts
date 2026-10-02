@@ -142,6 +142,9 @@ try {
               ? await createCommerceStudio({
                   assertScopeAllowedInTransaction:
                     runtime.assertScopeAllowedInTransaction,
+                  ...(commerce?.publicPacketRead
+                    ? { publicPacketRead: commerce.publicPacketRead }
+                    : {}),
                   pool: growthAPIPool ?? runtime.pool,
                   owners: {
                     commerce: commerce?.service,

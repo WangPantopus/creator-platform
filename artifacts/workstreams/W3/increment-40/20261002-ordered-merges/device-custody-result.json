@@ -1,0 +1,11 @@
+{
+  "source": "39a7dcc1293b7fb8628a8e4ccb305fadadf80766",
+  "avd": "Qelvora_W3_API34",
+  "serial": "emulator-5584",
+  "slot": "creator-platform-emulator-slot-1",
+  "initialFontScale": "2.0",
+  "restoredFontScale": "2.0",
+  "appANREventsSinceBoot": 0,
+  "ownedGuestStopped": true,
+  "exactOwnedLeaseReleased": true
+}

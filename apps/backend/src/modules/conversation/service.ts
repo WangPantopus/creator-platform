@@ -99,6 +99,9 @@ export class ConversationService {
   closeFrameNotifications(): void {
     this.frameNotifications?.close();
   }
+  isFor(database: Database, access: AccessService) {
+    return this.db === database && this.access === access;
+  }
   private approvals?: Pick<
     CommerceApprovals,
     "prepareDelivery" | "recordDelivery"
