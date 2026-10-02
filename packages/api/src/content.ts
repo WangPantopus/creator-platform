@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CommerceFulfillmentPlanRef } from "./commerce/fulfillment.js";
+import { CommerceFulfillmentPlanRef } from "./commerce/fulfillment.ts";
 
 /** C08 v1. Audience and AI-source permission are independent, server checked. */
 export const ContentAudience = z.discriminatedUnion("kind", [
