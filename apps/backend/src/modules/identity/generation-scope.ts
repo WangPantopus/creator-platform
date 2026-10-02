@@ -6,7 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
-export const GENERATION_SCOPE_MIGRATION = "0072_w1_generation_worker_scope";
+export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const consumerSchema = z.strictObject({
   migration: z.strictObject({
@@ -121,6 +121,7 @@ export class GenerationIdentityAuthority {
     private readonly configuration: Readonly<{
       assertAllowed: GenerationRestriction;
       assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
+      consumers: readonly GenerationPurposeConsumer[];
     }>,
   ) {}
 
@@ -147,7 +148,9 @@ export class GenerationIdentityAuthority {
     if (
       input.migration.version !== GENERATION_SCOPE_MIGRATION ||
       !Hash.safeParse(input.migration.checksum).success ||
-      !/^0093_w8_[a-z_]+$/u.test(input.denialMigration.version) ||
+      !/^0177_w8_generation_worker_denial$/u.test(
+        input.denialMigration.version,
+      ) ||
       !Hash.safeParse(input.denialMigration.checksum).success ||
       typeof input.assertAllowed !== "function" ||
       typeof input.assertDiscoveryAllowed !== "function"
@@ -157,8 +160,9 @@ export class GenerationIdentityAuthority {
         "Current generation purpose authority is not configured.",
         503,
       );
+    let consumers: GenerationPurposeConsumer[];
     try {
-      const consumers = z
+      consumers = z
         .array(consumerSchema)
         .max(32)
         .parse(input.consumers ?? []);
@@ -332,7 +336,30 @@ export class GenerationIdentityAuthority {
     return new GenerationIdentityAuthority(input.pool, {
       assertAllowed: input.assertAllowed,
       assertDiscoveryAllowed: input.assertDiscoveryAllowed,
+      consumers: Object.freeze(
+        consumers.map((consumer) =>
+          Object.freeze({
+            ...consumer,
+            migration: Object.freeze({ ...consumer.migration }),
+          }),
+        ),
+      ),
     });
+  }
+
+  /** Preparation only: a distinct purpose may use an executable only when
+   * this exact worker credential already qualified its actual definition. */
+  assertConsumerRegistered(consumer: GenerationPurposeConsumer): void {
+    if (
+      !this.configuration.consumers.some(
+        (registered) => canonical(registered) === canonical(consumer),
+      )
+    )
+      throw new DomainError(
+        "generation_scope_unconfigured",
+        "The exact worker purpose consumer is not registered.",
+        503,
+      );
   }
 
   private assertWorker(): void {

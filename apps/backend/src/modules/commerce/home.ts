@@ -49,7 +49,7 @@ export async function createCommerceHomePage(input: {
       input.access.threadScopeInTransactionAvailable &&
       input.database.threadScopeInTransactionAvailable &&
       typeof input.assertAccountAllowed === "function" &&
-      input.migration.version === "0080_w4_fan_request_page_index" &&
+      input.migration.version === "0166_w4_fan_request_page_index" &&
       /^[a-f0-9]{64}$/u.test(input.migration.checksum),
     "commerce_home_unconfigured",
     "Home requests need the canonical activity index and held current account authority.",
