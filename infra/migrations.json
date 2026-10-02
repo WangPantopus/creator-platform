@@ -628,6 +628,41 @@
       "version": "0097_w2_generation_attempt_admission",
       "state": "reserved_unapplied",
       "reason": "Actual pre-network all-attempt journal admission under exact W1 durable worker proof and reviewed consumer allowlist. Accounting retention policy and C10 custody remain explicit dependencies."
+    },
+    {
+      "id": "0098",
+      "owner": "W4",
+      "version": "0098_w4_generation_allowance_audience",
+      "state": "reserved_unapplied",
+      "reason": "Actual W1 generationId/workerToken purpose and current accepted allowance audience; exact immutable source/consumer review pending."
+    },
+    {
+      "id": "0099",
+      "owner": "W1",
+      "version": "0099_w1_generation_terminal_scope",
+      "state": "reserved_unapplied",
+      "reason": "Distinct actual completion/reconciliation private nonce and same-transaction transition/commit fence; no prefix regeneration or new provider/body authority."
+    },
+    {
+      "id": "0100",
+      "owner": "W8",
+      "version": "0100_w8_generation_terminal_denial",
+      "state": "reserved_unapplied",
+      "reason": "Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences."
+    },
+    {
+      "id": "0101",
+      "owner": "W7",
+      "version": "0101_w7_core_follow_metadata",
+      "state": "reserved_unapplied",
+      "reason": "Initial narrow metadata review complete; requires revised genuine held-session/fan/context proof, strict all-role custody and actual unrelated-account/busy/denial/deletion verification. W7 may not self-allocate/apply above its human ceiling."
+    },
+    {
+      "id": "0102",
+      "owner": "W5",
+      "version": "0102_w5_generation_content_origin",
+      "state": "reserved_unapplied",
+      "reason": "Fixed metadata-only current public-own-text origin projection under exact W1 durable worker nonce/client and real consumed signature. Immutable source/function/role/C10 review pending; no body/fan/paid authority or activation."
     }
   ]
 }
