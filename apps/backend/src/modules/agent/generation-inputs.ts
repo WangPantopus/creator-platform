@@ -20,6 +20,14 @@ export const GENERATION_INPUT_SIGNATURE =
   "creator.generation_agent_inputs(uuid,uuid)";
 const owner = "creator_w2_generation_input";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
+// Persisted published configuration is complete. Draft defaults must not
+// silently reinterpret a malformed stored version under its compiled hash.
+const StoredConfiguration = z.preprocess((value) => {
+  const parsed = DraftConfig.safeParse(value);
+  return parsed.success && canonical(value) === canonical(parsed.data)
+    ? value
+    : undefined;
+}, DraftConfig);
 const SourceIdentity = z.strictObject({
   id: z.uuid(),
   revision: z.int().positive(),
@@ -44,7 +52,7 @@ const Facts = z.strictObject({
     id: z.uuid(),
     compiledHash: Hash,
     pipelineHash: Hash,
-    configuration: DraftConfig,
+    configuration: StoredConfiguration,
     compiledPrefix: z.string().max(262144),
     sourceSet: z.array(SourceIdentity).max(1000),
   }),

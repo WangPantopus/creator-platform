@@ -6,4 +6,6 @@ API: PreparedGenerationAgentInputs.prepare({identity,workerPool,service,consumer
 
 Actual copied canonical57 rehearsal installed unregistered0072/0096, then refused no-current-scope, raw compiled read, raw scope read and interactive worker-wrapper calls with42501; no accepted job/provider/private content was manufactured. Live40 schema/ledger stays unchanged; only isolated owned-cluster purpose roles were created. Backend typecheck/lint/format/module graph and18 existing tests pass; unchanged T11 took45781ms. [Source/SQL/ACL receipt](closed-readers-receipt.json).
 
-This checkpoint does not activate generation. W1 final owner-parser publication, W8 executable0093/0096 review/registration, W4 actual purpose audience/passages, W5 content origins, W3 context/output/memory/terminal custody and0097 all-attempt admission remain in progress. Current key/production decisions remain separately gated.
+This checkpoint does not activate generation. W1 owner parser is consumed from published dcb77f23 with all exact-definition/role/private-client guards retained. W8 executable0093/0096 review/registration, W4 actual purpose audience/passages, W5 content origins, W3 context/output/memory/terminal custody and0097 all-attempt admission remain in progress. Current key/production decisions remain separately gated.
+
+[Published owner-contract correction](published-owner-contract.json) supersedes the earlier pending parser note. Stored configuration default reinterpretation now refuses; 0096 SQL bytes remain25f89…unchanged.
