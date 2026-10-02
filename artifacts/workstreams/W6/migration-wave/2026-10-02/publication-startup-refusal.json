@@ -1,10 +1,12 @@
 {
-  "at": "2026-10-02T08:36:17.200Z",
+  "at": "2026-10-02T08:45:37.075Z",
   "database": "creator_w6_wave_fresh_20261002",
   "appliedLedgerRows": 57,
   "actualRoleStartup": "refused",
   "code": "publication_schema_unconfigured",
   "futurePurposeActivated": false,
+  "futurePurposeEntries": 0,
   "publications": 0,
+  "verification": "actual role startup plus administrator metadata reads of the labelled local database",
   "positivePublicationAccepted": false
 }

@@ -103,13 +103,14 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
                 try { ZoneId.of(zone); windows.forEach { instant(it.startsAt); instant(it.endsAt) } }
                 catch (_: Exception) { notice = QelvoraCopy.text("w6UseISOTimesWithAnExplicitUTCOffsetForEach"); return }
                 val version = current?.version ?: 0
-                val rows = JSONArray(windows.map { JSONObject().put("startsAt", it.startsAt).put("endsAt", it.endsAt) })
-                command = AvailabilitySave(version, zone, windows.toList(), JSONObject().put("timeZone", zone).put("windows", rows).put("expectedVersion", version).put("idempotencyKey", UUID.randomUUID().toString()).toString())
+                val normalized = windows.map { AvailabilityWindow(instant(it.startsAt).toString(), instant(it.endsAt).toString()) }
+                val rows = JSONArray(normalized.map { JSONObject().put("startsAt", it.startsAt).put("endsAt", it.endsAt) })
+                command = AvailabilitySave(version, zone, normalized, JSONObject().put("timeZone", zone).put("windows", rows).put("expectedVersion", version).put("idempotencyKey", UUID.randomUUID().toString()).toString())
             }
             val sent = command ?: return
             val value = decode(api.request(root, "PUT", sent.body.toByteArray(), expectedAccountId = account)) ?: error("receipt_required")
             val normalized = sent.windows.sortedBy { instant(it.startsAt) }
-            require(value.version == sent.version + 1 && value.zone == sent.zone && value.windows.size == normalized.size &&
+            require(value.version == sent.version + 1 && ZoneId.of(value.zone).rules == ZoneId.of(sent.zone).rules && value.windows.size == normalized.size &&
                 value.windows.zip(normalized).all { (a, b) -> instant(a.startsAt) == instant(b.startsAt) && instant(a.endsAt) == instant(b.endsAt) })
             if (!active) return
             command = null; current = value; zone = value.zone; windows = value.windows; freshUntil = android.os.SystemClock.elapsedRealtime() + 5000; fresh = true; notice = QelvoraCopy.text("w6AvailabilitySaved")

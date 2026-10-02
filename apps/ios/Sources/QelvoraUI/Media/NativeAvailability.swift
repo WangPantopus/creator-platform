@@ -67,8 +67,14 @@ private struct NativeAvailability: View {
         loaded && (zone != (current?.timeZone ?? TimeZone.current.identifier) || windows != (current?.windows ?? []))
     }
     private func instant(_ value: String) -> Date? {
+        guard value.range(of: #"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$"#, options: .regularExpression) != nil else { return nil }
+        let withSeconds = value.replacingOccurrences(of: #"(T\d{2}:\d{2})(?=Z|[+-])"#, with: "$1:00", options: .regularExpression)
         let format = ISO8601DateFormatter(); format.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return format.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+        return format.date(from: withSeconds) ?? ISO8601DateFormatter().date(from: withSeconds)
+    }
+    private func sameZone(_ returned: String, _ sent: String) -> Bool {
+        guard let first = NSTimeZone(name: returned), let second = NSTimeZone(name: sent) else { return false }
+        return returned == sent || first.data == second.data
     }
     private func read(replace: Bool) async {
         guard !busy, scene == .active, let client, let actor = UUID(uuidString: account) else { return }
@@ -99,13 +105,15 @@ private struct NativeAvailability: View {
                       windows.allSatisfy({ instant($0.startsAt) != nil && instant($0.endsAt) != nil }) else {
                     notice = QelvoraCopy.text("w6UseISOTimesWithAnExplicitUTCOffsetForEach"); return
                 }
-                command = AvailabilitySave(timeZone: zone, windows: windows, expectedVersion: current?.version ?? 0, idempotencyKey: UUID().uuidString)
+                let format = ISO8601DateFormatter(); format.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                let normalized = windows.map { AvailabilityWindow(startsAt: format.string(from: instant($0.startsAt)!), endsAt: format.string(from: instant($0.endsAt)!)) }
+                command = AvailabilitySave(timeZone: zone, windows: normalized, expectedVersion: current?.version ?? 0, idempotencyKey: UUID().uuidString)
             }
             guard let sent = command else { return }
             let bytes = try await client.request(path: root, method: "PUT", body: JSONEncoder().encode(sent), expectedAccountId: actor)
             let value = try JSONDecoder().decode(SavedAvailability.self, from: bytes)
             let normalized = sent.windows.sorted { instant($0.startsAt)! < instant($1.startsAt)! }
-            guard value.creatorId == creator, value.version == sent.expectedVersion + 1, value.timeZone == sent.timeZone,
+            guard value.creatorId == creator, value.version == sent.expectedVersion + 1, sameZone(value.timeZone, sent.timeZone),
                   value.windows.count == normalized.count, zip(value.windows, normalized).allSatisfy({ pair in instant(pair.0.startsAt) == instant(pair.1.startsAt) && instant(pair.0.endsAt) == instant(pair.1.endsAt) }) else { throw URLError(.badServerResponse) }
             try Task.checkCancellation()
             guard scene == .active else { return }
