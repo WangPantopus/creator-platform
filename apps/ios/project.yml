@@ -14,6 +14,8 @@ targets:
     info:
       path: App/Info.plist
       properties:
+        CreatorAPIURL: $(CREATOR_API_URL)
+        CreatorLinkHost: $(CREATOR_LINK_HOST)
         NSMicrophoneUsageDescription: Record a voice note you choose to send.
         CFBundleURLTypes:
           - CFBundleURLName: local-development-entry
@@ -22,6 +24,8 @@ targets:
           NSAllowsLocalNetworking: true
     settings:
       base:
+        CREATOR_API_URL: ""
+        CREATOR_LINK_HOST: ""
         PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Qelvora

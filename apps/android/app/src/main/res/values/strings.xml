@@ -3,6 +3,57 @@
 <resources>
   <string name="app_name">Qelvora</string>
   <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
+  <string name="identity_profile_save_failed" formatted="false">Could not save. Try again.</string>
+  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
+  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
+  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_team_access_title" formatted="false">Current team access</string>
+  <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
+  <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
+  <string name="identity_verification_invalid_link" formatted="false">This verification link is invalid.</string>
+  <string name="identity_verification_missing" formatted="false">This signed act could not be found.</string>
+  <string name="identity_verification_unavailable_title" formatted="false">Verification unavailable</string>
+  <string name="identity_verification_signed_unavailable_title" formatted="false">Signed act unavailable</string>
+  <string name="identity_verification_checking_title" formatted="false">Checking signature</string>
+  <string name="identity_verification_loading" formatted="false">Loading the current public verification.</string>
+  <string name="identity_verification_unconfigured" formatted="false">Verification is unavailable in this app. Try again when the connection is available.</string>
+  <string name="identity_verification_failed" formatted="false">Reconnect and try again. Verification could not be checked.</string>
+  <string name="identity_verification_historical_unavailable" formatted="false">The historical approval remains recorded. Current authority is unavailable.</string>
+  <string name="identity_verification_withdrawn_content_title" formatted="false">Content withdrawn</string>
+  <string name="identity_verification_withdrawn_content" formatted="false">The content is no longer public. Signature metadata remains available.</string>
+  <string name="identity_verification_metadata_title" formatted="false">Signed act metadata</string>
+  <string name="identity_verification_metadata_notice" formatted="false">Open the original authorized object to view this act. This page shows its signature metadata.</string>
+  <string name="identity_verification_private_title" formatted="false">Private signed act</string>
+  <string name="identity_verification_private_notice" formatted="false">The act’s private content and conversation are not public. This page shows signature metadata.</string>
+  <string name="identity_verification_author" formatted="false">Author</string>
+  <string name="identity_verification_act" formatted="false">Act</string>
+  <string name="identity_verification_content_version" formatted="false">Signed content version</string>
+  <string name="identity_verification_written_by" formatted="false">Written by</string>
+  <string name="identity_verification_approved_author" formatted="false">AI draft · creator approved</string>
+  <string name="identity_verification_authorized_only" formatted="false">Shown only with authorized content</string>
+  <string name="identity_verification_signed" formatted="false">Signed</string>
+  <string name="identity_verification_status" formatted="false">Status</string>
+  <string name="identity_verification_valid" formatted="false">Valid when checked</string>
+  <string name="identity_verification_key_revoked" formatted="false">Signing key revoked</string>
+  <string name="identity_verification_creator_revoked" formatted="false">Creator verification revoked</string>
+  <string name="identity_verification_withdrawn" formatted="false">This card was withdrawn</string>
+  <string name="identity_verification_shared_by" formatted="false">Shared by</string>
+  <string name="identity_verification_not_disclosed" formatted="false">Not disclosed</string>
+  <string name="identity_verification_hash" formatted="false">Exact act hash · SHA-256
+{hash}</string>
+  <string name="identity_verification_public_notice" formatted="false">Anyone can open this page. It shows authorized content, signature provenance and the revocation status when checked, with nothing else from the conversation.</string>
+  <string name="identity_verification_refresh" formatted="false">Refresh verification</string>
+  <string name="identity_verification_act_reply" formatted="false">Reply</string>
+  <string name="identity_verification_act_approved" formatted="false">Approved AI draft</string>
+  <string name="identity_verification_act_note" formatted="false">Note · one-to-many</string>
+  <string name="identity_verification_act_reaction" formatted="false">Reaction</string>
+  <string name="identity_verification_act_acceptance" formatted="false">Acceptance</string>
+  <string name="identity_verification_act_correction" formatted="false">Correction</string>
+  <string name="identity_verification_act_other" formatted="false">Signed act</string>
+  <string name="creator_interview_estimate" formatted="false">About 20 minutes for your interview</string>
   <string name="welcome_title" formatted="false">Her AI answers you now. She answers in person when you ask.</string>
   <string name="welcome_body" formatted="false">Every message says who wrote it: Maya\'s AI, Maya herself, or her team. You\'ll always know which.</string>
   <string name="pantopus_account" formatted="false">One Pantopus account signs you in to every Pantopus app. New here? You\'ll create it in the next step.</string>
@@ -64,6 +115,12 @@
   <string name="welcome_context" formatted="false">Maya · Ceramics · Kiln Club</string>
   <string name="pantopus_unavailable" formatted="false">Pantopus sign-in is not connected in this local build.</string>
   <string name="pantopus_unavailable_title" formatted="false">Pantopus sign-in is unavailable</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="adult_only_title" formatted="false">This app is for adults</string>
+  <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>
@@ -192,6 +249,8 @@
   <string name="written_by" formatted="false">Written by {name}</string>
   <string name="monthly_limit_legend" formatted="false">Monthly limit for requests and memberships</string>
   <string name="limit_reminders" formatted="false">Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="no_limit" formatted="false">No limit</string>
   <string name="nav_chat" formatted="false">Chat</string>
   <string name="nav_posts" formatted="false">Posts</string>
@@ -282,6 +341,17 @@
   <string name="growth_preferences_were_not_saved" formatted="false">Preferences were not saved.</string>
   <string name="growth_your_in_app_notification_record_cannot_be_turned_off_push" formatted="false">Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.</string>
   <string name="growth_push_notifications" formatted="false">Push notifications</string>
+  <string name="growth_device_push_heading" formatted="false">Notifications on this device</string>
+  <string name="growth_device_push_allow" formatted="false">Allow notifications on this device</string>
+  <string name="growth_device_push_open_settings" formatted="false">Open notification settings</string>
+  <string name="growth_device_push_unavailable" formatted="false">Push delivery is not enabled for this app. Your in-app notifications remain available.</string>
+  <string name="growth_device_push_unknown" formatted="false">Device permission is unavailable. Check notification settings.</string>
+  <string name="growth_device_push_not_requested" formatted="false">Choose whether this device may show notifications. Your account preferences apply separately.</string>
+  <string name="growth_device_push_denied" formatted="false">Notifications are blocked in device settings. Your in-app record remains available.</string>
+  <string name="growth_device_push_granted" formatted="false">This device allows notifications. Your account preferences and quiet hours still apply.</string>
+  <string name="growth_device_push_quiet" formatted="false">This device allows quiet notifications. You can change their presentation in device settings.</string>
+  <string name="growth_device_push_permission_failed" formatted="false">Device permission could not be read. Try again in notification settings.</string>
+  <string name="growth_device_push_registration_failed" formatted="false">Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.</string>
   <string name="growth_email_digest" formatted="false">Email digest</string>
   <string name="growth_hide_sensitive_previews" formatted="false">Hide sensitive previews</string>
   <string name="growth_quiet_hours" formatted="false">Quiet hours</string>
@@ -355,6 +425,8 @@
   <string name="growth_discover_creators" formatted="false">Discover creators</string>
   <string name="growth_new_from_people_you_follow" formatted="false">New from people you follow</string>
   <string name="growth_latest_first" formatted="false">Latest first.</string>
+  <string name="growth_more_creators" formatted="false">More creators</string>
+  <string name="growth_first_page" formatted="false">First page</string>
   <string name="growth_an_invitation_from" formatted="false">AN INVITATION FROM {value1}</string>
   <string name="growth_s_ai_can_help_you_keep_going" formatted="false">{value1}\'s AI can help you keep going.</string>
   <string name="growth_accept_invitation" formatted="false">Accept invitation</string>
@@ -884,4 +956,6 @@
   <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
   <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
+  <string name="growth_download_complete_reply" formatted="false">Download complete reply</string>
+  <string name="growth_share_complete_reply" formatted="false">Share complete reply</string>
 </resources>

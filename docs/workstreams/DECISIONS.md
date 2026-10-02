@@ -6,7 +6,23 @@ These are implementation/release dependencies, not requests for the founder to a
 
 Node.js/TypeScript backend, Next.js web, native Swift iOS and Kotlin Android; standalone creator-platform now and Pantopus integration later; exact supplied appearance; replaceable Qelvora name; full build with membership first, human voice before AI voice, pass after sufficient roster; no new test code/coverage in this phase; actual browser/simulator/emulator verification. Older source references to Expo, a thin unselling native shell, five lifetime trial messages, auto-reply after twenty approvals, or a proof-only build do not reopen those choices.
 
+## W1 source conflicts resolved — October 1, 2026
+
+Under the founder's explicit authorization to decide routine UX/security details, W1 follows behavioral-source precedence for DI09 and the interview-duration conflict. Product Design S-F1/S-F5 defers the optional intro offer until after the first useful answer; initial Handle therefore collects only a pseudonymous handle. Existing profiles retain the optional intro editor through You/Account, and per-creator AI use remains a separate explicit choice. Initial profile creation sends an empty intro; hidden input cannot silently become consent. The real later one-time thread offer remains an uncompleted W3/W1 integration, with no generation or participant result inferred.
+
+Product Design S-C14, Second Review A10 and BRIEF S-C14 consistently specify about 20 minutes for the optional voice/text interview. The live setup rail uses that estimate. It adds no timer, required-duration gate or promise of completion, and imported-source-only setup remains valid under the producer's policy. The artboard's 15-minute sample label and all original references remain unchanged.
+
+These decisions resolve timing/copy, not genuine identity, legal terms, native Studio scope, screen-reader/device acceptance or Q12 study thresholds. Actual browser and compiler evidence is recorded with the implementation; native control is currently disabled.
+
 ## Required decisions and confirmation points
+
+### W1 credential issuer and recovery — October 1 completion run
+
+Stored native session credentials bind to one canonical root API origin (scheme, lowercased host and effective port). Keychain/Keystore namespaces separate issuers; Android encryption also authenticates the origin. The previous unbound credential cannot prove its issuer, so the upgrade requires reauthorization rather than migrating it. Existing device-only custody, purge fences and one-use rotation remain; Android persists a completed bounded rotation through foreground cancellation. Actual device isolation/purge/foreground acceptance remains outstanding.
+
+Web refresh transport/non-401 failures preserve the saved credential and registered destination on an explicit recovery page. A completed rotation is persisted even if its following session read fails. Personally operated production-bundle local development journeys verify outage Retry and a cancelled real refresh UPDATE followed by Retry. This verifies recovery behavior, not production identity or release origin configuration.
+
+Participant RLS receives transaction-local `app.identity_session_id` only after `assertCurrentSession` validates and holds the actual request session. The value clears with its transaction and adds no worker session/Actor fallback. Actual non-owner diagnostics cover current, expired and mismatched sessions. Background work requires a separate purpose issuer, durable tuple proof and held domain restrictions; an interactive account ID is never sufficient.
 
 | ID | Decision / unresolved input | Owner | Needed before | Work that continues meanwhile |
 | --- | --- | --- | --- | --- |
@@ -54,3 +70,16 @@ A gap entry records requirement/source, owner, affected platforms, proposed reus
 Resolve exact typed boundaries before parallel consumers diverge: `Approval` owner and invalidation, `ShareGrant` dual consent/revocation, stable current-authorization/grant versions, allowance transaction participation, packet-vs-thread audit, call acceptance timing, immutable signed original versus translated display, Note fan-out ordering, domain-wide outbox beyond the thread log, and privacy job completion receipts. See [CONTRACTS](CONTRACTS.md) and backend research for proposed ownership.
 
 The immediate planning work raises no blocking question: these owners can start useful, reversible implementation with the established decisions. A release may remain blocked for specific inputs even while its feature development is complete; record that distinction explicitly.
+
+
+### W1 — separate Growth/content API pool (October 2, 2026)
+
+The canonical core connection stays non-owner `creator_runtime` NOINHERIT for identity, Conversation, Agent and Trust. Growth and W5 follower-content transactions use an explicit same-database `GROWTH_API_DATABASE_URL` pool, inheriting only `creator_runtime` and `growth_runtime`. This preserves the actual follow row lock through the content transaction; a Boolean obtained from a released second connection cannot provide that guarantee. The root rejects a shared core login, another database, additional reachable roles, owner/bypass/create-role privileges and direct private relation/column/function grants. Disabled Growth allocates no extra pool. Startup failure and shutdown close the owned pool without logging URLs or credentials. Negative probes against W1's actual non-owner core connection pass; positive role/readiness and configured application journeys await reviewed role/schema composition.
+
+### W1 — purpose policies and issuer-bound push (October 2, 2026)
+
+0071 normalizes only existing PUBLIC content policies, preserving every named purpose role added by earlier migrations. W8 identified that normalizing all policies would break0069 reply-review metadata. Scope expiry uses wall-clock time, since transaction `now()` cannot measure a long callback's age. Integrated native push consumers bind credential reads to their API issuer; Android also refuses a captured credential from another issuer before unregistering remotely. Local notification cancellation still occurs during private cleanup. No push provider/device permission or delivery success is fabricated.
+
+### W1 October 2 — saved spending-reminder truth
+
+Shared SpendLimit accepts saved remindersOn=true/false/null. True preserves the supplied on-state copy, false says reminders are off, and missing/unknown state promises only immediate lower limits. Unsaved form toggles must not claim persisted reminder delivery. Original supplied preview fixtures explicitly pass true; reference source/images and comparison limits remain intact. Both native shipping consumers compile with backward-compatible defaults. W1 also contains Android foreground secure-storage reads inside the existing refresh failure/purge path and repairs its duplicate Swift Growth navigation merge argument. Actual Android rotation, cold restore, sign-out and under-18 denial evidence is qualified separately from compilation and full W1 acceptance.

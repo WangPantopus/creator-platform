@@ -26,7 +26,7 @@ private struct NativeCallOffer: Decodable, Sendable {
     @State private var submission: (slot: String, version: Int, key: String)?
     init(baseURL: URL?, destination: String, fanID: String?, open: @escaping (String) -> Void) {
         route = NativeCallRoute(destination: destination); self.fanID = fanID; self.open = open
-        client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
+        client = baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: { guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
     }
     private var root: String? { route.map { "/v1/w6/threads/\($0.creatorID.uuidString.lowercased())/\($0.fanID.uuidString.lowercased())/call-offers" } }
     private var canSelect: Bool { fanID?.lowercased() == route?.fanID.uuidString.lowercased() }

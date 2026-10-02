@@ -156,6 +156,9 @@ export interface DeliveryProvider {
     accountId: string;
     notificationId: string;
     idempotencyKey: string;
+    /** Actual held email delivery lease, used for durable provider receipts. */
+    deliveryIds?: string[];
+    leaseId?: string;
     sender: string;
     preview: string;
     destination: string;
@@ -174,6 +177,12 @@ export class DeliveryFailure extends Error {
     readonly permanent = false,
   ) {
     super("delivery_unavailable");
+  }
+}
+/** A bounded device batch made durable progress; it did not fail delivery. */
+export class DeliveryProgress extends Error {
+  constructor() {
+    super("delivery_pending_devices");
   }
 }
 class QuietDelivery extends DeliveryFailure {
@@ -298,19 +307,24 @@ export class Notifications {
     });
   }
   async drain(limit = 25) {
-    const leaseId = randomUUID();
-    const jobs = await this.db.transaction(
-      this.db.worker,
-      async (client) =>
-        (
-          await client.query(
-            `WITH picked AS (SELECT id FROM growth.delivery WHERE channel='push' AND ((state='queued' AND available_at<=now()) OR (state='leased' AND lease_until<now())) ORDER BY available_at LIMIT $1 FOR UPDATE SKIP LOCKED)
+    const boundedLimit = Math.min(Math.max(limit, 1), 100);
+    let claimed = 0;
+    for (let batch = 0; batch < boundedLimit; batch++) {
+      const leaseId = randomUUID();
+      const jobs = await this.db.transaction(
+        this.db.worker,
+        async (client) =>
+          (
+            await client.query(
+              `WITH picked AS (SELECT id FROM growth.delivery WHERE channel='push' AND ((state='queued' AND available_at<=now()) OR (state='leased' AND lease_until<now())) ORDER BY available_at LIMIT $1 FOR UPDATE SKIP LOCKED)
       UPDATE growth.delivery d SET state='leased',lease_until=now()+interval '60 seconds',lease_id=$2,attempts=attempts+1 FROM picked WHERE d.id=picked.id RETURNING d.*`,
-            [Math.min(Math.max(limit, 1), 100), leaseId],
-          )
-        ).rows,
-    );
-    for (const job of jobs) {
+              [1, leaseId],
+            )
+          ).rows,
+      );
+      const job = jobs[0];
+      if (!job) break;
+      claimed++;
       try {
         const result = await this.db.worker.query(
           `SELECT n.*,e.envelope,p.document AS preference FROM growth.notification n JOIN growth.event_inbox e ON e.id=n.event_id LEFT JOIN growth.preference p ON p.account_id=n.account_id WHERE n.id=$1`,
@@ -362,7 +376,7 @@ export class Notifications {
           if (
             !(
               await client.query(
-                "SELECT 1 FROM growth.delivery WHERE id=$1 AND lease_id=$2 AND state='leased'",
+                "SELECT 1 FROM growth.delivery WHERE id=$1 AND lease_id=$2 AND state='leased' AND lease_until>clock_timestamp() FOR NO KEY UPDATE",
                 [job.id, leaseId],
               )
             ).rowCount
@@ -415,8 +429,15 @@ export class Notifications {
           );
         });
       } catch (error) {
+        if (error instanceof DeliveryProgress) {
+          await this.db.worker.query(
+            "UPDATE growth.delivery SET state='queued',attempts=greatest(0,attempts-1),available_at=now()+interval '1 second',lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+            [job.id, leaseId],
+          );
+          continue;
+        }
         await this.db.worker.query(
-          "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2",
+          "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2 AND state='leased'",
           [
             job.id,
             leaseId,
@@ -433,9 +454,7 @@ export class Notifications {
       }
     }
     return {
-      claimed:
-        jobs.length +
-        (await this.drainEmail(Math.min(Math.max(limit, 1), 100))),
+      claimed: claimed + (await this.drainEmail(boundedLimit)),
     };
   }
   private async drainEmail(limit: number) {
@@ -525,7 +544,7 @@ export class Notifications {
         await this.db.transaction(this.db.worker, async (client) => {
           await this.erasure.lockEvents(client, eligibleEvents);
           const current = await client.query(
-            "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
+            "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased' AND lease_until>clock_timestamp() FOR NO KEY UPDATE",
             [eligible.map((job) => job.id), leaseId],
           );
           // Purge may have completed while owners were being read. Rebuild on the next lease.
@@ -570,6 +589,8 @@ export class Notifications {
             accountId: jobs[0]!.account_id,
             notificationId: sendingJobs[0]!.notification_id,
             idempotencyKey: jobs[0]!.digest_id,
+            deliveryIds: sendingJobs.map((job) => job.id),
+            leaseId,
             sender: copy.growthYourUpdates,
             preview: first.preview,
             destination: "/notifications",
@@ -651,6 +672,8 @@ export class Notifications {
       const current = state.available ? present(event.type, state) : null;
       output.push({
         id: row.id,
+        available: Boolean(current),
+        creatorId: event.creatorId,
         type: row.type,
         sender: current?.sender ?? row.sender,
         authorKind: state.available ? state.authorKind : "system",

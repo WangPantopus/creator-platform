@@ -494,7 +494,10 @@ for (const [relative, content] of outputs) {
       console.error(`Generated file is stale: ${relative}`);
       process.exitCode = 1;
     }
-  } else {
+  } else if (
+    !fs.existsSync(destination) ||
+    fs.readFileSync(destination, "utf8") !== content
+  ) {
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.writeFileSync(destination, content);
   }

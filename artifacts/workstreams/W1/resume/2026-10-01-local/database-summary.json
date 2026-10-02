@@ -1,0 +1,24 @@
+{
+  "recordedAt": "2026-10-01T09:22:44.368Z",
+  "database": "creator_w1_resume_20261001",
+  "provenance": "Fresh canonical development state. No recovery export or peer database was restored.",
+  "role": {
+    "rolname": "creator_runtime",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false
+  },
+  "state": {
+    "migrations": 40,
+    "checksums": 40,
+    "fans": 2,
+    "pendingcreatordrafts": 2,
+    "verifiedcreators": 0,
+    "proofchallenges": 1,
+    "submittedorreviewedproofs": 0,
+    "keys": 0,
+    "signedacts": 0
+  }
+}

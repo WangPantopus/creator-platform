@@ -66,7 +66,9 @@ export function IdentityWelcome({
                     ? "Sign-in request expired"
                     : error === "continuation_failed"
                       ? "Sign-in could not complete"
-                      : copy.pantopusUnavailableTitle
+                      : error === "adult_eligibility_required"
+                        ? copy.adultOnlyTitle
+                        : copy.pantopusUnavailableTitle
               }
             >
               {error === "invalid_return"
@@ -74,7 +76,9 @@ export function IdentityWelcome({
                 : error === "continuation_expired" ||
                     error === "continuation_failed"
                   ? "Start again to return to your saved destination."
-                  : copy.pantopusUnavailable}
+                  : error === "adult_eligibility_required"
+                    ? copy.adultOnlyBody
+                    : copy.pantopusUnavailable}
             </Notice>
           </div>
         )}

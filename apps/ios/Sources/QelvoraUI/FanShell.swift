@@ -11,6 +11,8 @@ public final class FanSession: ObservableObject {
     @Published public var choosingDevelopmentActor = false
     @Published public private(set) var arrival: ArrivalContext?
     @Published public private(set) var actors: [APIIdentityCapabilitiesDevelopmentActorsItem] = []
+    @Published public private(set) var localPurgeFailed = false
+    @Published public private(set) var purgingPrivateState = false
     public let api: CreatorAPIClient?
     private let storage: SecureSessionStorage
     private let baseURL: URL?
@@ -20,7 +22,7 @@ public final class FanSession: ObservableObject {
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
         self.baseURL = baseURL
-        storage = SecureSessionStorage()
+        storage = SecureSessionStorage(issuer: baseURL)
         if let baseURL { let credentials = storage; api = CreatorAPIClient(baseURL: baseURL, token: { try await credentials.read() }) } else { api = nil }
     }
     public func loadArrival() async {
@@ -36,30 +38,43 @@ public final class FanSession: ObservableObject {
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
-        guard let api, !rotatingCredential else { return }
+        guard let api, !rotatingCredential, !purgingPrivateState, !Task.isCancelled else { return }
         let current = generation
+        let token: String?
+        do { token = try await storage.read() }
+        catch {
+            guard current == generation, !Task.isCancelled else { return }
+            if await purge() { self.error = QelvoraCopy.text("identitySessionReadFailed") }
+            return
+        }
+        guard current == generation, !Task.isCancelled else { return }
+        guard token != nil else { if session != nil { await purge() }; return }
         do {
-            guard try await storage.read() != nil else { session = nil; return }
             let value = try await api.identitySession()
-            guard current == generation else { return }
-            if let previous = session, previous.accountId != value.accountId { await purge(); error = "The account changed. Continue with Pantopus again."; return }
+            guard current == generation, !Task.isCancelled else { return }
+            if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
+            #if os(iOS)
+            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL)
+            #endif
         } catch let failure as CreatorAPIError {
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             if failure.status == 401 {
                 if !busy { await refreshCredentials() }
-                else { await purge(); error = "Your session ended. Continue with Pantopus again." }
+                else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
-        } catch { guard current == generation else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        } catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
+        if localPurgeFailed, !(await purge()) { return }
         guard let api else { error = QelvoraCopy.text("pantopusUnavailable"); return }
         do {
             let capabilities = try await api.identityCapabilities()
+            guard capabilities.signInAvailable else { error = QelvoraCopy.text("pantopusUnavailable"); return }
             #if DEBUG
-            if capabilities.mode == .development { actors = capabilities.developmentActors ?? []; choosingDevelopmentActor = true; return }
+            if capabilities.mode == .development, let available = capabilities.developmentActors, !available.isEmpty { actors = available; choosingDevelopmentActor = true; return }
             #endif
             error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
         } catch { self.error = "Sign-in is unavailable. Reconnect and try again." }
@@ -71,7 +86,11 @@ public final class FanSession: ObservableObject {
             let continuation = try await api.continueWithPantopus(body: APIIdentityContinue(returnTo: destination))
             guard let challenge = continuation.continuationId else { throw URLError(.badServerResponse) }
             let result = try await api.completeIdentity(body: APICompleteIdentity(continuationId: challenge, code: id))
-            await purge(); try await storage.save(result.token)
+            guard await purge(), !Task.isCancelled else { return }
+            let installing = generation
+            do { try await storage.save(result.token) }
+            catch { guard installing == generation else { return }; if await purge() { self.error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
         } catch { self.error = Self.message(error) }
@@ -90,12 +109,59 @@ public final class FanSession: ObservableObject {
         catch { self.error = "Sign-out could not reach the server. Retry to revoke the session." }
     }
     public func refreshCredentials() async {
-        guard let api, !busy else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
-        do { let result = try await api.refreshSession(); guard current == generation else { return }; try await storage.save(result.token); generation += 1; rotatingCredential = false; await refresh() }
-        catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { await purge() }; error = Self.message(failure) }
-        catch { self.error = "Session refresh could not complete. Reconnect and try again." }
+        guard let api, !busy, !Task.isCancelled else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
+        do {
+            let previous = try await storage.read()
+            guard current == generation, !Task.isCancelled else { return }
+            guard let previous else { await purge(); return }
+            let result = try await api.refreshSession()
+            // Persist a completed rotation even if its foreground read was cancelled.
+            guard current == generation else { return }
+            do { try await storage.save(result.token, replacing: previous) }
+            catch { guard current == generation else { return }; if await purge() { self.error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            guard current == generation else { return }
+            generation += 1; rotatingCredential = false; await refresh()
+        }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
     }
-    public func purge() async { generation += 1; session = nil; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
+    @discardableResult public func purge() async -> Bool {
+        guard !purgingPrivateState else { return false }
+        purgingPrivateState = true; localPurgeFailed = true
+        defer { purgingPrivateState = false }
+        generation += 1; session = nil; actors = []; choosingDevelopmentActor = false; error = ""
+        URLCache.shared.removeAllCachedResponses()
+        #if os(iOS)
+        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
+        #endif
+        var cleared = true
+        do { try await storage.save(nil) } catch { cleared = false }
+        do { try await W3FanFeatures.clearPrivateState() } catch { cleared = false }
+        localPurgeFailed = !cleared
+        if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
+        return cleared
+    }
+    #if os(iOS)
+    func openNotification(_ id: UUID) async -> Bool {
+        guard let baseURL, let active = session else { open("/notifications"); return false }
+        let snapshot = generation
+        do {
+            guard let credential = try await storage.read() else { return false }
+            let target = try await GrowthClient(baseURL: baseURL).notificationDestination(id: id, expectedSession: credential)
+            guard !Task.isCancelled, snapshot == generation, session?.sessionId == active.sessionId else { return false }
+            open(target)
+            return true
+        } catch let failure as GrowthRequestFailure {
+            guard !Task.isCancelled, snapshot == generation else { return false }
+            open("/notifications"); error = failure.message
+            return [403, 404, 410].contains(failure.status)
+        } catch {
+            guard !Task.isCancelled, snapshot == generation else { return false }
+            open("/notifications"); self.error = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")
+            return false
+        }
+    }
+    #endif
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
@@ -111,13 +177,22 @@ public struct FanFeatureRegistration {
 
 public struct FanAppShell: View {
     @StateObject private var model: FanSession
+    @State private var destinationDelivery = UUID()
     private let features: [FanFeatureRegistration]
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.scenePhase) private var scenePhase
+    #if os(iOS)
+    @ObservedObject private var push = GrowthPushCoordinator.shared
+    @State private var notificationArrivalRevision = 0
+    #endif
     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
     public var body: some View {
         VStack(spacing: 0) {
             if !model.error.isEmpty {
               Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+            }
+            if model.localPurgeFailed {
+                Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
             }
             if model.choosingDevelopmentActor {
                 VStack(spacing: 16) {
@@ -126,9 +201,11 @@ public struct FanAppShell: View {
                     Button("Cancel", variant: .quiet) { model.choosingDevelopmentActor = false }
                 }.padding(16)
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
-                feature.screen(model)
+                feature.screen(model).id(model.destination + destinationDelivery.uuidString)
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
+            } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
+                feature.screen(model).id((model.session?.accountId ?? "") + model.destination)
             } else if model.session?.fan == nil {
                 NativeHandleForm(model: model)
             } else {
@@ -151,20 +228,38 @@ public struct FanAppShell: View {
                             #endif
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }
             }
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task { await model.refresh(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if model.session != nil { await model.refresh() } } }
-            .task(id: model.destination) { await model.loadArrival() }
+            .task(id: scenePhase) {
+                guard scenePhase == .active else { return }
+                await model.refresh()
+                while !Task.isCancelled {
+                    do { try await Task.sleep(for: .seconds(4)) } catch { return }
+                    guard !Task.isCancelled else { return }
+                    if model.session != nil { await model.refresh() }
+                }
+            }
+            .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
+            #if os(iOS)
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { push.refreshPermission(); notificationArrivalRevision += 1 }
+            }
+            .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision)) {
+                guard let tap = push.pendingTap else { return }
+                if await model.openNotification(tap.notificationID) { push.consumed(tap); destinationDelivery = UUID() }
+            }
+            #endif
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
-                guard (components.scheme == "qelvora" && components.host == "app") || (components.scheme == "https" && associationHost != nil && components.host == associationHost) else { model.error = "This link does not belong to this app."; return }
+                guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
                 model.open(target)
+                if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
     private var tab: FanTab { FanTab.allCases.first(where: { model.destination.components(separatedBy: "?")[0] == "/" + $0.rawValue.lowercased() }) ?? .home }
@@ -190,14 +285,16 @@ struct NativeHandleForm: View {
                             handleField.qText("body").textFieldStyle(.plain).padding(.horizontal, 12).frame(minHeight: 44).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12)).overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor("control-line", scheme), lineWidth: 1)).accessibilityLabel("Public handle").accessibilityHint("A pseudonym is allowed. Three to thirty letters, numbers or underscores.")
                             Text("Creators and their teams see your handle, never your name or city unless you share them in a request.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                         }
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("A LINE ABOUT YOU · OPTIONAL").qText("data-sm")
-                            TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel("A line about you, optional").onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
-                            Text("You choose, per creator, whether their AI may use this.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
-                        }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))
+                        if model.session?.fan != nil {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("A LINE ABOUT YOU · OPTIONAL").qText("data-sm")
+                                TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel("A line about you, optional").onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
+                                Text("You choose, per creator, whether their AI may use this.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+                            }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))
+                        }
                     }
                     Spacer(minLength: 24)
-                    Button(model.busy ? "Saving…" : "Continue", variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { if await model.saveHandle(handle, intro: intro) && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
+                    Button(model.busy ? "Saving…" : "Continue", variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { if await model.saveHandle(handle, intro: model.session?.fan == nil ? "" : intro) && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
                 }.frame(minHeight: max(0, frame.size.height - 52)).padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 36)
             }
         }.onAppear { handle = model.session?.fan?.handle ?? ""; intro = model.session?.fan?.intro ?? "" }

@@ -18,6 +18,7 @@ import type {
   NotificationState,
 } from "./contracts.js";
 import type { Retention } from "./retention.js";
+import { deliveredTextCommand } from "../conversation/signed-preview.js";
 
 const unavailable: NotificationState = {
   available: false,
@@ -82,7 +83,7 @@ export function conversationGrowthSource(
             type && frame.kind === "delivered"
               ? (
                   await client.query(
-                    "SELECT sequence,delivery_state FROM creator.message WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4",
+                    "SELECT sequence,author_kind,delivery_state FROM creator.message WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4",
                     [
                       frame.messageId,
                       scope.creatorId,
@@ -95,7 +96,8 @@ export function conversationGrowthSource(
           output.push({
             id: row.id,
             event:
-              message?.delivery_state === "delivered"
+              message?.delivery_state === "delivered" &&
+              message.author_kind === frame.authorKind
                 ? {
                     id: row.id,
                     schemaVersion: 1,
@@ -145,45 +147,66 @@ export function conversationNotificationState(
       return { ...unavailable, retryable: true };
     const scope = await resolveScope(event);
     if (!scope || scope.creatorId !== event.creatorId) return unavailable;
-    return database.withThread(scope, async (client) => {
-      const fan = (
-        await client.query(
-          "SELECT account_id FROM creator.fan_profile WHERE id=$1",
-          [scope.fanId],
+    return database.withThread(
+      scope,
+      async (client) => {
+        const fan = (
+          await client.query(
+            "SELECT account_id FROM creator.fan_profile WHERE id=$1",
+            [scope.fanId],
+          )
+        ).rows[0];
+        const message = (
+          await client.query(
+            "SELECT sequence,author_kind,author_account_id,text,delivery_state,signed_act_id,signed_content_hash,to_jsonb(m)->'signed_command' AS signed_command,to_jsonb(m)->'approval_id' AS approval_id,to_jsonb(m)->'recording_asset_id' AS recording_asset_id,to_jsonb(m)->'corrects_message_id' AS corrects_message_id,to_jsonb(m)->'corrects_message_version' AS corrects_message_version FROM creator.message m WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
+            [event.aggregateId, scope.threadId, scope.creatorId, scope.fanId],
+          )
+        ).rows[0];
+        const handle = await handleFor(scope.creatorId);
+        if (!message || !handle || !/^[a-z0-9_]{3,30}$/u.test(handle))
+          return unavailable;
+        const types = {
+          ai: "ai_reply",
+          approved_draft: "approved_draft",
+          human_creator: "personal_reply",
+        } as const;
+        if (
+          types[message.author_kind as keyof typeof types] !== event.type ||
+          message.sequence !== event.aggregateVersion ||
+          recipient.role !== "fan" ||
+          recipient.accountId !== fan?.account_id ||
+          message.delivery_state !== "delivered"
         )
-      ).rows[0];
-      const message = (
-        await client.query(
-          "SELECT sequence,author_kind,text,delivery_state,signed_act_id,signed_content_hash FROM creator.message WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
-          [event.aggregateId, scope.threadId, scope.creatorId, scope.fanId],
-        )
-      ).rows[0];
-      const handle = await handleFor(scope.creatorId);
-      if (!message || !handle) return unavailable;
-      const human = message.author_kind !== "ai";
-      const signature =
-        human && message.signed_act_id
-          ? await signing.publicVerification(message.signed_act_id)
-          : null;
-      return {
-        available: true,
-        authorized:
-          recipient.role === "fan" &&
-          recipient.accountId === fan?.account_id &&
-          message.delivery_state === "delivered" &&
-          (!human ||
-            (signature?.status === "valid" &&
-              signature.contentHash === message.signed_content_hash)),
-        version: message.sequence,
-        creatorName: scope.creatorName,
-        authorKind: message.author_kind,
-        safePreview: human
-          ? copy.growthSignedConversationUpdate
-          : copy.growthAiConversationUpdate,
-        inAppPreview: message.text.slice(0, 240),
-        destination: `/creators/${handle}/chat`,
-      };
-    });
+          return unavailable;
+        const human = message.author_kind !== "ai";
+        const command = human ? deliveredTextCommand(scope, message) : null;
+        if (human && (!command || typeof message.signed_act_id !== "string"))
+          return { ...unavailable, retryable: true };
+        const signed = command
+          ? await signing.matchesThreadAct(
+              client,
+              scope,
+              message.signed_act_id,
+              command,
+            )
+          : false;
+        return {
+          available: true,
+          authorized: !human || signed,
+          version: message.sequence,
+          creatorName: scope.creatorName,
+          authorKind: message.author_kind,
+          safePreview: human
+            ? copy.growthSignedConversationUpdate
+            : copy.growthAiConversationUpdate,
+          inAppPreview: Array.from(message.text as string)
+            .slice(0, 240)
+            .join(""),
+          destination: `/creators/${handle}/chat`,
+        };
+      },
+      "read",
+    );
   };
 }
 

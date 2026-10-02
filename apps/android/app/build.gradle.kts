@@ -18,6 +18,12 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "CREATOR_API_URL", "\"${providers.gradleProperty("creatorApiUrl").getOrElse("").replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        buildConfigField("boolean", "CREATOR_PUSH_ENABLED", if (providers.gradleProperty("creatorPushEnabled").orNull == "true") "true" else "false")
+        listOf("creatorFirebaseApplicationId" to "CREATOR_FIREBASE_APPLICATION_ID", "creatorFirebaseProjectId" to "CREATOR_FIREBASE_PROJECT_ID", "creatorFirebaseSenderId" to "CREATOR_FIREBASE_SENDER_ID", "creatorFirebaseApiKey" to "CREATOR_FIREBASE_API_KEY").forEach { (property, field) ->
+            val value = providers.gradleProperty(property).getOrElse("")
+            require(!value.contains('\n') && !value.contains('\r')) { "Firebase settings must be single-line values" }
+            buildConfigField("String", field, "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
@@ -43,6 +49,7 @@ dependencies {
     implementation("androidx.credentials:credentials:1.6.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.android.billingclient:billing:9.1.0")
+    implementation("com.google.firebase:firebase-messaging:25.1.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.01"))

@@ -48,7 +48,7 @@ private struct NativeCallDocument: Decodable, Sendable {
     @State private var active = true
     public init(baseURL: URL?, destination: String, actorAccountID: String?, open: @escaping (String) -> Void = { _ in }) {
         route = NativeCallRoute(destination: destination); self.actorAccountID = actorAccountID; self.open = open
-        client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
+        client = baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: { guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
     }
     private func clock(_ milliseconds: Int) -> String { String(format: "%02d:%02d", max(0, milliseconds) / 60000, max(0, milliseconds) / 1000 % 60) }
     private func role(_ value: NativeCallDocument) -> String? { actorAccountID == value.creatorAccountId ? "creator" : actorAccountID == value.fanAccountId ? "fan" : nil }

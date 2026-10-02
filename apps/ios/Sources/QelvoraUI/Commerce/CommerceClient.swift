@@ -61,8 +61,8 @@ private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { le
 
 /// Uses the same OS credential store as FanSession. Domain state is never stored locally.
 actor CommerceClient {
-    private let baseURL: URL; private let accountId: String?; private let credentials = SecureSessionStorage()
-    init(baseURL: URL, accountId: String? = nil) { self.baseURL = baseURL; self.accountId = accountId }
+    private let baseURL: URL; private let accountId: String?; private let credentials: SecureSessionStorage
+    init(baseURL: URL, accountId: String? = nil) { self.baseURL = baseURL; credentials = SecureSessionStorage(issuer: baseURL); self.accountId = accountId }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil) async throws -> T {
         guard let token = try await credentials.read() else { throw CommerceFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/commerce/" + path))

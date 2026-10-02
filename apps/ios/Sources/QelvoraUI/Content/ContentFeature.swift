@@ -15,8 +15,8 @@ private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let
 
 private actor ContentClient {
     let baseURL: URL
-    private let storage = SecureSessionStorage()
-    init(baseURL: URL) { self.baseURL = baseURL }
+    private let storage: SecureSessionStorage
+    init(baseURL: URL) { self.baseURL = baseURL; storage = SecureSessionStorage(issuer: baseURL) }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, expectedAccountId:String? = nil) async throws -> T {
         guard let token = try await storage.read() else { throw ContentFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
         guard let url = URL(string: "v1/content/" + path, relativeTo: baseURL) else { throw URLError(.badURL) }

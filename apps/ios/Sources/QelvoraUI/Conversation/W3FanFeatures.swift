@@ -3,7 +3,12 @@ import SwiftUI
 @MainActor
 public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
-    public static func clearPrivateState() async { await W3Realtime.shared.purge(); await W3ResumeStorage.shared.purge(); await W3OfflineStorage.shared.purge() }
+    public static func clearPrivateState() async throws {
+        await W3Realtime.shared.purge()
+        do { try await W3ResumeStorage.shared.purge() }
+        catch { await W3OfflineStorage.shared.purge(); throw error }
+        await W3OfflineStorage.shared.purge()
+    }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
             let path = destination.components(separatedBy: "?")[0]

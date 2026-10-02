@@ -12,6 +12,7 @@ import {
   platformFetch,
 } from "../../../../lib/session";
 import { trustLocalSessionCookie } from "../../../../lib/trust-session";
+import { requiresFanHandle } from "../../../../lib/identity-destination";
 
 function retry(request: NextRequest, error: string) {
   const saved = ReturnTargetSchema.safeParse(
@@ -80,17 +81,18 @@ async function complete(
     );
     if (!response.ok) {
       const failure = await response.json();
+      const code = failure.error?.code;
       return retry(
         request,
-        failure.error?.code === "continuation_expired"
-          ? "continuation_expired"
+        code === "continuation_expired" || code === "adult_eligibility_required"
+          ? code
           : "continuation_failed",
       );
     }
     const result = IdentityCompletionSchema.parse(await response.json());
-    const target = result.session.fan
-      ? result.returnTo
-      : `/onboarding/handle?returnTo=${encodeURIComponent(result.returnTo)}`;
+    const target = requiresFanHandle(result.session, result.returnTo)
+      ? `/onboarding/handle?returnTo=${encodeURIComponent(result.returnTo)}`
+      : result.returnTo;
     const redirect = NextResponse.redirect(
       new URL(target, applicationOrigin(request)),
       303,

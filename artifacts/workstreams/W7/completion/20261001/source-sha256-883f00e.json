@@ -1,0 +1,32 @@
+{
+  "combinedSource": "883f00efed7a85842b54e0e204ef89d088b2c834",
+  "reviewedMain": "817940d32fdec5c16167ff52b1b6a7e11a9d10f6",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt": "f10d25609cc1dd9eb5a85514a67037af603e37a81bca0b8c91a99f6f106934f3",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt": "7edca9acd8584de80c6b8060d4867b9fe0b8c086fcc91d4c54f0eb475b7bd16a",
+    "apps/android/app/src/main/res/values/strings.xml": "ab9a4b487be2cc327dd2098ba1d3045c2d2d16756d309f2052d65eb7c3ced50a",
+    "apps/backend/src/modules/agent/development-server.ts": "b3b115e70d83a223b28ecd3e30d66bd06302644319d282a5863ab0157526fcae",
+    "apps/backend/src/modules/agent/repository.ts": "e704b5ebffe9436642bcee44b12d70d0eb86b213658a7efc3418eb543164683f",
+    "apps/backend/src/modules/growth/configured.ts": "9fa6d97d1658576358ce286b6b03cef98bc745e5497d9d1df278903314013517",
+    "apps/backend/src/modules/growth/content.ts": "e7b09dd6157fba2cce8ab7b902097cd4e7d8a918e95d4e5fe122a5ed7530ddd1",
+    "apps/backend/src/modules/growth/contracts.ts": "2bcbe064c69abb640ad2c34dfc4c211a7d5589199dec700977098d87ab86997e",
+    "apps/backend/src/modules/growth/home.ts": "6ccc6c64397e657c56459dd7961e4ecda33f7414d6530e1e37878f32afb85083",
+    "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql": "2e53d6f7b11cbe9fdae39fba17c4d99462ca1dfef62c3b804b9ec5ea51463321",
+    "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql": "bbcc1ac9e181151e5f18c279dcc873597588d6dda35f2b4410aa067506395f3b",
+    "apps/backend/src/modules/growth/router.ts": "13e48ae6150767e0f5e6af3d0a292c95ff9b242f9debb250673b15e6a843d7da",
+    "apps/backend/src/modules/growth/runtime.ts": "86cccf5db1d1c98600dac693b9fcf677993cd3def47a36311ae4f1057a53c2c2",
+    "apps/backend/src/modules/growth/service.ts": "826b3b1303e25527e18bbadac2da87cff9f780926f3c410a49b884c148aa5bef",
+    "apps/backend/src/modules/growth/sources.ts": "9f0d51904dd6bffb7b55682d9646e8226ac413b8a541a59861e31a1604d9d32d",
+    "apps/backend/src/server.ts": "de260621e365775b3bcf62dfda7d812ae0dcda5178fe31dac44ff758f286a172",
+    "apps/ios/Sources/Generated/Localizable.xcstrings": "46790c7d4ec39224fb0bb6afdbe8143956f998d6b7c18acafb7b8fd7b44168ca",
+    "apps/ios/Sources/Generated/QelvoraCopy.swift": "70110f80c520da7814c87ca90dc2b20c2d56f3f3a08b1def98f8203ca3cd6915",
+    "apps/ios/Sources/QelvoraUI/Growth.swift": "53efc14bd0e86d0fa7f2417b38ccc7c1aadb4cc0251f630ec326ae393ed8f0d9",
+    "apps/web/app/home/page.tsx": "0509986251a1182311ffa551a9a141537f32a6c8d3576766ec4d5e0b21b9b877",
+    "apps/web/app/share/[id]/export/route.ts": "4352cfb9e2c254a1968a13d013349e9c3ce621650acd1efa47bb99b311540f8d",
+    "apps/web/app/share/[id]/page.tsx": "63f3b10f9f5bc47960ad1b184e0582727124140350dab0c181111141773721fa",
+    "apps/web/features/creator-ai/CreatorAI.tsx": "ac9605db7fcbe08790d0e746eef69721ef59cff042becaa7258518edd9c919a0",
+    "apps/web/features/growth/growth.css": "842686be439a04ba1f46efc5168932ce42216139ee9312c9fabf2541bf026fbc",
+    "config/copy.json": "d8d771536e937bb1837c1437990175ef2fac2c572b4ee8d0e7dc877789361cb2",
+    "packages/copy/src/index.ts": "ff819b963393a26663d1adb84306a76449076e25430220f5e0d5004e97cc0f41"
+  }
+}

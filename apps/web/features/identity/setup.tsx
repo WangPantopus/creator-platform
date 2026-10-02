@@ -1,10 +1,21 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { brand } from "@qelvora/brand";
+import { copy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
 import { ProofSchema, type Session } from "@qelvora/api";
 import { registerPasskey } from "./passkey";
 import { useIdentityRequest } from "./session-boundary";
+
+class IdentityActionError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+  }
+}
 
 async function identityAction(
   request: ReturnType<typeof useIdentityRequest>["request"],
@@ -17,10 +28,20 @@ async function identityAction(
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     cache: "no-store",
     signal: AbortSignal.timeout(10000),
+  }).catch(() => {
+    throw new IdentityActionError(
+      copy.identityInputKeptUnavailable,
+      503,
+      "service_unavailable",
+    );
   });
   const data = await response.json();
   if (!response.ok)
-    throw new Error(data.error?.message ?? "This action is unavailable.");
+    throw new IdentityActionError(
+      data.error?.message ?? "This action is unavailable.",
+      response.status,
+      data.error?.code,
+    );
   return data;
 }
 export function CreatorSetup({ initial }: { initial: Session }) {
@@ -42,8 +63,47 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [proofRead, setProofRead] = useState<{
+    creatorId: string | null;
+    status: "loading" | "ready" | "unavailable";
+  }>({ creatorId: null, status: "loading" });
+  const [proofRetry, setProofRetry] = useState(0);
+  const proofFocus = useRef<HTMLButtonElement | null>(null);
+  const proofRetryFocus = useRef<HTMLButtonElement | null>(null);
+  const proofAccountFocus = useRef<HTMLInputElement | null>(null);
+  const restoreProofFocus = useRef(false);
+  const proofReady =
+    !!creator &&
+    proofRead.creatorId === creator.id &&
+    proofRead.status === "ready";
+  const proofUnavailable =
+    !!creator &&
+    proofRead.creatorId === creator.id &&
+    proofRead.status === "unavailable";
   const proofExpired =
     !!proof && new Date(proof.expiresAt).getTime() <= Date.now();
+  const proofAccountBound =
+    proofReady &&
+    !!proof &&
+    !proofExpired &&
+    ["challenge", "pending"].includes(proof.state);
+  useEffect(() => {
+    if (
+      !restoreProofFocus.current ||
+      busy ||
+      (!proofReady && !proofUnavailable)
+    )
+      return;
+    restoreProofFocus.current = false;
+    const button = proofReady ? proofFocus.current : proofRetryFocus.current;
+    if (
+      button?.isConnected &&
+      !identity.signal.aborted &&
+      !document.hidden &&
+      document.activeElement === document.body
+    )
+      button.focus();
+  }, [busy, proofReady, proofUnavailable, identity.signal]);
   useEffect(() => {
     const current = identity.session.creator;
     if (
@@ -57,20 +117,34 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   }, [identity.session.creator, creator]);
   useEffect(() => {
     let active = true;
-    if (creator)
-      action(`${creator.id}/proof`)
+    const creatorId = creator?.id;
+    if (creatorId) {
+      setProofRead({ creatorId, status: "loading" });
+      action(`${creatorId}/proof`)
         .then((value) => {
           if (active) {
             setProof(ProofSchema.parse(value));
             setPlatform(value.platform);
             setAccount(value.accountUrl);
+            setProofRead({ creatorId, status: "ready" });
           }
         })
-        .catch(() => {});
+        .catch((error: unknown) => {
+          if (!active || identity.signal.aborted) return;
+          if (
+            error instanceof IdentityActionError &&
+            error.status === 404 &&
+            error.code === "proof_not_found"
+          ) {
+            setProof(null);
+            setProofRead({ creatorId, status: "ready" });
+          } else setProofRead({ creatorId, status: "unavailable" });
+        });
+    }
     return () => {
       active = false;
     };
-  }, [creator, action]);
+  }, [creator?.id, creator?.version, action, identity.signal, proofRetry]);
   const perform = async (work: () => Promise<void>) => {
     if (busy) return;
     setBusy(true);
@@ -93,7 +167,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     "Prove it’s you",
     "A passkey for signing",
     "Your license to your AI",
-    "A 15-minute interview in your voice",
+    copy.creatorInterviewEstimate,
     "Sources, style, rules, tests",
   ];
   return (
@@ -120,6 +194,12 @@ export function CreatorSetup({ initial }: { initial: Session }) {
         </ol>
       </aside>
       <section className="setup-content">
+        {identity.session.mode === "development" && (
+          <Notice title="Development identity">
+            Synthetic local account. External proof is not approved and cannot
+            activate a public AI.
+          </Notice>
+        )}
         {!creator ? (
           <>
             <span className="qv-meta">CONTINUE SETTING UP</span>
@@ -179,11 +259,18 @@ export function CreatorSetup({ initial }: { initial: Session }) {
               {platform === "instagram" ? "Instagram" : "YouTube"}
             </h2>
             <p>
-              Your Pantopus account proves you're a person. This proves you're
-              the {creator.displayName} your fans already follow. Post the code
-              in a story or a caption; you can delete it once we've seen it.
+              {identity.session.mode === "development" ? (
+                "This synthetic account does not verify a real person's identity. Local proof challenges are for development only."
+              ) : (
+                <>
+                  Your Pantopus account proves you're a person. This proves
+                  you're the {creator.displayName} your fans already follow.
+                  Post the code in a story or a caption; you can delete it once
+                  we've seen it.
+                </>
+              )}
             </p>
-            {proof && proof.state === "challenge" && (
+            {proofReady && proof && proof.state === "challenge" && (
               <div className="proof-code">
                 <span>{proof.code}</span>
                 <button
@@ -206,21 +293,65 @@ export function CreatorSetup({ initial }: { initial: Session }) {
               </label>
               <input
                 id="proof-account"
+                ref={proofAccountFocus}
                 className="qv-input"
+                disabled={busy || !proofReady}
+                readOnly={proofAccountBound}
+                aria-describedby={
+                  proofAccountBound ? "proof-account-hint" : undefined
+                }
                 placeholder={
                   platform === "instagram"
                     ? "https://instagram.com/your_handle"
                     : "https://youtube.com/@your_handle"
                 }
-                value={account}
+                value={
+                  proofAccountBound ? (proof?.accountUrl ?? account) : account
+                }
                 onChange={(event) => setAccount(event.target.value)}
               />
+              {proofAccountBound && (
+                <p id="proof-account-hint" className="qv-field__hint">
+                  This code applies to the saved account. Start a new proof
+                  request to use a different account.
+                </p>
+              )}
             </div>
             <Notice title="Proof is reviewed before signing">
               The proof code is saved with your verification request. Signing
               stays disabled until your request is approved.
             </Notice>
-            {proof?.state === "challenge" && (
+            {!proofReady && (
+              <Notice
+                title={
+                  proofUnavailable
+                    ? "Verification status unavailable"
+                    : "Loading verification status"
+                }
+                tone={proofUnavailable ? "offline" : undefined}
+              >
+                {proofUnavailable
+                  ? "Reconnect and reload your saved verification request before continuing. Your draft setup is kept."
+                  : "Checking your saved verification request before continuing."}
+              </Notice>
+            )}
+            {proofUnavailable && (
+              <button
+                type="button"
+                ref={proofRetryFocus}
+                className="qv-btn qv-btn--secondary"
+                disabled={busy}
+                onClick={(event) => {
+                  restoreProofFocus.current =
+                    document.activeElement === event.currentTarget;
+                  setError("");
+                  setProofRetry((attempt) => attempt + 1);
+                }}
+              >
+                Retry verification status
+              </button>
+            )}
+            {proofReady && proof?.state === "challenge" && (
               <div className="qv-field">
                 <label className="qv-field__label" htmlFor="proof-post">
                   Post URL
@@ -234,9 +365,31 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                 />
               </div>
             )}
+            {proofAccountBound && (
+              <button
+                type="button"
+                className="qv-btn qv-btn--quiet"
+                disabled={busy}
+                onClick={() => {
+                  setProof(null);
+                  setAccount("");
+                  setPost("");
+                  setError("");
+                  setNotice("Enter the account for a new proof code.");
+                  proofAccountFocus.current?.focus();
+                }}
+              >
+                Use a different account
+              </button>
+            )}
             <div className="proof-actions">
               <button
-                disabled={busy || (proof?.state === "pending" && !proofExpired)}
+                ref={proof ? undefined : proofFocus}
+                disabled={
+                  busy ||
+                  !proofReady ||
+                  (proof?.state === "pending" && !proofExpired)
+                }
                 className="qv-btn qv-btn--secondary qv-btn--lg"
                 onClick={() =>
                   perform(async () => {
@@ -277,7 +430,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                   : "I've posted it · check now"}
               </button>
               <button
-                disabled={busy}
+                disabled={busy || !proofReady}
                 className="qv-btn qv-btn--quiet"
                 onClick={() => {
                   setPlatform(
@@ -293,7 +446,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                   : "Use Instagram instead"}
               </button>
             </div>
-            {proof && (
+            {proofReady && proof && (
               <>
                 <Notice
                   title={`Verification ${proofExpired ? "expired" : proof.state}`}
@@ -306,19 +459,39 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                         : "Creator identity is checked independently of payout-provider identity checks."))}
                 </Notice>
                 <button
+                  ref={proofFocus}
                   className="qv-btn qv-btn--quiet"
                   disabled={busy}
-                  onClick={() =>
-                    perform(async () => {
-                      const [freshProof, freshSession] = await Promise.all([
-                        action(`${creator.id}/proof`),
-                        action("session"),
-                      ]);
-                      setProof(ProofSchema.parse(freshProof));
-                      setPlatform(freshProof.platform);
-                      setCreator(freshSession.creator);
-                    })
-                  }
+                  onClick={(event) => {
+                    restoreProofFocus.current =
+                      document.activeElement === event.currentTarget;
+                    return perform(async () => {
+                      setProofRead({
+                        creatorId: creator.id,
+                        status: "loading",
+                      });
+                      try {
+                        const [freshProof, freshSession] = await Promise.all([
+                          action(`${creator.id}/proof`),
+                          action("session"),
+                        ]);
+                        setProof(ProofSchema.parse(freshProof));
+                        setPlatform(freshProof.platform);
+                        setCreator(freshSession.creator);
+                        setProofRead({
+                          creatorId: creator.id,
+                          status: "ready",
+                        });
+                      } catch (error) {
+                        if (!identity.signal.aborted)
+                          setProofRead({
+                            creatorId: creator.id,
+                            status: "unavailable",
+                          });
+                        throw error;
+                      }
+                    });
+                  }}
                 >
                   Refresh verification status
                 </button>
@@ -327,7 +500,9 @@ export function CreatorSetup({ initial }: { initial: Session }) {
             <div className="passkey-controls">
               <h3>A passkey for signing</h3>
               <button
-                disabled={busy || creator.verification !== "verified"}
+                disabled={
+                  busy || !proofReady || creator.verification !== "verified"
+                }
                 className="qv-btn qv-btn--secondary"
                 onClick={() =>
                   perform(async () => {
