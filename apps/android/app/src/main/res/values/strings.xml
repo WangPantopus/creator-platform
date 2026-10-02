@@ -958,4 +958,13 @@
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
   <string name="growth_download_complete_reply" formatted="false">Download complete reply</string>
   <string name="growth_share_complete_reply" formatted="false">Share complete reply</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
+  <string name="w6_record_a_voice_reply" formatted="false">Record a voice reply</string>
+  <string name="w6_deliver_this_recording" formatted="false">Deliver this recording</string>
+  <string name="w6_recording_credentials_are_processing" formatted="false">Your signature is saved. Content credentials are processing before delivery.</string>
+  <string name="w6_recording_delivery_is_unconfirmed" formatted="false">Delivery is unconfirmed. Retry this same recording before starting another.</string>
+  <string name="w6_recording_delivered" formatted="false">Your signed recording was delivered to this conversation.</string>
+  <string name="w6_voice_reply_unavailable" formatted="false">Voice replies are unavailable for this conversation. Your text draft is kept.</string>
+  <string name="w6_selected_conversation_changed" formatted="false">This recording belongs to another conversation. Reopen the selected thread.</string>
+  <string name="w6_retry_recording_delivery" formatted="false">Retry this recording delivery</string>
 </resources>

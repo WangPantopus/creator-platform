@@ -84,6 +84,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     assertExpectedAccount(req, current.actorAccountId);
     return current;
   };
+  router.get(`${root}/recording-policy`, async (req, res) =>
+    res.json(await media().recordingPolicy(await scope(req))),
+  );
   const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
   const creatorMedia = () => {
     if (!dependencies.creatorMedia || !dependencies.creatorScopeFor)

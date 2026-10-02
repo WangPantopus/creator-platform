@@ -9,6 +9,9 @@ import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
+import { readMediaEnvironment } from "./modules/media/environment.js";
+import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
+import { DevelopmentLicenseVerifier, developmentSyntheticJournalPolicy } from "./modules/agent/development-license.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import {
   createDevelopmentTrust,
@@ -56,11 +59,32 @@ try {
           },
           signedSubjectPolicies: [commerceSignedSubjects],
           registerFeatures: async (runtime) => {
-            const host = await composeConversationHost(runtime, config);
+            const mediaEnvironment = readMediaEnvironment();
+            const mediaDenials = runtimeMediaDenials(runtime);
+            const mediaHost = mediaEnvironment && mediaDenials
+              ? composeMediaHost({ runtime, environment: mediaEnvironment, denials: mediaDenials, development: true })
+              : undefined;
+            const syntheticHost = {
+              environment: process.env.NODE_ENV,
+              enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+              identityMode: config.identityAdapter,
+              webOrigin: config.allowedOrigin,
+            };
+            const licensing = process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
+              ? {
+                  licenseVerifier: DevelopmentLicenseVerifier.create(runtime.pool, syntheticHost),
+                  journalPolicy: developmentSyntheticJournalPolicy(syntheticHost),
+                }
+              : {};
+            const host = await composeConversationHost(runtime, config, {
+              ...licensing,
+              ...(mediaHost ? { media: mediaHost.media, bindRecordingPublication: mediaHost.bindRecordingPublication } : {}),
+            });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             const contentDependencies = {
+              mediaPublication: mediaHost?.contentPublication,
               assertAllowed: runtime.assertCreatorAllowed,
               follows: async (
                 ...args: Parameters<
@@ -116,6 +140,7 @@ try {
                   },
                   dependencies: contentDependencies,
                 });
+            mediaHost?.bindContent(content.content);
             runtime.configureSignedSubjects(
               Array.isArray(content.signedSubjects)
                 ? content.signedSubjects
@@ -162,7 +187,7 @@ try {
                 pool: runtime.pool,
                 development: config.identityAdapter === "development",
               }),
-              mediaFeature({}),
+              mediaHost?.feature() ?? mediaFeature({}),
               ...(commerce ? [commerce.feature] : []),
               ...(content ? content.features : []),
               ...(features.growth ? [features.growth.feature] : []),

@@ -32,6 +32,7 @@ import {
   PrivateMediaStorage,
   type CreatorMediaPublicationBinding,
 } from "./storage.js";
+import { announceMediaJob } from "./jobs.js";
 
 export type CreatorMediaReadScope = CreatorScope | ThreadScope | AudienceScope;
 export interface CreatorMediaAuthority {
@@ -107,6 +108,14 @@ export function creatorAssetView(row: CreatorAssetRow): CreatorMediaAsset {
     failureCode: row.failure_code,
     provenance: row.provenance,
   });
+}
+function creatorJob(row: CreatorAssetRow) {
+  return {
+    kind: "creator" as const,
+    assetId: row.id,
+    creatorId: row.creator_id,
+    ownerAccountId: row.owner_account_id,
+  };
 }
 function isAudience(scope: CreatorMediaReadScope): scope is AudienceScope {
   return "kind" in scope && scope.kind === "audience";
@@ -394,9 +403,16 @@ export class CreatorMediaService {
     });
   }
   async read(scope: CreatorMediaReadScope, id: string) {
-    return this.transaction(scope, async (client) =>
-      creatorAssetView(await this.row(scope, client, id)),
-    );
+    return this.transaction(scope, async (client) => {
+      const row = await this.row(scope, client, id);
+      // Repeat a wakeup lost during an ingestion restart; the lease dedupes.
+      const pending = await client.query(
+        "SELECT 1 FROM creator.creator_media_asset WHERE id=$1 AND creator_id=$2 AND job_available_at<=now() AND (job_lease_until IS NULL OR job_lease_until<now()) AND (state IN('quarantined','processing') OR manifest_pending OR delete_pending)",
+        [row.id, row.creator_id],
+      );
+      if (pending.rowCount) await announceMediaJob(client, creatorJob(row));
+      return creatorAssetView(row);
+    });
   }
   async resume(scope: CreatorScope, id: string) {
     return this.transaction(scope, async (client) => {
@@ -484,6 +500,7 @@ export class CreatorMediaService {
         "UPDATE creator.creator_media_asset SET state='quarantined',job_available_at=now() WHERE id=$1 AND creator_id=$2 RETURNING *",
         [id, scope.creatorId],
       );
+      await announceMediaJob(client, creatorJob(updated.rows[0]!));
       return creatorAssetView(updated.rows[0]!);
     });
   }
@@ -505,6 +522,7 @@ export class CreatorMediaService {
         "UPDATE creator.creator_media_asset SET state='revoked',version=version+1,delete_pending=true,job_available_at=now() WHERE id=$1 AND creator_id=$2",
         [id, scope.creatorId],
       );
+      await announceMediaJob(client, creatorJob(row));
     });
   }
   /** W5 review/publish use this exact processed snapshot in their current transaction. */
@@ -612,6 +630,12 @@ export class CreatorMediaService {
         "UPDATE creator.creator_media_asset SET signed_act_id=$3,manifest_pending=true,job_available_at=now() WHERE id=$1 AND creator_id=$2 AND signed_act_id IS NULL",
         [proof.assetId, scope.creatorId, signedActId],
       );
+      await announceMediaJob(client, {
+        kind: "creator",
+        assetId: proof.assetId,
+        creatorId: scope.creatorId,
+        ownerAccountId: scope.accountId,
+      });
     }
   }
   /** W5 withdraws/unpublishes the real content in this same transaction and its

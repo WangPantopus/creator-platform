@@ -10362,6 +10362,105 @@
           }
         }
       }
+    },
+    "Uploads and signing are unavailable here. Your preview stays on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploads and signing are unavailable here. Your preview stays on this device."
+          }
+        }
+      }
+    },
+    "Record a voice reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record a voice reply"
+          }
+        }
+      }
+    },
+    "Deliver this recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deliver this recording"
+          }
+        }
+      }
+    },
+    "Your signature is saved. Content credentials are processing before delivery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your signature is saved. Content credentials are processing before delivery."
+          }
+        }
+      }
+    },
+    "Delivery is unconfirmed. Retry this same recording before starting another.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delivery is unconfirmed. Retry this same recording before starting another."
+          }
+        }
+      }
+    },
+    "Your signed recording was delivered to this conversation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your signed recording was delivered to this conversation."
+          }
+        }
+      }
+    },
+    "Voice replies are unavailable for this conversation. Your text draft is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice replies are unavailable for this conversation. Your text draft is kept."
+          }
+        }
+      }
+    },
+    "This recording belongs to another conversation. Reopen the selected thread.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording belongs to another conversation. Reopen the selected thread."
+          }
+        }
+      }
+    },
+    "Retry this recording delivery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this recording delivery"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -8,7 +8,7 @@ import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { modelFromEnvironment } from "../agent/model.js";
-import { PreparedGenerationJournal } from "../agent/generation-journal.js";
+import { GENERATION_JOURNAL_MIGRATION, PreparedGenerationJournal } from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
@@ -27,7 +27,7 @@ import { ConversationRecordings } from "./recordings.js";
 import { createConversationRuntime } from "./runtime.js";
 
 const migrations = {
-  journal: "0048_w2_usage_lineage",
+  journal: GENERATION_JOURNAL_MIGRATION,
   cost: "0049_w4_generation_cost_settlement",
   lineage: "0056_w3_correction_feedback_lineage",
   feedbackConsent: "0057_w3_feedback_consent",
@@ -274,6 +274,9 @@ export async function composeConversationHost(
   const conversation = createConversationRuntime({
     ...runtime,
     ...(policy ? { policy } : {}),
+    ...(env.W3_OFFLINE_ISSUER_ORIGIN
+      ? { offlineIssuer: { origin: env.W3_OFFLINE_ISSUER_ORIGIN, environment: env.NODE_ENV } }
+      : {}),
     ...generation,
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),

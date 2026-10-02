@@ -5,7 +5,11 @@ import {
   type CreatorMediaAsset,
   type CreatorMediaUploadTicket,
 } from "../../../../packages/api/src/media";
-import { mediaRequest, uploadCreatorMedia } from "../media/api";
+import {
+  MediaRequestError,
+  mediaRequest,
+  uploadCreatorMedia,
+} from "../media/api";
 
 /** Saved W5 object + real W6 upload/processing. No URL or processing receipt is
  * made locally; the editor signs the immutable processed revision separately.
@@ -97,6 +101,7 @@ export function PhotoAttachment({
     setError("");
     const abort = new AbortController();
     controller.current = abort;
+    const firstAttempt = uploadKey.current === undefined;
     uploadKey.current ??= crypto.randomUUID();
     try {
       const value = CreatorMediaAssetSchema.parse(
@@ -117,6 +122,13 @@ export function PhotoAttachment({
       );
       if (!abort.signal.aborted) setAsset(value);
     } catch (failure) {
+      if (
+        firstAttempt &&
+        !ticket.current &&
+        failure instanceof MediaRequestError &&
+        [400, 403, 404, 413, 415, 422].includes(failure.status)
+      )
+        uploadKey.current = undefined;
       if (!abort.signal.aborted)
         setError(
           failure instanceof Error
