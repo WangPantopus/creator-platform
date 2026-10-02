@@ -1,5 +1,12 @@
 # Trust operation and recovery
 
+## Actual development61 checkpoint and restore — 2026-10-02
+
+[Real three-client privacy and independent saved-state/restore receipt](../../artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/app-acceptance/README.md) qualifies the labelled synthetic increment only. Source5057343a completes Trust/identity/media and genuine empty-fan Agent; other four domains remain blocked and no download is offered. Own API/web/devices/container are stopped; private checkpoint is retained. Source and separate restored database `creator_w8_privacy61_app_20261002` / `creator_w8_privacy61_app_restore_20261002` are owner-closed with connection limit0. Their61 history/153 rows/schema/roles/security/sequence match after exact original owner-ACL representation replay. Original iMac recovery/journal, managed Growth configuration, real purge/expiry, provider/hardware/policy/release acceptance remain open.
+
+PostgreSQL17 pg_dump can restore the isolated0087/0103 scope tables with implicit default owner ACLs instead of the source's explicit owner ACL. The first raw-schema mismatch must be preserved as a failed qualification. Do not relax catalog guards or edit pg_catalog. Only after independently proving that these **two empty private scope tables' same-owner ACL representation is the sole difference**, replay supported `GRANT ALL PRIVILEGES` as each exact isolated owner on its own scope table, with the target closed/no other clients. Independently compare the complete catalog, data/history/role/effective-security/sequence again. Any other difference refuses; no public/runtime/worker grant, closure removal or traffic-ready claim. The actual scratch operator/metadata and dumps remain private outside Git. The first888.254s interval includes restore/custody inspection, not an original-data RTO or WAL RPO.
+
+
 
 ## Closed privacy continuation — 2026-10-02 (draft)
 
