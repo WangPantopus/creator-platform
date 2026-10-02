@@ -1016,7 +1016,9 @@ public enum QelvoraCopy {
     "w1CallLookupChecking": "Checking the booking and your current access…",
     "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status.",
     "identityDevelopmentTitle": "Development identity",
-    "identityDevelopmentBody": "Synthetic local account. Pantopus production sign-in is not connected."
+    "identityDevelopmentBody": "Synthetic local account. Pantopus production sign-in is not connected.",
+    "identityProofReviewSupport": "Request verification review",
+    "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
