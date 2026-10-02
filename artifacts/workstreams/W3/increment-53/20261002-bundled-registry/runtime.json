@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-10-02T14:48:24.371Z",
+  "source": "217ba8273d6850676471d3170c16ea855abf5d0f",
+  "catalogue": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "lineage_registered": true,
+    "feedback_consent_registered": true,
+    "acceptance_installed": false,
+    "generation_scope_installed": false,
+    "terminal_scope_installed": false,
+    "finalization_installed": false,
+    "finalization_registered": false,
+    "original_closed": true
+  },
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T14:48:24.365Z"
+        }
+      ]
+    }
+  },
+  "sqlApplied": false,
+  "terminalTransitionOperated": false,
+  "helpfulFeedbackOperated": false,
+  "introOfferOperated": false,
+  "approvedFeedbackPolicyConfigured": false,
+  "approvedIntroOfferPolicyConfigured": false,
+  "runtime": {
+    "apiPid": 94391,
+    "webPid": 94496,
+    "apiPort": 4103,
+    "webPort": 3003,
+    "entry": "apps/backend/dist/server.mjs",
+    "build": {
+      "exitCode": 0,
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    "bundleSha256": "08d62577d74321d462b67b400cafe51ae42cbc6c5c9fc0b7480056f2a0f34b31",
+    "producerSource": "9841372c38f1afe17d27a35e06e92c550b246bae",
+    "development": true,
+    "startupMissing": [
+      "provider model and credentials",
+      "in-transaction denial (W8)",
+      "registered 0077_w2_usage_lineage"
+    ]
+  },
+  "compiledHostStarted": true
+}

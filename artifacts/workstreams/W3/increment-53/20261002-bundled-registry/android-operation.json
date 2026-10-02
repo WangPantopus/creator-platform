@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-10-02T14:54:42.775093+00:00",
+  "source": "217ba8273d6850676471d3170c16ea855abf5d0f",
+  "binarySource": "f355db907b4beada09f4ad6f6d40e0af8d9a43ca",
+  "apkSha256": "872dd65f5554595b46314e8e982dac9041c917db99eedbb47068ecdb9522a018",
+  "backendEntry": "dist/server.mjs",
+  "sameDatabase": "creator_w3_dev57_1790946508212",
+  "apiPort": 4103,
+  "device": {
+    "token": "83db476f-5a03-4070-aaff-cfd53f5c6b74",
+    "inode": 241046415,
+    "pid": 3438,
+    "slot": "/private/tmp/creator-platform-emulator-slot-1",
+    "serial": "emulator-5584"
+  },
+  "screen": {
+    "pixels": [
+      1170,
+      2532
+    ],
+    "density": 480,
+    "points": [
+      390,
+      844
+    ],
+    "fontScale": 2.0,
+    "nightMode": "no"
+  },
+  "coldLaunchMs": 734,
+  "outageColdLaunchMs": 714,
+  "accountObserved": "kilnfire",
+  "coldOutageAccountHidden": true,
+  "retainedSessionNoticeObserved": true,
+  "recoveredAfterActualRetry": true,
+  "sameAccountReturned": true,
+  "normalOwnedShutdownVerified": true,
+  "matchingLeaseReleased": true,
+  "settingsChanged": false,
+  "approvedReplyOperated": false,
+  "threadRecoveryOperated": false,
+  "iOSOperated": false
+}
