@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-02T15:01:28.379946+00:00",
+  "updatedAt": "2026-10-02T17:50:32.041335+00:00",
   "owner": "W7 primary",
   "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
   "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T17:14:51.470668+00:00",
+    "recordedAt": "2026-10-02T17:54:38.013881+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,7 +136,7 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Stopped normally after private40 backup; CONNECTIONLIMIT0 and traffic-closed comment; restore preserved all six digests; noSQLactivation. Reopen only intentionally before actual runtime.",
+      "state": "stopped;40 canonical migrations;connectionlimit0 and trafficclosed comment after main-ecca journeys",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
@@ -375,6 +375,17 @@
       "limitQuestion": "pending exact0061/0062 development-only revision; no approval assumed",
       "allSixBackupRestoreDigestsMatch": true,
       "SQLActivated": false
+    },
+    "mainEccaRuntime": {
+      "sourceParent": "e306c224a934c1c837ec32fe7c8f34ee29196671",
+      "frozenMain": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+      "API": "stopped verified own17089 SIGTERM exit0",
+      "web": "stopped verified own20712 SIGTERM exit143;first wrongcwd start failure preserved",
+      "devices": "own FAB simulator shutdown,5580 emulator killed; exactownedslot1 UUID/device/inode leases released; companion48645 exit0",
+      "SQLActivated": false,
+      "webPid": 20712,
+      "database": "stopped;40 ledger;connectionlimit0;trafficclosed;no other clients",
+      "backupRefreshRequiredBeforeActivation": true
     }
   }
 }

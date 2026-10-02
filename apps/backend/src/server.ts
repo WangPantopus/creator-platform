@@ -23,6 +23,7 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
+import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -120,6 +121,15 @@ try {
             );
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            // Preparing the genuine graph does not configure a provider, worker
+            // purpose or arrival policy. The calls feature remains unmounted
+            // until those separate producers exist; no request Actor is invented.
+            const callControl = await InteractiveCallControl.prepare(runtime);
+            process.stdout.write(
+              callControl
+                ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
+                : "Call control: unavailable; canonical held request authority is not activated.\n",
+            );
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             features.growth = await configureGrowthForBackend({
               ...runtime,
@@ -204,7 +214,7 @@ try {
                 },
                 mediaPublication: mediaHost?.contentPublication,
                 // Canonical content retains creator_runtime and actual held
-                // scopes. Missing 0101 custody fails closed without Growth grants.
+                // scopes. Missing 0185 custody fails closed without Growth grants.
                 ...(features.growth
                   ? { follows: features.growth.coreContentFollows }
                   : {}),

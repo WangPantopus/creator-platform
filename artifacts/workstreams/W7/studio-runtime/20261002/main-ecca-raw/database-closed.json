@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-02T17:47:44.168Z",
+  "baseline": 40,
+  "newSQL": false,
+  "connectionLimit": 0,
+  "trafficClosed": true,
+  "otherClients": 0,
+  "backupRefreshRequiredBeforeActivation": true,
+  "firstClosureAttempt": {
+    "state": "42P01 wrong plural creator.schema_migrations; no mutation occurred",
+    "repair": "Read canonical migrator; exact creator.schema_migration used"
+  }
+}

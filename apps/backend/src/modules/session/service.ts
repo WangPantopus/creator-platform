@@ -22,6 +22,8 @@ import { validateProviderState, type CallProvider } from "./provider.js";
 import { calculateClocks, determineOutcome } from "./clocks.js";
 import type { AvailabilityService } from "./availability.js";
 import { withDeadline } from "../media/deadline.js";
+import type { Actor } from "../identity/adapter.js";
+import { InteractiveCallControl } from "./interactive-control.js";
 
 export interface CallAuthorization {
   commitmentId: string;
@@ -113,7 +115,17 @@ export class SessionService {
     private readonly authority: SchedulingAuthority,
     readonly provider: CallProvider,
     readonly availability?: AvailabilityService,
-  ) {}
+    private readonly conversationControl?: InteractiveCallControl,
+  ) {
+    invariant(
+      !conversationControl || conversationControl.isFor(db),
+      "call_control_pool_mismatch",
+      "Call control must use this canonical conversation database.",
+    );
+  }
+  get interactiveControlAvailable() {
+    return this.conversationControl?.isFor(this.db) === true;
+  }
   /** Internal cleanup/evidence read under an already-issued tenant scope, without renewing join authority. */
   async lifecycleRow(
     scope: ThreadScope,
@@ -568,6 +580,8 @@ export class SessionService {
         "call_ended",
         "call_unavailable",
         "call_authorization_revoked",
+        "call_control_changed",
+        "call_control_family_changed",
       ].includes(error.code)
     )
       return;
@@ -587,8 +601,15 @@ export class SessionService {
       );
     });
   }
-  async join(scope: ThreadScope, id: string) {
+  async join(scope: ThreadScope, id: string, actor?: Actor) {
     const role = participant(scope);
+    if (!this.conversationControl || !actor)
+      throw new DomainError(
+        "call_control_unconfigured",
+        "Calling is awaiting its current creator control authority.",
+        503,
+      );
+    const control = this.conversationControl;
     const row = await this.db.withThread(scope, async (client) => {
       const item = await this.row(scope, client, id, true);
       invariant(
@@ -612,6 +633,18 @@ export class SessionService {
         "call_admission_unverified",
         "Secure room admission is not available yet.",
       );
+      const epoch = await control.beforeAdmission(
+        client,
+        actor,
+        scope,
+        item.document,
+        "prepare",
+      );
+      if (epoch !== null && item.document.conversationEpoch === undefined)
+        item.document = await this.persist(scope, client, {
+          ...item.document,
+          conversationEpoch: epoch,
+        });
       await client.query(
         "INSERT INTO creator.call_effect(session_id,creator_id,fan_id,kind,key,payload) VALUES($1,$2,$3,'ensure_room',$4,$5) ON CONFLICT(key) DO NOTHING",
         [
@@ -660,6 +693,13 @@ export class SessionService {
           "This call has ended.",
         );
         const nonce = randomUUID();
+        await control.beforeAdmission(
+          client,
+          actor,
+          scope,
+          current.document,
+          "issue",
+        );
         const expiresAt = new Date(Date.now() + 30_000).toISOString();
         await client.query(
           "INSERT INTO creator.call_admission(id,session_id,creator_id,fan_id,account_id,expires_at) VALUES($1,$2,$3,$4,$5,$6)",
@@ -724,6 +764,13 @@ export class SessionService {
           "call_token_expired",
           "The room admission expired. Rejoin the same call.",
         );
+        await control.beforeAdmission(
+          client,
+          actor,
+          scope,
+          current.document,
+          "confirm",
+        );
       });
       return {
         ...token,
@@ -744,7 +791,14 @@ export class SessionService {
       throw error;
     }
   }
-  async redeem(scope: ThreadScope, id: string, nonce: string) {
+  async redeem(scope: ThreadScope, id: string, nonce: string, actor?: Actor) {
+    if (!this.conversationControl || !actor)
+      throw new DomainError(
+        "call_control_unconfigured",
+        "Calling is awaiting its current creator control authority.",
+        503,
+      );
+    const control = this.conversationControl;
     return this.db.withThread(scope, async (client) => {
       const current = await this.row(scope, client, id, true);
       invariant(
@@ -753,6 +807,13 @@ export class SessionService {
           Date.now() < Date.parse(current.document.hardEndAt),
         "call_ended",
         "This call has ended.",
+      );
+      await control.beforeAdmission(
+        client,
+        actor,
+        scope,
+        current.document,
+        "confirm",
       );
       const used = await client.query(
         "UPDATE creator.call_admission SET used_at=now() WHERE id=$1 AND session_id=$2 AND account_id=$3 AND creator_id=$4 AND fan_id=$5 AND used_at IS NULL AND expires_at>now() RETURNING id",

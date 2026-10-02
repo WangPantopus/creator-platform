@@ -1,0 +1,17 @@
+{
+  "ios": {
+    "QelvoraApp": {
+      "built": "9f348bc03c949d009e5b7e4cfeb5974e11972a065e3d184809cd8c05776f7f76",
+      "installed": "9f348bc03c949d009e5b7e4cfeb5974e11972a065e3d184809cd8c05776f7f76"
+    },
+    "QelvoraApp.debug.dylib": {
+      "built": "7ac9e4ab5e067a22c6139fe6c97bf4379c8017beafe786bc2c8d00e81c075eee",
+      "installed": "7ac9e4ab5e067a22c6139fe6c97bf4379c8017beafe786bc2c8d00e81c075eee"
+    }
+  },
+  "android": {
+    "built": "630498e8eb93a447342fa6d64c789f8c617bd87f75dc04c524233e9e8a61cb78",
+    "installed": "630498e8eb93a447342fa6d64c789f8c617bd87f75dc04c524233e9e8a61cb78"
+  },
+  "exactMatch": true
+}

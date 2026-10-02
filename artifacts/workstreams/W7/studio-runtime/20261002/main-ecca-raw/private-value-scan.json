@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-02T17:54:38.012841+00:00",
+  "stagedFilesScanned": 182,
+  "actualPrivateCredentialMatches": 0,
+  "gzipDecompressed": true,
+  "firstAttempt": "Overbroad KEY substring selected public PASSKEY_RP_ID/PASSKEY_ORIGINS host/origin settings; field-only report confirmed no credential leak. Secret suffix/password/token/database-URL selectors corrected."
+}

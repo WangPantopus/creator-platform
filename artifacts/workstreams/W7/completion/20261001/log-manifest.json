@@ -1185,5 +1185,64 @@
     "sha256": "726048446225e6656b08686439d60b8d6ef7a367b309a23cb9566d66a559275a",
     "raw": true,
     "privateContents": false
+  },
+  "currentStudioMainEcca": {
+    "rawDirectory": "../../studio-runtime/20261002/main-ecca-raw",
+    "logs": {
+      "main-ecca-workspace.log": {
+        "bytes": 10128,
+        "sha256": "b90f75f41a4a5f748dc8144148905a999669bee79c6c9d1a6381d36cda8bb7bd",
+        "gzipSha256": "6d040aea0c696afed323c7563bbac73ab89214352cf4318b430d461ece34c4fe",
+        "roundTripEqual": true
+      },
+      "main-ecca-android-build.log": {
+        "bytes": 3178,
+        "sha256": "0d812eb6de27b16a1894c6664edbcf06d6ac62cdb423957811c0cfb8403883e4",
+        "gzipSha256": "8fc3906bdb77d9d31eda3f8cc0633813c2ff4c7f0cb83d36c764506fbc574007",
+        "roundTripEqual": true
+      },
+      "main-ecca-ios-build.log": {
+        "bytes": 83811,
+        "sha256": "7f5e77ece6a9106e788cebff2e4f19e7336d0b581a1a436d428084ff9bc795fa",
+        "gzipSha256": "1367f9d1cf74c7668a322301991dd48f3482ac292a7e60378caa80cb8c8500c9",
+        "roundTripEqual": true
+      },
+      "main-ecca-swift-original.log": {
+        "bytes": 56182,
+        "sha256": "3126ac76b150795d7abf662507a55bdb4a597d1a692960d6262e29a49d51ccb5",
+        "gzipSha256": "76fa028a91a0fbfb50127fdfc4a99746975fc1374c0bab8d312dfbbf57c2519a",
+        "roundTripEqual": true
+      },
+      "main-ecca-api.log": {
+        "bytes": 140,
+        "sha256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+        "gzipSha256": "3009d94976c69afdc0e3dfd2517a6324d465f5340ea887073e591f465e5b2ac3",
+        "roundTripEqual": true
+      },
+      "main-ecca-web.log": {
+        "bytes": 386,
+        "sha256": "aac255f8033959f184f671c2f806ff053723b3bd47817dbed421db00d9b4c79e",
+        "gzipSha256": "0f04a82faf072f2774b1e28917b7f510ff6bc16137da0f1e80fd0ad647b0cd86",
+        "roundTripEqual": true
+      },
+      "main-ecca-web-repair.log": {
+        "bytes": 154,
+        "sha256": "5d679044055bd6eb017cfa942bb6c12514895763fd3a34e8b55b3d16e3c47c93",
+        "gzipSha256": "f463d319063be01066b2ab3077e65990f2e9dee906f739ee6c35fc3ab7326881",
+        "roundTripEqual": true
+      },
+      "main-ecca-idb.log": {
+        "bytes": 57521,
+        "sha256": "deb530d24c3f8e76c4ee67ea8c705063681dfede00d97103f6821234d3483102",
+        "gzipSha256": "4683f42ece85d120fd3cff3ad1fec75262716bc9d4b4162fdadc574cbe7523ad",
+        "roundTripEqual": true
+      },
+      "main-ecca-emulator.log": {
+        "bytes": 9016,
+        "sha256": "272d3a13cd15b5db04fa722cb6e496c90ec1ebe76b600c8ad42fadfbca406888",
+        "gzipSha256": "39d529d38124c8c70ef1511243ac586cfed48b6f832afc5d7c53dd03ac9c5323",
+        "roundTripEqual": true
+      }
+    }
   }
 }

@@ -28,6 +28,13 @@ type Thanks = {
   withdrawn: boolean;
 };
 type ReplyPage = { items: PrivateNoteReply[]; nextCursor: string | null };
+const accountChanged = (failure: unknown) =>
+  failure instanceof StudioFailure &&
+  [
+    "content_account_changed",
+    "session_account_changed",
+    "session_changed",
+  ].includes(failure.code);
 export function FanContent({
   creatorId,
   contentId,
@@ -42,6 +49,7 @@ export function FanContent({
   );
   const [content, setContent] = useState<ContentView | null>(null),
     [current, setCurrent] = useState(false),
+    [signInRequired, setSignInRequired] = useState(false),
     [replies, setReplies] = useState<PrivateNoteReply[]>([]),
     [cursor, setCursor] = useState<string | null>(null);
   const [text, setText] = useState(""),
@@ -79,14 +87,18 @@ export function FanContent({
       } catch (failure) {
         if (generation === loading.current) {
           setCurrent(false);
+          setSignInRequired(
+            failure instanceof StudioFailure && failure.status === 401,
+          );
           if (
             failure instanceof StudioFailure &&
-            [401, 403].includes(failure.status)
+            ([401, 403].includes(failure.status) || accountChanged(failure))
           ) {
             setContent(null);
             setReplies([]);
             setThanks(null);
             setViewer(null);
+            setCursor(null);
             resetInputs();
           }
           setError((failure as Error).message);
@@ -148,27 +160,37 @@ export function FanContent({
             r.status === "rejected" &&
             r.reason instanceof StudioFailure &&
             (r.reason.status === 401 ||
-              r.reason.code === "content_account_changed" ||
+              accountChanged(r.reason) ||
               (i > 0 && r.reason.status === 403)),
         )
       ) {
         setCurrent(false);
+        setSignInRequired(
+          results.some(
+            (r) =>
+              r.status === "rejected" &&
+              r.reason instanceof StudioFailure &&
+              r.reason.status === 401,
+          ),
+        );
         setContent(null);
         setReplies([]);
         setThanks(null);
         setViewer(null);
+        setCursor(null);
         setText("");
         setThanksText("");
         setShare(false);
         setIdentity(false);
         dirtyThanks.current = false;
         setError(
-          "Your session or current access changed. Sign in again to refresh.",
+          "Your session or current access changed. Check current access before continuing.",
         );
         return;
       }
 
       const [view, mine, page, pref] = results;
+      setSignInRequired(false);
       if (pref.status !== "fulfilled") {
         setCurrent(false);
         setError("Current access could not be confirmed. Your input is kept.");
@@ -243,15 +265,19 @@ export function FanContent({
       await load();
     } catch (failure) {
       setError((failure as Error).message);
+      setSignInRequired(
+        failure instanceof StudioFailure && failure.status === 401,
+      );
       if (
         failure instanceof StudioFailure &&
-        [401, 403].includes(failure.status)
+        ([401, 403].includes(failure.status) || accountChanged(failure))
       ) {
         setCurrent(false);
         setContent(null);
         setReplies([]);
         setThanks(null);
         setViewer(null);
+        setCursor(null);
         resetInputs();
       }
     } finally {
@@ -314,7 +340,7 @@ export function FanContent({
           Check current access
         </button>
       )}
-      {!current && !viewer && (
+      {!current && signInRequired && (
         <Link
           href={`/auth/continue?returnTo=${encodeURIComponent(`/content/${creatorId}/${contentId}`)}`}
         >
