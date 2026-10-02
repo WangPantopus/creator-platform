@@ -109,5 +109,34 @@
   "mainRulesets": [],
   "mainBranchProtection": "404: branch not protected",
   "pendingMacChecksArePassed": false,
-  "mainRuntimeVerification": "pending next checkpoint"
+  "mainRuntimeVerification": {
+    "observedAt": "2026-10-02T06:44:00Z",
+    "source": "6e9fb6c6eb84c60160f928c52c72fda42ecfe985",
+    "actualMainCheckout": true,
+    "apiRestarted": true,
+    "apiPort": 4102,
+    "webPort": 3002,
+    "databasePort": 55442,
+    "actor": "fictional Maya, development actor one",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "draftRevision": 15,
+    "examples": 20,
+    "licenseTerms": "development-synthetic-unreviewed",
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0,
+    "providerRefusalFocused": true,
+    "noticeTop": 0,
+    "noticeBottom": 110,
+    "horizontalOverflow": false,
+    "limits": [
+      "Provider remains absent; publication/cited delivery not verified.",
+      "Main does not yet contain the newer W1 unavailable-session recovery.",
+      "Main hosted CI may still be queued; no queued job is asserted passed."
+    ]
+  }
 }
