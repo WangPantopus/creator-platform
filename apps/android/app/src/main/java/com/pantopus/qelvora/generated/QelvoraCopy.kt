@@ -919,7 +919,16 @@ object QelvoraCopy {
     "w5ContentDuplicateChanged" to "This retry differs from the earlier action. Refresh before trying again.",
     "w5ContentReplyWithdrawn" to "This reply was withdrawn. It cannot be shared again.",
     "w5ContentFanProfileRequired" to "Set up your fan profile before continuing.",
-    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept."
+    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept.",
+    "identityChooseHandle" to "Choose your handle",
+    "identityEditPublicProfile" to "Edit public profile",
+    "identitySessionReadFailed" to "This device could not read your session securely. Unlock it and try signing in again.",
+    "identitySessionSaveFailed" to "This device could not save your session securely. Unlock it and try signing in again.",
+    "identityPrivateClearFailed" to "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.",
+    "identityPrivateClearRetry" to "Retry clearing saved private data",
+    "w1CallLookupTitle" to "Your call",
+    "w1CallLookupChecking" to "Checking the booking and your current access…",
+    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

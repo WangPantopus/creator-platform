@@ -20,7 +20,7 @@ private struct TrustFailure: Decodable { struct Detail: Decodable { let message:
 public struct TrustClient: Sendable {
     public let baseURL: URL
     public let token: @Sendable () async throws -> String?
-    public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    public init(baseURL: URL, token: (@Sendable () async throws -> String?)? = nil) { self.baseURL = baseURL; self.token = token ?? { try await SecureSessionStorage(issuer: baseURL).read() } }
     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
     }
@@ -73,7 +73,7 @@ public struct TrustFanFeature: View {
     @State private var feedbackComment = ""
     @State private var feedbackConsent = false
     @Environment(\.colorScheme) private var scheme
-    public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    public init(baseURL: URL?, destination: String = "/support", token: (@Sendable () async throws -> String?)? = nil) {
         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
         let query = URLComponents(string: destination)?.queryItems ?? []
         let creator = query.first { $0.name == "creatorId" }?.value ?? "", message = query.first { $0.name == "messageId" }?.value ?? ""
@@ -84,7 +84,7 @@ public struct TrustFanFeature: View {
     public static func registration(baseURL: URL?) -> FanFeatureRegistration { FanFeatureRegistration(matches: { $0.hasPrefix("/support") || $0.hasPrefix("/trust") }, allowsSignedOut: { $0.hasPrefix("/trust") }, screen: { model in
         let account = model.session?.accountId
         return AnyView(TrustFanFeature(baseURL: baseURL, destination: model.destination, token: {
-            let credential = try await SecureSessionStorage().read()
+            let credential = try await SecureSessionStorage(issuer: baseURL).read()
             // A task from the old screen must never pick up the next account's
             // credential after an asynchronous secure-storage read.
             guard account != nil, await MainActor.run(body: { model.session?.accountId }) == account else { throw TrustClientError(message: "Your account changed. Reopen this screen before continuing.", reference: nil) }

@@ -73,7 +73,7 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
 
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
-fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context).read() }) {
+fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context, baseURL).read() }) {
     val client = remember(baseURL) { baseURL?.let { TrustClient(it, token) } }
     val coroutine = rememberCoroutineScope()
     var route by remember { mutableStateOf(destination) }
