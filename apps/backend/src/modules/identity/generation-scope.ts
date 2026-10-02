@@ -35,6 +35,7 @@ export type GenerationTerminalPurposeConsumer = Readonly<
 const terminalContracts = [
   {
     owner: "creator_generation_terminal_authority",
+    originalScopeBridge: true,
     version: "0183_w1_generation_terminal_scope",
     checksum:
       "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
@@ -47,6 +48,7 @@ const terminalContracts = [
   },
   {
     owner: "creator_w2_generation_terminal_journal",
+    originalScopeBridge: false,
     version: "0188_w2_generation_terminal_journal",
     checksum:
       "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
@@ -57,6 +59,7 @@ const terminalContracts = [
   },
   {
     owner: "creator_w4_generation_terminal",
+    originalScopeBridge: false,
     version: "0189_w4_generation_terminal_settlement",
     checksum:
       "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
@@ -314,10 +317,10 @@ async function assertGenerationCatalogue(
           "purpose" in consumer
             ? "creator.generation_terminal_matches(uuid,uuid,boolean)"
             : "creator.generation_scope_matches(uuid,uuid)",
-          // The core0183 authority retains its unchanged reviewed compatibility
-          // bridge. Only the distinct188/189 leaves must lack that matcher.
           !("purpose" in consumer) ||
-            consumer.owner === terminalContracts[0].owner,
+            terminalContracts.find(
+              (contract) => contract.owner === consumer.owner,
+            )?.originalScopeBridge === true,
         ],
       )
     ).rows[0];
