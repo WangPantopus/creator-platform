@@ -1,0 +1,92 @@
+{
+  "recordedAt": "2026-10-02T06:52:01.265743+00:00",
+  "environment": "labelled synthetic creator_w8_purpose_20261002 clone of retained canonical40 creator_w8",
+  "canonicalLedgerRows": 40,
+  "manualProposalDDL": [
+    "0053",
+    "0045",
+    "0051",
+    "0071 prototype 5006b181",
+    "0073",
+    "0074"
+  ],
+  "canonicalActivation": false,
+  "source": {
+    "apps/backend/migrations/0073_w8_publication_worker_denial.sql": "19756efae13493a68cb724d4b457333518439ac52454c713b5849d35199725b4",
+    "apps/backend/migrations/0074_w8_content_runtime_denial.sql": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3",
+    "apps/backend/src/modules/trust/scope-restriction.ts": "1feb0bde94014948e4d999b4b9fddeedf600c0a4da79636006a5f66ec18ec3ae"
+  },
+  "producerCommit": "c56fe34254038bcb7ef6009a3caa5ff0841fa507 consumed with -x provenance",
+  "browser": {
+    "environment": "labelled synthetic isolated clone",
+    "actualCanonicalBrowserSignIn": true,
+    "before": {
+      "status": 200,
+      "items": 0
+    },
+    "savedBlock": {
+      "status": 200
+    },
+    "after": {
+      "status": 403,
+      "errorCode": "scope_revoked"
+    },
+    "positiveContentRead": "empty actual source only; no publication/proof invented",
+    "providerLatencyMeasurement": false
+  },
+  "durableSavedState": {
+    "activeBlockForRealBrowserActor": 1,
+    "blockWithMatchingReporterCase": 1,
+    "contentPublications": 0,
+    "canonicalLedgerRows": 40
+  },
+  "requestProbe": {
+    "environment": "labelled synthetic clone; current request negative authority only",
+    "missingRequestAuthority": 401,
+    "savedRealBlockDeniesHeldRequest": 403,
+    "otherCreatorNegative": "allowed",
+    "noObjectGrant": "not attempted",
+    "differentActualActor": 401,
+    "noSessionBinding": "unavailable",
+    "mismatchedSessionAccount": "unavailable",
+    "retainedSnapshot": "unavailable",
+    "corePublicationProjectionExecute": "42501",
+    "corePrivateTrustSelect": "42501",
+    "corePrivateSessionProjectionSelect": "42501"
+  },
+  "workerProbe": {
+    "environment": "labelled synthetic clone, negative worker authority only",
+    "positiveIssuance": false,
+    "noTaskFamily": "unavailable",
+    "forgedUnissuedFamily": "unavailable",
+    "malformedFamily": "unavailable",
+    "unissuedScope": false,
+    "rawTrustSelect": "42501",
+    "scopeLedgerSelect": "42501",
+    "denialOwnerMembership": "42501",
+    "requestRoleMembership": "42501",
+    "publicationAuthorityMembership": "42501"
+  },
+  "workerWrapper": {
+    "actualWorkerLogin": true,
+    "fullCandidateMetadataBound": true,
+    "noActualStoredTask": 503,
+    "sealedScopeIssued": false
+  },
+  "reviewedW1Correction": {
+    "commit": "7401b8d4",
+    "sha256": "e15ed1ad79ba0e4bcbb3eea2d5ca98e543b45a490ea725ec3e5001afe5271cb3",
+    "publicOnlyPolicyNormalization": true,
+    "wallclockExpiry": true,
+    "installedInThisClone": false
+  },
+  "servicesStopped": true,
+  "dataRetained": true,
+  "limitations": [
+    "No actual approved creator proof or signing/publication/positive worker scope.",
+    "No authenticated Team, Android or iOS content journey in this increment.",
+    "Not actual in-flight provider denial latency or original iMac preserved upgrade.",
+    "Final W1 policy correction reviewed but not installed here; full final-wave rehearsal remains required.",
+    "No C10 registration/retention/export/purge/recovery/release completion."
+  ]
+}

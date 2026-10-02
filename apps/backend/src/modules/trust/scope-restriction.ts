@@ -7,6 +7,10 @@ import type { AudienceRestriction } from "../identity/audience-scope.js";
 import type { Actor } from "../identity/adapter.js";
 import type { TrustService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+} from "../identity/request-authority.js";
 
 async function projectedDenial(
   client: PoolClient,
@@ -26,9 +30,35 @@ async function projectedDenial(
   );
   if (current.rows[0]?.account !== actor.accountId)
     throw new DomainError("scope_unavailable", "This scope is unavailable.");
-  const result = await client.query<{ denial: string }>(sql, values);
-  if (result.rows[0]?.denial !== "allowed")
+  const result = await denialQuery(client, sql, values);
+  if (result !== "allowed" && result !== "denied")
+    throw new DomainError(
+      "scope_denial_unavailable",
+      "Current scope authority is unavailable.",
+      503,
+    );
+  if (result === "denied")
     throw new DomainError("scope_revoked", "This scope is closed.");
+}
+
+async function denialQuery(client: PoolClient, sql: string, values: string[]) {
+  try {
+    return (await client.query<{ denial: string }>(sql, values)).rows[0]
+      ?.denial;
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      ["42883", "42501"].includes(String(error.code))
+    )
+      throw new DomainError(
+        "scope_denial_unconfigured",
+        "Current scope authority is not configured.",
+        503,
+      );
+    throw error;
+  }
 }
 
 /** 0053 answers only for the actual thread participant on this held client. */
@@ -71,6 +101,82 @@ export function trustCreatorRestrictionInTransaction() {
       "SELECT creator_trust.runtime_creator_denial($1) AS denial",
       [creatorId],
     );
+}
+
+/** Actual held content request, including Team publishers and fans. No owner
+ * account substitution, object permission or background request scope. */
+export function trustContentRestrictionInTransaction() {
+  return async (client: PoolClient, actor: Actor, creatorId: string) => {
+    const current = requestAuthority.getStore();
+    if (!current || current.accountId !== actor.accountId)
+      throw new DomainError(
+        "content_session_required",
+        "Continue with Pantopus for this content.",
+        401,
+      );
+    await assertCurrentSession(client, actor.accountId);
+    // Older canonical session helpers do not yet bind this GUC. The value comes
+    // solely from the genuine session just held above, never from the request.
+    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
+      current.sessionId,
+    ]);
+    await projectedDenial(
+      client,
+      actor,
+      "SELECT creator_trust.runtime_content_denial($1) AS denial",
+      [creatorId],
+    );
+  };
+}
+
+/** W1 publication purpose. Bind only its candidate task metadata, then require
+ * the actual durable tuple's held negative projection. This mints no sealed
+ * scope or permission; W1 still verifies the command and issues its own nonce.
+ * The host separately checks restoration currentness on this same client. */
+export function trustPublicationWorkerDenial() {
+  return async (
+    client: PoolClient,
+    task: Readonly<{
+      creatorId: string;
+      contentId: string;
+      version: number;
+      publisherAccountId: string;
+      signedActId: string | null;
+      commandHash: string;
+    }>,
+  ) => {
+    if (requestAuthority.getStore())
+      throw new DomainError(
+        "publication_worker_required",
+        "Use the separate publication worker authority.",
+        403,
+      );
+    await client.query(
+      `SELECT set_config('publication.operation','issue',true),
+       set_config('publication.creator_id',$1,true),set_config('publication.content_id',$2,true),
+       set_config('publication.version',$3,true),set_config('publication.publisher_account_id',$4,true),
+       set_config('publication.signed_act_id',$5,true),set_config('publication.command_hash',$6,true)`,
+      [
+        task.creatorId,
+        task.contentId,
+        String(task.version),
+        task.publisherAccountId,
+        task.signedActId ?? "",
+        task.commandHash,
+      ],
+    );
+    const result = await denialQuery(
+      client,
+      "SELECT creator_trust.publication_worker_denial($1,$2) AS denial",
+      [task.creatorId, task.publisherAccountId],
+    );
+    if (result !== "allowed")
+      throw new DomainError(
+        "publication_scope_revoked",
+        "Current publication authority is unavailable.",
+        result === "denied" ? 403 : 503,
+      );
+  };
 }
 
 /** W6 binary ingestion purpose, independent of interactive session authority.

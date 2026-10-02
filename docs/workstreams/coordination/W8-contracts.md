@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Held content/publication denial — 2026-10-02:** reserved0073/0074 and `trustContentRestrictionInTransaction()` / `trustPublicationWorkerDenial()` are implemented on `codex/w8-purpose-denial-authority`, consuming W5's exactc56fe342 held-client seam. [Actual receipt](../../../artifacts/workstreams/W8/purpose-denial/20261002-mac-studio/README.md) has canonical real web block save and current content200→403, saved block/case, non-owner session/snapshot/role and unissued-worker refusals. Registry remains40. W1's0071 PUBLIC-only/wallclock correction is reviewed, final-wave installation/positive proof/publication/Team/native/provider/C10 acceptance remains open. W8 services stopped; data retained.
+
 ## Canonical development trust increment — 2026-10-01
 
 Current source branch: `codex/w8-development-trust-runtime`. [Actual partial acceptance](../../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) separates implemented source, experimental DDL, real app operation and release gates. PR17 is merged. W8 remains the sole registry activation owner;0053 is not active yet.
