@@ -410,22 +410,41 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 
 @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
     val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
-    var account by remember { mutableStateOf<JsonObject?>(null) };var error by remember { mutableStateOf("") }
-    var cursor by remember { mutableStateOf<String?>(null) }; var loading by remember { mutableStateOf(false) }
+    var account by remember(client) { mutableStateOf<JsonObject?>(null) };var error by remember(client) { mutableStateOf("") }
+    var cursor by remember(client) { mutableStateOf<String?>(null) }; var loading by remember(client) { mutableStateOf(false) }
+    var revision by remember(client) { mutableStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    suspend fun refresh(before: String? = null) {
-        if (loading) return; loading = true; cursor = before
-        try { account = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject; cursor = before; error = "" }
-        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(failure is ConversationFailure && failure.status in listOf(401,403,404)) account=null; error=failure.message ?: "Reconnect to open You." }
-        finally { loading = false }
+    fun conceal() { revision += 1; account = null; loading = false }
+    DisposableEffect(lifecycleOwner, client) {
+        val observer = LifecycleEventObserver { _, _ ->
+            val active = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!active) conceal()
+            foreground = active
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); conceal() }
     }
-    LaunchedEffect(session.session?.accountId) { refresh() }
+    suspend fun refresh(before: String? = null) {
+        conceal()
+        if (!foreground) return
+        val currentRevision = revision
+        loading = true; cursor = before; error = ""
+        try {
+            val fresh = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject
+            if (revision == currentRevision && foreground) { account = fresh; cursor = before }
+        }
+        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: "Reconnect to open You." }
+        finally { if (revision == currentRevision) loading = false }
+    }
+    LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }
     val fan=account?.get("fan")?.jsonObject
     LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { BasicText("You",style=qText("title").copy(color = qColor("ink"))); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
-        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "Your account",style=qText("display-md").copy(color = qColor("ink")));BasicText(fan?.get("intro")?.jsonPrimitive?.contentOrNull ?: "Your intro is private until you choose to share it.",style=qText("body").copy(color = qColor("ink")));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
+        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "Your account",style=qText("display-md").copy(color = qColor("ink")));BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.",style=qText("body").copy(color = qColor("ink")));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
         item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce/requests") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/spending") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
-        item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
+        item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
         if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText("No conversations yet.",style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item { Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") } }
