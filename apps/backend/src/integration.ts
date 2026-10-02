@@ -109,6 +109,11 @@ export async function createConfiguredBackend(input: {
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
   });
+  // pg removes failed idle clients before emitting; active queries still reject.
+  // Errors and clients can contain connection/query secrets, so omit both.
+  pool.on("error", () => {
+    console.error("An idle database connection failed and was discarded.");
+  });
   let trust: Awaited<ReturnType<typeof createTrustRuntime>> | undefined;
   const assertScopeAllowed: ScopeRestriction = async (...scope) => {
     if (
