@@ -1,5 +1,9 @@
 # W8 successor prompt — 2026-10-02 checkpoint
 
+## Latest host cleanup direction — 2026-10-02
+
+[Permanent resource cleanup](W8-resource-cleanup-2026-10-02.md) supersedes old occupied-worktree/build statements below. W8 removed24 disposable build/cache/dependency paths (5.392GiB allocated before deletion), preserved private tools/results/configuration/backups, verified the retained native checkpoint hash and kept stopped database containers/volumes/compiler setup. The clean fully pushed W8 and60fb worktrees are removed after this cleanup documentation merges; create a fresh checkout and install/rebuild locked dependencies for continuation. No primary/peer/shared SDK/global cache/database/private-data cleanup or new acceptance is implied.
+
 Take ownership of W8 (trust operations, reliability and release) in WangPantopus/creator-platform. Continue the entire R1–R10 assignment, approved opportunities, cross-workstream integrations and G0–G5 demonstrations. The previous agent stopped at the human’s requested handoff checkpoint; the workstream is **not complete**. Implement, debug, integrate, personally operate the apps, inspect saved state, commit, push, open focused PRs and normally merge ready ones without asking again.
 
 ## Binding human directions
