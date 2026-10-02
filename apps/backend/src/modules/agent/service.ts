@@ -96,6 +96,11 @@ export class AgentService {
   private licensingServes(scope: CreatorScope) {
     return scope.development === Boolean(this.licenseVerifier?.synthetic);
   }
+  /** The configured verifier has already passed its host boundary. Never infer
+   * this qualification from a client flag, account ID or stored license text. */
+  get syntheticDevelopmentLicensing() {
+    return this.licenseVerifier?.synthetic === true;
+  }
   async currentLicense(
     scope: CreatorScope,
     license: License | null,
@@ -103,6 +108,7 @@ export class AgentService {
   ) {
     return license &&
       licensed(license) &&
+      this.licensingServes(scope) &&
       this.licenseVerifier &&
       (client
         ? await this.licenseVerifier.isCurrentInTransaction?.(
