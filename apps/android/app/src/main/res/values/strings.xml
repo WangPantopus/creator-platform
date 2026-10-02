@@ -680,6 +680,7 @@
   <string name="w6_reload_saved_windows" formatted="false">Reload saved windows</string>
   <string name="w6_the_call_is_unavailable" formatted="false">The call is unavailable.</string>
   <string name="w6_camera_or_microphone_access_is_off_or_unavailable_check_your" formatted="false">Camera or microphone access is off or unavailable. Check your device settings and try again.</string>
+  <string name="w6_call_service_unavailable" formatted="false">Calling is not connected yet.</string>
   <string name="w6_calling_is_not_connected_yet_your_booking_is_unchanged" formatted="false">Calling is not connected yet. Your booking is unchanged.</string>
   <string name="w6_connection_failed_rejoin_the_same_call" formatted="false">Connection failed. Rejoin the same call.</string>
   <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
@@ -724,6 +725,7 @@
   <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
   <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
   <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_call_in_progress" formatted="false">Human call</string>
   <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
   <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
   <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>
