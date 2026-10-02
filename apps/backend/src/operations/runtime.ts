@@ -20,13 +20,20 @@ import {
 import { Readiness, type Probe } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { TrustTelemetry } from "./telemetry.js";
-import { trustScopeRestriction } from "../modules/trust/scope-restriction.js";
+import {
+  trustScopeRestriction,
+  trustScopeRestrictionInTransaction,
+  trustAudienceRestrictionInTransaction,
+  trustCreatorRestrictionInTransaction,
+} from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
 import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
 
-/** W1 mounts this runtime in the canonical backend; no development identity fallback. */
+/** W1 mounts this runtime in the canonical backend. Local mode is explicit. */
 export async function createTrustRuntime(options: {
-  environment: "review" | "staging" | "production";
+  environment: "local-development" | "review" | "staging" | "production";
+  identityMode?: "development" | "pantopus";
+  closePoolsOnStop?: boolean;
   release: string;
   origin: string;
   apiPool: Pool;
@@ -41,8 +48,23 @@ export async function createTrustRuntime(options: {
   crisisResources: TrustRouterOptions["crisisResources"];
 }) {
   const origin = new URL(options.origin);
+  const localDevelopment = options.environment === "local-development";
   if (
-    origin.protocol !== "https:" ||
+    localDevelopment &&
+    (process.env.NODE_ENV !== "development" ||
+      process.env.TRUST_LOCAL_DEVELOPMENT !== "true" ||
+      options.identityMode !== "development" ||
+      !["localhost", "127.0.0.1", "[::1]"].includes(origin.hostname))
+  )
+    throw new Error(
+      "Local trust requires explicit development identity, NODE_ENV=development, TRUST_LOCAL_DEVELOPMENT=true and loopback.",
+    );
+  if (!localDevelopment && options.identityMode === "development")
+    throw new Error("Deployed trust requires Pantopus identity.");
+  if (
+    (localDevelopment
+      ? !["http:", "https:"].includes(origin.protocol)
+      : origin.protocol !== "https:") ||
     origin.username ||
     origin.password ||
     origin.pathname !== "/" ||
@@ -239,7 +261,7 @@ export async function createTrustRuntime(options: {
     },
     readiness,
     telemetry,
-    localDevelopment: false,
+    localDevelopment,
     crisisResources: options.crisisResources,
   });
   // Pass these into W1's configured backend. Restoration denial must cover
@@ -254,6 +276,17 @@ export async function createTrustRuntime(options: {
     await service.assertAllowed(actor);
   };
   const restrictScope = trustScopeRestriction(service, options.workerPool);
+  const restrictInTransaction = trustScopeRestrictionInTransaction();
+  const restrictAudience = trustAudienceRestrictionInTransaction();
+  const restrictCreator = trustCreatorRestrictionInTransaction();
+  const assertRestored = async () => {
+    if (!(await restored()))
+      throw new DomainError(
+        "restoration_pending",
+        "This restored environment is unavailable while recovery is verified.",
+        503,
+      );
+  };
   const assertScopeAllowed: ScopeRestriction = async (
     actor,
     creatorId,
@@ -274,15 +307,38 @@ export async function createTrustRuntime(options: {
     readiness,
     telemetry,
     worker,
+    trafficReady: restored,
     assertActorAllowed,
     assertScopeAllowed,
+    assertScopeAllowedInTransaction: async (
+      ...scope: Parameters<typeof restrictInTransaction>
+    ) => {
+      await assertRestored();
+      await restrictInTransaction(...scope);
+    },
+    assertAudienceAllowed: async (
+      ...scope: Parameters<typeof restrictAudience>
+    ) => {
+      await assertRestored();
+      await restrictAudience(...scope);
+    },
+    assertCreatorAllowedInTransaction: async (
+      ...scope: Parameters<typeof restrictCreator>
+    ) => {
+      await assertRestored();
+      await restrictCreator(...scope);
+    },
     privacyOwnershipScope: privacyOwnershipScope(options.workerPool),
-    start: () => worker.start(),
+    start: async () => {
+      if (await restored()) await worker.start();
+    },
     stop: async () => {
       await worker.stop();
       options.apiPool.off("error", poolError);
       options.workerPool.off("error", poolError);
       telemetry.close();
+      if (options.closePoolsOnStop)
+        await Promise.all([options.apiPool.end(), options.workerPool.end()]);
     },
   };
 }
