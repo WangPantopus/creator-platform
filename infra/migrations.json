@@ -906,6 +906,14 @@
       "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
       "state": "reserved_unapplied",
       "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Exact rolled-back SQL/ACL/refusal qualification pending; not activation or positive ingress acceptance."
+    },
+    {
+      "id": "0202",
+      "owner": "W4",
+      "version": "0202_w4_fulfillment_original_hash",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-original-hash.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct bounded original request hash validator after genuine0199 original-recipient viewer issuer. Exact source/NoLogin role/function/current viewer/session/client/PID/fullXID/plan/revision/original-member and C10 review pending. No arbitrary UUID oracle or raw viewer/runtime question, fan-answer or disclosure columns. Original0199 source remains immutable; no activation/positive viewing inferred."
     }
   ]
 }
