@@ -695,7 +695,10 @@ export class CommerceService {
             );
           else if (increase)
             await client.query(
-              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,effective_at=now()+interval '24 hours',reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
+              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,
+               effective_at=CASE WHEN pending_none=$4 AND pending_amount IS NOT DISTINCT FROM $3::bigint
+                 AND effective_at>now() THEN effective_at ELSE now()+interval '24 hours' END,
+               reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
               [
                 fan.id,
                 body.currency,
@@ -2352,6 +2355,10 @@ export class CommerceService {
       }
     } catch (error) {
       await this.account(actor, async (client) => {
+        // Reconciliation takes packet before effect everywhere else. Keep that
+        // order on failure too, so a returning provider result cannot deadlock
+        // with this recovery transaction while each holds the other's row.
+        await this.lockPacket(client, effect.packet_id);
         const changed = await client.query(
           "UPDATE creator.commerce_effect SET state='unknown',error_code=$2,lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1 AND attempt=$3 AND state='processing'",
           [
@@ -2719,12 +2726,32 @@ export class CommerceService {
       for (const p of rows)
         ids.push(await this.queueRelease(client, p, "expired"));
       const overdue = (
-        await client.query<{ packet_id: string }>(
-          "SELECT packet_id FROM creator.commerce_commitment WHERE state IN ('due','in_progress') AND due_at<=now() ORDER BY due_at LIMIT 50 FOR UPDATE SKIP LOCKED",
+        await client.query<PacketRow>(
+          `SELECT p.* FROM creator.commerce_packet p
+           JOIN creator.commerce_commitment c ON c.packet_id=p.id
+            AND c.creator_id=p.creator_id AND c.fan_id=p.fan_id
+           WHERE c.state IN ('due','in_progress') AND c.due_at<=now()
+           ORDER BY c.due_at,c.id LIMIT 50 FOR UPDATE OF p SKIP LOCKED`,
         )
       ).rows;
-      for (const row of overdue) {
-        const p = await this.lockPacket(client, row.packet_id);
+      for (const p of overdue) {
+        // Candidate metadata can change while waiting for its packet. Lock and
+        // recheck the commitment only after the packet, matching delivery and
+        // refund reconciliation; a concurrent completed delivery is skipped.
+        const current = await client.query<{ id: string }>(
+          `SELECT id FROM creator.commerce_commitment
+           WHERE packet_id=$1 AND creator_id=$2 AND fan_id=$3
+            AND state IN ('due','in_progress') AND due_at<=now() FOR UPDATE`,
+          [p.id, p.creator_id, p.fan_id],
+        );
+        if (!current.rowCount) continue;
+        invariant(
+          p.state === "accepted" &&
+            p.payment_state === "captured" &&
+            p.intent_ref,
+          "deadline_reconciliation_required",
+          "The overdue commitment needs confirmed captured payment reconciliation.",
+        );
         await client.query(
           "UPDATE creator.commerce_commitment SET state='refund_pending',outcome='deadline_missed',version=version+1 WHERE packet_id=$1",
           [p.id],
