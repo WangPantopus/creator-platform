@@ -253,11 +253,8 @@ export async function createDevelopmentTrust(
           database: runtime.database,
           identity: identity.profiles,
           commerce: options.consumers?.commerce,
-          assertAllowed: (accountId, creatorId) =>
-            runtime.assertCreatorAllowed(
-              { accountId, adultEligible: true },
-              creatorId,
-            ),
+          assertAllowed: (actor, creatorId) =>
+            runtime.assertCreatorAllowed(actor, creatorId),
         }),
         verifyExport: verifySession,
         verifyPrivacy: async (actor, input) => {
