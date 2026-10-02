@@ -1,5 +1,18 @@
 # W8 resume prompt — complete the workstream
 
+## Actual current privacy and scoped Ops — 2026-10-02
+
+[Real web/Android/iOS operation and independent saved-state evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/app-acceptance/README.md) at backend/webc3c0a6d1 verifies the same synthetic export in both appearances, explicit blocked core0087/configuration dependencies and no download. Actual Ops purpose-limited access and recorded Close cold-reload resolved; DB verifies reviewer/access/one decision/version2/zero external effects. Queue1280×900/220sidebar and390/no overflow plus keyboard skip-link observed. No all-eight C10/owner COMMIT, accessibility200%/screen reader, provider, original recovery or release completion.
+
+The real run repaired canonical Signout visibility, cosmetic-query return routing and premature parent deadletter/opaque configuration failures. All transaction denial adapters require actual held recovery custody. W4 PR134 merged and actorless source integrated. Held0103–0110 are allocations only; concrete0099 now permits W8 terminal-denial implementation. Own devices/slots/API/web stopped; data retained. W1 handles shared Ops/status return destinations.
+
+
+## Closed reconciliation and privacy authority — 2026-10-02
+
+PR95 merged normally at5ec5cb07 after W8's real three-client Report acceptance. The new [closed reconciliation inventory and catalogue evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/README.md) keeps trafficReady false, exact canonical57 and the retained six-complete/two-blocked export. [R6 procedure](../../operations/W8-preserved-reconciliation.md) distinguishes journal replay, all-eight owner effects, original financial custody, retention, current purpose/capability and real app acceptance from an owner opening a labelled development copy. Original iMac material remains absent.
+
+`createPrivacyConsumers` now composes prepared conversation owner ports with fixed pool/task authority/retention. Real0087 task fencing precedes family discovery; both held and coordinator verification require genuine cancellable jobs outside request ALS. A new catalogue guard requires actual activated0087 plus exact source/role/ACL/trigger custody; manually installed held proposals refuse503. W4's actorless port PR134 is under review; no adult Actor is constructed from a privacy job. Actual composed privacy/native/effect acceptance remains open. Worker-denial PR131 stays draft pending real worker/task acceptance. Held0098–0102 allocations are metadata only, not activation.
+
 ## Focused negative-authority integration — 2026-10-02
 
 PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.

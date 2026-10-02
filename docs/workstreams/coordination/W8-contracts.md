@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
+
+Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.
+
 ## Focused negative-authority integration — 2026-10-02
 
 PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.

@@ -4,7 +4,10 @@ import type {
   ConversationPrivacyAuthority,
   ConversationPrivacyFamily,
 } from "../conversation/privacy.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 
 /** Enumerate metadata, then use existing pair RLS. No interactive ThreadScope,
  * runtime grant or denial bypass is issued to a client by this worker adapter. */
@@ -15,10 +18,12 @@ export function conversationPrivacyAuthority(
   const verify = privacyTaskAuthority(coordinator);
   return {
     async families(job) {
-      const owned = await verify(job);
       const client = await runtime.connect();
       try {
         await client.query("BEGIN");
+        // Discovery is lifecycle work too. Lock the real job/task before any
+        // family reads and keep its deferred currentness check through COMMIT.
+        const owned = await privacyTaskAuthorityInTransaction(client, job);
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           job.accountId,
         ]);
@@ -73,6 +78,7 @@ export function conversationPrivacyAuthority(
             }
         }
         await verify(job);
+        job.signal?.throwIfAborted();
         await client.query("COMMIT");
         return families;
       } catch (error) {
