@@ -42,6 +42,14 @@ Existing server-recorded Apple/Google memberships now retain the official store-
 
 [Exact source and limits](../../../artifacts/workstreams/W4/runtime/2026-10-01/store-management/manifest.json) record successful Swift syntax parsing and whitespace review only. Final native builds, actual settings-sheet/intent operation, linked sandbox history, account switch and accessibility remain unverified. No new tests, receipts, entitlement or local cancellation writes were introduced.
 
+### Store recovery continuation — October 2, 2026
+
+PR44 now includes current main, W1's canonical handle metadata repairs and the W4 native spending crash correction. The primary's shipping Android sign-in exposed undefined spend-total/meta styles; the amount now uses the supplied local mono44/48 treatment and metadata uses data-sm. Both shipping native builds pass with normal iOS signing. Actual Android taps and system-keyboard input verified immediate7USD, pending No limit24h, Night cold return, real API outage/reconnect and Requests→Manage membership with honest unavailable purchase/restore. The owned emulator is stopped and its exact-owner slot released.
+
+[Sanitized native receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/native-spending/manifest.json) preserves the tested scope and remaining shared reminder-copy defect. Genuine store history/settings sheets remain dependent on the unavailable Apple/Google projects. Personal iOS taps remain unverified because Device Hub repeatedly times out in the UI connector; successful compilation/install/launch does not satisfy that acceptance. No memberships, provider receipts, verification or transactions were inserted to force the management button or a successful purchase.
+
+The corrected iOS shipping build subsequently passed with normal signing and installed/launched on the owned BC8 simulator. CUA bindings to the observed Device Hub bundle and application path timed out. Personal iOS taps remain unverified; the owned idle simulator and its exact-owner slot were released.
+
 ## Primary continuation: merges and real fan spending — October 1, 2026
 
 Personally reviewed and merged PR61 (reserved ownership), PR41 (atomic call/refund custody), PR46 (qualified-read receipt scope correction) and PR47 (signed voice, preserving both runtime inputs). Actual provider/read/signing consumers remain gated. W1 is folding PR53 into PR59 after hosted iOS passes; PR44 management source is integrated locally and awaits personal native operation. Backend/web scoped compilation, lint and formatting passed for the merged increments. Hosted obsolete visual/scale failures are recorded; no references or expectations were changed.
