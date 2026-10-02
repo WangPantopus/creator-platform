@@ -1,0 +1,9 @@
+# Held follower audience composition
+
+W5 integration source: `baf45f63`; actual combined local API source: `da948f68ed0f68015f9589ee936ad5fc46263e00`. W7 producer: `7c7722f9fbb34025d6e047c3ae700c68a7bde09e`.
+
+Only W7's published `canonicalContentFollows()` factory/imports were consumed, preserving its unrelated existing Pass adapter. The W5 development host mounts the actual factory through `composeContentHost.growth.follows`. It requires the genuine W1 request authority and actual account on the held content transaction, canonical non-owner Growth runtime membership, no worker/owner/BYPASSRLS privileges, and a current follow row held FOR SHARE. No separate-pool Boolean, owner-account substitution or background fan Actor is used. Missing follower count remains unavailable.
+
+Implemented/runnable: exact producer consumption and backend types/scoped lint/format pass. Integrated: actual API4105 runs the combined source with the configured composite content/Growth runtime and separate AI/worker pools. Verified on normal existing browser sessions: creator library200 retained unsigned revision3; fan preference200 retained the actual fan-one account; a deliberately stale expected-creator-account header was denied403 `content_account_changed`. The first request during the actual restart returned503; retry after startup produced the stated denial. No session injection or mutation was performed.
+
+The follower port itself has not been exercised against an eligible publication: this fresh database has no genuine W5 signed Note or canonical W7 creator projection. Positive follow/unfollow/content audience and source/distribution acceptance remain open. Release-ready: no. The creator is DEVELOPMENT-ONLY SEEDED VERIFIED with no proof/passkey; no verification, signature or privacy receipt was fabricated. No new tests or reserved migration activation.
