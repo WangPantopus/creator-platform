@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
@@ -243,7 +244,28 @@ class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedO
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L) {
-    val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
+    // Save navigation only. Session authority, credentials and feature payloads
+    // are reconstructed and checked against the current account after recreation.
+    val permittedReturn = returnTo.takeIf(ApplicationDestination::isPermitted) ?: "/home"
+    var savedOrigin by rememberSaveable { mutableStateOf(baseURL) }
+    var savedReturn by rememberSaveable { mutableStateOf(permittedReturn) }
+    var savedDelivery by rememberSaveable { mutableStateOf(destinationDelivery) }
+    var savedDestination by rememberSaveable { mutableStateOf(permittedReturn) }
+    val model = remember(baseURL) {
+        val restored = savedDestination.takeIf {
+            ApplicationDestination.isPermitted(returnTo) && savedOrigin == baseURL && savedReturn == permittedReturn &&
+                savedDelivery == destinationDelivery && ApplicationDestination.isPermitted(it)
+        }
+        FanSession(context, baseURL, restored ?: returnTo)
+    }
+    var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
+    var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
+    SideEffect {
+        savedOrigin = baseURL; savedReturn = permittedReturn
+        savedDelivery = destinationDelivery
+        savedDestination = model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home"
+    }
+    val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycleOwner) {
@@ -251,7 +273,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
+    LaunchedEffect(returnTo, destinationDelivery) {
+        // A new explicit delivery takes priority; an unchanged initial intent
+        // must not overwrite the route restored for this origin.
+        if (!ApplicationDestination.isPermitted(returnTo) || appliedReturn != returnTo || appliedDelivery != destinationDelivery) model.open(returnTo)
+        appliedReturn = returnTo; appliedDelivery = destinationDelivery
+    }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
