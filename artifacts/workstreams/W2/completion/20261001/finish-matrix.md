@@ -1,5 +1,7 @@
 # Current W2 scope and R01–R14
 
+**Final PR65 verification checkpoint:** main `95d60b3e` reconciled in `c83da8c9`; backend/web/API typechecks and focused lint/format pass. Existing PostgreSQL-enabled backend checks pass 18/18; unchanged T-11 ran 10,000 pairs / 30,000 queries in 47,870 ms against its 300,000 ms limit. The [native milestone backup](../20261001-mac-studio/native-acceptance/backup-receipt.json) was listed, checksummed and restored with actual draft/fan/session readback. Main contains CI repairs #59/#53; W1 session outage recovery remains on its unmerged dependency chain. Final exact-head CI and normal merge are pending; full W2 is incomplete.
+
 **October 2 native/UI increment:** [actual Android acceptance](../20261001-mac-studio/native-acceptance/README.md) verifies a repaired handle crash, fictional fan profile persistence and cold relaunch in Light/Night at OS font_scale 2.0. Error Notice scrolling now follows the design’s immediate behavior and passes all four web theme/viewport checks. Full R12/native generation/screen-reader/offline/p95 and all other release gates stay open.
 
 **Populated Studio draft:** fictional expert configuration now persists 20 approved/fixed examples, criteria/rules, synthetic exclusion canary and $5 daily cap (revision 15; no usage/evaluations/versions). Personally fixed/verified add/remove/save keyboard continuations; focus receipt records the exact scope. Existing backend 18/18 pass, T-11 80,787 ms with original workload and limit. Provider publication/native acceptance remain open.
