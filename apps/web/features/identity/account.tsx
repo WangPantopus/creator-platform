@@ -61,7 +61,7 @@ export function AccountPanel() {
           Synthetic local account. Pantopus production sign-in is not connected.
         </Notice>
       )}
-      <p>Signed in as @{session.fan?.handle ?? "Choose your handle"}</p>
+      {session.fan?.handle && <p>Signed in as @{session.fan.handle}</p>}
       <p>
         Only your public handle and chosen intro belong to this app. Your
         Pantopus neighborhood and private profile are not imported.
@@ -71,7 +71,7 @@ export function AccountPanel() {
           className="qv-btn qv-btn--secondary"
           href="/onboarding/handle?returnTo=%2Fidentity%2Faccount"
         >
-          Edit public profile
+          {session.fan?.handle ? "Edit public profile" : "Choose your handle"}
         </a>
         <a className="qv-btn qv-btn--secondary" href="/studio/setup">
           {session.creator

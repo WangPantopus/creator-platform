@@ -100,6 +100,15 @@ export class PublicAIIdentityAuthority {
     private readonly assertAllowed: PublicCreatorRestriction,
   ) {}
 
+  assertPool(pool: Pool): void {
+    if (this.pool !== pool)
+      throw new DomainError(
+        "public_ai_unconfigured",
+        "Public AI metadata authority belongs to a different database pool.",
+        503,
+      );
+  }
+
   static async create(input: {
     pool: Pool;
     migration: { version: string; checksum: string };
