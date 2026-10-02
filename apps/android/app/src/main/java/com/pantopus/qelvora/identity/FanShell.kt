@@ -168,16 +168,17 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (model.currentToken() != null && !model.choosingActor && !model.busy) model.refresh() } } }
-    LaunchedEffect(model.session?.accountId, model.currentToken()) { GrowthPush.refresh(context) }
+    LaunchedEffect(model.session) { GrowthPush.refresh(context) }
     LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
         val id = notificationID ?: return@LaunchedEffect
         if (model.session == null) return@LaunchedEffect
-        val captured = model.currentToken() ?: return@LaunchedEffect
+        val captured = runCatching { model.currentToken() }.getOrNull() ?: return@LaunchedEffect
+        val sameCredential = { runCatching { model.currentToken() }.getOrNull() == captured }
         val origin = baseURL ?: return@LaunchedEffect
-        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (model.currentToken() == captured) model.open(target) }
+        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (sameCredential()) model.open(target) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { if (model.currentToken() == captured) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
-        finally { if (model.currentToken() == captured) onNotificationConsumed() }
+        catch (_: Exception) { if (sameCredential()) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
+        finally { if (sameCredential()) onNotificationConsumed() }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)

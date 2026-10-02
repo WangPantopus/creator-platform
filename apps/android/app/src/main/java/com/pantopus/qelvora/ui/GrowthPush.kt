@@ -82,7 +82,7 @@ object GrowthPush {
     val configured: Boolean get() = BuildConfig.CREATOR_PUSH_ENABLED && runCatching { java.net.URI(BuildConfig.CREATOR_API_URL).let { it.scheme == "https" && !it.host.isNullOrBlank() && it.rawUserInfo == null && it.rawPath in listOf("", "/") && it.rawQuery == null && it.rawFragment == null } }.getOrDefault(false) &&
         BuildConfig.CREATOR_FIREBASE_APPLICATION_ID.isNotBlank() && BuildConfig.CREATOR_FIREBASE_PROJECT_ID.isNotBlank() &&
         BuildConfig.CREATOR_FIREBASE_SENDER_ID.isNotBlank() && BuildConfig.CREATOR_FIREBASE_API_KEY.isNotBlank()
-    private fun credential(context: Context) = SecureSessionStorage(context.applicationContext, BuildConfig.CREATOR_API_URL).read()
+    private fun credential(context: Context) = runCatching { SecureSessionStorage(context.applicationContext, BuildConfig.CREATOR_API_URL).read() }.getOrElse { failed = true; null }
     fun permitted(context: Context): Boolean = (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) && NotificationManagerCompat.from(context).areNotificationsEnabled() &&
         context.getSystemService(NotificationManager::class.java).getNotificationChannel(channelId)?.importance != NotificationManager.IMPORTANCE_NONE
     private fun messaging(context: Context): FirebaseMessaging {
