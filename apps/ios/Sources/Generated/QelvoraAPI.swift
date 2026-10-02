@@ -4851,14 +4851,16 @@ public struct APIProof: Codable, Sendable {
   public let `code`: String
   public let `platform`: APIProofPlatform
   public let `accountUrl`: String
+  public let `postUrl`: String?
   public let `expiresAt`: String
   public let `state`: APIProofState
   public let `reason`: String?
-  public init(id: String, code: String, platform: APIProofPlatform, accountUrl: String, expiresAt: String, state: APIProofState, reason: String? = nil) {
+  public init(id: String, code: String, platform: APIProofPlatform, accountUrl: String, postUrl: String? = nil, expiresAt: String, state: APIProofState, reason: String? = nil) {
     self.id = id
     self.code = code
     self.platform = platform
     self.accountUrl = accountUrl
+    self.postUrl = postUrl
     self.expiresAt = expiresAt
     self.state = state
     self.reason = reason
@@ -4868,6 +4870,7 @@ public struct APIProof: Codable, Sendable {
     case `code`
     case `platform`
     case `accountUrl`
+    case `postUrl`
     case `expiresAt`
     case `state`
     case `reason`
@@ -4878,6 +4881,7 @@ public struct APIProof: Codable, Sendable {
     self.code = try container.decode(String.self, forKey: .code)
     self.platform = try container.decode(APIProofPlatform.self, forKey: .platform)
     self.accountUrl = try container.decode(String.self, forKey: .accountUrl)
+    self.postUrl = try container.decode(String?.self, forKey: .postUrl)
     self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
     self.state = try container.decode(APIProofState.self, forKey: .state)
     self.reason = try container.decode(String?.self, forKey: .reason)
@@ -4888,6 +4892,7 @@ public struct APIProof: Codable, Sendable {
     try container.encode(code, forKey: .code)
     try container.encode(platform, forKey: .platform)
     try container.encode(accountUrl, forKey: .accountUrl)
+    try container.encode(postUrl, forKey: .postUrl)
     try container.encode(expiresAt, forKey: .expiresAt)
     try container.encode(state, forKey: .state)
     try container.encode(reason, forKey: .reason)
