@@ -1,5 +1,7 @@
 # W2 recovery and canonical session continuation
 
+**October 2 native/UI increment:** [actual Android acceptance](../20261001-mac-studio/native-acceptance/README.md) verifies a repaired handle crash, fictional fan profile persistence and cold relaunch in Light/Night at OS font_scale 2.0. Error Notice scrolling now follows the design’s immediate behavior and passes all four web theme/viewport checks. Full R12/native generation/screen-reader/offline/p95 and all other release gates stay open.
+
 **Populated Studio draft:** fictional expert configuration now persists 20 approved/fixed examples, criteria/rules, synthetic exclusion canary and $5 daily cap (revision 15; no usage/evaluations/versions). Personally fixed/verified add/remove/save keyboard continuations; focus receipt records the exact scope. Existing backend 18/18 pass, T-11 80,787 ms with original workload and limit. Provider publication/native acceptance remain open.
 
 **Studio confirmation increment:** shared success Toast and keyboard initiator restoration were personally operated through canonical saves in Light/Night, 1280×900 and 390×900. The weekly update persists; exact PNG viewport captures and the original JPEG capture limitation are [recorded](../20261001-mac-studio/focus/README.md). PR65 final exact-head CI/merge remain pending; provider, full fidelity/accessibility and native generation acceptance remain open.
