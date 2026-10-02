@@ -1,5 +1,7 @@
 # W2 successor handoff — October 2, 2026, Mac Studio
 
+**Local resource update:** the human authorized permanent disposable-resource cleanup after this handoff. Read [W2 cleanup and fresh successor setup](W2-resource-cleanup-20261002.md) first. Old W2 checkout/native-build paths below are retired; source is pushed, private custody/binaries/backups and database/device data are preserved. Recreate an isolated current-main workspace and restore dependencies rather than relying on removed local builds.
+
 This is a requested handoff at the Android navigation/export-security checkpoint, not completion of W2. It supersedes dated runtime, database, PR and approval assertions in earlier records. Preserve the original nine packages, R01–R14, C05/C08/C09/C10, O01/O15 and O08/O10/O19/O21 assignment. Read the [successor prompt](../prompts/W2-resume-20261002-mac-studio.md), the [October 1 Mac Studio handoff](W2-creator-ai-20261001-mac-studio.md), and the original October 1 handoff/prompt for the complete assignment and historical proof limits.
 
 ## Current code and review checkpoint

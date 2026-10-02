@@ -1,5 +1,7 @@
 # Resume W2 — Creator AI, knowledge and model runtime
 
+Read docs/workstreams/handoffs/W2-resource-cleanup-20261002.md first: the human authorized permanent local cleanup. W2 checkouts and disposable build/cache output are retired; all source is pushed (held draft132 head72888e63), private backups/tools/qualified binaries and canonical database/device data remain. Create a fresh isolated current-main worktree, restore frozen dependencies, and use the relocated private tools. The disposable check container/volume is removed; the retained main database container remains stopped. This updates local resource assumptions only; the complete assignment below is unchanged.
+
 Resume the complete W2 workstream from its October2 Mac Studio checkpoint. Do not restart, narrow scope, or stop at planning, compilation, a Welcome screen, one preview or one merged PR. Work ambitiously and independently until the complete remaining assignment is handled or I tell you to stop.
 
 Read first, after fetching current origin/main and draft PR132:
