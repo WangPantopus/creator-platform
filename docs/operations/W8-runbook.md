@@ -1,5 +1,19 @@
 # Trust operation and recovery
 
+## Simulator credential custody
+
+Build a launched iOS simulator app normally under the shared heavy-build guard, with `CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. Disabling signing can compile but omit Xcode's actual simulated `application-identifier` entitlement, causing canonical complete200 followed by Keychain failure and no authenticated session. Merely ad-hoc resigning that binary does not restore the omitted simulated entitlement. Verify the normally built shipping app through actual sign-in/cold return and saved backend state. No production signing key is fabricated by this simulator build.
+
+
+## Initial wave operator — 2026-10-02 (draft)
+
+Use `apps/backend/scripts/activate-wave.ts` only after review of the exact packet in `infra/migrations/waves/20261002.json`. Set `W8_MIGRATION_WAVE=20261002` and separate `DATABASE_MIGRATION_URL` in a private0600 env file. Set private `W8_MIGRATION_BACKUP_PATH` and `W8_MIGRATION_BACKUP_MANIFEST`; neither belongs in Git. The manifest must record the actual target, fresh backup SHA256, original ledger/catalog/business-data/security-ACL/sequence hashes and matching hashes from a real separate restore. `securitySha256` and `sequenceSha256` are mandatory at the manifest root and under `restored`; use `waveSecurityCustody` / `waveSequenceCustody` inside actual database transactions. Security custody covers all role/default/PUBLIC/direct ACLs and hashes secret-bearing options inside PostgreSQL. Sequence values and catalog rows stay private; publish only counts/hashes. Preserve the original executor/extension ownership when comparing fresh and restored catalogs. Never generate restore receipts from assumed values.
+
+Stop the target's applications/workers, owner-close its database marker, set `CONNECTION LIMIT 0`, and stop its other clients. This requires migration administrator authority; runtime roles must remain non-owner/non-bypass. From `apps/backend`, run `node --env-file=<private-file> --import tsx scripts/activate-wave.ts`. It holds the migration advisory lock, verifies exact historical/source custody, applies the whole wave in one transaction, and rolls back changed original rows/history/old roles. Success leaves traffic closed. Reopening requires domain reconciliation and real application acceptance, not the migration receipt alone. The exact adopted-W5 exception has a synthetic source-layout rehearsal; it does not replace the historical35→48 adopter or authorize any other profile. PUBLIC/effective database privileges and exact purpose-role function/ACL custody are checked before/after rollout.
+
+[Current synthetic rehearsal](../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/README.md) is SQL verification only. It is not original preserved-data recovery. The default fresh runner remains `scripts/migrate-trust.ts`; it refuses any existing ledger with pending wave migrations, which must use the private-backup atomic operator. Exact initial purpose-role custody is checked before/after both paths. Fresh empty install and fully applied verification remain available.
+
+
 **Mac Studio host, 2026-10-01 (current):** this host does not have the iMac's private W8 archives, env files or Docker volumes. Read [the re-verification record](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) before reusing any older instruction below.
 
 - **W8 resources on this host** (all stopped at handoff; volumes retained):

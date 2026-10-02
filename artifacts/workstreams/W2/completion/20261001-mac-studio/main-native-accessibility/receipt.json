@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T11:04:39.135945+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "androidShippingSource": "ad47dfe5",
+  "apkSha256": "3838b42519e6a8c92722eca0fe2235be0cada86edb2838777c6a4e6dfc17b198",
+  "device": {
+    "serial": "emulator-5554",
+    "avd": "Qelvora_W2_API34",
+    "cores": 2,
+    "memoryMb": 2048,
+    "fontScale": 2.0,
+    "pixels": [
+      1080,
+      2400
+    ],
+    "density": 420,
+    "nominalDpWidth": 411,
+    "theme": "Light"
+  },
+  "actor": {
+    "account": "10000000-0000-4000-8000-000000000002",
+    "fanId": "f1c199e1-58e7-4548-9166-86866acb6d63",
+    "handle": "w2_native_fan",
+    "kind": "synthetic development actor two"
+  },
+  "actions": [
+    "Build/install real main shipping app; operate Home and You in visible Android Studio mirroring.",
+    "Stop only owned creator-platform-w2-20261001, force-stop/relaunch actual app: account503 plus signed-out Welcome defect observed.",
+    "Restart owned DB; first readiness exit1 preserved; later ready exit0. Cold relaunch retrieves same actual saved fan without sign-in.",
+    "Use actual Android Settings Accessibility > Color and motion > Remove animations switch; enabled; read-only animator scale0.0 and system font2.0 confirmed.",
+    "Return to real app and personally tap You: same populated fan profile at actual200% text with reduced motion.",
+    "Reach actual TalkBack full-control permission; ask required human confirmation; deny/cancel while pending. TalkBack remains off."
+  ],
+  "talkBack": {
+    "permission": "pending human",
+    "enabled": false,
+    "acceptance": "unverified"
+  },
+  "outcome": {
+    "sameFanRecovered": true,
+    "coldOutageWelcomeDefect": "retained before fix",
+    "home": "actual404/unconfigured, no feed acceptance",
+    "providerCalls": 0,
+    "newUnitTests": 0
+  },
+  "captures": {
+    "android-main-home-unavailable-light.png": {
+      "bytes": 112462,
+      "sha256": "d465a200bfc0b89451705e66be9da297ee77a1713f47736aa7f1746c60194921"
+    },
+    "android-main-cold-outage-welcome-defect.png": {
+      "bytes": 223042,
+      "sha256": "cc594429b824b3f1caf2a667ea7f0a3b6ee2c69ba77ca6b181c5471cbd716db9"
+    },
+    "android-remove-animations-enabled.png": {
+      "bytes": 518014,
+      "sha256": "213bfe2b286f9b2c14b2abb42ef3937b19ae47ae4dab3435084d0a9037a51a2d"
+    },
+    "android-account-200-percent-reduced-motion.png": {
+      "bytes": 580439,
+      "sha256": "1c723381104604693a6f71cc32c24312f6e2394d554182c026f55b3690f1b158"
+    },
+    "android-talkback-permission-pending.png": {
+      "bytes": 232872,
+      "sha256": "7fa1c8d65074844a848fd46e89386b3089d90d1f3afccfba85c20713807ebb18"
+    },
+    "android-main-account-light.png": {
+      "bytes": 211877,
+      "sha256": "36cefecf77af301eecac257d4d380a47aaf1de72621009ec11b72f9844d1e565"
+    }
+  },
+  "limits": [
+    "This source predates W1 narrow7400de38 correction; no after-fix acceptance claimed here.",
+    "Native cited generation/composition is unavailable.",
+    "TalkBack, iOS personal inputs, full fidelity and browser200% remain unverified.",
+    "CUA native screenshots include surrounding shared IDE; actions applied only to explicit W2 mirrored guest5554."
+  ]
+}

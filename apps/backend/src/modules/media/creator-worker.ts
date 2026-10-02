@@ -105,6 +105,7 @@ export class CreatorMediaWorker {
         const processed = await this.service.storage.read(
           claimed.id,
           "processed",
+          Number(claimed.max_bytes),
         );
         if (
           !claimed.signed_act_id ||

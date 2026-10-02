@@ -1,0 +1,17 @@
+Thu Oct  1 09:22:06 2026 -> ClamAV update process started at Thu Oct  1 09:22:06 2026
+WARNING: Thu Oct  1 09:22:07 2026 -> Your ClamAV installation is OUTDATED!
+WARNING: Thu Oct  1 09:22:07 2026 -> Local version: 1.4.3 Recommended version: 1.4.6
+Thu Oct  1 09:22:07 2026 -> DON'T PANIC! Read https://docs.clamav.net/manual/Installing.html
+Thu Oct  1 09:22:07 2026 -> daily database available for download (remote version: 28140)
+Thu Oct  1 09:22:08 2026 -> Testing database: '/var/lib/clamav/tmp.25c1f14ec1/clamav-17c577f2560b4e4ff36b60b09a77818f.tmp-daily.cvd' ...
+Thu Oct  1 09:22:14 2026 -> Database test passed.
+Thu Oct  1 09:22:14 2026 -> daily.cvd updated (version: 28140, sigs: 355709, f-level: 90, builder: svc.clamav-publisher)
+Thu Oct  1 09:22:14 2026 -> main database available for download (remote version: 63)
+Thu Oct  1 09:22:17 2026 -> Testing database: '/var/lib/clamav/tmp.25c1f14ec1/clamav-29967fa7644784ef4523a33128dff16b.tmp-main.cvd' ...
+Thu Oct  1 09:22:22 2026 -> Database test passed.
+Thu Oct  1 09:22:22 2026 -> main.cvd updated (version: 63, sigs: 3287027, f-level: 90, builder: tomjudge)
+Thu Oct  1 09:22:22 2026 -> bytecode database available for download (remote version: 339)
+Thu Oct  1 09:22:22 2026 -> Testing database: '/var/lib/clamav/tmp.25c1f14ec1/clamav-251d76b31da3c6057802ce4cbd2e135b.tmp-bytecode.cvd' ...
+Thu Oct  1 09:22:22 2026 -> Database test passed.
+Thu Oct  1 09:22:22 2026 -> bytecode.cvd updated (version: 339, sigs: 80, f-level: 90, builder: nrandolp)
+ERROR: Thu Oct  1 09:22:22 2026 -> NotifyClamd: Can't find or parse configuration file /etc/clamav/clamd.conf

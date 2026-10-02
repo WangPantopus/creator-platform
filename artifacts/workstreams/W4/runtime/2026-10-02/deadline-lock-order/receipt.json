@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-10-02T09:40:18.410Z",
+  "operator": "Primary W4",
+  "implemented": [
+    "Packet-before-commitment deadline, call outcome and payout locking",
+    "Current overdue state/deadline rechecked after packet acquisition",
+    "Unknown or uncaptured overdue payment refuses refund creation",
+    "Packet-before-effect recovery lock order"
+  ],
+  "verified": [
+    "Backend typecheck and affected lint pass",
+    "Seven actual SQL statements plan with LockRows under creator_runtime on owned PostgreSQL 17; no ANALYZE or business writes",
+    "Personally restarted owned API4104 and operated real web Requests then Spending return; empty real history and saved 7 USD / original pending No limit / reminders off persist"
+  ],
+  "limits": [
+    "No genuine captured payment/call/payout fixture exists; paid concurrency and provider race acceptance unverified",
+    "No new unit tests, fake receipts, business rows or SQL migration activation"
+  ],
+  "files": [
+    {
+      "path": "web-requests-current-runtime.png",
+      "sha256": "cee74ac496b25fde5d90d212b9233753196a2944bb6bbb13dd327184d2a74b91"
+    }
+  ]
+}

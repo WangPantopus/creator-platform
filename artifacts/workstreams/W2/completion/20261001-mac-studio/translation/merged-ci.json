@@ -1,0 +1,141 @@
+{
+  "headRefOid": "db0b6c1cc65665402e998878f29afcf7eacb7af5",
+  "mergeable": "MERGEABLE",
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T09:19:08Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988855090/job/110780079593",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T09:16:47Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T09:18:56Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988849840/job/110780063956",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T09:16:43Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988855090/job/110780079731",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T09:16:44Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988849840/job/110780064019",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T09:16:41Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988855090/job/110780080045",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T09:16:44Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988849840/job/110780063906",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T09:16:41Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988855090/job/110780079810",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T09:16:44Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988849840/job/110780063621",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T09:16:41Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T09:22:39Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988855090/job/110780079732",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T09:17:22Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T09:21:38Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36988849840/job/110780063957",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T09:16:43Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "schemaVersion": 1,
+  "PR": 100,
+  "url": "https://github.com/WangPantopus/creator-platform/pull/100",
+  "normalMerge": true,
+  "adminOverride": false,
+  "mergeCommit": "1d3571b503e218085e333dcb977c9dfb630c4ffb",
+  "mergedAt": "2026-10-02T09:27:34Z",
+  "mainAtMerge": "83f605a71f96b56caf63f7c1f65c36f47685b875",
+  "protection": "404 unprotected",
+  "rulesets": [],
+  "mainVerification": {
+    "actualCheckout": "1d3571b503e218085e333dcb977c9dfb630c4ffb",
+    "backendTypecheck": "passed",
+    "acceptedTags": ["es", "zh-Hant-TW", "ja", "ar", "pt-BR"],
+    "invalidTagsRefused": 6,
+    "emptyVerdictRefused": true,
+    "missingHumanProvenanceRefused": true,
+    "invalidExecutionPurposesRefused": 5,
+    "providerCalls": 0,
+    "signedActsCreated": 0,
+    "durableJobsCreated": 0,
+    "liveDB": {
+      "migrations": 40,
+      "draftRevision": 15,
+      "usage": 0,
+      "evaluations": 0,
+      "versions": 0
+    }
+  },
+  "limits": [
+    "Six Mac jobs were queued, not passed.",
+    "Only structural operator checks on main; no actual W3 translation authority fabricated.",
+    "No positive provider, translation delivery, approved policy, native UX or p95 acceptance."
+  ]
+}

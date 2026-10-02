@@ -1,6 +1,7 @@
 import type { Actor } from "../identity/adapter.js";
 import type { CommerceService } from "./service.js";
 import { invariant } from "../../core/errors.js";
+import { lockCommitmentPacket } from "./packet-locks.js";
 
 export interface VerifiedMoneyStatement {
   paymentReference: string;
@@ -48,10 +49,11 @@ export class MoneyReconciliation {
       "The current provider statement is invalid.",
     );
     return this.service.account(actor, async (client) => {
+      await lockCommitmentPacket(client, before.commitment.id);
       const row = (
         await client.query(
-          "SELECT p.intent_ref,p.version AS packet_version,c.id AS commitment_id,c.version AS commitment_version,p.creator_id,p.fan_id FROM creator.commerce_packet p JOIN creator.commerce_commitment c ON c.packet_id=p.id WHERE p.id=$1 FOR UPDATE OF p,c",
-          [packetId],
+          "SELECT p.intent_ref,p.version AS packet_version,c.id AS commitment_id,c.version AS commitment_version,p.creator_id,p.fan_id FROM creator.commerce_packet p JOIN creator.commerce_commitment c ON c.packet_id=p.id AND c.creator_id=p.creator_id AND c.fan_id=p.fan_id WHERE p.id=$1 AND c.id=$2 FOR UPDATE OF c",
+          [packetId, before.commitment.id],
         )
       ).rows[0];
       invariant(

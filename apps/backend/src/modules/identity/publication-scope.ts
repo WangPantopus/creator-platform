@@ -86,6 +86,7 @@ export class PublicationIdentityAuthority {
     const result = await this.pool.query<{ allowed: boolean }>(
       `SELECT current_user='creator_publication_worker' AND session_user=current_user
         AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
+        AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
         AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
         AND to_regprocedure('creator.begin_publication_scope(uuid,uuid,integer,uuid,uuid,text,text)') IS NOT NULL
         AND to_regprocedure('creator_trust.publication_worker_denial(uuid,uuid)') IS NOT NULL
