@@ -3,6 +3,7 @@ package com.pantopus.qelvora.conversation
 import android.net.Uri
 import android.os.SystemClock
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,9 +13,13 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -38,6 +43,10 @@ import kotlinx.coroutines.flow.collect
 import kotlin.random.Random
 import kotlinx.serialization.json.*
 import java.util.UUID
+import com.pantopus.qelvora.commerce.CommerceClient
+import com.pantopus.qelvora.commerce.CommerceOverview
+import com.pantopus.qelvora.commerce.CommerceFailure
+import com.pantopus.qelvora.commerce.commerceMoney
 
 object W3FanFeatures {
     /** W1 calls this on sign-out/revocation alongside credential purge. */
@@ -253,7 +262,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("caption", strong = true).copy(color = qColor("ink")))
+            BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
             LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
             Button("Close", variant = ButtonVariant.QUIET) { source = null }
         }
@@ -455,7 +464,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = "Privacy status", children = error); Button("Try again", variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
         item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) "Loading your memories…" else "Memories unavailable.", style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("caption", strong = true).copy(color = qColor("ink")))
+            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("data-sm").copy(color = qColor("ink")))
             if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
             if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
             Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { source(item) } }
@@ -503,7 +512,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
         item {
-            BasicText("WHO RUNS IT",style=qText("caption", strong = true).copy(color = qColor("ink")))
+            BasicText("WHO RUNS IT",style=qText("data-sm").copy(color = qColor("ink")))
             val policy = capabilities?.providers
             if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
             policy?.providers?.forEach { provider ->
@@ -511,8 +520,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
                 BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
             }
-            BasicText("WHO CAN READ IT",style=qText("caption", strong = true).copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
-            BasicText("WHAT IT REMEMBERS",style=qText("caption", strong = true).copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHO CAN READ IT",style=qText("data-sm").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHAT IT REMEMBERS",style=qText("data-sm").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
         if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
@@ -531,13 +540,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 
 @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
     val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
+    val context = LocalContext.current
+    val accountId = session.session?.accountId
+    val commerceClient = remember(context, baseURL, accountId) { CommerceClient(context, baseURL, accountId) }
+    var commerce by remember(client) { mutableStateOf<CommerceOverview?>(null) }
+    val scroll = rememberLazyListState()
     var account by remember(client) { mutableStateOf<JsonObject?>(null) };var error by remember(client) { mutableStateOf("") }
     var cursor by remember(client) { mutableStateOf<String?>(null) }; var loading by remember(client) { mutableStateOf(false) }
     var revision by remember(client) { mutableStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    fun conceal() { revision += 1; account = null; loading = false }
+    fun conceal() { revision += 1; account = null; commerce = null; loading = false }
     DisposableEffect(lifecycleOwner, client) {
         val observer = LifecycleEventObserver { _, _ ->
             val active = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
@@ -554,17 +568,66 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         loading = true; cursor = before; error = ""
         try {
             val fresh = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject
-            if (revision == currentRevision && foreground) { account = fresh; cursor = before }
+            if (revision != currentRevision || !foreground || session.session?.accountId != accountId) return
+            account = fresh; cursor = before
+            val token = session.currentToken()
+            val overview = try { commerceClient.overview() } catch (failure: Throwable) {
+                if (failure is CancellationException) throw failure
+                if (failure is CommerceFailure && failure.status in listOf(401, 409)) {
+                    if (revision == currentRevision) conceal()
+                    throw failure
+                }
+                null
+            }
+            if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
+                commerce = overview
         }
         catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: "Reconnect to open You." }
         finally { if (revision == currentRevision) loading = false }
     }
     LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }
     val fan=account?.get("fan")?.jsonObject
-    LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { BasicText("You",style=qText("title").copy(color = qColor("ink"))); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
-        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "Your account",style=qText("display-md").copy(color = qColor("ink")));BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.",style=qText("body").copy(color = qColor("ink")));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
-        item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce/requests") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/spending") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
+    val overview = commerce
+    val largeText = LocalDensity.current.fontScale >= 1.5f
+    val limit = overview?.limits?.firstOrNull { it.currency == overview.policy.currency }
+    val limitDetail = if (overview == null) "Currently unavailable" else if (limit == null) "Choose your limit" else if (limit.explicit_none) "No limit" else limit.amount?.toLongOrNull()?.let { "of your ${commerceMoney(it, limit.currency)} limit" } ?: "Limit unavailable"
+    val privacyIndex = if (error.isNotEmpty()) 5 else 4
+    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), state = scroll, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "You", style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(if (session.session?.mode == APISessionMode.DEVELOPMENT) "Synthetic local account · development" else "Signed in with Pantopus", style = qText("caption").copy(color = qColor("ink-muted")))
+            }
+        }
+        if(error.isNotEmpty()) item { Notice(title = "Account unavailable", children = error) }
+        item {
+            if (largeText) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.fillMaxWidth())
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.fillMaxWidth())
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.weight(1f))
+                }
+            }
+        }
+        item {
+            Panel(Modifier.fillMaxWidth(), padding = 0.dp, gap = 0.dp) {
+                AccountRow("Me and privacy", "Memories, who opened your conversations, consents") { scope.launch { scroll.scrollToItem(privacyIndex) } }; Hairline()
+                AccountRow("Spending and time", "Your limit, receipts, time with each AI") { session.open("/commerce/spending") }; Hairline()
+                AccountRow("Memberships", "Manage your memberships") { session.open("/commerce/membership") }; Hairline()
+                AccountRow("Notifications", "Push and email, per creator, quiet hours") { session.open("/notifications/settings") }; Hairline()
+                AccountRow("Receipts", "Your purchases and deliveries") { session.open("/commerce/requests") }; Hairline()
+                AccountRow("Help and safety", "Report, block, crisis support") { session.open("/support") }
+            }
+        }
+        item {
+            BasicText("Your intro", style = qText("title").copy(color = qColor("ink")))
+            BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.", style = qText("body").copy(color = qColor("ink")))
+            Button("Edit handle and intro", variant = ButtonVariant.QUIET) { session.open("/identity/account") }
+        }
         item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
         if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText("No conversations yet.",style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
@@ -579,6 +642,24 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (cursor != null) Button("Back to first page",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
             if (error.isNotEmpty()) Button("Try again",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }
         }
-        item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") };Button("Help and safety",variant=ButtonVariant.QUIET) { session.open("/support") } }
+        item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") } }
+    }
+}
+
+@Composable private fun AccountMetric(title: String, value: String, detail: String, modifier: Modifier) {
+    Panel(modifier, padding = 14.dp, gap = 4.dp) {
+        BasicText(title, style = qText("data-sm").copy(color = qColor("ink-muted")))
+        BasicText(value, style = qText("data-lg").copy(color = qColor("ink")))
+        BasicText(detail, style = qText("caption").copy(color = qColor("ink-muted")))
+    }
+}
+
+@Composable private fun AccountRow(title: String, detail: String, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = onClick).semantics(mergeDescendants = true) {}.padding(horizontal = 16.dp, vertical = 7.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            BasicText(title, style = qText("body-strong").copy(color = qColor("ink")))
+            BasicText(detail, style = qText("caption").copy(color = qColor("ink-muted")))
+        }
+        Box(Modifier.clearAndSetSemantics {}) { Glyph("chevron", 16.dp, qColor("ink")) }
     }
 }

@@ -117,8 +117,8 @@ private struct W3ThreadScreen: View {
             }
             .onDisappear { model.setActive(false); Task { await model.presence(active: false) } }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session) }
-            .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("caption", weight: .semibold); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
-            .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("caption", weight: .semibold); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
+            .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("data-sm"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
+            .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
@@ -195,7 +195,7 @@ private struct W3FirstConversation: View {
             AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
             Text("Before your first message").qText("display-lg")
             VStack(alignment: .leading, spacing: 16) {
-                Text("WHO RUNS IT").qText("caption", weight: .semibold)
+                Text("WHO RUNS IT").qText("data-sm")
                 if let policy = caps?.providers {
                     Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
                     ForEach(policy.providers, id: \.name) { provider in
@@ -203,8 +203,8 @@ private struct W3FirstConversation: View {
                         Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
                     }
                 } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
-                Text("WHO CAN READ IT").qText("caption", weight: .semibold); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
-                Text("WHAT IT REMEMBERS").qText("caption", weight: .semibold); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
+                Text("WHO CAN READ IT").qText("data-sm"); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
+                Text("WHAT IT REMEMBERS").qText("data-sm"); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
             if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
             if session.destination.contains("context=") { Notice(title: "Post context unavailable", children: "This post context is not connected to the conversation service yet. Your destination is kept.") }
@@ -245,7 +245,7 @@ private struct W3PrivacyScreen: View {
             if memory == nil { Text(failure.isEmpty ? "Loading your memories…" : "Memories unavailable.").qText("body") }
             if memory?.items.isEmpty == true { Text("No memories. The AI asks before remembering.").qText("body") }
             ForEach(memory?.items ?? []) { item in VStack(alignment: .leading, spacing: 12) {
-                Text(item.state == "proposed" ? "Want me to remember this? Only if you say yes." : item.kind == "open_loop" ? "Open loop · " + item.state : "Remembered").qText("caption", weight: .semibold)
+                Text(item.state == "proposed" ? "Want me to remember this? Only if you say yes." : item.kind == "open_loop" ? "Open loop · " + item.state : "Remembered").qText("data-sm")
                 if editing == item.id { TextField("What you want remembered", text: $text, axis: .vertical).qText("body"); Button("Save proposal", variant: .secondary, disabled: busy || text.isEmpty) { Task { await decide(item, "edit") } } }
                 else { Text(item.text).qText("body").textSelection(.enabled) }
                 if item.sensitiveCategory != nil { Text("Sensitive item · agreement applies only to this exact memory.").qText("caption") }
@@ -349,6 +349,7 @@ private struct W3AccountScreen: View {
     @State private var revision = 0
     @State private var commerce: CommerceOverview?
     @ScaledMetric(relativeTo: .title2) private var metricSize: CGFloat = 24
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     var body: some View {
@@ -361,10 +362,15 @@ private struct W3AccountScreen: View {
                             .qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                     }
                     if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
-                    HStack(alignment: .top, spacing: 12) {
+                    if dynamicTypeSize.isAccessibilitySize {
+                        VStack(alignment: .leading, spacing: 12) {
+                            accountMetric("THIS MONTH", value: monthAmount, detail: limitDescription)
+                            accountMetric("MEMBERSHIPS", value: commerce.map { String($0.memberships.count) } ?? "—", detail: commerce == nil ? "Currently unavailable" : "Saved memberships")
+                        }
+                    } else { HStack(alignment: .top, spacing: 12) {
                         accountMetric("THIS MONTH", value: monthAmount, detail: limitDescription)
                         accountMetric("MEMBERSHIPS", value: commerce.map { String($0.memberships.count) } ?? "—", detail: commerce == nil ? "Currently unavailable" : "Saved memberships")
-                    }
+                    } }
                     accountPanel {
                         accountRow("Me and privacy", detail: "Memories, who opened your conversations, consents") { proxy.scrollTo("account-privacy", anchor: .top) }
                         accountDivider
@@ -427,7 +433,7 @@ private struct W3AccountScreen: View {
     private func accountMetric(_ title: String, value: String, detail: String) -> some View {
         accountPanel {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title).qText("caption", weight: .semibold).foregroundStyle(qColor("ink-muted", scheme))
+                Text(title).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
                 Text(value).font(QelvoraFonts.font("mono", size: metricSize)).minimumScaleFactor(0.8)
                 Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
             }.padding(14).frame(maxWidth: .infinity, alignment: .leading)
@@ -448,7 +454,7 @@ private struct W3AccountScreen: View {
                     Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 QelvoraGlyph(name: "chevron", size: 16).accessibilityHidden(true)
-            }.padding(.horizontal, 16).padding(.vertical, 10).frame(minHeight: 56)
+            }.padding(.horizontal, 16).padding(.vertical, 7).frame(minHeight: 56)
                 .contentShape(Rectangle())
         }.buttonStyle(.plain).accessibilityElement(children: .combine)
     }

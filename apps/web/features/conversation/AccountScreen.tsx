@@ -12,6 +12,28 @@ import { useConversationRequest, ConversationError } from "./api";
 import { useIdentityRequest } from "../identity/session-boundary";
 import "./conversation.css";
 type Account = ConversationAccountPage;
+type AccountCommerce = {
+  fan: { id: string } | null;
+  exposure: { captured: number; currency: string } | null;
+  policy: { currency: string };
+  limits: { currency: string; amount: string | null; explicit_none: boolean }[];
+  memberships: { id: string }[];
+};
+function accountMoney(value: number | string, currency: string): string {
+  const amount = Number(value);
+  if (!Number.isSafeInteger(amount) || amount < 0) return "—";
+  try {
+    const formatter = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+    });
+    const digits = formatter.resolvedOptions().maximumFractionDigits;
+    if (digits === undefined) return "—";
+    return formatter.format(amount / 10 ** digits);
+  } catch {
+    return "—";
+  }
+}
 type MemoryView = {
   revision: number;
   offTheRecord: boolean;
@@ -33,8 +55,14 @@ export function AccountScreen({
   fanId?: string;
 }) {
   const request = useConversationRequest();
-  const { session } = useIdentityRequest();
+  const {
+    session,
+    signal,
+    end,
+    request: identityRequest,
+  } = useIdentityRequest();
   const [account, setAccount] = useState<Account | null>(null);
+  const [commerce, setCommerce] = useState<AccountCommerce | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -48,6 +76,7 @@ export function AccountScreen({
       revision++;
       controller?.abort();
       setAccount(null);
+      setCommerce(null);
       setLoading(false);
     };
     const refresh = () => {
@@ -66,11 +95,52 @@ export function AccountScreen({
         undefined,
         controller.signal,
       )
-        .then((value) => {
-          if (active && revision === currentRevision) setAccount(value);
+        .then(async (value) => {
+          if (!active || revision !== currentRevision) return;
+          setAccount(value);
+          try {
+            const response = await fetch("/api/commerce/overview", {
+              cache: "no-store",
+              headers: { "X-Commerce-Account-Id": session.accountId },
+              signal: AbortSignal.any([
+                signal,
+                controller!.signal,
+                AbortSignal.timeout(10000),
+              ]),
+            });
+            if (!active || revision !== currentRevision || signal.aborted)
+              return;
+            if (response.status === 401) {
+              // Recheck the current session after an ordinary cookie rotation.
+              await identityRequest("session");
+              return;
+            }
+            if (
+              response.status === 409 &&
+              (await response.clone().json()).error?.code ===
+                "session_account_changed"
+            ) {
+              conceal();
+              end();
+              return;
+            }
+            if (!response.ok) return;
+            const overview = (await response.json()) as AccountCommerce;
+            if (
+              active &&
+              revision === currentRevision &&
+              !signal.aborted &&
+              overview.fan?.id === value.fan.id
+            )
+              setCommerce(overview);
+          } catch {
+            // Commerce has its own permission/read boundary. An unavailable
+            // metric never turns into a zero or replaces the account read.
+            if (active && revision === currentRevision) setCommerce(null);
+          }
         })
         .catch((error) => {
-          if (active && revision === currentRevision)
+          if (active && revision === currentRevision && !signal.aborted)
             setError(
               error instanceof Error
                 ? error.message
@@ -99,7 +169,17 @@ export function AccountScreen({
       window.removeEventListener("offline", offline);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [request, cursor, attempt, creatorId, fanId]);
+  }, [
+    request,
+    cursor,
+    attempt,
+    creatorId,
+    fanId,
+    session.accountId,
+    signal,
+    end,
+    identityRequest,
+  ]);
   if (creatorId && fanId)
     return (
       <ConversationPrivacy
@@ -108,8 +188,20 @@ export function AccountScreen({
         fanId={fanId}
       />
     );
+  const limit = commerce?.limits.find(
+    (value) => value.currency === commerce.policy.currency,
+  );
+  const limitDetail = !commerce
+    ? "Currently unavailable"
+    : !limit
+      ? "Choose your limit"
+      : limit.explicit_none
+        ? "No limit"
+        : limit.amount === null
+          ? "Limit unavailable"
+          : `of your ${accountMoney(limit.amount, limit.currency)} limit`;
   return (
-    <main className="conversation-account" aria-busy={loading}>
+    <main className="conversation-account conversation-you" aria-busy={loading}>
       <div className="account-title">
         <h1>{account ? `@${account.fan.handle}` : "You"}</h1>
         <p className="conversation-quiet">
@@ -133,18 +225,31 @@ export function AccountScreen({
           </button>
         </section>
       )}
-      <section>
-        <h2>Your intro</h2>
-        <p>
-          {account
-            ? account.fan.intro || "You haven’t added an intro yet."
-            : error
-              ? "Your intro is unavailable."
-              : "Loading your account…"}
-        </p>
-        <Button href="/identity/account" variant="quiet">
-          Edit handle and intro
-        </Button>
+      <section
+        className="account-metrics"
+        aria-label="Spending and memberships"
+      >
+        <article>
+          <span className="qv-meta">THIS MONTH</span>
+          <span className="account-metric-value">
+            {commerce?.exposure
+              ? accountMoney(
+                  commerce.exposure.captured,
+                  commerce.exposure.currency,
+                )
+              : "—"}
+          </span>
+          <span className="qv-help">{limitDetail}</span>
+        </article>
+        <article>
+          <span className="qv-meta">MEMBERSHIPS</span>
+          <span className="account-metric-value">
+            {commerce ? commerce.memberships.length : "—"}
+          </span>
+          <span className="qv-help">
+            {commerce ? "Saved memberships" : "Currently unavailable"}
+          </span>
+        </article>
       </section>
       <section>
         <nav aria-label="Your account">
@@ -178,16 +283,42 @@ export function AccountScreen({
               ["Help and safety", "Report, block, crisis support", "/support"],
             ].map(([title, description, href]) => (
               <a key={title} href={href}>
-                <span>
+                <span className="account-row-label">
                   <strong>{title}</strong>
-                  <br />
                   <span className="qv-help">{description}</span>
                 </span>
-                <span aria-hidden="true">›</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 3.5L10.5 8 6 12.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </a>
             ))}
           </article>
         </nav>
+      </section>
+      <section>
+        <h2>Your intro</h2>
+        <p>
+          {account
+            ? account.fan.intro || "You haven’t added an intro yet."
+            : error
+              ? "Your intro is unavailable."
+              : "Loading your account…"}
+        </p>
+        <Button href="/identity/account" variant="quiet">
+          Edit handle and intro
+        </Button>
       </section>
       <section id="conversations">
         <h2>Me and privacy</h2>

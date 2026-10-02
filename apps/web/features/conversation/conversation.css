@@ -168,7 +168,7 @@
   font-weight: 400;
   margin: 0;
 }
-.conversation-account nav a,
+.conversation-account nav[aria-label="Your account"] a,
 .conversation-account .conversation-row {
   min-height: 56px;
   padding: 12px 16px;
@@ -181,7 +181,7 @@
   text-decoration: none;
   box-sizing: border-box;
 }
-.conversation-account nav a:last-child {
+.conversation-account nav[aria-label="Your account"] a:last-child {
   border-bottom: 0;
 }
 .conversation-account input,
@@ -204,6 +204,68 @@
 }
 .conversation-account .account-title {
   padding: 28px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.conversation-you {
+  gap: 24px;
+}
+.conversation-you .account-title > p {
+  font-size: 13px;
+  line-height: 18px;
+}
+.conversation-you .account-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.account-metrics article {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.account-metric-value {
+  font: 24px/28px var(--font-mono);
+}
+.conversation-you nav[aria-label="Your account"] a {
+  padding: 7px 16px;
+}
+.account-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.account-row-label strong {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+}
+.conversation-you nav[aria-label="Your account"] svg {
+  flex-shrink: 0;
+}
+.conversation-you {
+  padding-bottom: 110px;
+}
+.conversation-you > .qv-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  box-sizing: border-box;
+  z-index: 4;
+}
+@media (max-width: 320px) {
+  .conversation-you .account-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .conversation-memory {
   padding: 14px 16px;
