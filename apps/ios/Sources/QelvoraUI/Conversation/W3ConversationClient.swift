@@ -72,11 +72,11 @@ struct W3Usage: Decodable, Sendable {
 /// W1's OS credential store supplies account authority; no model credential reaches a fan client.
 actor W3ConversationClient {
     let baseURL: URL
-    private let credentials = SecureSessionStorage()
+    private let credentials: SecureSessionStorage
     private let session: URLSession
     private let expectedAccountId: String?
     init(baseURL: URL, expectedAccountId: String? = nil) {
-        self.baseURL = baseURL
+        self.baseURL = baseURL; credentials = SecureSessionStorage(issuer: baseURL)
         self.expectedAccountId = expectedAccountId
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData

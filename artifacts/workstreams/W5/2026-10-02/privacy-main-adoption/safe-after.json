@@ -1,0 +1,23 @@
+{
+  "phase": "ownedMainUpgrade",
+  "ledgerRows": 61,
+  "originalLedgerRows": 57,
+  "originalHistoryPreserved": true,
+  "originalBusinessRows": 36,
+  "originalTables": 161,
+  "originalDataSha256": "d8ff1d7d7dd42a04e2c5154d9c183ca80ec6db824de7534011b2496f1ede73d4",
+  "oldRolesPreserved": true,
+  "roleSafety": {
+    "checkedRoles": 3,
+    "pinnedFunctions": 10,
+    "directCapabilities": 93,
+    "publicCapabilities": 331,
+    "pinnedPublicFunctions": 23
+  },
+  "privacyRoleSafety": {
+    "checkedPrivatePurposes": 2,
+    "administratorSelectedCatalogueReview": true
+  },
+  "trafficClosed": true,
+  "releaseReady": false
+}

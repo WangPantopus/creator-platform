@@ -98,6 +98,7 @@ export function composeContentHost(input: {
   publicProjection?: NonNullable<ContentDependencies["effect"]>;
   publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
+  groupPublication?: ContentDependencies["groupPublication"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -140,6 +141,9 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.groupPublication
+      ? { groupPublication: input.groupPublication }
+      : {}),
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
     ...(input.creatorTenure
       ? createContentCreatorTenureHost(input.creatorTenure)
