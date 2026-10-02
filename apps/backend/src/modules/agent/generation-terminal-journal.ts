@@ -5,7 +5,7 @@ import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import {
   GenerationIdentityAuthority,
-  type GenerationPurposeConsumer,
+  type GenerationTerminalPurposeConsumer,
 } from "../identity/generation-scope.js";
 import {
   GenerationTerminalAuthority,
@@ -52,7 +52,7 @@ export class PreparedGenerationTerminalJournal {
     private readonly journal: PreparedGenerationJournal,
     private readonly hostPool: Pool,
     private readonly custody: Readonly<{
-      consumers: readonly GenerationPurposeConsumer[];
+      consumers: readonly GenerationTerminalPurposeConsumer[];
       privateHelperDefinitionChecksum: string;
       catalogueChecksum: string;
     }>,
@@ -72,7 +72,7 @@ export class PreparedGenerationTerminalJournal {
     workerPool: Pool;
     hostPool: Pool;
     journal: PreparedGenerationJournal;
-    consumers: readonly GenerationPurposeConsumer[];
+    consumers: readonly GenerationTerminalPurposeConsumer[];
     privateHelperDefinitionChecksum: string;
     /** Independently reviewed effective column/table/RLS/schema catalogue. */
     catalogueChecksum: string;
@@ -130,7 +130,7 @@ export class PreparedGenerationTerminalJournal {
       "Both exact reviewed terminal journal executables and catalogue are required.",
     );
     for (const receipt of receipts)
-      input.identity.assertConsumerRegistered(receipt);
+      input.identity.assertTerminalConsumerRegistered(receipt);
     const terminalJournal = new PreparedGenerationTerminalJournal(
       input.terminal,
       input.journal,

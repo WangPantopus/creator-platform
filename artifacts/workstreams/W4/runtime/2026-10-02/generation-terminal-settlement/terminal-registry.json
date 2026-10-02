@@ -1,0 +1,46 @@
+{
+  "actualWorkerMetadata": true,
+  "sourceSha256": "3bffc1b86f4e55134ad1bba077a2d15c39afd70ec46e737d8d55f4fa09bf7d64",
+  "exactConsumerQuerySha256": "1408ed48df48aef41ef7b86ca67ef7ca32fb42cbff733b81a7dda02242d37894",
+  "exactConsumerPlans": true,
+  "unregisteredConsumerRefuses": true,
+  "matcherContracts": [
+    {
+      "role": "creator_generation_terminal_authority",
+      "originalBridge": true,
+      "terminalMatcher": true
+    },
+    {
+      "role": "creator_w2_generation_terminal_journal",
+      "originalBridge": false,
+      "terminalMatcher": true
+    },
+    {
+      "role": "creator_w4_generation_terminal",
+      "originalBridge": false,
+      "terminalMatcher": true
+    }
+  ],
+  "mutations": [
+    {
+      "name": "leafOriginalMatcherWidening",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "name": "coreOriginalBridgeWithdrawal",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    }
+  ],
+  "counts": {
+    "migrations": 57,
+    "generations": 0,
+    "receipts": 0
+  },
+  "positivePreparedScopeVerified": false
+}
