@@ -12,6 +12,7 @@ import {
   waveSequenceCustody,
 } from "./migration-wave-custody.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
+import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 
 /** Read-only recovery inventory. Counts/hashes are diagnostic evidence, never
  * provider receipts, policy approval, a completed purge or a reopening grant. */
@@ -96,6 +97,14 @@ async function audit() {
         (row) => row.version === "0082_w8_interactive_denial_try_fence",
       ),
     });
+    const privacyRoles = await assertPrivacyWaveRoleSafety(client, {
+      privacy: ledger.some(
+        (row) => row.version === "0087_w8_privacy_task_commit_fence",
+      ),
+      domain: ledger.some(
+        (row) => row.version === "0103_w8_domain_privacy_task_fence",
+      ),
+    });
     const security = await waveSecurityCustody(client);
     const sequence = await waveSequenceCustody(client);
     const privacy = (
@@ -177,6 +186,7 @@ async function audit() {
       closureVerified: true,
       ledger: { rows: ledger.length, sha256: sha256(canonical(ledger)) },
       roles,
+      privacyRoles,
       security,
       sequence: { sequences: sequence.sequences, sha256: sequence.sha256 },
       privacy: Object.fromEntries(
