@@ -1,0 +1,1 @@
+$ eslint apps/backend packages apps/web scripts tests playwright.config.ts --ignore-pattern '**/generated/**'
