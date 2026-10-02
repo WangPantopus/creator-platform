@@ -1,5 +1,12 @@
 # W8 contract, migration and runtime register
 
+## Team/public creator negative ports — 2026-10-02
+
+Reserved0084 is the separate real Team-triage candidate negative check used by `trustScopeRestrictionInTransaction()` for non-participants. Positive W1/W4 Team/current-family/Approval leases remain required. Reserved0086 exports `trustPublicCreatorDenial()` and canonical `holdPublicCreatorNegativeAuthority(client,creatorId)`, combining actual held restoration with a genuine visitor or explicitly empty anonymous context. [Personally reviewed exact W1dce780db0085 plus actual closed57 proposal/cleanup/grant checks](../../../artifacts/workstreams/W8/public-team-denial/20261002-mac-studio/README.md) leave all future ledger rows unregistered. No actual Team approval, creator proof, License or public AI permission is inferred.
+
+Additional allocation custody (not activation):0082 interactive tries;0083 W3 translation purpose;0084 Team negatives;0085 W1 public-AI metadata;0086 public-creator negatives;0087 W8 held privacy-task fence;0088 W5 policy-dependent reply cap;0089 W8 actual creator/fan negatives;0090 W4 spending-notice custody;0091 W8 current-account negative purpose. W8's sole activation branch will record these reservations and the exact ready-wave order. No client may invent a packet/thread/Actor or replay SQL to compensate for missing registration.
+
+
 ## Interactive denial contention correction — 2026-10-02
 
 Reserved additive0082 now supplies nonblocking exact-family negative gates through the existing held restriction exports. Applied0053 stays unchanged. [Actual web/saved-block and two-connection evidence](../../../artifacts/workstreams/W8/interactive-denial/20261002-mac-studio/README.md) verifies retryable503 on contention, genuine session/participant refusals, preserved saved block403 and usable caller transaction after refusal. Canonical ledger remains40 in this labelled purpose-review target. Native authenticated, real in-flight generation, canonical activation and complete R1–R10/release acceptance remain open.
