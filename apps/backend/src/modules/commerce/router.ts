@@ -417,6 +417,32 @@ export function createCommerceRouter(input: {
       ),
     ),
   );
+  router.post("/creators/:creatorId/fulfillment-plans", async (req, res) =>
+    res.json(
+      await service().createFulfillmentPlan(
+        await actorFor(req),
+        id(req.params.creatorId),
+        req.body,
+      ),
+    ),
+  );
+  router.get("/packets/:packetId/review-attestation", async (req, res) =>
+    res.json(
+      await service().reviewAttestationCommand(
+        await actorFor(req),
+        id(req.params.packetId),
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/review-attestation", async (req, res) =>
+    res.json(
+      await service().attestReview(
+        await actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
   router.post("/packets/:packetId/share", async (req, res) =>
     res.json(
       await service().share(

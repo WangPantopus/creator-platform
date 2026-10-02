@@ -127,6 +127,45 @@ export async function exportCommerceFinancial(
           ["id"],
           parameters,
         );
+        const fulfillmentSchema = (
+          await client.query<{ count: number }>(
+            "SELECT count(*)::integer AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_fulfillment_plan','commerce_fulfillment_member','commerce_group_delivery','commerce_review_attestation')",
+          )
+        ).rows[0]?.count;
+        invariant(
+          fulfillmentSchema === 0 || fulfillmentSchema === 4,
+          "fulfillment_schema_incomplete",
+          "The complete original group and review history is required before this export can finish.",
+        );
+        if (fulfillmentSchema === 4) {
+          await page(
+            "fulfillmentPlans",
+            "SELECT id,revision,creator_id,content_id,content_version,audience,minimum_recipients,recipient_count,source_hash,created_by,created_at FROM creator.commerce_fulfillment_plan",
+            `EXISTS(SELECT FROM creator.commerce_fulfillment_member member WHERE member.plan_id=commerce_fulfillment_plan.id AND member.plan_revision=commerce_fulfillment_plan.revision AND member.packet_id IN(${packets}))`,
+            ["id", "revision"],
+            parameters,
+          );
+          for (const [name, relation, keys] of [
+            [
+              "fulfillmentMembers",
+              "commerce_fulfillment_member",
+              ["plan_id", "plan_revision", "packet_id"],
+            ],
+            [
+              "groupDeliveries",
+              "commerce_group_delivery",
+              ["plan_id", "plan_revision", "packet_id"],
+            ],
+            ["reviewAttestations", "commerce_review_attestation", ["id"]],
+          ] as const)
+            await page(
+              name,
+              `SELECT * FROM creator.${relation}`,
+              `packet_id IN(${packets})`,
+              keys,
+              parameters,
+            );
+        }
         const approvalSchema = (
           await client.query<{
             drafts: string | null;

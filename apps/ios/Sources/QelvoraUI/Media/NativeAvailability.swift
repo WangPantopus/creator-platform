@@ -88,7 +88,8 @@ private struct NativeAvailability: View {
             try Task.checkCancellation()
             guard scene == .active, Date() < started.addingTimeInterval(5), value == nil || (value?.creatorId == creator && (value?.version ?? 0) > 0 && (value?.windows.count ?? 0) <= 64) else { throw URLError(.badServerResponse) }
             freshUntil = started.addingTimeInterval(5); fresh = true
-            if replace || !loaded {
+            if notice == QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") { notice = nil }
+            if replace || !loaded || (!dirty && command == nil && value?.version != current?.version) {
                 current = value; zone = value?.timeZone ?? TimeZone.current.identifier; windows = value?.windows ?? []; loaded = true; notice = nil
             }
         } catch is CancellationError { return }
@@ -135,14 +136,14 @@ private struct NativeAvailability: View {
                 Text(QelvoraCopy.text("w6UseDatedWindowsEachOfferedCallAndItsReconnectAllowance")).qText("caption")
                 if fresh && scene == .active {
                     Text(QelvoraCopy.text("w6YourTimeZone")).qText("caption")
-                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "zone").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-zone")
+                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).qDisableAutoCapitalization().autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "zone").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-zone")
                     ForEach(windows.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(QelvoraCopy.text("w6Window", values: ["value1": String(index + 1)])).qText("label")
                             Text(QelvoraCopy.text("w6Starts")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "start-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-start-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).qDisableAutoCapitalization().autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "start-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-start-\(index)")
                             Text(QelvoraCopy.text("w6Ends")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "end-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-end-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).qDisableAutoCapitalization().autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "end-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-end-\(index)")
                             Button(QelvoraCopy.text("w6RemoveWindow", values: ["value1": String(index + 1)]), variant: .quiet, disabled: busy || command != nil) { windows.remove(at: index) }
                         }
                     }
