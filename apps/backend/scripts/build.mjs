@@ -19,6 +19,7 @@ const registry = JSON.parse(
   await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
 );
 const registeredChecksums = Object.create(null);
+const registeredSources = Object.create(null);
 for (const entry of registry.migrations) {
   if (
     typeof entry.version !== "string" ||
@@ -32,6 +33,11 @@ for (const entry of registry.migrations) {
   registeredChecksums[entry.version] = createHash("sha256")
     .update(await readFile(location))
     .digest("hex");
+  registeredSources[entry.version] = {
+    path: entry.path,
+    owner: entry.owner,
+    checksum: registeredChecksums[entry.version],
+  };
 }
 
 await build({
@@ -50,5 +56,6 @@ await build({
   external,
   define: {
     __QELVORA_REGISTERED_MIGRATIONS__: JSON.stringify(registeredChecksums),
+    __QELVORA_REGISTERED_MIGRATION_SOURCES__: JSON.stringify(registeredSources),
   },
 });
