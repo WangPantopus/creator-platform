@@ -14,6 +14,7 @@ import {
 } from "../ops/trust-client";
 
 export default function SupportPage() {
+  const session = useTrust<{ accountId: string }>("session");
   const { data, error, refresh } = useTrust<{
     items: (CaseSummary & { resolution_reason?: string })[];
   }>("my-cases");
@@ -222,7 +223,10 @@ export default function SupportPage() {
             key.current = null;
           }}
         />
-        <button className="qv-btn qv-btn--secondary" disabled={busy}>
+        <button
+          className="qv-btn qv-btn--secondary"
+          disabled={busy || !session.data}
+        >
           {busy ? "Saving…" : "Send report"}
         </button>
         <ErrorState error={actionError} />
