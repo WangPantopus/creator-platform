@@ -928,7 +928,9 @@ object QelvoraCopy {
     "identityPrivateClearRetry" to "Retry clearing saved private data",
     "w1CallLookupTitle" to "Your call",
     "w1CallLookupChecking" to "Checking the booking and your current access…",
-    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status."
+    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status.",
+    "identityProofReviewSupport" to "Request verification review",
+    "identityProofReviewSupportBody" to "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
