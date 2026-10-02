@@ -260,10 +260,13 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     }
     var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
     var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
+    // Read in the composition so navigation invalidates this saving effect,
+    // including navigation performed inside a feature's own restart scope.
+    val currentSavedDestination = model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home"
     SideEffect {
         savedOrigin = baseURL; savedReturn = permittedReturn
         savedDelivery = destinationDelivery
-        savedDestination = model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home"
+        savedDestination = currentSavedDestination
     }
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
