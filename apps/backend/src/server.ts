@@ -4,17 +4,14 @@ import { readConfig } from "./config.js";
 import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
-import { createCommerceRuntime } from "./modules/commerce/runtime.js";
-import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
-import { createConversationRuntime } from "./modules/conversation/runtime.js";
+import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { readMediaEnvironment } from "./modules/media/environment.js";
 import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
 import { createDevelopmentTrust } from "./modules/trust/development.js";
-import { createAgentDomain } from "./modules/agent/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
@@ -22,7 +19,8 @@ import { agentFeature } from "./modules/agent/feature.js";
 const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
-} = { growth: null };
+  close: (() => void)[];
+} = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -63,16 +61,21 @@ const configured =
                 ? runtime.assertCreatorAllowed(actor, creatorId)
                 : runtime.assertActorAllowed(actor),
           });
-          const commerceConfiguration = readCommerceEnvironment(runtime.pool);
-          const commerce = commerceConfiguration
-            ? await createCommerceRuntime({
-                ...runtime,
-                ...commerceConfiguration,
-              })
-            : undefined;
-          const conversation = createConversationRuntime(runtime);
+          // W3 composes conversations, Creator AI and commerce together so
+          // fan generation uses one model, journal, allowance and trial path.
+          const host = await composeConversationHost(
+            runtime,
+            config,
+            mediaHost
+              ? {
+                  media: mediaHost.media,
+                  bindRecordingPublication: mediaHost.bindRecordingPublication,
+                }
+              : {},
+          );
+          features.close.push(() => host.close());
+          const { commerce, conversation, agent } = host;
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-          const agent = createAgentDomain({ pool: runtime.pool, model: null });
           const content = runtime.assertScopeAllowedInTransaction
             ? await createCommerceStudio({
                 assertScopeAllowedInTransaction:
@@ -138,6 +141,7 @@ server.listen(
 const shutdown = () => {
   void (async () => {
     await features.growth?.close();
+    for (const close of features.close) close();
     if (configured) await configured.close();
     else await new Promise<void>((resolve) => server.close(() => resolve()));
     process.exit(0);
