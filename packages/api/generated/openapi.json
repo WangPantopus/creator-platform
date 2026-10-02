@@ -19127,6 +19127,12 @@
           "accountUrl": {
             "type": "string"
           },
+          "postUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "expiresAt": {
             "type": "string",
             "format": "date-time",
@@ -19154,6 +19160,7 @@
           "code",
           "platform",
           "accountUrl",
+          "postUrl",
           "expiresAt",
           "state",
           "reason"
