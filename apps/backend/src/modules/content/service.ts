@@ -1402,7 +1402,7 @@ export class ContentService {
       const row = await this.index(client, creatorId, id);
       await this.authorizeRead(client, actor, row);
       if (row.state !== "published") return null;
-      const current = await this.view(client, actor, row);
+      const current = await this.view(client, actor, row, false);
       const publication = (
         await client.query(
           "SELECT * FROM creator.content_publication WHERE content_id=$1 AND version=$2",
