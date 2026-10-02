@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
+
+Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.
+
 Reserved0087: `privacyTaskAuthorityInTransaction(client, actualPrivacyHookJob)` requires the genuine worker signal/token and same-client BEGIN. Call before journal/family/domain locks; producer must check the same signal before pages and the separate COMMIT. `conversationPrivacyAuthority().fenceTaskInTransaction(client,job)` exposes the early port; `assertFamily` now uses the held capability too. The bounded metadata-only definer locks current job→task NOWAIT, checks current task at COMMIT and erases its nonce, including an early-trigger refusal. Missing/unregistered custody fails503.
 
 Reserved0089: `trustCreatorFanRestrictionInTransaction()` and `BackendRuntime.holdCreatorFanNegativeAuthority(client,actualActor,{creatorId,fanId}):Promise<void>` combine held restoration, canonical session and actual fan/owner negatives before positive tenure/content leases. Known denial403, missing authority/contention503. No Team/packet/ThreadScope constructed. Actual fan negative-gate pass and saved-block403 verified; creator/paid positivity open.

@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Actual current privacy and scoped Ops — 2026-10-02
+
+[Real web/Android/iOS operation and independent saved-state evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/app-acceptance/README.md) at backend/webc3c0a6d1 verifies the same synthetic export in both appearances, explicit blocked core0087/configuration dependencies and no download. Actual Ops purpose-limited access and recorded Close cold-reload resolved; DB verifies reviewer/access/one decision/version2/zero external effects. Queue1280×900/220sidebar and390/no overflow plus keyboard skip-link observed. No all-eight C10/owner COMMIT, accessibility200%/screen reader, provider, original recovery or release completion.
+
+The real run repaired canonical Signout visibility, cosmetic-query return routing and premature parent deadletter/opaque configuration failures. All transaction denial adapters require actual held recovery custody. W4 PR134 merged and actorless source integrated. Held0103–0110 are allocations only; concrete0099 now permits W8 terminal-denial implementation. Own devices/slots/API/web stopped; data retained. W1 handles shared Ops/status return destinations.
+
+
 ## Closed reconciliation and privacy authority — 2026-10-02
 
 PR95 merged normally at5ec5cb07 after W8's real three-client Report acceptance. The new [closed reconciliation inventory and catalogue evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/README.md) keeps trafficReady false, exact canonical57 and the retained six-complete/two-blocked export. [R6 procedure](../../operations/W8-preserved-reconciliation.md) distinguishes journal replay, all-eight owner effects, original financial custody, retention, current purpose/capability and real app acceptance from an owner opening a labelled development copy. Original iMac material remains absent.
