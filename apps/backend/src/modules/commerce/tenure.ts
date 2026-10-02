@@ -73,8 +73,11 @@ export function createCommerceTenureReader(
       "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
       [creatorId, fanId],
     );
+    // The configured authority already holds current creator denials/state.
+    // A fan cannot row-lock creator_profile through its owner-only UPDATE RLS;
+    // retain the actual account and recheck under that held authority instead.
     const creator = await client.query(
-      "SELECT id FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required FOR SHARE",
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required",
       [creatorId],
     );
     invariant(

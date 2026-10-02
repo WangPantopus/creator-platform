@@ -14,7 +14,8 @@
     "paid-only contiguous tenure from confirmed Stripe captures and qualified native intervals",
     "count-only current paid audience projection with restricted metadata roles",
     "boolean-only pending original receipt refund projection",
-    "complete keyset financial export collections and pool-cycle predicate repair"
+    "complete keyset financial export collections and pool-cycle predicate repair",
+    "fan tenure creator-state recheck uses SELECT only after required held authority; no owner-only profile row lock under fan account"
   ],
   "checks": [
     {
@@ -44,6 +45,10 @@
     {
       "name": "unknown/unowned narrow projections",
       "result": "count unavailable and receipt held; no positive data created"
+    },
+    {
+      "name": "peer-reviewed fan creator_profile RLS correction",
+      "result": "removed redundant FOR SHARE; backend typecheck and scoped lint pass; positive creator journey still unavailable"
     }
   ],
   "custody": {
