@@ -236,7 +236,7 @@
     "android": {
       "avd": "CreatorPlatform_W8_API34 (console 5568 / adb 5569), 2 cores / 2048 MB after adopting the shared budget",
       "build": "./gradlew :app:assembleDebug -PcreatorBuildDir=/private/tmp/creator-w8-android-build: BUILD SUCCESSFUL including the Trust.kt fix",
-      "launchedJourney": "not operated in this run (emulator stopped under the shared device budget); first remaining acceptance item"
+      "launchedJourney": "Completed closed /trust and /support/privacy in Light/Night; see androidCompletion. Original not-operated observation is superseded only for this bounded journey."
     }
   },
   "screenshotSha256": {
@@ -252,5 +252,46 @@
     "ios-closed-trust-night-fixed.jpg": "2694134c55063616250ef757ec77476d63bec40e95675397260e69e36a4f5063"
   },
   "sharedHostBudget": "Adopted W1's Mac Studio rule: one heavy native build at a time (/private/tmp/creator-platform-heavy-build.lock), at most two emulators and three booted simulators via slot directories; swap was 35.7/36.9 GB during the run.",
-  "servicesAtHandoff": "W8 API/web stopped; both W8 containers stopped with durable volumes retained; simulator shut down; emulator stopped."
+  "servicesAtHandoff": "W8 API/web stopped; both W8 containers stopped with durable volumes retained; simulator shut down; emulator stopped.",
+  "androidCompletion": {
+    "observedAt": "2026-10-02T04:27:06.147824+00:00",
+    "apiRevision": "32d825ea3a7b100b15a1712d75fd0ffd6b0f1891",
+    "integratedRevision": "0d35139977ebc44f87490dc3304b113722f9654d",
+    "apiMode": "runtime-closed.env; synthetic closed copy; public help only",
+    "apkSha256": "5f52b247162d200dcb26e12cd129af096408d36ff8d2646429166b7397b48b0a",
+    "avd": "CreatorPlatform_W8_API34",
+    "serial": "emulator-5568",
+    "os": "Android 14 API34 arm64",
+    "cores": 2,
+    "guestMemTotalKiB": 2026148,
+    "memoryCorrection": "Emulator37 raised -memory2048 to2560. Stopped owned instance and restarted with -qemu -m2048; /proc/meminfo verified 2026148KiB, cpu online0-1. No data wipe.",
+    "journeys": [
+      "/trust Light: crisis help and regional-unconfigured notice, no error",
+      "/trust Night: same public help, no error",
+      "/support/privacy Light: Welcome/Continue with Pantopus, no actor choices",
+      "/support/privacy Night: same sign-in, no actor choices",
+      "Tapped Continue: empty development sheet with Cancel only; no identity issued. W1 root defect reported for unavailable sign-in UX."
+    ],
+    "backendChecks": {
+      "publicHelp": 200,
+      "privatePrivacyJobs": 503,
+      "identitySignInAvailable": false,
+      "developmentActors": 0,
+      "databaseClosureMarker": "creator-platform:restored-traffic-closed",
+      "savedAggregateCounts": {
+        "privacyJobs": 1,
+        "safetyCases": 0,
+        "tombstones": 0
+      }
+    },
+    "operation": "Actual installed shipping debug APK; am start route/appearance args, uiautomator public hierarchy, adb tap, screenshots. No new tests.",
+    "scope": "PR17 affected Android acceptance complete; empty sign-in sheet is independently tracked W1 root defect; no authenticated privacy/export or preserved recovery claim",
+    "screenshots": {
+      "privacy-light.png": "8a2c3f2d2b80083e65e8837b3dbc4cc271e7bfffcc0231768bed5b0468340f55",
+      "privacy-night-signin-attempt.png": "d4b0f1deb6d950d045e4c7fe21c8092a4ce75b80ca107cddb0f25f0820c36b2e",
+      "privacy-night.png": "47d92788ad19cbabbf04d7968fa26b13c028044b9f5651fbac15937eb93b4b38",
+      "trust-light.png": "ad2cd04c6603acecf36adc4573ee7c4533f7e809b2323b2ccd015d276f6cfa45",
+      "trust-night.png": "7949fecfb915e236573c0fd5c492416f37a38d391b3f39e538dd3bac0083c25a"
+    }
+  }
 }

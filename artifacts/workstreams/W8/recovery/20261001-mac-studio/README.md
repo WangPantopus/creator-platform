@@ -19,12 +19,12 @@ So nothing here restores, replaces or re-derives the preserved W8 runtime (210 r
 
 The run uses a separately named **synthetic** environment, labeled as such everywhere:
 
-| | |
-| --- | --- |
-| Container | `creator-platform-w8-macstudio-20261001`, `pgvector/pgvector:pg17` (digest `ac08538c…`), PostgreSQL 17.11, loopback 55438 |
-| Database | `creator_w8`: fresh canonical registry (40 checksum-matching migrations), W8 synthetic seed, plus 0043's idempotent backfill for the seeded threads |
+|             |                                                                                                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Container   | `creator-platform-w8-macstudio-20261001`, `pgvector/pgvector:pg17` (digest `ac08538c…`), PostgreSQL 17.11, loopback 55438                                                                                                            |
+| Database    | `creator_w8`: fresh canonical registry (40 checksum-matching migrations), W8 synthetic seed, plus 0043's idempotent backfill for the seeded threads                                                                                  |
 | Closed copy | `creator-platform-w8-closed-20261001`, loopback 55439. Restored from a fresh custom-format backup of the synthetic database (2,223 ms), with all 146 tables' row counts identical. The closure marker is installed by the owner role |
-| Runtime | `local-server.ts` at `e7de7a18`, three non-owner pools, private env outside Git; web on 3008 |
+| Runtime     | `local-server.ts` at `e7de7a18`, three non-owner pools, private env outside Git; web on 3008                                                                                                                                         |
 
 **Open synthetic database** (no marker):
 
@@ -67,7 +67,9 @@ The run uses a separately named **synthetic** environment, labeled as such every
   - capabilities are read only on the privacy route and are cleared when that read fails, so a stale "configured" value can't enable submission;
   - account-data failures stay scoped.
 - After a rebuild, iOS shows crisis help with the help response's "regional resources not configured" line and no error ([after](ios-closed-trust-night-fixed.jpg)).
-- The Android change compiles into the debug APK. The Android emulator journey was **not operated** in this run: it was stopped under the shared Mac Studio device budget before the fix existed, so it remains the first acceptance item.
+- The original Android build was not operated in the earlier run. The successor installed that APK and personally completed the closed-host journey in Light/Night. [Help Light](android-closed/trust-light.png), [Help Night](android-closed/trust-night.png), [privacy Light](android-closed/privacy-light.png) and [privacy Night](android-closed/privacy-night.png) show public help without error and sign-in without actor choices. Backend help is200, private privacy is503 and identity offers zero actors. The existing closed copy retains one privacy job, zero cases and zero tombstones; no private action was accepted.
+- Tapping Continue exposes a W1 root UX defect: an [empty development sheet](android-closed/privacy-night-signin-attempt.png), with Cancel only. W1 was notified; no identity was issued. This does not reopen closed traffic.
+- Emulator37 silently raised the requested2GB to2.5GB. The successor stopped only W8 and restarted with an explicit QEMU2GB limit; actual guest memory is2,026,148KiB with two CPUs. The detailed receipt records this correction. PR17’s affected Android acceptance is now complete; original provider/preserved-data limits remain.
 
 ## Limits
 

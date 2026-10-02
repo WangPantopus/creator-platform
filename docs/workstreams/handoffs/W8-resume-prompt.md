@@ -1,10 +1,15 @@
 # W8 resume prompt — complete the workstream
 
+## Successor continuation — 2026-10-01
+
+PR17 Android closed-host acceptance is now personally complete in Light and Night: public crisis help renders without error; privacy reaches sign-in with no actors. [Receipt and captures](../../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) distinguish synthetic data from absent iMac recovery material. An empty unavailable sign-in chooser is reported to W1. Main through PR61 is integrated; PR17 is being published ready for normal merge. Next W8 increment is the development trust composition and0053, followed by the single activation wave and durable reply review. No R1–R10 or release gate is declared complete.
+
 ## Latest update — Mac Studio session, 2026-10-01 (read first)
 
 This section supersedes conflicting facts below. Everything else, including the human's latest direction, R1–R10 and the acceptance standard, is unchanged. Exact inputs are in the [Mac Studio snapshot](../../../artifacts/workstreams/W8/handoff/20261001-mac-studio/snapshot.json) and [re-verification evidence](../../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md).
 
 **Host facts.** Work now happens on a Mac Studio. Peer streams share it, each in a sibling worktree under `/Users/yingpengwang/estimate-rescue/creator-platform/`; W8's is `w8-trust-operations-3e30cd`. The following live on the iMac and are **absent here**:
+
 - the private W8 archives (`cleanup-20261001`, `w8-local`, `recovery-20261001-active`);
 - `secrets/openai.env`;
 - PR17's recovery volume.
@@ -12,6 +17,7 @@ This section supersedes conflicting facts below. Everything else, including the 
 Ask the human to copy them, then verify the hashes before any restore. Never reseed and call the result preserved state. Follow the shared budget recorded at the top of [the runbook](../../operations/W8-runbook.md): one heavy native build at a time via a lock directory, at most two emulators and three booted simulators via slot directories. Swap was near exhaustion during this session.
 
 **W8 resources here.** All are stopped; volumes are retained. Private env is in `~/.config/creator-platform/w8-mac-studio-20261001`. Restart commands are in the runbook.
+
 - Synthetic `creator_w8` on 55438.
 - Closed copy on 55439.
 - API 4108, web 3008.
@@ -19,6 +25,7 @@ Ask the human to copy them, then verify the hashes before any restore. Never res
 - AVD `CreatorPlatform_W8_API34` on 5568/5569.
 
 **Ordered next steps.**
+
 1. **Finish PR17.** It contains main's merge, the evidence, and a native crisis-help fix in `Trust.swift`/`Trust.kt` that this session found and verified on iOS.
    - Take an emulator slot and boot the AVD at 2 cores/2 GB. Install `/private/tmp/creator-w8-android-build/outputs/apk/debug/app-debug.apk`.
    - Start the API with `runtime-closed.env`. Launch `/trust` and `/support/privacy` with `--es api_url http://10.0.2.2:4108` in Light and Night. Confirm that crisis help renders without error and that privacy shows sign-in with no actors.
