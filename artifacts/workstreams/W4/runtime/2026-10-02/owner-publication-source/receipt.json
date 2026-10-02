@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T11:43:59.676628+00:00",
+  "workstream": "W4",
+  "state": "prepared actual owner source and consumer integration; retry fix pending, authority unactivated",
+  "changes": [
+    "Actual stored creator/content/version/document/audience/packet/original commitment/mode/acceptance are retained on exact client/xid/pid/Actor/ALS request",
+    "Original participant negatives precede Content/media/creator positives; separate staged permission takes TRY mode/packet and NOWAIT packet/commitment/share locks",
+    "Final signer-account lease is nonblocking and LAST after all domain/idempotency/challenge writes, followed only by plain current MVCC metadata",
+    "Current accepted captured snapshot/action/thread/packet and exact canonical acceptance hash are checked, with no refund/pending refund/dispute or key/creator/source withdrawal",
+    "Review cannot downgrade a published signature to null; challenge requires actual server-issued current challengeId; publication requires actual consumed exact stored signature and media evidence",
+    "CommerceStudio accepts only process-issued prepared source controller on exact same Pool; default publication stays unavailable",
+    "Nonpublic group destination remains unavailable until actual immutable0094 fulfillment plan, never guessed"
+  ],
+  "ownerSources": {
+    "W1": "0e494f937b9c0e29b13ac6c047f343799056172f",
+    "W5OwnerProof": "5b95b8904e76ec7d8ec9f8388092eaf1a5c82aaf",
+    "W5PhasedContent": "9adf2e88481984ac9bf56d14c9998596368faba5",
+    "integration": "Personally resolved Content import/composition conflicts, preserving current baseline and independent exact W1 finalization; unrelated inherited tenure/identity changes excluded"
+  },
+  "validation": {
+    "backendTypecheck": "PASS",
+    "backendBuild": "PASS",
+    "ownedLint": "PASS",
+    "format": "PASS",
+    "generatedConsistency": "PASS:12 resources,98 operations",
+    "sqlPlanning": {
+      "role": "creator_runtime",
+      "target": "owned fresh57",
+      "statements": 16,
+      "analyze": false,
+      "businessWrites": 0,
+      "result": "PASS",
+      "diagnosticCorrection": "Initial diagnostic JavaScript quote syntax failed before any database connection; corrected and repeated successfully"
+    },
+    "inactiveFactory": {
+      "result": "PASS",
+      "target": "actual source40",
+      "status": 503,
+      "reason": "actual canonical Database lacks held thread authority",
+      "authorityCallbackCalled": false,
+      "positivePermission": false
+    },
+    "advisoryContention": {
+      "result": "PASS",
+      "contendedSharedLease": false,
+      "afterExclusiveRelease": true,
+      "businessWrites": 0,
+      "scope": "Primitive only; arbitrary non-identity key, no signature or owner acceptance"
+    },
+    "personallyOperatedWeb": {
+      "origin": "http://localhost:3004",
+      "api": "current backend restarted4104",
+      "appearance": "Night",
+      "viewport": "390x844",
+      "observations": [
+        "Existing labeled development actor retains pending creator on real account/setup return",
+        "Signing passkey button disabled; no external proof account/code/request supplied",
+        "Actual Studio Requests denies pending creator verification/recovery",
+        "Real fan return retains7USD/original No limit deadline/reminders off/zero financial totals"
+      ]
+    }
+  },
+  "openDefects": [
+    "A genuine publish idempotency replay skips positive callback in W5 consumer; independently identified and compiled local fix, then preserved private reference and restored source to consume W5 immutable owner fix. No successful replay acceptance claimed."
+  ],
+  "limits": [
+    "Exact0070/0081 migrations and genuine composed held authority remain unavailable in source40; no activation or SQL registry changes",
+    "No genuine creator passkey/signature, payment/capture/consent, group service or public owner acceptance manufactured",
+    "No positive publication/signing/replay/revocation/refund/key-rotation race acceptance",
+    "Personal iOS controls remain unavailable; both Android emulator slots occupied, no owned device/slot acquired for repeat",
+    "No new unit tests, private grants or business SQL writes",
+    "All nine packages/R01\u2013R15 remain assigned; no release readiness"
+  ],
+  "files": [
+    {
+      "path": "apps/backend/src/modules/commerce/publication-source.ts",
+      "sha256": "dee0663aa4bcb8aa6c77abc2864e547413bad713df33b5969bbc26cbbb956e40"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/publication.ts",
+      "sha256": "2b74a9aa29ada14db6a700e4f469ea9ffa27294cae522d9c5df3fd25decfc20c"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/studio.ts",
+      "sha256": "8cd26b8397ff1a3062676bf0e27926751cfd9f09f9acb68fddb02854ceef6240"
+    },
+    {
+      "path": "apps/backend/src/modules/content/publication-source.ts",
+      "sha256": "6ac8b4b29b0676bd86086f6ede49e40a3eb6dedaa81d03fbe38f0c7e95daac68"
+    },
+    {
+      "path": "apps/backend/src/modules/content/service.ts",
+      "sha256": "d94f19776e0ef75b9bb27dbb56c3cd592aaf249a0235f5ddf6d206cf7388b1ae"
+    },
+    {
+      "path": "apps/backend/src/modules/content/registration.ts",
+      "sha256": "c470472b5ca2c82af38e2dc4aac9f8f328fb040131308870a8adea290ceff3be"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/subjects.ts",
+      "sha256": "c97a8f633197bd02576c8e8b1f27f1c2f3ea3ddbbf52c091ba255a64659bf64c"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/signed-acts.ts",
+      "sha256": "0de56eb445ab21a95ee30b4774e1dbfa7d1c22fa654f90e5bd991f6e367595e4"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/owner-publication-source/pending-creator-signing-night.png",
+      "sha256": "0fe52ee48af6c7e9d95bac15681d089bf9d5eacb19a1bc3fb8707435da661537"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/owner-publication-source/creator-requests-gate-night.png",
+      "sha256": "09a884fd7be92bee6198393393fdd6218f607cd76ea7166ecaa170d740de54e9"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/owner-publication-source/fan-return-night.png",
+      "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
+    }
+  ]
+}

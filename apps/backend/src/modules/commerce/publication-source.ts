@@ -382,6 +382,54 @@ export async function createCommercePublicationSource(input: {
         )
       ).rowCount;
       if (lineage !== 1) return false;
+      const acceptance = (
+        await client.query<{
+          command: unknown;
+          content_hash: string;
+          snapshot: unknown;
+          accepted_action: string;
+          version: number;
+          thread_id: string;
+        }>(
+          `SELECT publication.command,sa.content_hash,p.snapshot,p.accepted_action,p.version,p.thread_id
+           FROM creator.commerce_packet p JOIN creator.signed_act sa ON sa.id=p.accepted_act_id AND sa.creator_id=p.creator_id
+           JOIN creator.signed_publication publication ON publication.signed_act_id=sa.id AND publication.account_id=sa.account_id
+           WHERE p.id=$1 AND p.creator_id=$2 AND sa.id=$3 AND sa.account_id=$4 AND publication.withdrawn_at IS NULL`,
+          [
+            binding.packetId,
+            binding.creatorId,
+            binding.acceptanceId,
+            actor.accountId,
+          ],
+        )
+      ).rows[0];
+      if (
+        !acceptance ||
+        contentHash(acceptance.command) !== acceptance.content_hash
+      )
+        return false;
+      const accepted = z
+        .strictObject({
+          actType: z.literal("accept"),
+          subjectId: z.uuid(),
+          content: z.strictObject({
+            packetId: z.uuid(),
+            packetVersion: z.int().positive(),
+            snapshot: z.unknown(),
+            action: z.string(),
+          }),
+        })
+        .safeParse(acceptance.command);
+      if (
+        !accepted.success ||
+        accepted.data.subjectId !== acceptance.thread_id ||
+        accepted.data.content.packetId !== binding.packetId ||
+        accepted.data.content.packetVersion >= acceptance.version ||
+        accepted.data.content.action !== acceptance.accepted_action ||
+        contentHash(accepted.data.content.snapshot) !==
+          contentHash(acceptance.snapshot)
+      )
+        return false;
       const row = await stored(client, binding.creatorId, binding.contentId);
       if (
         !row ||
