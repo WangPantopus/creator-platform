@@ -1,5 +1,11 @@
 # Trust operation and recovery
 
+## Opt-in local private artifact directory
+
+`createDevelopmentTrust` accepts `TRUST_PRIVATE_ARTIFACT_DIRECTORY` only inside its existing loopback development mode. It prepares the actual absolute OS-owned directory before exposing the store; the leaf must be a nonsymlink directory with mode0700. Place it under an already private, owned configuration root. Missing configuration retains the unavailable-store behavior. This is single-host private file storage; it supplies no managed Growth key, off-site encryption, lifecycle authority, provider receipt or completed export.
+
+Actual filesystem preflight created an owned0700 directory and refused relative,0755 and symlink configurations. Backend types/scoped lint pass. Real prepared Agent0196 source, owner task/EOF/COMMIT qualification, protected complete artifact/download and eight-domain application acceptance remain required. No fake job or receipt was created by this preflight.
+
 
 ## Closed privacy continuation — 2026-10-02 (draft)
 

@@ -18,6 +18,12 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
   constructor(readonly directory: string) {
     if (!isAbsolute(directory)) throw new Error("artifact_directory_invalid");
   }
+  /** Validate the actual private directory before a host advertises this store. */
+  static async prepare(directory: string) {
+    const store = new PrivateFileArtifacts(directory);
+    await store.root();
+    return store;
+  }
   private async root() {
     await mkdir(this.directory, { recursive: true, mode: 0o700 });
     const stat = await lstat(this.directory);

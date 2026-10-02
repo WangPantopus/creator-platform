@@ -13,6 +13,7 @@ import {
 } from "./domain-adapters.js";
 import { createPrivacyConsumers } from "./privacy-consumers.js";
 import { trustLocalRestorationInTransaction } from "./restoration.js";
+import { PrivateFileArtifacts } from "./private-file-artifacts.js";
 
 /** W1 adds these to its development adapter. These are labels, never tokens,
  * membership grants, production identities or a second session issuer. */
@@ -239,6 +240,9 @@ export async function createDevelopmentTrust(
     const agent =
       options.agent ?? createAgentDomain({ pool: runtime.pool, model: null });
     const restoreReadyInTransaction = trustLocalRestorationInTransaction(env);
+    const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
+      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
+      : undefined;
     return {
       environment: "local-development",
       identityMode: "development",
@@ -246,6 +250,7 @@ export async function createDevelopmentTrust(
       release: env.RELEASE_REVISION ?? "",
       apiPool,
       workerPool,
+      privacyArtifacts,
       dependencies: {
         ...identityAuthority,
         evidence: scopedTrustEvidence({
